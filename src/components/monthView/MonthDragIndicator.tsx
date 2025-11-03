@@ -1,0 +1,60 @@
+import React from 'react';
+import { Event } from '@/types';
+import { Calendar } from 'lucide-react';
+import { daysDifference } from '@/utils';
+
+interface MonthDragIndicatorProps {
+  event: Event;
+  isCreating: boolean;
+  targetDate: Date | null;
+  isMultiDay?: boolean;
+  startDate?: Date | null;
+  endDate?: Date | null;
+}
+
+const MonthDragIndicatorComponent: React.FC<MonthDragIndicatorProps> = ({
+  event,
+  isCreating,
+  isMultiDay = false,
+  startDate,
+  endDate,
+}) => {
+  const getDisplayContent = () => {
+    if (isCreating) {
+      return {
+        title: 'New Event',
+        icon: <Calendar className="h-3 w-3" />,
+        showDateRange: false,
+      };
+    }
+
+    if (isMultiDay && startDate && endDate) {
+      const duration = daysDifference(startDate, endDate) + 1;
+      return {
+        title: event.title.replace(/ \(\d+天\)$/, ''),
+        // icon: getEventIcon(event),
+        showDateRange: true,
+        duration,
+      };
+    }
+
+    return {
+      title: event.title,
+      // icon: getEventIcon(event),
+      showDateRange: false,
+    };
+  };
+
+  const content = getDisplayContent();
+
+  return (
+    <div className="flex items-center space-x-2 text-white text-xs font-medium rounded-sm">
+      <div className="flex-shrink-0">{content.icon}</div>
+      <div className="flex-1 min-w-0">
+        <div className="truncate font-medium">{content.title}</div>
+      </div>
+    </div>
+  );
+};
+
+export default MonthDragIndicatorComponent;

@@ -1,0 +1,152 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  UseCalendarAppReturn,
+} from '@/types';
+import DefaultCalendarSidebar from '@/components/sidebar/DefaultCalendarSidebar';
+import DefaultEventDetailDialog from '@/components/common/DefaultEventDetailDialog';
+import { CalendarSidebarRenderProps } from '@/types';
+
+const DEFAULT_SIDEBAR_WIDTH = '240px';
+
+const toCssWidth = (width?: number | string): string => {
+  if (typeof width === 'number') {
+    return `${width}px`;
+  }
+  if (typeof width === 'string' && width.trim().length > 0) {
+    return width;
+  }
+  return DEFAULT_SIDEBAR_WIDTH;
+};
+
+interface DayFlowCalendarProps {
+  calendar: UseCalendarAppReturn;
+  className?: string;
+  style?: React.CSSProperties | undefined;
+  /** Custom event detail content component (content only, will be wrapped in default panel) */
+  customDetailPanelContent?: EventDetailContentRenderer;
+  /** Custom event detail dialog component (Dialog mode) */
+  customEventDetailDialog?: EventDetailDialogRenderer;
+  meta?: Record<string, any>; // Additional metadata
+}
+
+export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
+  calendar,
+  className,
+  style,
+  customDetailPanelContent,
+  customEventDetailDialog,
+  meta,
+}) => {
+  const app = calendar.app;
+  const currentView = app.getCurrentView();
+  const ViewComponent = currentView.component;
+  const sidebarConfig = app.getSidebarConfig();
+  const sidebarEnabled = sidebarConfig?.enabled ?? false;
+  const [sidebarVersion, setSidebarVersion] = useState(0);
+  const [isCollapsed, setIsCollapsed] = useState(
+    sidebarConfig?.initialCollapsed ?? false
+  );
+
+  useEffect(() => {
+    setIsCollapsed(sidebarConfig?.initialCollapsed ?? false);
+  }, [sidebarConfig?.initialCollapsed]);
+
+  const refreshSidebar = useCallback(() => {
+    setSidebarVersion(prev => prev + 1);
+  }, []);
+
+  const calendars = useMemo(
+    () => app.getCalendars(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [app, sidebarVersion]
+  );
+
+  const handleToggleCalendarVisibility = useCallback(
+    (calendarId: string, visible: boolean) => {
+      app.setCalendarVisibility(calendarId, visible);
+      refreshSidebar();
+    },
+    [app, refreshSidebar]
+  );
+
+  const handleToggleAllCalendars = useCallback(
+    (visible: boolean) => {
+      app.setAllCalendarsVisibility(visible);
+      refreshSidebar();
+    },
+    [app, refreshSidebar]
+  );
+
+  // DOM reference for the entire calendar
+  const calendarRef = useRef<HTMLDivElement>(null!);
+
+  // Determine which event detail dialog to use
+  // Priority: customEventDetailDialog > useEventDetailDialog (built-in) > undefined (use panel)
+  const effectiveEventDetailDialog: EventDetailDialogRenderer | undefined =
+    customEventDetailDialog ||
+    (app.getUseEventDetailDialog() ? DefaultEventDetailDialog : undefined);
+
+  // Prepare props to pass to view component
+  const viewProps = {
+    app: app,
+    config: currentView.config || {},
+    customDetailPanelContent,
+    customEventDetailDialog: effectiveEventDetailDialog,
+    switcherMode: app.state.switcherMode,
+    calendarRef,
+    meta,
+  };
+
+  const sidebarProps: CalendarSidebarRenderProps = {
+    app: app,
+    calendars,
+    toggleCalendarVisibility: handleToggleCalendarVisibility,
+    toggleAll: handleToggleAllCalendars,
+    isCollapsed,
+    setCollapsed: setIsCollapsed,
+  };
+
+  const renderSidebarContent = () => {
+    if (!sidebarEnabled) return null;
+
+    if (sidebarConfig.render) {
+      return sidebarConfig.render(sidebarProps);
+    }
+
+    return <DefaultCalendarSidebar {...sidebarProps} />;
+  };
+
+  const collapsedWidth = '60px';
+  const resolvedSidebarWidth = isCollapsed
+    ? collapsedWidth
+    : toCssWidth(sidebarConfig?.width);
+  const contentClassName = 'flex flex-col flex-1 h-full';
+
+
+  return (
+    <div className="calendar-container" style={style ?? {
+      height: 800,
+    }}>
+      <div className="flex h-full" >
+        {sidebarEnabled && (
+          <aside
+            className="flex-shrink-0"
+            style={{ width: resolvedSidebarWidth }}
+          >
+            {renderSidebarContent()}
+          </aside>
+        )}
+        <div className={contentClassName} ref={calendarRef}>
+          <div className="calendar-renderer h-full">
+            <ViewComponent {...viewProps} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Default export
+export default DayFlowCalendar;

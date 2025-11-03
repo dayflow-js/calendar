@@ -1,0 +1,166 @@
+import React from 'react';
+import TodayBox from './TodayBox';
+import {
+  headerContainer,
+  headerTitle,
+  headerSubtitle,
+  textGray900,
+} from '@/styles/classNames';
+import ViewSwitcher from './ViewSwitcher';
+import { CalendarApp } from '@/types';
+
+export type ViewHeaderType = 'day' | 'week' | 'month';
+export type ViewSwitcherMode = 'buttons' | 'select';
+
+interface ViewHeaderProps {
+  calendar: CalendarApp;
+  /** View type */
+  viewType: ViewHeaderType;
+  /** Current date */
+  currentDate: Date;
+  /** Previous period */
+  onPrevious?: () => void;
+  /** Next period */
+  onNext?: () => void;
+  /** Go to today */
+  onToday?: () => void;
+  /** Custom title (optional, takes priority over default title) */
+  customTitle?: string;
+  /** Custom subtitle (optional, only for Day view) */
+  customSubtitle?: string;
+  /** Whether to show TodayBox (default determined by viewType: day=false, week/month=true) */
+  showTodayBox?: boolean;
+  /** ViewSwitcher mode (default: 'select') */
+  switcherMode?: ViewSwitcherMode;
+}
+
+const ViewHeader: React.FC<ViewHeaderProps> = ({
+  calendar,
+  viewType,
+  currentDate,
+  onPrevious,
+  onNext,
+  onToday,
+  customTitle,
+  customSubtitle,
+  showTodayBox,
+  switcherMode = 'buttons',
+}) => {
+  // Determine whether to show TodayBox based on view type
+  const shouldShowTodayBox =
+    showTodayBox !== undefined ? showTodayBox : viewType !== 'day';
+
+  const isSwitcherCentered = switcherMode === 'buttons';
+
+  // Generate default title
+  const getDefaultTitle = (): string => {
+    switch (viewType) {
+      case 'day':
+        return currentDate.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+      case 'week':
+      case 'month':
+        return currentDate.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+      default:
+        return '';
+    }
+  };
+
+  // Generate default subtitle (only for Day view)
+  const getDefaultSubtitle = (): string | null => {
+    if (viewType === 'day') {
+      return currentDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+      });
+    }
+    return null;
+  };
+
+  const title = customTitle || getDefaultTitle();
+  const subtitle =
+    viewType === 'day' ? customSubtitle || getDefaultSubtitle() : null;
+
+  // Day view layout (in the 70% width left panel)
+  if (viewType === 'day') {
+    return (
+      <div className={headerContainer} style={{ position: 'relative' }}>
+        <div className="flex-1">
+          <div className={`${headerTitle} ${textGray900}`}>{title}</div>
+          {subtitle && <div className={headerSubtitle}>{subtitle}</div>}
+        </div>
+
+        {/* ViewSwitcher centered relative to the entire page (71.43% position in 70% container = 50% page position)
+        Total page width = 100%
+        DayView left container = 70%
+        Week/Month ViewSwitcher position = 50% (page center)
+
+        To reach 50% page position in 70% container:
+        50% ÷ 70% = 5/7 ≈ 71.43% + 0.5px(DayView Right content border) */}
+        {isSwitcherCentered && (
+          <div
+            className="absolute -translate-x-1/2"
+            style={{ left: 'calc(5 / 7 * 100% + 0.5px)' }}
+          >
+            <ViewSwitcher mode={switcherMode} calendar={calendar} />
+          </div>
+        )}
+
+        {/* ViewSwitcher in select mode: show on the local right */}
+        {!isSwitcherCentered && (
+          <div className="flex items-center gap-2">
+            {shouldShowTodayBox && onPrevious && onNext && onToday && (
+              <TodayBox
+                handlePreviousMonth={onPrevious}
+                handleNextMonth={onNext}
+                handleToday={onToday}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Week/Month view layout
+  return (
+    <div className={headerContainer} style={{ position: 'relative' }}>
+      <div>
+        <h1 className={headerTitle}>{title}</h1>
+      </div>
+
+      {/* buttons mode: center display */}
+      {isSwitcherCentered && (
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <ViewSwitcher mode={switcherMode} calendar={calendar} />
+        </div>
+      )}
+
+      {/* select mode or TodayBox: show on the right */}
+      {(shouldShowTodayBox || !isSwitcherCentered) &&
+        onPrevious &&
+        onNext &&
+        onToday && (
+          <div className="flex items-center gap-2">
+            {!isSwitcherCentered && (
+              <ViewSwitcher mode={switcherMode} calendar={calendar} />
+            )}
+            {shouldShowTodayBox && (
+              <TodayBox
+                handlePreviousMonth={onPrevious}
+                handleNextMonth={onNext}
+                handleToday={onToday}
+              />
+            )}
+          </div>
+        )}
+    </div>
+  );
+};
+
+export default ViewHeader;

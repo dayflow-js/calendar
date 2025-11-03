@@ -1,0 +1,94 @@
+{
+  "name": "dayflow",
+  "version": "0.1.0",
+  "description": "A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
+  "keywords": [
+    "react",
+    "calendar",
+    "schedule",
+    "events",
+    "typescript",
+    "drag-drop",
+    "react-calendar",
+    "event-calendar",
+    "day-view",
+    "week-view",
+    "month-view",
+    "year-view",
+    "virtual-scroll",
+    "plugin-architecture"
+  ],
+  "author": "Jayce Li",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JayceV552/DayFlow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JayceV552/DayFlow/issues"
+  },
+  "homepage": "https://github.com/JayceV552/DayFlow#readme",
+  "scripts": {
+    "dev": "vite --port 5529",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.487.0",
+    "temporal-polyfill": "^0.3.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.21",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "rollup": "^4.29.1",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tailwindcss": "^4.1.14",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.20"
+  }
+}

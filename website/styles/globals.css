@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Calendar-specific styles */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Custom checkbox styling reused by calendar sidebar */
+.calendar-checkbox {
+  appearance: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  border-radius: 0.125rem;
+  border: 1px solid #d1d5db;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.calendar-checkbox:focus-visible {
+  outline: 2px solid var(--checkbox-color, #3b82f6);
+  outline-offset: 2px;
+}
+
+.calendar-checkbox:checked {
+  background-color: var(--checkbox-color, #3b82f6);
+  border-color: var(--checkbox-color, #3b82f6);
+}
+
+.calendar-checkbox:checked::after {
+  content: '';
+  display: block;
+  width: 0.25rem;
+  height: 0.5rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+:root {
+  --docs-nav-bg: rgba(255, 255, 255, 0.85);
+  --docs-nav-border: rgba(148, 163, 184, 0.45);
+  --docs-nav-text: #475569;
+  --docs-nav-hover: #3b82f6;
+}
+
+html.dark {
+  --docs-nav-bg: rgba(2, 6, 23, 0.82);
+  --docs-nav-border: rgba(30, 41, 59, 0.85);
+  --docs-nav-text: #e2e8f0;
+  --docs-nav-hover: #60a5fa;
+}
+
+.nextra-nav-container {
+  backdrop-filter: none;
+  z-index: 25 !important;
+}
+
+.nextra-nav-container .nextra-nav-container-blur {
+  background: var(--docs-nav-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--docs-nav-border);
+  box-shadow: none;
+}
+
+.nextra-nav-container nav {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding-left: max(env(safe-area-inset-left), 1.25rem);
+  padding-right: max(env(safe-area-inset-right), 1.25rem);
+  gap: 1.5rem;
+  color: var(--docs-nav-text);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nextra-nav-container nav a {
+  color: inherit;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.nextra-nav-container nav a:hover {
+  color: var(--docs-nav-hover);
+}
+
+.nextra-nav-container nav a[aria-current='true'] {
+  color: var(--docs-nav-hover);
+}
+
+.nextra-nav-container nav a span {
+  color: inherit;
+}
+
+.nextra-nav-container nav .nx-p-2.nx-text-current {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.nextra-nav-container nav .nx-p-2.nx-text-current:hover {
+  color: var(--docs-nav-hover);
+}

@@ -1,0 +1,86 @@
+# Getting Started
+
+Welcome to Day Flow! This guide will help you get up and running quickly.
+
+## Installation
+
+Install the package using your preferred package manager:
+
+```bash
+npm install dayflow
+# or
+yarn add dayflow
+# or
+pnpm add dayflow
+```
+
+## Basic Usage
+
+Import and use the Calendar component in your React application:
+
+```tsx
+import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+
+function App() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    initialDate: new Date(),
+  });
+
+  return (
+    <div>
+      <h1>My Calendar</h1>
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## With Events
+
+You can easily create and pass events to the calendar:
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createEvent,
+  createAllDayEvent,
+} from 'dayflow';
+
+const events = [
+  // Simple timed event
+  createEvent({
+    id: '1',
+    title: 'Team Meeting',
+    date: new Date(2024, 9, 10),
+    startTime: { hour: 10, minute: 0 },
+    endTime: { hour: 11, minute: 0 },
+  }),
+  // All-day event
+  createAllDayEvent(
+    '2',
+    'Project Deadline',
+    new Date(2024, 9, 15)
+  ),
+];
+
+function App() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    initialDate: new Date(),
+    events,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+**Note:** The library uses the modern [Temporal API](/docs/temporal-migration) for date/time handling. The helper functions (`createEvent`, `createAllDayEvent`) make it easy to create events without dealing with Temporal directly.
+
+## Next Steps
+
+- Learn about [Configuration](/docs/configuration)
+- Explore [API Reference](/docs/api-reference)
+- Check out [Examples](/docs/examples)

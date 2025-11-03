@@ -1,0 +1,42 @@
+---
+title: View Switcher Modes
+description: Compare the button and select based view switchers.
+toc: false
+---
+
+<style jsx global>{`
+  .nextra-toc {
+    display: none !important;
+  }
+  .nextra-content {
+    max-width: 100% !important;
+  }
+`}</style>
+
+import { SwitcherModeShowcase } from '../../components/FeatureShowcase';
+
+# View Switcher Modes
+
+The `switcherMode` option controls how the header view switcher is rendered. The library ships with two modes tailored for different layouts:
+
+- **`buttons`** – the default desktop friendly layout with a centered button group.
+- **`select`** – condenses the switcher into a dropdown for mobile or compact toolbars.
+
+Use the interactive sample below to compare both modes with identical data and configuration.
+
+<SwitcherModeShowcase />
+
+## Quick Start
+
+```tsx
+import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  switcherMode: 'select',
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+Flip `switcherMode` between `'buttons'` and `'select'` to preview the alternate experiences instantly.

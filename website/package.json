@@ -1,0 +1,32 @@
+{
+  "name": "react-calendar-website",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/next-with-cache.js dev",
+    "build": "node scripts/next-with-cache.js build",
+    "start": "node scripts/next-with-cache.js start",
+    "lint": "node scripts/next-with-cache.js lint"
+  },
+  "dependencies": {
+    "dayflow": "file:..",
+    "next": "^14.2.0",
+    "nextra": "^2.13.4",
+    "nextra-theme-docs": "^2.13.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "temporal-polyfill": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "diff": "4.0.2"
+  }
+}

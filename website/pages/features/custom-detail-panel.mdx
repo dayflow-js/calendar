@@ -1,0 +1,54 @@
+---
+title: Custom Event Detail Content
+description: Replace the default detail panel content with your own UI.
+toc: false
+---
+
+<style jsx global>{`
+  .nextra-toc {
+    display: none !important;
+  }
+  .nextra-content {
+    max-width: 100% !important;
+  }
+`}</style>
+
+import { CustomDetailPanelShowcase } from '../../components/FeatureShowcase';
+
+# Custom Event Detail Content
+
+When a user selects an event, the calendar opens a side panel. The `customDetailPanelContent` prop lets you replace the panel body with business specific content and actions.
+
+<CustomDetailPanelShowcase />
+
+## Key Points
+
+- `customDetailPanelContent` receives a React component that only renders the inner content—the wrapper and positioning remain managed by the library.
+- The component gets `event`, `onEventUpdate`, `onEventDelete`, and `onClose` callbacks so you can mutate or remove events and dismiss the panel.
+- Render any UI you need: forms, quick links, tags, KPIs, and more.
+
+## Sample Snippet
+
+```tsx
+const CustomContent = ({ event, onEventUpdate }: EventDetailContentProps) => (
+  <div>
+    <h3>{event.title}</h3>
+    <button onClick={() => onEventUpdate({ ...event, color: '#2563eb' })}>
+      Update color
+    </button>
+  </div>
+);
+
+const calendar = useCalendarApp({
+  views,
+  events,
+  customDetailPanelContent: CustomContent,
+});
+
+<DayFlowCalendar
+  calendar={calendar}
+  customDetailPanelContent={CustomContent}
+/>;
+```
+
+Pass the same component to `DayFlowCalendar` and the default panel will render your custom content.

@@ -1,0 +1,41 @@
+---
+title: Sidebar
+description: Compare the default sidebar with a fully custom implementation.
+toc: false
+---
+
+<style jsx global>{`
+  .nextra-toc {
+    display: none !important;
+  }
+  .nextra-content {
+    max-width: 100% !important;
+  }
+`}</style>
+
+import {
+  SidebarBasicsShowcase,
+  SidebarCustomShowcase,
+} from '../../components/SidebarShowcases';
+
+# Sidebar
+
+Explore DayFlow's sidebar experience with live examples. The demos below demonstrate the built-in sidebar UI and a custom React implementation inspired by the `examples/custom-sidebar` sample.
+
+## Default sidebar
+
+Enable `useSidebar` to get the ready-made layout with visibility toggles, calendar color swatches, and collapse controls.
+
+<SidebarBasicsShowcase />
+
+## Custom sidebar layout
+
+Provide a `render` function to replace the sidebar with bespoke content — like team filters, analytics, or curated quick links — while still relying on the shared calendar state.
+
+<SidebarCustomShowcase />
+
+### What to explore
+
+- Hide and show calendars to see the toggles update instantly.
+- Drag events between views; the custom sidebar keeps upcoming highlights in sync.
+- Collapse the sidebar to reclaim space when focusing on dense week views.

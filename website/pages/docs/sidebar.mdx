@@ -1,0 +1,122 @@
+---
+title: Sidebar
+description: Enable the built-in calendar sidebar and replace it with custom layouts.
+---
+
+import Link from 'next/link';
+
+<div className="nx-mb-6 nx-flex nx-flex-col nx-gap-3 nx-rounded-xl nx-border nx-border-blue-200 nx-bg-blue-50 nx-p-5 nx-text-sm nx-text-blue-700 dark:nx-border-blue-400/40 dark:nx-bg-blue-500/10 dark:nx-text-blue-200 md:nx-flex-row md:nx-items-center md:nx-justify-between">
+  <div>
+    <strong>Want to see it in action?</strong> Explore the features page to see live examples of the default and custom sidebar implementations.
+  </div>
+  <Link
+    href="/features/sidebar"
+    className="nx-inline-flex nx-items-center nx-justify-center nx-rounded-full nx-bg-blue-500 nx-px-4 nx-py-2 nx-text-sm nx-font-semibold nx-text-white nx-shadow-sm nx-transition hover:nx-bg-blue-400"
+  >
+    View Sidebar Features →
+  </Link>
+</div>
+
+# Sidebar
+
+The DayFlow sidebar surfaces multiple calendar sources, upcoming events, and any additional controls you need for day-to-day planning. It ships with a polished default UI and can be swapped for a custom React component when you need bespoke layouts.
+
+## Enable the built-in sidebar
+
+Set `useSidebar` to `true` (or supply options) when creating your calendar application. The default sidebar includes visibility toggles, color chips, and collapse support out of the box.
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createDragPlugin,
+  ViewType,
+} from 'dayflow';
+
+const calendar = useCalendarApp({
+  views: [createMonthView(), createWeekView(), createDayView()],
+  plugins: [createDragPlugin()],
+  events,
+  calendars,
+  defaultView: ViewType.WEEK,
+  useSidebar: {
+    enabled: true,
+    width: 280, // Optional: tweak the sidebar width in pixels
+  },
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+You can still access every runtime control (`toggleCalendarVisibility`, `toggleAll`, `setCollapsed`) from hooks or plugins — the default sidebar simply wires those actions into a ready-made panel.
+
+## Replace the sidebar with your own component
+
+When you need a fully bespoke experience (filters, analytics, team shortcuts, etc.), provide a `render` callback. It receives the current calendar app instance, calendar collection, and helper callbacks.
+
+```tsx
+import type { CalendarSidebarRenderProps } from 'dayflow';
+
+const CustomSidebar = ({
+  app,
+  calendars,
+  toggleCalendarVisibility,
+  toggleAll,
+  isCollapsed,
+  setCollapsed,
+}: CalendarSidebarRenderProps) => {
+  if (isCollapsed) {
+    return (
+      <button onClick={() => setCollapsed(false)}>Expand</button>
+    );
+  }
+
+  return (
+    <aside>
+      <header>
+        <button onClick={() => toggleAll(true)}>Show all</button>
+        <button onClick={() => toggleAll(false)}>Hide all</button>
+      </header>
+      <ul>
+        {calendars.map(calendar => (
+          <li key={calendar.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={calendar.isVisible}
+                onChange={() =>
+                  toggleCalendarVisibility(calendar.id, !calendar.isVisible)
+                }
+              />
+              {calendar.name}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+};
+
+const calendar = useCalendarApp({
+  /* … */
+  useSidebar: {
+    enabled: true,
+    width: 320,
+    render: props => <CustomSidebar {...props} />,
+  },
+});
+```
+
+Inside the renderer you can pull real-time data (events, calendars, selected date) straight from the `app` instance, making it easy to show upcoming meetings, KPIs, or onboarding checklists next to the schedule.
+
+## Tips for great sidebar UX
+
+- Keep frequently used actions near the top or bottom edges so they stay reachable when the list scrolls.
+- Surface visibility state with clear color cues — it helps when dragging events between calendars.
+- Consider offering an “all visible / all hidden” toggle to reset quickly when collaborating with others.
+- For complex dashboards, collapse the sidebar by default on smaller screens via `initialCollapsed`.
+
+The [Sidebar Features](/features/sidebar) page demonstrates both approaches with drag-and-drop enabled calendars. Use it as a starting point, then tailor it to your team's workflows.

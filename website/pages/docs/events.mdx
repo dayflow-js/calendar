@@ -1,0 +1,402 @@
+# Working with Events
+
+Events are the core data structure in Day Flow. Learn how to create, update, delete, and manage calendar events.
+
+## Event Interface
+
+The library uses the Temporal API for all date/time handling. Events support three Temporal types:
+- **PlainDate**: For all-day events (no time)
+- **PlainDateTime**: For local events (date + time, no timezone) ✨ **Recommended for most use cases**
+- **ZonedDateTime**: For timezone-aware events (international meetings, flights, etc.)
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from 'dayflow';
+```
+
+| Property      | Type                                                               | Description                                                                                                    | Required |
+| ------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | -------- |
+| `id`          | `string`                                                           | Unique identifier for the event                                                                                | ✅ Yes   |
+| `title`       | `string`                                                           | Event title displayed in the calendar                                                                          | ✅ Yes   |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | ✅ Yes   |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                            | ✅ Yes   |
+| `description` | `string`                                                           | Optional event description or notes                                                                            | ❌ No    |
+| `allDay`      | `boolean`                                                          | Whether this is an all-day event (default: `false`)                                                            | ❌ No    |
+| `color`       | `string`                                                           | Display color as hex (`#3b82f6`) or CSS color name                                                             | ❌ No    |
+| `meta`        | `Record<string, any>`                                              | Additional custom metadata (location, attendees, etc.)                                                         | ❌ No    |
+| `day`         | `number`                                                           | Internal field: week day index (0-6), auto-calculated by the system                                            | ❌ No    |
+
+## Creating Events
+
+### Simple Event Creation (Recommended)
+
+Use the `createEvent()` helper for most use cases:
+
+```tsx
+import { createEvent, createAllDayEvent, createTimedEvent } from 'dayflow';
+
+// Local timed event (no timezone complexity)
+const meeting = createEvent({
+  id: '1',
+  title: 'Team Meeting',
+  date: new Date(2024, 9, 15), // October 15, 2024
+  startTime: { hour: 10, minute: 0 },
+  endTime: { hour: 11, minute: 0 },
+  color: '#3b82f6',
+});
+
+// All-day event
+const holiday = createAllDayEvent(
+  '2',
+  'Conference',
+  new Date(2024, 9, 20),
+  { color: '#10b981' }
+);
+
+// Quick timed event (using decimal hours: 14.5 = 14:30)
+const lunch = createTimedEvent(
+  '3',
+  'Lunch Break',
+  new Date(2024, 9, 15),
+  12.0,  // 12:00 PM
+  13.0,  // 1:00 PM
+  { color: '#f59e0b' }
+);
+```
+
+### Advanced: Using Temporal API Directly
+
+For more control, use Temporal API directly:
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from 'dayflow';
+
+// Local event with PlainDateTime (recommended)
+const localEvent: Event = {
+  id: '1',
+  title: 'Team Meeting',
+  start: Temporal.PlainDateTime.from({
+    year: 2024, month: 10, day: 15,
+    hour: 10, minute: 0
+  }),
+  end: Temporal.PlainDateTime.from({
+    year: 2024, month: 10, day: 15,
+    hour: 11, minute: 0
+  }),
+  color: '#3b82f6',
+};
+
+// All-day event with PlainDate
+const allDayEvent: Event = {
+  id: '2',
+  title: 'Conference',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+  color: '#10b981',
+};
+
+// Timezone-aware event with ZonedDateTime
+const timezoneEvent: Event = {
+  id: '3',
+  title: 'International Call',
+  start: Temporal.ZonedDateTime.from('2024-10-16T14:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-16T15:00:00[America/New_York]'),
+  color: '#f59e0b',
+};
+```
+
+### Event with Metadata
+
+```tsx
+import { createEvent } from 'dayflow';
+
+const event = createEvent({
+  id: '3',
+  title: 'Client Call',
+  description: 'Discuss Q4 roadmap',
+  date: new Date(2024, 9, 16),
+  startTime: { hour: 14, minute: 0 },
+  endTime: { hour: 15, minute: 0 },
+  color: '#f59e0b',
+  meta: {
+    location: 'Zoom',
+    attendees: ['john@example.com', 'jane@example.com'],
+    recurring: false,
+  },
+});
+```
+
+## Managing Events
+
+### Adding Events
+
+```tsx
+// Add a single event
+calendar.addEvent(event);
+
+// Add multiple events during initialization
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [event1, event2, event3],
+});
+```
+
+### Updating Events
+
+```tsx
+// Update an event
+calendar.updateEvent('event-id', {
+  title: 'Updated Meeting Title',
+  start: new Date(2024, 9, 15, 11, 0),
+  end: new Date(2024, 9, 15, 12, 0),
+});
+
+// Update with pending state (for resize operations)
+calendar.updateEvent('event-id', updatedEvent, true);
+```
+
+### Deleting Events
+
+```tsx
+// Delete an event by ID
+calendar.deleteEvent('event-id');
+```
+
+### Getting Events
+
+```tsx
+// Get all events
+const events = calendar.getEvents();
+
+// Get current events from state
+const { events } = calendar;
+```
+
+## Event Callbacks
+
+Day Flow provides callbacks to handle event lifecycle:
+
+```tsx
+import { useCalendarApp, createMonthView, Event } from 'dayflow';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: initialEvents,
+  callbacks: {
+    onEventCreate: (event: Event) => {
+      console.log('New event created:', event);
+      // Sync with backend
+      api.createEvent(event);
+    },
+    onEventUpdate: (event: Event) => {
+      console.log('Event updated:', event);
+      // Sync with backend
+      api.updateEvent(event);
+    },
+    onEventDelete: (eventId: string) => {
+      console.log('Event deleted:', eventId);
+      // Sync with backend
+      api.deleteEvent(eventId);
+    },
+  },
+});
+```
+
+## Event State Management
+
+### Using React State
+
+```tsx
+import { useState } from 'react';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  Event,
+} from 'dayflow';
+
+function MyCalendar() {
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events,
+    callbacks: {
+      onEventCreate: (event: Event) => {
+        setEvents(prev => [...prev, event]);
+      },
+      onEventUpdate: (event: Event) => {
+        setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+      },
+      onEventDelete: (eventId: string) => {
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+      },
+    },
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Syncing with Backend
+
+```tsx
+import { useCalendarApp, createMonthView, Event } from 'dayflow';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events,
+  callbacks: {
+    onEventCreate: async (event: Event) => {
+      try {
+        // Create event in backend
+        const savedEvent = await api.createEvent(event);
+
+        // Update local state with backend response
+        setEvents(prev => [...prev, savedEvent]);
+      } catch (error) {
+        console.error('Failed to create event:', error);
+        // Optionally remove the optimistic update
+      }
+    },
+    onEventUpdate: async (event: Event) => {
+      try {
+        await api.updateEvent(event);
+        setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
+    },
+    onEventDelete: async (eventId: string) => {
+      try {
+        await api.deleteEvent(eventId);
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+      } catch (error) {
+        console.error('Failed to delete event:', error);
+      }
+    },
+  },
+});
+```
+
+## Event Colors
+
+You can customize event appearance with colors:
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from 'dayflow';
+
+const event: Event = {
+  id: '1',
+  title: 'Design Review',
+  start: Temporal.ZonedDateTime.from('2024-10-15T14:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-15T15:00:00[America/New_York]'),
+  color: '#8b5cf6', // Purple
+};
+
+// Common color schemes
+const colors = {
+  work: '#3b82f6', // Blue
+  personal: '#10b981', // Green
+  meeting: '#f59e0b', // Amber
+  deadline: '#ef4444', // Red
+  review: '#8b5cf6', // Purple
+};
+```
+
+## Multi-Day Events
+
+Events can span multiple days:
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from 'dayflow';
+
+// Conference spanning 3 days (all-day event)
+const multiDayEvent: Event = {
+  id: '1',
+  title: 'Tech Conference 2024',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+  color: '#10b981',
+};
+
+// Meeting spanning across midnight (timed event)
+const crossMidnightEvent: Event = {
+  id: '2',
+  title: 'Night Shift',
+  start: Temporal.ZonedDateTime.from('2024-10-15T22:00:00[America/New_York]'), // 10 PM
+  end: Temporal.ZonedDateTime.from('2024-10-16T06:00:00[America/New_York]'), // 6 AM next day
+  color: '#6366f1',
+};
+```
+
+## Event Metadata
+
+Store additional information in the `meta` field:
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from 'dayflow';
+
+const event: Event = {
+  id: '1',
+  title: 'Project Kickoff',
+  start: Temporal.ZonedDateTime.from('2024-10-15T10:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-15T11:00:00[America/New_York]'),
+  meta: {
+    // Meeting details
+    location: 'Conference Room A',
+    meetingUrl: 'https://zoom.us/j/123456',
+
+    // Attendees
+    organizer: 'john@example.com',
+    attendees: ['jane@example.com', 'bob@example.com'],
+
+    // Custom fields
+    project: 'Project X',
+    priority: 'high',
+    tags: ['planning', 'kickoff'],
+
+    // Recurring info
+    recurring: true,
+    recurrenceRule: 'FREQ=WEEKLY;BYDAY=MO',
+
+    // Any other data
+    customField: 'custom value',
+  },
+};
+```
+
+## Best Practices
+
+1. **Always provide unique IDs** - Use UUID or database IDs (string format)
+2. **Use helper functions** - Prefer `createEvent()` over manual Temporal construction (90% of use cases)
+3. **Choose the right type**:
+   - Use `PlainDate` for all-day events (birthdays, holidays)
+   - Use `PlainDateTime` for local events (meetings, appointments) ✨ **Recommended default**
+   - Use `ZonedDateTime` only for timezone-aware events (international calls, flights)
+4. **Validate time values** - The helper functions validate hour (0-23) and minute (0-59) automatically
+5. **Set appropriate colors** - Use consistent color schemes across your app
+6. **Leverage the `meta` field** - Store custom data without modifying the Event interface
+7. **Validate event data** - Ensure start < end for timed events
+8. **Optimize event updates** - Batch updates when possible
+9. **Handle errors gracefully** - Provide user feedback on failures
+
+## Type Reference
+
+For detailed information about date/time handling, see:
+
+- [Temporal Migration Guide](/docs/temporal-migration) - Complete guide to Temporal API
+- Event interface: `/src/types/event.ts`
+
+## Related Documentation
+
+- [Temporal Migration](/docs/temporal-migration) - Migrating from Date to Temporal API
+- [Views](/docs/views) - Understanding calendar views
+- [Plugins](/docs/plugins) - Event management with plugins
+- [Getting Started](/docs/getting-started) - Basic usage examples

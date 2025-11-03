@@ -1,0 +1,344 @@
+# Calendar Views
+
+Day Flow supports four different view types, each optimized for different use cases and user needs. You can switch between views programmatically or provide a UI for users to switch views.
+
+## Available Views
+
+### Month View
+
+The month view displays a traditional calendar grid showing all days in a month.
+
+**Best for:**
+
+- Viewing events across the entire month
+- Getting an overview of upcoming events
+- Drag and drop event management
+- Multi-day event visualization
+
+**Features:**
+
+- Virtual scrolling for smooth performance
+- Responsive design (desktop, tablet, mobile)
+- Multi-day event spanning
+- Drag to create events
+- Drag to move events
+- Resize events
+- All-day events support
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  ViewType,
+} from 'dayflow';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Week View
+
+The week view displays a 7-day grid with time slots, showing events with their exact start and end times.
+
+**Best for:**
+
+- Detailed time management
+- Scheduling meetings and appointments
+- Viewing events with precise timing
+- Time-based event editing
+
+**Features:**
+
+- Hourly time slots (24-hour format)
+- Current time indicator
+- All-day events row
+- Multi-day events spanning across the week
+- Drag and drop for event creation and management
+- Resize events to adjust duration
+- Double-click to create events
+- Collision detection and smart event positioning
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createWeekView,
+  ViewType,
+} from 'dayflow';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Day View
+
+The day view focuses on a single day with detailed time slots, perfect for managing daily schedules.
+
+**Best for:**
+
+- Focus on daily tasks
+- Detailed daily planning
+- Avoiding distractions from other days
+- Mobile-friendly single-day view
+
+**Features:**
+
+- 24-hour time grid
+- Current time indicator
+- Mini calendar sidebar for date navigation
+- Event list for the selected day
+- All-day events section
+- Drag and drop support
+- Resize events
+- Event detail panel
+
+**Layout:**
+
+- Left side (70%): Time grid with events
+- Right side (30%): Mini calendar and event list
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  ViewType,
+} from 'dayflow';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createDayView()],
+    defaultView: ViewType.DAY,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Year View
+
+The year view displays all 12 months of a year in a grid layout.
+
+**Best for:**
+
+- Long-term planning
+- Viewing annual overview
+- Quick date selection
+- Holiday and milestone visualization
+
+**Features:**
+
+- Virtual scrolling for multiple years
+- Responsive grid layout (desktop: 4×3, tablet: 3×4, mobile: 2×6)
+- Quick navigation (keyboard support)
+- Current day highlighting
+- Selected date highlighting
+- Keyboard shortcuts (Arrow keys, Home, PageUp/Down)
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createYearView,
+  ViewType,
+} from 'dayflow';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createYearView()],
+    defaultView: ViewType.YEAR,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Using Multiple Views
+
+You can register multiple views and allow users to switch between them:
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createYearView,
+  ViewType,
+} from 'dayflow';
+
+function MultiViewCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createDayView(),
+      createWeekView(),
+      createMonthView(),
+      createYearView(),
+    ],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    callbacks: {
+      onViewChange: view => {
+        console.log('View changed to:', view);
+      },
+    },
+  });
+
+  return (
+    <div className="h-screen flex flex-col">
+      {/* View Switcher */}
+      <div className="border-b p-4">
+        <div className="flex gap-2">
+          <button onClick={() => calendar.changeView(ViewType.DAY)}>Day</button>
+          <button onClick={() => calendar.changeView(ViewType.WEEK)}>
+            Week
+          </button>
+          <button onClick={() => calendar.changeView(ViewType.MONTH)}>
+            Month
+          </button>
+          <button onClick={() => calendar.changeView(ViewType.YEAR)}>
+            Year
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar */}
+      <div className="flex-1">
+        <DayFlowCalendar calendar={calendar} />
+      </div>
+    </div>
+  );
+}
+```
+
+## Programmatic View Control
+
+### Changing Views
+
+```tsx
+// Change to a specific view
+calendar.changeView(ViewType.WEEK);
+
+// Get current view
+const currentView = calendar.app.getCurrentView();
+console.log(currentView.type); // 'week'
+```
+
+### Navigation
+
+All views support the same navigation methods:
+
+```tsx
+// Go to today
+calendar.goToToday();
+
+// Go to previous period (day/week/month/year depending on current view)
+calendar.goToPrevious();
+
+// Go to next period
+calendar.goToNext();
+
+// Go to a specific date
+calendar.selectDate(new Date(2024, 9, 15));
+```
+
+## View-Specific Features
+
+### Month View
+
+```tsx
+// Month view supports virtual scrolling
+// Automatically loads weeks as user scrolls
+// Optimized for 3+ years of data
+```
+
+### Week View
+
+```tsx
+// Week view shows precise timing
+// Time slots from 0:00 to 24:00
+// Configurable hour range
+```
+
+### Day View
+
+```tsx
+// Day view includes mini calendar for quick navigation
+// Event list shows all events for selected day
+// Side panel for better focus
+```
+
+### Year View
+
+```tsx
+// Year view keyboard shortcuts
+// Arrow Up/Down: Previous/Next year
+// Home: Go to today
+// PageUp/PageDown: Jump 5 years
+```
+
+## Responsive Behavior
+
+All views are responsive and adapt to different screen sizes:
+
+- **Desktop**: Full features with optimal layout
+- **Tablet**: Adjusted grid layouts and spacing
+- **Mobile**: Optimized for touch interactions and smaller screens
+
+```tsx
+// Views automatically detect screen size and adjust:
+// - Month View: Adjusts week height and event display
+// - Week View: Maintains usability with touch-friendly event cards
+// - Day View: Optimized single-column layout
+// - Year View: Switches from 4×3 to 3×4 to 2×6 grid
+```
+
+## ViewType Enum
+
+```tsx
+enum ViewType {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+```
+
+## Best Practices
+
+1. **Always provide multiple views** for better user experience
+2. **Set a sensible default view** based on your use case
+3. **Persist view preference** in local storage if needed
+4. **Provide clear view switching UI** for users
+5. **Handle view change callbacks** to sync with your app state
+
+## Related Documentation
+
+- [Getting Started](/docs/getting-started) - Basic setup and usage
+- [Events](/docs/events) - Working with calendar events
+- [Drag and Drop](/docs/drag-and-drop) - Drag plugin configuration
+- [Customization](/docs/customization) - Customize view appearance
+
+## Example
+
+See the complete multi-view example in the repository:
+
+- `examples/with-all-views/MultiViewCalendar.tsx`

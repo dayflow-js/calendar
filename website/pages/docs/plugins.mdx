@@ -1,0 +1,540 @@
+# Plugins
+
+Day Flow uses a plugin architecture to extend functionality. Plugins provide modular features that can be enabled, disabled, or configured based on your needs.
+
+## Plugin System Overview
+
+The plugin system allows you to:
+
+- **Enable/disable features** - Only load what you need
+- **Configure behavior** - Customize plugin settings
+- **Extend functionality** - Create custom plugins
+- **Access plugin APIs** - Use plugin services in your code
+
+## Built-in Plugins
+
+Day Flow comes with two core plugins:
+
+### Drag Plugin
+
+Enables drag-and-drop functionality for creating, moving, and resizing events.
+
+**Features:**
+
+- Drag events to move them
+- Resize events to adjust duration
+- Double-click to create new events
+- Drag in all-day row to create all-day events
+- View-specific behavior
+
+**Installation:**
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDragPlugin,
+  createMonthView,
+  ViewType,
+} from 'dayflow';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+    enableAllDayCreate: true,
+    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH],
+  });
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    plugins: [dragPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+**Configuration:**
+
+```tsx
+interface DragPluginConfig {
+  enableDrag: boolean; // Enable dragging events (default: true)
+  enableResize: boolean; // Enable resizing events (default: true)
+  enableCreate: boolean; // Enable creating events by double-click (default: true)
+  enableAllDayCreate: boolean; // Enable creating all-day events (default: true)
+  supportedViews: ViewType[]; // Views that support drag (default: [DAY, WEEK, MONTH])
+}
+```
+
+**Default Configuration:**
+
+```tsx
+const dragPlugin = createDragPlugin({
+  enableDrag: true,
+  enableResize: true,
+  enableCreate: true,
+  enableAllDayCreate: true,
+  supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH],
+});
+```
+
+**Accessing Drag API:**
+
+```tsx
+// Get drag service from the calendar app
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// Get current configuration
+const config = dragService?.getConfig();
+
+// Update configuration dynamically
+dragService?.updateConfig({
+  enableResize: false,
+});
+
+// Check if view supports drag
+const isSupported = dragService?.isViewSupported(ViewType.MONTH);
+```
+
+### Events Plugin
+
+Provides advanced event management capabilities including validation, filtering, and querying.
+
+**Features:**
+
+- Event validation
+- Date range queries
+- Event filtering
+- Automatic day recalculation
+- Max events per day limit
+
+**Installation:**
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createEventsPlugin,
+  createMonthView,
+} from 'dayflow';
+
+function MyCalendar() {
+  const eventsPlugin = createEventsPlugin({
+    enableAutoRecalculate: true,
+    enableValidation: true,
+    maxEventsPerDay: 50,
+  });
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    plugins: [eventsPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+**Configuration:**
+
+```tsx
+interface EventsPluginConfig {
+  enableAutoRecalculate?: boolean; // Auto-recalculate event days (default: true)
+  enableValidation?: boolean; // Validate events before add/update (default: true)
+  defaultEvents?: Event[]; // Initial events (default: [])
+  maxEventsPerDay?: number; // Maximum events per day (default: 50)
+}
+```
+
+**Accessing Events API:**
+
+```tsx
+// Get events service from the calendar app
+const eventsService = calendar.app.getPlugin<EventsService>('events');
+
+// Get all events
+const allEvents = eventsService?.getAll();
+
+// Get event by ID
+const event = eventsService?.getById('event-1');
+
+// Get events by date
+const todayEvents = eventsService?.getByDate(new Date());
+
+// Get events by date range
+const rangeEvents = eventsService?.getByDateRange(
+  new Date(2024, 9, 1),
+  new Date(2024, 9, 31)
+);
+
+// Get events for specific day of week
+const mondayEvents = eventsService?.getByDay(0, weekStart);
+
+// Get all-day events
+const allDayEvents = eventsService?.getAllDayEvents(0, events);
+
+// Validate an event
+const errors = eventsService?.validateEvent(event);
+if (errors && errors.length > 0) {
+  console.error('Validation errors:', errors);
+}
+
+// Filter events
+const filteredEvents = eventsService?.filterEvents(
+  events,
+  event => event.color === '#3b82f6'
+);
+
+// Recalculate event days
+const recalculatedEvents = eventsService?.recalculateEventDays(
+  events,
+  weekStart
+);
+```
+
+## Using Multiple Plugins
+
+You can combine multiple plugins for full functionality:
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDragPlugin,
+  createEventsPlugin,
+  createMonthView,
+  createWeekView,
+} from 'dayflow';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+  });
+
+  const eventsPlugin = createEventsPlugin({
+    enableValidation: true,
+    maxEventsPerDay: 50,
+  });
+
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    plugins: [dragPlugin, eventsPlugin],
+    events: initialEvents,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Using Both Plugins Together
+
+For most use cases, you'll want to use both plugins together:
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDragPlugin,
+  createEventsPlugin,
+  createMonthView,
+} from 'dayflow';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+  });
+
+  const eventsPlugin = createEventsPlugin({
+    enableValidation: true,
+    maxEventsPerDay: 100,
+  });
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    plugins: [dragPlugin, eventsPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Creating Custom Plugins
+
+You can create your own plugins to extend calendar functionality:
+
+### Plugin Interface
+
+```tsx
+interface CalendarPlugin {
+  name: string; // Unique plugin name
+  install: (app: CalendarApp) => void; // Installation function
+  config?: Record<string, unknown>; // Plugin configuration
+  api?: unknown; // Public API
+}
+```
+
+### Example: Analytics Plugin
+
+```tsx
+import { CalendarPlugin, CalendarApp, Event } from 'dayflow';
+
+interface AnalyticsConfig {
+  trackEventCreate: boolean;
+  trackEventUpdate: boolean;
+  trackEventDelete: boolean;
+  trackViewChange: boolean;
+}
+
+interface AnalyticsService {
+  logEvent: (name: string, data: any) => void;
+  getStats: () => { eventCreates: number; eventUpdates: number };
+}
+
+export function createAnalyticsPlugin(
+  config: Partial<AnalyticsConfig> = {}
+): CalendarPlugin {
+  const finalConfig: AnalyticsConfig = {
+    trackEventCreate: true,
+    trackEventUpdate: true,
+    trackEventDelete: true,
+    trackViewChange: true,
+    ...config,
+  };
+
+  let stats = {
+    eventCreates: 0,
+    eventUpdates: 0,
+    eventDeletes: 0,
+    viewChanges: 0,
+  };
+
+  const analyticsService: AnalyticsService = {
+    logEvent: (name: string, data: any) => {
+      console.log(`[Analytics] ${name}:`, data);
+      // Send to your analytics service
+    },
+    getStats: () => ({
+      eventCreates: stats.eventCreates,
+      eventUpdates: stats.eventUpdates,
+    }),
+  };
+
+  return {
+    name: 'analytics',
+    config: finalConfig,
+    install: (app: CalendarApp) => {
+      console.log('📊 Analytics plugin installed');
+
+      // Hook into calendar callbacks
+      const originalAddEvent = app.addEvent.bind(app);
+      app.addEvent = (event: Event) => {
+        if (finalConfig.trackEventCreate) {
+          stats.eventCreates++;
+          analyticsService.logEvent('event_created', { id: event.id });
+        }
+        originalAddEvent(event);
+      };
+
+      const originalUpdateEvent = app.updateEvent.bind(app);
+      app.updateEvent = (id: string, updates: Partial<Event>) => {
+        if (finalConfig.trackEventUpdate) {
+          stats.eventUpdates++;
+          analyticsService.logEvent('event_updated', { id });
+        }
+        originalUpdateEvent(id, updates);
+      };
+
+      const originalDeleteEvent = app.deleteEvent.bind(app);
+      app.deleteEvent = (id: string) => {
+        if (finalConfig.trackEventDelete) {
+          stats.eventDeletes++;
+          analyticsService.logEvent('event_deleted', { id });
+        }
+        originalDeleteEvent(id);
+      };
+    },
+    api: analyticsService,
+  };
+}
+```
+
+### Using Custom Plugin
+
+```tsx
+import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+
+function MyCalendar() {
+  const analyticsPlugin = createAnalyticsPlugin({
+    trackEventCreate: true,
+    trackEventUpdate: true,
+  });
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    plugins: [analyticsPlugin],
+  });
+
+  // Access plugin API
+  const analytics = calendar.app.getPlugin<AnalyticsService>('analytics');
+  const stats = analytics?.getStats();
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Plugin Best Practices
+
+### 1. Naming Convention
+
+Use descriptive, unique names for your plugins:
+
+```tsx
+// Good
+name: 'analytics';
+name: 'custom-validation';
+name: 'sync';
+
+// Bad
+name: 'plugin';
+name: 'p1';
+```
+
+### 2. Configuration
+
+Provide sensible defaults and make configuration optional:
+
+```tsx
+const defaultConfig = {
+  enabled: true,
+  timeout: 5000,
+};
+
+export function createMyPlugin(config: Partial<MyConfig> = {}) {
+  const finalConfig = { ...defaultConfig, ...config };
+  // ...
+}
+```
+
+### 3. API Design
+
+Expose a clean, typed API for plugin functionality:
+
+```tsx
+interface MyPluginService {
+  doSomething: () => void;
+  getSomething: () => SomeData;
+}
+
+const service: MyPluginService = {
+  doSomething: () => {
+    /* ... */
+  },
+  getSomething: () => {
+    /* ... */
+  },
+};
+
+return {
+  name: 'my-plugin',
+  api: service,
+};
+```
+
+### 4. Error Handling
+
+Handle errors gracefully and provide meaningful messages:
+
+```tsx
+install: (app: CalendarApp) => {
+  try {
+    // Plugin initialization
+  } catch (error) {
+    console.error('[MyPlugin] Failed to initialize:', error);
+    throw new Error('MyPlugin initialization failed');
+  }
+};
+```
+
+### 5. Cleanup
+
+Clean up resources when needed:
+
+```tsx
+let timer: NodeJS.Timeout;
+
+install: (app: CalendarApp) => {
+  timer = setInterval(() => {
+    // Do something periodically
+  }, 1000);
+
+  // Note: Add cleanup logic if your plugin needs it
+  // (Calendar doesn't have a built-in cleanup lifecycle yet)
+};
+```
+
+## Plugin Lifecycle
+
+1. **Plugin Creation** - Call `createMyPlugin()` with config
+2. **Plugin Registration** - Add to `plugins` array in `useCalendarApp`
+3. **Installation** - `install()` function is called with CalendarApp instance
+4. **Usage** - Access plugin API via `app.getPlugin()`
+
+```tsx
+// 1. Create
+const plugin = createDragPlugin({ enableDrag: true });
+
+// 2. Register
+const calendar = useCalendarApp({
+  plugins: [plugin], // Installation happens here
+});
+
+// 3. Use
+const dragService = calendar.app.getPlugin<DragService>('drag');
+```
+
+## Checking for Plugins
+
+Always check if a plugin is installed before using it:
+
+```tsx
+function MyComponent({ calendar }: { calendar: CalendarApp }) {
+  // Check if plugin exists
+  if (calendar.hasPlugin('drag')) {
+    const dragService = calendar.getPlugin<DragService>('drag');
+    // Use drag service
+  }
+
+  // Or get and check
+  const eventsService = calendar.getPlugin<EventsService>('events');
+  if (eventsService) {
+    const events = eventsService.getAll();
+  }
+}
+```
+
+## Plugin TypeScript Types
+
+```tsx
+import type {
+  CalendarPlugin,
+  DragService,
+  DragPluginConfig,
+  EventsService,
+  EventsPluginConfig,
+} from 'dayflow';
+
+// Type-safe plugin usage
+const dragService = app.getPlugin<DragService>('drag');
+const eventsService = app.getPlugin<EventsService>('events');
+```
+
+## Related Documentation
+
+- [Getting Started](/docs/getting-started) - Basic setup
+- [Events](/docs/events) - Working with calendar events
+- [Views](/docs/views) - Understanding calendar views
+- [API Reference](/docs/api-reference) - Complete API documentation

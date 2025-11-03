@@ -1,0 +1,70 @@
+# Installation
+
+## Requirements
+
+- React 18.0 or later
+- Node.js 16.0 or later
+
+## Package Manager
+
+Choose your preferred package manager to install Day Flow:
+
+### npm
+
+```bash
+npm install dayflow
+```
+
+### Yarn
+
+```bash
+yarn add dayflow
+```
+
+### pnpm
+
+```bash
+pnpm add dayflow
+```
+
+## TypeScript
+
+Day Flow is written in TypeScript and includes type definitions out of the box. No additional `@types` packages are needed.
+
+```tsx
+import type { CalendarAppConfig, Event } from 'dayflow';
+```
+
+## Styling
+
+The calendar comes with default styles, but you can customize them:
+
+### Using CSS
+
+```tsx
+import 'dayflow/dist/styles.css';
+```
+
+### Custom Styling
+
+You can override the default styles by providing your own CSS or using styled-components:
+
+```tsx
+import { DayFlowCalendar } from 'dayflow';
+import './my-calendar-styles.css';
+```
+
+## Troubleshooting
+
+If you encounter any issues during installation:
+
+1. Make sure your Node.js version is 16.0 or later
+2. Clear your package manager cache:
+   - npm: `npm cache clean --force`
+   - yarn: `yarn cache clean`
+   - pnpm: `pnpm store prune`
+3. Delete `node_modules` and reinstall dependencies
+
+## Next Steps
+
+Now that you've installed Day Flow, check out the [Getting Started](/docs/getting-started) guide to begin using it.

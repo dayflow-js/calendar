@@ -1,0 +1,84 @@
+---
+title: Event Dialog
+description: Built-in event dialog with comprehensive event management capabilities.
+toc: false
+---
+
+<style jsx global>{`
+  .nextra-toc {
+    display: none !important;
+  }
+  .nextra-content {
+    max-width: 100% !important;
+  }
+`}</style>
+
+import { EventDialogShowcase } from '../../components/FeatureShowcase';
+
+# Event Dialog
+
+DayFlow comes with a powerful built-in event dialog that provides a complete event management experience out of the box. The dialog supports creating, editing, and deleting events with an intuitive interface.
+
+<EventDialogShowcase />
+
+## Key Features
+
+- **Complete Event Management** - Create, edit, and delete events seamlessly
+- **Smart Date Handling** - Supports both all-day and timed events with easy conversion
+- **Time Range Picker** - Interactive time selection with intuitive controls
+- **Calendar Color Selection** - Organize events by calendar type with color coding
+- **Rich Text Notes** - Add detailed descriptions to your events
+- **Responsive Design** - Works beautifully on all screen sizes
+- **Portal Rendering** - Uses React Portal for proper z-index and overlay handling
+
+## Usage
+
+The default event dialog is automatically available when you use the DayFlowCalendar component. Simply click on any event to open the dialog, or use the calendar's API to create new events.
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react-calendar';
+
+<DayFlowCalendar
+  calendar={calendar}
+  // Event dialog is included by default
+/>
+```
+
+## Event Dialog Features
+
+### Title and Color
+Edit the event title and assign it to different calendar types with color-coded visual indicators.
+
+### Time Management
+- **Timed Events**: Use the RangePicker to select precise start and end times
+- **All-Day Events**: Toggle between timed and all-day events with a single click
+- **Multi-Day Support**: Automatically handles events spanning multiple days
+
+### Notes and Descriptions
+Add rich text descriptions to provide context and details for each event.
+
+### Quick Actions
+- **Convert Event Type**: Switch between all-day and timed events instantly
+- **Delete Events**: Remove events with confirmation
+- **Auto-save**: Changes are saved automatically as you edit
+
+## Customization
+
+While the default dialog covers most use cases, you can completely replace it with your own implementation using the `customEventDetailDialog` prop. See the [Custom Event Detail Dialog](/features/custom-detail-dialog) page for details.
+
+```tsx
+<DayFlowCalendar
+  calendar={calendar}
+  customEventDetailDialog={YourCustomDialog}
+/>
+```
+
+## Dialog Behavior
+
+- **Click Outside to Close**: Click the backdrop to close the dialog
+- **Escape Key Support**: Press ESC to close the dialog
+- **Smart Positioning**: Dialog is always centered and responsive
+- **Portal Rendering**: Rendered at the document root for proper layering
+- **Popup Integration**: Works seamlessly with date/time pickers and dropdowns
+
+The built-in event dialog is designed to handle the most common event management scenarios while remaining flexible enough to customize when needed.

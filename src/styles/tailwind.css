@@ -1,0 +1,139 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ==================== Component Layer ==================== */
+
+@layer components {
+  .calendar-container {
+    @apply relative flex flex-col bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200;
+  }
+
+  .calendar-header {
+    @apply flex justify-between items-center p-2 bg-white border-b border-gray-200;
+  }
+
+  .calendar-grid {
+    @apply flex-grow relative overflow-y-auto;
+  }
+
+  .calendar-weekdays {
+    @apply grid grid-cols-7 border-b border-gray-200;
+  }
+
+  .calendar-day-label {
+    @apply flex-1 text-center text-gray-500 text-sm p-1;
+  }
+
+  .calendar-time-column {
+    @apply w-20 flex-shrink-0 border-gray-200;
+  }
+
+  .calendar-time-slot {
+    @apply relative h-18 flex;
+  }
+
+  .calendar-time-row {
+    @apply h-18 border-t first:border-none border-gray-200 flex;
+  }
+
+  .calendar-time-cell {
+    @apply flex-1 relative border-r border-gray-200;
+  }
+
+  .calendar-all-day-row {
+    @apply flex items-center border-b border-gray-200;
+  }
+
+  .calendar-nav-button {
+    @apply p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors;
+  }
+
+  .calendar-today-button {
+    @apply px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded transition-colors;
+  }
+
+  .calendar-event-base {
+    @apply select-none pointer-events-auto cursor-pointer transition-all;
+  }
+
+  .mini-calendar-grid {
+    @apply grid grid-cols-7 gap-1 text-xs justify-items-center;
+  }
+
+  .mini-calendar-day {
+    @apply text-center py-1 rounded text-xs h-6 w-6 hover:bg-gray-100 transition-colors;
+  }
+
+  .calendar-checkbox {
+    @apply mr-2 h-4 w-4 inline-flex items-center justify-center border border-gray-300 rounded-sm cursor-pointer;
+    appearance: none;
+    background-color: transparent;
+    position: relative;
+  }
+
+  .calendar-checkbox:focus-visible {
+    outline: 2px solid var(--checkbox-color, #3b82f6);
+    outline-offset: 2px;
+  }
+
+  .calendar-checkbox:checked {
+    background-color: var(--checkbox-color, #3b82f6);
+    border-color: var(--checkbox-color, #3b82f6);
+  }
+
+  .calendar-checkbox:checked::after {
+    content: '';
+    display: block;
+    width: 0.25rem;
+    height: 0.5rem;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+}
+
+/* ==================== Utilities ==================== */
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

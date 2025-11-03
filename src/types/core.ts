@@ -1,0 +1,223 @@
+// Core type definitions
+import React from 'react';
+import { Event } from './event';
+import { ViewSwitcherMode } from '@/components/common/ViewHeader';
+import { CalendarType, ThemeConfig } from './calendarTypes';
+
+/**
+ * View type enum
+ */
+export enum ViewType {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
+/**
+ * Plugin interface
+ * Defines the basic structure of calendar plugins
+ */
+export interface CalendarPlugin {
+  name: string;
+  install: (app: CalendarApp) => void;
+  config?: Record<string, unknown>;
+  api?: unknown;
+}
+
+/**
+ * View interface
+ * Defines the basic structure of calendar views
+ */
+export interface CalendarView {
+  type: ViewType;
+  component: React.ComponentType<any>;
+  config?: Record<string, unknown>;
+}
+
+/**
+ * Calendar callbacks interface
+ * Defines calendar event callback functions
+ */
+export interface CalendarCallbacks {
+  onViewChange?: (view: ViewType) => void;
+  onEventCreate?: (event: Event) => void;
+  onEventUpdate?: (event: Event) => void;
+  onEventDelete?: (eventId: string) => void;
+  onDateChange?: (date: Date) => void;
+  onRender?: () => void;
+  onVisibleMonthChange?: (date: Date) => void;
+}
+
+/**
+ * Sidebar 渲染所需的 props
+ */
+export interface CalendarSidebarRenderProps {
+  app: CalendarApp;
+  calendars: CalendarType[];
+  toggleCalendarVisibility: (calendarId: string, visible: boolean) => void;
+  toggleAll: (visible: boolean) => void;
+  isCollapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}
+
+/**
+ * Sidebar 配置
+ */
+export interface SidebarConfig {
+  enabled?: boolean;
+  width?: number | string;
+  initialCollapsed?: boolean;
+  render?: (props: CalendarSidebarRenderProps) => React.ReactNode;
+}
+
+/**
+ * Calendar application configuration
+ * Used to initialize CalendarApp
+ */
+export interface CalendarAppConfig {
+  views: CalendarView[];
+  plugins?: CalendarPlugin[];
+  events?: Event[];
+  callbacks?: CalendarCallbacks;
+  defaultView?: ViewType;
+  initialDate?: Date;
+  switcherMode?: ViewSwitcherMode;
+  calendars?: CalendarType[];
+  defaultCalendar?: string;
+  theme?: ThemeConfig;
+  useSidebar?: boolean | SidebarConfig;
+  useEventDetailDialog?: boolean;
+}
+
+/**
+ * Calendar application state
+ * Internal state of CalendarApp
+ */
+export interface CalendarAppState {
+  currentView: ViewType;
+  currentDate: Date;
+  events: Event[];
+  plugins: Map<string, CalendarPlugin>;
+  views: Map<ViewType, CalendarView>;
+  switcherMode?: ViewSwitcherMode;
+  sidebar?: SidebarConfig;
+}
+
+/**
+ * Calendar application instance
+ * Core interface of CalendarApp
+ */
+export interface CalendarApp {
+  // State
+  state: CalendarAppState;
+
+  // View management
+  changeView: (view: ViewType) => void;
+  getCurrentView: () => CalendarView;
+
+  // Date management
+  setCurrentDate: (date: Date) => void;
+  getCurrentDate: () => Date;
+  goToToday: () => void;
+  goToPrevious: () => void;
+  goToNext: () => void;
+  selectDate: (date: Date) => void;
+
+  // Event management
+  addEvent: (event: Event) => void;
+  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  deleteEvent: (id: string) => void;
+  getEvents: () => Event[];
+  getAllEvents: () => Event[];
+  getCalendars: () => CalendarType[];
+  setCalendarVisibility: (calendarId: string, visible: boolean) => void;
+  setAllCalendarsVisibility: (visible: boolean) => void;
+  setVisibleMonth: (date: Date) => void;
+  getVisibleMonth: () => Date;
+
+  // Plugin management
+  getPlugin: <T = unknown>(name: string) => T | undefined;
+  hasPlugin: (name: string) => boolean;
+
+  // Rendering
+  render: () => React.ReactElement;
+
+  // Sidebar
+  getSidebarConfig: () => SidebarConfig;
+
+  // Event Detail Dialog
+  getUseEventDetailDialog: () => boolean;
+}
+
+/**
+ * useCalendarApp Hook return type
+ * Calendar application interface provided for React components
+ */
+export interface UseCalendarAppReturn {
+  app: CalendarApp;
+  currentView: ViewType;
+  currentDate: Date;
+  events: Event[];
+  changeView: (view: ViewType) => void;
+  setCurrentDate: (date: Date) => void;
+  addEvent: (event: Event) => void;
+  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  deleteEvent: (id: string) => void;
+  goToToday: () => void;
+  goToPrevious: () => void;
+  goToNext: () => void;
+  selectDate: (date: Date) => void;
+  getCalendars: () => CalendarType[];
+  setCalendarVisibility: (calendarId: string, visible: boolean) => void;
+  setAllCalendarsVisibility: (visible: boolean) => void;
+  getAllEvents: () => Event[];
+  setVisibleMonth: (date: Date) => void;
+  getVisibleMonth: () => Date;
+  sidebarConfig: SidebarConfig;
+}
+
+/**
+ * Calendar configuration system type
+ * Contains drag and view configurations
+ */
+export interface CalendarConfig {
+  drag: {
+    HOUR_HEIGHT: number;
+    FIRST_HOUR: number;
+    LAST_HOUR: number;
+    MIN_DURATION: number;
+    TIME_COLUMN_WIDTH: number;
+    ALL_DAY_HEIGHT: number;
+    getLineColor: (color: string) => string;
+    getDynamicPadding: (drag: { endHour: number; startHour: number }) => string;
+  };
+  views: {
+    day: Record<string, unknown>;
+    week: Record<string, unknown>;
+    month: Record<string, unknown>;
+  };
+}
+
+export interface UseCalendarReturn {
+  // State
+  view: ViewType;
+  currentDate: Date;
+  events: Event[];
+  currentWeekStart: Date;
+
+  // Actions
+  changeView: (view: ViewType) => void;
+  goToToday: () => void;
+  goToPrevious: () => void;
+  goToNext: () => void;
+  selectDate: (date: Date) => void;
+  updateEvent: (
+    eventId: string,
+    updates: Partial<Event>,
+    isPending?: boolean
+  ) => void;
+  deleteEvent: (eventId: string) => void;
+  addEvent: (event: Omit<Event, 'id'>) => void;
+  setEvents: (events: Event[] | ((prev: Event[]) => Event[])) => void;
+}

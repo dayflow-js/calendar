@@ -1,0 +1,598 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
+import {
+  MonthEventDragState,
+  Event,
+  ViewType,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+} from '@/types';
+import { VirtualWeekItem } from '@/types/monthView';
+import { monthNames } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
+import CalendarEvent from '../weekView/CalendarEvent';
+import { analyzeMultiDayEventsForWeek } from './util';
+import { extractHourFromDate } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
+
+export interface MultiDayEventSegment {
+  id: string;
+  originalEventId: string;
+  event: Event;
+  startDayIndex: number;
+  endDayIndex: number;
+  segmentType:
+  | 'start'
+  | 'middle'
+  | 'end'
+  | 'single'
+  | 'start-week-end'
+  | 'end-week-start';
+  totalDays: number;
+  segmentIndex: number;
+  isFirstSegment: boolean;
+  isLastSegment: boolean;
+  yPosition?: number;
+}
+
+interface WeekComponentProps {
+  currentMonth: string;
+  currentYear: number;
+  newlyCreatedEventId: string | null;
+  screenSize: 'mobile' | 'tablet' | 'desktop';
+  isScrolling: boolean;
+  isDragging: boolean;
+  item: VirtualWeekItem;
+  events: Event[];
+  dragState: MonthEventDragState;
+  calendarRef: React.RefObject<HTMLDivElement | null>;
+  onEventUpdate: (updatedEvent: Event) => void;
+  onEventDelete: (eventId: string) => void;
+  onMoveStart: (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    event: Event
+  ) => void;
+  onCreateStart: (e: React.MouseEvent, targetDate: Date) => void;
+  onResizeStart: (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    event: Event,
+    direction: string
+  ) => void;
+  onDetailPanelOpen: () => void;
+  onMoreEventsClick?: (date: Date) => void;
+  onChangeView?: (view: ViewType) => void;
+  onSelectDate?: (date: Date) => void;
+  selectedEventId?: string | null;
+  onEventSelect?: (eventId: string | null) => void;
+  detailPanelEventId?: string | null;
+  onDetailPanelToggle?: (eventId: string | null) => void;
+  customDetailPanelContent?: EventDetailContentRenderer;
+  customEventDetailDialog?: EventDetailDialogRenderer;
+}
+
+// 常量定义
+const ROW_HEIGHT = 16;
+const ROW_SPACING = 17;
+const MULTI_DAY_TOP_OFFSET = 33;
+const MAX_EVENTS_TO_SHOW = 4;
+
+// Organize multi-day event segments
+const organizeMultiDaySegments = (multiDaySegments: MultiDayEventSegment[]) => {
+  const sortedSegments = [...multiDaySegments].sort((a, b) => {
+    const aDays = a.endDayIndex - a.startDayIndex + 1;
+    const bDays = b.endDayIndex - b.startDayIndex + 1;
+
+    if (a.startDayIndex > b.startDayIndex) {
+      return 1; // a after b
+    }
+
+    if (aDays !== bDays) {
+      return bDays - aDays; // Longer events first
+    }
+
+    return a.startDayIndex - b.startDayIndex; // Earlier start time first
+  });
+
+  // Assign Y positions to avoid conflicts
+  const segmentsWithPosition: MultiDayEventSegment[] = [];
+
+  sortedSegments.forEach(segment => {
+    let yPosition = 0;
+    let positionFound = false;
+
+    while (!positionFound) {
+      const hasConflict = segmentsWithPosition.some(existingSegment => {
+        const yConflict =
+          Math.abs((existingSegment.yPosition ?? 0) - yPosition) < ROW_HEIGHT;
+        const timeConflict = !(
+          segment.endDayIndex < existingSegment.startDayIndex ||
+          segment.startDayIndex > existingSegment.endDayIndex
+        );
+        return yConflict && timeConflict;
+      });
+
+      if (!hasConflict) {
+        positionFound = true;
+      } else {
+        yPosition += ROW_HEIGHT;
+      }
+    }
+
+    segmentsWithPosition.push({ ...segment, yPosition });
+  });
+
+  // Convert to hierarchical structure
+  const layers: MultiDayEventSegment[][] = [];
+
+  segmentsWithPosition.forEach(segment => {
+    const layerIndex = Math.floor((segment.yPosition ?? 0) / ROW_HEIGHT);
+
+    if (!layers[layerIndex]) {
+      layers[layerIndex] = [];
+    }
+
+    layers[layerIndex].push(segment);
+  });
+
+  // Sort each layer by start time
+  layers.forEach(layer => {
+    layer.sort((a, b) => a.startDayIndex - b.startDayIndex);
+  });
+
+  return layers;
+};
+
+// Build render event list (multi-day regular events will be rendered through segment, skipping here)
+const constructRenderEvents = (events: Event[]): Event[] => {
+  const renderEvents: Event[] = [];
+
+  events.forEach(event => {
+    // Ensure events have start and end fields
+    if (!event.start || !event.end) {
+      logger.warn('Event missing start or end date:', event);
+      return; // Skip invalid events
+    }
+
+    const start = temporalToDate(event.start);
+    const end = temporalToDate(event.end);
+    const startDate = new Date(start);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(end);
+    endDate.setHours(0, 0, 0, 0);
+
+    // For normal events, if the end time is midnight 00:00 and the duration is less than 24 hours,
+    // the end date should be adjusted to the same day as the start date to avoid misidentifying as a multi-day event
+    let adjustedEndDate = new Date(endDate);
+    if (!event.allDay) {
+      const endHasTime = end.getHours() !== 0 || end.getMinutes() !== 0 || end.getSeconds() !== 0;
+      if (!endHasTime) {
+        // The end time is 00:00:00, check the duration
+        const durationMs = end.getTime() - start.getTime();
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        if (durationMs > 0 && durationMs < ONE_DAY_MS) {
+          // The duration is less than 24 hours, set the end date to the previous day
+          adjustedEndDate = new Date(endDate);
+          adjustedEndDate.setDate(adjustedEndDate.getDate() - 1);
+        }
+      }
+    }
+
+    // Check if it is a multi-day event (using the adjusted end date)
+    const isMultiDay = startDate.toDateString() !== adjustedEndDate.toDateString();
+
+    // Multi-day regular events: rendered through segment, skipping here
+    if (isMultiDay && !event.allDay) {
+      return;
+    }
+
+    // Multi-day all-day events: create event instances for each day (keeping old logic for all-day events)
+    if (isMultiDay && event.allDay) {
+      const current = new Date(start);
+      while (current <= end) {
+        const currentTemporal = Temporal.PlainDate.from({
+          year: current.getFullYear(),
+          month: current.getMonth() + 1,
+          day: current.getDate(),
+        });
+
+        renderEvents.push({
+          ...event,
+          start: currentTemporal,
+          end: currentTemporal,
+          day: current.getDay(),
+        });
+        current.setDate(current.getDate() + 1);
+      }
+    } else {
+      // Single-day events (all-day or regular)
+      renderEvents.push({
+        ...event,
+        start: event.start,
+        end: event.end,
+        day: start.getDay(),
+      });
+    }
+  });
+
+  return renderEvents;
+};
+
+// Sort events
+const sortDayEvents = (events: Event[]): Event[] => {
+  return [...events].sort((a, b) => {
+    // All-day events first
+    if (a.allDay !== b.allDay) {
+      return a.allDay ? -1 : 1;
+    }
+
+    // If both are all-day events, keep the original order
+    if (a.allDay && b.allDay) return 0;
+
+    // Non-all-day events sorted by start time
+    return extractHourFromDate(a.start) - extractHourFromDate(b.start);
+  });
+};
+
+// Create date string
+const createDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const WeekComponent = React.memo<WeekComponentProps>(
+  ({
+    currentMonth,
+    currentYear,
+    newlyCreatedEventId,
+    isScrolling,
+    isDragging,
+    item,
+    events,
+    dragState,
+    calendarRef,
+    onEventUpdate,
+    onEventDelete,
+    onMoveStart,
+    onCreateStart,
+    onResizeStart,
+    onDetailPanelOpen,
+    onMoreEventsClick,
+    onChangeView,
+    onSelectDate,
+    selectedEventId,
+    onEventSelect,
+    detailPanelEventId,
+    onDetailPanelToggle,
+    customDetailPanelContent,
+    customEventDetailDialog,
+  }) => {
+    const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
+    const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+      if (isScrolling) {
+        setShouldShowMonthTitle(true);
+
+        if (hideTitleTimeoutRef.current) {
+          clearTimeout(hideTitleTimeoutRef.current);
+          hideTitleTimeoutRef.current = null;
+        }
+
+        return () => {
+          if (hideTitleTimeoutRef.current) {
+            clearTimeout(hideTitleTimeoutRef.current);
+            hideTitleTimeoutRef.current = null;
+          }
+        };
+      }
+
+      if (!shouldShowMonthTitle) {
+        return;
+      }
+
+      hideTitleTimeoutRef.current = setTimeout(() => {
+        setShouldShowMonthTitle(false);
+        hideTitleTimeoutRef.current = null;
+      }, 100);
+
+      return () => {
+        if (hideTitleTimeoutRef.current) {
+          clearTimeout(hideTitleTimeoutRef.current);
+          hideTitleTimeoutRef.current = null;
+        }
+      };
+    }, [isScrolling, shouldShowMonthTitle]);
+
+    const { weekData, height: weekHeight } = item;
+    const firstDayOfMonth = weekData.days.find(day => day.day === 1);
+
+    // Use the exact height provided by virtual scrolling
+    const weekHeightPx = `${weekHeight}px`;
+
+    // Analyze multi-day events for the current week
+    const multiDaySegments = useMemo(
+      () => analyzeMultiDayEventsForWeek(events, weekData.startDate),
+      [events, weekData.startDate]
+    );
+
+    // Build render events
+    const constructedRenderEvents = useMemo(
+      () => constructRenderEvents(events),
+      [events]
+    );
+
+    // Organize multi-day event segments
+    const organizedMultiDaySegments = useMemo(
+      () => organizeMultiDaySegments(multiDaySegments),
+      [multiDaySegments]
+    );
+
+    const dayLayerCounts = useMemo(() => {
+      const counts = Array(7).fill(0);
+
+      organizedMultiDaySegments.forEach((layer, layerIndex) => {
+        layer.forEach(segment => {
+          for (let dayIndex = segment.startDayIndex; dayIndex <= segment.endDayIndex; dayIndex++) {
+            counts[dayIndex] = Math.max(counts[dayIndex], layerIndex + 1);
+          }
+        });
+      });
+
+      return counts;
+    }, [organizedMultiDaySegments]);
+
+    // Calculate the height of the multi-day event area
+    const multiDayAreaHeight = useMemo(
+      () => Math.max(0, organizedMultiDaySegments.length * ROW_SPACING),
+      [organizedMultiDaySegments]
+    );
+
+    // Get events for a specific date
+    const getEventsForDay = (dayDate: Date): Event[] => {
+      return constructedRenderEvents.filter(event => {
+        if (!event.start || !event.end) {
+          return (
+            temporalToDate(event.start).toDateString() ===
+            dayDate.toDateString()
+          );
+        }
+
+        const startDate = temporalToDate(event.start);
+        const endDate = temporalToDate(event.end);
+
+        // For normal events, check if they end at midnight and have a duration less than 24 hours
+        if (!event.allDay) {
+          const endHasTime = endDate.getHours() !== 0 || endDate.getMinutes() !== 0 || endDate.getSeconds() !== 0;
+          if (!endHasTime) {
+            const durationMs = endDate.getTime() - startDate.getTime();
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            if (durationMs > 0 && durationMs < ONE_DAY_MS) {
+              // Only match start date, not end date
+              return startDate.toDateString() === dayDate.toDateString();
+            }
+          }
+        }
+
+        return (
+          startDate.toDateString() === dayDate.toDateString() ||
+          endDate.toDateString() === dayDate.toDateString()
+        );
+      });
+    };
+
+    // Render date cell
+    const renderDayCell = (day: (typeof weekData.days)[0], dayIndex: number) => {
+      const belongsToCurrentMonth =
+        day.month === monthNames.indexOf(currentMonth) &&
+        day.year === currentYear;
+      const dayEvents = getEventsForDay(day.date);
+      const sortedEvents = sortDayEvents(dayEvents);
+      const displayEvents = sortedEvents.slice(0, MAX_EVENTS_TO_SHOW);
+      const hiddenEventsCount = sortedEvents.length - displayEvents.length;
+      const hasMoreEvents = hiddenEventsCount > 0;
+
+      // Create render array and layer array
+      const renderElements: React.JSX.Element[] = [];
+
+      const placeholderCount = dayLayerCounts[dayIndex] ?? 0;
+      for (let layerIndex = 0; layerIndex < placeholderCount; layerIndex++) {
+        renderElements.push(
+          <div
+            key={`placeholder-layer-${layerIndex}-${day.date.getTime()}`}
+            className="flex-shrink-0"
+            style={{
+              height: `${ROW_SPACING}px`,
+              minHeight: `${ROW_SPACING}px`,
+            }}
+          />
+        );
+      }
+
+      displayEvents.forEach((event, index) => {
+        const segment = organizedMultiDaySegments
+          .flat()
+          .find(seg => seg.originalEventId === event.id);
+
+        if (event.allDay && segment) {
+          return;
+        } else {
+          renderElements.push(
+            <CalendarEvent
+              key={`${event.id}-${event.day}-${extractHourFromDate(event.start)}-${index}`}
+              event={event}
+              isMonthView={true}
+              calendarRef={calendarRef}
+              hourHeight={72}
+              firstHour={0}
+              onEventUpdate={onEventUpdate}
+              onEventDelete={onEventDelete}
+              onMoveStart={onMoveStart}
+              onResizeStart={onResizeStart}
+              isBeingDragged={
+                isDragging &&
+                dragState.eventId === event.id &&
+                dragState.mode === 'move'
+              }
+              newlyCreatedEventId={newlyCreatedEventId}
+              onDetailPanelOpen={onDetailPanelOpen}
+              selectedEventId={selectedEventId}
+              onEventSelect={onEventSelect}
+              detailPanelEventId={detailPanelEventId}
+              onDetailPanelToggle={onDetailPanelToggle}
+              customDetailPanelContent={customDetailPanelContent}
+              customEventDetailDialog={customEventDetailDialog}
+            />
+          );
+        }
+      });
+
+      return (
+        <div
+          key={`day-${day.date.getTime()}`}
+          className={`
+          relative flex flex-col border-r border-gray-200 last:border-r-0 
+          ${!belongsToCurrentMonth ? 'text-gray-400' : 'text-gray-800'}
+        `}
+          style={{ height: weekHeightPx }}
+          data-date={createDateString(day.date)}
+          onDoubleClick={e => onCreateStart(e, day.date)}
+        >
+          {/* Date number area */}
+          <div className="flex items-start justify-between p-2 pb-1 relative z-20">
+            <div className="flex-1" />
+            <div className="flex items-center">
+              <span
+                className={`
+              inline-flex items-center justify-center h-5 w-5 rounded-full text-sm font-medium
+              ${day.isToday
+                    ? 'bg-blue-500 text-white'
+                    : belongsToCurrentMonth
+                      ? 'text-gray-900'
+                      : 'text-gray-400'
+                  }
+            `}
+              >
+                {day.day}
+              </span>
+              {day.day === 1 && (
+                <span className="text-xs text-gray-500 ml-1">
+                  {day.shortMonthName}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Event display area */}
+          <div className="flex-1 overflow-hidden px-1">
+            {renderElements}
+
+            {/* More events indicator */}
+            {hasMoreEvents && (
+              <div
+                className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer hover:underline"
+                onClick={e => {
+                  e.stopPropagation();
+                  if (onMoreEventsClick) {
+                    onMoreEventsClick(day.date);
+                  } else {
+                    onSelectDate?.(day.date);
+                    onChangeView?.(ViewType.DAY);
+                  }
+                }}
+              >
+                +{hiddenEventsCount} more
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div
+        className="relative select-none border-b border-gray-200"
+        style={{ height: weekHeightPx }}
+      >
+        {/* Month title: displayed when scrolling, hidden after scrolling stops */}
+        {firstDayOfMonth && (
+          <div
+            className={`
+            absolute top-10 left-0 z-30 bg-white/50 py-2 px-2 duration-300
+            ${shouldShowMonthTitle ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+          `}
+            style={{
+              transition: 'opacity 0.5s ease',
+              maxWidth: 'fit-content',
+            }}
+          >
+            <span className="text-2xl font-bold">
+              {firstDayOfMonth.monthName} {firstDayOfMonth.year}
+            </span>
+          </div>
+        )}
+
+        <div className="h-full flex flex-col">
+          <div className="calendar-week relative h-full">
+            {/* Date grid */}
+            <div className="grid grid-cols-7 h-full">
+              {weekData.days.map((day, index) => renderDayCell(day, index))}
+            </div>
+
+            {/* Multi-day event overlay layer */}
+            {organizedMultiDaySegments.length > 0 && (
+              <div
+                className="absolute left-0 right-0 pointer-events-none"
+                style={{
+                  top: `${MULTI_DAY_TOP_OFFSET}px`,
+                  height: `${multiDayAreaHeight}px`,
+                  zIndex: 10,
+                }}
+              >
+                {organizedMultiDaySegments.map((layer, layerIndex) => (
+                  <div key={`layer-${layerIndex}`} className="absolute inset-0">
+                    {layer.map(segment => (
+                      <CalendarEvent
+                        key={segment.id}
+                        event={segment.event}
+                        segment={segment}
+                        segmentIndex={layerIndex}
+                        isMonthView={true}
+                        isMultiDay={true}
+                        calendarRef={calendarRef}
+                        hourHeight={72}
+                        firstHour={0}
+                        onEventUpdate={onEventUpdate}
+                        onEventDelete={onEventDelete}
+                        onMoveStart={onMoveStart}
+                        onResizeStart={onResizeStart}
+                        isBeingDragged={
+                          isDragging &&
+                          dragState.eventId === segment.event.id &&
+                          dragState.mode === 'move'
+                        }
+                        newlyCreatedEventId={newlyCreatedEventId}
+                        onDetailPanelOpen={onDetailPanelOpen}
+                        selectedEventId={selectedEventId}
+                        onEventSelect={onEventSelect}
+                        detailPanelEventId={detailPanelEventId}
+                        onDetailPanelToggle={onDetailPanelToggle}
+                        customDetailPanelContent={customDetailPanelContent}
+                        customEventDetailDialog={customEventDetailDialog}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
+WeekComponent.displayName = 'WeekComponent';
+
+export default WeekComponent;
