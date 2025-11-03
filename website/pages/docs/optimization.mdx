@@ -15,11 +15,11 @@ DayFlow is built with tree-shaking in mind. Import only what you need:
 
 ```typescript
 // ✅ Good - Import specific functions
-import { useCalendarApp, DayFlowCalendar } from 'dayflow';
-import { createMonthView } from 'dayflow/factories';
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { createMonthView } from 'dayflow-core/factories';
 
 // ❌ Avoid - Importing everything
-import * as DayFlow from 'dayflow';
+import * as DayFlow from '@dayflow/core';
 ```
 
 ### Code Splitting

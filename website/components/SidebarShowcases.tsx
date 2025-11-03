@@ -9,20 +9,20 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { useCalendarApp } from '../../src/core/useCalendarApp';
-import { DayFlowCalendar } from '../../src/core/DayFlowCalendar';
-import { createMonthView } from '../../src/factories/createMonthView';
-import { createWeekView } from '../../src/factories/createWeekView';
-import { createDayView } from '../../src/factories/createDayView';
-import { createDragPlugin } from '../../src/plugins/dragPlugin';
+import { useCalendarApp } from '@dayflow/core';
+import { DayFlowCalendar } from '@dayflow/core';
+import { createMonthView } from '@dayflow/core';
+import { createWeekView } from '@dayflow/core';
+import { createDayView } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/core';
 import {
   CalendarType,
   CalendarSidebarRenderProps,
   Event,
   SidebarConfig,
   ViewType,
-} from '../../src/types';
-import { temporalToDate } from '../../src/utils/temporal';
+} from '@dayflow/core';
+import { temporalToDate } from '@dayflow/core';
 
 const BASE_CALENDARS: CalendarType[] = [
   {

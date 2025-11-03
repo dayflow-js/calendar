@@ -34,7 +34,7 @@ import {
   createMonthView,
   createDragPlugin,
   ViewType,
-} from 'dayflow';
+} from '@dayflow/core';
 
 const calendar = useCalendarApp({
   views: [createMonthView(), createWeekView(), createDayView()],
@@ -58,7 +58,7 @@ You can still access every runtime control (`toggleCalendarVisibility`, `toggleA
 When you need a fully bespoke experience (filters, analytics, team shortcuts, etc.), provide a `render` callback. It receives the current calendar app instance, calendar collection, and helper callbacks.
 
 ```tsx
-import type { CalendarSidebarRenderProps } from 'dayflow';
+import type { CalendarSidebarRenderProps } from '@dayflow/core';
 
 const CustomSidebar = ({
   app,

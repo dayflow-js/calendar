@@ -7,8 +7,8 @@ node_modules
 coverage
 
 # Next.js
-.next
-out
+website/.next
+website/out
 build
 dist
 

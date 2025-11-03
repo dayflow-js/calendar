@@ -11,18 +11,18 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { useCalendarApp } from '../../src/core/useCalendarApp';
-import { DayFlowCalendar } from '../../src/core/DayFlowCalendar';
-import { createMonthView } from '../../src/factories/createMonthView';
-import { createWeekView } from '../../src/factories/createWeekView';
-import { createDayView } from '../../src/factories/createDayView';
-import { createDragPlugin } from '../../src/plugins/dragPlugin';
+import { useCalendarApp } from '@dayflow/core';
+import { DayFlowCalendar } from '@dayflow/core';
+import { createMonthView } from '@dayflow/core';
+import { createWeekView } from '@dayflow/core';
+import { createDayView } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/core';
 import {
   ViewType,
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
-} from '../../src/types';
+} from '@dayflow/core';
 
 type SwitcherMode = 'buttons' | 'select';
 
@@ -61,7 +61,7 @@ const createSampleEvents = (): Event[] => {
         timeZone: 'UTC',
         plainTime: Temporal.PlainTime.from('11:00'),
       }),
-      color: '#2563eb',
+      calendarId: '#2563eb',
       meta: {
         owner: 'Alice',
         location: 'Room 301',
@@ -80,7 +80,7 @@ const createSampleEvents = (): Event[] => {
         timeZone: 'UTC',
         plainTime: Temporal.PlainTime.from('15:30'),
       }),
-      color: '#10b981',
+      calendarId: '#10b981',
       meta: {
         owner: 'Brian',
         location: 'Zoom',
@@ -99,7 +99,7 @@ const createSampleEvents = (): Event[] => {
         timeZone: 'UTC',
         plainTime: Temporal.PlainTime.from('13:00'),
       }),
-      color: '#f97316',
+      calendarId: '#f97316',
       meta: {
         owner: 'Chiara',
         location: 'Local Bistro',
@@ -113,7 +113,7 @@ const createSampleEvents = (): Event[] => {
       start: allDayStart,
       end: allDayEnd,
       allDay: true,
-      color: '#8b5cf6',
+      calendarId: '#8b5cf6',
       meta: {
         owner: 'Diego',
         location: 'Online',
@@ -341,7 +341,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};
-      const accentColor = event.color ?? '#6366f1';
+      const accentColor = '#6366f1';
 
       const toJsDate = (
         value: Event['start'] | Event['end']
@@ -501,10 +501,10 @@ export const CustomDetailDialogShowcase: React.FC = () => {
         });
       };
 
-      const handleUpdateColor = (color: string) => {
+      const handleUpdateColor = (calendarId: string) => {
         onEventUpdate({
           ...event,
-          color,
+          calendarId,
         });
       };
 

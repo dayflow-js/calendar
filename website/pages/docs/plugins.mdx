@@ -36,7 +36,7 @@ import {
   createDragPlugin,
   createMonthView,
   ViewType,
-} from 'dayflow';
+} from '@dayflow/core';
 
 function MyCalendar() {
   const dragPlugin = createDragPlugin({
@@ -118,7 +118,7 @@ import {
   DayFlowCalendar,
   createEventsPlugin,
   createMonthView,
-} from 'dayflow';
+} from '@dayflow/core';
 
 function MyCalendar() {
   const eventsPlugin = createEventsPlugin({
@@ -205,7 +205,7 @@ import {
   createEventsPlugin,
   createMonthView,
   createWeekView,
-} from 'dayflow';
+} from '@dayflow/core';
 
 function MyCalendar() {
   const dragPlugin = createDragPlugin({
@@ -240,7 +240,7 @@ import {
   createDragPlugin,
   createEventsPlugin,
   createMonthView,
-} from 'dayflow';
+} from '@dayflow/core';
 
 function MyCalendar() {
   const dragPlugin = createDragPlugin({
@@ -280,7 +280,7 @@ interface CalendarPlugin {
 ### Example: Analytics Plugin
 
 ```tsx
-import { CalendarPlugin, CalendarApp, Event } from 'dayflow';
+import { CalendarPlugin, CalendarApp, Event } from '@dayflow/core';
 
 interface AnalyticsConfig {
   trackEventCreate: boolean;
@@ -365,7 +365,7 @@ export function createAnalyticsPlugin(
 ### Using Custom Plugin
 
 ```tsx
-import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
 
 function MyCalendar() {
   const analyticsPlugin = createAnalyticsPlugin({
@@ -525,7 +525,7 @@ import type {
   DragPluginConfig,
   EventsService,
   EventsPluginConfig,
-} from 'dayflow';
+} from '@dayflow/core';
 
 // Type-safe plugin usage
 const dragService = app.getPlugin<DragService>('drag');

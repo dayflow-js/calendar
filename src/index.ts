@@ -54,6 +54,8 @@ export type {
   CalendarPlugin,
   CalendarView,
   CalendarConfig,
+  CalendarSidebarRenderProps,
+  SidebarConfig,
 } from './types/core';
 
 export type { Event } from './types/event';

@@ -2,13 +2,13 @@
 
 import React, { useMemo, useState } from 'react';
 // Import directly from source files to avoid CSS import in index.ts
-import { useCalendarApp } from '../../src/core/useCalendarApp';
-import { DayFlowCalendar } from '../../src/core/DayFlowCalendar';
-import { createMonthView } from '../../src/factories/createMonthView';
-import { createWeekView } from '../../src/factories/createWeekView';
-import { createDayView } from '../../src/factories/createDayView';
-import { createDragPlugin } from '../../src/plugins/dragPlugin';
-import { CalendarType, ViewType } from '../../src/types';
+import { useCalendarApp } from '@dayflow/core';
+import { DayFlowCalendar } from '@dayflow/core';
+import { createMonthView } from '@dayflow/core';
+import { createWeekView } from '@dayflow/core';
+import { createDayView } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/core';
+import { CalendarType, ViewType } from '@dayflow/core';
 import { Temporal } from 'temporal-polyfill';
 import { generateSampleEvents } from '../utils/sampleData';
 import { CALENDAR_SIDE_PANEL } from '../utils/palette';

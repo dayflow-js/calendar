@@ -32,8 +32,8 @@ npm run test:coverage
 ### Basic Event Management
 
 ```typescript
-import { CalendarApp } from 'dayflow';
-import { ViewType } from 'dayflow/types';
+import { CalendarApp } from '@dayflow/core';
+import { ViewType } from 'dayflow-core/types';
 import { Temporal } from 'temporal-polyfill';
 
 describe('Calendar Events', () => {
@@ -62,8 +62,8 @@ describe('Calendar Events', () => {
 
 ```typescript
 import { render, screen } from '@testing-library/react';
-import { DayFlowCalendar } from 'dayflow';
-import { useCalendarApp } from 'dayflow';
+import { DayFlowCalendar } from '@dayflow/core';
+import { useCalendarApp } from '@dayflow/core';
 
 describe('DayFlowCalendar', () => {
   it('should render calendar', () => {
@@ -93,7 +93,7 @@ import {
   isMultiDayEvent,
   formatTime,
   roundToTimeStep,
-} from 'dayflow/utils';
+} from 'dayflow-core/utils';
 
 describe('Date Helpers', () => {
   it('should format time correctly', () => {

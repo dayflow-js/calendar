@@ -7,11 +7,11 @@ Welcome to Day Flow! This guide will help you get up and running quickly.
 Install the package using your preferred package manager:
 
 ```bash
-npm install dayflow
+npm install @dayflow/core
 # or
-yarn add dayflow
+yarn add @dayflow/core
 # or
-pnpm add dayflow
+pnpm add @dayflow/core
 ```
 
 ## Basic Usage
@@ -19,7 +19,7 @@ pnpm add dayflow
 Import and use the Calendar component in your React application:
 
 ```tsx
-import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
 
 function App() {
   const calendar = useCalendarApp({
@@ -47,7 +47,7 @@ import {
   createMonthView,
   createEvent,
   createAllDayEvent,
-} from 'dayflow';
+} from '@dayflow/core';
 
 const events = [
   // Simple timed event

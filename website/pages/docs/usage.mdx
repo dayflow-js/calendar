@@ -7,7 +7,7 @@ Learn how to use Day Flow in various scenarios.
 The simplest way to use the calendar:
 
 ```tsx
-import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
 
 export default function MyCalendar() {
   const calendar = useCalendarApp({
@@ -25,7 +25,7 @@ Control the calendar with your own state:
 
 ```tsx
 import { useState } from 'react';
-import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
 
 export default function MyCalendar() {
   const [date, setDate] = useState(new Date());
@@ -54,7 +54,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from 'dayflow';
+} from '@dayflow/core';
 
 export default function MyCalendar() {
   const handleDateClick = (date: Date) => {
@@ -86,7 +86,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from 'dayflow';
+} from '@dayflow/core';
 
 const events: Event[] = [
   {
@@ -129,7 +129,7 @@ import {
   createWeekView,
   createMonthView,
   ViewType,
-} from 'dayflow';
+} from '@dayflow/core';
 
 export default function MyCalendar() {
   const calendar = useCalendarApp({
@@ -147,7 +147,7 @@ export default function MyCalendar() {
 Customize the calendar appearance:
 
 ```tsx
-import { useCalendarApp, DayFlowCalendar, createMonthView } from 'dayflow';
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
 
 export default function MyCalendar() {
   const calendar = useCalendarApp({

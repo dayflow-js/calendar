@@ -9,7 +9,7 @@
     "lint": "node scripts/next-with-cache.js lint"
   },
   "dependencies": {
-    "dayflow": "file:..",
+    "@dayflow/core": "^0.1.0",
     "next": "^14.2.0",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",

@@ -11,7 +11,7 @@ The library uses the Temporal API for all date/time handling. Events support thr
 
 ```tsx
 import { Temporal } from 'temporal-polyfill';
-import { Event } from 'dayflow';
+import { Event } from '@dayflow/core';
 ```
 
 | Property      | Type                                                               | Description                                                                                                    | Required |
@@ -33,7 +33,7 @@ import { Event } from 'dayflow';
 Use the `createEvent()` helper for most use cases:
 
 ```tsx
-import { createEvent, createAllDayEvent, createTimedEvent } from 'dayflow';
+import { createEvent, createAllDayEvent, createTimedEvent } from '@dayflow/core';
 
 // Local timed event (no timezone complexity)
 const meeting = createEvent({
@@ -70,7 +70,7 @@ For more control, use Temporal API directly:
 
 ```tsx
 import { Temporal } from 'temporal-polyfill';
-import { Event } from 'dayflow';
+import { Event } from '@dayflow/core';
 
 // Local event with PlainDateTime (recommended)
 const localEvent: Event = {
@@ -110,7 +110,7 @@ const timezoneEvent: Event = {
 ### Event with Metadata
 
 ```tsx
-import { createEvent } from 'dayflow';
+import { createEvent } from '@dayflow/core';
 
 const event = createEvent({
   id: '3',
@@ -179,7 +179,7 @@ const { events } = calendar;
 Day Flow provides callbacks to handle event lifecycle:
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from 'dayflow';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -215,7 +215,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from 'dayflow';
+} from '@dayflow/core';
 
 function MyCalendar() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -243,7 +243,7 @@ function MyCalendar() {
 ### Syncing with Backend
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from 'dayflow';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -287,7 +287,7 @@ You can customize event appearance with colors:
 
 ```tsx
 import { Temporal } from 'temporal-polyfill';
-import { Event } from 'dayflow';
+import { Event } from '@dayflow/core';
 
 const event: Event = {
   id: '1',
@@ -313,7 +313,7 @@ Events can span multiple days:
 
 ```tsx
 import { Temporal } from 'temporal-polyfill';
-import { Event } from 'dayflow';
+import { Event } from '@dayflow/core';
 
 // Conference spanning 3 days (all-day event)
 const multiDayEvent: Event = {
@@ -341,7 +341,7 @@ Store additional information in the `meta` field:
 
 ```tsx
 import { Temporal } from 'temporal-polyfill';
-import { Event } from 'dayflow';
+import { Event } from '@dayflow/core';
 
 const event: Event = {
   id: '1',

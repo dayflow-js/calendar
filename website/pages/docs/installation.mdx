@@ -12,19 +12,19 @@ Choose your preferred package manager to install Day Flow:
 ### npm
 
 ```bash
-npm install dayflow
+npm install @dayflow/core
 ```
 
 ### Yarn
 
 ```bash
-yarn add dayflow
+yarn add @dayflow/core
 ```
 
 ### pnpm
 
 ```bash
-pnpm add dayflow
+pnpm add @dayflow/core
 ```
 
 ## TypeScript
@@ -32,7 +32,7 @@ pnpm add dayflow
 Day Flow is written in TypeScript and includes type definitions out of the box. No additional `@types` packages are needed.
 
 ```tsx
-import type { CalendarAppConfig, Event } from 'dayflow';
+import type { CalendarAppConfig, Event } from '@dayflow/core';
 ```
 
 ## Styling
@@ -42,7 +42,7 @@ The calendar comes with default styles, but you can customize them:
 ### Using CSS
 
 ```tsx
-import 'dayflow/dist/styles.css';
+import '@dayflow/core/dist/styles.css';
 ```
 
 ### Custom Styling
@@ -50,7 +50,7 @@ import 'dayflow/dist/styles.css';
 You can override the default styles by providing your own CSS or using styled-components:
 
 ```tsx
-import { DayFlowCalendar } from 'dayflow';
+import { DayFlowCalendar } from '@dayflow/core';
 import './my-calendar-styles.css';
 ```
 

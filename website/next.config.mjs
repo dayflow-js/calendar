@@ -17,15 +17,11 @@ export default withNextra({
   images: {
     unoptimized: true,
   },
+  basePath: process.env.BASE_PATH || '',
   webpack: (config, { isServer, webpack }) => {
-    // Allow imports from parent directory (src folder)
-    config.resolve.modules.push('..');
-
-    // Add alias for @ to resolve to parent src directory
     // Force all React imports to use website's node_modules to avoid version conflicts
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': path.resolve(__dirname, '../src'),
       react: path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
       'react/jsx-runtime': path.resolve(
@@ -37,15 +33,6 @@ export default withNextra({
         './node_modules/react/jsx-dev-runtime'
       ),
     };
-
-    // Ignore CSS imports from parent src directory
-    // We use website's own Tailwind setup instead
-    config.plugins.push(
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^\.\/styles\/tailwind\.css$/,
-        contextRegExp: /src$/,
-      })
-    );
 
     // Fix for nextra/uvu compatibility issues in browser
     if (!isServer) {
@@ -67,5 +54,4 @@ export default withNextra({
 
     return config;
   },
-  transpilePackages: ['react-calendar-package'],
 });
