@@ -14,7 +14,6 @@ export function ClientOnlyCalendar() {
       setError(err as Error);
     }
   }, []);
-  console.log('LOG1');
 
   if (error) {
     return (
@@ -26,7 +25,6 @@ export function ClientOnlyCalendar() {
       </div>
     );
   }
-  console.log('LOG2');
 
   if (!mounted) {
     return (
@@ -35,7 +33,6 @@ export function ClientOnlyCalendar() {
       </div>
     );
   }
-  console.log('LOG3');
 
   return <InteractiveCalendar />;
 }

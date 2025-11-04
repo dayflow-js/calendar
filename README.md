@@ -19,6 +19,8 @@ A flexible and feature-rich calendar component library for React applications wi
 
 ## 📦 Installation
 
+### Install DayFlow
+
 ```bash
 npm install @dayflow/core lucide-react
 # or
@@ -33,6 +35,51 @@ DayFlow requires the following peer dependencies:
 - `react` >= 18.0.0
 - `react-dom` >= 18.0.0
 - `lucide-react` >= 0.400.0
+
+### Configure Tailwind CSS (Required)
+
+DayFlow uses Tailwind CSS for styling. Set up Tailwind in your project:
+
+**1. Install Tailwind CSS:**
+
+```bash
+npm install -D tailwindcss @tailwindcss/postcss autoprefixer
+```
+
+**2. Create `postcss.config.js`:**
+
+```js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+};
+```
+
+**3. Create `tailwind.config.js` with required spacing configuration:**
+
+```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      spacing: {
+        18: '4.5rem', // Required for Week/Day view hour heights
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+**4. Import Tailwind in your CSS:**
+
+```css
+/* src/index.css */
+@import 'tailwindcss';
+```
 
 ## 🚀 Quick Start
 
@@ -63,31 +110,32 @@ import {
   useCalendarApp,
   DayFlowCalendar,
   createMonthView,
-} from 'dayflow';
-import 'dayflow/dist/styles.css';
+  createEvent,
+  createAllDayEvent,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
 
 function MyCalendar() {
+  const events = [
+    // Timed event
+    createEvent({
+      id: '1',
+      title: 'Team Meeting',
+      start: new Date(2025, 0, 15, 10, 0),
+      end: new Date(2025, 0, 15, 11, 0),
+    }),
+    // All-day event
+    createAllDayEvent(
+      '2',
+      'Conference',
+      new Date(2025, 0, 20)
+    ),
+  ];
+
   const calendar = useCalendarApp({
     views: [createMonthView()],
     initialDate: new Date(),
-    events: [
-      {
-        id: 1,
-        title: 'Team Meeting',
-        date: new Date(2025, 0, 15),
-        startHour: 10,
-        endHour: 11,
-        color: '#3b82f6',
-      },
-      {
-        id: 2,
-        title: 'Conference',
-        startDate: new Date(2025, 0, 20),
-        endDate: new Date(2025, 0, 22),
-        isAllDay: true,
-        color: '#10b981',
-      },
-    ],
+    events,
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -105,8 +153,8 @@ import {
   createMonthView,
   createYearView,
   ViewType,
-} from 'dayflow';
-import 'dayflow/dist/styles.css';
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
 
 function MultiViewCalendar() {
   const calendar = useCalendarApp({
@@ -143,17 +191,19 @@ function CalendarWithCallbacks() {
   const calendar = useCalendarApp({
     views: [createMonthView()],
     initialDate: new Date(),
-    onEventCreate: event => {
-      console.log('Event created:', event);
-      // Save to database
-    },
-    onEventUpdate: event => {
-      console.log('Event updated:', event);
-      // Update in database
-    },
-    onEventDelete: eventId => {
-      console.log('Event deleted:', eventId);
-      // Delete from database
+    callbacks: {
+      onEventCreate: event => {
+        console.log('Event created:', event);
+        // Save to database
+      },
+      onEventUpdate: event => {
+        console.log('Event updated:', event);
+        // Update in database
+      },
+      onEventDelete: eventId => {
+        console.log('Event deleted:', eventId);
+        // Delete from database
+      },
     },
   });
 
@@ -163,33 +213,33 @@ function CalendarWithCallbacks() {
 
 ## 🎨 Customization
 
-### Custom Event Colors
+### Custom Event Styling
 
 ```tsx
+import { createEvent } from '@dayflow/core';
+
 const events = [
-  {
-    id: 1,
+  createEvent({
+    id: '1',
     title: 'Important Meeting',
-    date: new Date(),
-    startHour: 9,
-    endHour: 10,
-    color: '#ef4444', // Red
-  },
-  {
-    id: 2,
+    start: new Date(2025, 0, 15, 9, 0),
+    end: new Date(2025, 0, 15, 10, 0),
+    calendarId: 'work', // Use calendarId for color theming
+  }),
+  createEvent({
+    id: '2',
     title: 'Workshop',
-    date: new Date(),
-    startHour: 14,
-    endHour: 16,
-    color: '#8b5cf6', // Purple
-  },
+    start: new Date(2025, 0, 15, 14, 0),
+    end: new Date(2025, 0, 15, 16, 0),
+    calendarId: 'personal',
+  }),
 ];
 ```
 
 ### Custom Drag Indicator
 
 ```tsx
-import { DragIndicatorRenderer } from 'dayflow';
+import { DragIndicatorRenderer } from '@dayflow/core';
 
 const customRenderer: DragIndicatorRenderer = {
   renderDefaultContent: props => (

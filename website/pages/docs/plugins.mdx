@@ -180,10 +180,10 @@ if (errors && errors.length > 0) {
   console.error('Validation errors:', errors);
 }
 
-// Filter events
+// Filter events by calendar type
 const filteredEvents = eventsService?.filterEvents(
   events,
-  event => event.color === '#3b82f6'
+  event => event.calendarId === 'work'
 );
 
 // Recalculate event days

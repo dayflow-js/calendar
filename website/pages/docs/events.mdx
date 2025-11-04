@@ -22,8 +22,8 @@ import { Event } from '@dayflow/core';
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                            | ✅ Yes   |
 | `description` | `string`                                                           | Optional event description or notes                                                                            | ❌ No    |
 | `allDay`      | `boolean`                                                          | Whether this is an all-day event (default: `false`)                                                            | ❌ No    |
-| `color`       | `string`                                                           | Display color as hex (`#3b82f6`) or CSS color name                                                             | ❌ No    |
-| `meta`        | `Record<string, any>`                                              | Additional custom metadata (location, attendees, etc.)                                                         | ❌ No    |
+| `calendarId`  | `string`                                                           | Calendar type reference for multi-calendar support                                                             | ❌ No    |
+| `meta`        | `Record<string, any>`                                              | Additional custom metadata (location, attendees, custom fields, etc.)                                          | ❌ No    |
 | `day`         | `number`                                                           | Internal field: week day index (0-6), auto-calculated by the system                                            | ❌ No    |
 
 ## Creating Events
@@ -39,28 +39,23 @@ import { createEvent, createAllDayEvent, createTimedEvent } from '@dayflow/core'
 const meeting = createEvent({
   id: '1',
   title: 'Team Meeting',
-  date: new Date(2024, 9, 15), // October 15, 2024
-  startTime: { hour: 10, minute: 0 },
-  endTime: { hour: 11, minute: 0 },
-  color: '#3b82f6',
+  start: new Date(2024, 9, 15, 10, 0), // October 15, 2024, 10:00 AM
+  end: new Date(2024, 9, 15, 11, 0),   // October 15, 2024, 11:00 AM
 });
 
 // All-day event
 const holiday = createAllDayEvent(
   '2',
   'Conference',
-  new Date(2024, 9, 20),
-  { color: '#10b981' }
+  new Date(2024, 9, 20)
 );
 
-// Quick timed event (using decimal hours: 14.5 = 14:30)
+// Quick timed event
 const lunch = createTimedEvent(
   '3',
   'Lunch Break',
-  new Date(2024, 9, 15),
-  12.0,  // 12:00 PM
-  13.0,  // 1:00 PM
-  { color: '#f59e0b' }
+  new Date(2024, 9, 15, 12, 0), // 12:00 PM
+  new Date(2024, 9, 15, 13, 0)  // 1:00 PM
 );
 ```
 
@@ -84,7 +79,6 @@ const localEvent: Event = {
     year: 2024, month: 10, day: 15,
     hour: 11, minute: 0
   }),
-  color: '#3b82f6',
 };
 
 // All-day event with PlainDate
@@ -94,7 +88,6 @@ const allDayEvent: Event = {
   start: Temporal.PlainDate.from('2024-10-20'),
   end: Temporal.PlainDate.from('2024-10-22'),
   allDay: true,
-  color: '#10b981',
 };
 
 // Timezone-aware event with ZonedDateTime
@@ -103,7 +96,6 @@ const timezoneEvent: Event = {
   title: 'International Call',
   start: Temporal.ZonedDateTime.from('2024-10-16T14:00:00[America/New_York]'),
   end: Temporal.ZonedDateTime.from('2024-10-16T15:00:00[America/New_York]'),
-  color: '#f59e0b',
 };
 ```
 
@@ -116,10 +108,8 @@ const event = createEvent({
   id: '3',
   title: 'Client Call',
   description: 'Discuss Q4 roadmap',
-  date: new Date(2024, 9, 16),
-  startTime: { hour: 14, minute: 0 },
-  endTime: { hour: 15, minute: 0 },
-  color: '#f59e0b',
+  start: new Date(2024, 9, 16, 14, 0),
+  end: new Date(2024, 9, 16, 15, 0),
   meta: {
     location: 'Zoom',
     attendees: ['john@example.com', 'jane@example.com'],
@@ -281,30 +271,62 @@ const calendar = useCalendarApp({
 });
 ```
 
-## Event Colors
+## Event Styling with Calendar Types
 
-You can customize event appearance with colors:
+Customize event appearance by assigning events to different calendar types using `calendarId`. Each calendar type can have its own color scheme and styling:
 
 ```tsx
-import { Temporal } from 'temporal-polyfill';
-import { Event } from '@dayflow/core';
+import { createEvent } from '@dayflow/core';
 
-const event: Event = {
+// Work event
+const workEvent = createEvent({
   id: '1',
   title: 'Design Review',
-  start: Temporal.ZonedDateTime.from('2024-10-15T14:00:00[America/New_York]'),
-  end: Temporal.ZonedDateTime.from('2024-10-15T15:00:00[America/New_York]'),
-  color: '#8b5cf6', // Purple
-};
+  start: new Date(2024, 9, 15, 14, 0),
+  end: new Date(2024, 9, 15, 15, 0),
+  calendarId: 'work', // Links to work calendar styling
+});
 
-// Common color schemes
-const colors = {
-  work: '#3b82f6', // Blue
-  personal: '#10b981', // Green
-  meeting: '#f59e0b', // Amber
-  deadline: '#ef4444', // Red
-  review: '#8b5cf6', // Purple
-};
+// Personal event
+const personalEvent = createEvent({
+  id: '2',
+  title: 'Dentist Appointment',
+  start: new Date(2024, 9, 16, 10, 0),
+  end: new Date(2024, 9, 16, 11, 0),
+  calendarId: 'personal', // Links to personal calendar styling
+});
+
+// Configure calendar types with colors
+const calendars = [
+  {
+    id: 'work',
+    name: 'Work',
+    colors: {
+      eventColor: '#3b82f6',
+      eventSelectedColor: '#2563eb',
+      lineColor: '#3b82f6',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'personal',
+    name: 'Personal',
+    colors: {
+      eventColor: '#10b981',
+      eventSelectedColor: '#059669',
+      lineColor: '#10b981',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+];
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [workEvent, personalEvent],
+  calendars,
+});
 ```
 
 ## Multi-Day Events
@@ -322,7 +344,7 @@ const multiDayEvent: Event = {
   start: Temporal.PlainDate.from('2024-10-20'),
   end: Temporal.PlainDate.from('2024-10-22'),
   allDay: true,
-  color: '#10b981',
+  calendarId: 'conferences',
 };
 
 // Meeting spanning across midnight (timed event)
@@ -331,7 +353,7 @@ const crossMidnightEvent: Event = {
   title: 'Night Shift',
   start: Temporal.ZonedDateTime.from('2024-10-15T22:00:00[America/New_York]'), // 10 PM
   end: Temporal.ZonedDateTime.from('2024-10-16T06:00:00[America/New_York]'), // 6 AM next day
-  color: '#6366f1',
+  calendarId: 'shifts',
 };
 ```
 
@@ -381,7 +403,7 @@ const event: Event = {
    - Use `PlainDateTime` for local events (meetings, appointments) ✨ **Recommended default**
    - Use `ZonedDateTime` only for timezone-aware events (international calls, flights)
 4. **Validate time values** - The helper functions validate hour (0-23) and minute (0-59) automatically
-5. **Set appropriate colors** - Use consistent color schemes across your app
+5. **Use calendar types for styling** - Assign `calendarId` to categorize and style events consistently
 6. **Leverage the `meta` field** - Store custom data without modifying the Event interface
 7. **Validate event data** - Ensure start < end for timed events
 8. **Optimize event updates** - Batch updates when possible

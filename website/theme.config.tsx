@@ -23,12 +23,18 @@ const config: DocsThemeConfig = {
     </div>
   ),
   project: {
-    link: 'https://github.com/yourusername/react-calendar-package',
+    link: 'https://github.com/JayceV552/DayFlow',
   },
   docsRepositoryBase:
-    'https://github.com/yourusername/react-calendar-package/tree/main/website',
+    'https://github.com/JayceV552/DayFlow/tree/main/website',
   footer: {
     text: 'Day Flow Documentation',
+  },
+  navbar: {
+    extraContent: (
+      <>
+      </>
+    ),
   },
   useNextSeoProps() {
     return {

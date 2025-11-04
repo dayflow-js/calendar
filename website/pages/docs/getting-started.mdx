@@ -4,15 +4,68 @@ Welcome to Day Flow! This guide will help you get up and running quickly.
 
 ## Installation
 
+### Install DayFlow
+
 Install the package using your preferred package manager:
 
 ```bash
-npm install @dayflow/core
+npm install @dayflow/core lucide-react
 # or
-yarn add @dayflow/core
+yarn add @dayflow/core lucide-react
 # or
-pnpm add @dayflow/core
+pnpm add @dayflow/core lucide-react
 ```
+
+### Configure Tailwind CSS
+
+DayFlow uses Tailwind CSS for styling. You need to set up Tailwind CSS in your project:
+
+**1. Install Tailwind CSS dependencies:**
+
+```bash
+npm install -D tailwindcss @tailwindcss/postcss autoprefixer
+```
+
+**2. Create `postcss.config.js` in your project root:**
+
+```js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+};
+```
+
+**3. Create `tailwind.config.js` with required configuration:**
+
+```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {
+      // Required: Custom spacing for calendar hour heights
+      spacing: {
+        18: '4.5rem', // 72px - used for hour height in Week/Day views
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+**4. Import Tailwind in your CSS file:**
+
+```css
+/* src/index.css or src/App.css */
+@import 'tailwindcss';
+```
+
+**Important:** The `spacing.18` configuration is required for Week and Day views to display correctly.
 
 ## Basic Usage
 
@@ -54,9 +107,8 @@ const events = [
   createEvent({
     id: '1',
     title: 'Team Meeting',
-    date: new Date(2024, 9, 10),
-    startTime: { hour: 10, minute: 0 },
-    endTime: { hour: 11, minute: 0 },
+    start: new Date(2024, 9, 10, 10, 0),
+    end: new Date(2024, 9, 10, 11, 0),
   }),
   // All-day event
   createAllDayEvent(

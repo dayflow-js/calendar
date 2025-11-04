@@ -50,6 +50,14 @@ export default {
       minimize: true,
       inject: false,
       extract: 'styles.css',
+      config: {
+        path: './postcss.config.js',
+      },
+      use: {
+        sass: false,
+        stylus: false,
+        less: false,
+      },
     }),
     terser(),
     visualizer({

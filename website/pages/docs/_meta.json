@@ -1,12 +1,7 @@
 {
   "getting-started": "Getting Started",
-  "installation": "Installation",
-  "usage": "Usage Guide",
-  "views": "Calendar Views",
-  "sidebar": "Sidebar",
   "events": "Events",
+  "views": "Calendar Views",
   "plugins": "Plugins",
-  "testing": "Testing",
-  "optimization": "Performance & Optimization",
-  "temporal-migration": "Temporal API Migration"
+  "sidebar": "Sidebar"
 }

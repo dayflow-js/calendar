@@ -27,7 +27,7 @@ const calendarTypes: CalendarType[] = CALENDAR_SIDE_PANEL.map(item => ({
 }));
 
 export function InteractiveCalendar() {
-  const [currentView, setCurrentView] = useState<ViewType>(ViewType.WEEK);
+  const [currentView, setCurrentView] = useState<ViewType>(ViewType.MONTH);
 
   const events = useMemo(() => generateSampleEvents(), []);
 
@@ -61,7 +61,7 @@ export function InteractiveCalendar() {
 
   return (
     <div className="w-full">
-      <div className="rounded-lg border border-gray-200 shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
         <DayFlowCalendar
           calendar={calendar}
           className="w-full h-[780px]"
