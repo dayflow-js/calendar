@@ -29,10 +29,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: website/package-lock.json
 
-      - name: Install dependencies
+      - name: Clean and reinstall deps (fix optional native binding)
         run: |
           cd website
-          npm ci
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build website
         run: |
