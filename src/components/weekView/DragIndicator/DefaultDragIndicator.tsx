@@ -28,10 +28,10 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
           style={{ backgroundColor: getLineColor(color || 'blue') }}
         />
         <div
-          className={`h-full flex flex-col overflow-hidden pl-3 ${getDynamicPadding(drag)}`}
+          className={`h-full flex flex-col overflow-hidden pl-3 text-white ${getDynamicPadding(drag)}`}
         >
           <div
-            className="font-medium text-xs truncate pr-1"
+            className="font-medium text-xs truncate pr-1 text-white"
             style={{
               lineHeight:
                 drag.endHour - drag.startHour <= 0.25 ? '1.2' : 'normal',
@@ -40,7 +40,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
             {title}
           </div>
           {!drag.allDay && drag.endHour - drag.startHour > 0.5 && (
-            <div className="text-xs truncate time-display">
+            <div className="text-xs truncate time-display text-white opacity-90">
               {formatTime(drag.startHour)} - {formatTime(drag.endHour)}
             </div>
           )}
