@@ -3,8 +3,8 @@
 A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views, and plugin architecture.
 
 [![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/JayceV552/DayFlow/pulls)
-[![License](https://img.shields.io/github/license/JayceV552/DayFlow)](https://github.com/JayceV552/DayFlow/blob/main/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
+[![License](https://img.shields.io/github/license/dayflow-js/dayflow)](https://github.com/dayflow-js/dayflow/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/jc37N4xw)
 
 ## 🗓️ Features
@@ -25,23 +25,20 @@ A flexible and feature-rich calendar component library for React applications wi
 | ----------------------------------- | ------------------------------------ |
 | ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
 
-### Easy to resize and drag
+### 🎯 Easy to resize and drag
 
-<div style="
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-">
-  <video style="width: 45%; max-width: 640px;" controls autoplay muted playsinline>
-    <source src="./assets/videos/Dayflow1.mp4" type="video/mp4">
-  </video>
+<table>
+  <tr>
+    <td width="50%">
+      <video src="https://github.com/dayflow-js/dayflow/raw/main/assets/videos/Dayflow1.mp4" controls muted></video>
+    </td>
+    <td width="50%">
+      <video src="https://github.com/dayflow-js/dayflow/raw/main/assets/videos/Dayflow2.mp4" controls muted></video>
+    </td>
+  </tr>
+</table>
 
-  <video style="width: 45%; max-width: 640px;" controls autoplay muted playsinline>
-    <source src="./assets/videos/Dayflow2.mp4" type="video/mp4">
-  </video>
-</div>
+> **Note**: Videos demonstrate the drag-and-drop and resize functionality. For the best experience, view the [live demo](https://dayflow-js.github.io/dayflow/).
 
 ## ✨ Core Features
 
@@ -119,7 +116,7 @@ function App() {
 }
 ```
 
-> 📖 **[View Full Documentation →](https://dayflow-js.github.io/DayFlow/)**
+> 📖 **[View Full Documentation →](https://dayflow-js.github.io/dayflow/)**
 
 ## 🎯 Use Cases
 
@@ -145,7 +142,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🐛 Bug Reports
 
-If you find a bug, please file an issue on [GitHub Issues](https://github.com/JayceV552/DayFlow/issues).
+If you find a bug, please file an issue on [GitHub Issues](https://github.com/dayflow-js/dayflow/issues).
 
 ## 📮 Support
 

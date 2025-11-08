@@ -34,12 +34,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JayceV552/DayFlow.git"
+    "url": "https://github.com/dayflow-js/dayflow.git"
   },
   "bugs": {
-    "url": "https://github.com/JayceV552/DayFlow/issues"
+    "url": "https://github.com/dayflow-js/dayflow/issues"
   },
-  "homepage": "https://github.com/JayceV552/DayFlow#readme",
+  "homepage": "https://github.com/dayflow-js/dayflow#readme",
   "scripts": {
     "dev": "vite --port 5529",
     "build": "rollup -c --bundleConfigAsCjs",
