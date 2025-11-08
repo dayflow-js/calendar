@@ -28,7 +28,7 @@ export function LiveDemo() {
               Get started
             </Link>
             <Link
-              href="https://github.com/JayceV552/DayFlow"
+              href="https://github.com/dayflow-js/dayflow"
               className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-500 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-500/60 dark:hover:text-blue-300"
             >
               View on Github
@@ -68,7 +68,7 @@ export function LiveDemo() {
             Read the docs
           </Link>
           <Link
-            href="https://github.com/JayceV552/DayFlow"
+            href="https://github.com/dayflow-js/dayflow"
             className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-500 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-500/60"
           >
             Star on GitHub

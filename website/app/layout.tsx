@@ -15,7 +15,7 @@ const banner = <Banner storageKey="nextra-banner">Welcome to DayFlow 🎉</Banne
 const navbar = (
   <Navbar
     logo={<b>DayFlow</b>}
-    projectLink="https://github.com/JayceV552/DayFlow"
+    projectLink="https://github.com/dayflow-js/dayflow"
     chatLink="https://discord.gg/jc37N4xw"
   />
 );
@@ -34,7 +34,7 @@ export default async function RootLayout({
           banner={banner}
           navbar={navbar}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/JayceV552/DayFlow/blob/main/website"
+          docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
           footer={footer}
         >
           {children}

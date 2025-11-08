@@ -40,7 +40,7 @@ jobs:
           cd website
           npm run build
         env:
-          BASE_PATH: /DayFlow
+          BASE_PATH: /dayflow
 
       - name: Disable Jekyll and verify output
         run: |
