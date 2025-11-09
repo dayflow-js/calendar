@@ -7,18 +7,9 @@ import {
 import DefaultCalendarSidebar from '@/components/sidebar/DefaultCalendarSidebar';
 import DefaultEventDetailDialog from '@/components/common/DefaultEventDetailDialog';
 import { CalendarSidebarRenderProps } from '@/types';
+import { normalizeCssWidth } from '@/utils/styleUtils';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
-
-const toCssWidth = (width?: number | string): string => {
-  if (typeof width === 'number') {
-    return `${width}px`;
-  }
-  if (typeof width === 'string' && width.trim().length > 0) {
-    return width;
-  }
-  return DEFAULT_SIDEBAR_WIDTH;
-};
 
 interface DayFlowCalendarProps {
   calendar: UseCalendarAppReturn;
@@ -121,18 +112,19 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
   const collapsedWidth = '60px';
   const resolvedSidebarWidth = isCollapsed
     ? collapsedWidth
-    : toCssWidth(sidebarConfig?.width);
+    : normalizeCssWidth(sidebarConfig?.width, DEFAULT_SIDEBAR_WIDTH);
   const contentClassName = 'flex flex-col flex-1 h-full';
 
 
   return (
-    <div className="calendar-container" style={style ?? {
-      height: 800,
-    }}>
+    <div
+      className={`calendar-container ${className ?? ''}`}
+      style={{ height: 800, ...style }}
+    >
       <div className="flex h-full" >
         {sidebarEnabled && (
           <aside
-            className="flex-shrink-0"
+            className="shrink-0"
             style={{ width: resolvedSidebarWidth }}
           >
             {renderSidebarContent()}
@@ -148,5 +140,4 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
   );
 };
 
-// Default export
 export default DayFlowCalendar;

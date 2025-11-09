@@ -16,18 +16,9 @@ import {
   setDefaultCalendarRegistry,
 } from './calendarRegistry';
 import { logger } from '@/utils/logger';
+import { normalizeCssWidth } from '@/utils/styleUtils';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
-
-const normalizeSidebarWidth = (width?: number | string): string => {
-  if (typeof width === 'number') {
-    return `${width}px`;
-  }
-  if (typeof width === 'string' && width.trim().length > 0) {
-    return width;
-  }
-  return DEFAULT_SIDEBAR_WIDTH;
-};
 
 const resolveSidebarConfig = (
   input?: boolean | SidebarConfig
@@ -52,7 +43,7 @@ const resolveSidebarConfig = (
 
   return {
     enabled,
-    width: normalizeSidebarWidth(width),
+    width: normalizeCssWidth(width, DEFAULT_SIDEBAR_WIDTH),
     initialCollapsed,
     render,
   };
