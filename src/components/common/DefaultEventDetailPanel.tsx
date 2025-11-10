@@ -6,6 +6,7 @@ import { isPlainDate } from '@/utils/temporal';
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
 import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from './RangePicker';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * Default event detail panel component
@@ -21,6 +22,10 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
   onEventUpdate,
   onEventDelete,
 }) => {
+  const { effectiveTheme } = useTheme();
+  const arrowBgColor = effectiveTheme === 'dark' ? '#1f2937' : 'white';
+  const arrowBorderColor = effectiveTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
+
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {
     const registry = getDefaultCalendarRegistry();
@@ -117,14 +122,14 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
           position: 'absolute',
           width: '12px',
           height: '12px',
-          backgroundColor: 'white',
+          backgroundColor: arrowBgColor,
           transform: 'rotate(45deg)',
           transformOrigin: 'center',
           top: `${arrowRelativeY - 6}px`,
-          borderRight: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-          borderTop: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-          borderLeft: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
-          borderBottom: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
+          borderRight: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+          borderTop: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+          borderLeft: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
+          borderBottom: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
           ...(position.isSunday ? { right: '-6px' } : { left: '-6px' }),
         };
       }
@@ -145,16 +150,16 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
         position: 'absolute',
         width: '12px',
         height: '12px',
-        backgroundColor: 'white',
+        backgroundColor: arrowBgColor,
         transform: 'rotate(45deg)',
         transformOrigin: 'center',
         top: `${arrowTop}px`,
         left: position.isSunday ? undefined : '-6px',
         right: position.isSunday ? '-6px' : undefined,
-        borderRight: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-        borderTop: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-        borderLeft: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
-        borderBottom: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
+        borderRight: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+        borderTop: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+        borderLeft: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
+        borderBottom: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
       };
     } else {
       if (position && selectedEventElementRef.current && calendarRef.current) {
@@ -205,14 +210,14 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
             position: 'absolute',
             width: '12px',
             height: '12px',
-            backgroundColor: 'white',
+            backgroundColor: arrowBgColor,
             transform: 'rotate(45deg)',
             transformOrigin: 'center',
             top: `${finalArrowY - 6}px`,
-            borderRight: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-            borderTop: `${position.isSunday ? '1px solid rgb(229, 231, 235)' : 'none'}`,
-            borderLeft: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
-            borderBottom: `${position.isSunday ? 'none' : '1px solid rgb(229, 231, 235)'}`,
+            borderRight: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+            borderTop: `${position.isSunday ? `1px solid ${arrowBorderColor}` : 'none'}`,
+            borderLeft: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
+            borderBottom: `${position.isSunday ? 'none' : `1px solid ${arrowBorderColor}`}`,
             ...(position.isSunday ? { right: '-6px' } : { left: '-6px' }),
           };
         }
@@ -227,18 +232,17 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
   const panelContent = (
     <div
       ref={panelRef}
-      className="fixed bg-white shadow-lg border border-gray-200 rounded-lg p-4 "
+      className="fixed bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg p-4 "
       data-event-detail-panel="true"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
         zIndex: 9999,
         pointerEvents: 'auto',
-        backgroundColor: '#ffffff',
       }}
     >
       <div style={arrowStyle}></div>
-      <span className="block text-xs text-gray-600 mb-1">Event Title</span>
+      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Event Title</span>
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex-1">
           <input
@@ -250,7 +254,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
                 title: e.target.value,
               });
             }}
-            className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
           />
         </div>
         <ColorPicker
@@ -267,7 +271,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
 
       {isAllDay ? (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 mb-1">Date Range</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Date Range</div>
           <RangePicker
             value={[event.start, event.end]}
             format="YYYY-MM-DD"
@@ -280,7 +284,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
         </div>
       ) : (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 mb-1">Time Range</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Time Range</div>
           <RangePicker
             value={[event.start, event.end]}
             timeZone={
@@ -307,7 +311,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
       )}
 
       <div className="mb-3">
-        <span className="block text-xs text-gray-600 mb-1">Note</span>
+        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Note</span>
         <textarea
           value={event.description ?? ''}
           onChange={e =>
@@ -317,7 +321,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
             })
           }
           rows={3}
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition resize-none"
+          className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition resize-none"
           placeholder="Add a note..."
         />
       </div>
@@ -325,14 +329,14 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
       <div className="flex space-x-2">
         {!isAllDay ? (
           <button
-            className="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"
+            className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 text-xs font-medium transition"
             onClick={convertToAllDay}
           >
             Set as All-day
           </button>
         ) : (
           <button
-            className="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"
+            className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 text-xs font-medium transition"
             onClick={convertToRegular}
           >
             Set as Timed Event
@@ -340,7 +344,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
         )}
 
         <button
-          className="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium"
+          className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 text-xs font-medium transition"
           onClick={() => onEventDelete(event.id)}
         >
           Delete

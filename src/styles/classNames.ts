@@ -10,12 +10,12 @@
  * Used for the root container of WeekView and DayView
  */
 export const calendarContainer =
-  'relative flex flex-col bg-white  w-full overflow-hidden h-full';
+  'relative flex flex-col bg-white dark:bg-gray-900 w-full overflow-hidden h-full';
 
 /**
  * MonthView container
  */
-export const monthViewContainer = 'h-full flex flex-col';
+export const monthViewContainer = 'h-full flex flex-col bg-white dark:bg-gray-900';
 
 // ==================== Navigation Bar Styles ====================
 
@@ -27,12 +27,12 @@ export const headerContainer = 'p-2 flex justify-between';
 /**
  * Title text style
  */
-export const headerTitle = 'text-2xl font-semibold';
+export const headerTitle = 'text-2xl font-semibold text-gray-900 dark:text-gray-100';
 
 /**
  * Subtitle text style
  */
-export const headerSubtitle = 'mt-3';
+export const headerSubtitle = 'mt-3 text-gray-600 dark:text-gray-400';
 
 // ==================== Button Styles ====================
 
@@ -44,13 +44,13 @@ export const buttonGroup = 'flex items-center';
 /**
  * Navigation button (forward/backward)
  */
-export const navButton = 'p-1 text-gray-600 hover:bg-gray-100 rounded';
+export const navButton = 'p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded';
 
 /**
  * Today button
  */
 export const todayButton =
-  'px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded';
+  'px-4 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded';
 
 /**
  * Icon button size
@@ -68,23 +68,23 @@ export const weekGrid = 'grid grid-cols-7';
  * Week title row (MonthView)
  */
 export const weekHeaderRow =
-  'sticky top-0 z-10 bg-white border-b border-gray-200';
+  'sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700';
 
 /**
  * Weekday labels
  */
-export const dayLabel = 'text-right text-gray-500 text-sm py-2 pr-2';
+export const dayLabel = 'text-right text-gray-500 dark:text-gray-400 text-sm py-2 pr-2';
 
 /**
  * WeekView week title
  */
-export const weekDayHeader = 'flex border-b border-gray-200';
+export const weekDayHeader = 'flex border-b border-gray-200 dark:border-gray-700';
 
 /**
  * WeekView week title cell
  */
 export const weekDayCell =
-  'flex flex-1 justify-center items-center text-center text-gray-500 text-sm p-1';
+  'flex flex-1 justify-center items-center text-center text-gray-500 dark:text-gray-400 text-sm p-1';
 
 /**
  * Date number style
@@ -119,7 +119,7 @@ export const scrollbarHide = 'scrollbar-hide';
 /**
  * Time column container
  */
-export const timeColumn = 'w-20 flex-shrink-0 border-gray-200';
+export const timeColumn = 'w-20 flex-shrink-0 border-gray-200 dark:border-gray-700';
 
 /**
  * Time slot
@@ -129,18 +129,18 @@ export const timeSlot = 'relative h-[4.5rem] flex';
 /**
  * Time label
  */
-export const timeLabel = 'absolute -top-2.5 right-2 text-[12px] text-gray-500';
+export const timeLabel = 'absolute -top-2.5 right-2 text-[12px] text-gray-500 dark:text-gray-400';
 
 /**
  * Time grid row
  */
 export const timeGridRow =
-  'h-[4.5rem] border-t first:border-none border-gray-200 flex';
+  'h-[4.5rem] border-t first:border-none border-gray-200 dark:border-gray-700 flex';
 
 /**
  * Time grid cell
  */
-export const timeGridCell = 'flex-1 relative border-r border-gray-200';
+export const timeGridCell = 'flex-1 relative border-r border-gray-200 dark:border-gray-700';
 
 /**
  * Current time line container
@@ -163,13 +163,13 @@ export const currentTimeLineBar = 'h-0.5 w-full bg-red-600 relative';
 /**
  * All-day event row container
  */
-export const allDayRow = 'flex items-center border-b border-gray-200 sticky';
+export const allDayRow = 'flex items-center border-b border-gray-200 dark:border-gray-700 sticky';
 
 /**
  * All-day event label
  */
 export const allDayLabel =
-  'w-20 flex-shrink-0 p-1 text-xs font-medium text-gray-500 flex justify-end';
+  'w-20 flex-shrink-0 p-1 text-xs font-medium text-gray-500 dark:text-gray-400 flex justify-end';
 
 /**
  * All-day event content area
@@ -179,7 +179,7 @@ export const allDayContent = 'flex flex-1 relative';
 /**
  * All-day event cell
  */
-export const allDayCell = 'flex-1 border-r border-gray-200 relative';
+export const allDayCell = 'flex-1 border-r border-gray-200 dark:border-gray-700 relative';
 
 // ==================== Event Styles ====================
 
@@ -283,7 +283,7 @@ export const resizeHandleRight =
 /**
  * Mini calendar container
  */
-export const miniCalendarContainer = 'px-2 border-b border-gray-200';
+export const miniCalendarContainer = 'px-2 border-b border-gray-200 dark:border-gray-700';
 
 /**
  * Mini calendar grid
@@ -295,7 +295,7 @@ export const miniCalendarGrid =
  * Mini calendar weekday title
  */
 export const miniCalendarDayHeader =
-  'text-center text-gray-500 font-medium py-1 h-6 w-6';
+  'text-center text-gray-500 dark:text-gray-400 font-medium py-1 h-6 w-6';
 
 /**
  * Mini calendar date cell base style
@@ -305,12 +305,12 @@ export const miniCalendarDay = 'text-center py-1 rounded text-xs h-6 w-6';
 /**
  * Mini calendar current month date
  */
-export const miniCalendarCurrentMonth = 'text-gray-900';
+export const miniCalendarCurrentMonth = 'text-gray-900 dark:text-gray-100';
 
 /**
  * Mini calendar other month date
  */
-export const miniCalendarOtherMonth = 'text-gray-400';
+export const miniCalendarOtherMonth = 'text-gray-400 dark:text-gray-600';
 
 /**
  * Mini calendar today
@@ -328,19 +328,19 @@ export const miniCalendarSelected =
 /**
  * Border styles
  */
-export const borderGray = 'border-gray-200';
-export const borderBottom = 'border-b border-gray-200';
-export const borderTop = 'border-t border-gray-200';
-export const borderRight = 'border-r border-gray-200';
+export const borderGray = 'border-gray-200 dark:border-gray-700';
+export const borderBottom = 'border-b border-gray-200 dark:border-gray-700';
+export const borderTop = 'border-t border-gray-200 dark:border-gray-700';
+export const borderRight = 'border-r border-gray-200 dark:border-gray-700';
 
 /**
  * Text colors
  */
-export const textGray500 = 'text-gray-500';
-export const textGray600 = 'text-gray-600';
-export const textGray700 = 'text-gray-700';
-export const textGray800 = 'text-gray-800';
-export const textGray900 = 'text-gray-900';
+export const textGray500 = 'text-gray-500 dark:text-gray-400';
+export const textGray600 = 'text-gray-600 dark:text-gray-300';
+export const textGray700 = 'text-gray-700 dark:text-gray-200';
+export const textGray800 = 'text-gray-800 dark:text-gray-100';
+export const textGray900 = 'text-gray-900 dark:text-white';
 
 /**
  * Text sizes
@@ -355,9 +355,9 @@ export const text2xl = 'text-2xl';
 /**
  * Background colors
  */
-export const bgWhite = 'bg-white';
-export const bgGray50 = 'bg-gray-50';
-export const bgGray100 = 'bg-gray-100';
+export const bgWhite = 'bg-white dark:bg-gray-900';
+export const bgGray50 = 'bg-gray-50 dark:bg-gray-800';
+export const bgGray100 = 'bg-gray-100 dark:bg-gray-800';
 
 /**
  * Flex layouts

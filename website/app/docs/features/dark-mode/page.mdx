@@ -1,0 +1,366 @@
+# Dark Mode
+
+DayFlow Calendar includes comprehensive dark mode support out of the box. The calendar automatically adapts its appearance based on your theme preference, including all UI components, event colors, and interactive elements.
+
+## Features
+
+- **Three Theme Modes**: Light, Dark, and Auto (system preference)
+- **Automatic Color Adjustment**: Event colors optimized for both light and dark backgrounds
+- **Seamless Switching**: Instant theme changes without flickering
+- **System Sync**: Auto mode follows your operating system's theme preference
+- **Custom Colors**: Define different colors for light and dark modes
+
+## Quick Start
+
+### Basic Setup
+
+Enable dark mode by setting the `theme` configuration:
+
+```tsx
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    theme: {
+      mode: 'dark', // 'light' | 'dark' | 'auto'
+    },
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Theme Modes
+
+### Light Mode
+
+Default theme with light backgrounds and dark text.
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'light',
+  },
+});
+```
+
+### Dark Mode
+
+Dark theme with dark backgrounds and light text.
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'dark',
+  },
+});
+```
+
+### Auto Mode
+
+Automatically follows system theme preference and updates when system theme changes.
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'auto',
+  },
+});
+```
+
+## Theme Switching
+
+### Programmatic Theme Changes
+
+Use the calendar API to change themes dynamically:
+
+```tsx
+import { useCalendarApp } from '@dayflow/core';
+
+function ThemeToggle() {
+  const calendar = useCalendarApp({
+    theme: { mode: 'light' },
+  });
+
+  const toggleTheme = () => {
+    const currentTheme = calendar.app.getTheme();
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+    calendar.app.setTheme(nextTheme);
+  };
+
+  return (
+    <button onClick={toggleTheme}>
+      Toggle Theme
+    </button>
+  );
+}
+```
+
+### Subscribe to Theme Changes
+
+Listen to theme changes to update your UI:
+
+```tsx
+import { useEffect, useState } from 'react';
+import type { ThemeMode } from '@dayflow/core';
+
+function MyComponent({ calendar }) {
+  const [theme, setTheme] = useState<ThemeMode>('light');
+
+  useEffect(() => {
+    const handleThemeChange = (newTheme: ThemeMode) => {
+      setTheme(newTheme);
+    };
+
+    // Subscribe to theme changes
+    calendar.app.subscribeThemeChange(handleThemeChange);
+
+    // Cleanup
+    return () => {
+      calendar.app.unsubscribeThemeChange(handleThemeChange);
+    };
+  }, [calendar.app]);
+
+  return <div>Current theme: {theme}</div>;
+}
+```
+
+## Custom Theme Colors
+
+Define different colors for light and dark modes for your calendar types:
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'auto',
+  },
+  calendarTypes: [
+    {
+      id: 'work',
+      name: 'Work',
+      colors: {
+        // Light mode colors
+        lineColor: '#0066cc',
+        backgroundColor: '#e6f2ff',
+        textColor: '#003d7a',
+      },
+      darkColors: {
+        // Dark mode colors
+        lineColor: '#4da6ff',
+        backgroundColor: '#1a3d5c',
+        textColor: '#b3d9ff',
+      },
+    },
+  ],
+});
+```
+
+### Color Recommendations
+
+For optimal readability and accessibility:
+
+**Light Mode:**
+- Line colors: Vibrant, saturated colors (#0066cc, #16a34a)
+- Background colors: Light tints (#e6f2ff, #dcfce7)
+- Text colors: Dark shades for contrast (#003d7a, #14532d)
+
+**Dark Mode:**
+- Line colors: Lighter, more luminous variants (#4da6ff, #4ade80)
+- Background colors: Dark, desaturated backgrounds (#1a3d5c, #1e4d2b)
+- Text colors: Light shades for readability (#b3d9ff, #bbf7d0)
+
+## Default Calendar Type Colors
+
+DayFlow includes 10 default calendar types with pre-configured dark mode colors:
+
+| Calendar Type | Light Color | Dark Color |
+|--------------|-------------|------------|
+| Blue | #3b82f6 | #60a5fa |
+| Green | #22c55e | #4ade80 |
+| Purple | #a855f7 | #c084fc |
+| Yellow | #eab308 | #facc15 |
+| Red | #ef4444 | #f87171 |
+| Orange | #f97316 | #fb923c |
+| Pink | #ec4899 | #f472b6 |
+| Teal | #14b8a6 | #2dd4bf |
+| Indigo | #6366f1 | #818cf8 |
+| Gray | #6b7280 | #9ca3af |
+
+All default colors meet WCAG AA contrast requirements for both themes.
+
+## API Reference
+
+### Theme Configuration
+
+```typescript
+interface ThemeConfig {
+  mode: 'light' | 'dark' | 'auto';
+}
+```
+
+### Calendar App Methods
+
+```typescript
+// Get current theme mode
+app.getTheme(): ThemeMode
+
+// Set theme mode
+app.setTheme(mode: ThemeMode): void
+
+// Subscribe to theme changes
+app.subscribeThemeChange(callback: (theme: ThemeMode) => void): void
+
+// Unsubscribe from theme changes
+app.unsubscribeThemeChange(callback: (theme: ThemeMode) => void): void
+```
+
+### Calendar Type Colors
+
+```typescript
+interface CalendarTypeColors {
+  lineColor: string;      // Border and accent color
+  backgroundColor: string; // Background color
+  textColor: string;      // Text color
+}
+
+interface CalendarType {
+  id: string;
+  name: string;
+  colors: CalendarTypeColors;      // Light mode colors
+  darkColors?: CalendarTypeColors; // Dark mode colors (optional)
+}
+```
+
+## Best Practices
+
+### 1. Default to Auto Mode
+
+For the best user experience, consider using 'auto' mode by default:
+
+```tsx
+theme: {
+  mode: 'auto',
+}
+```
+
+### 2. Persist User Preference
+
+Save the user's theme choice to localStorage:
+
+```tsx
+const savedTheme = localStorage.getItem('theme') as ThemeMode || 'auto';
+
+const calendar = useCalendarApp({
+  theme: { mode: savedTheme },
+});
+
+// Save when theme changes
+useEffect(() => {
+  const handleThemeChange = (theme: ThemeMode) => {
+    localStorage.setItem('theme', theme);
+  };
+
+  calendar.app.subscribeThemeChange(handleThemeChange);
+  return () => calendar.app.unsubscribeThemeChange(handleThemeChange);
+}, []);
+```
+
+### 3. Test Color Contrast
+
+Ensure your custom colors meet accessibility standards:
+- Text contrast ratio: minimum 4.5:1 (WCAG AA)
+- Large text: minimum 3:1
+- UI components: minimum 3:1
+
+Use tools like [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to verify.
+
+### 4. Provide Visual Feedback
+
+Show the current theme mode in your UI to help users understand the current state.
+
+## Examples
+
+### Simple Theme Toggle
+
+```tsx
+import { DayFlowCalendar, useCalendarApp } from '@dayflow/core';
+import { Sun, Moon } from 'lucide-react';
+
+function SimpleThemeToggle() {
+  const calendar = useCalendarApp({
+    theme: { mode: 'light' },
+  });
+
+  const [isDark, setIsDark] = useState(false);
+
+  const toggleTheme = () => {
+    const nextTheme = isDark ? 'light' : 'dark';
+    calendar.app.setTheme(nextTheme);
+    setIsDark(!isDark);
+  };
+
+  return (
+    <div>
+      <button onClick={toggleTheme}>
+        {isDark ? <Sun /> : <Moon />}
+      </button>
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+### Three-Way Theme Switcher
+
+See the [dark-mode-toggle.tsx](https://github.com/your-repo/examples/dark-mode/dark-mode-toggle.tsx) example for a complete implementation with Light, Dark, and Auto modes.
+
+### Auto Theme with System Detection
+
+See the [auto-theme.tsx](https://github.com/your-repo/examples/dark-mode/auto-theme.tsx) example for automatic system theme detection.
+
+### Custom Theme Colors
+
+See the [custom-theme-colors.tsx](https://github.com/your-repo/examples/dark-mode/custom-theme-colors.tsx) example for custom color configurations.
+
+## Troubleshooting
+
+### Theme not applying
+
+Ensure your Tailwind CSS configuration includes dark mode support:
+
+```js
+// tailwind.config.js
+module.exports = {
+  darkMode: 'class', // or 'media'
+  // ... other config
+}
+```
+
+### Colors not changing
+
+If custom calendar type colors don't update:
+1. Ensure both `colors` and `darkColors` are defined
+2. Verify the color format is valid hex (#RRGGBB)
+3. Check that the calendar type ID matches the event's `calendarId`
+
+### Flashing on theme change
+
+This is usually caused by localStorage hydration. Use a loading state:
+
+```tsx
+const [isLoaded, setIsLoaded] = useState(false);
+
+useEffect(() => {
+  setIsLoaded(true);
+}, []);
+
+if (!isLoaded) return <div>Loading...</div>;
+
+return <DayFlowCalendar calendar={calendar} />;
+```
+
+## Related Documentation
+
+- [Use Calendar App](/docs/introduction/use-calendar-app) - Core calendar configuration
+- [Calendar Types](/docs/introduction/events#calendar-types) - Event categorization and colors
+- [Theme Customization Guide](/docs/guides/theme-customization) - Advanced theming

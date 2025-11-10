@@ -82,11 +82,69 @@ export function TeamCalendar() {
 - `'buttons'`: renders a horizontal button group, great for desktop.
 - `'select'`: renders a dropdown, perfect when space is limited or you expose many view types.
 
-### calendars, defaultCalendar & theme
+### calendars & defaultCalendar
 
 - `calendars` defines each calendar type (`id`, `name`, `colors`, visibility). The Calendar Registry automatically picks light/dark colors based on `theme.mode` (`'light' | 'dark' | 'auto'`).
 - `defaultCalendar` determines which calendar new events inherit; if omitted, the first visible calendar wins.
-- `theme.colors` lets you align the UI with brand colors by overriding background/text/border tokens.
+
+### theme
+
+The `theme` configuration controls the visual appearance of the entire calendar:
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'dark', // 'light' | 'dark' | 'auto'
+  },
+});
+```
+
+**Theme Modes:**
+- `'light'`: Light mode with light backgrounds and dark text (default)
+- `'dark'`: Dark mode with dark backgrounds and light text
+- `'auto'`: Automatically follows system theme preference
+
+**Programmatic Theme Changes:**
+
+```tsx
+// Get current theme
+const currentTheme = calendar.app.getTheme();
+
+// Set theme
+calendar.app.setTheme('dark');
+
+// Subscribe to theme changes
+calendar.app.subscribeThemeChange((theme) => {
+  console.log('Theme changed to:', theme);
+});
+```
+
+**Custom Dark Mode Colors:**
+
+Define different colors for light and dark modes for each calendar type:
+
+```tsx
+const calendars = [
+  {
+    id: 'work',
+    name: 'Work',
+    colors: {
+      // Light mode colors
+      lineColor: '#0066cc',
+      backgroundColor: '#e6f2ff',
+      textColor: '#003d7a',
+    },
+    darkColors: {
+      // Dark mode colors
+      lineColor: '#4da6ff',
+      backgroundColor: '#1a3d5c',
+      textColor: '#b3d9ff',
+    },
+  },
+];
+```
+
+See [Dark Mode](/docs/features/dark-mode) for comprehensive theming documentation.
 
 ### useSidebar
 

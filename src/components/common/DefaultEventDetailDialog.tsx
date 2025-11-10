@@ -129,19 +129,18 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/60 dark:bg-black/80"
         onClick={handleBackdropClick}
       />
 
       {/* Dialog - relative positioning ensures it appears above backdrop */}
       <div
-        className="relative bg-white shadow-2xl border border-gray-200 rounded-lg p-6 max-w-md w-full mx-4"
-        style={{ backgroundColor: '#ffffff' }}
+        className="relative bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-lg p-6 max-w-md w-full mx-4"
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+          className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-200 transition"
           aria-label="Close"
         >
           <svg
@@ -161,7 +160,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
 
         {/* Content */}
         <div className="pr-8">
-          <span className="block text-xs text-gray-600 mb-1">Event Title</span>
+          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Event Title</span>
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex-1">
               <input
@@ -173,7 +172,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
                     title: e.target.value,
                   });
                 }}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
               />
             </div>
             <ColorPicker
@@ -190,7 +189,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
 
           {isAllDay ? (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 mb-1">Date Range</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Date Range</div>
               <RangePicker
                 value={[event.start, event.end]}
                 format="YYYY-MM-DD"
@@ -203,7 +202,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
             </div>
           ) : (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 mb-1">Time Range</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Time Range</div>
               <RangePicker
                 value={[event.start, event.end]}
                 timeZone={eventTimeZone}
@@ -228,7 +227,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
           )}
 
           <div className="mb-4">
-            <span className="block text-xs text-gray-600 mb-1">Note</span>
+            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Note</span>
             <textarea
               value={event.description ?? ''}
               onChange={e =>
@@ -238,7 +237,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
                 })
               }
               rows={4}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition resize-none"
+              className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition resize-none"
               placeholder="Add a note..."
             />
           </div>
@@ -246,14 +245,14 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
           <div className="flex space-x-2">
             {!isAllDay ? (
               <button
-                className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium transition"
+                className="px-3 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 text-sm font-medium transition"
                 onClick={convertToAllDay}
               >
                 Set as All-day
               </button>
             ) : (
               <button
-                className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-sm font-medium transition"
+                className="px-3 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 text-sm font-medium transition"
                 onClick={convertToRegular}
               >
                 Set as Timed Event
@@ -261,7 +260,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
             )}
 
             <button
-              className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm font-medium transition"
+              className="px-3 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 text-sm font-medium transition"
               onClick={() => {
                 onEventDelete(event.id);
                 onClose();

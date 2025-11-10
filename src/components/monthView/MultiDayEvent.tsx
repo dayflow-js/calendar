@@ -168,8 +168,8 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
 
             {segment.isLastSegment &&
               segment.segmentType !== 'single' && (
-                <div className="flex-shrink-0 ml-1 text-white/80">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/60"></div>
+                <div className="flex-shrink-0 ml-1 text-white/80 dark:text-white/90">
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80"></div>
                 </div>
               )}
           </div>
@@ -229,7 +229,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
 
     return (
       <div
-        className="absolute px-1 text-xs select-none flex items-center transition-all duration-200 hover:shadow-sm group"
+        className="absolute px-1 text-xs select-none flex items-center transition-all duration-200 hover:shadow-sm dark:hover:shadow-lg dark:hover:shadow-black/20 group"
         style={{
           left: adjustedLeft,
           width: adjustedWidth,

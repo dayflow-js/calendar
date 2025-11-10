@@ -544,16 +544,18 @@ const WeekView: React.FC<WeekViewProps> = ({
                     {weekDays.map((_, idx) => (
                       <div key={idx} className="flex-1 flex items-center">
                         <div
-                          className="h-0.5 w-full relative"
+                          className={`h-0.5 w-full relative ${
+                            idx === todayIndex
+                              ? 'bg-red-600 dark:bg-red-500'
+                              : 'bg-red-100 dark:bg-red-900/30'
+                          }`}
                           style={{
-                            backgroundColor:
-                              idx === todayIndex ? '#C53030' : '#fdedebcc',
                             zIndex: 9999,
                           }}
                         >
                           {idx === todayIndex && todayIndex !== 0 && (
                             <div
-                              className="absolute w-2 h-2 bg-red-700 rounded-full"
+                              className="absolute w-2 h-2 bg-red-700 dark:bg-red-500 rounded-full"
                               style={{ top: '-3px', left: '-4px' }}
                             />
                           )}
@@ -593,14 +595,14 @@ const WeekView: React.FC<WeekViewProps> = ({
             ))}
 
             {/* Bottom boundary */}
-            <div className="h-3 border-t border-gray-200 flex relative">
-              <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500">
+            <div className="h-3 border-t border-gray-200 dark:border-gray-700 flex relative">
+              <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500 dark:text-gray-400">
                 00.00
               </div>
               {weekDays.map((_, dayIndex) => (
                 <div
                   key={`24-${dayIndex}`}
-                  className={`flex-1 relative border-r border-gray-200`}
+                  className={`flex-1 relative border-r border-gray-200 dark:border-gray-700`}
                 />
               ))}
             </div>

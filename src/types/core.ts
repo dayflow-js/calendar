@@ -2,7 +2,7 @@
 import React from 'react';
 import { Event } from './event';
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
-import { CalendarType, ThemeConfig } from './calendarTypes';
+import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
 
 /**
  * View type enum
@@ -148,6 +148,12 @@ export interface CalendarApp {
 
   // Event Detail Dialog
   getUseEventDetailDialog: () => boolean;
+
+  // Theme management
+  setTheme: (mode: ThemeMode) => void;
+  getTheme: () => ThemeMode;
+  subscribeThemeChange: (callback: (theme: ThemeMode) => void) => (() => void);
+  unsubscribeThemeChange: (callback: (theme: ThemeMode) => void) => void;
 }
 
 /**

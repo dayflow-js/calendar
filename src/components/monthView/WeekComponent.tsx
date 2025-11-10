@@ -479,8 +479,8 @@ const WeekComponent = React.memo<WeekComponentProps>(
         <div
           key={`day-${day.date.getTime()}`}
           className={`
-          relative flex flex-col border-r border-gray-200 last:border-r-0 
-          ${!belongsToCurrentMonth ? 'text-gray-400' : 'text-gray-800'}
+          relative flex flex-col border-r border-gray-200 dark:border-gray-700 last:border-r-0
+          ${!belongsToCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-100'}
         `}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
@@ -496,15 +496,15 @@ const WeekComponent = React.memo<WeekComponentProps>(
               ${day.isToday
                     ? 'bg-blue-500 text-white'
                     : belongsToCurrentMonth
-                      ? 'text-gray-900'
-                      : 'text-gray-400'
+                      ? 'text-gray-900 dark:text-gray-100'
+                      : 'text-gray-400 dark:text-gray-600'
                   }
             `}
               >
                 {day.day}
               </span>
               {day.day === 1 && (
-                <span className="text-xs text-gray-500 ml-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
                   {day.shortMonthName}
                 </span>
               )}
@@ -518,7 +518,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer hover:underline"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline"
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {
@@ -539,14 +539,14 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
     return (
       <div
-        className="relative select-none border-b border-gray-200"
+        className="relative select-none border-b border-gray-200 dark:border-gray-700"
         style={{ height: weekHeightPx }}
       >
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
         {firstDayOfMonth && (
           <div
             className={`
-            absolute top-10 left-0 z-30 bg-white/50 py-2 px-2 duration-300
+            absolute top-10 left-0 z-30 bg-white/50 dark:bg-gray-900/50 py-2 px-2 duration-300
             ${shouldShowMonthTitle ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
           `}
             style={{
@@ -554,7 +554,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
               maxWidth: 'fit-content',
             }}
           >
-            <span className="text-2xl font-bold">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {firstDayOfMonth.monthName} {firstDayOfMonth.year}
             </span>
           </div>

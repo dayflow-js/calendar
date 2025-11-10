@@ -1,0 +1,510 @@
+# Theme Customization Guide
+
+This guide covers advanced theme customization techniques for DayFlow Calendar, including custom color palettes, CSS variable customization, and Tailwind dark mode integration.
+
+## Table of Contents
+
+- [Custom Calendar Type Colors](#custom-calendar-type-colors)
+- [CSS Variable Customization](#css-variable-customization)
+- [Tailwind Integration](#tailwind-integration)
+- [Creating a Custom Theme](#creating-a-custom-theme)
+- [Accessibility Considerations](#accessibility-considerations)
+
+## Custom Calendar Type Colors
+
+### Basic Custom Colors
+
+Define unique colors for each calendar type with separate light and dark variants:
+
+```tsx
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'personal',
+      name: 'Personal',
+      colors: {
+        lineColor: '#0891b2', // cyan-600
+        backgroundColor: '#cffafe', // cyan-100
+        textColor: '#164e63', // cyan-900
+      },
+      darkColors: {
+        lineColor: '#22d3ee', // cyan-400
+        backgroundColor: '#164e63', // cyan-900
+        textColor: '#cffafe', // cyan-100
+      },
+    },
+  ],
+});
+```
+
+### Color Properties Explained
+
+Each color property serves a specific purpose:
+
+- **lineColor**: Border and accent color (left bar on events)
+- **backgroundColor**: Event background fill
+- **textColor**: Text color for event title and time
+
+### Brand Color Integration
+
+Match your brand colors with proper contrast:
+
+```tsx
+{
+  id: 'brand',
+  name: 'Brand Events',
+  colors: {
+    // Your brand primary color
+    lineColor: '#6366f1',        // Brand indigo
+    // Lightened for background
+    backgroundColor: '#e0e7ff',  // Indigo-100 (20% opacity equivalent)
+    // Darkened for text
+    textColor: '#312e81',        // Indigo-900
+  },
+  darkColors: {
+    // Lightened brand color for dark bg
+    lineColor: '#a5b4fc',        // Indigo-300
+    // Dark background with some color
+    backgroundColor: '#312e81',   // Indigo-900 (30% opacity equivalent)
+    // Light text
+    textColor: '#e0e7ff',        // Indigo-100
+  },
+}
+```
+
+### Color Generation Helper
+
+Use this utility to generate color sets:
+
+```tsx
+// utils/colorGenerator.ts
+interface ColorSet {
+  lineColor: string;
+  backgroundColor: string;
+  textColor: string;
+}
+
+/**
+ * Generate light mode colors from a base color
+ * Base color should be the main brand color (e.g., #6366f1)
+ */
+export function generateLightColors(baseColor: string): ColorSet {
+  // You can use a library like chroma-js or tinycolor2
+  // This is a simplified example
+  return {
+    lineColor: baseColor,
+    backgroundColor: lighten(baseColor, 0.9), // Very light
+    textColor: darken(baseColor, 0.4), // Very dark
+  };
+}
+
+/**
+ * Generate dark mode colors from a base color
+ */
+export function generateDarkColors(baseColor: string): ColorSet {
+  return {
+    lineColor: lighten(baseColor, 0.3), // Lighter variant
+    backgroundColor: darken(baseColor, 0.6), // Dark variant
+    textColor: lighten(baseColor, 0.8), // Very light
+  };
+}
+
+// Usage
+const brandColor = '#6366f1';
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'brand',
+      name: 'Brand',
+      colors: generateLightColors(brandColor),
+      darkColors: generateDarkColors(brandColor),
+    },
+  ],
+});
+```
+
+## CSS Variable Customization
+
+### Global CSS Variables
+
+DayFlow uses CSS variables for consistent theming. You can override these in your global CSS:
+
+```css
+/* styles/globals.css */
+
+:root {
+  /* Light mode variables */
+  --dayflow-bg-primary: #ffffff;
+  --dayflow-bg-secondary: #f9fafb;
+  --dayflow-text-primary: #111827;
+  --dayflow-text-secondary: #6b7280;
+  --dayflow-border: #e5e7eb;
+  --dayflow-hover: #f3f4f6;
+}
+
+.dark {
+  /* Dark mode variables */
+  --dayflow-bg-primary: #111827;
+  --dayflow-bg-secondary: #1f2937;
+  --dayflow-text-primary: #f9fafb;
+  --dayflow-text-secondary: #9ca3af;
+  --dayflow-border: #374151;
+  --dayflow-hover: #374151;
+}
+```
+
+### Component-Specific Variables
+
+Target specific calendar components:
+
+```css
+/* Calendar container */
+.calendar-container {
+  --calendar-bg: var(--dayflow-bg-primary);
+  --calendar-border: var(--dayflow-border);
+}
+
+/* Event styles */
+.calendar-event {
+  --event-hover-opacity: 0.9;
+  --event-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.dark .calendar-event {
+  --event-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Time grid */
+.time-grid {
+  --grid-line-color: var(--dayflow-border);
+  --grid-line-width: 1px;
+}
+```
+
+## Tailwind Integration
+
+### Tailwind Configuration
+
+Ensure your Tailwind config supports dark mode:
+
+```js
+// tailwind.config.js
+module.exports = {
+  darkMode: 'class', // Use class-based dark mode
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@dayflow/**/*.{js,ts,jsx,tsx}', // Include DayFlow components
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Add custom colors that work with DayFlow
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          // ... your brand colors
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+      },
+    },
+  },
+};
+```
+
+### Custom Component Styling
+
+Override DayFlow component styles using Tailwind:
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/core';
+
+function CustomStyledCalendar({ calendar }) {
+  return (
+    <div className="custom-calendar-wrapper">
+      <style jsx global>{`
+        /* Override with Tailwind classes */
+        .custom-calendar-wrapper .calendar-container {
+          @apply bg-gray-50 dark:bg-gray-950;
+        }
+
+        .custom-calendar-wrapper .calendar-header {
+          @apply border-b-2 border-brand-500 dark:border-brand-400;
+        }
+
+        .custom-calendar-wrapper .calendar-event {
+          @apply shadow-lg dark:shadow-2xl;
+        }
+      `}</style>
+
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## Creating a Custom Theme
+
+### Full Custom Theme Example
+
+Create a complete custom theme:
+
+```tsx
+// themes/oceanTheme.ts
+export const oceanTheme = {
+  mode: 'light' as const,
+  calendarTypes: [
+    {
+      id: 'deep-ocean',
+      name: 'Deep Ocean',
+      colors: {
+        lineColor: '#0369a1', // Sky-700
+        backgroundColor: '#e0f2fe', // Sky-100
+        textColor: '#0c4a6e', // Sky-900
+      },
+      darkColors: {
+        lineColor: '#7dd3fc', // Sky-300
+        backgroundColor: '#0c4a6e', // Sky-900
+        textColor: '#e0f2fe', // Sky-100
+      },
+    },
+    {
+      id: 'coral-reef',
+      name: 'Coral Reef',
+      colors: {
+        lineColor: '#ea580c', // Orange-600
+        backgroundColor: '#ffedd5', // Orange-100
+        textColor: '#7c2d12', // Orange-900
+      },
+      darkColors: {
+        lineColor: '#fb923c', // Orange-400
+        backgroundColor: '#7c2d12', // Orange-900
+        textColor: '#ffedd5', // Orange-100
+      },
+    },
+    {
+      id: 'sea-green',
+      name: 'Sea Green',
+      colors: {
+        lineColor: '#059669', // Emerald-600
+        backgroundColor: '#d1fae5', // Emerald-100
+        textColor: '#064e3b', // Emerald-900
+      },
+      darkColors: {
+        lineColor: '#34d399', // Emerald-400
+        backgroundColor: '#064e3b', // Emerald-900
+        textColor: '#d1fae5', // Emerald-100
+      },
+    },
+  ],
+};
+
+// Usage
+import { oceanTheme } from './themes/oceanTheme';
+
+function App() {
+  const calendar = useCalendarApp({
+    theme: { mode: oceanTheme.mode },
+    calendarTypes: oceanTheme.calendarTypes,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Theme Presets
+
+Create reusable theme presets:
+
+```tsx
+// themes/presets.ts
+export const themePresets = {
+  ocean: {
+    name: 'Ocean',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+  sunset: {
+    name: 'Sunset',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+  forest: {
+    name: 'Forest',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+};
+
+// Theme selector component
+function ThemeSelector({ calendar }) {
+  const [selectedTheme, setSelectedTheme] = useState('ocean');
+
+  const applyTheme = (themeName: string) => {
+    const theme = themePresets[themeName];
+    // Apply theme logic here
+    setSelectedTheme(themeName);
+  };
+
+  return (
+    <select onChange={e => applyTheme(e.target.value)} value={selectedTheme}>
+      {Object.entries(themePresets).map(([key, theme]) => (
+        <option key={key} value={key}>
+          {theme.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+## Accessibility Considerations
+
+### Color Contrast Requirements
+
+Follow WCAG 2.1 guidelines:
+
+| Content Type                | Contrast Ratio | Level |
+| --------------------------- | -------------- | ----- |
+| Normal text (under 18pt)    | 4.5:1          | AA    |
+| Large text (18pt or larger) | 3:1            | AA    |
+| UI components               | 3:1            | AA    |
+| Normal text (under 18pt)    | 7:1            | AAA   |
+
+### Testing Contrast
+
+Use this helper function to validate colors:
+
+```tsx
+// utils/contrast.ts
+
+/**
+ * Calculate relative luminance
+ */
+function getLuminance(r: number, g: number, b: number): number {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+/**
+ * Calculate contrast ratio between two colors
+ */
+export function getContrastRatio(color1: string, color2: string): number {
+  // Parse hex colors to RGB
+  const rgb1 = hexToRgb(color1);
+  const rgb2 = hexToRgb(color2);
+
+  const lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+  const lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+
+  const lighter = Math.max(lum1, lum2);
+  const darker = Math.min(lum1, lum2);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Check if color combination meets WCAG AA
+ */
+export function meetsWCAGAA(
+  textColor: string,
+  bgColor: string,
+  isLargeText = false
+): boolean {
+  const ratio = getContrastRatio(textColor, bgColor);
+  const required = isLargeText ? 3 : 4.5;
+  return ratio >= required;
+}
+
+// Usage
+const colors = {
+  textColor: '#164e63',
+  backgroundColor: '#cffafe',
+};
+
+if (!meetsWCAGAA(colors.textColor, colors.backgroundColor)) {
+  console.warn('Color combination does not meet WCAG AA standards');
+}
+```
+
+### High Contrast Mode
+
+Provide a high contrast option:
+
+```tsx
+const calendar = useCalendarApp({
+  theme: { mode: 'dark' },
+  calendarTypes: [
+    {
+      id: 'high-contrast',
+      name: 'High Contrast',
+      colors: {
+        lineColor: '#000000',
+        backgroundColor: '#ffffff',
+        textColor: '#000000',
+      },
+      darkColors: {
+        lineColor: '#ffffff',
+        backgroundColor: '#000000',
+        textColor: '#ffffff',
+      },
+    },
+  ],
+});
+```
+
+### Reduced Motion Support
+
+Respect user preferences for reduced motion:
+
+```css
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .calendar-event {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+```
+
+## Best Practices Summary
+
+1. **Always provide both light and dark colors** for calendar types
+2. **Test contrast ratios** to meet WCAG AA standards (minimum 4.5:1)
+3. **Use semantic color names** (e.g., 'primary', 'success') instead of literal colors
+4. **Maintain consistency** across calendar types
+5. **Consider colorblind users** - don't rely solely on color to convey information
+6. **Test with real content** to ensure readability
+7. **Respect system preferences** (dark mode, reduced motion)
+8. **Document your theme** for other developers
+
+## Resources
+
+### Tools
+
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) - Test color contrast
+- [Coolors](https://coolors.co/) - Generate color palettes
+- [Color Contrast Analyzer](https://www.tpgi.com/color-contrast-checker/) - Desktop tool for testing
+
+### Libraries
+
+- [chroma-js](https://gka.github.io/chroma.js/) - Color manipulation
+- [tinycolor2](https://github.com/bgrins/TinyColor) - Color utilities
+- [color](https://github.com/Qix-/color) - Color conversion and manipulation
+
+### Tailwind Resources
+
+- [Tailwind Dark Mode](https://tailwindcss.com/docs/dark-mode) - Official guide
+- [Tailwind Color Palette](https://tailwindcss.com/docs/customizing-colors) - Color customization
+
+## Related Documentation
+
+- [Dark Mode](/docs/features/dark-mode) - Dark mode overview and API
+- [Calendar Types](/docs/introduction/events#calendar-types) - Event categorization
+- [Use Calendar App](/docs/introduction/use-calendar-app) - Core configuration

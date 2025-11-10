@@ -57,21 +57,21 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 bg-gray-100 rounded-md px-2 py-1 hover:bg-gray-200 transition-colors h-8"
+        className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors h-8"
       >
         <span
           className="w-4 h-4 rounded-sm flex-shrink-0"
           style={{ backgroundColor: getColorForCalendarId(value) }}
         />
-        <ChevronsUpDown className="w-4 h-4 text-gray-600" />
+        <ChevronsUpDown className="w-4 h-4 text-gray-600 dark:text-gray-300" />
       </button>
 
       {isOpen && (
-        <ul className="absolute mt-1 w-full min-w-max bg-gray-100 rounded-md shadow-lg z-10 overflow-hidden">
+        <ul className="absolute mt-1 w-full min-w-max bg-gray-100 dark:bg-gray-700 rounded-md shadow-lg dark:shadow-gray-900/50 z-10 overflow-hidden border dark:border-gray-600">
           {options.map(opt => (
             <li
               key={opt.value}
-              className={`flex items-center px-2 py-1 cursor-pointer hover:bg-gray-300 transition-colors ${value === opt.value ? 'font-semibold' : ''
+              className={`flex items-center px-2 py-1 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors ${value === opt.value ? 'font-semibold' : ''
                 }`}
               onClick={() => handleSelect(opt.value)}
             >

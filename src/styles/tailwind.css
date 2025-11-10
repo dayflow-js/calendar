@@ -1,8 +1,27 @@
 @import 'tailwindcss';
 
+@variant dark (.dark &);
+
 :root {
+  /* Light mode colors */
   --background: #ffffff;
   --foreground: #171717;
+  --border: #e5e7eb;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+}
+
+.dark {
+  /* Dark mode colors */
+  --background: #111827;
+  --foreground: #f3f4f6;
+  --border: #374151;
+  --card: #1f2937;
+  --card-foreground: #f3f4f6;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
 }
 
 @theme inline {
@@ -13,9 +32,14 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light):not(.dark) {
+    --background: #111827;
+    --foreground: #f3f4f6;
+    --border: #374151;
+    --card: #1f2937;
+    --card-foreground: #f3f4f6;
+    --muted: #374151;
+    --muted-foreground: #9ca3af;
   }
 }
 
@@ -29,11 +53,11 @@ body {
 
 @layer components {
   .calendar-container {
-    @apply relative flex flex-col bg-white rounded-lg overflow-hidden shadow-lg border border-gray-200;
+    @apply relative flex flex-col bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700;
   }
 
   .calendar-header {
-    @apply flex justify-between items-center p-2 bg-white border-b border-gray-200;
+    @apply flex justify-between items-center p-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700;
   }
 
   .calendar-grid {
@@ -41,15 +65,15 @@ body {
   }
 
   .calendar-weekdays {
-    @apply grid grid-cols-7 border-b border-gray-200;
+    @apply grid grid-cols-7 border-b border-gray-200 dark:border-gray-700;
   }
 
   .calendar-day-label {
-    @apply flex-1 text-center text-gray-500 text-sm p-1;
+    @apply flex-1 text-center text-gray-500 dark:text-gray-400 text-sm p-1;
   }
 
   .calendar-time-column {
-    @apply w-20 flex-shrink-0 border-gray-200;
+    @apply w-20 flex-shrink-0 border-gray-200 dark:border-gray-700;
   }
 
   .calendar-time-slot {
@@ -57,23 +81,23 @@ body {
   }
 
   .calendar-time-row {
-    @apply h-[4.5rem] border-t first:border-none border-gray-200 flex;
+    @apply h-[4.5rem] border-t first:border-none border-gray-200 dark:border-gray-700 flex;
   }
 
   .calendar-time-cell {
-    @apply flex-1 relative border-r border-gray-200;
+    @apply flex-1 relative border-r border-gray-200 dark:border-gray-700;
   }
 
   .calendar-all-day-row {
-    @apply flex items-center border-b border-gray-200;
+    @apply flex items-center border-b border-gray-200 dark:border-gray-700;
   }
 
   .calendar-nav-button {
-    @apply p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors;
+    @apply p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors;
   }
 
   .calendar-today-button {
-    @apply px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded transition-colors;
+    @apply px-4 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors;
   }
 
   .calendar-event-base {
@@ -85,11 +109,11 @@ body {
   }
 
   .mini-calendar-day {
-    @apply text-center py-1 rounded text-xs h-6 w-6 hover:bg-gray-100 transition-colors;
+    @apply text-center py-1 rounded text-xs h-6 w-6 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
   }
 
   .calendar-checkbox {
-    @apply mr-2 h-4 w-4 inline-flex items-center justify-center border border-gray-300 rounded-sm cursor-pointer;
+    @apply mr-2 h-4 w-4 inline-flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-sm cursor-pointer;
     appearance: none;
     background-color: transparent;
     position: relative;

@@ -650,12 +650,12 @@ const RangePicker: React.FC<RangePickerProps> = ({
         return 'bg-blue-500 text-white font-semibold';
       }
       if (isInRange) {
-        return 'bg-blue-50 text-blue-600';
+        return 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300';
       }
       if (isOutsideMonth) {
-        return 'text-slate-300';
+        return 'text-slate-300 dark:text-gray-600';
       }
-      return 'text-slate-700 hover:bg-blue-50 hover:text-blue-600';
+      return 'text-slate-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300';
     })();
 
     return (
@@ -682,16 +682,16 @@ const RangePicker: React.FC<RangePickerProps> = ({
       : [...MINUTES, currentMinute].sort((a, b) => a - b);
 
     return (
-      <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm sm:w-28">
-        <div className="flex border-b border-slate-100 justify-center">
-          <div className='text-lg py-1'>{current.hour.toString().padStart(2, '0')}:{current.minute.toString().padStart(2, '0')}</div>
+      <div className="flex flex-col rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm sm:w-28">
+        <div className="flex border-b border-slate-100 dark:border-gray-600 justify-center">
+          <div className='text-lg py-1 text-slate-700 dark:text-gray-300'>{current.hour.toString().padStart(2, '0')}:{current.minute.toString().padStart(2, '0')}</div>
         </div>
 
         {/* Hour and Minute Selectors */}
         <div className="flex p-1">
           <div className="w-14">
             <div
-              className="h-72 overflow-y-auto rounded-md border border-slate-100 bg-white"
+              className="h-72 overflow-y-auto rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700"
               role="listbox"
               aria-label="Hour"
               ref={element => {
@@ -710,7 +710,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
                     onClick={() => handleHourSelect(field, hour)}
                     className={`flex h-8 w-full items-center justify-center text-sm transition ${isActive
                       ? 'bg-blue-500 text-white font-semibold'
-                      : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                      : 'text-slate-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300'
                       }`}
                     data-active={isActive ? 'true' : undefined}
                   >
@@ -722,7 +722,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
           </div>
           <div className="w-14">
             <div
-              className="h-72 overflow-y-auto rounded-md border border-slate-100 bg-white"
+              className="h-72 overflow-y-auto rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700"
               role="listbox"
               aria-label="Minute"
               ref={element => {
@@ -741,7 +741,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
                     onClick={() => handleMinuteSelect(field, minute)}
                     className={`flex h-8 w-full items-center justify-center text-sm transition ${isActive
                       ? 'bg-blue-500 text-white font-semibold'
-                      : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                      : 'text-slate-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300'
                       }`}
                     data-active={isActive ? 'true' : undefined}
                   >
@@ -883,21 +883,21 @@ const RangePicker: React.FC<RangePickerProps> = ({
       data-rangepicker-popup="true"
     >
       <div
-        className="space-y-3 rounded-xl border border-slate-200 bg-white p-3"
+        className="space-y-3 rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-3"
         style={{
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           width: matchTriggerWidth ? '100%' : undefined,
         }}
       >
         <div className="flex gap-1">
-          <div className="flex-3 rounded-xl border border-slate-200 bg-white shadow-sm w-full">
-            <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-700">
+          <div className="flex-3 rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm w-full">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-gray-600 px-3 py-2 text-sm font-medium text-slate-700 dark:text-gray-300">
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   disabled={disabled}
                   onClick={() => changeYear(-1)}
-                  className="rounded-md px-2 py-1 text-slate-400 transition hover:text-slate-600 disabled:opacity-40"
+                  className="rounded-md px-2 py-1 text-slate-400 dark:text-gray-400 transition hover:text-slate-600 dark:hover:text-gray-200 disabled:opacity-40"
                 >
                   <ChevronsLeft width={14} height={12} />
                 </button>
@@ -905,12 +905,12 @@ const RangePicker: React.FC<RangePickerProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={() => changeMonth(-1)}
-                  className="rounded-md px-2 py-1 text-slate-400 transition hover:text-slate-600 disabled:opacity-40"
+                  className="rounded-md px-2 py-1 text-slate-400 dark:text-gray-400 transition hover:text-slate-600 dark:hover:text-gray-200 disabled:opacity-40"
                 >
                   <ChevronLeft width={14} height={12} />
                 </button>
               </div>
-              <div className="text-sm font-semibold text-slate-700">
+              <div className="text-sm font-semibold text-slate-700 dark:text-gray-300">
                 {MONTHS[visibleMonth.month - 1]} {visibleMonth.year}
               </div>
               <div className="flex items-center gap-1">
@@ -918,7 +918,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={() => changeMonth(1)}
-                  className="rounded-md px-2 py-1 text-slate-400 transition hover:text-slate-600 disabled:opacity-40"
+                  className="rounded-md px-2 py-1 text-slate-400 dark:text-gray-400 transition hover:text-slate-600 dark:hover:text-gray-200 disabled:opacity-40"
                 >
                   <ChevronRight width={14} height={12} />
                 </button>
@@ -926,13 +926,13 @@ const RangePicker: React.FC<RangePickerProps> = ({
                   type="button"
                   disabled={disabled}
                   onClick={() => changeYear(1)}
-                  className="rounded-md px-2 py-1 text-slate-400 transition hover:text-slate-600 disabled:opacity-40"
+                  className="rounded-md px-2 py-1 text-slate-400 dark:text-gray-400 transition hover:text-slate-600 dark:hover:text-gray-200 disabled:opacity-40"
                 >
                   <ChevronsRight width={14} height={12} />
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-7 gap-1 px-3 pb-3 pt-2 text-center text-[11px] uppercase tracking-wide text-slate-400">
+            <div className="grid grid-cols-7 gap-1 px-3 pb-3 pt-2 text-center text-[11px] uppercase tracking-wide text-slate-400 dark:text-gray-500">
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
                 <span key={day}>{day}</span>
               ))}
@@ -967,10 +967,10 @@ const RangePicker: React.FC<RangePickerProps> = ({
     <div className="relative max-w-[400px]" ref={containerRef}>
       <div
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${disabled
-          ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400'
+          ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'
           : isOpen
-            ? 'border-blue-500 bg-white shadow-md'
-            : 'border-slate-200 bg-white hover:border-blue-300'
+            ? 'border-blue-500 bg-white dark:bg-gray-700 shadow-md'
+            : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500'
           }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -983,10 +983,10 @@ const RangePicker: React.FC<RangePickerProps> = ({
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
             className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-0 ${disabled
-              ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400'
+              ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
               : focusedField === 'start' && isOpen
-                ? ' bg-white text-blue-600'
-                : 'border-transparent bg-transparent text-slate-700 hover:border-blue-200'
+                ? ' bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400'
+                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300 hover:border-blue-200 dark:hover:border-blue-400'
               }`}
             placeholder={formatTemplate}
             autoComplete="off"
@@ -994,7 +994,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
           />
         </div>
 
-        <MoveRight className="text-slate-400" />
+        <MoveRight className="text-slate-400 dark:text-gray-500" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <input
@@ -1006,10 +1006,10 @@ const RangePicker: React.FC<RangePickerProps> = ({
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
             className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-0 ${disabled
-              ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400'
+              ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
               : focusedField === 'end' && isOpen
-                ? 'bg-white text-blue-600'
-                : 'border-transparent bg-transparent text-slate-700 hover:border-blue-200'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400'
+                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300 hover:border-blue-200 dark:hover:border-blue-400'
               }`}
             placeholder={formatTemplate}
             autoComplete="off"

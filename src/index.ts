@@ -7,6 +7,10 @@ export { useCalendarApp } from './core/useCalendarApp';
 export { DayFlowCalendar } from './core/DayFlowCalendar';
 export { CalendarRegistry } from './core/calendarRegistry';
 
+// Theme exports
+export { ThemeProvider, useTheme } from './contexts/ThemeContext';
+export type { ThemeContextType, ThemeProviderProps } from './contexts/ThemeContext';
+
 // View factories
 export { createDayView } from './factories/createDayView';
 export { createWeekView } from './factories/createWeekView';

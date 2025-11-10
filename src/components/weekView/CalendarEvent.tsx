@@ -39,6 +39,8 @@ import {
   eventIcon,
   resizeHandleTop,
   resizeHandleBottom,
+  resizeHandleLeft,
+  resizeHandleRight,
   textXs,
   textGray500,
   textGray800,
@@ -1132,7 +1134,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         {/* Left resize handle - only shown for single-day all-day events with onResizeStart */}
         {onResizeStart && (
           <div
-            className="resize-handle absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-20"
+            className={resizeHandleLeft}
             onMouseDown={e => {
               e.preventDefault();
               e.stopPropagation();
@@ -1156,7 +1158,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         {/* Right resize handle - only shown for single-day all-day events with onResizeStart */}
         {onResizeStart && (
           <div
-            className="resize-handle absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-20"
+            className={resizeHandleRight}
             onMouseDown={e => {
               e.preventDefault();
               e.stopPropagation();
@@ -1228,7 +1230,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
             {/* Right resize handle for multi-day events (only on the last segment) */}
             {!isFirstSegment && isLastSegment && multiDaySegmentInfo && (
               <div
-                className="resize-handle absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity z-20 bg-blue-500"
+                className={resizeHandleRight}
                 onMouseDown={e => {
                   e.preventDefault();
                   e.stopPropagation();

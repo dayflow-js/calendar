@@ -359,7 +359,7 @@ const DayView: React.FC<DayViewProps> = ({
     <div className={`flex h-full ${bgGray50}`}>
       {/* Left time axis area - 70% */}
       <div
-        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-[70%] bg-white border-r border-gray-200`}
+        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
       >
         <div className={`relative ${flexCol} h-full`}>
           {/* Fixed navigation bar */}
@@ -499,8 +499,8 @@ const DayView: React.FC<DayViewProps> = ({
                 ))}
 
                 {/* Bottom boundary */}
-                <div className="h-3 border-t border-gray-200 relative">
-                  <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500">
+                <div className="h-3 border-t border-gray-200 dark:border-gray-700 relative">
+                  <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500 dark:text-gray-400">
                     00.00
                   </div>
                 </div>
@@ -547,7 +547,7 @@ const DayView: React.FC<DayViewProps> = ({
       </div>
       {/* Right control panel - 30% */}
       <div
-        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[40%]'} w-[30%] bg-white`}
+        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[40%]'} w-[30%] bg-white dark:bg-gray-900`}
       >
         <div className={`${flexCol} h-full`}>
           {/* Mini calendar */}
@@ -617,8 +617,8 @@ const DayView: React.FC<DayViewProps> = ({
                     key={event.id}
                     className={`
                       ${p2} rounded border-l-4 cursor-pointer transition-colors
-                      ${selectedEvent?.id === event.id ? 'bg-blue-50 border-blue-500' : 'bg-gray-50 border-gray-300'}
-                      hover:bg-gray-100
+                      ${selectedEvent?.id === event.id ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-500' : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'}
+                      hover:bg-gray-100 dark:hover:bg-gray-700
                     `}
                     style={{
                       borderLeftColor: getLineColor(event.calendarId || 'blue'),

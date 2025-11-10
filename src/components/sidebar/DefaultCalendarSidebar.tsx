@@ -117,8 +117,8 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   );
 
   return (
-    <div className="flex h-full flex-col border-r border-gray-200 bg-white dark:bg-slate-900">
-      <div className="flex items-center px-3 py-2">
+    <div className="flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900">
+      <div className="flex items-center px-2 py-2">
         <button
           type="button"
           aria-label={isCollapsed ? 'Expand calendar sidebar' : 'Collapse calendar sidebar'}
@@ -126,9 +126,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           onClick={() => setCollapsed(!isCollapsed)}
         >
           {isCollapsed ? (
-            <PanelRightClose className="h-4 w-4 text-gray-500" />
+            <PanelRightClose className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           ) : (
-            <PanelRightOpen className="h-4 w-4 text-gray-500" />
+            <PanelRightOpen className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           )}
         </button>
         {!isCollapsed && (
@@ -204,7 +204,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
             </div>
             <div className={miniCalendarGrid}>
               {weekdayLabels.map(label => (
-                <div key={generateUniKey()} className={`${miniCalendarDayHeader} text-gray-500`}>
+                <div key={generateUniKey()} className={`${miniCalendarDayHeader} text-gray-500 dark:text-gray-400`}>
                   {label}
                 </div>
               ))}
