@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback } from 'react';
+import { useTheme } from 'next-themes';
 import { Temporal } from 'temporal-polyfill';
 import {
   CalendarDays,
@@ -134,6 +135,8 @@ const useDemoCalendar = ({
   switcherMode?: SwitcherMode;
   events?: Event[];
 }) => {
+  const { resolvedTheme } = useTheme();
+
   const memoizedEvents = useMemo(() => {
     if (events) {
       return events;
@@ -156,6 +159,12 @@ const useDemoCalendar = ({
   );
   const calendars = useMemo(() => cloneCalendarTypes(), []);
 
+  const themeMode = useMemo(() => {
+    if (resolvedTheme === 'dark') return 'dark';
+    if (resolvedTheme === 'light') return 'light';
+    return 'auto';
+  }, [resolvedTheme]);
+
   return useCalendarApp({
     views,
     plugins: [dragPlugin],
@@ -164,7 +173,7 @@ const useDemoCalendar = ({
     defaultView: ViewType.MONTH,
     initialDate: new Date(),
     switcherMode: switcherMode ?? 'buttons',
-    theme: { mode: 'dark' }
+    theme: { mode: themeMode }
   });
 };
 
@@ -191,22 +200,9 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
 export const SwitcherModeShowcase: React.FC = () => (
   <div className="flex flex-col gap-10">
     <div>
-      <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
-        Buttons Mode
-      </h4>
-      <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
-        The default experience with a centered button group for day, week, and
-        month views.
-      </p>
       <DemoCalendar switcherMode="buttons" className="h-[480px]" />
     </div>
     <div>
-      <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
-        Select Dropdown Mode
-      </h4>
-      <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
-        A compact select control that keeps toolbars tidy and mobile friendly.
-      </p>
       <DemoCalendar switcherMode="select" className="h-[480px]" />
     </div>
   </div>

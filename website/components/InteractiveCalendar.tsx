@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTheme } from 'next-themes';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -19,6 +20,7 @@ import { generateSampleEvents } from '@/utils/sampleData';
 const calendarTypes: CalendarType[] = getWebsiteCalendars();
 
 export function InteractiveCalendar() {
+  const { resolvedTheme } = useTheme();
   const currentView = ViewType.MONTH;
 
   const events = useMemo(() => generateSampleEvents(), []);
@@ -29,6 +31,12 @@ export function InteractiveCalendar() {
     () => [createDayView(), createWeekView(), createMonthView()],
     []
   );
+
+  const themeMode = useMemo(() => {
+    if (resolvedTheme === 'dark') return 'dark';
+    if (resolvedTheme === 'light') return 'light';
+    return 'auto';
+  }, [resolvedTheme]);
 
   const calendar = useCalendarApp({
     views,
@@ -41,7 +49,7 @@ export function InteractiveCalendar() {
     useSidebar: {
       enabled: true,
     },
-    theme: { mode: 'dark' }
+    theme: { mode: themeMode }
   });
 
   return (

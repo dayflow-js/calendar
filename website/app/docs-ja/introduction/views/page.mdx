@@ -1,0 +1,169 @@
+# ビュー
+
+DayFlow には日・週・月・年の 4 つのビューが用意されています。表示密度や操作感がそれぞれ異なるため、利用者のワークフローに合わせて組み合わせましょう。
+
+## 各ビューの特徴
+
+### 月ビュー
+
+伝統的なマンスリーカレンダー。1 か月の予定を鳥瞰しながらドラッグ&ドロップで編集できます。
+
+- **向いているケース**：長期計画の可視化、複数日のイベント配置、空き状況のざっくり確認
+- **主な機能**：バーチャルスクロール、終日/複数日イベント、イベント作成・移動・リサイズ、レスポンシブ対応
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createMonthView, ViewType } from '@dayflow/core';
+
+function MonthOnly() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 週ビュー
+
+1 日を時間軸で区切った 7 日分のグリッド。会議や細かいアポイント管理に最適です。
+
+- **向いているケース**：ミーティングの調整、工数見積り、時間単位のドラッグ編集
+- **主な機能**：24 時間スロット、現在時刻インジケータ、終日列、衝突検出、ダブルクリックで作成
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createWeekView, ViewType } from '@dayflow/core';
+
+function WeekOnly() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 日ビュー
+
+特定の 1 日に集中してタスクやイベントを整理するビュー。モバイルでも扱いやすい UI です。
+
+- **向いているケース**：集中した日次計画、タスク実行の進捗管理、他の日に気を散らされたくない場面
+- **主な機能**：1 日 24 時間グリッド、終日セクション、ミニカレンダーとイベント一覧、ドラッグ&リサイズ
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createDayView, ViewType } from '@dayflow/core';
+
+function DayOnly() {
+  const calendar = useCalendarApp({
+    views: [createDayView()],
+    defaultView: ViewType.DAY,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 年ビュー
+
+12 か月分を一度に確認できる年次グリッド。キーボード操作で高速に移動できます。
+
+- **向いているケース**：年間イベントの俯瞰、祝日や締切のざっくり配置、日付ピッカー代替
+- **主な機能**：マルチイヤーのバーチャルスクロール、レスポンシブレイアウト、現在日/選択日のハイライト、キーボードショートカット
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createYearView, ViewType } from '@dayflow/core';
+
+function YearOnly() {
+  const calendar = useCalendarApp({
+    views: [createYearView()],
+    defaultView: ViewType.YEAR,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 複数ビューを切り替える
+
+`views` に複数のファクトリを渡し、UI から `calendar.changeView` を呼び出せばタブのように切り替えられます。
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createYearView,
+  ViewType,
+} from '@dayflow/core';
+
+function MultiViewCalendar() {
+  const calendar = useCalendarApp({
+    views: [createDayView(), createWeekView(), createMonthView(), createYearView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    callbacks: {
+      onViewChange: view => console.log('view changed:', view),
+    },
+  });
+
+  return (
+    <div className="h-screen flex flex-col gap-4">
+      <div className="flex gap-2">
+        <button onClick={() => calendar.changeView(ViewType.DAY)}>Day</button>
+        <button onClick={() => calendar.changeView(ViewType.WEEK)}>Week</button>
+        <button onClick={() => calendar.changeView(ViewType.MONTH)}>Month</button>
+        <button onClick={() => calendar.changeView(ViewType.YEAR)}>Year</button>
+      </div>
+      <div className="flex-1">
+        <DayFlowCalendar calendar={calendar} />
+      </div>
+    </div>
+  );
+}
+```
+
+## プログラムからの制御
+
+共通の API を呼び出すだけで、独自のツールバーやショートカットからビューを制御できます。
+
+```tsx copy
+// ビュー切り替え
+calendar.changeView(ViewType.WEEK);
+
+// 日付ナビゲーション
+calendar.goToToday();
+calendar.goToPrevious();
+calendar.goToNext();
+calendar.selectDate(new Date(2024, 9, 15));
+
+const current = calendar.app.getCurrentView();
+console.log(current.type);
+```
+
+ビュー切り替えコンポーネントを自作する場合でも、この API 群さえ呼べば同じ挙動を実現できます。
+
+## ViewType 列挙体
+
+```ts copy
+export enum ViewType {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+```
+
+`createDayView()` などのファクトリが内部でこの enum を返すため、`defaultView` や `calendar.changeView` は必ず `ViewType` を指定してください。
+
+## 関連リンク
+
+- [イベントの扱い](/docs-ja/introduction/events)
+- [プラグイン](/docs-ja/introduction/plugins)
+- [DayFlow カレンダーの基本](/docs-ja/introduction/dayflow-calendar)

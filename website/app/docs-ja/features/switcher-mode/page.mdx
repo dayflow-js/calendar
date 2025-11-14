@@ -1,0 +1,38 @@
+import { SwitcherModeShowcase } from '@/components/FeatureShowcase';
+
+# ビュースイッチャーモード
+
+ヘッダーに表示されるビュー切り替え UI は `switcherMode` で制御できます。DayFlow には以下の 2 パターンが用意されています。
+
+- `buttons`：デスクトップに適したボタングループ。初期値はこちら。
+- `select`：ドロップダウン型で、省スペースかつモバイル向け。
+
+同じ設定で見た目の違いを比較したい場合は下のデモを触ってみてください。
+
+<SwitcherModeShowcase />
+
+## 使い方
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+} from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  switcherMode: 'select',
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+`switcherMode` を `'buttons'` ↔ `'select'` に切り替えるだけで、即座に別の UI を試せます。
+
+## 選択の目安
+
+- **ボタンモード**：3〜4 個のビューを並べて常に表示したいとき。ショートカットキーとも相性が良い。
+- **セレクトモード**：ヘッダースペースが限られている、またはモバイル UI を重視したいとき。
+
+カスタムヘッダーを作りたい場合は独自コンポーネントから `calendar.changeView()` を呼び出すだけで同じ体験を構築できます。

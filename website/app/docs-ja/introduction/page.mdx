@@ -1,0 +1,88 @@
+# はじめに
+
+DayFlow は「すぐに触れるカレンダー体験」を目指して設計された React コンポーネントスイートです。このページでは、最小構成で導入するための流れと、次に読むべきドキュメントをまとめました。
+
+## セットアップの流れ
+
+### DayFlow をインストール
+
+馴染みのあるパッケージマネージャーでコアパッケージとアイコンセットを追加します。
+
+```bash copy
+npm install @dayflow/core lucide-react
+# or
+yarn add @dayflow/core lucide-react
+# or
+pnpm add @dayflow/core lucide-react
+```
+
+### Tailwind CSS を準備
+
+DayFlow のスタイルは Tailwind CSS を前提としています。まだ環境に入っていない場合は次の 3 ステップで整えましょう。
+
+1. 依存関係をインストール
+
+```bash copy
+npm install -D tailwindcss @tailwindcss/postcss autoprefixer
+```
+
+2. プロジェクトルートに `postcss.config.mjs` を用意
+
+```js copy
+const config = {
+  plugins: ['@tailwindcss/postcss'],
+};
+
+export default config;
+```
+
+3. グローバル CSS で Tailwind を読み込む
+
+```css copy
+/* src/index.css など */
+@import 'tailwindcss';
+```
+
+### DayFlow のスタイルを読み込む
+
+Tailwind だけでは DayFlow のレイアウトは完成しません。アプリのエントリーポイントでスタイルシートを 1 行追加してください。
+
+```tsx copy
+import '@dayflow/core/dist/styles.css';
+```
+
+CSS でまとめて読み込みたい場合は次のように記述できます。
+
+```css copy
+@import '@dayflow/core/dist/styles.css';
+```
+
+## 最初のカレンダー
+
+`useCalendarApp` で状態を作り、`DayFlowCalendar` に渡すだけで月間ビューが表示されます。
+
+```tsx copy
+'use client';
+
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export default function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events: [],
+    calendars: [],
+    defaultView: 'month',
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 次に読むとよいページ
+
+- [イベント](/docs-ja/introduction/events)：予定作成・更新・削除の基本
+- [ビュー](/docs-ja/introduction/views)：日・週・月ビューの挙動
+- [サイドバー](/docs-ja/introduction/sidebar)：カレンダーリストやフィルターの構成
+- [機能一覧](/docs-ja/features)：DayFlow が提供する追加機能を俯瞰

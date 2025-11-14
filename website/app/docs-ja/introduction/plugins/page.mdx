@@ -1,0 +1,140 @@
+# プラグイン
+
+DayFlow はプラグイン方式で機能を拡張します。必要な機能だけを読み込み、設定や API から振る舞いを制御したり、独自プラグインを追加することもできます。
+
+## 仕組みの概要
+
+- **オン/オフが容易**：`plugins` 配列に追加したものだけが初期化されます。
+- **設定可能**：各プラグインは `createXxxPlugin(config)` のようにオプションを受け取ります。
+- **API へアクセス**：`calendar.app.getPlugin(name)` でプラグイン固有のサービスにアクセス可能。
+- **自作プラグイン**：`{ name, install(app) }` を実装すれば独自ロジックを組み込めます。
+
+## 標準プラグイン
+
+### ドラッグプラグイン
+
+イベントのドラッグ&ドロップやリサイズ、ダブルクリック作成などをまとめて提供します。
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDragPlugin,
+  createMonthView,
+  ViewType,
+} from '@dayflow/core';
+
+const dragPlugin = createDragPlugin({
+  enableDrag: true,
+  enableResize: true,
+  enableCreate: true,
+  enableAllDayCreate: true,
+  supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH],
+});
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  plugins: [dragPlugin],
+});
+```
+
+**主なオプション**
+
+```ts
+interface DragPluginConfig {
+  enableDrag?: boolean;         // イベントをドラッグで移動
+  enableResize?: boolean;       // 上下にドラッグして時間を変更
+  enableCreate?: boolean;       // ダブルクリックで新規作成
+  enableAllDayCreate?: boolean; // 終日行でのドラッグ作成
+  supportedViews?: ViewType[];  // 対応させたいビュー
+}
+```
+
+**実行中の設定を取得/更新**
+
+```tsx copy
+const dragService = calendar.app.getPlugin<DragService>('drag');
+dragService?.updateConfig({ enableResize: false });
+const isMonthSupported = dragService?.isViewSupported(ViewType.MONTH);
+```
+
+### Events プラグイン
+
+イベントの検証・フィルタリング・期間検索などをまとめて提供します。大規模データを扱う場合に便利です。
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createEventsPlugin,
+  createMonthView,
+} from '@dayflow/core';
+
+const eventsPlugin = createEventsPlugin({
+  enableAutoRecalculate: true,
+  enableValidation: true,
+  maxEventsPerDay: 100,
+});
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  plugins: [eventsPlugin],
+});
+```
+
+**主なオプション**
+
+```ts
+interface EventsPluginConfig {
+  enableAutoRecalculate?: boolean; // 週ビューなどで日付範囲が変わった際に自動再計算
+  enableValidation?: boolean;      // 追加・更新前にイベントを検証
+  defaultEvents?: Event[];         // 初期イベント
+  maxEventsPerDay?: number;        // 1 日のイベント数上限
+}
+```
+
+**API 例**
+
+```tsx copy
+const eventsService = calendar.app.getPlugin<EventsService>('events');
+const today = eventsService?.getByDate(new Date());
+const range = eventsService?.getByDateRange(start, end);
+const errors = eventsService?.validateEvent(event);
+```
+
+## 複数プラグインの併用
+
+多くのプロダクトではドラッグ操作とイベント管理の両方を同時に使います。
+
+```tsx copy
+const dragPlugin = createDragPlugin({ enableDrag: true });
+const eventsPlugin = createEventsPlugin({ enableValidation: true });
+
+const calendar = useCalendarApp({
+  views: [createMonthView(), createWeekView()],
+  plugins: [dragPlugin, eventsPlugin],
+  events: initialEvents,
+});
+```
+
+## 独自プラグインを作るには
+
+```ts
+const myPlugin = {
+  name: 'analytics',
+  install(app) {
+    app.on('event:create', event => analytics.track('create', event));
+  },
+};
+
+const calendar = useCalendarApp({
+  /* ... */
+  plugins: [myPlugin],
+});
+```
+
+`install` で `app` インスタンスにアクセスできるため、イベント購読やカスタム API の登録が自由に行えます。
+
+---
+
+プラグインは DayFlow の柔軟性を支える仕組みです。標準プラグインを土台にしつつ、自分たちの運用に合わせて拡張していきましょう。

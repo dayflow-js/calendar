@@ -1,0 +1,105 @@
+# DayFlowCalendar コンポーネント
+
+`DayFlowCalendar` は現在のビューを描画し、サイドバーやイベント詳細ダイアログなどの UI をひとまとめに扱う React コンポーネントです。`useCalendarApp` から返される `calendar` オブジェクトを渡すだけで、選択中のビューが自動的に切り替わります。
+
+## 基本的な使い方
+
+```tsx copy
+import {
+  DayFlowCalendar,
+  useCalendarApp,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export function CalendarDemo() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+    events: [],
+    useSidebar: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+このコンポーネントが担うのは以下のような処理です。
+
+- サイドバーの表示・折りたたみ
+- イベント詳細パネル/ダイアログの切り替え
+- ビュー変更やカレンダーの可視状態に合わせたレイアウト更新
+
+## Props
+
+| Prop | 型 | 必須 | 説明 |
+| --- | --- | --- | --- |
+| `calendar` | `UseCalendarAppReturn` | ✅ | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。 |
+| `className` | `string` | ❌ | ルートコンテナに追加するクラス名。標準クラスは `calendar-container`。 |
+| `style` | `React.CSSProperties` | ❌ | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。 |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | ❌ | 組み込み詳細パネルの中身だけを置き換える。 |
+| `customEventDetailDialog` | `EventDetailDialogRenderer` | ❌ | モーダル UI 全体をカスタム実装に差し替える。 |
+| `meta` | `Record<string, any>` | ❌ | すべてのビューへ受け渡したい任意の追加データ。 |
+
+## コンテナスタイルを調整する
+
+月ビューでのバーチャルスクロールのためデフォルト高さは 800px です。`style` または `className` で自由に変更できます。
+
+```tsx copy
+<DayFlowCalendar calendar={calendar} style={{ height: 600 }} />
+<DayFlowCalendar calendar={calendar} style={{ height: '100vh' }} />
+<DayFlowCalendar calendar={calendar} className="my-calendar shadow-lg" />
+```
+
+## サイドバー連携
+
+`useCalendarApp` 側で `useSidebar` を設定すると、`DayFlowCalendar` が自動的にレイアウトへ組み込みます。
+
+```tsx copy
+const calendar = useCalendarApp({
+  views: [createWeekView()],
+  useSidebar: {
+    width: 280,
+    initialCollapsed: false,
+  },
+});
+
+return <DayFlowCalendar calendar={calendar} />;
+```
+
+- `useSidebar: true` の場合はデフォルトのサイドバーが描画されます。
+- オブションオブジェクトを渡すと幅や折りたたみ状態、`render` での完全カスタムが可能です。
+
+## イベント詳細 UI
+
+DayFlow には 2 つの表示モードがあります。
+
+1. **パネルモード**：ビュー内に詳細パネルを表示。`customDetailPanelContent` で中身だけ差し替え可能。
+2. **ダイアログモード**：`useEventDetailDialog: true` を指定するとモーダル表示に切り替わり、`customEventDetailDialog` で UI 全体を置き換えできます。
+
+```tsx copy
+<DayFlowCalendar
+  calendar={calendar}
+  customEventDetailDialog={({ event, close }) => (
+    <MyDialog open={!!event} onClose={close}>
+      <EventForm event={event} onSubmit={handleSave} />
+    </MyDialog>
+  )}
+/>;
+```
+
+## メタデータの共有
+
+`meta` prop は登録済みの各ビューへそのまま渡されます。フラグや A/B テスト用の値を共有したいときに便利です。
+
+```tsx copy
+<DayFlowCalendar calendar={calendar} meta={{ featureFlags: ['split-pane'] }} />
+```
+
+カスタムビューを実装している場合は `props.meta` から値を参照できます。
+
+---
+
+つまり `DayFlowCalendar` は「レイアウトと補助 UI の制御」を一手に引き受け、開発者は `useCalendarApp` の設定や周辺 UI に集中できるようになっています。
