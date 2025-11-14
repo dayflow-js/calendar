@@ -452,38 +452,6 @@ return {
 };
 ```
 
-### 4. Error Handling
-
-Handle errors gracefully and provide meaningful messages:
-
-```tsx copy
-install: (app: CalendarApp) => {
-  try {
-    // Plugin initialization
-  } catch (error) {
-    console.error('[MyPlugin] Failed to initialize:', error);
-    throw new Error('MyPlugin initialization failed');
-  }
-};
-```
-
-### 5. Cleanup
-
-Clean up resources when needed:
-
-```tsx copy
-let timer: NodeJS.Timeout;
-
-install: (app: CalendarApp) => {
-  timer = setInterval(() => {
-    // Do something periodically
-  }, 1000);
-
-  // Note: Add cleanup logic if your plugin needs it
-  // (Calendar doesn't have a built-in cleanup lifecycle yet)
-};
-```
-
 ## Plugin Lifecycle
 
 1. **Plugin Creation** - Call `createMyPlugin()` with config

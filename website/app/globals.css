@@ -10,10 +10,7 @@
   }
 }
 
-html body[data-scroll-locked] {
-  overflow: visible !important;
-  margin-right: 0 !important;
-}
+
 
 .nextra-banner-container {
   @apply bg-[linear-gradient(1deg,#383838,#212121)];

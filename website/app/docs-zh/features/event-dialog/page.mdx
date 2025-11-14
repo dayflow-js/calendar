@@ -1,0 +1,74 @@
+import { EventDialogShowcase } from '@/components/FeatureShowcase';
+
+# 事件对话框
+
+DayFlow 自带的事件对话框涵盖了大多数团队需要的 CRUD 流程：创建/编辑/删除、全天与定时切换、日历颜色选择、备注输入等，都在同一个模态中完成。
+
+<EventDialogShowcase />
+
+## 亮点特性
+
+- **完整的事件管理**：在同一界面里完成添加、修改、删除
+- **智能时间段**：支持全天与定时事件随时互换，跨日区间自动计算
+- **时间范围选择器**：内置 RangePicker，精准选择开始/结束时间
+- **颜色与日历**：直接在对话框里选择 `calendarId`，同步对应颜色
+- **富文本备注**：可填写会议链接、议程等补充信息
+- **响应式布局**：从手机到桌面都保持舒适的表单体验
+- **Portal 渲染**：由 React Portal 统一处理遮罩与层级，避免干扰其他弹层
+
+## 使用方法
+
+当您使用 DayFlowCalendar 组件时，默认事件对话框会自动可用。只需点击任何事件即可打开对话框，或使用日历的 API 创建新事件。
+
+```tsx copy
+import { DayFlowCalendar } from '@dayflow/core';
+
+<DayFlowCalendar
+  calendar={calendar}
+  // 默认包含事件对话框
+/>;
+```
+
+## 功能详解
+
+### 标题与颜色
+
+- 事件标题实时同步到主视图
+- 可在下拉框中选择所属日历类型，颜色提示也会随之更新
+
+### 时间管理
+
+- **定时事件**：使用 RangePicker 选中起止时间
+- **全天事件**：勾选即可切换为全天模式，自动隐藏时间输入
+- **跨日事件**：选择结束时间在次日之后时，会自动按跨日形式呈现
+
+### 备注与附加字段
+
+- 备注区域支持多行文本，可放入会议链接、议题或重要备注
+- 如需更多字段，可以利用 `customEventDetailDialog` 完全替换
+
+### 快捷操作
+
+- “转换为全天 / 定时”一键切换
+- “删除事件”带确认提示，防止误删
+- 自动保存草稿，避免意外关闭导致内容丢失
+
+## 自定义
+
+若默认对话框不足以满足需求，可以通过 `customEventDetailDialog` 将其整体替换，UI 与交互完全由你掌控。参考 [自定义事件详情对话框](/docs-zh/features/custom-detail-dialog) 了解更多。
+
+```tsx copy
+<DayFlowCalendar
+  calendar={calendar}
+  customEventDetailDialog={YourCustomDialog}
+/>
+```
+
+## 对话框行为
+
+- 点击背景或按 `Esc` 即可关闭
+- 始终在视口居中显示，并根据屏幕尺寸自动调整宽度
+- 使用 React Portal 渲染，保证遮罩层级正确
+- 与日期/时间选择器、下拉菜单等 popup 组件无缝配合
+
+默认实现覆盖了大部分使用场景，若需要更复杂的流程（审批、费用等），可以基于此对话框示例进行扩展。

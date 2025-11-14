@@ -1,0 +1,308 @@
+# イベントの扱い
+
+DayFlow におけるイベントは、ビューやプラグインすべての土台になるデータ構造です。ここではイベント定義の考え方、作成・更新・削除の方法、そしてバックエンド連携までをまとめて紹介します。
+
+## イベントインターフェース
+
+日付/時刻はすべて [Temporal API](https://tc39.es/proposal-temporal/) をベースにしています。必要に応じて以下 3 種類を使い分けます。
+
+- **PlainDate**：終日イベント（開始・終了日のみ欲しい場合）
+- **PlainDateTime**：タイムゾーンを意識しないローカルの予定 ➜ **標準はこちらを推奨**
+- **ZonedDateTime**：タイムゾーン込みの予定（海外会議・移動など）
+
+```tsx copy
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+```
+
+| プロパティ | 型 | 説明 | 必須 |
+| --- | --- | --- | --- |
+| `id` | `string` | イベントを一意に識別する ID | ✅ |
+| `title` | `string` | カレンダーに表示するタイトル | ✅ |
+| `start` | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 開始日時。イベント種別に合わせて型を選択 | ✅ |
+| `end` | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う | ✅ |
+| `description` | `string` | メモや詳細。表示方法は自由 | ❌ |
+| `allDay` | `boolean` | true なら終日イベントとして描画 | ❌ |
+| `calendarId` | `string` | 複数カレンダーを使う場合のカテゴリ ID | ❌ |
+| `meta` | `Record<string, any>` | 任意の追加データ（場所・参加者など） | ❌ |
+
+## イベントの作り方
+
+### ヘルパー関数（最も簡単）
+
+`createEvent` などのヘルパーは `Date` を渡すだけで内部で Temporal に変換してくれます。
+
+```tsx copy
+import {
+  createEvent,
+  createAllDayEvent,
+  createTimedEvent,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+const meeting = createEvent({
+  id: '1',
+  title: 'チームミーティング',
+  start: new Date(2024, 9, 15, 10, 0),
+  end: new Date(2024, 9, 15, 11, 0),
+});
+
+const holiday = createAllDayEvent('2', 'カンファレンス', new Date(2024, 9, 20));
+
+const lunch = createTimedEvent(
+  '3',
+  'ランチ休憩',
+  new Date(2024, 9, 15, 12, 0),
+  new Date(2024, 9, 15, 13, 0)
+);
+```
+
+### Temporal を直接扱う
+
+日時の粒度を厳密に制御したい場合はインターフェースを直接実装します。
+
+```tsx copy
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+
+const localEvent: Event = {
+  id: '1',
+  title: 'ローカル会議',
+  start: Temporal.PlainDateTime.from({ year: 2024, month: 10, day: 15, hour: 10 }),
+  end: Temporal.PlainDateTime.from({ year: 2024, month: 10, day: 15, hour: 11 }),
+};
+
+const allDayEvent: Event = {
+  id: '2',
+  title: 'カンファレンス',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+};
+
+const timezoneEvent: Event = {
+  id: '3',
+  title: '国際ミーティング',
+  start: Temporal.ZonedDateTime.from('2024-10-16T14:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-16T15:00:00[America/New_York]'),
+};
+```
+
+### メタデータ付きのイベント
+
+`meta` は UI に露出しない任意の情報を詰め込めます。
+
+```tsx copy
+import { createEvent } from '@dayflow/core';
+
+const event = createEvent({
+  id: '3',
+  title: '顧客打ち合わせ',
+  description: 'Q4 のロードマップ確認',
+  start: new Date(2024, 9, 16, 14, 0),
+  end: new Date(2024, 9, 16, 15, 0),
+  meta: {
+    location: 'Zoom',
+    attendees: ['john@example.com', 'jane@example.com'],
+    recurring: false,
+  },
+});
+```
+
+## イベントの管理
+
+DayFlow では `useCalendarApp` から返る `calendar` インスタンスに対して CRUD を行います。
+
+### 追加
+
+```tsx copy
+calendar.addEvent(event);
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [event1, event2],
+});
+```
+
+### 更新
+
+```tsx copy
+calendar.updateEvent('event-id', {
+  title: 'タイトルを更新',
+  start: new Date(2024, 9, 15, 11, 0),
+  end: new Date(2024, 9, 15, 12, 0),
+});
+
+// 3 つ目の引数を true にするとドラッグ中などの一時状態として扱える
+calendar.updateEvent('event-id', updatedEvent, true);
+```
+
+### 削除・取得
+
+```tsx copy
+calendar.deleteEvent('event-id');
+
+const allEvents = calendar.getEvents();
+const { events } = calendar; // 現在の状態をそのまま参照
+```
+
+## コールバックと状態管理
+
+`callbacks` オプションを利用すると、UI 操作とアプリの状態更新をきれいに分離できます。
+
+```tsx copy
+import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: initialEvents,
+  callbacks: {
+    onEventCreate: (event: Event) => api.createEvent(event),
+    onEventUpdate: (event: Event) => api.updateEvent(event),
+    onEventDelete: (eventId: string) => api.deleteEvent(eventId),
+  },
+});
+```
+
+React ステートと組み合わせると次のようになります。
+
+```tsx copy
+import { useState } from 'react';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  Event,
+} from '@dayflow/core';
+
+function MyCalendar() {
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events,
+    callbacks: {
+      onEventCreate: event => setEvents(prev => [...prev, event]),
+      onEventUpdate: event => setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
+      onEventDelete: eventId => setEvents(prev => prev.filter(e => e.id !== eventId)),
+    },
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+バックエンドと同期する場合は非同期処理をコールバックに直接書いて問題ありません。
+
+```tsx copy
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events,
+  callbacks: {
+    onEventCreate: async event => {
+      const saved = await api.createEvent(event);
+      setEvents(prev => [...prev, saved]);
+    },
+    onEventUpdate: async event => {
+      await api.updateEvent(event);
+      setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+    },
+    onEventDelete: async eventId => {
+      await api.deleteEvent(eventId);
+      setEvents(prev => prev.filter(e => e.id !== eventId));
+    },
+  },
+});
+```
+
+## カレンダータイプと装飾
+
+`calendarId` と `calendars` 設定を組み合わせると、予定ごとに色やスタイルを切り替えられます。
+
+```tsx copy
+import { createEvent, useCalendarApp, createMonthView } from '@dayflow/core';
+
+const workEvent = createEvent({
+  id: '1',
+  title: 'デザインレビュー',
+  start: new Date(2024, 9, 15, 14, 0),
+  end: new Date(2024, 9, 15, 15, 0),
+  calendarId: 'work',
+});
+
+const personalEvent = createEvent({
+  id: '2',
+  title: '歯医者',
+  start: new Date(2024, 9, 16, 10, 0),
+  end: new Date(2024, 9, 16, 11, 0),
+  calendarId: 'personal',
+});
+
+const calendars = [
+  {
+    id: 'work',
+    name: '仕事',
+    colors: {
+      eventColor: '#3b82f6',
+      eventSelectedColor: '#2563eb',
+      lineColor: '#3b82f6',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'personal',
+    name: 'プライベート',
+    colors: {
+      eventColor: '#10b981',
+      eventSelectedColor: '#059669',
+      lineColor: '#10b981',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+];
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [workEvent, personalEvent],
+  calendars,
+});
+```
+
+## 複数日にまたがる予定
+
+```tsx copy
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+
+const conference: Event = {
+  id: '1',
+  title: 'Tech Conference 2024',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+};
+
+const nightShift: Event = {
+  id: '2',
+  title: '夜勤シフト',
+  start: Temporal.ZonedDateTime.from('2024-10-15T22:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-16T06:00:00[America/New_York]'),
+};
+```
+
+## ベストプラクティス
+
+1. **ID は必ず一意に**：UUID もしくはバックエンドの ID をそのまま使う
+2. **ヘルパーを優先**：`createEvent` 系で 9 割のユースケースを賄える
+3. **型の選択を意識**：終日 = PlainDate、通常 = PlainDateTime、時差対応 = ZonedDateTime
+4. **`calendarId` で分類**：色分けやフィルタリングが簡単になる
+5. **`meta` を活用**：場所や出席者など UI に依存しない情報をここへ
+6. **開始と終了の整合性をチェック**：`start < end` を守るとバグを防げる
+7. **バッチ更新を検討**：大量更新はまとめて `updateEvents` 相当の処理に寄せる
+
+## 参考リンク
+
+- 型定義：`src/types/event.ts`
+- 関連ドキュメント：[ビュー](/docs-ja/introduction/views) / [プラグイン](/docs-ja/introduction/plugins) / [はじめに](/docs-ja/introduction)

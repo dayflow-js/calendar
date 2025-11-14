@@ -5,6 +5,7 @@ import {
   EventDetailContentRenderer,
 } from '@/types/eventDetail';
 import { useTheme } from '@/contexts/ThemeContext';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
 
 /**
  * Event detail panel wrapper for rendering custom content in the default panel
@@ -30,9 +31,10 @@ export const EventDetailPanelWithContent: React.FC<
   contentRenderer: ContentComponent,
 }) => {
     const { effectiveTheme } = useTheme();
-    const arrowBgColor = effectiveTheme === 'dark' ? '#1f2937' : 'white';
+    const appliedTheme = resolveAppliedTheme(effectiveTheme);
+    const arrowBgColor = appliedTheme === 'dark' ? '#1f2937' : 'white';
     const arrowBorderColor =
-      effectiveTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
+      appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
     // Calculate arrow style (same logic as DefaultEventDetailPanel)
     const calculateArrowStyle = (): React.CSSProperties => {
@@ -167,7 +169,7 @@ export const EventDetailPanelWithContent: React.FC<
           left: `${position.left}px`,
           zIndex: 9999,
           pointerEvents: 'auto',
-          backgroundColor: effectiveTheme === 'dark' ? '#1f2937' : '#ffffff',
+          backgroundColor: appliedTheme === 'dark' ? '#1f2937' : '#ffffff',
         }}
       >
         <div style={arrowStyle}></div>

@@ -1,0 +1,120 @@
+import { CustomDetailDialogShowcase } from '@/components/FeatureShowcase';
+
+# 自定义事件详情对话框
+
+当你想把事件详情从侧边面板迁移到模态对话框时，只需为 `customEventDetailDialog` 提供一个组件即可。日历会负责开关状态，你可以专注在自定义 UI、表单流程或审批按钮上。下方的演示采用玻璃拟态风格，展示了一个带渐变 Hero、快捷操作和颜色选择器的现代化对话框。
+
+<CustomDetailDialogShowcase />
+
+## 要点速览
+
+- 该渲染器会收到 `event`、`isOpen`、`onClose`、`onEventUpdate`、`onEventDelete` 五个参数。
+- 只需要返回 JSX，适配你现有的任意对话框基础组件即可。
+- 开关逻辑由 DayFlow 统一处理，完成自定义操作后调用 `onClose()` 即可关闭。
+- `onEventUpdate`、`onEventDelete` 已与核心状态绑定，方便直接复用。
+
+## 示例代码
+
+```tsx copy
+const CustomDialog: EventDetailDialogRenderer = ({
+  event,
+  isOpen,
+  onClose,
+  onEventUpdate,
+  onEventDelete,
+}) => {
+  if (!isOpen) return null;
+
+  const accent = event.color ?? '#6366f1';
+  const handleColor = (next: string) =>
+    onEventUpdate({ ...event, color: next });
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-md sm:py-10"
+      data-event-detail-dialog="true"
+    >
+      <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div
+          className="absolute inset-x-0 top-0 h-44"
+          style={{
+            background: `linear-gradient(135deg, ${accent}, #0f172a)`,
+          }}
+        />
+
+        <header className="relative px-8 pt-10 pb-6 text-white">
+          <p className="text-xs uppercase tracking-[0.25em] text-white/70">
+            由 {event.meta?.owner ?? '团队'} 主办
+          </p>
+          <h2 className="mt-2 text-3xl font-semibold leading-tight">
+            {event.title}
+          </h2>
+          {event.description && (
+            <p className="mt-3 max-w-xl text-sm text-white/80">
+              {event.description}
+            </p>
+          )}
+        </header>
+
+        <section className="relative grid gap-6 px-8 pb-8 sm:grid-cols-[1.6fr,1fr]">
+          <article className="rounded-2xl border border-gray-100 bg-white/70 p-5 shadow-sm backdrop-blur">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              日程安排
+            </h3>
+            <p className="mt-3 text-sm text-gray-700">
+              {event.allDay
+                ? '全天'
+                : `${event.start.toString()} → ${event.end?.toString()}`}
+            </p>
+          </article>
+
+          <aside className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              个性化
+            </h3>
+            <p className="mt-2 text-xs text-gray-500">
+              与您的品牌调色板或优先级信号同步。
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {['#6366f1', '#f97316', '#22c55e', '#0ea5e9'].map(color => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => handleColor(color)}
+                  className="h-9 w-9 rounded-full border-2 border-white shadow-sm ring-offset-2 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                onEventDelete(event.id);
+                onClose();
+              }}
+              className="mt-4 w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+            >
+              删除事件
+            </button>
+          </aside>
+        </section>
+
+        <footer className="border-t border-gray-100 bg-gray-50 px-8 py-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-gray-400 hover:text-gray-900"
+          >
+            关闭
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+};
+
+<DayFlowCalendar calendar={calendar} customEventDetailDialog={CustomDialog} />;
+```
+
+现在点击事件将启动您的自定义对话框，同时保留默认生命周期。

@@ -1,0 +1,40 @@
+import { CustomDetailPanelShowcase } from '@/components/FeatureShowcase';
+
+# カスタム詳細パネル
+
+イベントをクリックすると、DayFlow は右側に詳細パネルを表示します。`customDetailPanelContent` にコンポーネントを渡すと、このパネルの「中身だけ」を好きな UI に差し替えられます。枠やアニメーションはライブラリ側で維持されるため、ビジネス固有の情報を安全に埋め込めます。
+
+<CustomDetailPanelShowcase />
+
+## 仕組み
+
+- ライブラリが用意したパネルコンテナはそのまま利用し、ボディ部分のみを置き換えます。
+- 渡される props は `event`, `onEventUpdate`, `onEventDelete`, `onClose` の 4 つ。
+- 更新系のコールバックは `useCalendarApp` と同じロジックに繋がっているため、ローカルでの状態更新と UI 連携を気にする必要はありません。
+
+## サンプル
+
+```tsx copy
+import type { EventDetailContentProps } from '@dayflow/core';
+
+const CustomContent = ({ event, onEventUpdate }: EventDetailContentProps) => (
+  <div className="space-y-3">
+    <h3 className="text-lg font-semibold">{event.title}</h3>
+    <button
+      className="rounded-full bg-indigo-600 px-3 py-1 text-sm text-white"
+      onClick={() => onEventUpdate({ ...event, color: '#2563eb' })}
+    >
+      企業カラーに更新
+    </button>
+  </div>
+);
+
+const calendar = useCalendarApp({
+  /* ... */
+  customDetailPanelContent: CustomContent,
+});
+
+<DayFlowCalendar calendar={calendar} customDetailPanelContent={CustomContent} />;
+```
+
+フォームやタグ、関連ドキュメントへのショートカットなど、チームに必要なコンテンツを自由に追加してください。

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { ThemeMode } from '@/types/calendarTypes';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
 
 /**
  * Theme Context Type
@@ -130,14 +131,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
     const root = document.documentElement;
 
-    // Remove both classes first
+    // When in auto mode, respect any existing host overrides (like global dark mode toggles)
+    const appliedTheme = resolveAppliedTheme(effectiveTheme);
+    const targetTheme = theme === 'auto' ? appliedTheme : effectiveTheme;
+
+    // Remove both classes first to avoid duplicates
     root.classList.remove('light', 'dark');
+    root.classList.add(targetTheme);
 
-    // Add the effective theme class
-    root.classList.add(effectiveTheme);
+    // Track which theme DayFlow applied for other consumers if needed
+    if (theme === 'auto') {
+      root.removeAttribute('data-dayflow-theme-override');
+    } else {
+      root.setAttribute('data-dayflow-theme-override', targetTheme);
+    }
 
-    // Also set data attribute for CSS selectors
-    root.setAttribute('data-theme', effectiveTheme);
+    // Set data attribute for CSS selectors
+    root.setAttribute('data-theme', targetTheme);
 
   }, [effectiveTheme, theme, systemTheme]);
 

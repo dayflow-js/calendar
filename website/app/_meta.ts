@@ -17,6 +17,18 @@ const meta: MetaRecord = {
     href: 'docs',
     title: 'Docs'
   },
+  'docs-zh': {
+    display: "hidden",
+    type: 'page',
+    href: 'docs-zh',
+    title: '中文文档'
+  },
+  'docs-ja': {
+    display: "hidden",
+    type: 'page',
+    href: 'docs-ja',
+    title: '日本語ドキュメント'
+  },
 }
 
 export default meta

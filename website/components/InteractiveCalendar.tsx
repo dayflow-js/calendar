@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTheme } from 'next-themes';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -13,23 +14,13 @@ import {
 } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
-import { CALENDAR_SIDE_PANEL } from '@/utils/palette';
+import { getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
 
-const calendarTypes: CalendarType[] = CALENDAR_SIDE_PANEL.map(item => ({
-  id: item.id,
-  name: item.name,
-  icon: item.icon,
-  colors: {
-    eventColor: `${item.color}20`,
-    eventSelectedColor: `${item.color}`,
-    lineColor: item.color,
-    textColor: item.color,
-  },
-  isVisible: true,
-}));
+const calendarTypes: CalendarType[] = getWebsiteCalendars();
 
 export function InteractiveCalendar() {
+  const { resolvedTheme } = useTheme();
   const currentView = ViewType.MONTH;
 
   const events = useMemo(() => generateSampleEvents(), []);
@@ -40,6 +31,12 @@ export function InteractiveCalendar() {
     () => [createDayView(), createWeekView(), createMonthView()],
     []
   );
+
+  const themeMode = useMemo(() => {
+    if (resolvedTheme === 'dark') return 'dark';
+    if (resolvedTheme === 'light') return 'light';
+    return 'auto';
+  }, [resolvedTheme]);
 
   const calendar = useCalendarApp({
     views,
@@ -52,7 +49,7 @@ export function InteractiveCalendar() {
     useSidebar: {
       enabled: true,
     },
-    theme: { mode: 'auto' }
+    theme: { mode: themeMode }
   });
 
   return (

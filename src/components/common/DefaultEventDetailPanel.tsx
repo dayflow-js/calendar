@@ -7,6 +7,7 @@ import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
 import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from './RangePicker';
 import { useTheme } from '@/contexts/ThemeContext';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
 
 /**
  * Default event detail panel component
@@ -23,8 +24,9 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
   onEventDelete,
 }) => {
   const { effectiveTheme } = useTheme();
-  const arrowBgColor = effectiveTheme === 'dark' ? '#1f2937' : 'white';
-  const arrowBorderColor = effectiveTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
+  const appliedTheme = resolveAppliedTheme(effectiveTheme);
+  const arrowBgColor = appliedTheme === 'dark' ? '#1f2937' : 'white';
+  const arrowBorderColor = appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {

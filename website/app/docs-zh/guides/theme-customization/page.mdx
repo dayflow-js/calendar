@@ -1,0 +1,373 @@
+# **主题定制指南**
+
+本指南涵盖 DayFlow Calendar 的高级主题定制技术，包括自定义配色方案、CSS 变量定制和 Tailwind 深色模式集成。
+
+## **自定义日历类型颜色**
+
+### **基础自定义颜色**
+
+为每个日历类型定义独特的颜色，包含浅色和深色变体：
+
+```tsx
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'personal',
+      name: '个人日程',
+      colors: {
+        lineColor: '#0891b2', // cyan-600
+        backgroundColor: '#cffafe', // cyan-100
+        textColor: '#164e63', // cyan-900
+      },
+      darkColors: {
+        lineColor: '#22d3ee', // cyan-400
+        backgroundColor: '#164e63', // cyan-900
+        textColor: '#cffafe', // cyan-100
+      },
+    },
+  ],
+});
+```
+
+### **颜色属性说明**
+
+每个颜色属性都有特定用途：
+
+- **lineColor**：边框和强调色（事件左侧条）
+- **backgroundColor**：事件背景填充色
+- **textColor**：事件标题和时间的文字颜色
+
+### **品牌颜色集成**
+
+使用符合对比度要求的品牌颜色：
+
+```tsx
+{
+  id: 'brand',
+  name: '品牌活动',
+  colors: {
+    // 您的品牌主色
+    lineColor: '#6366f1',        // 品牌靛蓝色
+    // 变浅用于背景
+    backgroundColor: '#e0e7ff',  // Indigo-100（相当于20%不透明度）
+    // 变深用于文字
+    textColor: '#312e81',        // Indigo-900
+  },
+  darkColors: {
+    // 在深色背景上使用较亮的品牌色
+    lineColor: '#a5b4fc',        // Indigo-300
+    // 带有些许色彩的深色背景
+    backgroundColor: '#312e81',   // Indigo-900（相当于30%不透明度）
+    // 浅色文字
+    textColor: '#e0e7ff',        // Indigo-100
+  },
+}
+```
+
+### **颜色生成助手**
+
+使用此工具生成颜色组合：
+
+```tsx
+// utils/colorGenerator.ts
+interface ColorSet {
+  lineColor: string;
+  backgroundColor: string;
+  textColor: string;
+}
+
+/**
+ * 从基础颜色生成浅色模式颜色
+ * 基础颜色应为品牌主色（例如 #6366f1）
+ */
+export function generateLightColors(baseColor: string): ColorSet {
+  // 可以使用 chroma-js 或 tinycolor2 等库
+  // 这是一个简化示例
+  return {
+    lineColor: baseColor,
+    backgroundColor: lighten(baseColor, 0.9), // 非常浅
+    textColor: darken(baseColor, 0.4), // 非常深
+  };
+}
+
+/**
+ * 从基础颜色生成深色模式颜色
+ */
+export function generateDarkColors(baseColor: string): ColorSet {
+  return {
+    lineColor: lighten(baseColor, 0.3), // 较亮变体
+    backgroundColor: darken(baseColor, 0.6), // 较暗变体
+    textColor: lighten(baseColor, 0.8), // 非常亮
+  };
+}
+
+// 使用示例
+const brandColor = '#6366f1';
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'brand',
+      name: '品牌',
+      colors: generateLightColors(brandColor),
+      darkColors: generateDarkColors(brandColor),
+    },
+  ],
+});
+```
+
+## **CSS 变量定制**
+
+### **全局 CSS 变量**
+
+DayFlow 使用 CSS 变量实现一致的主题定制。您可以在全局 CSS 中覆盖这些变量：
+
+```css
+/* styles/globals.css */
+
+:root {
+  /* 浅色模式变量 */
+  --dayflow-bg-primary: #ffffff;
+  --dayflow-bg-secondary: #f9fafb;
+  --dayflow-text-primary: #111827;
+  --dayflow-text-secondary: #6b7280;
+  --dayflow-border: #e5e7eb;
+  --dayflow-hover: #f3f4f6;
+}
+
+.dark {
+  /* 深色模式变量 */
+  --dayflow-bg-primary: #111827;
+  --dayflow-bg-secondary: #1f2937;
+  --dayflow-text-primary: #f9fafb;
+  --dayflow-text-secondary: #9ca3af;
+  --dayflow-border: #374151;
+  --dayflow-hover: #374151;
+}
+```
+
+### **组件特定变量**
+
+针对特定日历组件进行定制：
+
+```css
+/* 日历容器 */
+.calendar-container {
+  --calendar-bg: var(--dayflow-bg-primary);
+  --calendar-border: var(--dayflow-border);
+}
+
+/* 事件样式 */
+.calendar-event {
+  --event-hover-opacity: 0.9;
+  --event-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.dark .calendar-event {
+  --event-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* 时间网格 */
+.time-grid {
+  --grid-line-color: var(--dayflow-border);
+  --grid-line-width: 1px;
+}
+```
+
+## **Tailwind 集成**
+
+### **Tailwind 配置**
+
+确保您的 Tailwind 配置支持深色模式：
+
+```js
+// tailwind.config.js
+module.exports = {
+  darkMode: 'class', // 使用基于类的深色模式
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@dayflow/**/*.{js,ts,jsx,tsx}', // 包含 DayFlow 组件
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // 添加与 DayFlow 兼容的自定义颜色
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          // ... 您的品牌颜色
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+      },
+    },
+  },
+};
+```
+
+### **自定义组件样式**
+
+使用 Tailwind 覆盖 DayFlow 组件样式：
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/core';
+
+function CustomStyledCalendar({ calendar }) {
+  return (
+    <div className="custom-calendar-wrapper">
+      <style jsx global>{`
+        /* 使用 Tailwind 类覆盖样式 */
+        .custom-calendar-wrapper .calendar-container {
+          @apply bg-gray-50 dark:bg-gray-950;
+        }
+
+        .custom-calendar-wrapper .calendar-header {
+          @apply border-b-2 border-brand-500 dark:border-brand-400;
+        }
+
+        .custom-calendar-wrapper .calendar-event {
+          @apply shadow-lg dark:shadow-2xl;
+        }
+      `}</style>
+
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## **创建自定义主题**
+
+### **完整自定义主题示例**
+
+创建完整的自定义主题：
+
+```tsx
+// themes/oceanTheme.ts
+export const oceanTheme = {
+  mode: 'light' as const,
+  calendarTypes: [
+    {
+      id: 'deep-ocean',
+      name: '深海蓝',
+      colors: {
+        lineColor: '#0369a1',// Sky-700
+        backgroundColor: '#e0f2fe',// Sky-100
+        textColor: '#0c4a6e',// Sky-900},
+      darkColors: {
+        lineColor: '#7dd3fc',// Sky-300
+        backgroundColor: '#0c4a6e',// Sky-900
+        textColor: '#e0f2fe',// Sky-100},
+    },
+    {
+      id: 'coral-reef',
+      name: '珊瑚礁',
+      colors: {
+        lineColor: '#ea580c',// Orange-600
+        backgroundColor: '#ffedd5',// Orange-100
+        textColor: '#7c2d12',// Orange-900},
+      darkColors: {
+        lineColor: '#fb923c',// Orange-400
+        backgroundColor: '#7c2d12',// Orange-900
+        textColor: '#ffedd5',// Orange-100},
+    },
+    {
+      id: 'sea-green',
+      name: '海洋绿',
+      colors: {
+        lineColor: '#059669',// Emerald-600
+        backgroundColor: '#d1fae5',// Emerald-100
+        textColor: '#064e3b',// Emerald-900},
+      darkColors: {
+        lineColor: '#34d399',// Emerald-400
+        backgroundColor: '#064e3b',// Emerald-900
+        textColor: '#d1fae5',// Emerald-100},
+    },
+  ],
+};
+
+// 使用示例
+import { oceanTheme } from './themes/oceanTheme';
+
+function App() {
+  const calendar = useCalendarApp({
+    theme: { mode: oceanTheme.mode },
+    calendarTypes: oceanTheme.calendarTypes,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### **主题预设**
+
+创建可重用的主题预设：
+
+```tsx
+// themes/presets.ts
+export const themePresets = {
+  ocean: {
+    name: '海洋主题',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+  sunset: {
+    name: '日落主题',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+  forest: {
+    name: '森林主题',
+    calendarTypes: [
+      /* ... */
+    ],
+  },
+};
+
+// 主题选择器组件
+function ThemeSelector({ calendar }) {
+  const [selectedTheme, setSelectedTheme] = useState('ocean');
+
+  const applyTheme = (themeName: string) => {
+    const theme = themePresets[themeName];
+    // 在此处应用主题逻辑
+    setSelectedTheme(themeName);
+  };
+
+  return (
+    <select onChange={e => applyTheme(e.target.value)} value={selectedTheme}>
+      {Object.entries(themePresets).map(([key, theme]) => (
+        <option key={key} value={key}>
+          {theme.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+## **资源**
+
+### **工具**
+
+- [WebAIM 对比度检查器](https://webaim.org/resources/contrastchecker/) - 测试颜色对比度
+- [Coolors](https://coolors.co/) - 生成配色方案
+- [颜色对比度分析器](https://www.tpgi.com/color-contrast-checker/) - 用于测试的桌面工具
+
+### **库**
+
+- [chroma-js](https://gka.github.io/chroma.js/) - 颜色操作
+- [tinycolor2](https://github.com/bgrins/TinyColor) - 颜色工具
+- [color](https://github.com/Qix-/color) - 颜色转换和操作
+
+### **Tailwind 资源**
+
+- [Tailwind 深色模式](https://tailwindcss.com/docs/dark-mode) - 官方指南
+- [Tailwind 调色板](https://tailwindcss.com/docs/customizing-colors) - 颜色定制
+
+## **相关文档**
+
+- [深色模式](docs/features/dark-mode) - 深色模式概览和 API
+- [日历类型](docs/introduction/events#calendar-types) - 事件分类
+- [使用日历应用](docs/introduction/use-calendar-app) - 核心配置

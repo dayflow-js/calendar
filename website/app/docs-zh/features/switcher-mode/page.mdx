@@ -1,0 +1,31 @@
+import { SwitcherModeShowcase } from '@/components/FeatureShowcase';
+
+# 视图切换器模式
+
+`switcherMode` 决定了顶部视图切换器长什么样。DayFlow 内置两种表现形式：
+
+- `buttons`：水平按钮组，默认启用，适合桌面端
+- `select`：下拉菜单，节省空间，移动端更友好
+
+下面的示例使用同一套数据，方便你直观比较两种模式。
+
+<SwitcherModeShowcase />
+
+## 快速上手
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+} from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  switcherMode: 'select',
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+在 `'buttons'` 与 `'select'` 之间切换即可即时预览差异。如果还需要完全自定义的切换器，可以直接构建自己的控件并调用 `calendar.changeView`.

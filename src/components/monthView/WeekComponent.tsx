@@ -71,29 +71,38 @@ interface WeekComponentProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
 }
 
-// 常量定义
+// Constants
 const ROW_HEIGHT = 16;
 const ROW_SPACING = 17;
 const MULTI_DAY_TOP_OFFSET = 33;
-const MORE_TEXT_HEIGHT = 20; // "+ x more" 文本的高度
+const MORE_TEXT_HEIGHT = 20; // Height reserved for the "+ x more" indicator
 
 /**
- * 根据日期格子高度计算最多可显示的事件数量
- * 理想状态：4个事件 + "+ x more" 文本
- * 高度不足时：逐渐减少事件数量，最少只显示 "+ x more"
+ * Calculate how many single-day events can be shown inside a cell.
+ * Ideal case: show 4 events plus the "+ x more" indicator.
+ * When the height is limited, gradually reduce the number of events.
  */
 const calculateMaxEventsToShow = (weekHeight: number): number => {
-  // 减去日期数字区域的高度（约33px）和 "+ x more" 文本高度
-  const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET - MORE_TEXT_HEIGHT;
+  // Reserve the top portion for the date label/multi-day layer offset
+  const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET;
 
-  // 每个事件占用的高度（包括间距）
+  if (availableHeight <= 0) {
+    return 0;
+  }
+
   const eventHeight = ROW_SPACING;
+  const maxEventsWithoutCap = Math.floor(availableHeight / eventHeight);
+  const cappedEvents = Math.max(0, Math.min(4, maxEventsWithoutCap));
 
-  // 计算可以显示多少个事件
-  const maxEvents = Math.floor(availableHeight / eventHeight);
+  // If we're not limited by the hard cap of 4 events, ensure there's space for the "+ x more" line
+  if (
+    cappedEvents === maxEventsWithoutCap &&
+    availableHeight - cappedEvents * eventHeight < MORE_TEXT_HEIGHT
+  ) {
+    return Math.max(0, cappedEvents - 1);
+  }
 
-  // 限制范围：最少0个（只显示 "+ x more"），最多4个
-  return Math.max(0, Math.min(4, maxEvents));
+  return cappedEvents;
 };
 
 // Organize multi-day event segments
@@ -292,7 +301,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // 根据 weekHeight 动态计算最多可显示的事件数量
+    // Dynamically determine how many events can be shown based on the current week height
     const maxEventsToShow = useMemo(() => {
       return calculateMaxEventsToShow(weekHeight);
     }, [weekHeight]);
@@ -427,7 +436,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
         renderElements.push(
           <div
             key={`placeholder-layer-${layerIndex}-${day.date.getTime()}`}
-            className="flex-shrink-0"
+            className="shrink-0"
             style={{
               height: `${ROW_SPACING}px`,
               minHeight: `${ROW_SPACING}px`,

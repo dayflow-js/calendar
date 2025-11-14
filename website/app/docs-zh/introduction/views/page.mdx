@@ -1,0 +1,207 @@
+# 日历视图
+
+DayFlow 自带日、周、月、年四种视图。它们在信息密度、交互方式和终端适配上各有侧重，因此推荐根据团队场景挑选或组合使用。
+
+## 四种视图一览
+
+### 月视图
+
+传统的网格式月历，适合从宏观角度浏览计划。
+
+**适用场景**
+
+- 长周期排期和资源规划
+- 一次性查看多条日程并快速调整
+- 多日事件或跨周项目的可视化
+
+**功能亮点**
+
+- 虚拟滚动，渲染上百条事件仍然顺滑
+- 桌面 / 平板 / 移动端响应式布局
+- 支持拖拽创建、移动、调整长度
+- 终日事件与跨日事件自动铺排
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createMonthView, ViewType } from '@dayflow/core';
+
+function MonthOnly() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 周视图
+
+带 24 小时刻度的 7 天时间表，强调精确时间段。
+
+**适用场景**
+
+- 会议排期、班次排班、医疗预约等精确时间场景
+- 需要同时查看多个终日事件与带时间的事件
+- 键盘/鼠标混合操作的桌面应用
+
+**功能亮点**
+
+- 小时/半小时网格（24 小时制）
+- 当前时间指示、终日行、跨天事件铺排
+- 拖拽创建/移动、拖拽缩放调整时长
+- 双击创建、冲突检测和智能避让
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createWeekView, ViewType } from '@dayflow/core';
+
+function WeekOnly() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 日视图
+
+聚焦单日，左侧是 24 小时时间表，右侧可以放迷你月历和事件列表。
+
+**适用场景**
+
+- 专注当天的任务与会议，避免被其他日期干扰
+- 销售、客服等需要查看“今日待办 + 细节”的场景
+- 更适配移动端或窄屏设备
+
+**功能亮点**
+
+- 细粒度时间格、终日区域
+- 迷你日历 + 当日事件列表
+- 内置事件详情面板，可用 `customDetailPanelContent` 自定义
+- 拖拽/缩放操作与周视图保持一致
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createDayView, ViewType } from '@dayflow/core';
+
+function DayOnly() {
+  const calendar = useCalendarApp({
+    views: [createDayView()],
+    defaultView: ViewType.DAY,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 年视图
+
+一次展示 12 个月的全年棋盘，可通过键盘或滚动快速定位。
+
+**适用场景**
+
+- 年度 OKR、节假日、里程碑的 Bird-eye 视角
+- 日期选择器或跳转器
+- 长期项目的宏观排布
+
+**功能亮点**
+
+- 多年虚拟滚动与键盘导航
+- 桌面 4×3 / 平板 3×4 / 移动 2×6 响应式布局
+- 高亮今日、选中日期，并支持快捷跳转
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar, createYearView, ViewType } from '@dayflow/core';
+
+function YearOnly() {
+  const calendar = useCalendarApp({
+    views: [createYearView()],
+    defaultView: ViewType.YEAR,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 组合视图与切换
+
+想让用户自由切换，就把多个视图注册到 `views` 中，并在 UI 中调用 `calendar.changeView`。
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createYearView,
+  ViewType,
+} from '@dayflow/core';
+
+function MultiViewCalendar() {
+  const calendar = useCalendarApp({
+    views: [createDayView(), createWeekView(), createMonthView(), createYearView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    callbacks: {
+      onViewChange: view => console.log('view changed:', view),
+    },
+  });
+
+  return (
+    <div className="h-screen flex flex-col gap-4">
+      <div className="flex gap-2">
+        <button onClick={() => calendar.changeView(ViewType.DAY)}>日</button>
+        <button onClick={() => calendar.changeView(ViewType.WEEK)}>周</button>
+        <button onClick={() => calendar.changeView(ViewType.MONTH)}>月</button>
+        <button onClick={() => calendar.changeView(ViewType.YEAR)}>年</button>
+      </div>
+      <div className="flex-1">
+        <DayFlowCalendar calendar={calendar} />
+      </div>
+    </div>
+  );
+}
+```
+
+## 编程式控制
+
+日历实例提供统一 API，可被工具栏、快捷键或自定义按钮复用：
+
+```tsx copy
+// 切换视图
+calendar.changeView(ViewType.WEEK);
+
+// 日期导航
+calendar.goToToday();
+calendar.goToPrevious(); // 根据当前视图，跳转到上一天/周/月/年
+calendar.goToNext();
+calendar.selectDate(new Date(2024, 9, 15));
+
+// 读取当前视图
+const current = calendar.app.getCurrentView();
+console.log(current.type); // 'week'
+```
+
+如需更灵活的体验，可以配合 `switcherMode` 或完全自定义的按钮组。
+
+## ViewType 枚举
+
+```ts copy
+enum ViewType {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+```
+
+## 延伸阅读
+
+- [事件](/docs-zh/introduction/events)：为各视图提供统一的数据
+- [插件](/docs-zh/introduction/plugins)：用拖拽/验证等插件增强交互
+- [DayFlowCalendar](/docs-zh/introduction/dayflow-calendar)：了解容器如何协调视图和 UI

@@ -1,0 +1,119 @@
+import { DefaultColorPalette } from '@/components/ColorPalette';
+
+# 深色模式
+
+DayFlow Calendar 原生支持完整的深色模式能力：从视图、侧边栏、事件卡片到对话框，都会在浅色/深色/自动模式之间无缝切换。无论是桌面仪表盘还是移动端排程，都可以与系统偏好保持一致。
+
+## 功能综述
+
+- **三种主题模式**：`light`、`dark`、`auto`
+- **自动颜色调整**：事件颜色会针对不同背景自动优化对比度
+- **瞬时切换**：无白屏、无闪烁，状态保持不变
+- **系统同步**：`auto` 跟随操作系统主题变化
+- **自定义调色**：可为每个日历类型定义独立的浅/深色配色
+
+## 快速上手
+
+```tsx copy
+import { DayFlowCalendar, useCalendarApp } from '@dayflow/core';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    theme: {
+      mode: 'dark', // 'light' | 'dark' | 'auto'
+    },
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+切换模式也只需修改 `mode`：
+
+```tsx copy
+useCalendarApp({ theme: { mode: 'light' } });
+useCalendarApp({ theme: { mode: 'dark' } });
+useCalendarApp({ theme: { mode: 'auto' } });
+```
+
+## 编程式主题切换
+
+```tsx copy
+const calendar = useCalendarApp({ theme: { mode: 'light' } });
+
+const toggleTheme = () => {
+  const current = calendar.app.getTheme();
+  calendar.app.setTheme(current === 'light' ? 'dark' : 'light');
+};
+```
+
+如果需要让其他组件知道主题变化，可订阅事件：
+
+```tsx copy
+useEffect(() => {
+  const handler = (mode: ThemeMode) => setTheme(mode);
+  calendar.app.subscribeThemeChange(handler);
+  return () => calendar.app.unsubscribeThemeChange(handler);
+}, [calendar.app]);
+```
+
+## 为日历类型配置浅/深色
+
+```tsx copy
+const calendars = [
+  {
+    id: 'work',
+    name: '工作',
+    colors: {
+      lineColor: '#0066cc',
+      backgroundColor: '#e6f2ff',
+      textColor: '#003d7a',
+    },
+    darkColors: {
+      lineColor: '#4da6ff',
+      backgroundColor: '#1a3d5c',
+      textColor: '#b3d9ff',
+    },
+  },
+];
+
+const calendar = useCalendarApp({
+  theme: { mode: 'auto' },
+  calendars,
+});
+```
+
+> 建议：浅色模式选择亮背景 + 深文本，深色模式选择低饱和背景 + 偏发光的线条色，以保证对比度。
+
+## 默认色板
+
+DayFlow 预设了 10 种日历类型，浅色与深色都满足 WCAG AA 对比度，可直接使用：
+
+<DefaultColorPalette />
+
+## API 速查
+
+```ts copy
+interface ThemeConfig {
+  mode: 'light' | 'dark' | 'auto';
+}
+
+// CalendarApp
+app.getTheme(): ThemeMode;
+app.setTheme(mode: ThemeMode): void;
+app.subscribeThemeChange(callback: (theme: ThemeMode) => void): void;
+app.unsubscribeThemeChange(callback: (theme: ThemeMode) => void): void;
+```
+
+## 与 Tailwind / CSS 变量搭配
+
+- Tailwind 项目中可以设置 `darkMode: 'class'`，让页面根节点负责切换，再把当前模式传给 DayFlow。
+- 也可以通过 CSS 变量（如 `--dayflow-bg-primary`）覆盖默认颜色，形成统一的 Design Token。可参考[主题自定义指南](/docs-zh/guides/theme-customization)。
+
+## 测试建议
+
+1. 在浅色和深色模式下分别验证事件颜色与文字对比度（≥4.5:1）。
+2. 检查拖拽、事件对话框、侧边栏等交互在模式切换时是否仍清晰可见。
+3. 若使用 `auto` 模式，记得在系统主题切换时手动测试一次，确保没有闪烁。
+
+通过这些配置，DayFlow 可以轻松融入任何品牌配色与暗色策略中。

@@ -1,0 +1,40 @@
+import { CustomDetailPanelShowcase } from '@/components/FeatureShowcase';
+
+# 自定义事件详情内容
+
+当用户点击事件时，DayFlow 会在右侧打开一个细节面板。通过 `customDetailPanelContent` 参数，你可以只替换面板的“内容区域”，而完整的容器、动画和布局依旧由库托管。
+
+<CustomDetailPanelShowcase />
+
+## 要点
+
+- 仅需提供一个组件，负责渲染主体内容；滚动、头部、关闭按钮仍由内置面板处理。
+- 组件会拿到 `event`、`onEventUpdate`、`onEventDelete`、`onClose` 等回调，可直接执行保存/撤销/关闭等操作。
+- 无论是审批按钮、会议纪要、相关链接还是 KPI 模块，都可以内嵌在同一个面板中。
+- 若未来想切换到模态对话框，也可以保留同一套内容组件，在 `customEventDetailDialog` 中复用。
+
+## 示例代码
+
+```tsx copy
+const CustomContent = ({ event, onEventUpdate }: EventDetailContentProps) => (
+  <div>
+    <h3>{event.title}</h3>
+    <button onClick={() => onEventUpdate({ ...event, color: '#2563eb' })}>
+      更新颜色
+    </button>
+  </div>
+);
+
+const calendar = useCalendarApp({
+  views,
+  events,
+  customDetailPanelContent: CustomContent,
+});
+
+<DayFlowCalendar
+  calendar={calendar}
+  customDetailPanelContent={CustomContent}
+/>;
+```
+
+将同一组件传递给 `DayFlowCalendar`，默认面板将渲染您的自定义内容。

@@ -1,0 +1,226 @@
+import Link from 'next/link';
+
+<div className="nx-mb-6 nx-flex nx-flex-col nx-gap-3 nx-rounded-xl nx-border nx-border-blue-200 nx-bg-blue-50 nx-p-5 nx-text-sm nx-text-blue-700 dark:nx-border-blue-400/40 dark:nx-bg-blue-500/10 dark:nx-text-blue-200 md:nx-flex-row md:nx-items-center md:nx-justify-between">
+  <div>
+    想直接看效果？前往功能示例页，可在同一演示里切换默认侧边栏与自定义布局。
+  </div>
+  <Link
+    href="/docs-zh/features/sidebar"
+    className="nx-inline-flex nx-items-center nx-justify-center nx-rounded-full nx-bg-blue-500 nx-px-4 nx-py-2 nx-text-sm nx-font-semibold nx-text-white nx-shadow-sm nx-transition hover:nx-bg-blue-400"
+  >
+    查看侧边栏示例 →
+  </Link>
+</div>
+
+# 侧边栏
+
+DayFlow 的侧边栏用于呈现多个日历源、快捷操作与即将到来的事件。默认 UI 已经包含良好的交互，也可以按需完全替换。
+
+## 内置侧边栏
+
+通过 `useSidebar` 打开即可。默认面板内置如下能力：
+
+- 列出所有日历并显示颜色样例
+- 勾选控制 `calendarId` 的可见性
+- 一键全选/全隐藏
+- 折叠/展开以节省空间
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createDragPlugin,
+  ViewType,
+} from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView(), createWeekView(), createDayView()],
+  plugins: [createDragPlugin()],
+  events,
+  calendars,
+  defaultView: ViewType.WEEK,
+  useSidebar: {
+    enabled: true,
+    width: 280,
+  },
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+就算启用了侧边栏，`toggleCalendarVisibility`、`toggleAll`、`setCollapsed` 等 API 仍旧可以在自定义工具栏或插件中调用，二者并不冲突。
+
+## 完全自定义
+
+若要把侧栏换成团队自己的布局，只需要向 `useSidebar.render` 传入一个渲染函数。它会收到实时的日历状态与辅助操作。
+
+```tsx copy
+import type { CalendarSidebarRenderProps } from '@dayflow/core';
+
+const CustomSidebar = ({
+  app,
+  calendars,
+  toggleCalendarVisibility,
+  toggleAll,
+  isCollapsed,
+  setCollapsed,
+}: CalendarSidebarRenderProps) => {
+  if (isCollapsed) {
+    return <button onClick={() => setCollapsed(false)}>展开侧栏</button>;
+  }
+
+  return (
+    <aside className="flex h-full flex-col gap-4 p-4">
+      <header className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">日历列表</h3>
+        <div className="space-x-2">
+          <button onClick={() => toggleAll(true)}>全显</button>
+          <button onClick={() => toggleAll(false)}>全隐</button>
+        </div>
+      </header>
+      <ul className="space-y-2">
+        {calendars.map(calendar => (
+          <li key={calendar.id} className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={calendar.isVisible}
+              onChange={() =>
+                toggleCalendarVisibility(calendar.id, !calendar.isVisible)
+              }
+            />
+            <span
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: calendar.colors.eventColor }}
+            />
+            {calendar.name}
+          </li>
+        ))}
+      </ul>
+      <section className="rounded-xl border border-slate-200 p-3 text-xs">
+        <p>当前日期：{app.getCurrentDate().toDateString()}</p>
+        <p>事件总数：{app.getEvents().length}</p>
+      </section>
+    </aside>
+  );
+};
+
+const calendar = useCalendarApp({
+  /* ... */
+  useSidebar: {
+    enabled: true,
+    width: 320,
+    render: props => <CustomSidebar {...props} />,
+  },
+});
+```
+
+`CalendarSidebarRenderProps` 同时提供了 `toggleCalendarVisibility`、`toggleAll`、`isCollapsed`、`setCollapsed` 以及当前的 `app` 实例，方便在自定义侧栏里读取事件列表、选定日期等信息。
+
+## 设计建议
+
+- **宽度**：280–320 px 在桌面端阅读性最好；在移动端可以用 `initialCollapsed` 先收起。
+- **同步状态**：如果侧栏中需要显示 KPI、提醒或快捷筛选，直接读取 `app` 中的 `events`、`date` 即可，无需额外状态管理。
+- **体验一致**：保持与主日历相同的颜色体系，帮助用户快速理解不同日历来源。
+
+更多交互示例请参考 [功能 · 侧边栏](/docs-zh/features/sidebar)。
+
+## 配置参考
+
+```ts copy
+interface SidebarConfig {
+  enabled?: boolean;
+  width?: number | string;
+  initialCollapsed?: boolean;
+  render?: (props: CalendarSidebarRenderProps) => React.ReactNode;
+}
+
+interface CalendarSidebarRenderProps {
+  app: CalendarApp;
+  calendars: CalendarType[];
+  toggleCalendarVisibility: (calendarId: string, visible: boolean) => void;
+  toggleAll: (visible: boolean) => void;
+  isCollapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}
+```
+
+借助这些类型，可以在 TypeScript 中获得完整的智能提示。
+
+## 示例：带统计信息的侧边栏
+
+```tsx copy
+import type { CalendarSidebarRenderProps } from '@dayflow/core';
+import { useEffect, useState } from 'react';
+
+const AnalyticsSidebar = ({
+  app,
+  calendars,
+  toggleCalendarVisibility,
+}: CalendarSidebarRenderProps) => {
+  const [stats, setStats] = useState({ total: 0, upcoming: 0, today: 0 });
+
+  useEffect(() => {
+    const events = app.getEvents();
+    const today = new Date();
+    const todayEvents = events.filter(event =>
+      event.start.toDateString?.() === today.toDateString()
+    );
+
+    setStats({
+      total: events.length,
+      upcoming: events.filter(event => event.start > today).length,
+      today: todayEvents.length,
+    });
+  }, [app]);
+
+  return (
+    <aside className="flex h-full flex-col gap-4 p-4">
+      <section>
+        <h3 className="text-sm font-semibold">统计</h3>
+        <p className="text-xs text-slate-500">总事件：{stats.total}</p>
+        <p className="text-xs text-slate-500">即将到来：{stats.upcoming}</p>
+        <p className="text-xs text-slate-500">今天：{stats.today}</p>
+      </section>
+
+      <section>
+        <h3 className="text-sm font-semibold">日历列表</h3>
+        <ul className="space-y-2">
+          {calendars.map(calendar => (
+            <li key={calendar.id} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={calendar.isVisible}
+                onChange={() =>
+                  toggleCalendarVisibility(calendar.id, !calendar.isVisible)
+                }
+              />
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: calendar.colors.eventColor }}
+              />
+              {calendar.name}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </aside>
+  );
+};
+```
+
+通过这种方式，可以在侧栏里放 KPI、快捷筛选甚至团队公告，并且始终与主日历保持同步。
+
+1. **使用默认侧边栏作为起点** - 对于大多数用例来说已经足够了
+2. **只在需要时自定义** - 自定义侧边栏需要更多维护
+3. **保持侧边栏响应式** - 确保在不同屏幕尺寸下正常工作
+4. **利用 app 实例** - 访问实时数据和日历方法
+5. **处理折叠状态** - 为移动设备提供折叠选项
+
+## 相关文档
+
+- [快速开始](/docs-zh/introduction) - 基本设置
+- [事件](/docs-zh/introduction/events) - 事件管理
+- [视图](/docs-zh/introduction/views) - 日历视图

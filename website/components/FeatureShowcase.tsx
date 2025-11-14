@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback } from 'react';
+import { useTheme } from 'next-themes';
 import { Temporal } from 'temporal-polyfill';
 import {
   CalendarDays,
@@ -22,7 +23,10 @@ import {
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
+  CalendarType,
 } from '@dayflow/core';
+import { CALENDAR_SIDE_PANEL, getWebsiteCalendars } from '@/utils/palette';
+import { generateSampleEvents } from '@/utils/sampleData';
 
 type SwitcherMode = 'buttons' | 'select';
 
@@ -39,89 +43,68 @@ interface FeatureCardProps {
   children: React.ReactNode;
 }
 
-const createSampleEvents = (): Event[] => {
-  const today = Temporal.Now.plainDateISO();
-  const tomorrow = today.add({ days: 1 });
-  const nextWeek = today.add({ days: 7 });
-  const allDayStart = Temporal.PlainDate.from(nextWeek.toString());
-  const allDayEnd = Temporal.PlainDate.from(
-    nextWeek.add({ days: 1 }).toString()
-  );
+const cloneCalendarTypes = (): CalendarType[] => getWebsiteCalendars();
 
-  return [
-    {
-      id: 'event-1',
-      title: 'Sprint Planning',
-      description: 'Outline sprint goals and assign key tasks.',
-      start: today.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('09:30'),
-      }),
-      end: today.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('11:00'),
-      }),
-      calendarId: 'blue',
+const COLOR_PRESETS = CALENDAR_SIDE_PANEL.map(item => ({
+  id: item.id,
+  color: item.color,
+  label: item.name,
+}));
+
+const META_PRESETS = [
+  {
+    owner: 'Alice',
+    location: 'HQ West · Room 301',
+    attendees: ['Brian', 'Chiara', 'Diego'],
+    favorite: true,
+  },
+  {
+    owner: 'Brian',
+    location: 'Zoom',
+    attendees: ['Alice', 'Product Design'],
+    favorite: false,
+  },
+  {
+    owner: 'Chiara',
+    location: 'Local Bistro',
+    attendees: ['Ops', 'Marketing'],
+    favorite: false,
+  },
+  {
+    owner: 'Diego',
+    location: 'Online broadcast',
+    attendees: ['Stakeholders', 'Engineering'],
+    favorite: false,
+  },
+  {
+    owner: 'Mina',
+    location: 'HQ East · Innovation Lab',
+    attendees: ['Research', 'Growth'],
+    favorite: true,
+  },
+  {
+    owner: 'Noah',
+    location: 'Client HQ',
+    attendees: ['Customer team', 'Support'],
+    favorite: false,
+  },
+];
+
+const enrichEventsWithMeta = (sourceEvents: Event[]): Event[] =>
+  sourceEvents.map((event, index) => {
+    const preset = META_PRESETS[index % META_PRESETS.length];
+    return {
+      ...event,
       meta: {
-        owner: 'Alice',
-        location: 'Room 301',
-        favorite: true,
+        ...(event.meta ?? {}),
+        ...preset,
+        favorite:
+          typeof preset.favorite === 'boolean'
+            ? preset.favorite
+            : index % 4 === 0,
       },
-    },
-    {
-      id: 'event-2',
-      title: 'Design Review',
-      description: 'Review new dashboard designs with the product team.',
-      start: today.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('14:00'),
-      }),
-      end: today.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('15:30'),
-      }),
-      calendarId: 'green',
-      meta: {
-        owner: 'Brian',
-        location: 'Zoom',
-        favorite: false,
-      },
-    },
-    {
-      id: 'event-3',
-      title: 'Team Lunch',
-      description: 'Monthly team lunch to celebrate recent wins.',
-      start: tomorrow.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('12:00'),
-      }),
-      end: tomorrow.toZonedDateTime({
-        timeZone: 'UTC',
-        plainTime: Temporal.PlainTime.from('13:00'),
-      }),
-      calendarId: 'orange',
-      meta: {
-        owner: 'Chiara',
-        location: 'Local Bistro',
-        favorite: false,
-      },
-    },
-    {
-      id: 'event-4',
-      title: 'Product Showcase',
-      description: 'Live demo for enterprise customer group.',
-      start: allDayStart,
-      end: allDayEnd,
-      allDay: true,
-      calendarId: 'purple',
-      meta: {
-        owner: 'Diego',
-        location: 'Online',
-        favorite: false,
-      },
-    },
-  ];
-};
+    };
+  });
 
 const formatTemporal = (value: Event['start']) => {
   try {
@@ -136,12 +119,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   description,
   children,
 }) => (
-  <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-    <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
-      <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-      <p className="mt-2 text-sm text-gray-600">{description}</p>
+  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+    <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
+      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{description}</p>
     </div>
-    <div className="p-6 bg-white">{children}</div>
+    <div className="p-6 bg-white dark:bg-slate-900">{children}</div>
   </div>
 );
 
@@ -152,10 +135,14 @@ const useDemoCalendar = ({
   switcherMode?: SwitcherMode;
   events?: Event[];
 }) => {
-  const memoizedEvents = useMemo(
-    () => events ?? createSampleEvents(),
-    [events]
-  );
+  const { resolvedTheme } = useTheme();
+
+  const memoizedEvents = useMemo(() => {
+    if (events) {
+      return events;
+    }
+    return enrichEventsWithMeta(generateSampleEvents());
+  }, [events]);
 
   const views = useMemo(
     () => [createMonthView(), createWeekView(), createDayView()],
@@ -170,15 +157,23 @@ const useDemoCalendar = ({
       }),
     []
   );
+  const calendars = useMemo(() => cloneCalendarTypes(), []);
+
+  const themeMode = useMemo(() => {
+    if (resolvedTheme === 'dark') return 'dark';
+    if (resolvedTheme === 'light') return 'light';
+    return 'auto';
+  }, [resolvedTheme]);
 
   return useCalendarApp({
     views,
     plugins: [dragPlugin],
     events: memoizedEvents,
+    calendars,
     defaultView: ViewType.MONTH,
     initialDate: new Date(),
     switcherMode: switcherMode ?? 'buttons',
-    theme: { mode: 'auto' }
+    theme: { mode: themeMode }
   });
 };
 
@@ -191,7 +186,7 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   const calendar = useDemoCalendar({ switcherMode });
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
       <DayFlowCalendar
         calendar={calendar}
         className={`w-full ${className}`}
@@ -205,22 +200,9 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
 export const SwitcherModeShowcase: React.FC = () => (
   <div className="flex flex-col gap-10">
     <div>
-      <h4 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">
-        Buttons Mode
-      </h4>
-      <p className="mb-4 text-sm text-gray-500">
-        The default experience with a centered button group for day, week, and
-        month views.
-      </p>
       <DemoCalendar switcherMode="buttons" className="h-[480px]" />
     </div>
     <div>
-      <h4 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">
-        Select Dropdown Mode
-      </h4>
-      <p className="mb-4 text-sm text-gray-500">
-        A compact select control that keeps toolbars tidy and mobile friendly.
-      </p>
       <DemoCalendar switcherMode="select" className="h-[480px]" />
     </div>
   </div>
@@ -252,10 +234,10 @@ export const CustomDetailPanelShowcase: React.FC = () => {
         <div className="space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <h5 className="text-base font-semibold text-gray-900">
+              <h5 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                 {event.title}
               </h5>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {formatTemporal(event.start)} → {formatTemporal(event.end)}
               </p>
             </div>
@@ -267,18 +249,18 @@ export const CustomDetailPanelShowcase: React.FC = () => {
           </div>
 
           {event.description && (
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {event.description}
             </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
+          <div className="grid grid-cols-2 gap-3 text-xs text-slate-500 dark:text-slate-400">
             <div>
-              <span className="font-medium text-gray-700">Owner:</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">Owner:</span>
               <span>{meta.owner ?? 'Unassigned'}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Location:</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">Location:</span>
               <span>{meta.location ?? 'TBD'}</span>
             </div>
           </div>
@@ -287,14 +269,14 @@ export const CustomDetailPanelShowcase: React.FC = () => {
             <button
               type="button"
               onClick={handleToggleFavorite}
-              className="rounded-md border border-amber-300 px-3 py-1.5 text-xs font-medium text-amber-600 hover:bg-amber-50 transition-colors"
+              className="rounded-md border border-amber-300 dark:border-amber-600 px-3 py-1.5 text-xs font-medium text-amber-600 dark:text-amber-200 hover:bg-amber-50 dark:bg-amber-900/30 transition-colors"
             >
               {isFavorite ? 'Remove favorite' : 'Add to favorites'}
             </button>
             <button
               type="button"
               onClick={handleDelete}
-              className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-200 hover:bg-red-50 dark:bg-red-900/30 transition-colors"
             >
               Delete event
             </button>
@@ -307,9 +289,9 @@ export const CustomDetailPanelShowcase: React.FC = () => {
 
   return (
     <div>
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
         Use{' '}
-        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">
+        <code className="bg-slate-100 dark:bg-slate-800/70 px-1.5 py-0.5 rounded text-[11px] text-slate-800 dark:text-black">
           customDetailPanelContent
         </code>{' '}
         to replace the default panel content with business context and custom
@@ -326,7 +308,7 @@ export const CustomDetailPanelShowcase: React.FC = () => {
 export const EventDialogShowcase: React.FC = () => {
   return (
     <div>
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
         The built-in event dialog provides comprehensive event management with
         editing, time selection, calendar types, and delete functionality. Click
         any event to see it in action.
@@ -342,23 +324,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};
-      const colorPresets = [
-        { id: 'blue', color: '#6366f1' },
-        { id: 'orange', color: '#f97316' },
-        { id: 'green', color: '#22c55e' },
-        { id: 'teal', color: '#0ea5e9' },
-        { id: 'red', color: '#ef4444' },
-      ];
+      const colorPresets = COLOR_PRESETS;
       const accentColor =
-        colorPresets.find(preset => {
-          if (event.calendarId === preset.id) return true;
-          if (typeof event.calendarId === 'string') {
-            return (
-              event.calendarId.toLowerCase() === preset.color.toLowerCase()
-            );
-          }
-          return false;
-        })?.color ||
+        colorPresets.find(preset => preset.id === event.calendarId)?.color ||
         (typeof event.calendarId === 'string' && event.calendarId.startsWith('#')
           ? event.calendarId
           : '#6366f1');
@@ -538,7 +506,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
           className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-md sm:py-10"
           data-event-detail-dialog="true"
         >
-          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
+          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-2xl ring-1 ring-black/5">
             <div
               className="absolute inset-x-0 top-0 h-40"
               style={{
@@ -548,7 +516,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6 sm:top-6 z-10"
+              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-900/20 text-white transition hover:bg-white dark:bg-slate-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6 sm:top-6 z-10"
               aria-label="Close dialog"
             >
               <X className="h-5 w-5" />
@@ -572,7 +540,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     {headerChips.map(({ icon: Icon, label }) => (
                       <span
                         key={label}
-                        className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur"
+                        className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/10 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur"
                       >
                         <Icon className="h-4 w-4" />
                         {label}
@@ -584,7 +552,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleToggleFavorite}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${isFavorite ? 'bg-white/20 backdrop-blur' : 'hover:bg-white/15'
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${isFavorite ? 'bg-white dark:bg-slate-900/20 backdrop-blur' : 'hover:bg-white dark:bg-slate-900/15'
                       }`}
                     aria-label={
                       isFavorite ? 'Remove from focus list' : 'Add to focus list'
@@ -603,8 +571,8 @@ export const CustomDetailDialogShowcase: React.FC = () => {
             <div className="relative flex-1 overflow-y-auto px-7 pb-7 sm:px-9 sm:pb-9">
               <div className="grid gap-6 lg:grid-cols-[1.6fr,1fr]">
                 <div className="space-y-5">
-                  <div className="rounded-2xl border border-gray-100 bg-white/60 p-5 shadow-sm backdrop-blur">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm backdrop-blur">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Schedule
                     </h3>
                     <div className="mt-4 space-y-4">
@@ -636,8 +604,8 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                             style={{ backgroundColor: accentColor }}
                           />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{title}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{title}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                               {date}
                               {time ? ` · ${time}` : ''}
                             </p>
@@ -647,13 +615,13 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {durationLabel && (
-                        <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-200">
                           <Clock3 className="h-4 w-4" />
                           {durationLabel}
                         </span>
                       )}
                       {timeZoneLabel && (
-                        <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-200">
                           <Clock3 className="h-4 w-4" />
                           {timeZoneLabel}
                         </span>
@@ -661,46 +629,46 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Logistics
                     </h3>
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div className="flex items-start gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200">
                           <User className="h-5 w-5" />
                         </span>
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                             Host
                           </p>
-                          <p className="text-sm text-gray-900">
+                          <p className="text-sm text-slate-900 dark:text-slate-100">
                             {(meta.owner as string) ?? 'Unassigned'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200">
                           <MapPin className="h-5 w-5" />
                         </span>
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                             Location
                           </p>
-                          <p className="text-sm text-gray-900">{location}</p>
+                          <p className="text-sm text-slate-900 dark:text-slate-100">{location}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="mt-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Participants
                       </p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {participants.map(participant => (
                           <span
                             key={participant}
-                            className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm"
+                            className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1 text-xs font-medium text-slate-700 dark:text-slate-200 shadow-sm"
                           >
                             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
                             {participant}
@@ -712,20 +680,16 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                 </div>
 
                 <div className="space-y-5">
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Personalize
                     </h3>
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                       Update highlight colors to match your brand palette.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {colorPresets.map(({ id, color }) => {
-                        const isActive =
-                          event.calendarId === id ||
-                          (typeof event.calendarId === 'string' &&
-                            event.calendarId.toLowerCase() ===
-                            color.toLowerCase());
+                        const isActive = event.calendarId === id;
                         return (
                           <button
                             key={id}
@@ -741,8 +705,8 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Quick actions
                     </h3>
                     <div className="mt-4 space-y-3">
@@ -750,8 +714,8 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                         type="button"
                         onClick={handleToggleFavorite}
                         className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${isFavorite
-                            ? 'border-amber-200 bg-amber-50 text-amber-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                          ? 'border-amber-200 bg-amber-50 dark:bg-amber-900/30 text-amber-700'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-slate-300'
                           }`}
                       >
                         <span>
@@ -762,7 +726,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleDelete}
-                        className="flex w-full items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-100"
+                        className="flex w-full items-center justify-between rounded-xl border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-200 transition hover:bg-red-100"
                       >
                         <span>Delete event</span>
                         <X className="h-4 w-4" />
@@ -771,7 +735,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-xs text-gray-500">
+              <div className="mt-6 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
                 Need more? Swap in your design system dialog.
               </div>
             </div>
@@ -784,9 +748,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
 
   return (
     <div>
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
         Use{' '}
-        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">
+        <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-[11px]">
           customEventDetailDialog
         </code>{' '}
         to supply a fully custom modal that aligns with your design system.

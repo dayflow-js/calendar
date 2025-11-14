@@ -1,0 +1,124 @@
+# 入门指南
+
+DayFlow 是一套围绕“即插即用的日历体验”打造的 React 组件。下面的内容会带你完成最小化集成，并指向后续更深入的章节。
+
+## 安装流程
+
+### 安装核心包
+
+任选熟悉的包管理器，把核心依赖和图标库一起装好：
+
+```bash copy
+npm install @dayflow/core lucide-react
+# or
+yarn add @dayflow/core lucide-react
+# or
+pnpm add @dayflow/core lucide-react
+```
+
+### 准备 Tailwind CSS
+
+DayFlow 的样式体系默认依赖 Tailwind。若项目里还没有，按照下面三步完成配置：
+
+1. 安装依赖
+
+```bash copy
+npm install -D tailwindcss @tailwindcss/postcss autoprefixer
+```
+
+2. 在项目根目录创建 `postcss.config.mjs`
+
+```js copy
+const config = {
+  plugins: ['@tailwindcss/postcss'],
+};
+
+export default config;
+```
+
+3. 在全局 CSS 中引入
+
+```css copy
+/* src/index.css 等 */
+@import 'tailwindcss';
+```
+
+### 引入 DayFlow 样式
+
+Tailwind 之外，还需要把 DayFlow 的基础样式拉进来，通常在应用入口处加一行即可。
+
+```tsx copy
+import '@dayflow/core/dist/styles.css';
+```
+
+如果喜欢把样式集中写在 CSS 文件里，也可以：
+
+```css copy
+@import '@dayflow/core/dist/styles.css';
+```
+
+## 创建第一个日历
+
+`useCalendarApp` 负责初始化状态，`DayFlowCalendar` 负责渲染。一个只包含月视图的最小示例如下：
+
+```tsx copy
+'use client';
+
+import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export default function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events: [],
+    calendars: [],
+    defaultView: 'month',
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 带事件的示例
+
+通过内置的 helper（`createEvent`、`createAllDayEvent`…）可以快速生成不同类型的事件。
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createEvent,
+  createAllDayEvent,
+} from '@dayflow/core';
+
+const events = [
+  createEvent({
+    id: '1',
+    title: '团队会议',
+    start: new Date(2024, 9, 10, 10, 0),
+    end: new Date(2024, 9, 10, 11, 0),
+  }),
+  createAllDayEvent('2', '项目截止', new Date(2024, 9, 15)),
+];
+
+function App() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+> 提醒：DayFlow 底层使用 [Temporal API](/docs-zh/temporal-migration) 处理日期/时间，helper 会替你做好转换，无需直接接触 Temporal。
+
+## 接下来？
+
+- [事件](/docs-zh/introduction/events)：了解事件模型、CRUD 与最佳实践
+- [视图](/docs-zh/introduction/views)：对比日/周/月/年视图的适用场景
+- [侧边栏](/docs-zh/introduction/sidebar)：启用默认侧栏或自定义内容
+- [功能总览](/docs-zh/features)：通过交互示例快速熟悉所有亮点功能

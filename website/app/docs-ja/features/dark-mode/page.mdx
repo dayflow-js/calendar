@@ -1,0 +1,115 @@
+import { DefaultColorPalette } from '@/components/ColorPalette';
+
+# ダークモード
+
+DayFlow にはライト/ダーク/自動の 3 つのテーマモードが標準搭載されており、ビューやサイドバー、イベントカード、ダイアログまで一貫して切り替わります。システム設定に合わせたり、アプリ独自のトグルから制御するのも簡単です。
+
+## 特徴
+
+- **3 モード対応**：`light` / `dark` / `auto`
+- **シームレスな切替**：ちらつきやレイアウト崩れなし
+- **システム連動**：`auto` で OS のテーマと同期
+- **イベントカラー最適化**：背景に応じたコントラスト調整
+- **API 完備**：`getTheme` / `setTheme` / `subscribeThemeChange`
+- **カレンダー単位の色替え**：各 `calendarId` にライト/ダーク用の色を設定可能
+
+## クイックスタート
+
+```tsx copy
+import { DayFlowCalendar, useCalendarApp } from '@dayflow/core';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    theme: { mode: 'dark' }, // 'light' | 'dark' | 'auto'
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+モードを切り替えるときは `mode` を変更するだけです。
+
+```tsx copy
+useCalendarApp({ theme: { mode: 'light' } }); // ライト
+useCalendarApp({ theme: { mode: 'dark' } });  // ダーク
+useCalendarApp({ theme: { mode: 'auto' } });  // OS に追従
+```
+
+## プログラムからの切り替え
+
+```tsx copy
+const calendar = useCalendarApp({ theme: { mode: 'light' } });
+
+const toggleTheme = () => {
+  const current = calendar.app.getTheme();
+  calendar.app.setTheme(current === 'light' ? 'dark' : 'light');
+};
+```
+
+購読 API を使えば、アプリ全体でテーマを共有できます。
+
+```tsx copy
+useEffect(() => {
+  const handler = (mode: ThemeMode) => setTheme(mode);
+  calendar.app.subscribeThemeChange(handler);
+  return () => calendar.app.unsubscribeThemeChange(handler);
+}, [calendar.app]);
+```
+
+## カレンダータイプごとの色を調整
+
+```tsx copy
+const calendars = [
+  {
+    id: 'work',
+    name: '仕事',
+    colors: {
+      lineColor: '#0066cc',
+      backgroundColor: '#e6f2ff',
+      textColor: '#003d7a',
+    },
+    darkColors: {
+      lineColor: '#4da6ff',
+      backgroundColor: '#1a3d5c',
+      textColor: '#b3d9ff',
+    },
+  },
+];
+
+const calendar = useCalendarApp({
+  theme: { mode: 'auto' },
+  calendars,
+});
+```
+
+`darkColors` を省略するとライトモードの色がそのまま使われます。暗い背景でも読みやすいよう、必ずトーンを調整しましょう。
+
+## デフォルト色セット
+
+<DefaultColorPalette />
+
+## API リファレンス
+
+```ts copy
+interface ThemeConfig {
+  mode: 'light' | 'dark' | 'auto';
+}
+
+app.getTheme(): ThemeMode;
+app.setTheme(mode: ThemeMode): void;
+app.subscribeThemeChange((mode: ThemeMode) => void): void;
+app.unsubscribeThemeChange((mode: ThemeMode) => void): void;
+```
+
+## Tailwind / CSS 変数との併用
+
+- Tailwind で `darkMode: 'class'` にしている場合、ページのルートに付与している `dark` クラスと DayFlow の `theme.mode` を同期させると整合性が取れます。
+- `--dayflow-bg-primary` などの CSS カスタムプロパティを上書きすれば、より細かいトークンレベルでブランドカラーを適用できます（[テーマカスタマイズガイド](/docs-ja/guides/theme-customization) 参照）。
+
+## テストのヒント
+
+1. ライト/ダークの両方でイベント文字のコントラストが十分か確認する（4.5:1 以上が目安）。
+2. ドラッグ&ドロップ、ポップアップ、サイドバーなど動的 UI がモード切り替え時に崩れないかテストする。
+3. `auto` モードを使う場合は、OS のテーマ変更イベントを実機で試し、即時反映されるかチェックする。
+
+この仕組みを使えば、DayFlow を既存アプリのテーマ戦略にスムーズに統合できます。

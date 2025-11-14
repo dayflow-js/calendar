@@ -260,57 +260,6 @@ calendar.goToNext();
 calendar.selectDate(new Date(2024, 9, 15));
 ```
 
-## View-Specific Features
-
-### Month View
-
-```tsx copy
-// Month view supports virtual scrolling
-// Automatically loads weeks as user scrolls
-// Optimized for 3+ years of data
-```
-
-### Week View
-
-```tsx copy
-// Week view shows precise timing
-// Time slots from 0:00 to 24:00
-// Configurable hour range
-```
-
-### Day View
-
-```tsx copy
-// Day view includes mini calendar for quick navigation
-// Event list shows all events for selected day
-// Side panel for better focus
-```
-
-### Year View
-
-```tsx copy
-// Year view keyboard shortcuts
-// Arrow Up/Down: Previous/Next year
-// Home: Go to today
-// PageUp/PageDown: Jump 5 years
-```
-
-## Responsive Behavior
-
-All views are responsive and adapt to different screen sizes:
-
-- **Desktop**: Full features with optimal layout
-- **Tablet**: Adjusted grid layouts and spacing
-- **Mobile**: Optimized for touch interactions and smaller screens
-
-```tsx copy
-// Views automatically detect screen size and adjust:
-// - Month View: Adjusts week height and event display
-// - Week View: Maintains usability with touch-friendly event cards
-// - Day View: Optimized single-column layout
-// - Year View: Switches from 4×3 to 3×4 to 2×6 grid
-```
-
 ## ViewType Enum
 
 ```tsx copy
@@ -321,24 +270,3 @@ enum ViewType {
   YEAR = 'year',
 }
 ```
-
-## Best Practices
-
-1. **Always provide multiple views** for better user experience
-2. **Set a sensible default view** based on your use case
-3. **Persist view preference** in local storage if needed
-4. **Provide clear view switching UI** for users
-5. **Handle view change callbacks** to sync with your app state
-
-## Related Documentation
-
-- [Getting Started](/docs/getting-started) - Basic setup and usage
-- [Events](/docs/events) - Working with calendar events
-- [Drag and Drop](/docs/drag-and-drop) - Drag plugin configuration
-- [Customization](/docs/customization) - Customize view appearance
-
-## Example
-
-See the complete multi-view example in the repository:
-
-- `examples/with-all-views/MultiViewCalendar.tsx`

@@ -1,0 +1,26 @@
+import {
+  SidebarBasicsShowcase,
+  SidebarCustomShowcase,
+} from '@/components/SidebarShowcases';
+
+# 侧边栏
+
+这一页用两个示例展示侧边栏的不同形态：一个是开箱即用的默认布局，另一个是完全由 React 自绘的高定化版本。
+
+## 默认体验
+
+简单启用 `useSidebar` 就能获得包含颜色点、可见性开关和折叠按钮的侧栏。它会自动与日历状态同步，无需额外代码。
+
+<SidebarBasicsShowcase />
+
+## 自定义布局
+
+如果想把侧栏变成团队仪表盘或过滤中心，只要提供 `render` 函数即可。自定义版本依旧使用相同的 `calendar` 实例，因此拖拽事件、切换日历可见性都会实时反映在主视图中。
+
+<SidebarCustomShowcase />
+
+### 可以尝试
+
+- 在两个示例中切换日历可见性，观察 UI 如何瞬时同步
+- 拖拽或创建事件，侧栏的“即将到来”卡片会实时更新
+- 折叠侧栏，看看在周视图等高密度布局里如何回收更多空间

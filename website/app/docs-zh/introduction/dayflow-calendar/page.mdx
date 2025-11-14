@@ -1,0 +1,131 @@
+# **DayFlowCalendar 组件**
+
+`DayFlowCalendar` 是 React 日历组件的核心容器，负责渲染当前选中的视图、处理整体布局，并集成可选 UI 元素（如侧边栏和事件详情弹窗）。配合 `useCalendarApp` 和视图工厂函数，您可以用最少的代码快速构建功能完整的日历应用。
+
+## **基础用法**
+
+```tsx
+import {
+  DayFlowCalendar,
+  useCalendarApp,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export function CalendarDemo() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+    events: [],
+    useSidebar: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+该组件接收来自 `useCalendarApp` 的 `calendar` 对象，读取当前激活的视图，并渲染对应的视图组件。可以在 `DayFlowCalendar` 外部放置工具栏或其他自定义 UI，该组件本身已内置：
+
+- 可选日历侧边栏（通过 `useSidebar` 控制）
+- 事件详情弹窗支持（可通过 `useEventDetailDialog` 或自定义渲染器驱动）
+- 日历切换或视图变更时的自动布局更新
+
+## **属性说明**
+
+| **属性名**                 | **类型**                     | **说明**                                                              | **必填** |
+| -------------------------- | ---------------------------- | --------------------------------------------------------------------- | -------- |
+| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | ✅       |
+| `className`                | `string`                     | 根容器的附加类名（基础类名为 `calendar-container`）                   | ❌       |
+| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                    | ❌       |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                      | ❌       |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`          | ❌       |
+| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）          | ❌       |
+
+## **自定义容器样式**
+
+根容器默认高度为 `800px`，以确保月视图下虚拟滚动的正常运作。您可以通过 `style` 属性自定义样式：
+
+```tsx
+// 自定义高度
+<DayFlowCalendar
+  calendar={calendar}
+  style={{ height: 600 }}
+/>
+
+// 满屏高度
+<DayFlowCalendar
+  calendar={calendar}
+  style={{ height: '100vh' }}
+/>
+
+// 附加样式
+<DayFlowCalendar
+  calendar={calendar}
+  style={{ height: 1000, backgroundColor: '#f5f5f5' }}
+/>
+```
+
+也可以通过 `className` 添加自定义 CSS 类名，这些类名会附加在基础类 `calendar-container` 之后：
+
+```tsx
+<DayFlowCalendarcalendar={calendar}className="my-custom-calendar shadow-lg"/>
+```
+
+## **侧边栏配置**
+
+侧边栏通过 `useCalendarApp` 的 `useSidebar` 选项控制：
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createWeekView()],
+  useSidebar: {
+    width: 280,
+    initialCollapsed: false,
+  },
+});
+
+return <DayFlowCalendar calendar={calendar} />;
+```
+
+- 当 `useSidebar` 设为 `true` 时，会渲染默认侧边栏（`DefaultCalendarSidebar`），包含日历筛选器和全选控制功能
+- 当 `useSidebar` 为 `SidebarConfig` 配置对象时，可自定义宽度、默认折叠状态，或通过 `render(props)` 提供完全自定义的渲染器。自定义渲染器会接收到与 DayFlow 内部相同的 `CalendarSidebarRenderProps`，便于复用其辅助回调和数据
+
+## **事件详情展示**
+
+DayFlow 提供两种事件详情展示方式：
+
+1. **默认面板模式** - 当 `useEventDetailDialog` 为 `false` 时，各视图会渲染 `DefaultEventDetailPanel`。通过 `customDetailPanelContent` 可替换面板内容区域，同时保留默认框架
+2. **弹窗模式** - 在 `useCalendarApp` 中设置 `useEventDetailDialog: true` 可启用内置弹窗（`DefaultEventDetailDialog`）。通过 `customEventDetailDialog` 可完全替换弹窗 UI，底层 Hook 仍会管理打开/关闭状态和滚动锁定，您只需负责渲染内容
+
+```tsx
+<DayFlowCalendar
+  calendar={calendar}
+  customEventDetailDialog={({ event, close }) => (
+    <MyDialog isOpen={!!event} onClose={close}>
+      <EventForm event={event} onSubmit={handleSave} />
+    </MyDialog>
+  )}
+/>
+```
+
+## **向视图传递元数据**
+
+某些场景下需要向所有注册的视图共享上下文数据（如特性开关、数据分析处理器或布局提示）。使用 `meta` 属性即可在自定义视图组件中访问这些数据：
+
+```tsx
+<DayFlowCalendar calendar={calendar} meta={{ featureFlags: ['split-pane'] }} />
+```
+
+在视图组件内部，可通过 `props.meta` 访问元数据，并可按需传递给子组件。
+
+---
+
+总而言之，`DayFlowCalendar` 承担了协调层的职责——处理整体布局、侧边栏集成和事件详情逻辑——让您能够专注于配置 `useCalendarApp` 和构建周边的产品体验。
+
+## 相关文档
+
+- [useCalendarApp](/docs-zh/introduction/use-calendar-app) - 日历应用 hook
+- [快速开始](/docs-zh/introduction) - 设置指南
+- [视图](/docs-zh/introduction/views) - 可用视图

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback } from 'react';
+import { useTheme } from 'next-themes';
 import { Temporal } from 'temporal-polyfill';
 import {
   CalendarRange,
@@ -23,74 +24,27 @@ import {
   ViewType,
 } from '@dayflow/core';
 import { temporalToDate } from '@dayflow/core';
+import { getWebsiteCalendars } from '@/utils/palette';
 
-const BASE_CALENDARS: CalendarType[] = [
-  {
-    id: 'team',
-    name: 'Product Team',
-    icon: '👩‍💻',
-    colors: {
-      eventColor: 'rgba(59,130,246,0.12)',
-      eventSelectedColor: 'rgba(59,130,246,0.25)',
-      lineColor: '#2563eb',
-      textColor: '#1e3a8a',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'personal',
-    name: 'Personal',
-    icon: '❤️',
-    colors: {
-      eventColor: 'rgba(14,165,233,0.12)',
-      eventSelectedColor: 'rgba(14,165,233,0.25)',
-      lineColor: '#0ea5e9',
-      textColor: '#075985',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'learning',
-    name: 'Learning & Growth',
-    icon: '📚',
-    colors: {
-      eventColor: 'rgba(139,92,246,0.12)',
-      eventSelectedColor: 'rgba(139,92,246,0.25)',
-      lineColor: '#8b5cf6',
-      textColor: '#5b21b6',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'travel',
-    name: 'Travel',
-    icon: '✈️',
-    colors: {
-      eventColor: 'rgba(249,115,22,0.12)',
-      eventSelectedColor: 'rgba(249,115,22,0.25)',
-      lineColor: '#f97316',
-      textColor: '#c2410c',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'wellness',
-    name: 'Wellness',
-    icon: '🧘',
-    colors: {
-      eventColor: 'rgba(16,185,129,0.12)',
-      eventSelectedColor: 'rgba(16,185,129,0.25)',
-      lineColor: '#10b981',
-      textColor: '#047857',
-    },
-    isVisible: true,
-  },
-];
+const SIDEBAR_CALENDAR_IDS = new Set([
+  'team',
+  'personal',
+  'learning',
+  'travel',
+  'wellness',
+]);
+
+const BASE_CALENDARS: CalendarType[] = getWebsiteCalendars().filter(calendar =>
+  SIDEBAR_CALENDAR_IDS.has(calendar.id)
+);
 
 const cloneCalendars = (): CalendarType[] =>
   BASE_CALENDARS.map(calendar => ({
     ...calendar,
     colors: { ...calendar.colors },
+    darkColors: calendar.darkColors
+      ? { ...calendar.darkColors }
+      : undefined,
   }));
 
 const createSidebarEvents = (): Event[] => {
@@ -146,6 +100,8 @@ const createSidebarEvents = (): Event[] => {
 };
 
 const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
+  const { resolvedTheme } = useTheme();
+
   const views = useMemo(
     () => [createMonthView(), createWeekView(), createDayView()],
     []
@@ -162,6 +118,12 @@ const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
   const events = useMemo(() => createSidebarEvents(), []);
   const calendars = useMemo(() => cloneCalendars(), []);
 
+  const themeMode = useMemo(() => {
+    if (resolvedTheme === 'dark') return 'dark';
+    if (resolvedTheme === 'light') return 'light';
+    return 'auto';
+  }, [resolvedTheme]);
+
   return useCalendarApp({
     views,
     plugins: [dragPlugin],
@@ -171,7 +133,7 @@ const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
     initialDate: new Date(),
     switcherMode: 'buttons',
     useSidebar: sidebarConfig,
-    theme: { mode: 'auto' }
+    theme: { mode: themeMode }
   });
 };
 
@@ -375,4 +337,3 @@ export const SidebarCustomShowcase: React.FC = () => {
     </ShowcaseWrapper>
   );
 };
-

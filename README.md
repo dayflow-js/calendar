@@ -1,5 +1,7 @@
 # DayFlow
 
+**English** | [中文](README.zh.md) | [日本語](README.ja.md)
+
 A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views, and plugin architecture.
 
 [![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)

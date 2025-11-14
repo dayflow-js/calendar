@@ -1,0 +1,424 @@
+# **事件管理指南**
+
+事件是 Day Flow 日历的核心数据结构。本文将介绍如何创建、更新、删除和管理日历事件。
+
+## **事件接口定义**
+
+本库使用 Temporal API 处理所有日期/时间相关操作。事件支持三种 Temporal 类型：
+
+- **PlainDate**：适用于全天事件（不包含具体时间）
+- **PlainDateTime**：适用于本地事件（日期+时间，无时区）✨ **推荐在大多数场景使用**
+- **ZonedDateTime**：适用于时区敏感事件（国际会议、航班等）
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+```
+
+| 属性          | 类型                                                                     | 描述                                                                       | 必需 |
+| ------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ---- |
+| `id`          | `string`                                                                 | 事件的唯一标识符                                                           | ✅   |
+| `title`       | `string`                                                                 | 在日历中显示的事件标题                                                     | ✅   |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件开始日期/时间。使用 `PlainDate` 表示全天，`PlainDateTime` 表示本地时间 | ✅   |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                          | ✅   |
+| `description` | `string`                                                                 | 可选的事件描述或备注                                                       | ❌   |
+| `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                            | ❌   |
+| `calendarId`  | `string`                                                                 | 日历类型引用，用于多日历支持                                               | ❌   |
+| `meta`        | `Record<string, any>`                                                    | 额外的自定义元数据（位置、参与者、自定义字段等）                           | ❌   |
+
+## **创建事件**
+
+### **简单事件创建（推荐）**
+
+在大多数场景下，使用 `createEvent()` 辅助函数：
+
+```tsx
+import {
+  createEvent,
+  createAllDayEvent,
+  createTimedEvent,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+// 本地定时事件（无时区复杂性）
+const meeting = createEvent({
+  id: '1',
+  title: '团队会议',
+  start: new Date(2024, 9, 15, 10, 0), // 2024年10月15日 10:00
+  end: new Date(2024, 9, 15, 11, 0), // 2024年10月15日 11:00
+});
+
+// 全天事件
+const holiday = createAllDayEvent('2', '技术大会', new Date(2024, 9, 20));
+
+// 快速创建定时事件
+const lunch = createTimedEvent(
+  '3',
+  '午餐休息',
+  new Date(2024, 9, 15, 12, 0), // 12:00
+  new Date(2024, 9, 15, 13, 0) // 13:00
+);
+```
+
+### **高级用法：直接使用 Temporal API**
+
+如需更精细的控制，可直接使用 Temporal API：
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+
+// 使用 PlainDateTime 的本地事件（推荐）
+const localEvent: Event = {
+  id: '1',
+  title: '团队会议',
+  start: Temporal.PlainDateTime.from({
+    year: 2024,
+    month: 10,
+    day: 15,
+    hour: 10,
+    minute: 0,
+  }),
+  end: Temporal.PlainDateTime.from({
+    year: 2024,
+    month: 10,
+    day: 15,
+    hour: 11,
+    minute: 0,
+  }),
+};
+
+// 使用 PlainDate 的全天事件
+const allDayEvent: Event = {
+  id: '2',
+  title: '技术大会',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+};
+
+// 使用时区感知的 ZonedDateTime 事件
+const timezoneEvent: Event = {
+  id: '3',
+  title: '国际电话会议',
+  start: Temporal.ZonedDateTime.from('2024-10-16T14:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-16T15:00:00[America/New_York]'),
+};
+```
+
+### **包含元数据的事件**
+
+```tsx
+import { createEvent } from '@dayflow/core';
+
+const event = createEvent({
+  id: '3',
+  title: '客户电话',
+  description: '讨论第四季度路线图',
+  start: new Date(2024, 9, 16, 14, 0),
+  end: new Date(2024, 9, 16, 15, 0),
+  meta: {
+    location: 'Zoom 会议',
+    attendees: ['zhangsan@example.com', 'lisi@example.com'],
+    recurring: false,
+  },
+});
+```
+
+## **事件管理**
+
+### **添加事件**
+
+```tsx
+// 添加单个事件
+calendar.addEvent(event);
+
+// 初始化时添加多个事件const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [event1, event2, event3],
+});
+```
+
+### **更新事件**
+
+```tsx
+// 更新事件
+calendar.updateEvent('event-id', {
+  title: '更新后的会议标题',
+  start: new Date(2024, 9, 15, 11, 0),
+  end: new Date(2024, 9, 15, 12, 0),
+});
+
+// 使用待处理状态更新（适用于调整大小操作）
+calendar.updateEvent('event-id', updatedEvent, true);
+```
+
+### **删除事件**
+
+```tsx
+// 根据 ID 删除事件
+calendar.deleteEvent('event-id');
+```
+
+### **获取事件**
+
+```tsx
+// 获取所有事件const events = calendar.getEvents();
+
+// 从状态中获取当前事件const { events } = calendar;
+```
+
+## **事件回调函数**
+
+Day Flow 提供回调函数来处理事件生命周期：
+
+```tsx
+import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: initialEvents,
+  callbacks: {
+    onEventCreate: (event: Event) => {
+      console.log('新事件已创建:', event);
+      // 与后端同步
+      api.createEvent(event);
+    },
+    onEventUpdate: (event: Event) => {
+      console.log('事件已更新:', event);
+      // 与后端同步
+      api.updateEvent(event);
+    },
+    onEventDelete: (eventId: string) => {
+      console.log('事件已删除:', eventId);
+      // 与后端同步
+      api.deleteEvent(eventId);
+    },
+  },
+});
+```
+
+## **事件状态管理**
+
+### **使用 React 状态**
+
+```tsx
+import { useState } from 'react';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  Event,
+} from '@dayflow/core';
+
+function MyCalendar() {
+  const [events, setEvents] = useState<Event[]>([]);
+
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    events,
+    callbacks: {
+      onEventCreate: (event: Event) => {
+        setEvents(prev => [...prev, event]);
+      },
+      onEventUpdate: (event: Event) => {
+        setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+      },
+      onEventDelete: (eventId: string) => {
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+      },
+    },
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### **与后端同步**
+
+```tsx
+import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events,
+  callbacks: {
+    onEventCreate: async (event: Event) => {
+      try {
+        // 在后端创建事件
+        const savedEvent = await api.createEvent(event);
+
+        // 使用后端响应更新本地状态
+        setEvents(prev => [...prev, savedEvent]);
+      } catch (error) {
+        console.error('创建事件失败:', error);
+        // 可选：回滚乐观更新
+      }
+    },
+    onEventUpdate: async (event: Event) => {
+      try {
+        await api.updateEvent(event);
+        setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+      } catch (error) {
+        console.error('更新事件失败:', error);
+      }
+    },
+    onEventDelete: async (eventId: string) => {
+      try {
+        await api.deleteEvent(eventId);
+        setEvents(prev => prev.filter(e => e.id !== eventId));
+      } catch (error) {
+        console.error('删除事件失败:', error);
+      }
+    },
+  },
+});
+```
+
+## **通过日历类型设置事件样式**
+
+通过 `calendarId` 将事件分配到不同的日历类型来自定义外观。每个日历类型都可以有自己的配色方案和样式：
+
+```tsx
+import { createEvent } from '@dayflow/core';
+
+// 工作事件
+const workEvent = createEvent({
+  id: '1',
+  title: '设计评审',
+  start: new Date(2024, 9, 15, 14, 0),
+  end: new Date(2024, 9, 15, 15, 0),
+  calendarId: 'work',// 关联工作日历样式});
+
+// 个人事件
+const personalEvent = createEvent({
+  id: '2',
+  title: '牙医预约',
+  start: new Date(2024, 9, 16, 10, 0),
+  end: new Date(2024, 9, 16, 11, 0),
+  calendarId: 'personal',// 关联个人日历样式});
+
+// 配置带颜色的日历类型
+const calendars = [
+  {
+    id: 'work',
+    name: '工作',
+    colors: {
+      eventColor: '#3b82f6',
+      eventSelectedColor: '#2563eb',
+      lineColor: '#3b82f6',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'personal',
+    name: '个人',
+    colors: {
+      eventColor: '#10b981',
+      eventSelectedColor: '#059669',
+      lineColor: '#10b981',
+      textColor: '#ffffff',
+    },
+    isVisible: true,
+  },
+];
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  events: [workEvent, personalEvent],
+  calendars,
+});
+```
+
+## **跨多天事件**
+
+事件可以跨越多个日期：
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+
+// 持续3天的会议（全天事件）
+const multiDayEvent: Event = {
+  id: '1',
+  title: '2024技术大会',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+  calendarId: 'conferences',
+};
+
+// 跨越午夜的事件（定时事件）
+const crossMidnightEvent: Event = {
+  id: '2',
+  title: '夜班',
+  start: Temporal.ZonedDateTime.from('2024-10-15T22:00:00[America/New_York]'), // 晚上10点
+  end: Temporal.ZonedDateTime.from('2024-10-16T06:00:00[America/New_York]'), // 次日早上6点
+  calendarId: 'shifts',
+};
+```
+
+## **事件元数据**
+
+在 `meta` 字段中存储额外信息：
+
+```tsx
+import { Temporal } from 'temporal-polyfill';
+import { Event } from '@dayflow/core';
+
+const event: Event = {
+  id: '1',
+  title: '项目启动会',
+  start: Temporal.ZonedDateTime.from('2024-10-15T10:00:00[America/New_York]'),
+  end: Temporal.ZonedDateTime.from('2024-10-15T11:00:00[America/New_York]'),
+  meta: {
+    // 会议详情
+    location: 'A会议室',
+    meetingUrl: 'https://zoom.us/j/123456',
+
+    // 参与人
+    organizer: 'zhangsan@example.com',
+    attendees: ['lisi@example.com', 'wangwu@example.com'],
+
+    // 自定义字段
+    project: 'X项目',
+    priority: 'high',
+    tags: ['规划', '启动会'],
+
+    // 重复信息
+    recurring: true,
+    recurrenceRule: 'FREQ=WEEKLY;BYDAY=MO',
+
+    // 其他任意数据
+    customField: '自定义值',
+  },
+};
+```
+
+## **最佳实践**
+
+1. **始终提供唯一ID** - 使用 UUID 或数据库 ID（字符串格式）
+2. **使用辅助函数** - 优先使用 `createEvent()` 而非手动构建 Temporal 对象（覆盖90%的使用场景）
+3. **选择正确的类型**：
+   - 全天事件（生日、节假日）使用 `PlainDate`
+   - 本地事件（会议、预约）使用 `PlainDateTime` ✨ **推荐默认选项**
+   - 仅时区敏感事件（国际电话、航班）使用 `ZonedDateTime`
+4. **验证时间值** - 辅助函数会自动验证小时（0-23）和分钟（0-59）
+5. **使用日历类型进行样式设置** - 分配 `calendarId` 来分类事件并保持样式一致性
+6. **善用 `meta` 字段** - 存储自定义数据而无需修改 Event 接口
+7. **验证事件数据** - 确保定时事件的开始时间早于结束时间
+8. **优化事件更新** - 尽可能批量更新
+9. **优雅处理错误** - 在失败时向用户提供反馈
+
+## **类型参考**
+
+有关日期/时间处理的详细信息，请参阅：
+
+- 事件接口：`/src/types/event.ts`
+
+## **相关文档**
+
+- [视图管理](docs/introduction/views) - 理解日历视图
+- [插件系统](docs/introduction/plugins) - 使用插件管理事件
+- [快速开始](docs/introduction/getting-started) - 基础使用示例

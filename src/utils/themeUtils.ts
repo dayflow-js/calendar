@@ -126,3 +126,42 @@ export const mergeClasses = (
 ): string => {
   return classes.filter(Boolean).join(' ');
 };
+
+/**
+ * Resolve the currently applied theme on the document.
+ *
+ * This inspects common override hooks (like `data-dayflow-theme-override` or
+ * manual `dark`/`light` classes) so host applications can force a theme even
+ * when DayFlow is configured in `auto` mode.
+ */
+export const resolveAppliedTheme = (
+  effectiveTheme: 'light' | 'dark'
+): 'light' | 'dark' => {
+  if (typeof document === 'undefined') {
+    return effectiveTheme;
+  }
+
+  const root = document.documentElement;
+
+  const overrideAttributes = [
+    root.getAttribute('data-dayflow-theme-override'),
+    root.getAttribute('data-theme-override'),
+    root.getAttribute('data-theme'),
+  ];
+
+  for (const attr of overrideAttributes) {
+    if (attr === 'light' || attr === 'dark') {
+      return attr;
+    }
+  }
+
+  if (root.classList.contains('dark')) {
+    return 'dark';
+  }
+
+  if (root.classList.contains('light')) {
+    return 'light';
+  }
+
+  return effectiveTheme;
+};

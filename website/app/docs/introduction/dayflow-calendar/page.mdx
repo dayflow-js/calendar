@@ -37,8 +37,8 @@ The component receives the `calendar` object from `useCalendarApp`, reads the ac
 | Prop                       | Type                         | Required | Description                                                                                         |
 | -------------------------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
 | `calendar`                 | `UseCalendarAppReturn`       | ✅       | Result of `useCalendarApp`. Provides state, registered views, sidebar config, and calendar actions. |
-| `className`                | `string`                     | ❌       | Additional class names appended to the root container (base class: `calendar-container`).          |
-| `style`                    | `React.CSSProperties`        | ❌       | Inline styles for the root container. Default height is `800px`, which can be overridden.          |
+| `className`                | `string`                     | ❌       | Additional class names appended to the root container (base class: `calendar-container`).           |
+| `style`                    | `React.CSSProperties`        | ❌       | Inline styles for the root container. Default height is `800px`, which can be overridden.           |
 | `customDetailPanelContent` | `EventDetailContentRenderer` | ❌       | Replaces the default detail panel body when the built-in panel is used.                             |
 | `customEventDetailDialog`  | `EventDetailDialogRenderer`  | ❌       | Full override for the event detail dialog UI. Takes precedence over `useEventDetailDialog`.         |
 | `meta`                     | `Record<string, any>`        | ❌       | Arbitrary metadata forwarded to every view component (helpful for feature flags or layout hints).   |
@@ -70,10 +70,7 @@ The root container has a default height of `800px` to ensure proper functioning 
 You can also add custom CSS classes via `className`, which will be appended to the base `calendar-container` class:
 
 ```tsx copy
-<DayFlowCalendar
-  calendar={calendar}
-  className="my-custom-calendar shadow-lg"
-/>
+<DayFlowCalendar calendar={calendar} className="my-custom-calendar shadow-lg" />
 ```
 
 ## Sidebar Behavior

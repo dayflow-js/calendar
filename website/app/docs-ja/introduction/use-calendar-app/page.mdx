@@ -1,0 +1,188 @@
+# useCalendarApp リファレンス
+
+`useCalendarApp(config: CalendarAppConfig)` は DayFlow の中枢フックです。ビューの登録、イベントやカレンダータイプの投入、テーマ設定、コールバック登録などを 1 つのオブジェクトで完結させます。
+
+## クイックスタート
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export function TeamCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    events: [],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 主な設定項目
+
+| オプション | 型 | 必須 | デフォルト | 説明 |
+| --- | --- | --- | --- | --- |
+| `views` | `CalendarView[]` | ✅ | — | 表示するビューを登録。`createMonthView()` などのファクトリを使用。 |
+| `plugins` | `CalendarPlugin[]` | ❌ | `[]` | ドラッグ操作やショートカットなどのプラグインをインストール。 |
+| `events` | `Event[]` | ❌ | `[]` | 初期イベント配列。以後は `calendar.addEvent` などで更新。 |
+| `callbacks` | `CalendarCallbacks` | ❌ | `{}` | ビュー変更やイベント CRUD をフックするライフサイクルコールバック。 |
+| `defaultView` | `ViewType` | ❌ | `ViewType.WEEK` | 最初に表示するビュー。`views` に含まれている必要あり。 |
+| `initialDate` | `Date` | ❌ | `new Date()` | フォーカスする基準日。ルーティングの状態などから差し替え可能。 |
+| `switcherMode` | `'buttons' \| 'select'` | ❌ | `'buttons'` | ビルトインビュースイッチャーの表示方法。 |
+| `calendars` | `CalendarType[]` | ❌ | `[]` | カテゴリや色の定義。`calendarId` と連携。 |
+| `defaultCalendar` | `string` | ❌ | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。 |
+| `theme` | `ThemeConfig` | ❌ | `{ mode: 'light' }` | テーマモード（`light`/`dark`/`auto`）やトークン上書き。 |
+| `useSidebar` | `boolean \| SidebarConfig` | ❌ | `false` | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。 |
+| `useEventDetailDialog` | `boolean` | ❌ | `false` | 詳細表示をモーダルダイアログに切り替える。 |
+
+## それぞれのポイント
+
+### Views
+
+- 少なくとも 1 つのビューが必要です。`defaultView` が未指定の場合は週ビューが使われます。
+- ファクトリの戻り値は `{ type, component, config }` から成る `CalendarView`。自作ビューを追加することも可能です。
+
+### Events
+
+- 渡した配列がそのままメモリ上のイベントストアになります。
+- CRUD は `calendar.addEvent`, `calendar.updateEvent`, `calendar.deleteEvent` を使うと即座に UI に反映されます。
+- `Event` インターフェースは Temporal の `PlainDate` / `PlainDateTime` / `ZonedDateTime` を受け付けます。
+
+### Plugins
+
+- プラグインは `{ name, install(app) }` を持ち、初期化時に 1 度だけ実行されます。
+- ドラッグ&ドロップやキーボード操作、外部 API との橋渡しなどをここで拡張できます。
+- 複数のプラグインを同時に登録でき、それぞれ独立して動作します。
+
+```tsx copy
+const dragPlugin = createDragPlugin({
+  enableDrag: true,
+  enableResize: true,
+  enableCreate: true,
+});
+
+const eventsPlugin = createEventsPlugin({
+  enableValidation: true,
+  maxEventsPerDay: 100,
+});
+
+const calendar = useCalendarApp({
+  views: [createWeekView(), createMonthView()],
+  plugins: [dragPlugin, eventsPlugin],
+});
+```
+
+### Callbacks
+
+| コールバック | 役割 |
+| --- | --- |
+| `onViewChange(view)` | ビュー切り替え後に発火。アナリティクスや URL 同期に便利。 |
+| `onDateChange(date)` | 選択日が変わったときに発火。日付連動のサイドバーなどに。 |
+| `onVisibleMonthChange(date)` | 表示月が変わったタイミングで呼ばれる。先読み API 呼び出しに。 |
+| `onEventCreate / Update / Delete` | イベント CRUD を捕捉。バックエンドと同期。 |
+| `onRender()` | レンダリング完了時に 1 度だけ発火。計測用。 |
+
+### switcherMode
+
+- `'buttons'`: デスクトップ向けの水平ボタン群。
+- `'select'`: モバイルや画面幅が狭い場合に便利なセレクトボックス。
+
+### calendars & defaultCalendar
+
+- `calendars` に `id`, `name`, `colors`, `darkColors`, `isVisible` などを定義すると、イベントが `calendarId` を通じてスタイルを引き継ぎます。
+- `defaultCalendar` を設定しない場合は最初に可視状態のカレンダーが使われます。
+
+### theme
+
+```tsx copy
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'dark', // 'light' | 'dark' | 'auto'
+  },
+});
+
+// 現在のテーマを取得
+const currentTheme = calendar.app.getTheme();
+calendar.app.setTheme('light');
+calendar.app.subscribeThemeChange(theme => console.log(theme));
+```
+
+各カレンダータイプには `colors` と `darkColors` を用意しておくと、ライト/ダークの切替時も自然な配色になります。詳細は [ダークモードガイド](/docs-ja/features/dark-mode) へ。
+
+### useSidebar
+
+- `true` で標準サイドバー（幅 240px）が表示されます。
+- オブジェクト形式で `width`, `initialCollapsed`, `render` を指定すると、折りたたみ状態やカスタムレンダーを制御可能です。
+
+### useEventDetailDialog
+
+- `true` にするとモーダルダイアログが有効になります。
+- `DayFlowCalendar` の `customEventDetailDialog` と組み合わせれば UI を完全に差し替えつつ、開閉ロジックはそのまま利用できます。
+
+## 応用的な設定例
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+
+const calendars = [
+  {
+    id: 'work',
+    name: '仕事',
+    colors: {
+      eventColor: '#2563eb',
+      eventSelectedColor: '#1d4ed8',
+      lineColor: '#1e40af',
+      textColor: '#ffffff',
+    },
+  },
+  {
+    id: 'personal',
+    name: 'プライベート',
+    colors: {
+      eventColor: '#f97316',
+      eventSelectedColor: '#ea580c',
+      lineColor: '#c2410c',
+      textColor: '#ffffff',
+    },
+  },
+];
+
+export function AdvancedCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date('2024-10-01'),
+    events: [],
+    calendars,
+    defaultCalendar: 'work',
+    switcherMode: 'select',
+    callbacks: {
+      onEventUpdate: event => api.events.update(event),
+      onVisibleMonthChange: month => preloadMonthData(month),
+    },
+    useSidebar: {
+      width: 280,
+      initialCollapsed: false,
+    },
+    useEventDetailDialog: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+> ヒント：`useCalendarApp` が返すインスタンスをカレンダー本体・ヘッダー・サイドバーなど複数のコンポーネントで共有すると、状態が常に同期されたまま UI を構築できます。

@@ -1,0 +1,243 @@
+# useCalendarApp 详解
+
+`useCalendarApp(config: CalendarAppConfig)` 是 DayFlow 的“中控台”。通过一个配置对象即可完成视图注册、事件注入、主题/侧边栏/对话框开关，以及与外部系统同步的回调设置。下面依次拆解常用选项与实践技巧。
+
+## 快速开始
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+export function TeamCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    events: [],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 配置概览
+
+| 选项                   | 类型                       | 必需 | 默认值              | 描述                                                                   |
+| ---------------------- | -------------------------- | ---- | ------------------- | ---------------------------------------------------------------------- |
+| `views`                | `CalendarView[]`           | ✅   | —                   | 注册视图定义（例如 `createMonthView()`）。至少需要一个视图             |
+| `plugins`              | `CalendarPlugin[]`         | ❌   | `[]`                | 安装可选插件（拖拽辅助、快捷键等）。每个插件在安装期间接收 app 实例    |
+| `events`               | `Event[]`                  | ❌   | `[]`                | 初始事件数据。之后使用 `addEvent`/`updateEvent` 来修改状态             |
+| `callbacks`            | `CalendarCallbacks`        | ❌   | `{}`                | 在视图、日期或事件更改时触发的生命周期钩子——非常适合与 API 同步        |
+| `defaultView`          | `ViewType`                 | ❌   | `ViewType.WEEK`     | 首先加载的视图；必须存在于 `views` 中                                  |
+| `initialDate`          | `Date`                     | ❌   | `new Date()`        | 起始焦点日期（也初始化可见月份计算）                                   |
+| `switcherMode`         | `'buttons' \| 'select'`    | ❌   | `'buttons'`         | 控制内置视图切换器在标题中的渲染方式                                   |
+| `calendars`            | `CalendarType[]`           | ❌   | `[]`                | 注册日历类别（工作、个人等）及其颜色和可见性                           |
+| `defaultCalendar`      | `string`                   | ❌   | 第一个可见日历      | 创建新事件时使用的 ID                                                  |
+| `theme`                | `ThemeConfig`              | ❌   | `{ mode: 'light' }` | 设置全局主题模式和可选的令牌覆盖                                       |
+| `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                       |
+| `useEventDetailDialog` | `boolean`                  | ❌   | `false`             | 启用默认模态详情对话框而不是内联面板                                   |
+
+## 核心选项说明
+
+### 视图（必选）
+
+- 每个视图都是一个包含 `type`、`component`、`config` 的 `CalendarView`
+- 推荐使用内置工厂 `createDayView`/`createWeekView`/`createMonthView`/`createYearView`
+- `defaultView` 必须存在于 `views` 列表，否则初始化会报错
+
+### 事件
+
+- `events` 数组会注入到内部状态，之后通过 `calendar.addEvent` / `updateEvent` / `deleteEvent` 来维护
+- 事件的 `start`/`end` 支持 `PlainDate`、`PlainDateTime`、`ZonedDateTime`，helper 已经帮你转换
+
+### 插件
+
+- 插件在 `install(app)` 阶段获取到日历实例，可注册拖拽、快捷键、统计等能力
+- 通过 `calendar.app.getPlugin('drag')` 等方式可以在别处访问插件 API
+- 可以同时安装多个插件，它们彼此独立
+
+```tsx copy
+const dragPlugin = createDragPlugin({
+  enableDrag: true,
+  enableResize: true,
+  enableCreate: true,
+});
+
+const eventsPlugin = createEventsPlugin({
+  enableValidation: true,
+  maxEventsPerDay: 100,
+});
+
+const calendar = useCalendarApp({
+  views: [createWeekView(), createMonthView()],
+  plugins: [dragPlugin, eventsPlugin],
+});
+```
+
+### 回调
+
+`callbacks` 是连接后端或其他状态管理的桥梁，例如：
+
+- `onViewChange(view)`：视图切换后触发，可用于埋点或同步 URL
+- `onDateChange(date)`：当前聚焦日期变化
+- `onVisibleMonthChange(date)`：月份视窗滚动，用于预加载数据
+- `onEventCreate/Update/Delete`：与服务端 CRUD 对接
+- `onRender`：一次渲染完成后触发，适合性能监控
+
+### 默认视图 & 初始日期
+
+- 单视图日历务必显式设置 `defaultView`
+- `initialDate` 可从路由、用户偏好或服务器数据中读取，以保持多端一致
+
+### switcherMode
+
+- `'buttons'`：横向按钮，桌面端常用
+- `'select'`：下拉选择，占用空间小，适合移动端或视图较多的场景
+
+### calendars 与 defaultCalendar
+
+- 用 `calendars` 声明不同的日历类别（工作/个人…）及颜色
+- 不指定 `defaultCalendar` 时会使用第一个可见日历
+
+### theme
+
+`theme` 控制全局配色与明暗模式：
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'dark', // 'light' | 'dark' | 'auto'
+  },
+});
+```
+
+**主题模式：**
+- `'light'`：浅色模式，浅色背景和深色文本（默认）
+- `'dark'`：深色模式，深色背景和浅色文本
+- `'auto'`：自动跟随系统主题偏好
+
+**编程式主题更改：**
+
+```tsx
+// 获取当前主题
+const currentTheme = calendar.app.getTheme();
+
+// 设置主题
+calendar.app.setTheme('dark');
+
+// 订阅主题更改
+calendar.app.subscribeThemeChange((theme) => {
+  console.log('主题已更改为:', theme);
+});
+```
+
+**自定义深色模式颜色：**
+
+为每个日历类型定义浅色和深色模式的不同颜色：
+
+```tsx
+const calendars = [
+  {
+    id: 'work',
+    name: '工作',
+    colors: {
+      // 浅色模式颜色
+      lineColor: '#0066cc',
+      backgroundColor: '#e6f2ff',
+      textColor: '#003d7a',
+    },
+    darkColors: {
+      // 深色模式颜色
+      lineColor: '#4da6ff',
+      backgroundColor: '#1a3d5c',
+      textColor: '#b3d9ff',
+    },
+  },
+];
+```
+
+更多细节见 [深色模式](/docs-zh/features/dark-mode)。
+
+### useSidebar
+
+- `true`：启用默认侧边栏
+- 传递对象即可自定义宽度、初始折叠状态或提供 `render` 函数来自绘
+
+### useEventDetailDialog
+
+- `true`：切换到模态详情对话框
+- 可与 `DayFlowCalendar` 的 `customEventDetailDialog` / `customDetailPanelContent` 协作，实现完全自定义的详情体验
+
+## 高级配置示例
+
+```tsx copy
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/core';
+import '@dayflow/core/dist/styles.css';
+
+const calendars = [
+  {
+    id: 'work',
+    name: '工作',
+    colors: {
+      eventColor: '#2563eb',
+      eventSelectedColor: '#1d4ed8',
+      lineColor: '#1e40af',
+      textColor: '#ffffff',
+    },
+  },
+  {
+    id: 'personal',
+    name: '个人',
+    colors: {
+      eventColor: '#f97316',
+      eventSelectedColor: '#ea580c',
+      lineColor: '#c2410c',
+      textColor: '#ffffff',
+    },
+  },
+];
+
+export function AdvancedCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date('2024-10-01'),
+    events: [],
+    calendars,
+    defaultCalendar: 'work',
+    switcherMode: 'select',
+    callbacks: {
+      onEventUpdate: event => api.events.update(event),
+      onVisibleMonthChange: month => preloadMonthData(month),
+    },
+    useSidebar: {
+      width: 280,
+      initialCollapsed: false,
+    },
+    useEventDetailDialog: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+> 提示：`useCalendarApp` 返回的对象同时公开状态（`currentView`、`currentDate`、`events`）和操作。与 `DayFlowCalendar`、您自己的工具栏和侧面板共享相同的实例以保持所有内容同步。
+
+## 相关文档
+
+- [DayFlowCalendar](/docs-zh/introduction/dayflow-calendar) - 主要 UI 组件
+- [快速开始](/docs-zh/introduction) - 设置指南
+- [事件](/docs-zh/introduction/events) - 事件管理
+- [视图](/docs-zh/introduction/views) - 可用视图
