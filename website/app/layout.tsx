@@ -3,16 +3,17 @@ import { Head } from 'nextra/components';
 import 'nextra-theme-docs/style.css';
 import "./globals.css";
 import '@dayflow/core/dist/styles.css';
+import { withBasePath } from '@/utils/basePath';
 
 export const metadata: Metadata = {
   title: "DayFlow - Calendar toolkit for product teams",
   description: "Ship a polished calendar without rebuilding the basics",
   icons: {
     icon: [
-      { url: '/logo.', type: 'image/svg+xml' },
+      { url: withBasePath('/logo.svg'), type: 'image/svg+xml' },
     ],
-    shortcut: ['/logo.png'],
-    apple: ['/logo.png'],
+    shortcut: [withBasePath('/logo.png')],
+    apple: [withBasePath('/logo.png')],
   },
 };
 
