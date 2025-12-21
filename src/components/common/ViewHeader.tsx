@@ -150,7 +150,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
             style={{
               position: 'relative',
               overflow: 'hidden',
-              height: '40px',
+              height: '48px',
             }}
           >
             {/* Placeholder keeps layout stable even when sticky year is hidden */}

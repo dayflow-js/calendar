@@ -52,7 +52,7 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
   );
   const [headerHeight, setHeaderHeight] = useState(72);
   const [stickyHeaderState, setStickyHeaderState] = useState({
-    stickyYear: null as number | null,
+    stickyYear: currentDate.getFullYear() as number | null,
     nextYear: null as number | null,
     stickyOffset: 0,
     nextOffset: YEAR_TITLE_HEIGHT + STICKY_PUSH_GAP,
@@ -94,32 +94,6 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const observer = new ResizeObserver(entries => {
-      entries.forEach(entry => {
-        const height = Math.round(entry.contentRect.height);
-        if (height > 0) {
-          setVirtualYearHeight(prev =>
-            Math.abs(prev - height) > 1 ? height : prev
-          );
-        }
-      });
-    });
-
-    yearContainerObserverRef.current = observer;
-
-    yearContainerElementsRef.current.forEach(element => {
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => {
-      observer.disconnect();
-      yearContainerObserverRef.current = null;
-    };
-  }, []);
-
   // Cache and references
   const yearDataCache = React.useRef(new YearDataCache<YearData>());
   const todayRef = React.useRef(new Date());
@@ -127,7 +101,6 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
   // Virtual scroll
   const {
     currentYear,
-    isScrolling,
     virtualData,
     scrollElementRef,
     handleScroll,
@@ -139,6 +112,38 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
     currentDate,
     yearHeight: virtualYearHeight,
   });
+
+  // Calculate virtualYearHeight based on full viewport height
+  // Each year fills the entire viewport (year title + spacer + month grid)
+  // When scrolled to a year: title is covered by ViewHeader, months are fully visible
+  useEffect(() => {
+    const scrollElement = scrollElementRef.current;
+    if (!scrollElement) return;
+
+    const updateYearHeight = () => {
+      // Full viewport height = scroll container clientHeight
+      const viewportHeight = scrollElement.clientHeight;
+      if (viewportHeight > 0) {
+        setVirtualYearHeight(prev =>
+          Math.abs(prev - viewportHeight) > 1 ? viewportHeight : prev
+        );
+      }
+    };
+
+    // Initial calculation after layout
+    updateYearHeight();
+
+    // Listen for resize
+    const resizeObserver = new ResizeObserver(() => {
+      updateYearHeight();
+    });
+
+    resizeObserver.observe(scrollElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [scrollElementRef]);
 
   const updateStickyHeaderFromDom = useCallback(() => {
     const container = scrollElementRef.current;
@@ -457,8 +462,13 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
     }
   );
 
+  // Spacer height: gap between year title and month grid to ensure months start below ViewHeader
+  // Year title area = pt-2 (8px) + YEAR_TITLE_HEIGHT (48px) = 56px
+  // Spacer fills the gap: headerHeight - 56px
+  const spacerHeight = Math.max(0, headerHeight - YEAR_TITLE_HEIGHT - 8);
+
   // Virtual year item
-  const VirtualYearItem = React.memo<{ item: VirtualItem }>(({ item }) => {
+  const VirtualYearItem = React.memo<{ item: VirtualItem; spacer: number }>(({ item, spacer }) => {
     const yearData = getYearData(item.year);
 
     return (
@@ -467,13 +477,13 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
         className="absolute w-full"
         style={{
           top: item.top,
-          minHeight: item.height,
+          height: item.height,
           contain: 'layout style paint',
           scrollSnapAlign: 'start',
         }}
       >
-        <div className="px-4 bg-white">
-          {/* Year header - displayed in content area */}
+        <div className="px-4 pt-2 bg-white h-full">
+          {/* Year header - visible in content, will be covered by ViewHeader when at top */}
           <div
             ref={registerYearTitle(item.year)}
             className="text-2xl font-bold text-gray-900 dark:text-gray-100 py-2 px-2"
@@ -481,6 +491,7 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
             {item.year}
           </div>
 
+          {spacer > 0 && <div style={{ height: spacer }} />}
           <div className="mx-auto px-2 pb-2">
             {/* Month grid - optimized layout to fit in one screen */}
             <div
@@ -512,19 +523,18 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({
       {/* Virtual scroll container - fills entire space */}
       <div
         ref={scrollElementRef}
-        className="absolute inset-0 overflow-auto bg-gray-50"
+        className="absolute inset-0 overflow-auto bg-white"
         onScroll={handleYearViewScroll}
         style={{
           contain: 'layout style paint',
           scrollBehavior: 'auto',
           scrollSnapType: 'y mandatory',
-          paddingTop: `${headerHeight}px`,
           scrollPaddingTop: `${headerHeight}px`,
         }}
       >
         <div className="relative" style={{ height: virtualData.totalHeight }}>
           {virtualData.visibleItems.map(item => (
-            <VirtualYearItem key={item.year} item={item} />
+            <VirtualYearItem key={item.year} item={item} spacer={spacerHeight} />
           ))}
         </div>
       </div>
