@@ -5,6 +5,8 @@ import "./globals.css";
 import '@dayflow/core/dist/styles.css';
 import { withBasePath } from '@/utils/basePath';
 
+const basePath = process.env.BASE_PATH || '';
+
 export const metadata: Metadata = {
   title: "DayFlow - Calendar toolkit for product teams",
   description: "Ship a polished calendar without rebuilding the basics",

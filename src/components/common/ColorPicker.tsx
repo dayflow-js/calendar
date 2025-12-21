@@ -67,7 +67,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       </button>
 
       {isOpen && (
-        <ul className="absolute mt-1 w-full min-w-max bg-gray-100 dark:bg-gray-700 rounded-md shadow-lg dark:shadow-gray-900/50 z-10 overflow-hidden border dark:border-gray-600">
+        <ul className="absolute mt-1 w-full min-w-max bg-gray-100 dark:bg-gray-700 rounded-md shadow-lg dark:shadow-gray-900/50 z-10 overflow-hidden border border-gray-200 dark:border-gray-600">
           {options.map(opt => (
             <li
               key={opt.value}
