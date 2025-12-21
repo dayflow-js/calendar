@@ -27,7 +27,7 @@ export const headerContainer = 'p-2 flex justify-between';
 /**
  * Title text style
  */
-export const headerTitle = 'text-2xl font-semibold text-gray-900 dark:text-gray-100';
+export const headerTitle = 'text-2xl font-bold text-gray-900 dark:text-gray-100';
 
 /**
  * Subtitle text style

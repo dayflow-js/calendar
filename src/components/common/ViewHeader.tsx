@@ -145,36 +145,52 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   return (
     <div className={headerContainer} style={{ position: 'relative' }}>
       <div>
-        {/* For Year view: show sticky year if available, otherwise show title */}
-        {viewType === 'year' && stickyYear ? (
-          <div style={{ position: 'relative', overflow: 'hidden' }}>
-            {/* Current sticky year - being pushed up */}
+        {viewType === 'year' ? (
+          <div
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              height: '48px',
+            }}
+          >
+            {/* Placeholder keeps layout stable even when sticky year is hidden */}
             <h1
-              className={headerTitle}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                transform: `translateY(-${stickyYearOffset}px)`,
-                willChange: 'transform',
-              }}
+              aria-hidden="true"
+              className={`${headerTitle} py-2 px-2`}
+              style={{ visibility: 'hidden' }}
             >
-              {stickyYear}
+              {title}
             </h1>
-            {/* Next year - coming from below */}
-            {nextYear && (
-              <h1
-                className={headerTitle}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  transform: `translateY(${nextYearOffset}px)`,
-                  willChange: 'transform',
-                }}
-              >
-                {nextYear}
-              </h1>
+
+            {stickyYear !== null && (
+              <>
+                <h1
+                  className={`${headerTitle} py-2 px-2`}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '8px',
+                    transform: `translateY(-${stickyYearOffset}px)`,
+                    willChange: 'transform',
+                  }}
+                >
+                  {stickyYear}
+                </h1>
+                {nextYear !== null && (
+                  <h1
+                    className={`${headerTitle} py-2 px-2`}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '8px',
+                      transform: `translateY(${nextYearOffset}px)`,
+                      willChange: 'transform',
+                    }}
+                  >
+                    {nextYear}
+                  </h1>
+                )}
+              </>
             )}
           </div>
         ) : (

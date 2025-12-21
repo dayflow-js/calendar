@@ -14,20 +14,22 @@ import {
 // Virtual scroll configuration
 export const VIRTUAL_SCROLL_CONFIG = {
   // Basic configuration
-  OVERSCAN: 2, // Number of additional years to render before and after
-  BUFFER_SIZE: 50, // Cache size
-  MIN_YEAR: 1900, // Minimum year
-  MAX_YEAR: 2200, // Maximum year
+  OVERSCAN: 0, // Number of additional years to render before and after (0 for best performance)
+  BUFFER_SIZE: 20, // Cache size (reduced for better performance)
+  MIN_YEAR: 1970, // Minimum year
+  MAX_YEAR: 2100, // Maximum year
 
   // Performance configuration
-  SCROLL_THROTTLE: 8, // Scroll throttle (120fps)
-  SCROLL_DEBOUNCE: 150, // Scroll end detection
-  CACHE_CLEANUP_THRESHOLD: 100, // Cache cleanup threshold
+  SCROLL_THROTTLE: 8, // Scroll throttle for smooth scrolling (8ms = ~120fps)
+  SCROLL_DEBOUNCE: 100, // Scroll end detection (reduced for faster response)
+  CACHE_CLEANUP_THRESHOLD: 30, // Cache cleanup threshold
 
-  // Responsive configuration - adjust year height to fit new layout
-  MOBILE_YEAR_HEIGHT: 1400, // Mobile year height (2 columns 6 rows need more space)
-  TABLET_YEAR_HEIGHT: 1000, // Tablet year height (3 columns 4 rows)
-  YEAR_HEIGHT: 900, // Desktop year height (4 columns 3 rows, more compact)
+  // Responsive configuration - initial minimum height for year items
+  // Actual height will be measured by ResizeObserver and adjusted automatically
+  // These values are just initial estimates for the first render
+  MOBILE_YEAR_HEIGHT: 1200, // Mobile: initial min height
+  TABLET_YEAR_HEIGHT: 900, // Tablet: initial min height
+  YEAR_HEIGHT: 700, // Desktop: initial min height
 } as const;
 
 // Performance monitoring class
@@ -187,19 +189,22 @@ export const useResponsiveConfig = () => {
   useEffect(() => {
     const updateConfig = () => {
       const width = window.innerWidth;
-      if (width < 768) {
+      if (width < 640) {
+        // Only trigger mobile layout on very small screens (< 640px)
         setConfig({
-          yearHeight: VIRTUAL_SCROLL_CONFIG.MOBILE_YEAR_HEIGHT, // 1400px for 2x6 layout
+          yearHeight: VIRTUAL_SCROLL_CONFIG.MOBILE_YEAR_HEIGHT,
           screenSize: 'mobile',
         });
-      } else if (width < 1024) {
+      } else if (width < 900) {
+        // Tablet layout for medium screens (640px - 900px)
         setConfig({
-          yearHeight: VIRTUAL_SCROLL_CONFIG.TABLET_YEAR_HEIGHT, // 1100px for 3x4 layout
+          yearHeight: VIRTUAL_SCROLL_CONFIG.TABLET_YEAR_HEIGHT,
           screenSize: 'tablet',
         });
       } else {
+        // Desktop layout for larger screens (>= 900px)
         setConfig({
-          yearHeight: VIRTUAL_SCROLL_CONFIG.YEAR_HEIGHT, // 700px for 4x3 layout
+          yearHeight: VIRTUAL_SCROLL_CONFIG.YEAR_HEIGHT,
           screenSize: 'desktop',
         });
       }
@@ -236,6 +241,21 @@ export const useVirtualScroll = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollTime = useRef(0);
   const lastScrollTop = useRef(0);
+  const previousYearHeightRef = useRef(yearHeight);
+  useEffect(() => {
+    if (previousYearHeightRef.current === yearHeight) return;
+    previousYearHeightRef.current = yearHeight;
+
+    const targetTop =
+      (currentYear - VIRTUAL_SCROLL_CONFIG.MIN_YEAR) * yearHeight;
+
+    setScrollTop(targetTop);
+    lastScrollTop.current = targetTop;
+
+    if (scrollElementRef.current) {
+      scrollElementRef.current.scrollTop = targetTop;
+    }
+  }, [yearHeight, currentYear]);
 
   // Virtual scroll calculation - optimize initial render
   const virtualData = useMemo(() => {
@@ -295,9 +315,10 @@ export const useVirtualScroll = ({
       requestAnimationFrame(() => {
         setScrollTop(newScrollTop);
 
-        const centerPos = newScrollTop + containerHeight / 2;
-        const newYear = Math.round(
-          VIRTUAL_SCROLL_CONFIG.MIN_YEAR + centerPos / yearHeight
+        // Calculate year at the top of the viewport (for sticky header)
+        const topPos = newScrollTop;
+        const newYear = Math.floor(
+          VIRTUAL_SCROLL_CONFIG.MIN_YEAR + topPos / yearHeight
         );
 
         if (
@@ -326,6 +347,7 @@ export const useVirtualScroll = ({
 
     // Immediately set correct scroll position
     element.scrollTop = initialScrollTop;
+    lastScrollTop.current = initialScrollTop;
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       setContainerHeight(entry.contentRect.height);
@@ -341,15 +363,14 @@ export const useVirtualScroll = ({
       if (!scrollElementRef.current) return;
 
       const targetIndex = targetYear - VIRTUAL_SCROLL_CONFIG.MIN_YEAR;
-      const targetTop =
-        targetIndex * yearHeight - containerHeight / 2 + yearHeight / 2;
+      const targetTop = targetIndex * yearHeight;
 
       scrollElementRef.current.scrollTo({
         top: Math.max(0, targetTop),
         behavior: smooth ? 'smooth' : 'auto',
       });
     },
-    [yearHeight, containerHeight]
+    [yearHeight]
   );
 
   // Navigation functions
