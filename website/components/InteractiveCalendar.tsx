@@ -60,6 +60,7 @@ export function InteractiveCalendar() {
       <DayFlowCalendar
         calendar={calendar}
         className="w-full"
+        style={{ height: 750 }}
       />
       <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
         <strong>Tip:</strong> Try dragging events across weeks, resizing them in

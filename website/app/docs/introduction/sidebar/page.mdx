@@ -11,7 +11,7 @@ import Link from 'next/link';
     live examples of the default and custom sidebar implementations.
   </div>
   <Link
-    href="/features/sidebar"
+    href="/docs/features/sidebar"
     className="nx-inline-flex nx-items-center nx-justify-center nx-rounded-full nx-bg-blue-500 nx-px-4 nx-py-2 nx-text-sm nx-font-semibold nx-text-white nx-shadow-sm nx-transition hover:nx-bg-blue-400"
   >
     View Sidebar Features →
@@ -37,17 +37,48 @@ import {
   ViewType,
 } from '@dayflow/core';
 
-const calendar = useCalendarApp({
-  views: [createMonthView(), createWeekView(), createDayView()],
-  plugins: [createDragPlugin()],
-  events,
-  calendars,
-  defaultView: ViewType.WEEK,
-  useSidebar: {
-    enabled: true,
-    width: 280, // Optional: tweak the sidebar width in pixels
-  },
-});
+  const sidebarConfig = {
+    createCalendarMode: 'inline' as const,
+    renderCreateCalendarDialog: (props: any) => (
+      <CustomCreateCalendarDialog // <----  you can custom create calendar dialog
+        onClose={props.onClose}
+        onCreate={props.onCreate}
+      />
+    ),
+    renderCalendarContextMenu: (calendar: CalendarType, onClose: () => void) => (
+      appRef.current ? (
+        <CustomContextMenu // <--- you can custom right click context menu
+          calendar={calendar}
+          onClose={onClose}
+          app={appRef.current}
+        />
+      ) : null
+    )
+  } 
+
+  const calendar = useCalendarApp({
+    views: [createDayView(), createWeekView(), createMonthView()],
+    events: events,
+    plugins: [dragPlugin],
+    theme: { mode: 'auto' },
+    useSidebar: sidebarConfig,
+    callbacks: {
+      onCalendarUpdate: async (calendar) => { // <-- get update callback
+        console.log('update calendar:', calendar);
+      },
+      onCalendarDelete: async (calendar) => {
+        console.log('delete calendar:', calendar);
+      },
+      onCalendarCreate: async (calendar) => {
+        // call server api using promise function
+        // await ...
+        console.log('create calendar:', calendar);
+      },
+      onCalendarMerge: async (sourceId, targetId) => {
+        console.log('merge calendar:', sourceId, targetId);
+      },
+    }
+  });
 
 <DayFlowCalendar calendar={calendar} />;
 ```

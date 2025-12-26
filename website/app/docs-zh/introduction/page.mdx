@@ -48,12 +48,14 @@ export default config;
 Tailwind 之外，还需要把 DayFlow 的基础样式拉进来，通常在应用入口处加一行即可。
 
 ```tsx copy
+// App.tsx or layout.tsx
 import '@dayflow/core/dist/styles.css';
 ```
 
-如果喜欢把样式集中写在 CSS 文件里，也可以：
+也可以在全局css文件中导入:
 
 ```css copy
+/* src/index.css */
 @import '@dayflow/core/dist/styles.css';
 ```
 
@@ -64,7 +66,11 @@ import '@dayflow/core/dist/styles.css';
 ```tsx copy
 'use client';
 
-import { useCalendarApp, DayFlowCalendar, createMonthView } from '@dayflow/core';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+} from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
 export default function MyCalendar() {
