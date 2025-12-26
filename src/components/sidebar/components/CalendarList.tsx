@@ -9,6 +9,7 @@ interface CalendarListProps {
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
+  activeContextMenuCalendarId?: string | null;
 }
 
 const getCalendarInitials = (calendar: CalendarType): string => {
@@ -27,6 +28,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
   onContextMenu,
   editingId,
   setEditingId,
+  activeContextMenuCalendarId,
 }) => {
   const [editingName, setEditingName] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -196,6 +198,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
           const calendarColor = calendar.colors?.lineColor || '#3b82f6';
           const showIcon = Boolean(calendar.icon);
           const isDropTarget = dropTarget?.id === calendar.id;
+          const isActive = activeContextMenuCalendarId === calendar.id || editingId === calendar.id;
 
           return (
             <li
@@ -217,7 +220,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
                   }`}
               >
                 <div
-                  className="group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800"
+                  className={`group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800 ${isActive ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
                   title={calendar.name}
                 >
                   <input

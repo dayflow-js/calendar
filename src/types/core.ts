@@ -40,17 +40,17 @@ export interface CalendarView {
  * Defines calendar event callback functions
  */
 export interface CalendarCallbacks {
-  onViewChange?: (view: ViewType) => void;
-  onEventCreate?: (event: Event) => void;
-  onEventUpdate?: (event: Event) => void;
-  onEventDelete?: (eventId: string) => void;
-  onDateChange?: (date: Date) => void;
-  onRender?: () => void;
-  onVisibleMonthChange?: (date: Date) => void;
-  onCalendarUpdate?: (calendar: CalendarType) => void;
-  onCalendarCreate?: (calendar: CalendarType) => void;
-  onCalendarDelete?: (calendarId: string) => void;
-  onCalendarMerge?: (sourceId: string, targetId: string) => void;
+  onViewChange?: (view: ViewType) => void | Promise<void>;
+  onEventCreate?: (event: Event) => void | Promise<void>;
+  onEventUpdate?: (event: Event) => void | Promise<void>;
+  onEventDelete?: (eventId: string) => void | Promise<void>;
+  onDateChange?: (date: Date) => void | Promise<void>;
+  onRender?: () => void | Promise<void>;
+  onVisibleMonthChange?: (date: Date) => void | Promise<void>;
+  onCalendarUpdate?: (calendar: CalendarType) => void | Promise<void>;
+  onCalendarCreate?: (calendar: CalendarType) => void | Promise<void>;
+  onCalendarDelete?: (calendarId: string) => void | Promise<void>;
+  onCalendarMerge?: (sourceId: string, targetId: string) => void | Promise<void>;
 }
 
 export interface CreateCalendarDialogProps {

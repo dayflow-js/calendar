@@ -241,6 +241,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
             onContextMenu={handleContextMenu}
             editingId={editingCalendarId}
             setEditingId={setEditingCalendarId}
+            activeContextMenuCalendarId={contextMenu?.calendarId}
           />
           <MiniCalendar
             visibleMonth={visibleMonth}
@@ -258,6 +259,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           onContextMenu={handleContextMenu}
           editingId={editingCalendarId}
           setEditingId={setEditingCalendarId}
+          activeContextMenuCalendarId={contextMenu?.calendarId}
         />
       )}
 
