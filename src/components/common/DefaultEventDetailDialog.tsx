@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Temporal } from 'temporal-polyfill';
 import { EventDetailDialogProps } from '../../types/eventDetail';
@@ -6,35 +6,52 @@ import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from './RangePicker';
+import { CalendarApp } from '../../types';
+
+interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
+  app?: CalendarApp;
+}
 
 /**
  * Default event detail dialog component (Dialog mode)
  * Content is consistent with DefaultEventDetailPanel, but displayed using Dialog/Modal
  */
-const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
+const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
   event,
   isOpen,
   isAllDay,
   onEventUpdate,
   onEventDelete,
   onClose,
+  app,
 }) => {
+  const [editedEvent, setEditedEvent] = useState(event);
+
+  // Sync state when event prop changes (e.g. if opened with a different event)
+  useEffect(() => {
+    setEditedEvent(event);
+  }, [event]);
 
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {
-    const registry = getDefaultCalendarRegistry();
+    const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
     return registry.getVisible().map(cal => ({
       label: cal.name,
       value: cal.id,
     }));
-  }, []);
+  }, [app, app?.getCalendars()]);
+
+  const handleSave = () => {
+    onEventUpdate(editedEvent);
+    onClose();
+  };
 
   const convertToAllDay = () => {
-    const plainDate = isPlainDate(event.start)
-      ? event.start
-      : event.start.toPlainDate();
-    onEventUpdate({
-      ...event,
+    const plainDate = isPlainDate(editedEvent.start)
+      ? editedEvent.start
+      : editedEvent.start.toPlainDate();
+    setEditedEvent({
+      ...editedEvent,
       allDay: true,
       start: plainDate,
       end: plainDate,
@@ -42,9 +59,9 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
   };
 
   const convertToRegular = () => {
-    const plainDate = isPlainDate(event.start)
-      ? event.start
-      : event.start.toPlainDate();
+    const plainDate = isPlainDate(editedEvent.start)
+      ? editedEvent.start
+      : editedEvent.start.toPlainDate();
     const start = Temporal.ZonedDateTime.from({
       year: plainDate.year,
       month: plainDate.month,
@@ -61,8 +78,8 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
       minute: 0,
       timeZone: Temporal.Now.timeZoneId(),
     });
-    onEventUpdate({
-      ...event,
+    setEditedEvent({
+      ...editedEvent,
       allDay: false,
       start,
       end,
@@ -70,31 +87,31 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
   };
 
   const eventTimeZone = useMemo(() => {
-    if (!isPlainDate(event.start)) {
+    if (!isPlainDate(editedEvent.start)) {
       return (
-        (event.start as any).timeZoneId ||
-        (event.start as Temporal.ZonedDateTime).timeZoneId ||
+        (editedEvent.start as any).timeZoneId ||
+        (editedEvent.start as Temporal.ZonedDateTime).timeZoneId ||
         Temporal.Now.timeZoneId()
       );
     }
 
-    if (event.end && !isPlainDate(event.end)) {
+    if (editedEvent.end && !isPlainDate(editedEvent.end)) {
       return (
-        (event.end as any).timeZoneId ||
-        (event.end as Temporal.ZonedDateTime).timeZoneId ||
+        (editedEvent.end as any).timeZoneId ||
+        (editedEvent.end as Temporal.ZonedDateTime).timeZoneId ||
         Temporal.Now.timeZoneId()
       );
     }
 
     return Temporal.Now.timeZoneId();
-  }, [event.end, event.start]);
+  }, [editedEvent.end, editedEvent.start]);
 
   const handleAllDayRangeChange = (
     nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
   ) => {
     const [start, end] = nextRange;
-    onEventUpdate({
-      ...event,
+    setEditedEvent({
+      ...editedEvent,
       start: start.toPlainDate(),
       end: end.toPlainDate(),
     });
@@ -159,31 +176,32 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
         </button>
 
         {/* Content */}
-        <div className="pr-8">
+        <div>
           <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Event Title</span>
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex-1">
               <input
                 type="text"
-                value={event.title}
+                value={editedEvent.title}
                 onChange={e => {
-                  onEventUpdate({
-                    ...event,
+                  setEditedEvent({
+                    ...editedEvent,
                     title: e.target.value,
                   });
                 }}
-                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
+                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
               />
             </div>
             <ColorPicker
               options={colorOptions}
-              value={event.calendarId || 'blue'}
+              value={editedEvent.calendarId || 'blue'}
               onChange={value => {
-                onEventUpdate({
-                  ...event,
+                setEditedEvent({
+                  ...editedEvent,
                   calendarId: value,
                 });
               }}
+              registry={app?.getCalendarRegistry()}
             />
           </div>
 
@@ -191,7 +209,7 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
             <div className="mb-4">
               <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Date Range</div>
               <RangePicker
-                value={[event.start, event.end]}
+                value={[editedEvent.start, editedEvent.end]}
                 format="YYYY-MM-DD"
                 showTime={false}
                 timeZone={eventTimeZone}
@@ -204,20 +222,20 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
             <div className="mb-4">
               <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Time Range</div>
               <RangePicker
-                value={[event.start, event.end]}
+                value={[editedEvent.start, editedEvent.end]}
                 timeZone={eventTimeZone}
                 onChange={(nextRange) => {
                   const [start, end] = nextRange;
-                  onEventUpdate({
-                    ...event,
+                  setEditedEvent({
+                    ...editedEvent,
                     start,
                     end,
                   });
                 }}
                 onOk={(nextRange) => {
                   const [start, end] = nextRange;
-                  onEventUpdate({
-                    ...event,
+                  setEditedEvent({
+                    ...editedEvent,
                     start,
                     end,
                   });
@@ -229,10 +247,10 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
           <div className="mb-4">
             <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Note</span>
             <textarea
-              value={event.description ?? ''}
+              value={editedEvent.description ?? ''}
               onChange={e =>
-                onEventUpdate({
-                  ...event,
+                setEditedEvent({
+                  ...editedEvent,
                   description: e.target.value,
                 })
               }
@@ -267,6 +285,13 @@ const DefaultEventDetailDialog: React.FC<EventDetailDialogProps> = ({
               }}
             >
               Delete
+            </button>
+
+            <button
+              className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium transition ml-auto"
+              onClick={handleSave}
+            >
+              Save
             </button>
           </div>
         </div>

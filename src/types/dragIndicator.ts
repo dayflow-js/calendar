@@ -1,5 +1,5 @@
 // Drag-related type definitions
-import { DragConfig } from '../types';
+import { DragConfig, CalendarApp } from '../types';
 import { EventLayout } from './layout';
 import { Event } from './event';
 import {
@@ -113,6 +113,7 @@ export interface useDragProps extends Partial<DragConfig> {
   currentWeekStart: Date;
   events: Event[];
   renderer?: DragIndicatorRenderer; // Required for Week/Day views
+  app?: CalendarApp;
 }
 
 // Unified drag state type definitions

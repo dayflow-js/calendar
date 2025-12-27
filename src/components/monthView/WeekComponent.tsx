@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
+import { CalendarApp } from '@/core';
 import {
   MonthEventDragState,
   Event,
@@ -71,6 +72,8 @@ interface WeekComponentProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
   onCalendarDrop?: (e: React.DragEvent, dropDate: Date, dropHour?: number, isAllDay?: boolean) => Event | null;
   onCalendarDragOver?: (e: React.DragEvent) => void;
+  calendarSignature?: string;
+  app: CalendarApp;
 }
 
 // Constants
@@ -301,6 +304,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     customEventDetailDialog,
     onCalendarDrop,
     onCalendarDragOver,
+    app,
   }) => {
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -483,6 +487,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
               onDetailPanelToggle={onDetailPanelToggle}
               customDetailPanelContent={customDetailPanelContent}
               customEventDetailDialog={customEventDetailDialog}
+              app={app}
             />
           );
         }
@@ -628,6 +633,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                         onDetailPanelToggle={onDetailPanelToggle}
                         customDetailPanelContent={customDetailPanelContent}
                         customEventDetailDialog={customEventDetailDialog}
+                        app={app}
                       />
                     ))}
                   </div>

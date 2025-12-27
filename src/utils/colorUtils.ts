@@ -5,7 +5,7 @@
  * All color functions return actual color values (not CSS classes) for inline styles.
  */
 
-import { getDefaultCalendarRegistry } from '../core/calendarRegistry';
+import { getDefaultCalendarRegistry, CalendarRegistry } from '../core/calendarRegistry';
 
 // ============================================================================
 // Color Tools
@@ -15,9 +15,9 @@ import { getDefaultCalendarRegistry } from '../core/calendarRegistry';
  * Get event background color (actual color value, not CSS class)
  * Use this for inline styles
  */
-export const getEventBgColor = (calendarIdOrColor: string): string => {
-  const registry = getDefaultCalendarRegistry();
-  const colors = registry.resolveColors(calendarIdOrColor);
+export const getEventBgColor = (calendarIdOrColor: string, registry?: CalendarRegistry): string => {
+  const reg = registry || getDefaultCalendarRegistry();
+  const colors = reg.resolveColors(calendarIdOrColor);
   return colors.eventColor;
 };
 
@@ -25,9 +25,9 @@ export const getEventBgColor = (calendarIdOrColor: string): string => {
  * Get event text color (actual color value, not CSS class)
  * Use this for inline styles
  */
-export const getEventTextColor = (calendarIdOrColor: string): string => {
-  const registry = getDefaultCalendarRegistry();
-  const colors = registry.resolveColors(calendarIdOrColor);
+export const getEventTextColor = (calendarIdOrColor: string, registry?: CalendarRegistry): string => {
+  const reg = registry || getDefaultCalendarRegistry();
+  const colors = reg.resolveColors(calendarIdOrColor);
   return colors.textColor;
 };
 
@@ -35,9 +35,9 @@ export const getEventTextColor = (calendarIdOrColor: string): string => {
  * Get selected background color
  * Now uses the calendar registry for color resolution
  */
-export const getSelectedBgColor = (calendarIdOrColor: string): string => {
-  const registry = getDefaultCalendarRegistry();
-  const colors = registry.resolveColors(calendarIdOrColor);
+export const getSelectedBgColor = (calendarIdOrColor: string, registry?: CalendarRegistry): string => {
+  const reg = registry || getDefaultCalendarRegistry();
+  const colors = reg.resolveColors(calendarIdOrColor);
   return colors.eventSelectedColor;
 };
 
@@ -45,8 +45,8 @@ export const getSelectedBgColor = (calendarIdOrColor: string): string => {
  * Get line color
  * Now uses the calendar registry for color resolution
  */
-export const getLineColor = (calendarIdOrColor: string): string => {
-  const registry = getDefaultCalendarRegistry();
-  const colors = registry.resolveColors(calendarIdOrColor);
+export const getLineColor = (calendarIdOrColor: string, registry?: CalendarRegistry): string => {
+  const reg = registry || getDefaultCalendarRegistry();
+  const colors = reg.resolveColors(calendarIdOrColor);
   return colors.lineColor;
 };

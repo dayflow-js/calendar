@@ -3,6 +3,7 @@ import React from 'react';
 import { Event } from './event';
 import { ViewSwitcherMode } from '../components/common/ViewHeader';
 import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
+import { CalendarRegistry } from '../core/calendarRegistry';
 
 /**
  * View type enum
@@ -166,7 +167,13 @@ export interface CalendarApp {
   // Sidebar
   getSidebarConfig: () => SidebarConfig;
 
-  // Event Detail Dialog
+  // Trigger render callback
+  triggerRender: () => void;
+
+  // Get CalendarRegistry instance
+  getCalendarRegistry: () => CalendarRegistry;
+
+  // Get whether to use event detail dialog
   getUseEventDetailDialog: () => boolean;
 
   // Theme management

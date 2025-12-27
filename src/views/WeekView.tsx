@@ -524,6 +524,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                 }
                 customDetailPanelContent={customDetailPanelContent}
                 customEventDetailDialog={customEventDetailDialog}
+                app={app}
               />
             ))}
           </div>
@@ -715,6 +716,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                         customDetailPanelContent={customDetailPanelContent}
                         customEventDetailDialog={customEventDetailDialog}
                         multiDaySegmentInfo={segmentInfo}
+                        app={app}
                       />
                     );
                   })}

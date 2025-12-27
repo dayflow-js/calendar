@@ -7,8 +7,6 @@ type BrandLogoProps = {
   showText?: boolean;
 };
 
-const basePath = process.env.BASE_PATH || '';
-
 export function BrandLogo({ className, showText = true }: BrandLogoProps) {
   return (
     <span

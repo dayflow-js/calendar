@@ -108,9 +108,6 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-300">
-              Calendar Name
-            </label>
             <div className="flex items-center gap-3">
               <div
                 className="h-9 w-9 rounded-md border border-gray-200 shadow-sm dark:border-gray-600"
@@ -128,25 +125,21 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
           </div>
 
           <div className="mb-6">
-            <label className="mb-2 block text-xs text-gray-600 dark:text-gray-300">
-              Color
-            </label>
-            <div className="grid grid-cols-7 gap-3">
+            <div className="grid grid-cols-7 gap-6">
               {COLORS.map((color) => (
                 <button
                   key={color}
                   type="button"
-                  className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
-                    selectedColor === color
-                      ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-800'
-                      : ''
-                  }`}
+                  className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${selectedColor === color
+                    ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-800'
+                    : ''
+                    }`}
                   style={{ backgroundColor: color }}
                   onClick={() => setSelectedColor(color)}
                 />
               ))}
             </div>
-            
+
             <div className="mt-2 relative">
               <button
                 type="button"

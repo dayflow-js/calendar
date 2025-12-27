@@ -431,6 +431,7 @@ const DayView: React.FC<DayViewProps> = ({
                       }
                       customDetailPanelContent={customDetailPanelContent}
                       customEventDetailDialog={customEventDetailDialog}
+                      app={app}
                     />
                   ))}
               </div>
@@ -573,6 +574,7 @@ const DayView: React.FC<DayViewProps> = ({
                           }
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
+                          app={app}
                         />
                       );
                     })}

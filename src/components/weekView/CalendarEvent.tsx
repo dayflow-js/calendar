@@ -48,6 +48,7 @@ import {
   mr1,
 } from '@/styles/classNames';
 import ReactDOM from 'react-dom';
+import { CalendarApp } from '@/core';
 
 interface CalendarEventProps {
   event: Event;
@@ -87,6 +88,7 @@ interface CalendarEventProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
   /** Multi-day regular event segment information */
   multiDaySegmentInfo?: { startHour: number; endHour: number; isFirst: boolean; isLast: boolean; dayIndex?: number };
+  app?: CalendarApp;
 }
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -117,6 +119,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   multiDaySegmentInfo,
+  app,
 }) => {
   const [isSelected, setIsSelected] = useState(false);
   const detailPanelKey =
@@ -996,6 +999,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         onEventUpdate,
         onEventDelete,
         onClose: handleClose,
+        app,
       };
 
       if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -1043,6 +1047,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         onEventUpdate={onEventUpdate}
         onEventDelete={onEventDelete}
         onClose={handleClose}
+        app={app}
       />
     );
   };
@@ -1106,7 +1111,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         <div className="flex items-center flex-1 min-w-0">
           <span
             style={{
-              backgroundColor: getLineColor(event.calendarId || 'blue'),
+              backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()),
             }}
             className={`inline-block w-[3px] h-3 ${mr1} flex-shrink-0 rounded-full`}
           ></span>
@@ -1189,7 +1194,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       <>
         <div
           className={eventColorBar}
-          style={{ backgroundColor: getLineColor(event.calendarId || 'blue') }}
+          style={{ backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()) }}
         />
         <div
           className={`h-full flex flex-col overflow-hidden pl-3 ${getDynamicPadding()}`}
@@ -1309,12 +1314,12 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           ...calculateEventStyle(),
           ...(isEventSelected
             ? {
-              backgroundColor: getSelectedBgColor(calendarId),
+              backgroundColor: getSelectedBgColor(calendarId, app?.getCalendarRegistry()),
               color: '#fff',
             }
             : {
-              backgroundColor: getEventBgColor(calendarId),
-              color: getEventTextColor(calendarId),
+              backgroundColor: getEventBgColor(calendarId, app?.getCalendarRegistry()),
+              color: getEventTextColor(calendarId, app?.getCalendarRegistry()),
             }),
         }}
         onClick={handleClick}

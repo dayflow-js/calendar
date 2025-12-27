@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useDragProps, useDragReturn, ViewType } from '../../types';
 import { defaultDragConfig } from '../../core/config';
+import { getLineColor } from '../../utils';
 import { useDragCommon } from './useDragCommon';
 import { useDragState } from './useDragState';
 import { useDragManager } from './useDragManager';
@@ -11,7 +12,16 @@ import { useMonthDrag } from './useMonthDrag';
 export const useDrag = (options: useDragProps): useDragReturn => {
   // Merge default configuration with user-provided configuration
   const config = useMemo(
-    () => ({ ...defaultDragConfig, ...options }),
+    () => ({
+      ...defaultDragConfig,
+      ...options,
+      getLineColor: (color: string) => {
+        if (options.getLineColor) {
+          return options.getLineColor(color);
+        }
+        return getLineColor(color, options.app?.getCalendarRegistry());
+      },
+    }),
     [options]
   );
 

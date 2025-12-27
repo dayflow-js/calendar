@@ -8,11 +8,16 @@ import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from './RangePicker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
+import { CalendarApp } from '@/core';
+
+interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
+  app?: CalendarApp;
+}
 
 /**
  * Default event detail panel component
  */
-const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
+const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
   event,
   position,
   panelRef,
@@ -22,6 +27,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
   selectedEventElementRef,
   onEventUpdate,
   onEventDelete,
+  app,
 }) => {
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
@@ -30,12 +36,12 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
 
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {
-    const registry = getDefaultCalendarRegistry();
+    const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
     return registry.getVisible().map(cal => ({
       label: cal.name,
       value: cal.id,
     }));
-  }, []);
+  }, [app, app?.getCalendars()]); // Depend on app.getCalendars() to update when calendars change
 
   const convertToAllDay = () => {
     const plainDate = isPlainDate(event.start)
@@ -268,6 +274,7 @@ const DefaultEventDetailPanel: React.FC<EventDetailPanelProps> = ({
               calendarId: value,
             });
           }}
+          registry={app?.getCalendarRegistry()}
         />
       </div>
 

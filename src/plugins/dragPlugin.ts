@@ -52,7 +52,7 @@ export function useDragForView(
   const dragService = app.getPlugin<DragService>('drag');
 
   // Always call Hook to maintain React Hook rules
-  const result = useDrag(options);
+  const result = useDrag({ ...options, app });
 
   // If dragPlugin is not installed, gracefully degrade - return disabled drag functionality
   if (!dragService) {

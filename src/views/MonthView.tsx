@@ -44,6 +44,7 @@ const MonthView: React.FC<MonthViewProps> = ({
 }) => {
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
+  const calendarSignature = app.getCalendars().map(c => c.id + c.colors.lineColor).join('-');
   const previousEventsRef = useRef<Event[] | null>(null);
   // Stabilize events reference so week calculations do not rerun on every scroll frame
   const events = useMemo(() => {
@@ -466,6 +467,8 @@ const MonthView: React.FC<MonthViewProps> = ({
               customEventDetailDialog={customEventDetailDialog}
               onCalendarDrop={handleDrop}
               onCalendarDragOver={handleDragOver}
+              calendarSignature={calendarSignature}
+              app={app}
             />
           );
         })}

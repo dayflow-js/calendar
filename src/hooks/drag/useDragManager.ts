@@ -29,6 +29,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     FIRST_HOUR = 0,
     TIME_COLUMN_WIDTH = 80,
     ALL_DAY_HEIGHT = 60,
+    app,
   } = options;
 
   const isMonthView = viewType === ViewType.MONTH;
@@ -247,8 +248,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
       // Set color
       if (color) {
-        indicator.style.backgroundColor = getSelectedBgColor(color);
-        indicator.style.color = getEventTextColor(color);
+        indicator.style.backgroundColor = getSelectedBgColor(color, app?.getCalendarRegistry());
+        indicator.style.color = getEventTextColor(color, app?.getCalendarRegistry());
       } else {
         indicator.className +=
           ' bg-blue-50/70 text-blue-900 border border-dashed border-blue-400';

@@ -2,6 +2,7 @@
 
 import { Event } from './event';
 import { EventDetailPosition } from './dragIndicator';
+import { CalendarApp } from '../types';
 
 // Re-export EventDetailPosition for convenience
 export type { EventDetailPosition } from './dragIndicator';
@@ -76,6 +77,7 @@ export interface EventDetailDialogProps {
   onEventDelete: (eventId: string) => void;
   /** Close dialog callback */
   onClose: () => void;
+  app?: CalendarApp;
 }
 
 /**
