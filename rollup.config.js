@@ -68,5 +68,13 @@ export default {
       template: 'treemap',
     }),
   ],
-  external: ['react', 'react-dom', 'react/jsx-runtime', 'lucide-react'],
+  external: [
+    'react',
+    'react-dom',
+    'react/jsx-runtime',
+    'lucide-react',
+    'react-color',
+    'temporal-polyfill',
+    'tslib',
+  ],
 };

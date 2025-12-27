@@ -1,5 +1,7 @@
 # Source files
 src/
+examples/
+website/
 
 # Development files
 .git/
