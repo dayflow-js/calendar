@@ -132,7 +132,7 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
     return <DefaultCalendarSidebar {...sidebarProps} />;
   };
 
-  const collapsedWidth = '60px';
+  const collapsedWidth = '50px';
   const resolvedSidebarWidth = isCollapsed
     ? collapsedWidth
     : normalizeCssWidth(sidebarConfig?.width, DEFAULT_SIDEBAR_WIDTH);
