@@ -78,9 +78,9 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
 
     return (
       <>
-        <div className="absolute left-0.5 top-1 bottom-1 w-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+        <div className="absolute left-0.5 top-1 bottom-1 w-0.5 rounded-full bg-primary" />
         <div className="h-full flex flex-col overflow-hidden pl-3 p-1">
-          <div className="font-medium text-xs truncate pr-1 text-blue-900 dark:text-blue-100">
+          <div className="font-medium text-xs truncate pr-1 text-primary">
             {title}
           </div>
         </div>

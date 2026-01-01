@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CalendarType } from '../../../types';
+import { cancelButton } from '@/styles/classNames';
 
 interface DeleteCalendarDialogProps {
   calendarId: string;
@@ -26,7 +27,7 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-800">
+      <div className="w-full max-w-md rounded-lg p-6 shadow-xl bg-background">
         {step === 'initial' ? (
           <>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -45,7 +46,7 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
                   Merge
                 </button>
                 {showMergeDropdown && (
-                  <div className="absolute left-0 top-full mt-1 min-w-full w-max rounded-md border border-gray-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800 z-10 max-h-60 overflow-y-auto">
+                  <div className="absolute left-0 top-full mt-1 min-w-full w-max rounded-md border border-gray-200 bg-background shadow-lg dark:border-slate-700 z-10 max-h-60 overflow-y-auto">
                     {calendars
                       .filter(c => c.id !== calendarId)
                       .map(calendar => (
@@ -71,14 +72,14 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+                  className={cancelButton}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={() => onStepChange('confirm_delete')}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                  className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
                 >
                   Delete
                 </button>
@@ -104,7 +105,7 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
               <button
                 type="button"
                 onClick={onConfirmDelete}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
               >
                 Delete
               </button>

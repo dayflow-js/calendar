@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { CalendarApp } from '@/core';
 import {
   formatTime,
@@ -23,6 +23,7 @@ import { defaultDragConfig } from '@/core/config';
 import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import TodayBox from '@/components/common/TodayBox';
 import ViewSwitcher from '@/components/common/ViewSwitcher';
+import { MiniCalendar } from '@/components/common/MiniCalendar';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import {
@@ -73,7 +74,6 @@ const DayView: React.FC<DayViewProps> = ({
   calendarRef,
   switcherMode = 'buttons',
 }) => {
-  const currentDate = app.getCurrentDate();
   const events = app.getEvents();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -83,6 +83,35 @@ const DayView: React.FC<DayViewProps> = ({
   );
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
+  );
+
+  const currentDate = app.getCurrentDate();
+  const visibleMonthDate = app.getVisibleMonth();
+  const visibleYear = visibleMonthDate.getFullYear();
+  const visibleMonthIndex = visibleMonthDate.getMonth();
+  // Visible Month State
+  const [visibleMonth, setVisibleMonth] = useState(currentDate);
+  const prevDateRef = React.useRef(currentDate.getTime());
+
+  if (currentDate.getTime() !== prevDateRef.current) {
+    prevDateRef.current = currentDate.getTime();
+    if (
+      currentDate.getFullYear() !== visibleMonth.getFullYear() ||
+      currentDate.getMonth() !== visibleMonth.getMonth()
+    ) {
+      setVisibleMonth(currentDate);
+    }
+  }
+
+  const handleMonthChange = useCallback(
+    (offset: number) => {
+      setVisibleMonth(prev => {
+        const next = new Date(prev.getFullYear(), prev.getMonth() + offset, 1);
+        app.setVisibleMonth(next);
+        return next;
+      });
+    },
+    [app]
   );
 
   // Get configuration constants
@@ -295,63 +324,19 @@ const DayView: React.FC<DayViewProps> = ({
     label: formatTime(i + FIRST_HOUR),
   }));
 
-  // Generate mini calendar data
-  const generateMiniCalendar = () => {
-    const year = app.getCurrentDate().getFullYear();
-    const month = app.getCurrentDate().getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Adjust to start from Monday
-    const days = [];
-
-    // Add dates from previous month
-    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-      const date = new Date(year, month, -i);
-      days.push({
-        date: date.getDate(),
-        isCurrentMonth: false,
-        isToday: false,
-        isSelected: false,
-        fullDate: date,
-      });
-    }
-
-    // Add dates from current month
-    for (let i = 1; i <= lastDay.getDate(); i++) {
-      const date = new Date(year, month, i);
-      const isToday = date.toDateString() === new Date().toDateString();
-      const isSelected = date.toDateString() === currentDate.toDateString();
-      days.push({
-        date: i,
-        isCurrentMonth: true,
-        isToday,
-        isSelected,
-        fullDate: date,
-      });
-    }
-
-    // Add dates from next month to fill 42 cells
-    const remainingDays = 42 - days.length;
-    for (let i = 1; i <= remainingDays; i++) {
-      const date = new Date(year, month + 1, i);
-      days.push({
-        date: i,
-        isCurrentMonth: false,
-        isToday: false,
-        isSelected: false,
-        fullDate: date,
-      });
-    }
-    return days;
-  };
-
-  const miniCalendarDays = generateMiniCalendar();
-
   // Date selection handling
-  const handleDateSelect = (date: Date) => {
-    app.setCurrentDate(date);
-  };
-
+  const handleDateSelect = useCallback(
+    (date: Date) => {
+      const nextDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+      app.setCurrentDate(nextDate);
+      setVisibleMonth(new Date(nextDate.getFullYear(), nextDate.getMonth(), 1));
+    },
+    [app]
+  );
   // Check if it is today
   const isToday = useMemo(() => {
     const today = new Date();
@@ -489,7 +474,7 @@ const DayView: React.FC<DayViewProps> = ({
               </div>
 
               {/* Time grid */}
-              <div className="flex-grow relative">
+              <div className="grow relative">
                 {timeSlots.map((slot, slotIndex) => (
                   <div
                     key={slotIndex}
@@ -610,28 +595,12 @@ const DayView: React.FC<DayViewProps> = ({
                   handleToday={() => app.goToToday()}
                 />
               </div>
-              {/* Mini calendar grid */}
-              <div className={miniCalendarGrid}>
-                {weekDays.map(day => (
-                  <div key={day} className={miniCalendarDayHeader}>
-                    {day.charAt(0)}
-                  </div>
-                ))}
-                {miniCalendarDays.map((day, i) => (
-                  <button
-                    key={i}
-                    className={`
-                  ${miniCalendarDay}
-                  ${day.isCurrentMonth ? miniCalendarCurrentMonth : miniCalendarOtherMonth}
-                  ${day.isToday ? miniCalendarToday : ''}
-                  ${day.isSelected && !day.isToday ? miniCalendarSelected : ''}
-                `}
-                    onClick={() => handleDateSelect(day.fullDate)}
-                  >
-                    {day.date}
-                  </button>
-                ))}
-              </div>
+              <MiniCalendar
+                visibleMonth={visibleMonth}
+                currentDate={currentDate}
+                onMonthChange={handleMonthChange}
+                onDateSelect={handleDateSelect}
+              />
             </div>
           </div>
 
@@ -656,7 +625,7 @@ const DayView: React.FC<DayViewProps> = ({
                     key={event.id}
                     className={`
                       ${p2} rounded border-l-4 cursor-pointer transition-colors
-                      ${selectedEvent?.id === event.id ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-500' : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'}
+                      ${selectedEvent?.id === event.id ? 'bg-primary/10 border-primary' : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'}
                       hover:bg-gray-100 dark:hover:bg-gray-700
                     `}
                     style={{

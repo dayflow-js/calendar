@@ -14,7 +14,7 @@ import { generateUniKey } from '../../utils/helpers';
 // common component
 import { SidebarHeader } from './components/SidebarHeader';
 import { CalendarList } from './components/CalendarList';
-import { MiniCalendar } from './components/MiniCalendar';
+import { MiniCalendar } from '../common/MiniCalendar';
 import { MergeMenuItem } from './components/MergeMenuItem';
 import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
@@ -243,12 +243,16 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
             setEditingId={setEditingCalendarId}
             activeContextMenuCalendarId={contextMenu?.calendarId}
           />
-          <MiniCalendar
-            visibleMonth={visibleMonth}
-            currentDate={currentDate}
-            onMonthChange={handleMonthChange}
-            onDateSelect={handleDateSelect}
-          />
+
+          <div className='border-t border-gray-200'>
+            <MiniCalendar
+              visibleMonth={visibleMonth}
+              currentDate={currentDate}
+              showHeader
+              onMonthChange={handleMonthChange}
+              onDateSelect={handleDateSelect}
+            />
+          </div>
         </>
       ) : (
         <CalendarList

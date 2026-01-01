@@ -647,15 +647,15 @@ const RangePicker: React.FC<RangePickerProps> = ({
 
     const stateClass = (() => {
       if (isStart || isEnd) {
-        return 'bg-blue-500 text-white font-semibold';
+        return 'bg-primary text-primary-foreground font-semibold';
       }
       if (isInRange) {
-        return 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300';
+        return 'bg-primary/10 text-primary';
       }
       if (isOutsideMonth) {
         return 'text-slate-300 dark:text-gray-600';
       }
-      return 'text-slate-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300';
+      return 'text-slate-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary';
     })();
 
     return (
@@ -709,8 +709,8 @@ const RangePicker: React.FC<RangePickerProps> = ({
                     disabled={disabled}
                     onClick={() => handleHourSelect(field, hour)}
                     className={`flex h-8 w-full items-center justify-center text-sm transition ${isActive
-                      ? 'bg-blue-500 text-white font-semibold'
-                      : 'text-slate-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300'
+                      ? 'bg-primary text-primary-foreground font-semibold'
+                      : 'text-slate-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary'
                       }`}
                     data-active={isActive ? 'true' : undefined}
                   >
@@ -740,8 +740,8 @@ const RangePicker: React.FC<RangePickerProps> = ({
                     disabled={disabled}
                     onClick={() => handleMinuteSelect(field, minute)}
                     className={`flex h-8 w-full items-center justify-center text-sm transition ${isActive
-                      ? 'bg-blue-500 text-white font-semibold'
-                      : 'text-slate-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-300'
+                      ? 'bg-primary text-primary-foreground font-semibold'
+                      : 'text-slate-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary'
                       }`}
                     data-active={isActive ? 'true' : undefined}
                   >
@@ -954,7 +954,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
             type="button"
             onClick={handleOk}
             disabled={disabled}
-            className="inline-flex items-center rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:bg-slate-300"
+            className="inline-flex items-center rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             OK
           </button>
@@ -969,8 +969,8 @@ const RangePicker: React.FC<RangePickerProps> = ({
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${disabled
           ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'
           : isOpen
-            ? 'border-blue-500 bg-white dark:bg-gray-700 shadow-md'
-            : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500'
+            ? 'border-primary bg-white dark:bg-gray-700 shadow-md'
+            : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700'
           }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -982,11 +982,11 @@ const RangePicker: React.FC<RangePickerProps> = ({
             onClick={() => openPanelForField('start')}
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-0 ${disabled
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${disabled
               ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
               : focusedField === 'start' && isOpen
-                ? ' bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400'
-                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300 hover:border-blue-200 dark:hover:border-blue-400'
+                ? ' bg-white dark:bg-gray-700 text-primary'
+                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
               }`}
             placeholder={formatTemplate}
             autoComplete="off"
@@ -1005,11 +1005,11 @@ const RangePicker: React.FC<RangePickerProps> = ({
             onClick={() => openPanelForField('end')}
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-0 ${disabled
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${disabled
               ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
               : focusedField === 'end' && isOpen
-                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400'
-                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300 hover:border-blue-200 dark:hover:border-blue-400'
+                ? 'bg-white dark:bg-gray-700 text-primary'
+                : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
               }`}
             placeholder={formatTemplate}
             autoComplete="off"

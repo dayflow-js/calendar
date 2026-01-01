@@ -161,7 +161,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
   // we might want to sync. But usually the parent sets editingId after creation.
   // We need to ensure when editingId changes from null to something, we initialize editingName.
   // Actually, parent might pass a new ID.
-  
+
   // Let's use an effect to sync editingName when editingId changes?
   // Or just rely on handleRenameStart.
   // But for "Create Calendar", the parent sets editingId directly.
@@ -170,23 +170,23 @@ export const CalendarList: React.FC<CalendarListProps> = ({
   // app.createCalendar(newCalendar);
   // setEditingCalendarId(newId);
   // setEditingName('Untitled');
-  
+
   // So the parent should probably control the editing state entirely or we provide a way to start editing a specific ID.
   // I added `editingId` and `setEditingId` to props.
   // But `editingName` is local. This might be an issue if the parent wants to set the initial name.
   // In the original code, `setEditingName` was also in the main component.
-  
+
   // To support the "Create Calendar" flow correctly where it auto-focuses 'Untitled':
   // We can add a useEffect to check if editingId changed and matches a calendar, then set name?
   // But if it's a new calendar, we might want to set 'Untitled' or whatever the calendar has.
-  
+
   useEffect(() => {
-     if (editingId) {
-         const calendar = calendars.find(c => c.id === editingId);
-         if (calendar) {
-             setEditingName(calendar.name);
-         }
-     }
+    if (editingId) {
+      const calendar = calendars.find(c => c.id === editingId);
+      if (calendar) {
+        setEditingName(calendar.name);
+      }
+    }
   }, [editingId, calendars]);
 
 
@@ -210,7 +210,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
               onContextMenu={(e) => onContextMenu(e, calendar.id)}
             >
               {isDropTarget && dropTarget.position === 'top' && (
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 z-10 pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none" />
               )}
               <div
                 draggable
@@ -231,7 +231,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
                     } as React.CSSProperties}
                     checked={isVisible}
                     onChange={event =>
-                        onToggleVisibility(calendar.id, event.target.checked)
+                      onToggleVisibility(calendar.id, event.target.checked)
                     }
                   />
                   {showIcon && (
@@ -264,7 +264,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
                 </div>
               </div>
               {isDropTarget && dropTarget.position === 'bottom' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 z-10 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none" />
               )}
             </li>
           );

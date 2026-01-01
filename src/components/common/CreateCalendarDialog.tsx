@@ -4,6 +4,7 @@ import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
+import { cancelButton } from '@/styles/classNames';
 
 const COLORS = [
   '#ea426b',
@@ -101,7 +102,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-slate-800">
+      <div className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-background">
         <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           Create New Calendar
         </h2>
@@ -117,7 +118,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
                 placeholder="e.g. Work"
                 autoFocus
               />
@@ -130,9 +131,8 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
                 <button
                   key={color}
                   type="button"
-                  className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${selectedColor === color
-                    ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-800'
-                    : ''
+                  className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${selectedColor === color
+                    ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800' : ''
                     }`}
                   style={{ backgroundColor: color }}
                   onClick={() => setSelectedColor(color)}
@@ -167,14 +167,14 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+              className={cancelButton}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               Create
             </button>

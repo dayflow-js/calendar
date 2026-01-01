@@ -393,9 +393,18 @@ const MonthView: React.FC<MonthViewProps> = ({
         viewType={ViewType.MONTH}
         currentDate={currentDate}
         customTitle={`${currentMonth} ${currentYear}`}
-        onPrevious={handlePreviousMonth}
-        onNext={handleNextMonth}
-        onToday={handleToday}
+        onPrevious={() => {
+          app.goToPrevious();
+          handlePreviousMonth();
+        }}
+        onNext={() => {
+          app.goToNext();
+          handleNextMonth();
+        }}
+        onToday={() => {
+          app.goToToday();
+          handleToday();
+        }}
         switcherMode={switcherMode}
       />
 

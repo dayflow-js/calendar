@@ -66,7 +66,7 @@ export const ContextMenuItem: React.FC<{
   return (
     <div
       className={`relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-slate-100 focus:text-slate-900 data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 hover:bg-slate-100 dark:hover:bg-slate-800 ${danger
-        ? 'text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400'
+        ? 'text-destructive focus:text-destructive-foreground focus:bg-destructive hover:bg-destructive hover:text-destructive-foreground'
         : 'text-slate-900 dark:text-slate-50'
         }`}
       onClick={(e) => {
@@ -112,7 +112,7 @@ export const ContextMenuColorPicker: React.FC<{
           <button
             key={color}
             type="button"
-            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 dark:focus:ring-offset-slate-800 ${selectedColor?.toLowerCase() === color.toLowerCase() ? 'ring-2 ring-offset-1 ring-blue-500 dark:ring-offset-slate-800' : ''
+            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary dark:focus:ring-offset-slate-800 ${selectedColor?.toLowerCase() === color.toLowerCase() ? 'ring-2 ring-offset-1 ring-primary dark:ring-offset-slate-800' : ''
               }`}
             style={{ backgroundColor: color }}
             onClick={(e) => {

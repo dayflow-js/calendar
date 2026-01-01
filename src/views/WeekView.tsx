@@ -27,6 +27,7 @@ import {
   calendarContainer,
   weekDayHeader,
   weekDayCell,
+  miniCalendarToday,
   dateNumber,
   allDayRow,
   allDayLabel,
@@ -459,7 +460,9 @@ const WeekView: React.FC<WeekViewProps> = ({
             <div className="inline-flex items-center justify-center text-sm h-6 w-6 mt-1 mr-1">
               {day}
             </div>
-            <div className={dateNumber}>{weekDates[i].date}</div>
+            <div className={`${dateNumber} ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
+              {weekDates[i].date}
+            </div>
           </div>
         ))}
       </div>
@@ -567,18 +570,16 @@ const WeekView: React.FC<WeekViewProps> = ({
                     {weekDays.map((_, idx) => (
                       <div key={idx} className="flex-1 flex items-center">
                         <div
-                          className={`h-0.5 w-full relative ${
-                            idx === todayIndex
-                              ? 'bg-red-600 dark:bg-red-500'
-                              : 'bg-red-100 dark:bg-red-900/30'
-                          }`}
-                          style={{
-                            zIndex: 9999,
-                          }}
+                          className={`h-0.5 w-full relative ${idx === todayIndex
+                            ? 'bg-primary'
+                            : 'bg-primary/30'
+                            }`} style={{
+                              zIndex: 9999,
+                            }}
                         >
                           {idx === todayIndex && todayIndex !== 0 && (
                             <div
-                              className="absolute w-2 h-2 bg-red-700 dark:bg-red-500 rounded-full"
+                              className="absolute w-2 h-2 bg-primary rounded-full"
                               style={{ top: '-3px', left: '-4px' }}
                             />
                           )}
@@ -602,7 +603,7 @@ const WeekView: React.FC<WeekViewProps> = ({
           </div>
 
           {/* Time grid */}
-          <div className="flex-grow relative">
+          <div className="grow relative">
             {timeSlots.map((slot, slotIndex) => (
               <div key={slotIndex} className={timeGridRow}>
                 {weekDays.map((_, dayIndex) => {

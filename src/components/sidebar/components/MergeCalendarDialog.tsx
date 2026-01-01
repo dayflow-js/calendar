@@ -1,3 +1,4 @@
+import { cancelButton } from '@/styles/classNames';
 import React from 'react';
 
 interface MergeCalendarDialogProps {
@@ -15,7 +16,7 @@ export const MergeCalendarDialog: React.FC<MergeCalendarDialogProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-800">
+      <div className="w-full max-w-md rounded-lg p-6 shadow-xl bg-background">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           Merge &quot;{sourceName}&quot; with &quot;{targetName}&quot;?
         </h2>
@@ -26,14 +27,14 @@ export const MergeCalendarDialog: React.FC<MergeCalendarDialogProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+            className={cancelButton}
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+            className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
           >
             Merge
           </button>

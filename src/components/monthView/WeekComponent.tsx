@@ -513,11 +513,10 @@ const WeekComponent = React.memo<WeekComponentProps>(
               <span
                 className={`
               inline-flex items-center justify-center h-5 w-5 rounded-full text-sm font-medium
-              ${day.isToday
-                    ? 'bg-blue-500 text-white'
-                    : belongsToCurrentMonth
-                      ? 'text-gray-900 dark:text-gray-100'
-                      : 'text-gray-400 dark:text-gray-600'
+                              ${day.isToday
+                                  ? 'bg-primary text-primary-foreground'
+                                  : belongsToCurrentMonth
+                                    ? 'text-gray-900 dark:text-gray-100'                      : 'text-gray-400 dark:text-gray-600'
                   }
             `}
               >

@@ -27,12 +27,12 @@ export const headerContainer = 'p-2 flex justify-between';
 /**
  * Title text style
  */
-export const headerTitle = 'text-2xl font-semibold text-gray-900 dark:text-gray-100';
+export const headerTitle = 'text-2xl font-semibold text-primary';
 
 /**
  * Subtitle text style
  */
-export const headerSubtitle = 'mt-3 text-gray-600 dark:text-gray-400';
+export const headerSubtitle = 'mt-3 text-secondary';
 
 // ==================== Button Styles ====================
 
@@ -44,18 +44,23 @@ export const buttonGroup = 'flex items-center';
 /**
  * Navigation button (forward/backward)
  */
-export const navButton = 'p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded';
+export const navButton = 'p-1 text-gray-600 dark:text-gray-300 hover:bg-primary/10 hover:text-primary rounded transition-colors';
 
 /**
  * Today button
  */
 export const todayButton =
-  'px-4 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded';
+  'px-4 py-1 text-sm text-primary font-medium hover:bg-primary/10 rounded transition-colors';
 
 /**
  * Icon button size
  */
 export const iconSize = 'h-5 w-5';
+
+/**
+ * Cancel button
+ */
+export const cancelButton = 'rounded-md bg-background border border-border px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-(--hover)'
 
 // ==================== Grid Styles ====================
 
@@ -73,7 +78,7 @@ export const weekHeaderRow =
 /**
  * Weekday labels
  */
-export const dayLabel = 'text-right text-gray-500 dark:text-gray-400 text-sm py-2 pr-2';
+export const dayLabel = 'text-right text-secondary text-sm py-2 pr-2';
 
 /**
  * WeekView week title
@@ -84,7 +89,7 @@ export const weekDayHeader = 'flex border-b border-gray-200 dark:border-gray-700
  * WeekView week title cell
  */
 export const weekDayCell =
-  'flex flex-1 justify-center items-center text-center text-gray-500 dark:text-gray-400 text-sm p-1';
+  'flex flex-1 justify-center items-center text-center text-secondary text-sm p-1';
 
 /**
  * Date number style
@@ -129,7 +134,7 @@ export const timeSlot = 'relative h-[4.5rem] flex';
 /**
  * Time label
  */
-export const timeLabel = 'absolute -top-2.5 right-2 text-[12px] text-gray-500 dark:text-gray-400';
+export const timeLabel = 'absolute -top-2.5 right-2 text-[12px] text-secondary';
 
 /**
  * Time grid row
@@ -151,12 +156,12 @@ export const currentTimeLine = 'absolute left-0 top-0 flex pointer-events-none';
  * Current time label
  */
 export const currentTimeLabel =
-  'ml-2 text-white text-xs font-bold px-1.5 bg-red-500 rounded-sm';
+  'ml-2 text-primary-foreground text-xs font-bold px-1.5 bg-primary rounded-sm';
 
 /**
  * Current time line bar
  */
-export const currentTimeLineBar = 'h-0.5 w-full bg-red-600 relative';
+export const currentTimeLineBar = 'h-0.5 w-full bg-primary relative';
 
 // ==================== All-Day Event Area ====================
 
@@ -169,7 +174,7 @@ export const allDayRow = 'flex items-center border-b border-gray-200 dark:border
  * All-day event label
  */
 export const allDayLabel =
-  'w-20 flex-shrink-0 p-1 text-xs font-medium text-gray-500 dark:text-gray-400 flex justify-end';
+  'w-20 flex-shrink-0 p-1 text-xs font-medium text-secondary flex justify-end';
 
 /**
  * All-day event content area
@@ -295,7 +300,7 @@ export const miniCalendarGrid =
  * Mini calendar weekday title
  */
 export const miniCalendarDayHeader =
-  'text-center text-gray-500 dark:text-gray-400 font-medium py-1 h-6 w-6';
+  'text-center text-secondary font-medium py-1 h-6 w-6';
 
 /**
  * Mini calendar date cell base style
@@ -305,23 +310,23 @@ export const miniCalendarDay = 'text-center py-1 rounded text-xs h-6 w-6';
 /**
  * Mini calendar current month date
  */
-export const miniCalendarCurrentMonth = 'text-gray-900 dark:text-gray-100';
+export const miniCalendarCurrentMonth = 'text-primary';
 
 /**
  * Mini calendar other month date
  */
-export const miniCalendarOtherMonth = 'text-gray-400 dark:text-gray-600';
+export const miniCalendarOtherMonth = 'text-secondary';
 
 /**
  * Mini calendar today
  */
-export const miniCalendarToday = 'bg-blue-500 rounded-full text-white';
+export const miniCalendarToday = 'bg-primary rounded-full text-primary-foreground';
 
 /**
  * Mini calendar selected date
  */
 export const miniCalendarSelected =
-  'bg-red-100 text-red-600 rounded-full font-medium';
+  'bg-secondary text-secondary-foreground rounded-full font-medium';
 
 // ==================== Utility Styles ====================
 

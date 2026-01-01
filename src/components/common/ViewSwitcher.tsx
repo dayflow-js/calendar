@@ -66,7 +66,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       <div className="relative inline-block" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-1 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 shadow-sm min-w-[120px] justify-between"
+          className="flex items-center gap-2 px-3 py-1 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all duration-200 shadow-sm min-w-[120px] justify-between"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
@@ -89,7 +89,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
                     setIsOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 text-sm transition-colors duration-150 ${currentView === viewType
-                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
+                      ? 'bg-primary/10 text-primary font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
                   role="option"

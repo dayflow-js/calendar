@@ -252,7 +252,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         indicator.style.color = getEventTextColor(color, app?.getCalendarRegistry());
       } else {
         indicator.className +=
-          ' bg-blue-50/70 text-blue-900 border border-dashed border-blue-400';
+          ' bg-primary/10 text-primary border border-dashed border-primary/50';
       }
 
       dragIndicatorRef.current = indicator;

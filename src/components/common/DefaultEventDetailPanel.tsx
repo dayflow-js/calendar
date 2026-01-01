@@ -262,7 +262,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
                 title: e.target.value,
               });
             }}
-            className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
+            className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
           />
         </div>
         <ColorPicker
@@ -330,7 +330,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
             })
           }
           rows={3}
-          className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition resize-none"
+          className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
           placeholder="Add a note..."
         />
       </div>
@@ -338,14 +338,14 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
       <div className="flex space-x-2">
         {!isAllDay ? (
           <button
-            className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 text-xs font-medium transition"
+            className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
             onClick={convertToAllDay}
           >
             Set as All-day
           </button>
         ) : (
           <button
-            className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 text-xs font-medium transition"
+            className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
             onClick={convertToRegular}
           >
             Set as Timed Event
@@ -353,7 +353,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
         )}
 
         <button
-          className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 text-xs font-medium transition"
+          className="px-2 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 text-xs font-medium transition"
           onClick={() => onEventDelete(event.id)}
         >
           Delete
