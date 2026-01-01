@@ -189,7 +189,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                     title: e.target.value,
                   });
                 }}
-                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition"
+                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
               />
             </div>
             <ColorPicker
@@ -205,7 +205,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
             />
           </div>
 
-          {isAllDay ? (
+          {!!editedEvent.allDay ? (
             <div className="mb-4">
               <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Date Range</div>
               <RangePicker
@@ -255,22 +255,22 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                 })
               }
               rows={4}
-              className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 focus:border-blue-400 dark:focus:border-blue-500 transition resize-none"
+              className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
               placeholder="Add a note..."
             />
           </div>
 
           <div className="flex space-x-2">
-            {!isAllDay ? (
+            {!editedEvent.allDay ? (
               <button
-                className="px-3 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 text-sm font-medium transition"
+                className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
                 onClick={convertToAllDay}
               >
                 Set as All-day
               </button>
             ) : (
               <button
-                className="px-3 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 text-sm font-medium transition"
+                className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
                 onClick={convertToRegular}
               >
                 Set as Timed Event
@@ -278,7 +278,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
             )}
 
             <button
-              className="px-3 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 text-sm font-medium transition"
+              className="px-3 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 text-sm font-medium transition"
               onClick={() => {
                 onEventDelete(event.id);
                 onClose();
@@ -288,12 +288,14 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
             </button>
 
             <button
-              className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium transition ml-auto"
+              className="px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 text-sm font-medium transition ml-auto"
               onClick={handleSave}
             >
               Save
             </button>
           </div>
+
+
         </div>
       </div>
     </div>
