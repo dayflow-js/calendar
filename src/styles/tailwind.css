@@ -2,85 +2,87 @@
 
 @variant dark (.dark &);
 
-:root {
+/* Define default CSS variables with low specificity using :where() */
+:where(:root) {
   /* Light mode colors */
-  --background: #ffffff;
-  --foreground: #2e2e2e;
-  --hover: #f5f5f5;
-  --border: #e5e5e5;
-  --card: #ffffff;
-  --card-foreground: #2e2e2e;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
+  --color-background: rgb(255 255 255);
+  --color-foreground: rgb(46 46 46);
+  --color-hover: rgb(245 245 245);
+  --color-border: rgb(229 229 229);
+  --color-card: rgb(255 255 255);
+  --color-card-foreground: rgb(46 46 46);
+  --color-muted: rgb(243 244 246);
+  --color-muted-foreground: rgb(107 114 128);
 
   /* Theme Colors */
-  --primary: #2e2e2e;
-  --primary-foreground: #ffffff;
-  --secondary: #64748b;
-  --secondary-foreground: #ffffff;
+  --color-primary: rgb(46 46 46);
+  --color-primary-foreground: rgb(255 255 255);
+  --color-secondary: rgb(100 116 139);
+  --color-secondary-foreground: rgb(255 255 255);
 
   /* Destructive */
-  --destructive: #d42422;
-  --destructive-foreground: #ffffff;
+  --color-destructive: rgb(212 36 34);
+  --color-destructive-foreground: rgb(255 255 255);
 }
 
-.dark {
+:where(.dark) {
   /* Dark mode colors */
-  --background: #151515;
-  --hover: #1c1c1c;
-  --foreground: #e5e5e5;
-  --card: #1f2937;
-  --card-foreground: #e5e5e5;
-  --border: #383838;
-  --muted: #374151;
-  --muted-foreground: #9ca3af;
+  --color-background: rgb(21 21 21);
+  --color-hover: rgb(28 28 28);
+  --color-foreground: rgb(229 229 229);
+  --color-card: rgb(31 41 55);
+  --color-card-foreground: rgb(229 229 229);
+  --color-border: rgb(56 56 56);
+  --color-muted: rgb(55 65 81);
+  --color-muted-foreground: rgb(156 163 175);
 
-  --primary: #e5e5e5;
-  --primary-foreground: #171717;
-  --secondary: #9ca3af;
-  --secondary-foreground: #171717;
+  --color-primary: rgb(229 229 229);
+  --color-primary-foreground: rgb(23 23 23);
+  --color-secondary: rgb(156 163 175);
+  --color-secondary-foreground: rgb(23 23 23);
 
   /* Destructive */
-  --destructive: #934645;
-  --destructive-foreground: #fef2f2;
+  --color-destructive: rgb(147 70 69);
+  --color-destructive-foreground: rgb(254 242 242);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-hover: var(--color-hover);
+  --color-border: var(--color-border);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
 
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
 
-  --color-border: var(--border);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light):not(.dark) {
-    --background: #111827;
-    --foreground: #f3f4f6;
-    --border: #374151;
-    --card: #1f2937;
-    --card-foreground: #f3f4f6;
-    --muted: #374151;
-    --muted-foreground: #9ca3af;
+    --color-background: rgb(17 24 39);
+    --color-foreground: rgb(243 244 246);
+    --color-border: rgb(55 65 81);
+    --color-card: rgb(31 41 55);
+    --color-card-foreground: rgb(243 244 246);
+    --color-muted: rgb(55 65 81);
+    --color-muted-foreground: rgb(156 163 175);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
 

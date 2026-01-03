@@ -47,7 +47,7 @@ export default {
     }),
     postcss({
       extensions: ['.css'],
-      minimize: true,
+      minimize: false,
       inject: false,
       extract: 'styles.css',
       config: {

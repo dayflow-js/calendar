@@ -3,14 +3,9 @@
 
 @layer l-base {
   :root {
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
-    --secondary-foreground: 333 100% 50%;
     --accent: 217 91% 60%;
   }
 }
-
-
 
 .nextra-banner-container {
   @apply bg-[linear-gradient(1deg,#383838,#212121)];
