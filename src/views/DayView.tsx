@@ -8,6 +8,7 @@ import {
   getLineColor,
   getEventEndHour,
 } from '@/utils';
+import { t } from '@/utils/locale';
 import {
   EventLayout,
   Event,
@@ -365,13 +366,13 @@ const DayView: React.FC<DayViewProps> = ({
             viewType={ViewType.DAY}
             currentDate={currentDate}
             switcherMode={switcherMode}
-            customSubtitle={currentTime.toLocaleDateString('en-US', {
+            customSubtitle={currentTime.toLocaleDateString(app.state.locale, {
               weekday: 'long',
             })}
           />
           {/* All-day event area */}
           <div className={allDayRow} ref={allDayRowRef}>
-            <div className={allDayLabel}>all-day</div>
+            <div className={allDayLabel}>{t('allDay', app.state.locale)}</div>
             <div className="flex flex-1 relative">
               <div
                 className="w-full relative"
@@ -593,21 +594,24 @@ const DayView: React.FC<DayViewProps> = ({
                   handlePreviousMonth={() => app.goToPrevious()}
                   handleNextMonth={() => app.goToNext()}
                   handleToday={() => app.goToToday()}
+                  locale={app.state.locale}
                 />
               </div>
-              <MiniCalendar
-                visibleMonth={visibleMonth}
-                currentDate={currentDate}
-                onMonthChange={handleMonthChange}
-                onDateSelect={handleDateSelect}
-              />
+        <MiniCalendar
+          visibleMonth={visibleMonth}
+          currentDate={currentDate}
+          showHeader={true}
+          onMonthChange={handleMonthChange}
+          onDateSelect={handleDateSelect}
+          locale={app.state.locale}
+        />
             </div>
           </div>
 
           {/* Event details area */}
           <div className={`flex-1 ${p4} overflow-y-auto`}>
             <h3 className={`${textLg} font-semibold ${mb3}`}>
-              {currentDate.toLocaleDateString('en-US', {
+              {currentDate.toLocaleDateString(app.state.locale, {
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',
@@ -616,7 +620,7 @@ const DayView: React.FC<DayViewProps> = ({
 
             {currentDayEvents.length === 0 ? (
               <p className={`${textGray500} ${textSm}`}>
-                No events for this day
+                {t('noEvents', app.state.locale)}
               </p>
             ) : (
               <div className="space-y-2">
@@ -641,7 +645,7 @@ const DayView: React.FC<DayViewProps> = ({
                       </div>
                     )}
                     {event.allDay && (
-                      <div className={`${textXs} ${textGray600}`}>All day</div>
+                      <div className={`${textXs} ${textGray600}`}>{t('allDay', app.state.locale)}</div>
                     )}
                   </div>
                 ))}

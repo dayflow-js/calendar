@@ -104,6 +104,7 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useSidebar?: boolean | SidebarConfig;
   useEventDetailDialog?: boolean;
+  locale?: string;
 }
 
 /**
@@ -118,6 +119,7 @@ export interface CalendarAppState {
   views: Map<ViewType, CalendarView>;
   switcherMode?: ViewSwitcherMode;
   sidebar?: SidebarConfig;
+  locale: string;
 }
 
 /**
@@ -217,6 +219,7 @@ export interface UseCalendarAppReturn {
  * Contains drag and view configurations
  */
 export interface CalendarConfig {
+  locale?: string;
   drag: {
     HOUR_HEIGHT: number;
     FIRST_HOUR: number;

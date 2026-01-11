@@ -36,9 +36,6 @@ export const formatTime = (hours: number, minutes = 0) => {
  * @returns Formatted time range (e.g., "14:00 - 16:00" or "All day")
  */
 export const formatEventTimeRange = (event: Event) => {
-  if (event.allDay) {
-    return 'All day';
-  }
   const startHour = extractHourFromDate(event.start);
   const endHour = getEventEndHour(event);
   return `${formatTime(startHour)} - ${formatTime(endHour)}`;
