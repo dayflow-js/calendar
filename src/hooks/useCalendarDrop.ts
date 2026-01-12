@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { CalendarApp } from '../core';
 import { Event, CalendarColors } from '../types';
 import { Temporal } from 'temporal-polyfill';
+import { t } from '../utils/locale';
 
 export interface CalendarDropData {
   calendarId: string;
@@ -109,7 +110,8 @@ export function useCalendarDrop(
         // Create new event
         const newEvent: Event = {
           id: eventId,
-          title: `New ${dragData.calendarName} Event`,
+          title: (allDay ? t('newAllDayCalendarEvent', app.state.locale) : t('newCalendarEvent', app.state.locale))
+            .replace('{calendarName}', dragData.calendarName),
           description: '',
           start,
           end,

@@ -15,6 +15,7 @@ import {
   getEventTextColor,
   formatTime,
 } from '../../utils';
+import { t } from '../../utils/locale';
 import { dateToZonedDateTime } from '../../utils/temporal';
 
 export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
@@ -111,7 +112,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           ({
             id: String(Date.now()),
             color: color || 'blue',
-            title: title || 'New Event',
+            title: title || t('newEvent', app?.state.locale),
             start: nowTemporal,
             end: nowTemporal,
             allDay: false,
@@ -125,6 +126,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             targetDate: drag.targetDate || null,
             startDate: drag.originalStartDate || null,
             endDate: drag.originalEndDate || null,
+            locale: app?.state.locale,
           })
         );
       } else {
@@ -242,6 +244,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             getLineColor: getLineColor || (() => ''),
             getDynamicPadding: getDynamicPadding || (() => '0px'),
             renderer,
+            locale: app?.state.locale,
           })
         );
       }
@@ -381,6 +384,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               getLineColor: getLineColor || (() => ''),
               getDynamicPadding: getDynamicPadding || (() => '0px'),
               renderer,
+              locale: app?.state.locale,
             })
           );
         }
