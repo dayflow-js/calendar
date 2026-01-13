@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { CalendarApp } from '@/core';
 import { extractHourFromDate } from '@/utils';
-import { getMonthLabels, getWeekDaysLabels } from '@/utils/locale';
+import { useLocale } from '@/locale';
 import {
   Event,
   MonthEventDragState,
@@ -42,6 +42,7 @@ const MonthView: React.FC<MonthViewProps> = ({
   calendarRef,
   switcherMode = 'buttons',
 }) => {
+  const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
   const calendarSignature = app.getCalendars().map(c => c.id + c.colors.lineColor).join('-');
@@ -247,8 +248,8 @@ const MonthView: React.FC<MonthViewProps> = ({
   });
 
   const weekDaysLabels = useMemo(() => {
-    return getWeekDaysLabels(app.state.locale, 'short');
-  }, [app.state.locale]);
+    return getWeekDaysLabels(locale, 'short');
+  }, [locale, getWeekDaysLabels]);
 
   const {
     currentMonth,
@@ -265,8 +266,8 @@ const MonthView: React.FC<MonthViewProps> = ({
     currentDate,
     weekHeight,
     onCurrentMonthChange: (monthName: string, year: number) => {
-      const isAsian = app.state.locale.startsWith('zh') || app.state.locale.startsWith('ja');
-      const localizedMonths = getMonthLabels(app.state.locale, isAsian ? 'short' : 'long');
+      const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
+      const localizedMonths = getMonthLabels(locale, isAsian ? 'short' : 'long');
       const monthIndex = localizedMonths.indexOf(monthName);
 
       if (monthIndex >= 0) {
@@ -274,7 +275,7 @@ const MonthView: React.FC<MonthViewProps> = ({
       }
     },
     initialWeeksToLoad: 156,
-    locale: app.state.locale
+    locale: locale
   });
 
   const previousStartIndexRef = useRef(0);
@@ -396,7 +397,7 @@ const MonthView: React.FC<MonthViewProps> = ({
 
   // TODO: remove getCustomTitle and using app.currentDate to fixed
   const getCustomTitle = () => {
-    const isAsianLocale = app.state.locale.startsWith('zh') || app.state.locale.startsWith('ja');
+    const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
     return isAsianLocale ? `${currentYear}年${currentMonth}` : `${currentMonth} ${currentYear}`;
   };
 

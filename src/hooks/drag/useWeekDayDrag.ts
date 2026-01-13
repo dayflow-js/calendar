@@ -2,11 +2,12 @@
 import { useCallback } from 'react';
 import { ViewType, UseWeekDayDragParams, UseWeekDayDragReturn } from '../../types';
 import { getDateByDayIndex } from '../../utils';
-import { t } from '../../utils/locale';
+import { useLocale } from '@/locale';
 
 export const useWeekDayDrag = (
   params: UseWeekDayDragParams
 ): UseWeekDayDragReturn => {
+  const { t } = useLocale();
   const { options, common, state, manager, handleDragMove, handleDragEnd } =
     params;
   const { viewType, currentWeekStart, app } = options;
@@ -49,7 +50,7 @@ export const useWeekDayDrag = (
         endHour: 0,
         allDay: true,
       });
-      createDragIndicator(drag, 'blue', t('newAllDayEvent', app?.state.locale));
+      createDragIndicator(drag, 'blue', t('newAllDayEvent'));
       document.addEventListener('mousemove', handleDragMove);
       document.addEventListener('mouseup', handleDragEnd);
     },

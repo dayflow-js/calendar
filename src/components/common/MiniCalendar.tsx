@@ -9,6 +9,7 @@ import {
   miniCalendarToday,
   miniCalendarSelected,
 } from '../../styles/classNames';
+import { useLocale, getWeekDaysLabels } from '@/locale';
 
 interface MiniCalendarProps {
   visibleMonth: Date;
@@ -25,22 +26,13 @@ export const MiniCalendar: React.FC<MiniCalendarProps> = ({
   showHeader = false,
   onMonthChange,
   onDateSelect,
-  locale = 'en-US',
 }) => {
+  const { locale } = useLocale();
   const todayKey = useMemo(() => new Date().toDateString(), []);
   const currentDateKey = currentDate.toDateString();
 
   const weekdayLabels = useMemo(() => {
-    const labels = [];
-    const baseDate = new Date(2024, 0, 1); // 2024-01-01 is Monday
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(baseDate);
-      date.setDate(baseDate.getDate() + i);
-      labels.push(
-        date.toLocaleDateString(locale, { weekday: 'narrow' })
-      );
-    }
-    return labels;
+    return getWeekDaysLabels(locale, 'narrow');
   }, [locale]);
 
   const monthLabel = useMemo(

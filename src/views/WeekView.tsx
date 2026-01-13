@@ -7,7 +7,7 @@ import {
   createDateWithHour,
   getDateByDayIndex,
 } from '@/utils';
-import { t, getWeekDaysLabels } from '@/utils/locale';
+import { useLocale } from '@/locale';
 import {
   EventLayout,
   Event,
@@ -59,6 +59,7 @@ const WeekView: React.FC<WeekViewProps> = ({
   calendarRef,
   switcherMode = 'buttons',
 }) => {
+  const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const events = app.getEvents();
 
@@ -392,12 +393,12 @@ const WeekView: React.FC<WeekViewProps> = ({
   });
 
   const weekDaysLabels = useMemo(() => {
-    return getWeekDaysLabels(app.state.locale, 'short');
-  }, [app.state.locale]);
+    return getWeekDaysLabels(locale, 'short');
+  }, [locale, getWeekDaysLabels]);
 
   const allDayLabelText = useMemo(() => {
-    return t('allDay', app.state.locale);
-  }, [app.state.locale]);
+    return t('allDay');
+  }, [t]);
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
@@ -415,12 +416,12 @@ const WeekView: React.FC<WeekViewProps> = ({
       dateOnly.setHours(0, 0, 0, 0);
       return {
         date: date.getDate(),
-        month: date.toLocaleString(app.state.locale, { month: 'short' }),
+        month: date.toLocaleString(locale, { month: 'short' }),
         fullDate: new Date(date),
         isToday: dateOnly.getTime() === today.getTime(),
       };
     });
-  }, [currentWeekStart, weekDaysLabels, app.state.locale]);
+  }, [currentWeekStart, weekDaysLabels, locale]);
 
   // Event handling functions
   const handleEventUpdate = (updatedEvent: Event) => {

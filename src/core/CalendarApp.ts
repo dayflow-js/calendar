@@ -79,7 +79,7 @@ export class CalendarApp implements ICalendarApp {
       switcherMode: config.switcherMode || 'buttons',
       plugins: new Map(),
       views: new Map(),
-      locale: config.locale || (typeof navigator !== 'undefined' ? navigator.language : 'en-US'),
+      locale: config.locale || 'en-US',
     };
 
     this.callbacks = config.callbacks || {};

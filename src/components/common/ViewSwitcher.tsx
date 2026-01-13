@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CalendarApp, ViewType } from '../../types';
-import { t } from '@/utils/locale';
+import { useLocale } from '@/locale';
 
 interface ViewSwitcherProps {
   calendar: CalendarApp;
@@ -32,11 +32,11 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useLocale();
 
   // Get all registered views
   const registeredViews = Array.from(calendar.state.views.keys());
   const currentView = calendar.state.currentView;
-  const locale = calendar.state.locale;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -65,7 +65,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
-          <span className="text-gray-900 dark:text-gray-100">{t(currentView as any, locale)}</span>
+          <span className="text-gray-900 dark:text-gray-100">{t(currentView as any)}</span>
           <span
             className={`text-gray-500 dark:text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           >
@@ -90,7 +90,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
                   role="option"
                   aria-selected={currentView === viewType}
                 >
-                  {t(viewType as any, locale)}
+                  {t(viewType as any)}
                 </button>
               ))}
             </div>
@@ -127,7 +127,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             }`}
           onClick={() => calendar.changeView(viewType)}
         >
-          {t(viewType as any, locale)}
+          {t(viewType as any)}
         </button>
       ))}
     </div>

@@ -4,7 +4,7 @@ import {
   DragIndicatorRenderer,
 } from '@/types/dragIndicator';
 import { DefaultDragIndicatorRenderer } from '@/components/weekView/DragIndicator/DefaultDragIndicator';
-import { t } from '@/utils/locale';
+import { useLocale } from '@/locale';
 
 interface DragIndicatorComponentProps extends DragIndicatorProps {
   renderer?: DragIndicatorRenderer;
@@ -20,9 +20,9 @@ const DragIndicatorComponent: React.FC<DragIndicatorComponentProps> = ({
   getLineColor,
   getDynamicPadding,
   renderer = DefaultDragIndicatorRenderer,
-  locale = 'en-US',
 }) => {
-  const eventTitle = title || (allDay ? t('newAllDayEvent', locale) : t('newEvent', locale));
+  const { t } = useLocale();
+  const eventTitle = title || (allDay ? t('newAllDayEvent') : t('newEvent'));
 
   const renderContent = () => {
     if (color) {

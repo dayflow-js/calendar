@@ -9,7 +9,7 @@ import RangePicker from './RangePicker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
 import { CalendarApp } from '@/core';
-import { t } from '@/utils/locale';
+import { useLocale } from '@/locale';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
   app?: CalendarApp;
@@ -32,6 +32,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
 }) => {
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
+  const { t } = useLocale();
   const arrowBgColor = appliedTheme === 'dark' ? '#1f2937' : 'white';
   const arrowBorderColor = appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
@@ -251,7 +252,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
       }}
     >
       <div style={arrowStyle}></div>
-      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('eventTitle', app?.state.locale)}</span>
+      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('eventTitle')}</span>
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex-1">
           <input
@@ -281,7 +282,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
 
       {isAllDay ? (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('dateRange', app?.state.locale)}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('dateRange')}</div>
           <RangePicker
             value={[event.start, event.end]}
             format="YYYY-MM-DD"
@@ -295,7 +296,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
         </div>
       ) : (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('timeRange', app?.state.locale)}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('timeRange')}</div>
           <RangePicker
             value={[event.start, event.end]}
             timeZone={
@@ -323,7 +324,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
       )}
 
       <div className="mb-3">
-        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note', app?.state.locale)}</span>
+        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
         <textarea
           value={event.description ?? ''}
           onChange={e =>
@@ -334,7 +335,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
           }
           rows={3}
           className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
-          placeholder={t('addNotePlaceholder', app?.state.locale)}
+          placeholder={t('addNotePlaceholder')}
         />
       </div>
 
@@ -344,14 +345,14 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
             className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
             onClick={convertToAllDay}
           >
-            {t('setAsAllDay', app?.state.locale)}
+            {t('setAsAllDay')}
           </button>
         ) : (
           <button
             className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
             onClick={convertToRegular}
           >
-            {t('setAsTimed', app?.state.locale)}
+            {t('setAsTimed')}
           </button>
         )}
 
@@ -359,7 +360,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
           className="px-2 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 text-xs font-medium transition"
           onClick={() => onEventDelete(event.id)}
         >
-          {t('delete', app?.state.locale)}
+          {t('delete')}
         </button>
       </div>
     </div>

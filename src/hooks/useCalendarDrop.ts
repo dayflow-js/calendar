@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { CalendarApp } from '../core';
 import { Event, CalendarColors } from '../types';
 import { Temporal } from 'temporal-polyfill';
-import { t } from '../utils/locale';
+import { useLocale } from '@/locale';
 
 export interface CalendarDropData {
   calendarId: string;
@@ -33,6 +33,7 @@ export function useCalendarDrop(
   options: CalendarDropOptions
 ): CalendarDropReturn {
   const { app, onEventCreated } = options;
+  const { t } = useLocale();
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     // Check if the drag data is from a calendar
@@ -110,8 +111,9 @@ export function useCalendarDrop(
         // Create new event
         const newEvent: Event = {
           id: eventId,
-          title: (allDay ? t('newAllDayCalendarEvent', app.state.locale) : t('newCalendarEvent', app.state.locale))
-            .replace('{calendarName}', dragData.calendarName),
+          title: allDay
+            ? t('newAllDayCalendarEvent', { calendarName: dragData.calendarName })
+            : t('newCalendarEvent', { calendarName: dragData.calendarName }),
           description: '',
           start,
           end,

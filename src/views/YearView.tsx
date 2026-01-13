@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { t, getWeekDaysLabels } from '@/utils/locale';
+import { useLocale } from '@/locale';
 import { CalendarApp } from '@/core';
 import {
   useVirtualScroll,
@@ -34,6 +34,7 @@ interface YearData {
 
 // Main component
 const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
+  const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
 
   // Responsive configuration
@@ -93,11 +94,11 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
       }
 
       const monthDate = new Date(year, month, 1);
-      const localizedMonthName = monthDate.toLocaleDateString(app.state.locale, { month: 'long' });
+      const localizedMonthName = monthDate.toLocaleDateString(locale, { month: 'long' });
 
       return { year, month, monthName: localizedMonthName, days };
     },
-    [currentDate, app.state.locale]
+    [currentDate, locale]
   );
 
   // Cached year data retrieval
@@ -120,8 +121,8 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
   );
 
   const weekDayLabels = useMemo(() => {
-    return getWeekDaysLabels(app.state.locale, 'narrow');
-  }, [app.state.locale]);
+    return getWeekDaysLabels(locale, 'narrow');
+  }, [locale, getWeekDaysLabels]);
 
   // Navigation functions
   const handleToday = useCallback(() => {
@@ -303,7 +304,7 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
               onClick={() => app.goToToday()}
               title="Go to today"
             >
-              {t('today', app.state.locale)}
+              {t('today')}
             </button>
             <button
               className="p-1 text-gray-600 hover:bg-gray-100 rounded"

@@ -10,7 +10,7 @@ import {
 } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { temporalToDate } from '@/utils/temporal';
-import { t } from '@/utils/locale';
+import { useLocale } from '@/locale';
 import CalendarEvent from '../weekView/CalendarEvent';
 import { analyzeMultiDayEventsForWeek } from './util';
 import { extractHourFromDate } from '@/utils/helpers';
@@ -74,7 +74,6 @@ interface WeekComponentProps {
   onCalendarDragOver?: (e: React.DragEvent) => void;
   calendarSignature?: string;
   app: CalendarApp;
-  locale?: string;
 }
 
 // Constants
@@ -307,6 +306,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     onCalendarDragOver,
     app,
   }) => {
+    const { t, locale } = useLocale();
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -430,7 +430,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     const renderDayCell = (day: (typeof weekData.days)[0], dayIndex: number) => {
       // We need to parse currentMonth (localized string) back to month index, OR compare strings
       // Comparing localized month strings is safer than trying to parse back
-      const dayMonthName = day.date.toLocaleDateString(app.state.locale, { month: (app.state.locale.startsWith('zh') || app.state.locale.startsWith('ja')) ? 'short' : 'long' });
+      const dayMonthName = day.date.toLocaleDateString(locale, { month: (locale.startsWith('zh') || locale.startsWith('ja')) ? 'short' : 'long' });
 
       const belongsToCurrentMonth =
         dayMonthName === currentMonth &&
@@ -527,7 +527,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                     }
                   `}
                 >
-                  {day.date.toLocaleDateString(app.state.locale, {
+                  {day.date.toLocaleDateString(locale, {
                     month: 'short',
                     day: 'numeric',
                   })}
@@ -568,7 +568,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                   }
                 }}
               >
-                +{hiddenEventsCount} {t('more', app.state.locale)}
+                +{hiddenEventsCount} {t('more')}
               </div>
             )}
           </div>
@@ -578,11 +578,11 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
     const localizedMonthYear = useMemo(() => {
       if (!firstDayOfMonth) return '';
-      return firstDayOfMonth.date.toLocaleDateString(app.state.locale, {
+      return firstDayOfMonth.date.toLocaleDateString(locale, {
         month: 'long',
         year: 'numeric',
       });
-    }, [firstDayOfMonth, app.state.locale]);
+    }, [firstDayOfMonth, locale]);
 
     return (
       <div

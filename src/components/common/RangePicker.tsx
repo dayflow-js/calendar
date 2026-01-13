@@ -18,6 +18,7 @@ import {
   pad,
 } from '../../utils/rangePicker';
 import { MoveRight, ChevronsRight, ChevronRight, ChevronLeft, ChevronsLeft } from 'lucide-react';
+import { getMonthLabels, getWeekDaysLabels } from '@/locale';
 
 type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
 
@@ -89,23 +90,11 @@ const RangePicker: React.FC<RangePickerProps> = ({
   }, [showTime]);
 
   const monthLabels = useMemo(() => {
-    const labels = [];
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(2024, i, 1);
-      labels.push(date.toLocaleDateString(locale, { month: 'short' }));
-    }
-    return labels;
+    return getMonthLabels(locale, 'short');
   }, [locale]);
 
   const weekDayLabels = useMemo(() => {
-    const labels = [];
-    const baseDate = new Date(2024, 0, 7); // 2024-01-07 is Sunday
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(baseDate);
-      date.setDate(baseDate.getDate() + i);
-      labels.push(date.toLocaleDateString(locale, { weekday: 'narrow' }));
-    }
-    return labels;
+    return getWeekDaysLabels(locale, 'narrow');
   }, [locale]);
 
   const effectiveTimeFormat = useMemo(() => {
@@ -986,7 +975,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
   );
 
   return (
-    <div className="relative max-w-[400px]" ref={containerRef}>
+    <div className="relative max-w-100" ref={containerRef}>
       <div
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${disabled
           ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'

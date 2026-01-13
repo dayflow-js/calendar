@@ -2,21 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
 import { CalendarType } from '../../../types';
-import { t } from '@/utils/locale';
+import { useLocale } from '@/locale';
 
 interface MergeMenuItemProps {
   calendars: CalendarType[];
   currentCalendarId: string;
   onMergeSelect: (targetId: string) => void;
-  locale?: string;
 }
 
 export const MergeMenuItem: React.FC<MergeMenuItemProps> = ({
   calendars,
   currentCalendarId,
   onMergeSelect,
-  locale = 'en-US',
 }) => {
+  const { t } = useLocale();
   const [isHovered, setIsHovered] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
   const submenuRef = useRef<HTMLDivElement>(null);
@@ -61,7 +60,7 @@ export const MergeMenuItem: React.FC<MergeMenuItemProps> = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <span>{t('merge', locale)}</span>
+        <span>{t('merge')}</span>
         <ChevronRight className="h-4 w-4" />
       </div>
       {isHovered && createPortal(

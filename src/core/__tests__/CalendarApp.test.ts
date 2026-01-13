@@ -115,4 +115,27 @@ describe('CalendarApp', () => {
       expect(appDate.getDate()).toBe(today.getDate());
     });
   });
+
+  describe('Locale Management', () => {
+    it('should default to en-US locale', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+      });
+
+      expect(app.state.locale).toBe('en-US');
+    });
+
+    it('should use provided locale', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: 'ja-JP',
+      });
+
+      expect(app.state.locale).toBe('ja-JP');
+    });
+  });
 });

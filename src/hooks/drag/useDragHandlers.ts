@@ -15,7 +15,7 @@ import {
   getEndOfDay,
   getEventEndHour,
 } from '../../utils/helpers';
-import { t } from '../../utils/locale';
+import { useLocale } from '@/locale';
 import { Temporal } from 'temporal-polyfill';
 import {
   temporalToDate,
@@ -26,6 +26,7 @@ import {
 export const useDragHandlers = (
   params: UseDragHandlersParams
 ): UseDragHandlersReturn => {
+  const { t } = useLocale();
   const { options, common, state, manager } = params;
   const {
     viewType,
@@ -993,7 +994,7 @@ export const useDragHandlers = (
 
           onEventCreate?.({
             id: String(Date.now()),
-            title: t('newEvent', app?.state.locale),
+            title: t('newEvent'),
             day: drag.dayIndex,
             start: startTemporal,
             end: endTemporal,
@@ -1076,7 +1077,7 @@ export const useDragHandlers = (
 
         const newEvent: Event = {
           id: String(Date.now()),
-          title: t('newEvent', app?.state.locale),
+          title: t('newEvent'),
           start: startTemporal,
           end: endTemporal,
           day: targetDate.getDay(),
@@ -1128,7 +1129,7 @@ export const useDragHandlers = (
           drag.startHour,
           drag.endHour
         );
-        createDragIndicator(drag, 'blue', t('newEvent', app?.state.locale), newEventLayout);
+        createDragIndicator(drag, 'blue', t('newEvent'), newEventLayout);
         drag.sourceElement = null;
         drag.indicatorVisible = true;
         document.addEventListener('mousemove', handleDragMove);
