@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { LocaleContext } from './LocaleContext';
 import { t as translate } from './translator';
 import { getWeekDaysLabels, getMonthLabels } from './intl';
+import { isValidLocale } from './utils';
 import type { LocaleCode, LocaleMessages, TranslationKey, Locale } from './types';
 
 export interface LocaleProviderProps {
@@ -17,9 +18,16 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
 }) => {
   const resolvedLocale = useMemo(() => {
     if (typeof locale === 'string') {
-      return { code: locale, messages: undefined };
+      const code = isValidLocale(locale) ? locale : 'en-US';
+      return { code, messages: undefined };
     }
-    return locale;
+    
+    // If it's a Locale object, ensure its code is valid
+    if (locale && !isValidLocale(locale.code)) {
+      return { ...locale, code: 'en-US' };
+    }
+    
+    return locale || { code: 'en-US' };
   }, [locale]);
 
   const value = useMemo(() => {

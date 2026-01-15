@@ -8,16 +8,29 @@ export function getIntlLabel(
   try {
     if (key === 'today') {
       const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-      const parts = rtf.formatToParts(0, 'day');
-      return parts.find(p => p.type === 'literal')?.value || null;
+      return (
+        rtf
+          .formatToParts(0, 'day')
+          .find(p => p.type === 'literal')?.value ?? null
+      );
     }
 
-    const dn = new Intl.DisplayNames([locale], { type: 'dateTimeField' });
+    if (key === 'week') {
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
+      return (
+        rtf
+          .formatToParts(1, 'week')
+          .find(p => p.type === 'unit')?.value ?? null
+      );
+    }
+
+    const dn = new Intl.DisplayNames(locale, { type: 'dateTimeField' });
     return dn.of(key) ?? null;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
+
 
 /**
  * Capitalizes the first letter of a string.
@@ -36,7 +49,11 @@ export const getWeekDaysLabels = (locale: string, format: 'long' | 'short' | 'na
   for (let i = 0; i < 7; i++) {
     const date = new Date(baseDate);
     date.setDate(baseDate.getDate() + i);
-    labels.push(date.toLocaleDateString(locale, { weekday: format }));
+    try {
+      labels.push(date.toLocaleDateString(locale, { weekday: format }));
+    } catch (err) {
+      labels.push(date.toLocaleDateString('en-US', { weekday: format }));
+    }
   }
   return labels;
 };
@@ -48,7 +65,11 @@ export const getMonthLabels = (locale: string, format: 'long' | 'short' | 'narro
   const labels: string[] = [];
   for (let i = 0; i < 12; i++) {
     const date = new Date(2024, i, 1);
-    labels.push(date.toLocaleDateString(locale, { month: format }));
+    try {
+      labels.push(date.toLocaleDateString(locale, { month: format }));
+    } catch (err) {
+      labels.push(date.toLocaleDateString('en-US', { month: format }));
+    }
   }
   return labels;
 };

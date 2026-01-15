@@ -47,6 +47,7 @@ const MonthView: React.FC<MonthViewProps> = ({
   const rawEvents = app.getEvents();
   const calendarSignature = app.getCalendars().map(c => c.id + c.colors.lineColor).join('-');
   const previousEventsRef = useRef<Event[] | null>(null);
+  const DEFAULT_WEEK_HEIGHT = 119;
   // Stabilize events reference so week calculations do not rerun on every scroll frame
   const events = useMemo(() => {
     const previous = previousEventsRef.current;
@@ -140,15 +141,7 @@ const MonthView: React.FC<MonthViewProps> = ({
 
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
-  const [weekHeight, setWeekHeight] = useState(() => {
-    if (typeof window !== 'undefined') {
-      // Estimate container height: viewport height - header/toolbar space
-      const estimatedHeaderHeight = 150;
-      const estimatedContainerHeight = window.innerHeight - estimatedHeaderHeight;
-      return Math.max(80, Math.floor(estimatedContainerHeight / 6));
-    }
-    return 119; // Fallback for SSR
-  });
+  const [weekHeight, setWeekHeight] = useState(DEFAULT_WEEK_HEIGHT);
   const [isWeekHeightInitialized, setIsWeekHeightInitialized] = useState(false);
   const previousWeekHeightRef = useRef(weekHeight);
 
@@ -382,6 +375,13 @@ const MonthView: React.FC<MonthViewProps> = ({
       resizeObserver.disconnect();
     };
   }, [scrollElementRef, isWeekHeightInitialized, setScrollTop]);
+
+  useEffect(() => {
+    const estimatedHeaderHeight = 150;
+    const estimatedContainerHeight = window.innerHeight - estimatedHeaderHeight;
+    const height = Math.max(80, Math.floor(estimatedContainerHeight / 6));
+    setWeekHeight(height);
+  }, []);
 
   const handleEventUpdate = (updatedEvent: Event) => {
     app.updateEvent(updatedEvent.id, updatedEvent);

@@ -13,3 +13,16 @@ export function normalizeLocale(locale: string): SupportedLang {
 
   return 'en';
 }
+
+/**
+ * Checks if a string is a valid locale identifier.
+ */
+export function isValidLocale(locale: string): boolean {
+  try {
+    // eslint-disable-next-line no-new
+    new Intl.DateTimeFormat(locale);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

@@ -4,6 +4,7 @@ import { Event } from './event';
 import { ViewSwitcherMode } from '../components/common/ViewHeader';
 import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
 import { CalendarRegistry } from '../core/calendarRegistry';
+import { Locale } from '../locale/types';
 
 /**
  * View type enum
@@ -104,7 +105,7 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useSidebar?: boolean | SidebarConfig;
   useEventDetailDialog?: boolean;
-  locale?: string;
+  locale?: string | Locale;
 }
 
 /**
@@ -119,7 +120,7 @@ export interface CalendarAppState {
   views: Map<ViewType, CalendarView>;
   switcherMode?: ViewSwitcherMode;
   sidebar?: SidebarConfig;
-  locale: string;
+  locale: string | Locale;
 }
 
 /**

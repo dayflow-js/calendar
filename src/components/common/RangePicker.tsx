@@ -19,6 +19,7 @@ import {
 } from '../../utils/rangePicker';
 import { MoveRight, ChevronsRight, ChevronRight, ChevronLeft, ChevronsLeft } from 'lucide-react';
 import { getMonthLabels, getWeekDaysLabels } from '@/locale';
+import { Locale } from '../../locale/types';
 
 type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
 
@@ -38,7 +39,7 @@ export interface RangePickerProps {
   autoAdjustOverflow?: boolean;
   getPopupContainer?: () => HTMLElement;
   matchTriggerWidth?: boolean;
-  locale?: string;
+  locale?: string | Locale;
 }
 
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm';
@@ -83,6 +84,10 @@ const RangePicker: React.FC<RangePickerProps> = ({
   matchTriggerWidth = false,
   locale = 'en-US',
 }) => {
+  const localeCode = useMemo(() => {
+    return typeof locale === 'string' ? locale : locale?.code || 'en-US';
+  }, [locale]);
+
   const isTimeEnabled = useMemo(() => {
     if (showTime === undefined) return true;
     if (typeof showTime === 'object') return true;
@@ -90,12 +95,12 @@ const RangePicker: React.FC<RangePickerProps> = ({
   }, [showTime]);
 
   const monthLabels = useMemo(() => {
-    return getMonthLabels(locale, 'short');
-  }, [locale]);
+    return getMonthLabels(localeCode, 'short');
+  }, [localeCode]);
 
   const weekDayLabels = useMemo(() => {
-    return getWeekDaysLabels(locale, 'narrow');
-  }, [locale]);
+    return getWeekDaysLabels(localeCode, 'narrow');
+  }, [localeCode]);
 
   const effectiveTimeFormat = useMemo(() => {
     if (!isTimeEnabled) {
