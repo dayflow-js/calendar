@@ -16,7 +16,7 @@ const navbar = (
 );
 const footer = <Footer>MIT {new Date().getFullYear()} © DayFlow.</Footer>;
 
-export default async function ThemesLayout({
+export default async function BlogLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ export default async function ThemesLayout({
     <Layout
       banner={banner}
       navbar={navbar}
-      pageMap={await getPageMap()}
+      pageMap={await getPageMap('/blog')}
       docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
       footer={footer}
       nextThemes={{

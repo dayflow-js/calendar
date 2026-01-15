@@ -1,6 +1,17 @@
+---
+title: 'V1.5-1.6: Theme Customization'
+description: Learn how to customize the look and feel of your calendar with CSS variables.
+date: 2026-01-03
+---
+
 # Default Black theme
 
-<img width="1458" height="728" alt="image" src="https://github.com/user-attachments/assets/484795ba-d751-4ad3-b370-a7f10240e5f0" />
+<img
+  width="1458"
+  height="728"
+  alt="image"
+  src="https://github.com/user-attachments/assets/484795ba-d751-4ad3-b370-a7f10240e5f0"
+/>
 
 ```css
 :root {
@@ -49,7 +60,12 @@
 
 # Mac Calendar theme
 
-<img width="1461" height="737" alt="image" src="https://github.com/user-attachments/assets/31815665-649d-47b5-a895-03f5b0a71df0" />
+<img
+  width="1461"
+  height="737"
+  alt="image"
+  src="https://github.com/user-attachments/assets/31815665-649d-47b5-a895-03f5b0a71df0"
+/>
 
 ```css
 /* Light mode - Mac Calendar style */
@@ -98,14 +114,19 @@
 
 # Ant Design Theme
 
-<img width="1448" height="725" alt="image" src="https://github.com/user-attachments/assets/1b8e80ad-6a3a-4e5d-b4b4-6d3a2b9d1f76" />
+<img
+  width="1448"
+  height="725"
+  alt="image"
+  src="https://github.com/user-attachments/assets/1b8e80ad-6a3a-4e5d-b4b4-6d3a2b9d1f76"
+/>
 
 ```css
 /* Light mode - Ant Design style */
 :root {
   --color-background: rgb(255 255 255);
   --color-foreground: rgb(31 31 31);
-  --color-hover: rgb(230 247 255);           /* light blue hover */
+  --color-hover: rgb(230 247 255); /* light blue hover */
   --color-border: rgb(217 217 217);
   --color-card: rgb(255 255 255);
   --color-card-foreground: rgb(31 31 31);
@@ -113,20 +134,20 @@
   --color-muted-foreground: rgb(140 140 140);
 
   /* Theme Colors */
-  --color-primary: rgb(24 144 255);          /* Ant Design blue-6 */
+  --color-primary: rgb(24 144 255); /* Ant Design blue-6 */
   --color-primary-foreground: rgb(255 255 255);
-  --color-secondary: rgb(64 169 255);        /* lighter blue */
+  --color-secondary: rgb(64 169 255); /* lighter blue */
   --color-secondary-foreground: rgb(255 255 255);
 
   /* Destructive */
-  --color-destructive: rgb(255 77 79);       /* Ant Design red-6 */
+  --color-destructive: rgb(255 77 79); /* Ant Design red-6 */
   --color-destructive-foreground: rgb(255 255 255);
 }
 
 /* Dark mode */
 .dark {
   --color-background: rgb(20 20 20);
-  --color-hover: rgb(10 61 102);             /* darker blue hover */
+  --color-hover: rgb(10 61 102); /* darker blue hover */
   --color-foreground: rgb(229 229 229);
   --color-card: rgb(31 31 31);
   --color-card-foreground: rgb(229 229 229);
@@ -146,14 +167,19 @@
 
 # Material Design Theme
 
-<img width="1462" height="733" alt="image" src="https://github.com/user-attachments/assets/2d219a54-6b45-4a3b-a856-2055757b9668" />
+<img
+  width="1462"
+  height="733"
+  alt="image"
+  src="https://github.com/user-attachments/assets/2d219a54-6b45-4a3b-a856-2055757b9668"
+/>
 
 ```css
 /* Light mode - Material Design style */
 :root {
   --color-background: rgb(255 255 255);
   --color-foreground: rgb(33 33 33);
-  --color-hover: rgb(224 247 250);           /* light cyan hover */
+  --color-hover: rgb(224 247 250); /* light cyan hover */
   --color-border: rgb(224 224 224);
   --color-card: rgb(255 255 255);
   --color-card-foreground: rgb(33 33 33);
@@ -161,20 +187,20 @@
   --color-muted-foreground: rgb(117 117 117);
 
   /* Theme Colors */
-  --color-primary: rgb(76 175 80);           /* green-500 */
+  --color-primary: rgb(76 175 80); /* green-500 */
   --color-primary-foreground: rgb(255 255 255);
-  --color-secondary: rgb(255 152 0);         /* orange-500 */
+  --color-secondary: rgb(255 152 0); /* orange-500 */
   --color-secondary-foreground: rgb(255 255 255);
 
   /* Destructive */
-  --color-destructive: rgb(244 67 54);       /* red-500 */
+  --color-destructive: rgb(244 67 54); /* red-500 */
   --color-destructive-foreground: rgb(255 255 255);
 }
 
 /* Dark mode */
 .dark {
   --color-background: rgb(18 18 18);
-  --color-hover: rgb(27 94 32);              /* dark green hover */
+  --color-hover: rgb(27 94 32); /* dark green hover */
   --color-foreground: rgb(224 224 224);
   --color-card: rgb(30 30 30);
   --color-card-foreground: rgb(224 224 224);
@@ -197,25 +223,28 @@
 You can override default colors by defining CSS variables in a `:root` block in your CSS file. This must be loaded **after** DayFlow's CSS to override the default values.
 
 **Important:**
+
 - Use `--color-primary` format (with `--color-` prefix)
 - Colors must use `rgb()` format with space-separated values
 - Import DayFlow CSS first, then your custom CSS
 
 **Example (in your layout file):**
+
 ```tsx
 import '@dayflow/core/dist/styles.css';
-import './globals.css';  // Your custom styles after DayFlow
+import './globals.css'; // Your custom styles after DayFlow
 ```
 
 **Example (in your globals.css):**
+
 ```css
 :root {
   /* Theme Colors - use rgb() format */
-  --color-primary: rgb(26 115 232);              /* blue */
+  --color-primary: rgb(26 115 232); /* blue */
   --color-primary-foreground: rgb(255 255 255);
-  --color-secondary: rgb(255 152 0);             /* orange */
+  --color-secondary: rgb(255 152 0); /* orange */
   --color-secondary-foreground: rgb(23 23 23);
-  --color-destructive: rgb(229 57 53);           /* red */
+  --color-destructive: rgb(229 57 53); /* red */
   --color-destructive-foreground: rgb(255 255 255);
 
   /* Other colors */
@@ -231,7 +260,7 @@ import './globals.css';  // Your custom styles after DayFlow
 
 /* For dark mode: */
 .dark {
-  --color-primary: rgb(96 165 250);              /* lighter blue */
+  --color-primary: rgb(96 165 250); /* lighter blue */
   --color-primary-foreground: rgb(23 23 23);
   --color-background: rgb(18 18 18);
   --color-foreground: rgb(229 229 229);
@@ -242,6 +271,7 @@ import './globals.css';  // Your custom styles after DayFlow
 > **Note:** DayFlow uses `:where()` selectors for its default CSS variables, giving them zero specificity. This means your `:root` definitions will automatically override the defaults without needing `!important`.
 
 **Converting Hex to RGB:**
+
 - Hex `#1a73e8` → `rgb(26 115 232)`
 - Hex `#ff9800` → `rgb(255 152 0)`
 - Hex `#e53935` → `rgb(229 57 53)`
