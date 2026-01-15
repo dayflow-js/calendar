@@ -40,6 +40,7 @@ export function TeamCalendar() {
 | `calendars`            | `CalendarType[]`           | ❌       | `[]`                   | Registers calendar categories (Work, Personal, etc.) with colors and visibility.                                   |
 | `defaultCalendar`      | `string`                   | ❌       | First visible calendar | ID used when new events are created.                                                                               |
 | `theme`                | `ThemeConfig`              | ❌       | `{ mode: 'light' }`    | Sets global theme mode and optional token overrides.                                                               |
+| `locale`               | `string \| Locale`         | ❌       | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
 | `useSidebar`           | `boolean \| SidebarConfig` | ❌       | `false`                | Enables the built-in sidebar or lets you customize width, collapse state, and renderer.                            |
 | `useEventDetailDialog` | `boolean`                  | ❌       | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
 
@@ -148,6 +149,35 @@ const calendars = [
 ```
 
 See [Dark Mode](/docs/features/dark-mode) for comprehensive theming documentation.
+
+### locale
+
+The `locale` option sets the language and regional settings for the calendar.
+
+- **String:** Use a language code like `'en-US'`, `'ja'`, `'zh'`, `'de'`, `'fr'`, `'es'`, `'ko'`.
+- **Locale Object:** Pass an imported `Locale` object for type safety or a custom object for unsupported languages.
+
+```tsx
+// String code
+const calendar = useCalendarApp({
+  locale: 'ja',
+});
+
+// Built-in Locale object
+import { ja } from '@dayflow/core';
+const calendar = useCalendarApp({
+  locale: ja,
+});
+
+// Custom Locale object
+const customLocale = {
+  code: 'it',
+  messages: { today: 'Oggi', ... }
+};
+const calendar = useCalendarApp({
+  locale: customLocale,
+});
+```
 
 ### useSidebar
 

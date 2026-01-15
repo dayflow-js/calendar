@@ -78,7 +78,7 @@ export const weekHeaderRow =
 /**
  * Weekday labels
  */
-export const dayLabel = 'text-right text-secondary-foreground text-sm py-2 pr-2';
+export const dayLabel = 'text-right text-gray-500 dark:text-gray-400 text-sm py-2 pr-2';
 
 /**
  * WeekView week title

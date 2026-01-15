@@ -10,6 +10,9 @@ import { CalendarSidebarRenderProps } from '../types';
 import { normalizeCssWidth } from '../utils/styleUtils';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { ThemeMode } from '../types/calendarTypes';
+import { LocaleProvider } from '../locale/LocaleProvider';
+import { useLocale } from '../locale/useLocale';
+import { LocaleMessages, LocaleCode, Locale } from '../locale/types';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
 
@@ -22,7 +25,28 @@ interface DayFlowCalendarProps {
   /** Custom event detail dialog component (Dialog mode) */
   customEventDetailDialog?: EventDetailDialogRenderer;
   meta?: Record<string, any>; // Additional metadata
+  /** Custom localization messages to override defaults */
+  customMessages?: LocaleMessages;
 }
+
+const CalendarInternalLocaleProvider: React.FC<{
+  locale: LocaleCode | Locale;
+  messages?: LocaleMessages;
+  children: React.ReactNode;
+}> = ({ locale, messages, children }) => {
+  const context = useLocale();
+
+  // If already wrapped by an external LocaleProvider, don't wrap again
+  if (!context.isDefault) {
+    return <>{children}</>;
+  }
+
+  return (
+    <LocaleProvider locale={locale} messages={messages}>
+      {children}
+    </LocaleProvider>
+  );
+};
 
 export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
   calendar,
@@ -31,6 +55,7 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   meta,
+  customMessages,
 }) => {
   const app = calendar.app;
   const currentView = app.getCurrentView();
@@ -141,28 +166,31 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
 
   return (
     <ThemeProvider initialTheme={theme} onThemeChange={handleThemeChange}>
-      <div
-        className={`calendar-container ${className ?? ''}`}
-        style={{ height: 800, ...style }}
-      >
-        <div className="flex h-full" >
-          {sidebarEnabled && (
-            <aside
-              className="shrink-0"
-              style={{ width: resolvedSidebarWidth }}
-            >
-              {renderSidebarContent()}
-            </aside>
-          )}
-          <div className={contentClassName} ref={calendarRef}>
-            <div className="calendar-renderer h-full">
-              <ViewComponent {...viewProps} />
+      <CalendarInternalLocaleProvider locale={app.state.locale} messages={customMessages}>
+        <div
+          className={`calendar-container ${className ?? ''}`}
+          style={{ height: 800, ...style }}
+        >
+          <div className="flex h-full" >
+            {sidebarEnabled && (
+              <aside
+                className="shrink-0"
+                style={{ width: resolvedSidebarWidth }}
+              >
+                {renderSidebarContent()}
+              </aside>
+            )}
+            <div className={contentClassName} ref={calendarRef}>
+              <div className="calendar-renderer h-full">
+                <ViewComponent {...viewProps} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </CalendarInternalLocaleProvider>
     </ThemeProvider>
   );
 };
+
 
 export default DayFlowCalendar;

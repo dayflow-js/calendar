@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CalendarType } from '../../../types';
 import { cancelButton } from '@/styles/classNames';
+import { useLocale } from '@/locale';
 
 interface DeleteCalendarDialogProps {
   calendarId: string;
@@ -24,6 +25,7 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
   onMergeSelect,
 }) => {
   const [showMergeDropdown, setShowMergeDropdown] = useState(false);
+  const { t } = useLocale();
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
@@ -31,10 +33,10 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
         {step === 'initial' ? (
           <>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Delete &quot;{calendarName}&quot;?
+              {t('deleteCalendar', { calendarName })}
             </h2>
             <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
-              Do you want to delete &quot;{calendarName}&quot; or merge its events into another existing calendar?
+              {t('deleteCalendarMessage', { calendarName })}
             </p>
             <div className="mt-6 flex justify-between items-center">
               <div className="relative">
@@ -43,7 +45,7 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
                   onClick={() => setShowMergeDropdown(!showMergeDropdown)}
                   className="flex items-center gap-1 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-slate-700"
                 >
-                  Merge
+                  {t('merge')}
                 </button>
                 {showMergeDropdown && (
                   <div className="absolute left-0 top-full mt-1 min-w-full w-max rounded-md border border-gray-200 bg-background shadow-lg dark:border-slate-700 z-10 max-h-60 overflow-y-auto">
@@ -74,14 +76,14 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
                   onClick={onCancel}
                   className={cancelButton}
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="button"
                   onClick={() => onStepChange('confirm_delete')}
                   className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  {t('delete')}
                 </button>
               </div>
             </div>
@@ -89,10 +91,10 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
         ) : (
           <>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Are you sure you want to delete the calendar &ldquo;{calendarName}&rdquo;?
+              {t('confirmDeleteTitle', { calendarName })}
             </h2>
             <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
-              If you delete this calendar, all events associated with the calendar will also be deleted.
+              {t('confirmDeleteMessage')}
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -100,14 +102,14 @@ export const DeleteCalendarDialog: React.FC<DeleteCalendarDialogProps> = ({
                 onClick={onCancel}
                 className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
                 onClick={onConfirmDelete}
                 className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
               >
-                Delete
+                {t('delete')}
               </button>
             </div>
           </>

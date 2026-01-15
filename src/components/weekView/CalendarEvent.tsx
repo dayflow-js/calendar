@@ -1083,7 +1083,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         {event.title.toLowerCase().includes('easter') ||
           event.title.toLowerCase().includes('holiday') ? (
           <span
-            className={`inline-block ${mr1} flex-shrink-0 ${isEventSelected ? 'text-yellow-200' : 'text-yellow-600'}`}
+            className={`inline-block ${mr1} shrink-0 ${isEventSelected ? 'text-yellow-200' : 'text-yellow-600'}`}
           >
             ⭐
           </span>
@@ -1113,7 +1113,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
             style={{
               backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()),
             }}
-            className={`inline-block w-[3px] h-3 ${mr1} flex-shrink-0 rounded-full`}
+            className={`inline-block w-0.75 h-3 ${mr1} shrink-0 rounded-full`}
           ></span>
           <span
             className={`truncate ${isEventSelected ? 'text-white' : ''}`}
@@ -1122,7 +1122,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           </span>
         </div>
         <span
-          className={`${textXs} ml-1 flex-shrink-0 ${isEventSelected ? 'text-white' : ''}`}
+          className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''}`}
           style={!isEventSelected ? { opacity: 0.8 } : undefined}
         >
           {startTime}

@@ -9,8 +9,8 @@ import {
   EventDetailDialogRenderer,
 } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
-import { monthNames } from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
+import { useLocale } from '@/locale';
 import CalendarEvent from '../weekView/CalendarEvent';
 import { analyzeMultiDayEventsForWeek } from './util';
 import { extractHourFromDate } from '@/utils/helpers';
@@ -306,6 +306,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     onCalendarDragOver,
     app,
   }) => {
+    const { t, locale } = useLocale();
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -427,8 +428,12 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
     // Render date cell
     const renderDayCell = (day: (typeof weekData.days)[0], dayIndex: number) => {
+      // We need to parse currentMonth (localized string) back to month index, OR compare strings
+      // Comparing localized month strings is safer than trying to parse back
+      const dayMonthName = day.date.toLocaleDateString(locale, { month: (locale.startsWith('zh') || locale.startsWith('ja')) ? 'short' : 'long' });
+
       const belongsToCurrentMonth =
-        day.month === monthNames.indexOf(currentMonth) &&
+        dayMonthName === currentMonth &&
         day.year === currentYear;
       const dayEvents = getEventsForDay(day.date);
       const sortedEvents = sortDayEvents(dayEvents);
@@ -510,21 +515,36 @@ const WeekComponent = React.memo<WeekComponentProps>(
           <div className="flex items-start justify-between p-2 pb-1 relative z-20">
             <div className="flex-1" />
             <div className="flex items-center">
-              <span
-                className={`
-              inline-flex items-center justify-center h-5 w-5 rounded-full text-sm font-medium
-                              ${day.isToday
-                                  ? 'bg-primary text-primary-foreground'
-                                  : belongsToCurrentMonth
-                                    ? 'text-gray-900 dark:text-gray-100'                      : 'text-gray-400 dark:text-gray-600'
-                  }
-            `}
-              >
-                {day.day}
-              </span>
-              {day.day === 1 && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
-                  {day.shortMonthName}
+              {day.day === 1 ? (
+                <span
+                  className={`
+                    inline-flex items-center justify-center px-1.5 h-5 rounded-full text-sm font-medium whitespace-nowrap
+                    ${day.isToday
+                      ? 'bg-primary text-primary-foreground'
+                      : belongsToCurrentMonth
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }
+                  `}
+                >
+                  {day.date.toLocaleDateString(locale, {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              ) : (
+                <span
+                  className={`
+                    inline-flex items-center justify-center h-5 w-5 rounded-full text-sm font-medium
+                    ${day.isToday
+                      ? 'bg-primary text-primary-foreground'
+                      : belongsToCurrentMonth
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }
+                  `}
+                >
+                  {day.day}
                 </span>
               )}
             </div>
@@ -548,13 +568,21 @@ const WeekComponent = React.memo<WeekComponentProps>(
                   }
                 }}
               >
-                +{hiddenEventsCount} more
+                +{hiddenEventsCount} {t('more')}
               </div>
             )}
           </div>
         </div>
       );
     };
+
+    const localizedMonthYear = useMemo(() => {
+      if (!firstDayOfMonth) return '';
+      return firstDayOfMonth.date.toLocaleDateString(locale, {
+        month: 'long',
+        year: 'numeric',
+      });
+    }, [firstDayOfMonth, locale]);
 
     return (
       <div
@@ -574,7 +602,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
             }}
           >
             <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {firstDayOfMonth.monthName} {firstDayOfMonth.year}
+              {localizedMonthYear}
             </span>
           </div>
         )}

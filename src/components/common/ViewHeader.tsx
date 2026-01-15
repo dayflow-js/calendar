@@ -8,6 +8,7 @@ import {
 } from '../../styles/classNames';
 import ViewSwitcher from './ViewSwitcher';
 import { CalendarApp } from '../../types';
+import { useLocale } from '@/locale';
 
 export type ViewHeaderType = 'day' | 'week' | 'month' | 'year';
 export type ViewSwitcherMode = 'buttons' | 'select';
@@ -58,6 +59,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   nextYear,
   nextYearOffset = 0,
 }) => {
+  const { locale } = useLocale();
   // Determine whether to show TodayBox based on view type
   const shouldShowTodayBox =
     showTodayBox !== undefined ? showTodayBox : viewType !== 'day';
@@ -68,14 +70,14 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   const getDefaultTitle = (): string => {
     switch (viewType) {
       case 'day':
-        return currentDate.toLocaleDateString('en-GB', {
+        return currentDate.toLocaleDateString(locale, {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
         });
       case 'week':
       case 'month':
-        return currentDate.toLocaleDateString('en-US', {
+        return currentDate.toLocaleDateString(locale, {
           month: 'long',
           year: 'numeric',
         });
@@ -89,7 +91,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   // Generate default subtitle (only for Day view)
   const getDefaultSubtitle = (): string | null => {
     if (viewType === 'day') {
-      return currentDate.toLocaleDateString('en-US', {
+      return currentDate.toLocaleDateString(locale, {
         weekday: 'long',
       });
     }
@@ -104,7 +106,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   if (viewType === 'day') {
     return (
       <div className={headerContainer} style={{ position: 'relative' }}>
-        <div className="flex-1">
+        <div className="flex-1 mb-px">
           <div className={`${headerTitle} ${textGray900}`}>{title}</div>
           {subtitle && <div className={headerSubtitle}>{subtitle}</div>}
         </div>

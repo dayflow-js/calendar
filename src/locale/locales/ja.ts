@@ -1,0 +1,48 @@
+import type { Locale } from '../types';
+
+const ja: Locale = {
+  code: 'ja-JP',
+  messages: {
+    allDay: '終日',
+    noEvents: '本日は予定がありません',
+    more: '件',
+    eventTitle: '予定名',
+    dateRange: '日付範囲',
+    timeRange: '時間範囲',
+    note: 'メモ',
+    addNotePlaceholder: 'メモを追加...',
+    setAsAllDay: '終日予定に設定',
+    setAsTimed: '時間指定の予定に設定',
+    delete: '削除',
+    confirm: '確認',
+    cancel: 'キャンセル',
+    today: '今日',
+    day: '日',
+    week: '週',
+    month: '月',
+    year: '年',
+    newEvent: '新規予定',
+    newAllDayEvent: '新規終日予定',
+    newCalendarEvent: '新規 {calendarName} 予定',
+    newAllDayCalendarEvent: '新規 {calendarName} 終日予定',
+    save: '保存',
+    deleteCalendar: 'カレンダー "{calendarName}" を削除しますか？',
+    deleteCalendarMessage: 'カレンダー "{calendarName}" を削除しますか？それともイベントを別の既存のカレンダーにマージしますか？',
+    merge: 'マージ',
+    confirmDeleteTitle: 'カレンダー "{calendarName}" を削除してもよろしいですか？',
+    confirmDeleteMessage: 'このカレンダーを削除すると、関連するすべてのイベントも削除されます。',
+    mergeConfirmTitle: '"{sourceName}" を "{targetName}" にマージしますか？',
+    mergeConfirmMessage: '"{sourceName}" を "{targetName}" にマージしてもよろしいですか？これにより、"{sourceName}" のすべてのイベントが "{targetName}" に移動し、"{sourceName}" は削除されます。この操作は元に戻せません。',
+    expandSidebar: 'カレンダーサイドバーを展開',
+    collapseSidebar: 'カレンダーサイドバーを折りたたむ',
+    calendars: 'カレンダー',
+    createCalendar: '新しいカレンダーを作成',
+    calendarNamePlaceholder: '例：仕事',
+    customColor: 'カスタムカラー...',
+    create: '作成',
+    calendarOptions: 'カレンダーオプション',
+    untitled: '無題',
+  }
+};
+
+export default ja;

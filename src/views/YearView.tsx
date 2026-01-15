@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { monthNames } from '@/utils';
+import { useLocale } from '@/locale';
 import { CalendarApp } from '@/core';
 import {
   useVirtualScroll,
@@ -34,6 +34,7 @@ interface YearData {
 
 // Main component
 const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
+  const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
 
   // Responsive configuration
@@ -92,9 +93,12 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
         });
       }
 
-      return { year, month, monthName: monthNames[month], days };
+      const monthDate = new Date(year, month, 1);
+      const localizedMonthName = monthDate.toLocaleDateString(locale, { month: 'long' });
+
+      return { year, month, monthName: localizedMonthName, days };
     },
-    [currentDate]
+    [currentDate, locale]
   );
 
   // Cached year data retrieval
@@ -115,6 +119,10 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
     },
     [generateMonthData]
   );
+
+  const weekDayLabels = useMemo(() => {
+    return getWeekDaysLabels(locale, 'narrow');
+  }, [locale, getWeekDaysLabels]);
 
   // Navigation functions
   const handleToday = useCallback(() => {
@@ -189,7 +197,7 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
           </div>
 
           <div className="grid grid-cols-7 gap-0 mb-1 sm:mb-2">
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+            {weekDayLabels.map((day, i) => (
               <div
                 key={i}
                 className={`text-center text-gray-500 py-0.5 text-xs w-10`}
@@ -207,8 +215,8 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
                 text-center rounded-sm transition-colors
                 w-10
                 ${screenSize === 'mobile'
-                    ? 'text-xs py-1 min-h-[18px]'
-                    : 'text-xs py-1 sm:py-1.5 min-h-[20px] sm:min-h-[26px]'
+                    ? 'text-xs py-1 min-h-4.5'
+                    : 'text-xs py-1 sm:py-1.5 min-h-5 sm:min-h-6.5'
                   }
                 ${day.isCurrentMonth
                     ? 'text-gray-900 font-medium hover:bg-gray-100 active:bg-gray-200'
@@ -255,10 +263,10 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
             {/* Month grid - corrected to 3 rows 4 columns layout */}
             <div
               className={`grid gap-3 lg:gap-8 ${screenSize === 'mobile'
-                  ? 'grid-cols-2 grid-rows-6' // Mobile: 2 columns 6 rows
-                  : screenSize === 'tablet'
-                    ? 'grid-cols-3 grid-rows-4' // Tablet: 3 columns 4 rows
-                    : 'grid-cols-4 grid-rows-3' // Desktop: 4 columns 3 rows
+                ? 'grid-cols-2 grid-rows-6' // Mobile: 2 columns 6 rows
+                : screenSize === 'tablet'
+                  ? 'grid-cols-3 grid-rows-4' // Tablet: 3 columns 4 rows
+                  : 'grid-cols-4 grid-rows-3' // Desktop: 4 columns 3 rows
                 }`}
             >
               {yearData.months.map(monthData => (
@@ -296,7 +304,7 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
               onClick={() => app.goToToday()}
               title="Go to today"
             >
-              Today
+              {t('today')}
             </button>
             <button
               className="p-1 text-gray-600 hover:bg-gray-100 rounded"

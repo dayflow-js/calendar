@@ -29,14 +29,24 @@ const titles = [
   'Content Planning',
 ];
 
-const randomInt = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+// Simple deterministic random number generator
+const createRandom = (seed: number) => {
+  let s = seed;
+  return () => {
+    const x = Math.sin(s++) * 10000;
+    return x - Math.floor(x);
+  };
+};
 
-const DEFAULT_TIME_ZONE = Temporal.Now.timeZoneId();
+const createRandomInt = (random: () => number) => (min: number, max: number) =>
+  Math.floor(random() * (max - min + 1)) + min;
+
+const DEFAULT_TIME_ZONE = 'UTC'; // Use UTC for consistency
 
 const createTimedEvent = (
   baseDate: Temporal.PlainDate,
-  index: number
+  index: number,
+  randomInt: (min: number, max: number) => number
 ): Event => {
   const startHour = randomInt(8, 18);
   const duration = Math.max(1, randomInt(1, 3));
@@ -101,11 +111,15 @@ export const generateSampleEvents = (): Event[] => {
   const windowStart = today.subtract({ days: 24 });
   const events: Event[] = [];
 
+  // Initialize deterministic random generator
+  const random = createRandom(12345);
+  const randomInt = createRandomInt(random);
+
   for (let offset = 0; offset < 56; offset += 1) {
     const date = windowStart.add({ days: offset });
     const dayEvents = randomInt(2, 4);
     for (let i = 0; i < dayEvents; i += 1) {
-      events.push(createTimedEvent(date, offset * 10 + i));
+      events.push(createTimedEvent(date, offset * 10 + i, randomInt));
     }
   }
   baseAllDayDefinitions.forEach((definition, index) => {

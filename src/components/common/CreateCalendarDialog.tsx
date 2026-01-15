@@ -5,6 +5,7 @@ import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
 import { cancelButton } from '@/styles/classNames';
+import { useLocale } from '@/locale';
 
 const COLORS = [
   '#ea426b',
@@ -27,6 +28,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
   const [showPicker, setShowPicker] = useState(false);
   const [previousColor, setPreviousColor] = useState('');
   const { effectiveTheme } = useTheme();
+  const { t } = useLocale();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +106,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-background">
         <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-          Create New Calendar
+          {t('createCalendar')}
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -119,7 +121,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
-                placeholder="e.g. Work"
+                placeholder={t('calendarNamePlaceholder')}
                 autoFocus
               />
             </div>
@@ -146,7 +148,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
                 onClick={handleOpenPicker}
                 className="flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800"
               >
-                Custom Color...
+                {t('customColor')}
               </button>
 
               {showPicker && (
@@ -169,14 +171,14 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
               onClick={onClose}
               className={cancelButton}
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
               className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
-              Create
+              {t('create')}
             </button>
           </div>
         </form>

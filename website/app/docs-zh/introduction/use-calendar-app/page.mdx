@@ -40,6 +40,7 @@ export function TeamCalendar() {
 | `calendars`            | `CalendarType[]`           | ❌   | `[]`                | 注册日历类别（工作、个人等）及其颜色和可见性                        |
 | `defaultCalendar`      | `string`                   | ❌   | 第一个可见日历      | 创建新事件时使用的 ID                                               |
 | `theme`                | `ThemeConfig`              | ❌   | `{ mode: 'light' }` | 设置全局主题模式和可选的令牌覆盖                                    |
+| `locale`               | `string \| Locale`         | ❌   | `'en-US'`           | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。 |
 | `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                    |
 | `useEventDetailDialog` | `boolean`                  | ❌   | `false`             | 启用默认模态详情对话框而不是内联面板                                |
 
@@ -166,6 +167,35 @@ const calendars = [
 ```
 
 更多细节见 [深色模式](/docs-zh/features/dark-mode)。
+
+### locale
+
+`locale` 选项用于设置日历的语言和区域设置。
+
+- **字符串代码：** 使用 `'en-US'`、`'ja'`、`'zh'`、`'de'`、`'fr'`、`'es'`、`'ko'` 等语言代码。
+- **Locale 对象：** 传递导入的 `Locale` 对象（以获得类型安全）或自定义对象（用于未支持的语言）。
+
+```tsx
+// 使用字符串代码
+const calendar = useCalendarApp({
+  locale: 'zh',
+});
+
+// 使用内置 Locale 对象
+import { zh } from '@dayflow/core';
+const calendar = useCalendarApp({
+  locale: zh,
+});
+
+// 使用自定义 Locale 对象
+const customLocale = {
+  code: 'it',
+  messages: { today: 'Oggi', ... }
+};
+const calendar = useCalendarApp({
+  locale: customLocale,
+});
+```
 
 ### useSidebar
 

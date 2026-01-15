@@ -1,0 +1,126 @@
+---
+title: "V1.4: Building a Customizable Calendar Sidebar in React"
+description: Learn how to build a powerful calendar sidebar with context menus, inline renaming, custom colours, and flexible calendar creation modes using a React calendar API.
+date: 2026-01-01
+---
+
+**1. Context Menu Actions on Calendars**
+
+Calendars in the sidebar support a right-click context menu, allowing quick access to common actions.
+
+Available actions include:
+
+- Delete calendar
+- Merge calendar
+- Change calendar colour
+
+<img width="1024" height="724" alt="image" src="https://github.com/user-attachments/assets/e28d97ca-4ef3-41e7-ad00-3798233d7aa2" />
+
+When selecting Custom Colour, a colour picker will be displayed, enabling users to choose any colour from a palette and apply it to the calendar immediately.
+
+<img width="337" height="306" alt="Image" src="https://github.com/user-attachments/assets/852d3f97-b689-4dc6-8d46-04fce9a98a9e" />
+
+**2. Rename Calendar via Double-Click**
+
+Calendars can be renamed directly in the sidebar. Double-click on a calendar name to enter edit mode.
+
+<img width="210" height="284" alt="Image" src="https://github.com/user-attachments/assets/ae9c0c46-e422-42c3-859f-558451dc70ac" />
+
+**3. Add a New Calendar**
+
+New calendars can be created by clicking the “＋” (Add) button in the sidebar.
+
+Two creation modes are supported:
+
+```ts
+  createCalendarMode?: 'inline' | 'modal';
+```
+
+**Inline Mode (Default)**
+
+The new calendar is created immediately in the sidebar.
+
+The default name is **Untitled**.
+
+Suitable for fast creation and minimal interruption.
+
+<img width="207" height="211" alt="Image" src="https://github.com/user-attachments/assets/05b2ee0d-03e6-4158-a6af-f0b3e56343b9" />
+
+**Modal Mode**
+
+The calendar is created through a modal dialog.
+
+Allows additional configuration before confirming creation.
+
+Useful when more setup options are required.
+
+<img width="554" height="525" alt="image" src="https://github.com/user-attachments/assets/bbcaa543-a595-4082-8fd0-2d3cb941c584" />
+
+**4. How to use**
+
+```ts
+const CalendarWithSidebar: React.FC<{}> = () => {
+  const [events] = useState<Event[]>(getSampleEvents());
+  const appRef = useRef<CalendarApp | null>(null);
+
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+  });
+
+  const sidebarConfig = {
+    createCalendarMode: 'modal' as const,
+    renderCreateCalendarDialog: (props: any) => (
+      <CustomCreateCalendarDialog // <----  you can custom create calendar dialog
+        onClose={props.onClose}
+        onCreate={props.onCreate}
+      />
+    ),
+    renderCalendarContextMenu: (calendar: CalendarType, onClose: () => void) => (
+      appRef.current ? (
+        <CustomContextMenu // <--- you can custom right click context menu
+          calendar={calendar}
+          onClose={onClose}
+          app={appRef.current}
+        />
+      ) : null
+    )
+  }
+
+  const calendar = useCalendarApp({
+    views: [createDayView(), createWeekView(), createMonthView()],
+    events: events,
+    calendars: customCalendarTypes,
+    defaultCalendar: 'work',
+    plugins: [dragPlugin],
+    theme: { mode: 'auto' },
+    useSidebar: sidebarConfig,
+    callbacks: {
+      onCalendarUpdate: async (calendar) => { // <-- get update callback
+        console.log('update calendar:', calendar);
+      },
+      onCalendarDelete: async (calendar) => {
+        console.log('delete calendar:', calendar);
+      },
+      onCalendarCreate: async (calendar) => {
+        // call server api using promise function
+        // await ...
+        console.log('create calendar:', calendar);
+      },
+      onCalendarMerge: async (sourceId, targetId) => {
+        console.log('merge calendar:', sourceId, targetId);
+      },
+    }
+  });
+
+  // Assign app ref after initialization
+  appRef.current = calendar.app as any;
+
+  return (
+    <div >
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+};
+```

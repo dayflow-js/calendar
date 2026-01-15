@@ -1,0 +1,48 @@
+import type { Locale } from '../types';
+
+const zh: Locale = {
+  code: 'zh-CN',
+  messages: {
+    allDay: '全天',
+    noEvents: '今日无日程',
+    more: '个',
+    eventTitle: '事件标题',
+    dateRange: '日期范围',
+    timeRange: '时间范围',
+    note: '备注',
+    addNotePlaceholder: '添加备注...',
+    setAsAllDay: '设为全天',
+    setAsTimed: '设为普通事件',
+    delete: '删除',
+    confirm: '确认',
+    cancel: '取消',
+    today: '今天',
+    day: '日',
+    week: '周',
+    month: '月',
+    year: '年',
+    newEvent: '新建日程',
+    newAllDayEvent: '新建全天日程',
+    newCalendarEvent: '新建 {calendarName} 日程',
+    newAllDayCalendarEvent: '新建 {calendarName} 全天日程',
+    save: '保存',
+    deleteCalendar: '删除日历 "{calendarName}"?',
+    deleteCalendarMessage: '您想删除日历 "{calendarName}" 还是将其事件合并到另一个现有日历中？',
+    merge: '合并',
+    confirmDeleteTitle: '您确定要删除日历 "{calendarName}" 吗？',
+    confirmDeleteMessage: '如果您删除此日历，与其关联的所有事件也将被删除。',
+    mergeConfirmTitle: '将 "{sourceName}" 合并到 "{targetName}"?',
+    mergeConfirmMessage: '您确定要将 "{sourceName}" 合并到 "{targetName}" 吗？这样做会将 "{sourceName}" 中的所有事件移动到 "{targetName}"，并且 "{sourceName}" 将被删除。此操作无法撤销。',
+    expandSidebar: '展开日历侧边栏',
+    collapseSidebar: '收起日历侧边栏',
+    calendars: '日历',
+    createCalendar: '创建新日历',
+    calendarNamePlaceholder: '例如：工作',
+    customColor: '自定义颜色...',
+    create: '创建',
+    calendarOptions: '日历选项',
+    untitled: '未命名',
+  }
+};
+
+export default zh;

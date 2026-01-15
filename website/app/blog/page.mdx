@@ -1,0 +1,58 @@
+import { getPageMap } from 'nextra/page-map';
+import Link from 'next/link';
+
+export const BlogList = async () => {
+  const pageMap = await getPageMap('/blog')
+  const posts = pageMap
+    .filter((item) => item.route && item.route !== '/blog' && item.name !== 'index')
+    .map((item) => ({
+      route: item.route,
+      title: item.frontMatter?.title || item.name,
+      description: item.frontMatter?.description,
+      date: item.frontMatter?.date,
+    }))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+return (
+
+    <div className="mt-10 space-y-12">
+      {posts.map((post) => (
+        <article key={post.route} className="flex flex-col items-start justify-between">
+          <div className="flex items-center gap-x-4 text-xs">
+            <time dateTime={post.date} className="text-gray-500 dark:text-gray-400">
+              {post.date ? new Date(post.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) : 'No date'}
+            </time>
+          </div>
+          <div className="group relative">
+            <h3
+              className="mt-3 text-2xl font-semibold leading-6 text-gray-900 dark:text-white group-hover:text-primary transition-colors">
+              <Link href={post.route}>
+                <span className="absolute inset-0" />
+                {post.title}
+              </Link>
+            </h3>
+            <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+              {post.description}
+            </p>
+          </div>
+          <div className="mt-6 flex items-center gap-x-4">
+            <Link href={post.route} className="text-sm font-medium text-primary hover:opacity-80 transition-opacity">
+              Read more →
+            </Link>
+          </div>
+        </article>
+      ))}
+    </div>
+
+)
+}
+
+<div className="max-w-4xl mx-auto px-6 py-12">
+  <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Blog</h1>
+  <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">The latest news and technical articles from the DayFlow team.</p>
+  <BlogList />
+</div>

@@ -8,6 +8,7 @@ import {
   getLineColor,
   getEventEndHour,
 } from '@/utils';
+import { useLocale } from '@/locale';
 import {
   EventLayout,
   Event,
@@ -75,8 +76,9 @@ const DayView: React.FC<DayViewProps> = ({
   switcherMode = 'buttons',
 }) => {
   const events = app.getEvents();
+  const { t, locale } = useLocale();
 
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
     null
@@ -348,6 +350,7 @@ const DayView: React.FC<DayViewProps> = ({
 
   // Timer
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
@@ -365,13 +368,13 @@ const DayView: React.FC<DayViewProps> = ({
             viewType={ViewType.DAY}
             currentDate={currentDate}
             switcherMode={switcherMode}
-            customSubtitle={currentTime.toLocaleDateString('en-US', {
+            customSubtitle={currentDate.toLocaleDateString(locale, {
               weekday: 'long',
             })}
           />
           {/* All-day event area */}
           <div className={allDayRow} ref={allDayRowRef}>
-            <div className={allDayLabel}>all-day</div>
+            <div className={allDayLabel}>{t('allDay')}</div>
             <div className="flex flex-1 relative">
               <div
                 className="w-full relative"
@@ -427,7 +430,7 @@ const DayView: React.FC<DayViewProps> = ({
           <div className={calendarContent} style={{ position: 'relative' }}>
             <div className="relative flex">
               {/* Current time line */}
-              {isToday &&
+              {isToday && currentTime &&
                 (() => {
                   const now = currentTime;
                   const hours = now.getHours() + now.getMinutes() / 60;
@@ -595,19 +598,20 @@ const DayView: React.FC<DayViewProps> = ({
                   handleToday={() => app.goToToday()}
                 />
               </div>
-              <MiniCalendar
-                visibleMonth={visibleMonth}
-                currentDate={currentDate}
-                onMonthChange={handleMonthChange}
-                onDateSelect={handleDateSelect}
-              />
+        <MiniCalendar
+          visibleMonth={visibleMonth}
+          currentDate={currentDate}
+          showHeader={true}
+          onMonthChange={handleMonthChange}
+          onDateSelect={handleDateSelect}
+        />
             </div>
           </div>
 
           {/* Event details area */}
           <div className={`flex-1 ${p4} overflow-y-auto`}>
             <h3 className={`${textLg} font-semibold ${mb3}`}>
-              {currentDate.toLocaleDateString('en-US', {
+              {currentDate.toLocaleDateString(locale, {
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',
@@ -616,7 +620,7 @@ const DayView: React.FC<DayViewProps> = ({
 
             {currentDayEvents.length === 0 ? (
               <p className={`${textGray500} ${textSm}`}>
-                No events for this day
+                {t('noEvents')}
               </p>
             ) : (
               <div className="space-y-2">
@@ -641,7 +645,7 @@ const DayView: React.FC<DayViewProps> = ({
                       </div>
                     )}
                     {event.allDay && (
-                      <div className={`${textXs} ${textGray600}`}>All day</div>
+                      <div className={`${textXs} ${textGray600}`}>{t('allDay')}</div>
                     )}
                   </div>
                 ))}

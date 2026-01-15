@@ -12,10 +12,10 @@ import { roundToTimeStep, TIME_STEP, getDateByDayIndex } from '../../utils';
 import {
   extractHourFromDate,
   createDateWithHour,
-  getStartOfDay,
   getEndOfDay,
   getEventEndHour,
 } from '../../utils/helpers';
+import { useLocale } from '@/locale';
 import { Temporal } from 'temporal-polyfill';
 import {
   temporalToDate,
@@ -26,6 +26,7 @@ import {
 export const useDragHandlers = (
   params: UseDragHandlersParams
 ): UseDragHandlersReturn => {
+  const { t } = useLocale();
   const { options, common, state, manager } = params;
   const {
     viewType,
@@ -39,6 +40,7 @@ export const useDragHandlers = (
     FIRST_HOUR = 0,
     LAST_HOUR = 24,
     MIN_DURATION = 0.25,
+    app,
   } = options;
 
   const {
@@ -99,11 +101,11 @@ export const useDragHandlers = (
     (e: MouseEvent) => {
       e.preventDefault();
 
-          const drag = dragRef.current;
-          if (!drag || !drag.active) return;
-      
-          // Set cursor based on drag mode and direction
-          if (drag.mode === 'resize') {
+      const drag = dragRef.current;
+      if (!drag || !drag.active) return;
+
+      // Set cursor based on drag mode and direction
+      if (drag.mode === 'resize') {
         if (drag.allDay) {
           // AllDay event resize (horizontal)
           document.body.style.cursor = 'ew-resize';
@@ -366,11 +368,11 @@ export const useDragHandlers = (
     (e: MouseEvent) => {
       e.preventDefault();
 
-          const drag = dragRef.current;
-          if (!drag || !drag.active) return;
-      
-          // Set cursor based on drag mode and direction
-          if (drag.mode === 'resize') {
+      const drag = dragRef.current;
+      if (!drag || !drag.active) return;
+
+      // Set cursor based on drag mode and direction
+      if (drag.mode === 'resize') {
         if (isMonthView || drag.allDay) {
           // MonthView or AllDay event resize (horizontal)
           document.body.style.cursor = 'ew-resize';
@@ -482,11 +484,11 @@ export const useDragHandlers = (
               prev.map(event =>
                 event.id === drag.eventId
                   ? {
-                      ...event,
-                      start: newStartTemporal,
-                      end: newEndTemporal,
-                      title: event.title,
-                    }
+                    ...event,
+                    start: newStartTemporal,
+                    end: newEndTemporal,
+                    title: event.title,
+                  }
                   : event
               ),
             drag.mode
@@ -855,11 +857,11 @@ export const useDragHandlers = (
             prev.map(event =>
               event.id === drag.eventId
                 ? {
-                    ...event,
-                    start: newStartTemporal,
-                    end: newEndTemporal,
-                    title: event.title,
-                  }
+                  ...event,
+                  start: newStartTemporal,
+                  end: newEndTemporal,
+                  title: event.title,
+                }
                 : event
             )
           );
@@ -890,11 +892,11 @@ export const useDragHandlers = (
               prev.map(event =>
                 event.id === drag.eventId
                   ? {
-                      ...event,
-                      start: newStartTemporal,
-                      end: newEndTemporal,
-                      title: event.title,
-                    }
+                    ...event,
+                    start: newStartTemporal,
+                    end: newEndTemporal,
+                    title: event.title,
+                  }
                   : event
               )
             );
@@ -992,7 +994,7 @@ export const useDragHandlers = (
 
           onEventCreate?.({
             id: String(Date.now()),
-            title: 'New Event',
+            title: t('newEvent'),
             day: drag.dayIndex,
             start: startTemporal,
             end: endTemporal,
@@ -1021,9 +1023,9 @@ export const useDragHandlers = (
               prev.map(event =>
                 event.id === drag.eventId
                   ? {
-                      ...event,
-                      day: drag.dayIndex,
-                    }
+                    ...event,
+                    day: drag.dayIndex,
+                  }
                   : event
               )
             );
@@ -1075,7 +1077,7 @@ export const useDragHandlers = (
 
         const newEvent: Event = {
           id: String(Date.now()),
-          title: 'New Event',
+          title: t('newEvent'),
           start: startTemporal,
           end: endTemporal,
           day: targetDate.getDay(),
@@ -1127,7 +1129,7 @@ export const useDragHandlers = (
           drag.startHour,
           drag.endHour
         );
-        createDragIndicator(drag, 'blue', 'New Event', newEventLayout);
+        createDragIndicator(drag, 'blue', t('newEvent'), newEventLayout);
         drag.sourceElement = null;
         drag.indicatorVisible = true;
         document.addEventListener('mousemove', handleDragMove);
@@ -1178,7 +1180,7 @@ export const useDragHandlers = (
           endDate.setHours(0, 0, 0, 0);
           eventDurationDays = Math.floor(
             (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000) +
-              1
+            1
           );
 
           // Ensure AllDay event eventDurationDays is at least 1 day

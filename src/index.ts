@@ -53,6 +53,9 @@ export { EventLayoutCalculator } from './components/EventLayout';
 // Utilities
 export * from './utils';
 
+// Locale exports
+export * from './locale';
+
 // Type exports
 export type {
   CalendarPlugin,

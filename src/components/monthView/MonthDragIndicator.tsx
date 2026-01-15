@@ -2,6 +2,7 @@ import React from 'react';
 import { Event } from '../../types';
 import { Calendar } from 'lucide-react';
 import { daysDifference } from '../../utils';
+import { useLocale } from '@/locale';
 
 interface MonthDragIndicatorProps {
   event: Event;
@@ -19,10 +20,11 @@ const MonthDragIndicatorComponent: React.FC<MonthDragIndicatorProps> = ({
   startDate,
   endDate,
 }) => {
+  const { t } = useLocale();
   const getDisplayContent = () => {
     if (isCreating) {
       return {
-        title: 'New Event',
+        title: t('newEvent'),
         icon: <Calendar className="h-3 w-3" />,
         showDateRange: false,
       };

@@ -18,6 +18,8 @@ import {
   pad,
 } from '../../utils/rangePicker';
 import { MoveRight, ChevronsRight, ChevronRight, ChevronLeft, ChevronsLeft } from 'lucide-react';
+import { getMonthLabels, getWeekDaysLabels } from '@/locale';
+import { Locale } from '../../locale/types';
 
 type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
 
@@ -37,6 +39,7 @@ export interface RangePickerProps {
   autoAdjustOverflow?: boolean;
   getPopupContainer?: () => HTMLElement;
   matchTriggerWidth?: boolean;
+  locale?: string | Locale;
 }
 
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm';
@@ -79,12 +82,25 @@ const RangePicker: React.FC<RangePickerProps> = ({
   autoAdjustOverflow = true,
   getPopupContainer,
   matchTriggerWidth = false,
+  locale = 'en-US',
 }) => {
+  const localeCode = useMemo(() => {
+    return typeof locale === 'string' ? locale : locale?.code || 'en-US';
+  }, [locale]);
+
   const isTimeEnabled = useMemo(() => {
     if (showTime === undefined) return true;
     if (typeof showTime === 'object') return true;
     return Boolean(showTime);
   }, [showTime]);
+
+  const monthLabels = useMemo(() => {
+    return getMonthLabels(localeCode, 'short');
+  }, [localeCode]);
+
+  const weekDayLabels = useMemo(() => {
+    return getWeekDaysLabels(localeCode, 'narrow');
+  }, [localeCode]);
 
   const effectiveTimeFormat = useMemo(() => {
     if (!isTimeEnabled) {
@@ -911,7 +927,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
                 </button>
               </div>
               <div className="text-sm font-semibold text-slate-700 dark:text-gray-300">
-                {MONTHS[visibleMonth.month - 1]} {visibleMonth.year}
+                {monthLabels[visibleMonth.month - 1]} {visibleMonth.year}
               </div>
               <div className="flex items-center gap-1">
                 <button
@@ -933,8 +949,8 @@ const RangePicker: React.FC<RangePickerProps> = ({
               </div>
             </div>
             <div className="grid grid-cols-7 gap-1 px-3 pb-3 pt-2 text-center text-[11px] uppercase tracking-wide text-slate-400 dark:text-gray-500">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                <span key={day}>{day}</span>
+              {weekDayLabels.map((day, index) => (
+                <span key={index}>{day}</span>
               ))}
             </div>
             <div className="grid grid-cols-7 gap-2 px-1 ">
@@ -964,7 +980,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
   );
 
   return (
-    <div className="relative max-w-[400px]" ref={containerRef}>
+    <div className="relative max-w-100" ref={containerRef}>
       <div
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${disabled
           ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'

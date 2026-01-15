@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { CalendarApp } from '@/core';
-import { weekDays, extractHourFromDate } from '@/utils';
-import { monthNames } from '@/utils/helpers';
+import { extractHourFromDate } from '@/utils';
+import { useLocale } from '@/locale';
 import {
   Event,
   MonthEventDragState,
@@ -42,10 +42,12 @@ const MonthView: React.FC<MonthViewProps> = ({
   calendarRef,
   switcherMode = 'buttons',
 }) => {
+  const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
   const calendarSignature = app.getCalendars().map(c => c.id + c.colors.lineColor).join('-');
   const previousEventsRef = useRef<Event[] | null>(null);
+  const DEFAULT_WEEK_HEIGHT = 119;
   // Stabilize events reference so week calculations do not rerun on every scroll frame
   const events = useMemo(() => {
     const previous = previousEventsRef.current;
@@ -139,15 +141,7 @@ const MonthView: React.FC<MonthViewProps> = ({
 
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
-  const [weekHeight, setWeekHeight] = useState(() => {
-    if (typeof window !== 'undefined') {
-      // Estimate container height: viewport height - header/toolbar space
-      const estimatedHeaderHeight = 150;
-      const estimatedContainerHeight = window.innerHeight - estimatedHeaderHeight;
-      return Math.max(80, Math.floor(estimatedContainerHeight / 6));
-    }
-    return 119; // Fallback for SSR
-  });
+  const [weekHeight, setWeekHeight] = useState(DEFAULT_WEEK_HEIGHT);
   const [isWeekHeightInitialized, setIsWeekHeightInitialized] = useState(false);
   const previousWeekHeightRef = useRef(weekHeight);
 
@@ -246,6 +240,10 @@ const MonthView: React.FC<MonthViewProps> = ({
     },
   });
 
+  const weekDaysLabels = useMemo(() => {
+    return getWeekDaysLabels(locale, 'short');
+  }, [locale, getWeekDaysLabels]);
+
   const {
     currentMonth,
     currentYear,
@@ -261,12 +259,16 @@ const MonthView: React.FC<MonthViewProps> = ({
     currentDate,
     weekHeight,
     onCurrentMonthChange: (monthName: string, year: number) => {
-      const monthIndex = monthNames.indexOf(monthName);
+      const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
+      const localizedMonths = getMonthLabels(locale, isAsian ? 'short' : 'long');
+      const monthIndex = localizedMonths.indexOf(monthName);
+
       if (monthIndex >= 0) {
         app.setVisibleMonth(new Date(year, monthIndex, 1));
       }
     },
     initialWeeksToLoad: 156,
+    locale: locale
   });
 
   const previousStartIndexRef = useRef(0);
@@ -374,6 +376,13 @@ const MonthView: React.FC<MonthViewProps> = ({
     };
   }, [scrollElementRef, isWeekHeightInitialized, setScrollTop]);
 
+  useEffect(() => {
+    const estimatedHeaderHeight = 150;
+    const estimatedContainerHeight = window.innerHeight - estimatedHeaderHeight;
+    const height = Math.max(80, Math.floor(estimatedContainerHeight / 6));
+    setWeekHeight(height);
+  }, []);
+
   const handleEventUpdate = (updatedEvent: Event) => {
     app.updateEvent(updatedEvent.id, updatedEvent);
   };
@@ -386,13 +395,19 @@ const MonthView: React.FC<MonthViewProps> = ({
     app.changeView(view);
   };
 
+  // TODO: remove getCustomTitle and using app.currentDate to fixed
+  const getCustomTitle = () => {
+    const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
+    return isAsianLocale ? `${currentYear}年${currentMonth}` : `${currentMonth} ${currentYear}`;
+  };
+
   return (
     <div className={monthViewContainer}>
       <ViewHeader
         calendar={app}
         viewType={ViewType.MONTH}
         currentDate={currentDate}
-        customTitle={`${currentMonth} ${currentYear}`}
+        customTitle={getCustomTitle()}
         onPrevious={() => {
           app.goToPrevious();
           handlePreviousMonth();
@@ -410,7 +425,7 @@ const MonthView: React.FC<MonthViewProps> = ({
 
       <div className={weekHeaderRow}>
         <div className={`${weekGrid} px-2`}>
-          {weekDays.map((day, i) => (
+          {weekDaysLabels.map((day, i) => (
             <div key={i} className={dayLabel}>
               {day}
             </div>

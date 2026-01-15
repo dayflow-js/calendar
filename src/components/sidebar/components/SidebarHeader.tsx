@@ -1,5 +1,6 @@
 import React from 'react';
 import { PanelRightClose, PanelRightOpen, Plus } from 'lucide-react';
+import { useLocale } from '@/locale';
 
 interface SidebarHeaderProps {
   isCollapsed: boolean;
@@ -12,11 +13,12 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onCollapseToggle,
   onAddCalendar,
 }) => {
+  const { t } = useLocale();
   return (
     <div className="flex items-center px-2 py-2">
       <button
         type="button"
-        aria-label={isCollapsed ? 'Expand calendar sidebar' : 'Collapse calendar sidebar'}
+        aria-label={isCollapsed ? t('expandSidebar') : t('collapseSidebar')}
         className="flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800"
         onClick={onCollapseToggle}
       >
@@ -29,7 +31,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
       {!isCollapsed && (
         <div className='flex flex-1 justify-between items-center'>
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            Calendars
+            {t('calendars')}
           </span>
           <button
             className="flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800"

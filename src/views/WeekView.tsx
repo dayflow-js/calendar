@@ -7,6 +7,7 @@ import {
   createDateWithHour,
   getDateByDayIndex,
 } from '@/utils';
+import { useLocale } from '@/locale';
 import {
   EventLayout,
   Event,
@@ -58,6 +59,7 @@ const WeekView: React.FC<WeekViewProps> = ({
   calendarRef,
   switcherMode = 'buttons',
 }) => {
+  const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const events = app.getEvents();
 
@@ -76,7 +78,7 @@ const WeekView: React.FC<WeekViewProps> = ({
     () => getWeekStart(currentDate),
     [currentDate]
   );
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
     null
   );
@@ -390,10 +392,14 @@ const WeekView: React.FC<WeekViewProps> = ({
     },
   });
 
-  const weekDays = useMemo(
-    () => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    []
-  );
+  const weekDaysLabels = useMemo(() => {
+    return getWeekDaysLabels(locale, 'short');
+  }, [locale, getWeekDaysLabels]);
+
+  const allDayLabelText = useMemo(() => {
+    return t('allDay');
+  }, [t]);
+
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
     label: formatTime(i + FIRST_HOUR),
@@ -403,19 +409,19 @@ const WeekView: React.FC<WeekViewProps> = ({
   const weekDates = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Compare date part only
-    return weekDays.map((_, index) => {
+    return weekDaysLabels.map((_, index) => {
       const date = new Date(currentWeekStart);
       date.setDate(currentWeekStart.getDate() + index);
       const dateOnly = new Date(date);
       dateOnly.setHours(0, 0, 0, 0);
       return {
         date: date.getDate(),
-        month: date.toLocaleString('default', { month: 'short' }),
+        month: date.toLocaleString(locale, { month: 'short' }),
         fullDate: new Date(date),
         isToday: dateOnly.getTime() === today.getTime(),
       };
     });
-  }, [currentWeekStart, weekDays]);
+  }, [currentWeekStart, weekDaysLabels, locale]);
 
   // Event handling functions
   const handleEventUpdate = (updatedEvent: Event) => {
@@ -435,6 +441,7 @@ const WeekView: React.FC<WeekViewProps> = ({
 
   // Timer
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
@@ -455,9 +462,9 @@ const WeekView: React.FC<WeekViewProps> = ({
       {/* Weekday titles */}
       <div className={weekDayHeader}>
         <div className="w-20 p-2"></div>
-        {weekDays.map((day, i) => (
+        {weekDaysLabels.map((day, i) => (
           <div key={i} className={weekDayCell}>
-            <div className="inline-flex items-center justify-center text-sm h-6 w-6 mt-1 mr-1">
+            <div className="inline-flex items-center justify-center text-sm mt-1 mr-1">
               {day}
             </div>
             <div className={`${dateNumber} ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
@@ -469,12 +476,12 @@ const WeekView: React.FC<WeekViewProps> = ({
 
       {/* All-day event area */}
       <div className={allDayRow} ref={allDayRowRef}>
-        <div className={allDayLabel}>all-day</div>
+        <div className={allDayLabel}>{allDayLabelText}</div>
         <div
           className={allDayContent}
           style={{ minHeight: `${allDayAreaHeight}px` }}
         >
-          {weekDays.map((_, dayIndex) => {
+          {weekDaysLabels.map((_, dayIndex) => {
             const dropDate = new Date(currentWeekStart);
             dropDate.setDate(currentWeekStart.getDate() + dayIndex);
             return (
@@ -538,7 +545,7 @@ const WeekView: React.FC<WeekViewProps> = ({
       <div className={calendarContent} style={{ position: 'relative' }}>
         <div className="relative flex">
           {/* Current time line */}
-          {isCurrentWeek &&
+          {isCurrentWeek && currentTime &&
             (() => {
               const now = currentTime;
               const hours = now.getHours() + now.getMinutes() / 60;
@@ -567,7 +574,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                   </div>
 
                   <div className="flex flex-1">
-                    {weekDays.map((_, idx) => (
+                    {weekDaysLabels.map((_, idx) => (
                       <div key={idx} className="flex-1 flex items-center">
                         <div
                           className={`h-0.5 w-full relative ${idx === todayIndex
@@ -606,7 +613,7 @@ const WeekView: React.FC<WeekViewProps> = ({
           <div className="grow relative">
             {timeSlots.map((slot, slotIndex) => (
               <div key={slotIndex} className={timeGridRow}>
-                {weekDays.map((_, dayIndex) => {
+                {weekDaysLabels.map((_, dayIndex) => {
                   const dropDate = new Date(currentWeekStart);
                   dropDate.setDate(currentWeekStart.getDate() + dayIndex);
                   return (
@@ -631,7 +638,7 @@ const WeekView: React.FC<WeekViewProps> = ({
               <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500 dark:text-gray-400">
                 00.00
               </div>
-              {weekDays.map((_, dayIndex) => (
+              {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`24-${dayIndex}`}
                   className={`flex-1 relative border-r border-gray-200 dark:border-gray-700`}
@@ -640,7 +647,7 @@ const WeekView: React.FC<WeekViewProps> = ({
             </div>
 
             {/* Event layer */}
-            {weekDays.map((_, dayIndex) => {
+            {weekDaysLabels.map((_, dayIndex) => {
               // Collect all event segments for this day (including segments of multi-day events)
               const dayEvents = getEventsForDay(dayIndex, currentWeekEvents);
               const allEventSegments: Array<{

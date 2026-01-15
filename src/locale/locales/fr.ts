@@ -1,0 +1,48 @@
+import type { Locale } from '../types';
+
+const fr: Locale = {
+  code: 'fr-FR',
+  messages: {
+    allDay: 'Toute la journée',
+    noEvents: "Aucun événement aujourd'hui",
+    more: 'de plus',
+    eventTitle: "Titre de l'événement",
+    dateRange: 'Plage de dates',
+    timeRange: 'Plage horaire',
+    note: 'Note',
+    addNotePlaceholder: 'Ajouter une note...',
+    setAsAllDay: 'Définir comme toute la journée',
+    setAsTimed: 'Définir comme événement horaire',
+    delete: 'Supprimer',
+    confirm: 'Confirmer',
+    cancel: 'Annuler',
+    today: "Aujourd'hui",
+    day: 'Jour',
+    week: 'Semaine',
+    month: 'Mois',
+    year: 'Année',
+    newEvent: 'Nouvel événement',
+    newAllDayEvent: 'Nouvel événement toute la journée',
+    newCalendarEvent: 'Nouvel événement dans {calendarName}',
+    newAllDayCalendarEvent: 'Nouvel événement toute la journée dans {calendarName}',
+    save: 'Enregistrer',
+    deleteCalendar: 'Supprimer "{calendarName}" ?',
+    deleteCalendarMessage: 'Voulez-vous supprimer "{calendarName}" ou fusionner ses événements dans un autre calendrier existant ?',
+    merge: 'Fusionner',
+    confirmDeleteTitle: 'Êtes-vous sûr de vouloir supprimer le calendrier "{calendarName}" ?',
+    confirmDeleteMessage: 'Si vous supprimez ce calendrier, tous les événements associés seront également supprimés.',
+    mergeConfirmTitle: 'Fusionner "{sourceName}" avec "{targetName}" ?',
+    mergeConfirmMessage: 'Êtes-vous sûr de vouloir fusionner "{sourceName}" avec "{targetName}" ? Cela déplacera tous les événements de "{sourceName}" vers "{targetName}" et "{sourceName}" sera supprimé. Cette action est irréversible.',
+    expandSidebar: 'Développer la barre latérale',
+    collapseSidebar: 'Réduire la barre latérale',
+    calendars: 'Calendriers',
+    createCalendar: 'Créer un nouveau calendrier',
+    calendarNamePlaceholder: 'ex. Travail',
+    customColor: 'Couleur personnalisée...',
+    create: 'Créer',
+    calendarOptions: 'Options du calendrier',
+    untitled: 'Sans titre',
+  }
+};
+
+export default fr;

@@ -115,4 +115,75 @@ describe('CalendarApp', () => {
       expect(appDate.getDate()).toBe(today.getDate());
     });
   });
+
+  describe('Locale Management', () => {
+    it('should default to en-US locale', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+      });
+
+      expect(app.state.locale).toBe('en-US');
+    });
+
+    it('should accept any provided locale string', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: 'ja',
+      });
+
+      expect(app.state.locale).toBe('ja');
+    });
+
+    it('should accept arbitrary locale string (validation handled by consumer)', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: 'fr-CA',
+      });
+
+      expect(app.state.locale).toBe('fr-CA');
+    });
+
+    it('should accept Locale object', () => {
+      const customLocale = {
+        code: 'custom',
+        messages: { today: 'Today Custom' },
+      };
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: customLocale,
+      });
+
+      expect(app.state.locale).toBe(customLocale);
+    });
+
+    it('should fallback to en-US for invalid locale string', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: '!!!',
+      });
+
+      expect(app.state.locale).toBe('en-US');
+    });
+
+    it('should fallback to en-US for Locale object with invalid code', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        locale: { code: '!!invalid!!', messages: {} },
+      });
+
+      expect((app.state.locale as any).code).toBe('en-US');
+    });
+  });
 });

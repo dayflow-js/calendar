@@ -7,6 +7,7 @@ import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from './RangePicker';
 import { CalendarApp } from '../../types';
+import { useLocale } from '@/locale';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: CalendarApp;
@@ -26,6 +27,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
   app,
 }) => {
   const [editedEvent, setEditedEvent] = useState(event);
+  const { t } = useLocale();
 
   // Sync state when event prop changes (e.g. if opened with a different event)
   useEffect(() => {
@@ -177,7 +179,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
 
         {/* Content */}
         <div>
-          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Event Title</span>
+          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('eventTitle')}</span>
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex-1">
               <input
@@ -207,7 +209,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
 
           {!!editedEvent.allDay ? (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Date Range</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('dateRange')}</div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
                 format="YYYY-MM-DD"
@@ -216,11 +218,12 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                 matchTriggerWidth
                 onChange={handleAllDayRangeChange}
                 onOk={handleAllDayRangeChange}
+                locale={app?.state.locale}
               />
             </div>
           ) : (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Time Range</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('timeRange')}</div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
                 timeZone={eventTimeZone}
@@ -240,12 +243,13 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                     end,
                   });
                 }}
+                locale={app?.state.locale}
               />
             </div>
           )}
 
           <div className="mb-4">
-            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Note</span>
+            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
             <textarea
               value={editedEvent.description ?? ''}
               onChange={e =>
@@ -256,7 +260,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
               }
               rows={4}
               className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
-              placeholder="Add a note..."
+              placeholder={t('addNotePlaceholder')}
             />
           </div>
 
@@ -266,14 +270,14 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                 className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
                 onClick={convertToAllDay}
               >
-                Set as All-day
+                {t('setAsAllDay')}
               </button>
             ) : (
               <button
                 className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
                 onClick={convertToRegular}
               >
-                Set as Timed Event
+                {t('setAsTimed')}
               </button>
             )}
 
@@ -284,14 +288,14 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
                 onClose();
               }}
             >
-              Delete
+              {t('delete')}
             </button>
 
             <button
               className="px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 text-sm font-medium transition ml-auto"
               onClick={handleSave}
             >
-              Save
+              {t('save')}
             </button>
           </div>
 

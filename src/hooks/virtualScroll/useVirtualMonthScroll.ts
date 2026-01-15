@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { WeeksData } from '../../types';
-import { generateWeekData, generateWeekRange, monthNames } from '../../utils';
+import { generateWeekData, generateWeekRange } from '../../utils';
 import {
   UseVirtualMonthScrollProps,
   UseVirtualMonthScrollReturn,
@@ -82,10 +82,17 @@ export const useVirtualMonthScroll = ({
   weekHeight,
   onCurrentMonthChange,
   initialWeeksToLoad = 104,
+  locale = 'en-US',
 }: UseVirtualMonthScrollProps): UseVirtualMonthScrollReturn => {
   const targetNavigationRef = useRef<{ month: string; year: number } | null>(
     null
   );
+
+  const getMonthName = useCallback((monthIndex: number, year: number) => {
+    const date = new Date(year, monthIndex, 1);
+    const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
+    return date.toLocaleDateString(locale, { month: isAsian ? 'short' : 'long' });
+  }, [locale]);
 
   const initialWeeksData = useMemo(() => {
     const firstDayOfMonth = new Date(currentDate);
@@ -111,7 +118,7 @@ export const useVirtualMonthScroll = ({
   const [scrollTop, setScrollTop] = useState(initialScrollTop);
   const [containerHeight, setContainerHeight] = useState(600);
   const [currentMonth, setCurrentMonth] = useState(
-    monthNames[currentDate.getMonth()]
+    getMonthName(currentDate.getMonth(), currentDate.getFullYear())
   );
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [isScrolling, setIsScrolling] = useState(false);
@@ -144,6 +151,7 @@ export const useVirtualMonthScroll = ({
   // Cached week data retrieval
   const getCachedWeekData = useCallback((weekStartDate: Date): WeeksData => {
     let weekData = weekDataCache.current.get(weekStartDate);
+    console.log('weekData', weekData);
 
     if (!weekData) {
       weekData = generateWeekData(weekStartDate);
@@ -266,7 +274,7 @@ export const useVirtualMonthScroll = ({
       const monthDayCounts: Record<string, number> = {};
 
       centerItem.weekData.days.forEach(day => {
-        const monthKey = `${monthNames[day.month]}-${day.year}`;
+        const monthKey = `${getMonthName(day.month, day.year)}-${day.year}`;
         monthDayCounts[monthKey] = (monthDayCounts[monthKey] || 0) + 1;
       });
 
@@ -503,25 +511,23 @@ export const useVirtualMonthScroll = ({
 
   // Navigation functions
   const handlePreviousMonth = useCallback(() => {
-    const prevMonth =
-      currentMonth === 'January' ? 11 : monthNames.indexOf(currentMonth) - 1;
-    const prevYear = currentMonth === 'January' ? currentYear - 1 : currentYear;
-    const targetDate = new Date(prevYear, prevMonth, 1);
+    // use weeksData which contains month info.
+    const displayWeek = weeksData[virtualData.displayStartIndex];
+    const firstDayOfDisplay = displayWeek.days[0].date;
+    const targetDate = new Date(firstDayOfDisplay.getFullYear(), firstDayOfDisplay.getMonth() - 1, 1);
     scrollToDate(targetDate);
-  }, [currentMonth, currentYear, scrollToDate]);
+  }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 
   const handleNextMonth = useCallback(() => {
-    const nextMonth =
-      currentMonth === 'December' ? 0 : monthNames.indexOf(currentMonth) + 1;
-    const nextYear =
-      currentMonth === 'December' ? currentYear + 1 : currentYear;
-    const targetDate = new Date(nextYear, nextMonth, 1);
+    const displayWeek = weeksData[virtualData.displayStartIndex];
+    const firstDayOfDisplay = displayWeek.days[0].date;
+    const targetDate = new Date(firstDayOfDisplay.getFullYear(), firstDayOfDisplay.getMonth() + 1, 1);
     scrollToDate(targetDate);
-  }, [currentMonth, currentYear, scrollToDate]);
+  }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 
   const handleToday = useCallback(() => {
     const today = new Date();
-    const todayMonth = monthNames[today.getMonth()];
+    const todayMonth = getMonthName(today.getMonth(), today.getFullYear());
     const todayYear = today.getFullYear();
 
     // Create date of first day of current month
@@ -595,7 +601,7 @@ export const useVirtualMonthScroll = ({
 
     if (prevMonth !== nextMonth || prevYear !== nextYear) {
       const firstDayOfMonth = new Date(nextYear, nextMonth, 1);
-      const monthName = monthNames[nextMonth];
+      const monthName = getMonthName(nextMonth, nextYear);
 
       targetNavigationRef.current = { month: monthName, year: nextYear };
       setCurrentMonth(monthName);

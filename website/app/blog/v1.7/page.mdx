@@ -1,0 +1,142 @@
+---
+title: 'V1.7: Internationalization Support & Localization'
+description: DayFlow now supports multiple languages natively, including English, Japanese, Chinese, German, French, Spanish, and Korean.
+date: 2026-01-15
+---
+
+The release of V1.7, which brings comprehensive Internationalization (i18n) support to DayFlow. This update allows you to build calendar applications that speak your users' languages.
+
+**1. Native Multi-language Support**
+
+DayFlow now includes built-in translations for the following languages:
+
+- **Chinese** (zh)
+- **English** (en)
+- **French** (fr)
+- **German** (de)
+- **Japanese** (ja)
+- **Korean** (ko)
+- **Spanish** (es)
+
+All UI elements, including buttons, dialogs, and labels, are automatically translated based on the configured locale.
+
+**2. How to Set the Locale**
+
+You can set the locale when initializing your calendar application using the `useCalendarApp` hook. You can provide a language code string, a built-in `Locale` object, or a custom `Locale` object.
+
+**Option A: Using a language code string**
+This is the simplest way. DayFlow will look up the built-in translation.
+
+```ts
+const calendar = useCalendarApp({
+  // ... other config
+  locale: 'ja', // Set locale to Japanese
+});
+```
+
+**Option B: Using built-in Locale objects**
+You can import locale objects directly from the package. This is useful if you want to ensure type safety or extend an existing locale.
+
+```ts
+import { ja, zh } from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  // ... other config
+  locale: ja, // Pass the Japanese locale object directly
+});
+```
+
+**Option C: Using a custom Locale object**
+If you want to support a language not included in DayFlow or provide a full set of translations, you can pass a custom `Locale` object:
+
+```ts
+const customLocale = {
+  code: 'it', // Italian
+  messages: {
+    today: 'Oggi',
+    day: 'Giorno',
+    week: 'Settimana',
+    month: 'Mese',
+    // ... all other translation keys
+  },
+};
+
+const calendar = useCalendarApp({
+  // ... other config
+  locale: customLocale,
+});
+```
+
+**3. Custom Localization Messages**
+
+If you just want to override specific terms in the current locale (whether built-in or custom), you can provide `customMessages` directly to the `DayFlowCalendar` component.
+
+```tsx
+const customMessages = {
+  today: 'Today!',
+  newEvent: 'New Appointment',
+  // ... override other keys
+};
+
+return <DayFlowCalendar calendar={calendar} customMessages={customMessages} />;
+```
+
+4. examples for week view(default English):
+   **Chinese:**
+   <img
+     width="1256"
+     height="752"
+     alt="image"
+     src="https://github.com/user-attachments/assets/7c5e28e2-9d8a-4edb-b39a-4119537cdc12"
+   />
+
+**Japanese:**
+
+<img
+  width="1261"
+  height="755"
+  alt="image"
+  src="https://github.com/user-attachments/assets/4b7c15bd-d8b5-481c-b5e1-d55ad148c20a"
+/>
+
+**German:**
+
+<img
+  width="1254"
+  height="747"
+  alt="image"
+  src="https://github.com/user-attachments/assets/6d789a35-5aa2-493c-9490-ae99520bb23c"
+/>
+
+**French:**
+
+<img
+  width="1258"
+  height="754"
+  alt="image"
+  src="https://github.com/user-attachments/assets/e40f108b-793a-41df-b564-d1555813dec4"
+/>
+
+**Korean:**
+
+<img
+  width="1253"
+  height="753"
+  alt="image"
+  src="https://github.com/user-attachments/assets/f0d16e2f-2c49-4587-ae18-7ce68893e579"
+/>
+
+**Spanish:**
+
+<img
+  width="1256"
+  height="760"
+  alt="image"
+  src="https://github.com/user-attachments/assets/bdeec281-d2b7-477f-8fc4-186dcf77d17d"
+/>
+
+**What's Next?**
+
+We are committed to making DayFlow the most flexible calendar toolkit. In future updates, we plan to add support for more languages and improve Right-to-Left (RTL) layout support.
+
+Stay tuned for more updates!

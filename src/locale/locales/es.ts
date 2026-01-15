@@ -1,0 +1,48 @@
+import type { Locale } from '../types';
+
+const es: Locale = {
+  code: 'es-ES',
+  messages: {
+    allDay: 'Todo el día',
+    noEvents: 'No hay eventos hoy',
+    more: 'más',
+    eventTitle: 'Título del evento',
+    dateRange: 'Rango de fechas',
+    timeRange: 'Rango de tiempo',
+    note: 'Nota',
+    addNotePlaceholder: 'Añadir una nota...',
+    setAsAllDay: 'Establecer como todo el día',
+    setAsTimed: 'Establecer como evento con horario',
+    delete: 'Eliminar',
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+    today: 'Hoy',
+    day: 'Día',
+    week: 'Semana',
+    month: 'Mes',
+    year: 'Año',
+    newEvent: 'Nuevo evento',
+    newAllDayEvent: 'Nuevo evento de todo el día',
+    newCalendarEvent: 'Nuevo evento en {calendarName}',
+    newAllDayCalendarEvent: 'Nuevo evento de todo el día en {calendarName}',
+    save: 'Guardar',
+    deleteCalendar: '¿Eliminar "{calendarName}"?',
+    deleteCalendarMessage: '¿Quieres eliminar "{calendarName}" o fusionar sus eventos en otro calendario existente?',
+    merge: 'Fusionar',
+    confirmDeleteTitle: '¿Seguro que quieres eliminar el calendario "{calendarName}"?',
+    confirmDeleteMessage: 'Si eliminas este calendario, también se eliminarán todos los eventos asociados.',
+    mergeConfirmTitle: '¿Fusionar "{sourceName}" con "{targetName}"?',
+    mergeConfirmMessage: '¿Seguro que quieres fusionar "{sourceName}" con "{targetName}"? Esto moverá todos los eventos de "{sourceName}" a "{targetName}" y se eliminará "{sourceName}". Esta acción no se puede deshacer.',
+    expandSidebar: 'Expandir barra lateral del calendario',
+    collapseSidebar: 'Contraer barra lateral del calendario',
+    calendars: 'Calendarios',
+    createCalendar: 'Crear nuevo calendario',
+    calendarNamePlaceholder: 'ej. Trabajo',
+    customColor: 'Color personalizado...',
+    create: 'Crear',
+    calendarOptions: 'Opciones de calendario',
+    untitled: 'Sin título',
+  }
+};
+
+export default es;

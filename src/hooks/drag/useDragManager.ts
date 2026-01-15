@@ -15,9 +15,12 @@ import {
   getEventTextColor,
   formatTime,
 } from '../../utils';
+import { useLocale } from '@/locale';
+import { LocaleProvider } from '@/locale/LocaleProvider';
 import { dateToZonedDateTime } from '../../utils/temporal';
 
 export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
+  const { t, locale } = useLocale();
   const {
     calendarRef,
     allDayRowRef,
@@ -111,7 +114,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           ({
             id: String(Date.now()),
             color: color || 'blue',
-            title: title || 'New Event',
+            title: title || t('newEvent'),
             start: nowTemporal,
             end: nowTemporal,
             allDay: false,
@@ -119,13 +122,15 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           } as Event);
 
         reactRootRef.current.render(
-          React.createElement(MonthDragIndicatorComponent, {
-            event: eventForComponent,
-            isCreating: drag.mode === 'create',
-            targetDate: drag.targetDate || null,
-            startDate: drag.originalStartDate || null,
-            endDate: drag.originalEndDate || null,
-          })
+          React.createElement(LocaleProvider, { locale },
+            React.createElement(MonthDragIndicatorComponent, {
+              event: eventForComponent,
+              isCreating: drag.mode === 'create',
+              targetDate: drag.targetDate || null,
+              startDate: drag.originalStartDate || null,
+              endDate: drag.originalEndDate || null,
+            })
+          )
         );
       } else {
         // Week/Day view indicator
@@ -232,17 +237,19 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         // Render Week/Day view content
         reactRootRef.current = createRoot(indicator);
         reactRootRef.current.render(
-          React.createElement(DragIndicatorComponent, {
-            drag,
-            color,
-            title,
-            layout,
-            allDay: drag.allDay,
-            formatTime: formatTime,
-            getLineColor: getLineColor || (() => ''),
-            getDynamicPadding: getDynamicPadding || (() => '0px'),
-            renderer,
-          })
+          React.createElement(LocaleProvider, { locale },
+            React.createElement(DragIndicatorComponent, {
+              drag,
+              color,
+              title,
+              layout,
+              allDay: drag.allDay,
+              formatTime: formatTime,
+              getLineColor: getLineColor || (() => ''),
+              getDynamicPadding: getDynamicPadding || (() => '0px'),
+              renderer,
+            })
+          )
         );
       }
 
@@ -371,17 +378,19 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           dragPropsRef.current.drag = updatedDrag;
 
           reactRootRef.current.render(
-            React.createElement(DragIndicatorComponent, {
-              drag: updatedDrag,
-              color: dragPropsRef.current.color,
-              title: dragPropsRef.current.title,
-              layout: layout || dragPropsRef.current.layout,
-              allDay: isAllDay,
-              formatTime: formatTime,
-              getLineColor: getLineColor || (() => ''),
-              getDynamicPadding: getDynamicPadding || (() => '0px'),
-              renderer,
-            })
+            React.createElement(LocaleProvider, { locale },
+              React.createElement(DragIndicatorComponent, {
+                drag: updatedDrag,
+                color: dragPropsRef.current.color,
+                title: dragPropsRef.current.title,
+                layout: layout || dragPropsRef.current.layout,
+                allDay: isAllDay,
+                formatTime: formatTime,
+                getLineColor: getLineColor || (() => ''),
+                getDynamicPadding: getDynamicPadding || (() => '0px'),
+                renderer,
+              })
+            )
           );
         }
       }

@@ -18,6 +18,7 @@ import {
 import { logger } from '../utils/logger';
 import { normalizeCssWidth } from '../utils/styleUtils';
 import { ThemeMode } from '../types/calendarTypes';
+import { isValidLocale } from '../locale/utils';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
 
@@ -79,6 +80,7 @@ export class CalendarApp implements ICalendarApp {
       switcherMode: config.switcherMode || 'buttons',
       plugins: new Map(),
       views: new Map(),
+      locale: this.resolveLocale(config.locale),
     };
 
     this.callbacks = config.callbacks || {};
@@ -108,6 +110,22 @@ export class CalendarApp implements ICalendarApp {
     config.plugins?.forEach(plugin => {
       this.installPlugin(plugin);
     });
+  }
+
+  private resolveLocale(locale?: string | any): string | any {
+    if (!locale) {
+      return 'en-US';
+    }
+
+    if (typeof locale === 'string') {
+      return isValidLocale(locale) ? locale : 'en-US';
+    }
+
+    if (locale && typeof locale === 'object' && !isValidLocale(locale.code)) {
+      return { ...locale, code: 'en-US' };
+    }
+
+    return locale;
   }
 
   // View management
@@ -312,7 +330,7 @@ export class CalendarApp implements ICalendarApp {
 
   mergeCalendars = (sourceId: string, targetId: string): void => {
     const sourceEvents = this.state.events.filter(e => e.calendarId === sourceId);
-    
+
     // Update all events from source calendar to target calendar
     sourceEvents.forEach(event => {
       this.updateEvent(event.id, { calendarId: targetId });

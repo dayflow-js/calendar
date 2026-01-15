@@ -61,6 +61,7 @@ export interface DragIndicatorProps {
   formatTime: (hour: number) => string;
   getLineColor: (color: string) => string;
   getDynamicPadding: (drag: DragRef) => string;
+  locale?: string;
 }
 
 export interface DragIndicatorRenderer {
