@@ -28,21 +28,21 @@ export function TeamCalendar() {
 
 ## 主な設定項目
 
-| オプション             | 型                         | 必須 | デフォルト           | 説明                                                               |
-| ---------------------- | -------------------------- | ---- | -------------------- | ------------------------------------------------------------------ |
-| `views`                | `CalendarView[]`           | ✅   | —                    | 表示するビューを登録。`createMonthView()` などのファクトリを使用。 |
-| `plugins`              | `CalendarPlugin[]`         | ❌   | `[]`                 | ドラッグ操作やショートカットなどのプラグインをインストール。       |
-| `events`               | `Event[]`                  | ❌   | `[]`                 | 初期イベント配列。以後は `calendar.addEvent` などで更新。          |
-| `callbacks`            | `CalendarCallbacks`        | ❌   | `{}`                 | ビュー変更やイベント CRUD をフックするライフサイクルコールバック。 |
-| `defaultView`          | `ViewType`                 | ❌   | `ViewType.WEEK`      | 最初に表示するビュー。`views` に含まれている必要あり。             |
-| `initialDate`          | `Date`                     | ❌   | `new Date()`         | フォーカスする基準日。ルーティングの状態などから差し替え可能。     |
-| `switcherMode`         | `'buttons' \| 'select'`    | ❌   | `'buttons'`          | ビルトインビュースイッチャーの表示方法。                           |
-| `calendars`            | `CalendarType[]`           | ❌   | `[]`                 | カテゴリや色の定義。`calendarId` と連携。                          |
-| `defaultCalendar`      | `string`                   | ❌   | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。                            |
-| `theme`                | `ThemeConfig`              | ❌   | `{ mode: 'light' }`  | テーマモード（`light`/`dark`/`auto`）やトークン上書き。            |
+| オプション             | 型                         | 必須 | デフォルト           | 説明                                                                                 |
+| ---------------------- | -------------------------- | ---- | -------------------- | ------------------------------------------------------------------------------------ |
+| `views`                | `CalendarView[]`           | ✅   | —                    | 表示するビューを登録。`createMonthView()` などのファクトリを使用。                   |
+| `plugins`              | `CalendarPlugin[]`         | ❌   | `[]`                 | ドラッグ操作やショートカットなどのプラグインをインストール。                         |
+| `events`               | `Event[]`                  | ❌   | `[]`                 | 初期イベント配列。以後は `calendar.addEvent` などで更新。                            |
+| `callbacks`            | `CalendarCallbacks`        | ❌   | `{}`                 | ビュー変更やイベント CRUD をフックするライフサイクルコールバック。                   |
+| `defaultView`          | `ViewType`                 | ❌   | `ViewType.WEEK`      | 最初に表示するビュー。`views` に含まれている必要あり。                               |
+| `initialDate`          | `Date`                     | ❌   | `new Date()`         | フォーカスする基準日。ルーティングの状態などから差し替え可能。                       |
+| `switcherMode`         | `'buttons' \| 'select'`    | ❌   | `'buttons'`          | ビルトインビュースイッチャーの表示方法。                                             |
+| `calendars`            | `CalendarType[]`           | ❌   | `[]`                 | カテゴリや色の定義。`calendarId` と連携。                                            |
+| `defaultCalendar`      | `string`                   | ❌   | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。                                              |
+| `theme`                | `ThemeConfig`              | ❌   | `{ mode: 'light' }`  | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                              |
 | `locale`               | `string \| Locale`         | ❌   | `'en-US'`            | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。 |
-| `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。     |
-| `useEventDetailDialog` | `boolean`                  | ❌   | `false`              | 詳細表示をモーダルダイアログに切り替える。                         |
+| `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。                       |
+| `useEventDetailDialog` | `boolean`                  | ❌   | `false`              | 詳細表示をモーダルダイアログに切り替える。                                           |
 
 ## それぞれのポイント
 
