@@ -219,8 +219,9 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       position: 'absolute' as const,
       opacity: isBeingDragged ? 0.3 : 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
-      transform: isPopping ? 'scale(1.12)' : undefined,
-      transition: 'transform 0.1s ease-in-out',
+      // TODO(DayView bug)
+      transform: isDayView ? null : (isPopping ? 'scale(1.12)' : undefined),
+      transition: isDayView ? null : 'transform 0.1s ease-in-out',
     };
 
     if (isEventSelected && showDetailPanel) {
@@ -862,6 +863,15 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     window.addEventListener('scroll', handleScroll, true);
     window.addEventListener('resize', handleResize);
 
+    // Add ResizeObserver to monitor calendar container size changes (e.g. Search Drawer toggle)
+    let resizeObserver: ResizeObserver | null = null;
+    if (calendarRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(calendarRef.current);
+    }
+
     checkEventVisibility();
 
     return () => {
@@ -870,6 +880,9 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       });
       window.removeEventListener('scroll', handleScroll, true);
       window.removeEventListener('resize', handleResize);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
   }, [
     isSelected,
@@ -887,6 +900,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const clickedInsideEvent = eventRef.current?.contains(target);
+      const clickedOnSameEvent = target.closest(`[data-event-id="${event.id}"]`) !== null;
       const clickedInsidePanel = detailPanelRef.current?.contains(target);
       const clickedInsideDetailDialog = target.closest(
         '[data-event-detail-dialog]'
@@ -898,6 +912,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       if (showDetailPanel) {
         if (
           !clickedInsideEvent &&
+          !clickedOnSameEvent &&
           !clickedInsidePanel &&
           !clickedInsideDetailDialog &&
           !clickedInsideRangePickerPopup
@@ -909,7 +924,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           setIsSelected(false);
           onDetailPanelToggle?.(null);
         }
-      } else if (isEventSelected && !clickedInsideEvent) {
+      } else if (isEventSelected && !clickedInsideEvent && !clickedOnSameEvent) {
         if (onEventSelect) {
           onEventSelect(null);
         }
@@ -924,7 +939,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isEventSelected, showDetailPanel, onEventSelect, onDetailPanelToggle]);
+  }, [isEventSelected, showDetailPanel, onEventSelect, onDetailPanelToggle, event.id]);
 
   useEffect(() => {
     if (isMultiDay && segment && !segment.isFirstSegment) {
