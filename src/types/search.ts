@@ -1,13 +1,10 @@
 
-export interface CalendarSearchEvent {
-  id: string;
-  title: string;
-  start: Date | string | any; // Allow flexibility for Temporal or Date
-  end: Date | string | any;
-  description?: string;
+import { Event } from './event';
+
+export type CalendarSearchEvent = Event & {
   color?: string; // For calendar color
   [key: string]: any;
-}
+};
 
 export interface CalendarSearchProps {
   /**

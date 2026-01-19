@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale } from '@/locale';
 import { CalendarApp } from '@/core';
 import {
@@ -31,6 +30,8 @@ interface YearData {
   year: number;
   months: MonthData[];
 }
+
+import ViewHeader from '@/components/common/ViewHeader';
 
 // Main component
 const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
@@ -288,34 +289,21 @@ const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
   return (
     <div className="relative flex flex-col bg-white shadow-md w-full overflow-hidden h-full">
       {/* Header navigation */}
-      <div className="p-2 bg-white">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">{currentYear}</h1>
-          <div className="flex space-x-1">
-            <button
-              className="p-1 text-gray-600 hover:bg-gray-100 rounded"
-              onClick={() => app.goToPrevious()}
-              title="Previous week"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              className="px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded"
-              onClick={() => app.goToToday()}
-              title="Go to today"
-            >
-              {t('today')}
-            </button>
-            <button
-              className="p-1 text-gray-600 hover:bg-gray-100 rounded"
-              onClick={() => app.goToNext()}
-              title="Next week"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <ViewHeader
+        calendar={app}
+        viewType="year"
+        currentDate={currentDate}
+        customTitle={currentYear.toString()}
+        onPrevious={() => {
+          app.goToPrevious();
+          handlePreviousYear();
+        }}
+        onNext={() => {
+          app.goToNext();
+          handleNextYear();
+        }}
+        onToday={handleToday}
+      />
 
       {/* Scrolling year indicator */}
       {isScrolling && (

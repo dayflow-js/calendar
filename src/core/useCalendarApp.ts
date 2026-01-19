@@ -116,6 +116,12 @@ export function useCalendarApp(
       triggerUpdate();
     };
 
+    const originalHighlightEvent = app.highlightEvent;
+    app.highlightEvent = (eventId: string | null) => {
+      originalHighlightEvent(eventId);
+      triggerUpdate();
+    };
+
     return () => {
       // Cleanup work, if needed
     };
@@ -218,6 +224,7 @@ export function useCalendarApp(
     setCalendarVisibility,
     setAllCalendarsVisibility,
     getAllEvents: () => app.getAllEvents(),
+    highlightEvent: (eventId: string | null) => app.highlightEvent(eventId),
     setVisibleMonth: (date: Date) => app.setVisibleMonth(date),
     getVisibleMonth: () => app.getVisibleMonth(),
     sidebarConfig: app.getSidebarConfig(),

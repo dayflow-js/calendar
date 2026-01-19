@@ -83,6 +83,17 @@ const DayView: React.FC<DayViewProps> = ({
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
     null
   );
+
+  // Sync highlighted event from app state
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      const event = events.find(e => e.id === app.state.highlightedEventId);
+      if (event) {
+        setSelectedEvent(event);
+      }
+    }
+  }, [app.state.highlightedEventId, events]);
+
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
@@ -373,7 +384,7 @@ const DayView: React.FC<DayViewProps> = ({
             })}
           />
           {/* All-day event area */}
-          <div className={allDayRow} ref={allDayRowRef}>
+          <div className={`${allDayRow} pt-px`} ref={allDayRowRef}>
             <div className={allDayLabel}>{t('allDay')}</div>
             <div className="flex flex-1 relative">
               <div
@@ -417,6 +428,11 @@ const DayView: React.FC<DayViewProps> = ({
                       onDetailPanelToggle={(eventId: string | null) =>
                         setDetailPanelEventId(eventId)
                       }
+                      selectedEventId={selectedEvent?.id ?? null}
+                      onEventSelect={(eventId: string | null) => {
+                        const evt = events.find(e => e.id === eventId);
+                        setSelectedEvent(evt || null);
+                      }}
                       customDetailPanelContent={customDetailPanelContent}
                       customEventDetailDialog={customEventDetailDialog}
                       app={app}
@@ -560,6 +576,11 @@ const DayView: React.FC<DayViewProps> = ({
                           onDetailPanelToggle={(eventId: string | null) =>
                             setDetailPanelEventId(eventId)
                           }
+                          selectedEventId={selectedEvent?.id ?? null}
+                          onEventSelect={(eventId: string | null) => {
+                            const evt = events.find(e => e.id === eventId);
+                            setSelectedEvent(evt || null);
+                          }}
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
                           app={app}
@@ -598,13 +619,13 @@ const DayView: React.FC<DayViewProps> = ({
                   handleToday={() => app.goToToday()}
                 />
               </div>
-        <MiniCalendar
-          visibleMonth={visibleMonth}
-          currentDate={currentDate}
-          showHeader={true}
-          onMonthChange={handleMonthChange}
-          onDateSelect={handleDateSelect}
-        />
+              <MiniCalendar
+                visibleMonth={visibleMonth}
+                currentDate={currentDate}
+                showHeader={true}
+                onMonthChange={handleMonthChange}
+                onDateSelect={handleDateSelect}
+              />
             </div>
           </div>
 

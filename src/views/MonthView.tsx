@@ -155,6 +155,13 @@ const MonthView: React.FC<MonthViewProps> = ({
   // Selected event ID, used for cross-week MultiDayEvent selected state synchronization
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
+  // Sync highlighted event from app state
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      setSelectedEventId(app.state.highlightedEventId);
+    }
+  }, [app.state.highlightedEventId]);
+
   // Detail panel event ID, used to control displaying only one detail panel
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
     null

@@ -87,6 +87,13 @@ const WeekView: React.FC<WeekViewProps> = ({
     null
   );
 
+  // Sync highlighted event from app state
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      setSelectedEventId(app.state.highlightedEventId);
+    }
+  }, [app.state.highlightedEventId]);
+
   // Get configuration constants
   const {
     HOUR_HEIGHT,
@@ -487,7 +494,7 @@ const WeekView: React.FC<WeekViewProps> = ({
             return (
               <div
                 key={`allday-${dayIndex}`}
-                className={allDayCell}
+                className={`${allDayCell} ${dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
                 style={{ minHeight: `${allDayAreaHeight}px` }}
                 onDoubleClick={e => handleCreateAllDayEvent?.(e, dayIndex)}
                 onDragOver={handleDragOver}
@@ -619,7 +626,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                   return (
                     <div
                       key={`${slotIndex}-${dayIndex}`}
-                      className={timeGridCell}
+                      className={`${timeGridCell} ${dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
                       onDoubleClick={e => {
                         handleCreateStart(e, dayIndex, slot.hour);
                       }}
@@ -641,7 +648,7 @@ const WeekView: React.FC<WeekViewProps> = ({
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`24-${dayIndex}`}
-                  className={`flex-1 relative border-r border-gray-200 dark:border-gray-700`}
+                  className={`flex-1 relative ${dayIndex === weekDaysLabels.length - 1 ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
                 />
               ))}
             </div>

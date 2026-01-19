@@ -111,4 +111,9 @@ export type {
   EventDetailDialogRenderer,
 } from './types/eventDetail';
 
+export type {
+  CalendarSearchProps,
+  CalendarSearchEvent,
+} from './types/search';
+
 export { ViewType } from './types';

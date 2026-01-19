@@ -73,6 +73,8 @@ export interface CalendarSidebarRenderProps {
   renderCalendarContextMenu?: (calendar: CalendarType, onClose: () => void) => React.ReactNode;
   createCalendarMode?: 'inline' | 'modal';
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => React.ReactNode;
+  editingCalendarId?: string | null;
+  setEditingCalendarId?: (id: string | null) => void;
 }
 
 /**
@@ -121,6 +123,7 @@ export interface CalendarAppState {
   switcherMode?: ViewSwitcherMode;
   sidebar?: SidebarConfig;
   locale: string | Locale;
+  highlightedEventId?: string | null;
 }
 
 /**
@@ -149,6 +152,7 @@ export interface CalendarApp {
   deleteEvent: (id: string) => void;
   getEvents: () => Event[];
   getAllEvents: () => Event[];
+  highlightEvent: (eventId: string | null) => void;
   getCalendars: () => CalendarType[];
   reorderCalendars: (fromIndex: number, toIndex: number) => void;
   setCalendarVisibility: (calendarId: string, visible: boolean) => void;
@@ -210,6 +214,7 @@ export interface UseCalendarAppReturn {
   setCalendarVisibility: (calendarId: string, visible: boolean) => void;
   setAllCalendarsVisibility: (visible: boolean) => void;
   getAllEvents: () => Event[];
+  highlightEvent: (eventId: string | null) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
   sidebarConfig: SidebarConfig;

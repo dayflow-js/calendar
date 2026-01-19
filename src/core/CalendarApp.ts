@@ -81,6 +81,7 @@ export class CalendarApp implements ICalendarApp {
       plugins: new Map(),
       views: new Map(),
       locale: this.resolveLocale(config.locale),
+      highlightedEventId: null,
     };
 
     this.callbacks = config.callbacks || {};
@@ -264,6 +265,11 @@ export class CalendarApp implements ICalendarApp {
 
   getAllEvents = (): Event[] => {
     return [...this.state.events];
+  };
+
+  highlightEvent = (eventId: string | null): void => {
+    this.state.highlightedEventId = eventId;
+    this.callbacks.onRender?.();
   };
 
   getEvents = (): Event[] => {
