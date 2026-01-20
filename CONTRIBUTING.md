@@ -1,140 +1,48 @@
-# Contributing to DayFlow
+# Contribution Guide
 
-First of all, thank you for your interest in contributing to **DayFlow** 🎉
+Thank you for your interest in contributing to **DayFlow**! We welcome contributions from the community. Please follow this guide to set up the project and ensure your contributions align with our standards.
 
-DayFlow is an open-source calendar UI designed to work well across **web and desktop applications**. We welcome all kinds of contributions — from bug reports and documentation improvements to new features and performance optimizations.
+## 🚀 How to Start the Project
 
----
+If you have forked the repository and want to run the examples locally, follow these steps:
 
-## Ways to Contribute
+1.  **Clone your fork:**
 
-You can contribute in many ways:
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/DayFlow.git
+    cd DayFlow
+    ```
 
-* 🐞 Reporting bugs
-* 💡 Suggesting new features or improvements
-* 📝 Improving documentation or examples
-* 🎨 UI/UX improvements
-* ⚙️ Performance optimizations
-* 🔧 Refactoring or code quality improvements
+2.  **Install dependencies:**
 
-If you're not sure where to start, feel free to open an issue and start a discussion.
+    ```bash
+    npm install
+    ```
 
----
+3.  **Start the development server:**
+    This command will start the Vite server and launch the example application.
+    ```bash
+    npm run dev
+    ```
+    The application typically runs at `http://localhost:5529`.
 
-## Before You Start
+## 📝 Commit Message Guidelines
 
-* Please search existing **issues** and **pull requests** before opening a new one.
-* For large changes, it’s recommended to open an issue first to discuss your idea.
-* Be respectful and constructive — this is a collaborative project.
+We follow a strict convention for commit messages to keep the history clean and readable. Please use the appropriate emoji and type for your changes. _Inspired by [siyuan-note](https://github.com/siyuan-note/siyuan)_
 
----
-
-## Development Setup
-
-### Prerequisites
-
-* Node.js (LTS recommended)
-* pnpm (recommended) or npm
-
-### Install Dependencies
-
-```bash
-pnpm install
-```
-
-### Start Development
-
-```bash
-pnpm dev
-```
-
-Make sure all packages build correctly before making changes.
-
----
-
-## Coding Guidelines
-
-* Use **TypeScript** where applicable
-* Follow existing code style and patterns
-* Keep components **small and composable**
-* Avoid unnecessary abstractions
-* Prefer clarity over cleverness
-
-If you add new APIs, please consider backward compatibility.
-
----
-
-## Styling Guidelines
-
-DayFlow uses **Tailwind CSS v4**:
-
-* Avoid global CSS leakage
-* Prefer component-scoped styles
-* Use existing design tokens and CSS variables when possible
-* Keep class names consistent with existing components
-
----
-
-## Commit Messages
-
-Please use clear and descriptive commit messages. Recommended format:
-
-```
-feat: add support for week range selection
-fix: correct all-day event spacing in month view
-docs: improve getting started guide
-```
-
----
-
-## Pull Request Guidelines
-
-* Keep PRs focused and reasonably sized
-* Clearly describe **what** and **why**
-* Link related issues if applicable
-* Include screenshots or GIFs for UI changes
-
-Once submitted:
-
-* Maintainers may request changes or suggestions
-* Please be patient — reviews may take some time
-
----
-
-## Reporting Bugs
-
-When reporting a bug, please include:
-
-* DayFlow version
-* Environment (web / desktop, framework, OS)
-* Steps to reproduce
-* Expected vs actual behavior
-* Screenshots or videos if helpful
-
----
-
-## Feature Requests
-
-We welcome feature ideas! Please include:
-
-* The problem you’re trying to solve
-* Why it’s useful
-* Any prior art or references (e.g. macOS Calendar, Google Calendar)
-
----
-
-## Code of Conduct
-
-By participating in this project, you agree to follow our **Code of Conduct**.
-Please be respectful, inclusive, and constructive.
-
----
-
-## Questions?
-
-If you have questions:
-
-* Open a discussion or issue
-* Ask in the PR comments
-
-Thanks again for contributing to **DayFlow** — every contribution matters ❤️
+| Emoji | Type     | Meaning              | When to Use                          | Example                            |
+| ----- | -------- | -------------------- | ------------------------------------ | ---------------------------------- |
+| ✨    | feat     | New feature          | Add new functionality                | ✨ feat: add event search drawer   |
+| 🐛    | fix      | Bug fix              | Fix errors or incorrect behavior     | 🐛 fix: crash when result is empty |
+| ⚡    | perf     | Performance          | Improve speed or efficiency          | ⚡ perf: debounce search input     |
+| ♻️    | refactor | Refactor             | Code changes without behavior change | ♻️ refactor: extract search hook   |
+| 🎨    | style    | Code style           | Formatting, lint, structure          | 🎨 style: format calendar code     |
+| 💄    | style    | UI styling           | Visual/UI-only changes               | 💄 style: improve empty state UI   |
+| 📝    | docs     | Documentation        | README, comments, docs               | 📝 docs: update search API         |
+| 🌐    | i18n     | Internationalization | Add or update translations           | 🌐 i18n: add empty result texts    |
+| 🙈    | chore    | Ignore files         | Update `.gitignore`                  | 🙈 ignore log files                |
+| 🧑‍💻    | dx       | Developer Experience | Improve tooling, DX, types           | 🧑‍💻 improve TypeScript types        |
+| 🚨    | fix      | Critical fix         | Emergency issues, lint errors        | 🚨 fix: production crash           |
+| 🔒    | security | Security             | Fix security vulnerabilities         | 🔒 fix: prevent XSS                |
+| 🔥    | remove   | Removal              | Remove code, files, features         | 🔥 remove legacy API               |
+| 🔖    | release  | Release              | Versioning, tagging                  | 🔖 release: v0.7.0                 |

@@ -1,8 +1,9 @@
 # DayFlow
 
-**English** | [中文](README.zh.md) | [日本語](README.ja.md)
+**English** | [中文](README.zh.md) | [日本語](README.ja.md) | [Getting Started & Contributing](CONTRIBUTING.md)
 
-A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views, and plugin architecture.
+A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple
+views, and plugin architecture.
 
 [![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
@@ -14,17 +15,17 @@ A flexible and feature-rich calendar component library for React applications wi
 ### ✨ Monthly, Weekly, Daily and Various View Types
 
 | Monthly                                  | Weekly                                 |
-| ---------------------------------------- | -------------------------------------- |
+|------------------------------------------|----------------------------------------|
 | ![image](./assets/images//MonthView.png) | ![image](./assets/images/WeekView.png) |
 
 | Daily                                 | Event Stack Level                        |
-| ------------------------------------- | ---------------------------------------- |
+|---------------------------------------|------------------------------------------|
 | ![image](./assets/images/DayView.png) | ![image](./assets/images/stackLevel.png) |
 
 ### 🤩 Default Panel (with multiple Event Detail Panel options available)
 
 | Detail Popup                        | Detail Dialog                        |
-| ----------------------------------- | ------------------------------------ |
+|-------------------------------------|--------------------------------------|
 | ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
 
 ## Quick Start
@@ -36,7 +37,11 @@ https://dayflow-js.github.io/calendar/
 ### Installation
 
 ```tsx
-npm install@dayflow/core lucide-react
+npm
+install
+@dayflow/
+core
+lucide - react
 
 ```
 
@@ -46,7 +51,7 @@ This object is then rendered using the `DayFlowCalendar` UI component.
 
 ```tsx
 'use client';
- 
+
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -62,18 +67,22 @@ const meeting = createEvent({
   id: '1',
   title: 'Team Meeting',
   start: new Date(2024, 9, 15, 10, 0), // Oct 15, 2024 10:00
-  end: new Date(2024, 9, 15, 11, 0),   // Oct 15, 2024 11:00
+  end: new Date(2024, 9, 15, 11, 0), // Oct 15, 2024 11:00
 });
- 
+
 // All-day event
-const holiday = createAllDayEvent('2', 'Tech Conference', new Date(2024, 9, 20));
- 
+const holiday = createAllDayEvent(
+  '2',
+  'Tech Conference',
+  new Date(2024, 9, 20)
+);
+
 // Quick timed event creation
 const lunch = createTimedEvent(
   '3',
   'Lunch Break',
   new Date(2024, 9, 15, 12, 0), // 12:00
-  new Date(2024, 9, 15, 13, 0)  // 13:00
+  new Date(2024, 9, 15, 13, 0) // 13:00
 );
 
 export default function MyCalendar() {
@@ -84,41 +93,36 @@ export default function MyCalendar() {
     defaultView: 'month',
     initialDate: new Date(),
   });
- 
+
   return <DayFlowCalendar calendar={calendar} />;
 }
 ```
 
 - **views**: An array of calendar views. Currently, DayFlow provides four built-in factory functions:
-    
-    `createMonthView`, `createWeekView`, `createDayView`, and `createYearView` (still in development).
-    
-    The order of views determines the order of tabs (Year / Month / Week / Day).
-    
+  `createMonthView`, `createWeekView`, `createDayView`, and `createYearView` (still in development).
+  The order of views determines the order of tabs (Year / Month / Week / Day).
 - **events**: The core data of the calendar. Events can be created using the built-in helpers
-    
-    `createEvent`, `createAllDayEvent`, and `createTimedEvent`, depending on the event type.
-    
+  `createEvent`, `createAllDayEvent`, and `createTimedEvent`, depending on the event type.
 
 ---
 
 ## `useCalendarApp` Configuration Options
 
-| Option | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `views` | `CalendarView[]` | ✅ | — | Registered view definitions (e.g. `createMonthView()`). At least one view is required |
-| `plugins` | `CalendarPlugin[]` | ❌ | `[]` | Optional plugins (drag support, keyboard shortcuts, etc.). Each plugin receives the app instance during installation |
-| `events` | `Event[]` | ❌ | `[]` | Initial event data. Use `addEvent` / `updateEvent` to modify later |
-| `callbacks` | `CalendarCallbacks` | ❌ | `{}` | Lifecycle hooks triggered on view, date, or event changes — ideal for API synchronization |
-| `defaultView` | `ViewType` | ❌ | `ViewType.WEEK` | Initial view on load; must exist in `views` |
-| `initialDate` | `Date` | ❌ | `new Date()` | Initial focused date (also initializes visible range calculation) |
-| `switcherMode` | `'buttons' | 'select'` | ❌ | `'buttons'` | Controls how the built-in view switcher is rendered in the header |
-| `calendars` | `CalendarType[]` | ❌ | `[]` | Register calendar categories (work, personal, etc.) with colors and visibility |
-| `defaultCalendar` | `string` | ❌ | First visible calendar | Calendar ID used when creating new events |
-| `theme` | `ThemeConfig` | ❌ | `{ mode: 'light' }` | Global theme mode and optional token overrides |
-| `locale` | `string | Locale` | ❌ | `'en-US'` | Internationalization (i18n). Supports language codes (e.g. `'zh'`) or Locale objects |
-| `useSidebar` | `boolean | SidebarConfig` | ❌ | `false` | Enable the built-in sidebar or customize width, collapse state, and renderer |
-| `useEventDetailDialog` | `boolean` | ❌ | `false` | Use a modal dialog for event details instead of an inline panel |
+| Option                 | Type                      | Default                | Description                                                                                                          | Required |
+|------------------------|---------------------------|------------------------|----------------------------------------------------------------------------------------------------------------------|----------|
+| `views`                | `CalendarView[]`          | —                      | Registered view definitions (e.g. `createMonthView()`). At least one view is required                                | ✅        |
+| `plugins`              | `CalendarPlugin[]`        | `[]`                   | Optional plugins (drag support, keyboard shortcuts, etc.). Each plugin receives the app instance during installation | ❌        |
+| `events`               | `Event[]`                 | `[]`                   | Initial event data. Use `addEvent` / `updateEvent` to modify later                                                   | ❌        |
+| `callbacks`            | `CalendarCallbacks`       | `{}`                   | Lifecycle hooks triggered on view, date, or event changes — ideal for API synchronization                            | ❌        |
+| `defaultView`          | `ViewType`                | `ViewType.WEEK`        | Initial view on load; must exist in `views`                                                                          | ❌        |
+| `initialDate`          | `Date`                    | `new Date()`           | Initial focused date (also initializes visible range calculation)                                                    | ❌        |
+| `switcherMode`         | `'buttons' | 'select'`    | `'buttons'`            | Controls how the built-in view switcher is rendered in the header                                                    | ❌        |
+| `calendars`            | `CalendarType[]`          | `[]`                   | Register calendar categories (work, personal, etc.) with colors and visibility                                       | ❌        |
+| `defaultCalendar`      | `string`                  | First visible calendar | Calendar ID used when creating new events                                                                            | ❌        |
+| `theme`                | `ThemeConfig`             | `{ mode: 'light' }`    | Global theme mode and optional token overrides                                                                       | ❌        |
+| `locale`               | `string | Locale`         | `'en-US'`              | Internationalization (i18n). Supports language codes (e.g. `'zh'`) or Locale objects                                 | ❌        |
+| `useSidebar`           | `boolean | SidebarConfig` | `false`                | Enable the built-in sidebar or customize width, collapse state, and renderer                                         | ❌        |
+| `useEventDetailDialog` | `boolean`                 | `false`                | Use a modal dialog for event details instead of an inline panel                                                      | ❌        |
 
 ## Callback Functions
 
@@ -175,12 +179,15 @@ DayFlow includes a default event detail panel that supports editing:
 
 You can also pass a `meta` object to store custom fields such as **meeting links**, **locations**, etc.
 
+<img width="536" height="323" alt="image" src="https://github.com/user-attachments/assets/7a599105-460e-4f83-8418-92bcd0ff8c2a" />
+
 You can enable the detail panel as a modal dialog by passing `useEventDetailDialog` to `DayFlowCalendar`:
 
 ```tsx
 <DayFlowCalendar calendar={calendar} useEventDetailDialog={true} />
-
 ```
+
+<img width="1476" height="1108" alt="image" src="https://github.com/user-attachments/assets/c9f1e231-f8d1-4006-8ff1-942bb7491934" />
 
 ---
 
@@ -197,19 +204,14 @@ For fully customized UIs, you can replace the default detail panel or dialog by 
   customEventDetailDialog={CustomDialog} // Modal dialog
   customDetailPanelContent={CustomContent} // Floating panel
 />
-
 ```
 
 See the documentation for details:
 
 - **Custom Event Detail Dialog**
-    
-    https://dayflow-js.github.io/calendar/docs-zh/features/custom-detail-dialog
-    
+  https://dayflow-js.github.io/calendar/docs/features/custom-detail-dialog
 - **Custom Event Detail Panel**
-    
-    https://dayflow-js.github.io/calendar/docs-zh/features/custom-detail-panel
-    
+  https://dayflow-js.github.io/calendar/docs/features/custom-detail-panel
 
 ---
 
@@ -220,8 +222,16 @@ DayFlow ships with a powerful built-in sidebar.
 You can:
 
 - Drag calendars from the sidebar to create events
+
+  ![Area](https://github.com/user-attachments/assets/938a9a8f-b995-4ea0-8fe3-fa25ca2be4b6)
+
 - Merge, delete, and recolor calendars
+
+  <img width="540" height="423" alt="image" src="https://github.com/user-attachments/assets/257a8671-e645-43fe-861e-613030f6c46e" />
+
 - Use preset colors or choose custom colors via a color picker
+
+  <img width="872" height="708" alt="image" src="https://github.com/user-attachments/assets/bfda7cde-281e-4c23-86d6-910b13e7bc63" />
 
 ```tsx
 const calendar = useCalendarApp({
@@ -235,22 +245,22 @@ const calendar = useCalendarApp({
     width: 280,
   },
 });
-
 ```
 
 ---
 
 ### `useSidebar` Configuration
 
-| Property | Type | Description | Default |
-| --- | --- | --- | --- |
-| `enabled` | `boolean` | Enable or disable the sidebar | `true` |
-| `width` | `number | string` | Sidebar width (e.g. `240` or `'20%'`) | `'240px'` |
-| `initialCollapsed` | `boolean` | Whether the sidebar is collapsed by default | `false` |
-| `render` | `(props: CalendarSidebarRenderProps) => ReactNode` | Fully custom sidebar UI | — |
-| `createCalendarMode` | `'inline' | 'modal'` | Calendar creation mode | `'inline'` |
-| `renderCalendarContextMenu` | `(calendar, onClose) => ReactNode` | Custom right-click menu | — |
-| `renderCreateCalendarDialog` | `(props) => ReactNode` | Custom calendar creation dialog (modal mode) | — |
+| Property                     | Type                                                               | Description                                                                                 | Default    |
+|------------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------|------------|
+| `enabled`                    | `boolean`                                                          | Whether the sidebar is enabled.                                                             | `true`     |
+| `width`                      | `number \| string`                                                 | Width of the sidebar (e.g., `240` or `'20%'`).                                              | `'240px'`  |
+| `initialCollapsed`           | `boolean`                                                          | Whether the sidebar is collapsed by default.                                                | `false`    |
+| `render`                     | `(props: CalendarSidebarRenderProps) => React.ReactNode`           | Full override for the sidebar UI.                                                           | -          |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                              | Mode for creating new calendars: `inline` (direct edit in list) or `modal` (pop-up dialog). | `'inline'` |
+| `renderCalendarContextMenu`  | `(calendar: CalendarType, onClose: () => void) => React.ReactNode` | Custom renderer for the right-click context menu on calendar items.                         | -          |
+| `renderCreateCalendarDialog` | `(props: CreateCalendarDialogProps) => React.ReactNode`            | Custom renderer for the calendar creation dialog (used in `modal` mode).                    | -          |
+
 
 ---
 
@@ -320,7 +330,6 @@ const calendar = useCalendarApp({
     render: props => <CustomSidebar {...props} />,
   },
 });
-
 ```
 
 ---
@@ -329,21 +338,22 @@ const calendar = useCalendarApp({
 
 DayFlow Calendar natively supports full dark mode across views, sidebar, event cards, and dialogs.
 
+<img width="1103" height="729" alt="image" src="https://github.com/user-attachments/assets/03c542d4-4b1b-4b99-9590-08c7be7f85df" />
+
 You can switch between **light**, **dark**, or **auto** (follows system preference).
 
 ```tsx
 import { DayFlowCalendar, useCalendarApp } from '@dayflow/core';
- 
+
 function MyCalendar() {
   const calendar = useCalendarApp({
     theme: {
       mode: 'dark', // 'light' | 'dark' | 'auto'
     },
   });
- 
+
   return <DayFlowCalendar calendar={calendar} />;
 }
-
 ```
 
 ---
@@ -355,7 +365,12 @@ The `switcherMode` option controls how the view switcher in the header is render
 DayFlow provides two built-in modes:
 
 - **`buttons`**: Horizontal button tabs (default, ideal for desktop)
+
+<img width="2190" height="406" alt="image" src="https://github.com/user-attachments/assets/a4be37bc-90ac-4872-afa0-589e3d1f7e9b" />
+
 - **`select`**: Dropdown menu (space-saving, mobile-friendly)
+
+<img width="2186" height="420" alt="image" src="https://github.com/user-attachments/assets/28e321ae-6c56-441a-a9fc-ddcfa504c920" />
 
 ---
 

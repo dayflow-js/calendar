@@ -13,7 +13,8 @@ import {
   ja,
   ko,
   zh,
-  fr
+  fr,
+  ViewType
 } from '../../src';
 import { Sun, Moon } from 'lucide-react';
 import { generateSampleEvents } from '../../website/utils/sampleData';
@@ -34,6 +35,7 @@ const DefaultCalendarExample: React.FC = () => {
     calendars: getWebsiteCalendars(),
     defaultCalendar: 'work',
     plugins: [dragPlugin],
+    defaultView: ViewType.MONTH,
     // locale: zh, // ja | ko | fr
     theme: { mode: 'auto' },
     useSidebar: {
