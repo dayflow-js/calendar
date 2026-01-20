@@ -6,9 +6,6 @@ node_modules
 # Testing
 coverage
 
-# Examples (local playgrounds; not part of the package)
-examples/
-
 # Next.js
 website/.next
 website/out
