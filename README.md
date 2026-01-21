@@ -28,6 +28,12 @@ views, and plugin architecture.
 |-------------------------------------|--------------------------------------|
 | ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
 
+### 🎯 Easy to resize and drag
+https://github.com/user-attachments/assets/726a5232-35a8-4fe3-8e7b-4de07c455353
+
+https://github.com/user-attachments/assets/957317e5-02d8-4419-a74b-62b7d191e347
+
+
 ## Quick Start
 
 Official website:
