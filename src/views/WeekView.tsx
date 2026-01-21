@@ -49,7 +49,6 @@ interface WeekViewProps {
   customDetailPanelContent?: EventDetailContentRenderer; // Custom event detail content
   customEventDetailDialog?: EventDetailDialogRenderer; // Custom event detail dialog
   calendarRef: React.RefObject<HTMLDivElement>; // The DOM reference of the entire calendar passed from CalendarRenderer
-  switcherMode?: ViewSwitcherMode;
 }
 
 const WeekView: React.FC<WeekViewProps> = ({
@@ -57,7 +56,6 @@ const WeekView: React.FC<WeekViewProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
-  switcherMode = 'buttons',
 }) => {
   const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
@@ -88,10 +86,15 @@ const WeekView: React.FC<WeekViewProps> = ({
   );
 
   // Sync highlighted event from app state
+  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+
   useEffect(() => {
     if (app.state.highlightedEventId) {
       setSelectedEventId(app.state.highlightedEventId);
+    } else if (prevHighlightedEventId.current) {
+      setSelectedEventId(null);
     }
+    prevHighlightedEventId.current = app.state.highlightedEventId;
   }, [app.state.highlightedEventId]);
 
   // Get configuration constants
@@ -460,7 +463,6 @@ const WeekView: React.FC<WeekViewProps> = ({
         calendar={app}
         viewType={ViewType.WEEK}
         currentDate={currentDate}
-        switcherMode={switcherMode}
         onPrevious={() => app.goToPrevious()}
         onNext={() => app.goToNext()}
         onToday={() => app.goToToday()}

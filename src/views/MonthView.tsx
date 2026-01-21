@@ -32,7 +32,6 @@ interface MonthViewProps {
   customDetailPanelContent?: EventDetailContentRenderer; // Custom event detail content
   customEventDetailDialog?: EventDetailDialogRenderer; // Custom event detail dialog
   calendarRef: React.RefObject<HTMLDivElement>; // The DOM reference of the entire calendar passed from CalendarRenderer
-  switcherMode?: ViewSwitcherMode;
 }
 
 const MonthView: React.FC<MonthViewProps> = ({
@@ -40,7 +39,6 @@ const MonthView: React.FC<MonthViewProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
-  switcherMode = 'buttons',
 }) => {
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
@@ -156,10 +154,16 @@ const MonthView: React.FC<MonthViewProps> = ({
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   // Sync highlighted event from app state
+  const prevHighlightedEventId = useRef(app.state.highlightedEventId);
+
   useEffect(() => {
     if (app.state.highlightedEventId) {
       setSelectedEventId(app.state.highlightedEventId);
+    } else if (prevHighlightedEventId.current) {
+      // Only clear if previously had a highlighted event
+      setSelectedEventId(null);
     }
+    prevHighlightedEventId.current = app.state.highlightedEventId;
   }, [app.state.highlightedEventId]);
 
   // Detail panel event ID, used to control displaying only one detail panel
@@ -427,7 +431,6 @@ const MonthView: React.FC<MonthViewProps> = ({
           app.goToToday();
           handleToday();
         }}
-        switcherMode={switcherMode}
       />
 
       <div className={weekHeaderRow}>

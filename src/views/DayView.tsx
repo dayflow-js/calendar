@@ -39,13 +39,6 @@ import {
   currentTimeLabel,
   currentTimeLineBar,
   miniCalendarContainer,
-  miniCalendarGrid,
-  miniCalendarDayHeader,
-  miniCalendarDay,
-  miniCalendarCurrentMonth,
-  miniCalendarOtherMonth,
-  miniCalendarToday,
-  miniCalendarSelected,
   bgGray50,
   flexCol,
   p2,
@@ -85,14 +78,21 @@ const DayView: React.FC<DayViewProps> = ({
   );
 
   // Sync highlighted event from app state
+  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+
   useEffect(() => {
     if (app.state.highlightedEventId) {
-      const event = events.find(e => e.id === app.state.highlightedEventId);
+      const currentEvents = app.getEvents();
+      const event = currentEvents.find(e => e.id === app.state.highlightedEventId);
       if (event) {
         setSelectedEvent(event);
       }
+    } else if (prevHighlightedEventId.current) {
+      // Only clear if previously had a highlighted event
+      setSelectedEvent(null);
     }
-  }, [app.state.highlightedEventId, events]);
+    prevHighlightedEventId.current = app.state.highlightedEventId;
+  }, [app.state.highlightedEventId]);
 
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
@@ -378,7 +378,6 @@ const DayView: React.FC<DayViewProps> = ({
             calendar={app}
             viewType={ViewType.DAY}
             currentDate={currentDate}
-            switcherMode={switcherMode}
             customSubtitle={currentDate.toLocaleDateString(locale, {
               weekday: 'long',
             })}
@@ -595,7 +594,7 @@ const DayView: React.FC<DayViewProps> = ({
       </div>
       {/* Right control panel - 30% */}
       <div
-        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[40%]'} w-[30%] bg-white dark:bg-gray-900`}
+        className={`flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
       >
         <div className={`${flexCol} h-full`}>
           {/* Mini calendar */}
@@ -610,9 +609,6 @@ const DayView: React.FC<DayViewProps> = ({
                     <h1 className={headerTitle}>&nbsp;</h1>
                   </div>
                 </div>
-                {switcherMode === 'select' ? (
-                  <ViewSwitcher mode={switcherMode} calendar={app} />
-                ) : null}
                 <TodayBox
                   handlePreviousMonth={() => app.goToPrevious()}
                   handleNextMonth={() => app.goToNext()}

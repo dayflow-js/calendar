@@ -38,9 +38,6 @@ interface ViewHeaderProps {
   nextYear?: number | null;
   /** Offset for the next year coming from below (in pixels) */
   nextYearOffset?: number;
-  // TODO(remove): Kept for compatibility but not used for rendering switcher anymore
-  switcherMode?: any;
-  onToggleSidebar?: any;
 }
 
 const ViewHeader: React.FC<ViewHeaderProps> = ({

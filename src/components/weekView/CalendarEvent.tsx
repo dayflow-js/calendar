@@ -220,8 +220,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       opacity: isBeingDragged ? 0.3 : 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
       // TODO(DayView bug)
-      transform: isDayView ? null : (isPopping ? 'scale(1.12)' : undefined),
-      transition: isDayView ? null : 'transform 0.1s ease-in-out',
+      transform: isPopping ? 'scale(1.12)' : undefined,
+      transition: 'transform 0.1s ease-in-out',
     };
 
     if (isEventSelected && showDetailPanel) {
@@ -1000,15 +1000,36 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     detailPanelKey,
   ]);
 
+  const lastPoppedHighlightId = useRef<string | null>(null);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isEventSelected && app?.state.highlightedEventId === event.id) {
-      scrollEventToCenter().then(() => {
-        setIsPopping(true);
-        timer = setTimeout(() => setIsPopping(false), 150);
-      });
+    let isActive = true;
+
+    const currentHighlightId = app?.state.highlightedEventId;
+    const shouldPop = isEventSelected && currentHighlightId === event.id;
+
+    if (shouldPop) {
+      if (lastPoppedHighlightId.current !== currentHighlightId) {
+        lastPoppedHighlightId.current = currentHighlightId;
+        scrollEventToCenter().then(() => {
+          if (!isActive) return;
+          setIsPopping(true);
+          timer = setTimeout(() => {
+            if (isActive) setIsPopping(false);
+          }, 150);
+        });
+      }
+    } else {
+      setIsPopping(false);
     }
+
+    if (currentHighlightId !== event.id) {
+      lastPoppedHighlightId.current = null;
+    }
+
     return () => {
+      isActive = false;
       if (timer) clearTimeout(timer);
     };
   }, [isEventSelected, app?.state.highlightedEventId, event.id]);
