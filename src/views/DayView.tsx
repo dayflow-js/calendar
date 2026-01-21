@@ -370,7 +370,7 @@ const DayView: React.FC<DayViewProps> = ({
     <div className={`flex h-full ${bgGray50}`}>
       {/* Left time axis area - 70% */}
       <div
-        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
+        className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full md:w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
       >
         <div className={`relative ${flexCol} h-full`}>
           {/* Fixed navigation bar */}
@@ -594,7 +594,7 @@ const DayView: React.FC<DayViewProps> = ({
       </div>
       {/* Right control panel - 30% */}
       <div
-        className={`flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
+        className={`hidden md:block flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
       >
         <div className={`${flexCol} h-full`}>
           {/* Mini calendar */}
