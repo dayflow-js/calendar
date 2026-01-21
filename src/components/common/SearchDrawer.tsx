@@ -1,13 +1,6 @@
-import React, { useMemo } from 'react';
-import { Loader2 } from 'lucide-react';
+import React from 'react';
+import SearchResultsList from './SearchResultsList';
 import { CalendarSearchEvent } from '../../types/search';
-import { useLocale } from '../../locale/useLocale';
-import {
-  groupSearchResults,
-  getSearchHeaderInfo,
-  getDateObj,
-  normalizeDate
-} from '../../utils/searchUtils';
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -28,127 +21,23 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({
   onResultClick,
   emptyText,
 }) => {
-  const { t, locale } = useLocale();
-
-  const today = useMemo(() => normalizeDate(new Date()), []);
-
-  // Group events by date (sorted)
-  const groupedEvents = useMemo(() => {
-    return groupSearchResults(results, today);
-  }, [results, today]);
-
-  // Helper to get time string
-  const getTime = (d: any) => {
-    return getDateObj(d);
-  };
-
-  const getEmptyText = () => {
-    if (typeof emptyText === 'string') return emptyText;
-    if (emptyText && typeof emptyText === 'object') {
-      return emptyText[locale] || emptyText['en'] || 'No results found';
-    }
-    return t('noResults') || 'No results found';
-  };
-
   return (
     <div
-      className={`relative h-full bg-white dark:bg-gray-900 transition-all duration-300 ease-in-out flex flex-col border-l border-gray-200 dark:border-gray-700 overflow-hidden ${isOpen ? 'w-64' : 'w-0 border-l-0'
+      className={`hidden md:flex relative h-full bg-white dark:bg-gray-900 transition-all duration-300 ease-in-out flex-col border-l border-gray-200 dark:border-gray-700 overflow-hidden ${isOpen ? 'w-64' : 'w-0 border-l-0'
         }`}
     >
       {/* Content */}
       <div className="flex-1 overflow-y-auto min-w-64">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center h-40 text-gray-500">
-            <Loader2 className="w-8 h-8 animate-spin mb-2" />
-            <span>Loading...</span>
-          </div>
-        ) : results.length === 0 ? (
-          keyword ? (
-            <div className="flex flex-col items-center justify-center h-40 text-gray-500">
-              <SearchIconPlaceholder />
-              <span className="mt-2 text-sm">{getEmptyText()}</span>
-            </div>
-          ) : null
-        ) : (
-          <div className="space-y-6">
-            {groupedEvents.map((group) => {
-              const { title, colorClass } = getSearchHeaderInfo(group.date, today, locale, t);
-
-              return (
-                <div key={group.date.getTime()}>
-                  <h3 className={`p-2 text-sm font-medium mb-2 sticky top-0 bg-white dark:bg-gray-900 py-1 z-10 ${colorClass} border-b border-gray-200 dark:border-gray-700`}>
-                    {title}
-                  </h3>
-                  <div className="flex flex-col">
-                    {group.events.map((event) => {
-                      const start = getTime(event.start);
-                      const end = getTime(event.end);
-
-                      const timeOpt: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
-                      const startTimeStr = event.allDay
-                        ? (t('allDay') || 'All Day')
-                        : start.toLocaleTimeString(locale, timeOpt);
-                      const endTimeStr = event.allDay
-                        ? ''
-                        : end.toLocaleTimeString(locale, timeOpt);
-
-                      return (
-                        <React.Fragment key={event.id}>
-                          <div
-                            className="p-2 mx-2 mb-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group"
-                            onClick={() => onResultClick?.(event)}
-                          >
-                            <div className="flex items-stretch gap-3">
-                              <div
-                                className="w-1 rounded-full shrink-0"
-                                style={{ backgroundColor: event.color || '#3b82f6' }}
-                              />
-                              <div className="flex-1 min-w-0 flex justify-between items-start">
-                                <div className="font-medium text-black dark:text-white truncate pr-2 text-sm">
-                                  {event.title}
-                                </div>
-                                <div className="text-xs flex flex-col items-end shrink-0 leading-tight">
-                                  <div className="text-black dark:text-white">
-                                    {startTimeStr}
-                                  </div>
-                                  {endTimeStr && (
-                                    <div className="text-gray-500 dark:text-gray-400">
-                                      {endTimeStr}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="mx-2 border-b border-gray-200 dark:border-gray-700" />
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <SearchResultsList
+          loading={loading}
+          results={results}
+          keyword={keyword}
+          onResultClick={onResultClick}
+          emptyText={emptyText}
+        />
       </div>
     </div>
   );
 };
-
-const SearchIconPlaceholder = () => (
-  <svg
-    className="w-12 h-12 text-gray-300 dark:text-gray-600"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1}
-      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-    />
-  </svg>
-);
 
 export default SearchDrawer;

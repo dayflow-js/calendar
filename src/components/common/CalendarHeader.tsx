@@ -9,6 +9,8 @@ interface CalendarHeaderProps {
   switcherMode?: ViewSwitcherMode;
   onAddCalendar?: () => void;
   onSearchChange?: (value: string) => void;
+  /** Triggered when search icon is clicked (typically on mobile) */
+  onSearchClick?: () => void;
   searchValue?: string;
   isSearchOpen?: boolean;
 }
@@ -25,6 +27,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   switcherMode = 'buttons',
   onAddCalendar,
   onSearchChange,
+  onSearchClick,
   searchValue = '',
   isSearchOpen = false,
 }) => {
@@ -43,7 +46,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={`flex items-center justify-between px-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${(isDayView || isSearchOpen) ? 'border-gray-200 dark:border-gray-700' : 'border-transparent'
       }`}>
       {/* Left Section: Add Calendar Button Only */}
-      <div className="flex items-center min-w-50 mb-1">
+      <div className="flex items-center mb-1">
         {onAddCalendar && (
           <button
             onClick={onAddCalendar}
@@ -66,7 +69,16 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       {!isSwitcherCentered && (
         <ViewSwitcher mode={switcherMode} calendar={calendar} />
       )}
-      <div className="flex items-center justify-end gap-3 min-w-50 pb-1 h-6">
+      <div className="flex items-center justify-end gap-3 m pb-1 h-6">
+        {/* Mobile Search Icon */}
+        <button
+          onClick={onSearchClick}
+          className="md:hidden flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <SearchIcon />
+        </button>
+
+        {/* Desktop Search Bar */}
         <div className="relative hidden md:block group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span className="text-gray-400 group-focus-within:text-primary transition-colors">
