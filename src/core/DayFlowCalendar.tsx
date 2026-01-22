@@ -17,6 +17,7 @@ import DefaultEventDetailDialog from '../components/common/DefaultEventDetailDia
 import CalendarHeader from '../components/common/CalendarHeader';
 import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
 import SearchDrawer from '../components/common/SearchDrawer';
+import MobileSearchDialog from '../components/common/MobileSearchDialog';
 import { CalendarSearchProps, CalendarSearchEvent } from '../types/search';
 import { normalizeCssWidth } from '../utils/styleUtils';
 import { ThemeProvider } from '../contexts/ThemeContext';
@@ -106,6 +107,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
   // Search State
   const [searchKeyword, setSearchKeyword] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<CalendarSearchEvent[]>([]);
 
@@ -203,6 +205,10 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
 
     // Highlight the event
     app.highlightEvent(event.id);
+
+    if (isMobileSearchOpen) {
+      setIsMobileSearchOpen(false);
+    }
 
     // TODO(mobile view)
   };
@@ -364,6 +370,10 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
             switcherMode={app.state.switcherMode}
             onAddCalendar={handleCreateCalendar}
             onSearchChange={setSearchKeyword}
+            onSearchClick={() => {
+              setSearchKeyword('');
+              setIsMobileSearchOpen(true);
+            }}
             searchValue={searchKeyword}
             isSearchOpen={isSearchOpen}
           />
@@ -388,6 +398,21 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
                 emptyText={searchConfig?.emptyText}
               />
             </div>
+
+            <MobileSearchDialog
+              isOpen={isMobileSearchOpen}
+              onClose={() => {
+                setIsMobileSearchOpen(false);
+                setSearchKeyword('');
+                app.highlightEvent(null);
+              }}
+              keyword={searchKeyword}
+              onSearchChange={setSearchKeyword}
+              results={searchResults}
+              loading={searchLoading}
+              onResultClick={handleSearchResultClick}
+              emptyText={searchConfig?.emptyText}
+            />
           </div>
         </div>
 

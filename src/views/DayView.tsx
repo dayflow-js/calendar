@@ -23,10 +23,10 @@ import { ViewType as DragViewType, WeekDayDragState } from '@/types';
 import { defaultDragConfig } from '@/core/config';
 import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import TodayBox from '@/components/common/TodayBox';
-import ViewSwitcher from '@/components/common/ViewSwitcher';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import {
   allDayRow,
   allDayLabel,
@@ -70,6 +70,8 @@ const DayView: React.FC<DayViewProps> = ({
 }) => {
   const events = app.getEvents();
   const { t, locale } = useLocale();
+  const { screenSize } = useResponsiveMonthConfig();
+  const isMobile = screenSize !== 'desktop';
 
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -313,6 +315,7 @@ const DayView: React.FC<DayViewProps> = ({
     events: currentDayEvents,
     calculateNewEventLayout,
     calculateDragLayout,
+    TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
   });
 
   // Use calendar drop functionality
@@ -384,7 +387,7 @@ const DayView: React.FC<DayViewProps> = ({
           />
           {/* All-day event area */}
           <div className={`${allDayRow} pt-px`} ref={allDayRowRef}>
-            <div className={allDayLabel}>{t('allDay')}</div>
+            <div className={`${allDayLabel} ${isMobile ? 'w-12 text-[10px]' : 'w-20'}`}>{t('allDay')}</div>
             <div className="flex flex-1 relative">
               <div
                 className="w-full relative"
@@ -435,6 +438,7 @@ const DayView: React.FC<DayViewProps> = ({
                       customDetailPanelContent={customDetailPanelContent}
                       customEventDetailDialog={customEventDetailDialog}
                       app={app}
+                      isMobile={isMobile}
                     />
                   ))}
               </div>
@@ -481,10 +485,10 @@ const DayView: React.FC<DayViewProps> = ({
                 })()}
 
               {/* Time column */}
-              <div className={timeColumn}>
+              <div className={`${timeColumn} ${isMobile ? 'w-12' : 'w-20'}`}>
                 {timeSlots.map((slot, slotIndex) => (
                   <div key={slotIndex} className={timeSlot}>
-                    <div className={timeLabel}>
+                    <div className={`${timeLabel} ${isMobile ? 'text-[10px]' : ''}`}>
                       {slotIndex === 0 ? '' : slot.label}
                     </div>
                   </div>
@@ -583,6 +587,7 @@ const DayView: React.FC<DayViewProps> = ({
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
                           app={app}
+                          isMobile={isMobile}
                         />
                       );
                     })}

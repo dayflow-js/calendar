@@ -4,6 +4,7 @@ import { Event } from './event';
 import { EventLayout } from './layout';
 import { ViewType } from './core';
 import { MonthDragState, WeekDayDragState } from './dragIndicator';
+import { DragConfig } from './config';
 
 /**
  * Events service interface
@@ -46,7 +47,7 @@ export interface EventsPluginConfig {
 /**
  * Drag Hook options
  */
-export interface DragHookOptions {
+export interface DragHookOptions extends Partial<DragConfig> {
   calendarRef: React.RefObject<HTMLDivElement | null>;
   allDayRowRef?: React.RefObject<HTMLDivElement | null>;
   viewType: ViewType;

@@ -177,6 +177,17 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           _segmentInfo: multiDaySegmentInfo
         };
         onMoveStart(syntheticEvent, adjustedEvent as Event);
+      } else if (isMultiDay && segment) {
+        const adjustedEvent = {
+          ...event,
+          day: segment.startDayIndex,
+          _segmentInfo: {
+            dayIndex: segment.startDayIndex,
+            isFirst: segment.isFirstSegment,
+            isLast: segment.isLastSegment
+          }
+        };
+        onMoveStart(syntheticEvent, adjustedEvent as Event);
       } else {
         onMoveStart(syntheticEvent, event);
       }
@@ -1465,6 +1476,18 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
               day: multiDaySegmentInfo.dayIndex ?? event.day,
               // To calculate dragging, we need to store segment information
               _segmentInfo: multiDaySegmentInfo
+            };
+            onMoveStart(e, adjustedEvent as Event);
+          } else if (isMultiDay && segment) {
+            // Handle MultiDayEventSegment (e.g. WeekView all-day events)
+            const adjustedEvent = {
+              ...event,
+              day: segment.startDayIndex,
+              _segmentInfo: {
+                dayIndex: segment.startDayIndex,
+                isFirst: segment.isFirstSegment,
+                isLast: segment.isLastSegment
+              }
             };
             onMoveStart(e, adjustedEvent as Event);
           } else {

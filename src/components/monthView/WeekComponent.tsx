@@ -311,9 +311,18 @@ const WeekComponent = React.memo<WeekComponentProps>(
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Dynamically determine how many events can be shown based on the current week height
-    const maxEventsToShow = useMemo(() => {
-      return calculateMaxEventsToShow(weekHeight);
+    // Calculate layout parameters once per week render
+    const layoutParams = useMemo(() => {
+      const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET;
+      if (availableHeight <= 0) return { maxSlots: 0, maxSlotsWithMore: 0 };
+
+      const hardCap = 4;
+      const maxSlots = Math.min(hardCap, Math.floor(availableHeight / ROW_SPACING));
+
+      const spaceForMore = availableHeight - MORE_TEXT_HEIGHT;
+      const maxSlotsWithMore = Math.min(hardCap, Math.max(0, Math.floor(spaceForMore / ROW_SPACING)));
+
+      return { maxSlots, maxSlotsWithMore };
     }, [weekHeight]);
 
     useEffect(() => {
@@ -438,8 +447,18 @@ const WeekComponent = React.memo<WeekComponentProps>(
         day.year === currentYear;
       const dayEvents = getEventsForDay(day.date);
       const sortedEvents = sortDayEvents(dayEvents);
-      const displayEvents = sortedEvents.slice(0, maxEventsToShow);
-      const hiddenEventsCount = sortedEvents.length - displayEvents.length;
+
+      const totalEvents = sortedEvents.length;
+      let displayCount = 0;
+
+      if (totalEvents <= layoutParams.maxSlots) {
+        displayCount = totalEvents;
+      } else {
+        displayCount = layoutParams.maxSlotsWithMore;
+      }
+
+      const displayEvents = sortedEvents.slice(0, displayCount);
+      const hiddenEventsCount = totalEvents - displayCount;
       const hasMoreEvents = hiddenEventsCount > 0;
 
       // Create render array and layer array
@@ -559,7 +578,9 @@ const WeekComponent = React.memo<WeekComponentProps>(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline"
+                className={`text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline ${
+                  screenSize === 'mobile' ? 'text-center font-medium' : ''
+                }`}
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {
@@ -570,7 +591,9 @@ const WeekComponent = React.memo<WeekComponentProps>(
                   }
                 }}
               >
-                +{hiddenEventsCount} {t('more')}
+                {screenSize === 'mobile'
+                  ? `+${hiddenEventsCount}`
+                  : `+${hiddenEventsCount} ${t('more')}`}
               </div>
             )}
           </div>

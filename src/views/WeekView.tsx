@@ -20,10 +20,11 @@ import { EventLayoutCalculator } from '@/components/EventLayout';
 import { useDragForView } from '@/plugins/dragPlugin';
 import { ViewType as DragViewType, WeekDayDragState } from '@/types';
 import { defaultDragConfig } from '@/core/config';
-import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
+import ViewHeader from '@/components/common/ViewHeader';
 import { analyzeMultiDayEventsForWeek, analyzeMultiDayRegularEvent } from '@/components/monthView/util';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import {
   calendarContainer,
   weekDayHeader,
@@ -60,6 +61,8 @@ const WeekView: React.FC<WeekViewProps> = ({
   const { t, getWeekDaysLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const events = app.getEvents();
+  const { screenSize } = useResponsiveMonthConfig();
+  const isMobile = screenSize !== 'desktop';
 
   // Utility function: Get week start time
   const getWeekStart = (date: Date): Date => {
@@ -392,6 +395,7 @@ const WeekView: React.FC<WeekViewProps> = ({
     events: currentWeekEvents,
     calculateNewEventLayout,
     calculateDragLayout,
+    TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
   });
 
   // Use calendar drop functionality
@@ -470,11 +474,11 @@ const WeekView: React.FC<WeekViewProps> = ({
 
       {/* Weekday titles */}
       <div className={weekDayHeader}>
-        <div className="w-20 p-2"></div>
+        <div className={isMobile ? 'w-12' : 'w-20'}></div>
         {weekDaysLabels.map((day, i) => (
           <div key={i} className={weekDayCell}>
             <div className="inline-flex items-center justify-center text-sm mt-1 mr-1">
-              {day}
+              {isMobile ? day.charAt(0) : day}
             </div>
             <div className={`${dateNumber} ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
               {weekDates[i].date}
@@ -485,7 +489,7 @@ const WeekView: React.FC<WeekViewProps> = ({
 
       {/* All-day event area */}
       <div className={allDayRow} ref={allDayRowRef}>
-        <div className={allDayLabel}>{allDayLabelText}</div>
+        <div className={`${allDayLabel} ${isMobile ? 'w-12 text-[10px]' : 'w-20'}`}>{allDayLabelText}</div>
         <div
           className={allDayContent}
           style={{ minHeight: `${allDayAreaHeight}px` }}
@@ -544,6 +548,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                 customDetailPanelContent={customDetailPanelContent}
                 customEventDetailDialog={customEventDetailDialog}
                 app={app}
+                isMobile={isMobile}
               />
             ))}
           </div>
@@ -608,10 +613,10 @@ const WeekView: React.FC<WeekViewProps> = ({
             })()}
 
           {/* Time column */}
-          <div className={timeColumn}>
+          <div className={`${timeColumn} ${isMobile ? 'w-12' : 'w-20'}`}>
             {timeSlots.map((slot, slotIndex) => (
               <div key={slotIndex} className={timeSlot}>
-                <div className={timeLabel}>
+                <div className={`${timeLabel} ${isMobile ? 'text-[10px]' : ''}`}>
                   {slotIndex === 0 ? '' : slot.label}
                 </div>
               </div>
@@ -734,6 +739,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                         customEventDetailDialog={customEventDetailDialog}
                         multiDaySegmentInfo={segmentInfo}
                         app={app}
+                        isMobile={isMobile}
                       />
                     );
                   })}

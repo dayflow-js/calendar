@@ -9,13 +9,12 @@ import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
 } from '@/types';
-import { VirtualWeekItem } from '@/types/monthView';
 import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
 } from '@/hooks/virtualScroll';
 import { useDragForView } from '@/plugins/dragPlugin';
-import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
+import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { temporalToDate } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
@@ -279,7 +278,8 @@ const MonthView: React.FC<MonthViewProps> = ({
       }
     },
     initialWeeksToLoad: 156,
-    locale: locale
+    locale: locale,
+    isEnabled: isWeekHeightInitialized
   });
 
   const previousStartIndexRef = useRef(0);
