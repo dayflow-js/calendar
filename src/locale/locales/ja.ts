@@ -52,6 +52,12 @@ const ja: Locale = {
     notesPlaceholder: 'メモ',
     editEvent: '予定を編集',
     done: '完了',
+    quickCreateEvent: 'クイック作成',
+    quickCreatePlaceholder: 'タイトル',
+    noSuggestions: '入力して作成',
+    newCalendar: '新しいカレンダー',
+    refreshAll: 'すべて更新',
+    tomorrow: '明日',
   }
 };
 

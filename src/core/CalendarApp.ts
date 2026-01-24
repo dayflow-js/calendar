@@ -70,6 +70,7 @@ export class CalendarApp implements ICalendarApp {
   private sidebarConfig: SidebarConfig;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
+  private useCalendarHeader: boolean | ((props: any) => React.ReactNode);
   private customMobileEventRenderer?: MobileEventRenderer;
   private themeChangeListeners: Set<(theme: ThemeMode) => void>;
 
@@ -103,6 +104,7 @@ export class CalendarApp implements ICalendarApp {
     const current = this.state.currentDate;
     this.visibleMonth = new Date(current.getFullYear(), current.getMonth(), 1);
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
+    this.useCalendarHeader = config.useCalendarHeader ?? true;
     this.customMobileEventRenderer = config.customMobileEventRenderer;
 
     // Register views
@@ -358,6 +360,10 @@ export class CalendarApp implements ICalendarApp {
     return this.sidebarConfig;
   };
 
+  getCalendarHeaderConfig = (): boolean | ((props: any) => React.ReactNode) => {
+    return this.useCalendarHeader;
+  };
+
   // Plugin management
   private installPlugin = (plugin: CalendarPlugin): void => {
     if (this.state.plugins.has(plugin.name)) {
@@ -437,6 +443,9 @@ export class CalendarApp implements ICalendarApp {
     }
     if (config.useEventDetailDialog !== undefined) {
       this.useEventDetailDialog = config.useEventDetailDialog;
+    }
+    if (config.useCalendarHeader !== undefined) {
+      this.useCalendarHeader = config.useCalendarHeader;
     }
     // Add other config updates here if needed
     

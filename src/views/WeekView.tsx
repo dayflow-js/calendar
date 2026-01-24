@@ -95,18 +95,6 @@ const WeekView: React.FC<WeekViewProps> = ({
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
   const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Sync highlighted event from app state
-  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
-
-  useEffect(() => {
-    if (app.state.highlightedEventId) {
-      setSelectedEventId(app.state.highlightedEventId);
-    } else if (prevHighlightedEventId.current) {
-      setSelectedEventId(null);
-    }
-    prevHighlightedEventId.current = app.state.highlightedEventId;
-  }, [app.state.highlightedEventId]);
-
   // Get configuration constants
   const {
     HOUR_HEIGHT,
@@ -151,6 +139,44 @@ const WeekView: React.FC<WeekViewProps> = ({
       };
     });
   }, [events, currentWeekStart]);
+
+  // Sync highlighted event from app state
+  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      setSelectedEventId(app.state.highlightedEventId);
+
+      // Auto scroll to highlighted event
+      const highlightedEvent = currentWeekEvents.find(
+        e => e.id === app.state.highlightedEventId
+      );
+      if (highlightedEvent && !highlightedEvent.allDay) {
+        const startHour = extractHourFromDate(highlightedEvent.start);
+        const scrollContainer =
+          calendarRef.current?.querySelector('.calendar-content');
+        if (scrollContainer) {
+          const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
+          // Scroll with some padding using requestAnimationFrame for smoother performance
+          requestAnimationFrame(() => {
+            scrollContainer.scrollTo({
+              top: Math.max(0, top - 100),
+              behavior: 'smooth',
+            });
+          });
+        }
+      }
+    } else if (prevHighlightedEventId.current) {
+      setSelectedEventId(null);
+    }
+    prevHighlightedEventId.current = app.state.highlightedEventId;
+  }, [
+    app.state.highlightedEventId,
+    currentWeekEvents,
+    FIRST_HOUR,
+    HOUR_HEIGHT,
+    calendarRef,
+  ]);
 
   // Analyze multi-day all-day events
   const multiDaySegments = useMemo(

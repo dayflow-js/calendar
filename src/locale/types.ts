@@ -49,7 +49,13 @@ export type TranslationKey =
   | 'titlePlaceholder'
   | 'notesPlaceholder'
   | 'editEvent'
-  | 'done';
+  | 'done'
+  | 'quickCreateEvent'
+  | 'quickCreatePlaceholder'
+  | 'noSuggestions'
+  | 'newCalendar'
+  | 'refreshAll'
+  | 'tomorrow';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

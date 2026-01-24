@@ -157,29 +157,6 @@ export const CalendarList: React.FC<CalendarListProps> = ({
     }
   }, [editingId]);
 
-  // If a new calendar is created (editingId is set externally but we don't have editingName set yet),
-  // we might want to sync. But usually the parent sets editingId after creation.
-  // We need to ensure when editingId changes from null to something, we initialize editingName.
-  // Actually, parent might pass a new ID.
-
-  // Let's use an effect to sync editingName when editingId changes?
-  // Or just rely on handleRenameStart.
-  // But for "Create Calendar", the parent sets editingId directly.
-  // The parent also needs to tell us the initial name if it's new.
-  // But in the original code:
-  // app.createCalendar(newCalendar);
-  // setEditingCalendarId(newId);
-  // setEditingName('Untitled');
-
-  // So the parent should probably control the editing state entirely or we provide a way to start editing a specific ID.
-  // I added `editingId` and `setEditingId` to props.
-  // But `editingName` is local. This might be an issue if the parent wants to set the initial name.
-  // In the original code, `setEditingName` was also in the main component.
-
-  // To support the "Create Calendar" flow correctly where it auto-focuses 'Untitled':
-  // We can add a useEffect to check if editingId changed and matches a calendar, then set name?
-  // But if it's a new calendar, we might want to set 'Untitled' or whatever the calendar has.
-
   useEffect(() => {
     if (editingId) {
       const calendar = calendars.find(c => c.id === editingId);
@@ -255,7 +232,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
                     />
                   ) : (
                     <span
-                      className="flex-1 truncate text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white ml-2"
+                      className="flex-1 pl-1 truncate text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white ml-2"
                       onDoubleClick={() => handleRenameStart(calendar)}
                     >
                       {calendar.name || calendar.id}

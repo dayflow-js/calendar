@@ -497,6 +497,11 @@ const WeekComponent = React.memo<WeekComponentProps>(
               event={event}
               isAllDay={!!event.allDay}
               isMonthView={true}
+              isBeingDragged={
+                isDragging &&
+                dragState.eventId === event.id &&
+                dragState.mode === 'move'
+              }
               calendarRef={calendarRef}
               hourHeight={72}
               firstHour={0}
@@ -504,16 +509,11 @@ const WeekComponent = React.memo<WeekComponentProps>(
               onEventDelete={onEventDelete}
               onMoveStart={onMoveStart}
               onResizeStart={onResizeStart}
-              isBeingDragged={
-                isDragging &&
-                dragState.eventId === event.id &&
-                dragState.mode === 'move'
-              }
-              newlyCreatedEventId={newlyCreatedEventId}
               onDetailPanelOpen={onDetailPanelOpen}
-              selectedEventId={selectedEventId}
               onEventSelect={onEventSelect}
               onEventLongPress={onEventLongPress}
+              newlyCreatedEventId={newlyCreatedEventId}
+              selectedEventId={selectedEventId}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={onDetailPanelToggle}
               customDetailPanelContent={customDetailPanelContent}
@@ -614,9 +614,8 @@ const WeekComponent = React.memo<WeekComponentProps>(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className={`text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline ${
-                  screenSize === 'mobile' ? 'text-center font-medium' : ''
-                }`}
+                className={`text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline ${screenSize === 'mobile' ? 'text-center font-medium' : ''
+                  }`}
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {

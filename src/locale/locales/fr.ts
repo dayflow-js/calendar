@@ -52,6 +52,12 @@ const fr: Locale = {
     notesPlaceholder: 'Notes',
     editEvent: 'Modifier l\'événement',
     done: 'Terminé',
+    quickCreateEvent: 'Création rapide',
+    quickCreatePlaceholder: 'Titre',
+    noSuggestions: 'Tapez pour créer',
+    newCalendar: 'Nouveau calendrier',
+    refreshAll: 'Tout actualiser',
+    tomorrow: 'Demain',
   }
 };
 

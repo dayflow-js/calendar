@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { CalendarApp } from '@/core';
 import {
   formatTime,
@@ -82,23 +82,6 @@ const DayView: React.FC<DayViewProps> = ({
     null
   );
 
-  // Sync highlighted event from app state
-  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
-
-  useEffect(() => {
-    if (app.state.highlightedEventId) {
-      const currentEvents = app.getEvents();
-      const event = currentEvents.find(e => e.id === app.state.highlightedEventId);
-      if (event) {
-        setSelectedEvent(event);
-      }
-    } else if (prevHighlightedEventId.current) {
-      // Only clear if previously had a highlighted event
-      setSelectedEvent(null);
-    }
-    prevHighlightedEventId.current = app.state.highlightedEventId;
-  }, [app.state.highlightedEventId]);
-
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
@@ -113,7 +96,7 @@ const DayView: React.FC<DayViewProps> = ({
   const visibleMonthIndex = visibleMonthDate.getMonth();
   // Visible Month State
   const [visibleMonth, setVisibleMonth] = useState(currentDate);
-  const prevDateRef = React.useRef(currentDate.getTime());
+  const prevDateRef = useRef(currentDate.getTime());
 
   if (currentDate.getTime() !== prevDateRef.current) {
     prevDateRef.current = currentDate.getTime();
@@ -144,6 +127,48 @@ const DayView: React.FC<DayViewProps> = ({
     TIME_COLUMN_WIDTH,
     ALL_DAY_HEIGHT,
   } = defaultDragConfig;
+
+  // Sync highlighted event from app state
+  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      const currentEvents = app.getEvents();
+      const event = currentEvents.find(
+        e => e.id === app.state.highlightedEventId
+      );
+      if (event) {
+        setSelectedEvent(event);
+
+        // Auto scroll to highlighted event
+        if (!event.allDay) {
+          const startHour = extractHourFromDate(event.start);
+          const scrollContainer =
+            calendarRef.current?.querySelector('.calendar-content');
+          if (scrollContainer) {
+            const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
+            // Scroll with some padding using requestAnimationFrame for smoother performance
+            requestAnimationFrame(() => {
+              scrollContainer.scrollTo({
+                top: Math.max(0, top - 100),
+                behavior: 'smooth',
+              });
+            });
+          }
+        }
+      }
+    } else if (prevHighlightedEventId.current) {
+      // Only clear if previously had a highlighted event
+      setSelectedEvent(null);
+    }
+    prevHighlightedEventId.current = app.state.highlightedEventId;
+  }, [
+    app.state.highlightedEventId,
+    FIRST_HOUR,
+    HOUR_HEIGHT,
+    calendarRef,
+    app,
+  ]);
 
   // References
   const allDayRowRef = React.useRef<HTMLDivElement>(null);
@@ -497,7 +522,8 @@ const DayView: React.FC<DayViewProps> = ({
                           setDraftEvent(evt);
                           setIsDrawerOpen(true);
                         } else {
-                          setSelectedEvent(evt || null);
+                          const e = events.find(e => e.id === eventId);
+                          setSelectedEvent(e || null);
                         }
                       }}
                       onEventLongPress={(eventId: string) => {
@@ -669,7 +695,8 @@ const DayView: React.FC<DayViewProps> = ({
                               setDraftEvent(evt);
                               setIsDrawerOpen(true);
                             } else {
-                              setSelectedEvent(evt || null);
+                              const e = events.find(e => e.id === eventId);
+                              setSelectedEvent(e || null);
                             }
                           }}
                           onEventLongPress={(eventId: string) => {

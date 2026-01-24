@@ -52,6 +52,12 @@ const ko: Locale = {
     notesPlaceholder: '메모',
     editEvent: '일정 편집',
     done: '완료',
+    quickCreateEvent: '빠른 일정 생성',
+    quickCreatePlaceholder: '제목',
+    noSuggestions: '입력하여 만들기',
+    newCalendar: '새 캘린더',
+    refreshAll: '모두 새로 고침',
+    tomorrow: '내일',
   }
 };
 

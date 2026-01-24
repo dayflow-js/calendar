@@ -27,6 +27,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   renderCalendarContextMenu,
   editingCalendarId: propEditingCalendarId,
   setEditingCalendarId: propSetEditingCalendarId,
+  onCreateCalendar,
 }) => {
   const { t } = useLocale();
   const visibleMonthDate = app.getVisibleMonth();
@@ -72,6 +73,12 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     calendarId: string;
   } | null>(null);
 
+  // Sidebar Context Menu State (Background)
+  const [sidebarContextMenu, setSidebarContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
   const [customColorPicker, setCustomColorPicker] = useState<{
     x: number;
     y: number;
@@ -91,15 +98,30 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
 
   const handleContextMenu = useCallback((e: React.MouseEvent, calendarId: string) => {
     e.preventDefault();
+    e.stopPropagation(); // Stop propagation to prevent sidebar context menu
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
       calendarId,
     });
+    setSidebarContextMenu(null);
+  }, []);
+
+  const handleSidebarContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setSidebarContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+    });
+    setContextMenu(null);
   }, []);
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenu(null);
+  }, []);
+
+  const handleCloseSidebarContextMenu = useCallback(() => {
+    setSidebarContextMenu(null);
   }, []);
 
   const handleDeleteCalendar = useCallback(() => {
@@ -177,7 +199,10 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   const deleteCalendarName = deleteState ? calendars.find(c => c.id === deleteState.calendarId)?.name || 'Unknown' : '';
 
   return (
-    <div className="flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900">
+    <div 
+      className="flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900"
+      onContextMenu={handleSidebarContextMenu}
+    >
       <SidebarHeader
         isCollapsed={isCollapsed}
         onCollapseToggle={() => setCollapsed(!isCollapsed)}
@@ -259,16 +284,44 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
         </ContextMenu>
       )}
 
-      {mergeState && (
+      {sidebarContextMenu && createPortal(
+        <ContextMenu
+          x={sidebarContextMenu.x}
+          y={sidebarContextMenu.y}
+          onClose={handleCloseSidebarContextMenu}
+          className="w-max p-2"
+        >
+          <ContextMenuItem
+            onClick={() => {
+              onCreateCalendar?.();
+              handleCloseSidebarContextMenu();
+            }}
+          >
+            {t('newCalendar') || 'New Calendar'}
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              app.triggerRender();
+              handleCloseSidebarContextMenu();
+            }}
+          >
+            {t('refreshAll') || 'Refresh All'}
+          </ContextMenuItem>
+        </ContextMenu>,
+        document.body
+      )}
+
+      {mergeState && createPortal(
         <MergeCalendarDialog
           sourceName={sourceCalendarName}
           targetName={targetCalendarName}
           onConfirm={handleMergeConfirm}
           onCancel={() => setMergeState(null)}
-        />
+        />,
+        document.body
       )}
 
-      {deleteState && (
+      {deleteState && createPortal(
         <DeleteCalendarDialog
           calendarId={deleteState.calendarId}
           calendarName={deleteCalendarName}
@@ -278,7 +331,8 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           onConfirmDelete={handleConfirmDelete}
           onCancel={() => setDeleteState(null)}
           onMergeSelect={handleDeleteMergeSelect}
-        />
+        />,
+        document.body
       )}
 
       {customColorPicker && createPortal(

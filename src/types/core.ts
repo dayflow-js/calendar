@@ -61,6 +61,17 @@ export interface CreateCalendarDialogProps {
   onCreate: (calendar: CalendarType) => void;
 }
 
+export interface CalendarHeaderProps {
+  calendar: CalendarApp;
+  switcherMode?: ViewSwitcherMode;
+  onAddCalendar?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onSearchChange?: (value: string) => void;
+  /** Triggered when search icon is clicked (typically on mobile) */
+  onSearchClick?: () => void;
+  searchValue?: string;
+  isSearchOpen?: boolean;
+}
+
 /**
  * Sidebar render props
  */
@@ -76,6 +87,7 @@ export interface CalendarSidebarRenderProps {
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => React.ReactNode;
   editingCalendarId?: string | null;
   setEditingCalendarId?: (id: string | null) => void;
+  onCreateCalendar?: () => void;
 }
 
 /**
@@ -108,6 +120,7 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useSidebar?: boolean | SidebarConfig;
   useEventDetailDialog?: boolean;
+  useCalendarHeader?: boolean | ((props: CalendarHeaderProps) => React.ReactNode);
   customMobileEventRenderer?: MobileEventRenderer;
   locale?: string | Locale;
 }
@@ -175,6 +188,9 @@ export interface CalendarApp {
 
   // Sidebar
   getSidebarConfig: () => SidebarConfig;
+
+  // Calendar Header
+  getCalendarHeaderConfig: () => boolean | ((props: CalendarHeaderProps) => React.ReactNode);
 
   // Trigger render callback
   triggerRender: () => void;
