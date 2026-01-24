@@ -24,6 +24,7 @@ import { defaultDragConfig } from '@/core/config';
 import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import TodayBox from '@/components/common/TodayBox';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
+import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
@@ -99,6 +100,10 @@ const DayView: React.FC<DayViewProps> = ({
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [draftEvent, setDraftEvent] = useState<Event | null>(null);
+  const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const currentDate = app.getCurrentDate();
   const visibleMonthDate = app.getVisibleMonth();
@@ -306,7 +311,12 @@ const DayView: React.FC<DayViewProps> = ({
       eventsToUpdate.forEach(event => app.updateEvent(event.id, event));
     },
     onEventCreate: (event: Event) => {
-      app.addEvent(event);
+      if (isMobile) {
+        setDraftEvent(event);
+        setIsDrawerOpen(true);
+      } else {
+        app.addEvent(event);
+      }
     },
     onEventEdit: () => {
       // Event edit handling (add logic here if needed)
@@ -317,6 +327,53 @@ const DayView: React.FC<DayViewProps> = ({
     calculateDragLayout,
     TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
   });
+
+  const handleTouchStart = (e: React.TouchEvent, dayIndex: number) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    const clientX = touch.clientX;
+    const clientY = touch.clientY;
+    const target = e.currentTarget;
+
+    longPressTimerRef.current = setTimeout(() => {
+      const rect = calendarRef.current
+        ?.querySelector('.calendar-content')
+        ?.getBoundingClientRect();
+
+      if (!rect) return;
+      const container = calendarRef.current?.querySelector('.calendar-content');
+      const scrollTop = container ? container.scrollTop : 0;
+      const relativeY = clientY - rect.top + scrollTop;
+      const clickedHour = FIRST_HOUR + relativeY / HOUR_HEIGHT;
+
+      const mockEvent = {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+        touches: [{ clientX, clientY }],
+        changedTouches: [{ clientX, clientY }],
+        target: target,
+        currentTarget: target,
+        cancelable: true,
+      } as unknown as React.TouchEvent;
+
+      handleCreateStart(mockEvent, dayIndex, clickedHour);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleTouchMove = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
 
   // Use calendar drop functionality
   const { handleDrop, handleDragOver } = useCalendarDrop({
@@ -496,7 +553,10 @@ const DayView: React.FC<DayViewProps> = ({
               </div>
 
               {/* Time grid */}
-              <div className="grow relative">
+              <div
+                className="grow relative select-none"
+                style={{ WebkitTouchCallout: 'none' }}
+              >
                 {timeSlots.map((slot, slotIndex) => (
                   <div
                     key={slotIndex}
@@ -521,6 +581,15 @@ const DayView: React.FC<DayViewProps> = ({
                       const clickedHour = FIRST_HOUR + relativeY / HOUR_HEIGHT;
                       handleCreateStart(e, currentDayIndex, clickedHour);
                     }}
+                    onTouchStart={e => {
+                      const currentDayIndex = Math.floor(
+                        (currentDate.getTime() - currentWeekStart.getTime()) /
+                        (24 * 60 * 60 * 1000)
+                      );
+                      handleTouchStart(e, currentDayIndex);
+                    }}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchMove}
                     onDragOver={handleDragOver}
                     onDrop={e => {
                       const rect = calendarRef.current
@@ -676,6 +745,20 @@ const DayView: React.FC<DayViewProps> = ({
           </div>
         </div>
       </div>
+      <MobileEventDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setDraftEvent(null);
+        }}
+        onSave={(updatedEvent) => {
+          app.addEvent(updatedEvent);
+          setIsDrawerOpen(false);
+          setDraftEvent(null);
+        }}
+        draftEvent={draftEvent}
+        app={app}
+      />
     </div>
   );
 };

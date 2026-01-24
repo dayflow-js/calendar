@@ -44,6 +44,12 @@ const ja: Locale = {
     untitled: '無題',
     search: '検索',
     noResults: '結果が見つかりません',
+    calendar: 'カレンダー',
+    starts: '開始',
+    ends: '終了',
+    notes: 'メモ',
+    titlePlaceholder: '予定名',
+    notesPlaceholder: 'メモ',
   }
 };
 

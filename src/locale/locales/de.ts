@@ -44,6 +44,12 @@ const de: Locale = {
     untitled: 'Unbenannt',
     search: 'Suchen',
     noResults: 'Keine Ergebnisse gefunden',
+    calendar: 'Kalender',
+    starts: 'Beginnt',
+    ends: 'Endet',
+    notes: 'Notizen',
+    titlePlaceholder: 'Titel',
+    notesPlaceholder: 'Notizen',
   }
 };
 

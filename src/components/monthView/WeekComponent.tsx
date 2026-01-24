@@ -536,7 +536,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
           <div className="flex items-start justify-between p-2 pb-1 relative z-20">
             <div className="flex-1" />
             <div className="flex items-center">
-              {day.day === 1 ? (
+              {day.day === 1 && screenSize === 'desktop' ? (
                 <span
                   className={`
                     inline-flex items-center justify-center px-1.5 h-5 rounded-full text-sm font-medium whitespace-nowrap

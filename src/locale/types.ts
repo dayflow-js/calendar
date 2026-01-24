@@ -41,7 +41,13 @@ export type TranslationKey =
   | 'calendarOptions'
   | 'untitled'
   | 'search'
-  | 'noResults';
+  | 'noResults'
+  | 'calendar'
+  | 'starts'
+  | 'ends'
+  | 'notes'
+  | 'titlePlaceholder'
+  | 'notesPlaceholder';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

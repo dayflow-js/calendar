@@ -44,6 +44,12 @@ const zh: Locale = {
     untitled: '未命名',
     search: '搜索',
     noResults: '无结果',
+    calendar: '日历',
+    starts: '开始',
+    ends: '结束',
+    notes: '备注',
+    titlePlaceholder: '标题',
+    notesPlaceholder: '备注',
   }
 };
 

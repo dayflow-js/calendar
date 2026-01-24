@@ -33,8 +33,12 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
-  const arrowBgColor = appliedTheme === 'dark' ? '#1f2937' : 'white';
-  const arrowBorderColor = appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
+
+  // Check if dark mode is active (either via theme context or DOM class)
+  const isDark = appliedTheme === 'dark' || (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+
+  const arrowBgColor = isDark ? '#1f2937' : 'white';
+  const arrowBorderColor = isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {

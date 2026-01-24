@@ -44,6 +44,12 @@ const es: Locale = {
     untitled: 'Sin título',
     search: 'Buscar',
     noResults: 'No se encontraron resultados',
+    calendar: 'Calendario',
+    starts: 'Empieza',
+    ends: 'Termina',
+    notes: 'Notas',
+    titlePlaceholder: 'Título',
+    notesPlaceholder: 'Notas',
   }
 };
 

@@ -44,6 +44,12 @@ const ko: Locale = {
     untitled: '무제',
     search: '검색',
     noResults: '결과 없음',
+    calendar: '캘린더',
+    starts: '시작',
+    ends: '종료',
+    notes: '메모',
+    titlePlaceholder: '제목',
+    notesPlaceholder: '메모',
   }
 };
 
