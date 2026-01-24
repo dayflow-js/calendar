@@ -81,6 +81,7 @@ interface CalendarEventProps {
   onEventDelete: (eventId: string) => void;
   onDetailPanelOpen?: () => void;
   onEventSelect?: (eventId: string | null) => void;
+  onEventLongPress?: (eventId: string) => void;
   onDetailPanelToggle?: (eventId: string | null) => void;
   /** Custom event detail content component (content only, will be wrapped in default panel) */
   customDetailPanelContent?: EventDetailContentRenderer;
@@ -117,6 +118,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   newlyCreatedEventId,
   onDetailPanelOpen,
   onEventSelect,
+  onEventLongPress,
   onDetailPanelToggle,
   customDetailPanelContent,
   customEventDetailDialog,
@@ -161,6 +163,12 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     touchStartPosRef.current = { x: clientX, y: clientY };
 
     longPressTimerRef.current = setTimeout(() => {
+      if (onEventLongPress) {
+        onEventLongPress(event.id);
+      } else {
+        setIsSelected(true);
+      }
+
       // Create a compatible event object
       const syntheticEvent = {
         preventDefault: () => { },
@@ -192,6 +200,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         onMoveStart(syntheticEvent, event);
       }
       longPressTimerRef.current = null;
+      touchStartPosRef.current = null; // Clear pos so touchend doesn't trigger tap
 
       // Provide haptic feedback if available
       if (navigator.vibrate) {
@@ -213,11 +222,25 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     }
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
     }
+
+    if (isMobile && touchStartPosRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (onEventSelect) {
+        onEventSelect(event.id);
+      } else {
+        setIsSelected(true);
+      }
+      onDetailPanelToggle?.(null);
+      setDetailPanelPosition(null);
+    }
+
     touchStartPosRef.current = null;
   };
 
@@ -299,7 +322,6 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       position: 'absolute' as const,
       opacity: isBeingDragged ? 0.3 : 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
-      // TODO(DayView bug)
       transform: isPopping ? 'scale(1.12)' : undefined,
       transition: 'transform 0.1s ease-in-out',
     };
@@ -381,10 +403,14 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     }
 
     if (layout && !isAllDay) {
+      const widthStyle = isDayView
+        ? `calc(${layout.width}% - 3px)`
+        : `${layout.width - 1}%`;
+
       return {
         ...baseStyle,
         left: `${layout.left}%`,
-        width: `${layout.width - 1}%`,
+        width: widthStyle,
         right: 'auto',
       };
     }
@@ -420,13 +446,17 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       setActiveDayIndex(event.day ?? null);
     }
 
-    if (onEventSelect) {
-      onEventSelect(event.id);
-    } else {
-      setIsSelected(true);
-    }
-    onDetailPanelToggle?.(null);
-    setDetailPanelPosition(null);
+    const handleSelect = () => {
+      if (onEventSelect) {
+        onEventSelect(event.id);
+      } else {
+        setIsSelected(true);
+      }
+      onDetailPanelToggle?.(null);
+      setDetailPanelPosition(null);
+    };
+
+    handleSelect();
   };
 
   const scrollEventToCenter = (): Promise<void> => {
@@ -535,17 +565,19 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 
     scrollEventToCenter().then(() => {
       setIsSelected(true);
-      onDetailPanelToggle?.(detailPanelKey);
-      setDetailPanelPosition({
-        top: -9999,
-        left: -9999,
-        eventHeight: 0,
-        eventMiddleY: 0,
-        isSunday: false,
-      });
-      requestAnimationFrame(() => {
-        updatePanelPosition();
-      });
+      if (!isMobile) {
+        onDetailPanelToggle?.(detailPanelKey);
+        setDetailPanelPosition({
+          top: -9999,
+          left: -9999,
+          eventHeight: 0,
+          eventMiddleY: 0,
+          isSunday: false,
+        });
+        requestAnimationFrame(() => {
+          updatePanelPosition();
+        });
+      }
     });
   };
 
@@ -832,7 +864,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 
   const checkEventVisibility = useCallback(() => {
     if (
-      !isSelected ||
+      !isEventSelected ||
       !showDetailPanel ||
       !eventRef.current ||
       !calendarRef.current ||
@@ -905,7 +937,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   ]);
 
   useEffect(() => {
-    if (!isSelected || !showDetailPanel || isAllDay) return;
+    if (!isEventSelected || !showDetailPanel || isAllDay) return;
 
     const calendarContent =
       calendarRef.current?.querySelector('.calendar-content');
@@ -965,7 +997,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       }
     };
   }, [
-    isSelected,
+    isEventSelected,
     showDetailPanel,
     isAllDay,
     checkEventVisibility,
@@ -1392,6 +1424,29 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
             )}
           </>
         )}
+
+        {isMobile && isEventSelected && onResizeStart && (
+          <>
+            {/* Top-Right Indicator (Start Time) */}
+            <div
+              className="absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+              style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                onResizeStart(e, event, 'top');
+              }}
+            />
+            {/* Bottom-Left Indicator (End Time) */}
+            <div
+              className="absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+              style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                onResizeStart(e, event, 'bottom');
+              }}
+            />
+          </>
+        )}
       </>
     );
   };
@@ -1465,8 +1520,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
               color: getEventTextColor(calendarId, app?.getCalendarRegistry()),
             }),
         }}
-        onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
+        onClick={isMobile ? undefined : handleClick}
+        onDoubleClick={isMobile ? undefined : handleDoubleClick}
         onMouseDown={onMoveStart ? (e) => {
           // If it's a multi-day event segment, special handling is needed
           if (multiDaySegmentInfo) {

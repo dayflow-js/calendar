@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { Temporal } from 'temporal-polyfill';
-import { EventDetailPanelProps } from '../../types/eventDetail';
+import {
+  EventDetailPanelProps,
+  CalendarType,
+} from '../../types';
 import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import ColorPicker, { ColorOption } from './ColorPicker';
@@ -43,7 +46,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
   // Get visible calendar type options
   const colorOptions: ColorOption[] = useMemo(() => {
     const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
-    return registry.getVisible().map(cal => ({
+    return registry.getVisible().map((cal: CalendarType) => ({
       label: cal.name,
       value: cal.id,
     }));

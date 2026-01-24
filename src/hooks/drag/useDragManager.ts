@@ -33,6 +33,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     TIME_COLUMN_WIDTH = 80,
     ALL_DAY_HEIGHT = 60,
     app,
+    isMobile,
   } = options;
 
   const isMonthView = viewType === ViewType.MONTH;
@@ -203,11 +204,11 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             if (layout) {
               if (isDayView) {
                 indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-                indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px)`;
+                indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
               } else {
                 const dayWidth = `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
                 indicator.style.left = `calc(${TIME_COLUMN_WIDTH}px + (${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
-                indicator.style.width = `calc((${dayWidth} * ${layout.width / 100}))`;
+                indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
               }
               indicator.style.zIndex = String(1000);
             } else {
@@ -217,7 +218,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               indicator.style.left = isDayView
                 ? `${TIME_COLUMN_WIDTH}px`
                 : `calc(${TIME_COLUMN_WIDTH}px + (${dayColumnWidth} * ${drag.dayIndex}))`;
-              indicator.style.width = dayColumnWidth;
+              indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
             }
           }
         }
@@ -248,6 +249,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               getLineColor: getLineColor || (() => ''),
               getDynamicPadding: getDynamicPadding || (() => '0px'),
               renderer,
+              isMobile,
             })
           )
         );
@@ -345,11 +347,11 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           if (layout) {
             if (isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px)`;
+              indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
               const dayWidth = `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
               indicator.style.left = `calc(${TIME_COLUMN_WIDTH}px + (${dayWidth} * ${dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
-              indicator.style.width = `calc((${dayWidth} * ${layout.width / 100}))`;
+              indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
             }
             indicator.style.zIndex = String(layout.zIndex + 10);
           } else {
@@ -359,7 +361,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             indicator.style.left = isDayView
               ? `${TIME_COLUMN_WIDTH}px`
               : `calc(${TIME_COLUMN_WIDTH}px + (${dayColumnWidth} * ${dayIndex}))`;
-            indicator.style.width = dayColumnWidth;
+            indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
           }
         }
 
@@ -389,6 +391,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
                 getLineColor: getLineColor || (() => ''),
                 getDynamicPadding: getDynamicPadding || (() => '0px'),
                 renderer,
+                isMobile,
               })
             )
           );

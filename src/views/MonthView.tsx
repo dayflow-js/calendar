@@ -16,6 +16,7 @@ import {
 import { useDragForView } from '@/plugins/dragPlugin';
 import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
+import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { temporalToDate } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import {
@@ -136,6 +137,8 @@ const MonthView: React.FC<MonthViewProps> = ({
   // Responsive configuration
   const { screenSize } = useResponsiveMonthConfig();
 
+  const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
+
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
   const [weekHeight, setWeekHeight] = useState(DEFAULT_WEEK_HEIGHT);
@@ -148,6 +151,9 @@ const MonthView: React.FC<MonthViewProps> = ({
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [draftEvent, setDraftEvent] = useState<Event | null>(null);
 
   // Selected event ID, used for cross-week MultiDayEvent selected state synchronization
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -233,7 +239,12 @@ const MonthView: React.FC<MonthViewProps> = ({
       );
     },
     onEventCreate: (event: Event) => {
-      app.addEvent(event);
+      if (screenSize !== 'desktop') {
+        setDraftEvent(event);
+        setIsDrawerOpen(true);
+      } else {
+        app.addEvent(event);
+      }
     },
     onEventEdit: (event: Event) => {
       setNewlyCreatedEventId(event.id);
@@ -494,7 +505,20 @@ const MonthView: React.FC<MonthViewProps> = ({
               onChangeView={handleChangeView}
               onSelectDate={app.selectDate}
               selectedEventId={selectedEventId}
-              onEventSelect={setSelectedEventId}
+              onEventSelect={(eventId: string | null) => {
+                if (screenSize !== 'desktop' && eventId) {
+                  const evt = events.find(e => e.id === eventId);
+                  if (evt) {
+                    setDraftEvent(evt);
+                    setIsDrawerOpen(true);
+                    return;
+                  }
+                }
+                setSelectedEventId(eventId);
+              }}
+              onEventLongPress={(eventId: string) => {
+                if (screenSize !== 'desktop') setSelectedEventId(eventId);
+              }}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}
               customDetailPanelContent={customDetailPanelContent}
@@ -512,6 +536,24 @@ const MonthView: React.FC<MonthViewProps> = ({
           }}
         />
       </div>
+      <MobileEventDrawerComponent
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setDraftEvent(null);
+        }}
+        onSave={(updatedEvent) => {
+          if (events.find(e => e.id === updatedEvent.id)) {
+            app.updateEvent(updatedEvent.id, updatedEvent);
+          } else {
+            app.addEvent(updatedEvent);
+          }
+          setIsDrawerOpen(false);
+          setDraftEvent(null);
+        }}
+        draftEvent={draftEvent}
+        app={app}
+      />
     </div>
   );
 };

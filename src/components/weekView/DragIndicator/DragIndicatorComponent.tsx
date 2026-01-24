@@ -20,6 +20,7 @@ const DragIndicatorComponent: React.FC<DragIndicatorComponentProps> = ({
   getLineColor,
   getDynamicPadding,
   renderer = DefaultDragIndicatorRenderer,
+  isMobile,
 }) => {
   const { t } = useLocale();
   const eventTitle = title || (allDay ? t('newAllDayEvent') : t('newEvent'));
@@ -36,6 +37,7 @@ const DragIndicatorComponent: React.FC<DragIndicatorComponentProps> = ({
           formatTime,
           getLineColor,
           getDynamicPadding,
+          isMobile,
         });
       } else {
         return renderer.renderRegularContent({
@@ -47,6 +49,7 @@ const DragIndicatorComponent: React.FC<DragIndicatorComponentProps> = ({
           formatTime,
           getLineColor,
           getDynamicPadding,
+          isMobile,
         });
       }
     }
@@ -60,6 +63,7 @@ const DragIndicatorComponent: React.FC<DragIndicatorComponentProps> = ({
       formatTime,
       getLineColor,
       getDynamicPadding,
+      isMobile,
     });
   };
 

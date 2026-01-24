@@ -9,6 +9,7 @@ import {
   CalendarCallbacks,
   SidebarConfig,
   CalendarType,
+  MobileEventRenderer,
 } from '../types';
 import { Event } from '../types';
 import {
@@ -69,6 +70,7 @@ export class CalendarApp implements ICalendarApp {
   private sidebarConfig: SidebarConfig;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
+  private customMobileEventRenderer?: MobileEventRenderer;
   private themeChangeListeners: Set<(theme: ThemeMode) => void>;
 
   constructor(config: CalendarAppConfig) {
@@ -101,6 +103,7 @@ export class CalendarApp implements ICalendarApp {
     const current = this.state.currentDate;
     this.visibleMonth = new Date(current.getFullYear(), current.getMonth(), 1);
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
+    this.customMobileEventRenderer = config.customMobileEventRenderer;
 
     // Register views
     config.views.forEach(view => {
@@ -420,6 +423,25 @@ export class CalendarApp implements ICalendarApp {
   // Get whether to use event detail dialog
   getUseEventDetailDialog = (): boolean => {
     return this.useEventDetailDialog;
+  };
+
+  // Get custom mobile event renderer
+  getCustomMobileEventRenderer = (): MobileEventRenderer | undefined => {
+    return this.customMobileEventRenderer;
+  };
+
+  // Update configuration dynamically
+  updateConfig = (config: Partial<CalendarAppConfig>): void => {
+    if (config.customMobileEventRenderer !== undefined) {
+      this.customMobileEventRenderer = config.customMobileEventRenderer;
+    }
+    if (config.useEventDetailDialog !== undefined) {
+      this.useEventDetailDialog = config.useEventDetailDialog;
+    }
+    // Add other config updates here if needed
+    
+    // Trigger re-render to reflect changes
+    this.triggerRender();
   };
 
   // Theme management

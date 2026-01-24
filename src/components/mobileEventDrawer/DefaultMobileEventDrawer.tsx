@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Event } from '@/types';
+import { Event, MobileEventProps, CalendarType } from '@/types';
 import { CalendarApp } from '@/core';
 import { MiniCalendar } from '../common/MiniCalendar';
 import { ColorPicker, ColorOption } from '../common/ColorPicker';
@@ -9,15 +9,7 @@ import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { Switch } from './components/Switch';
 import { TimePickerWheel } from './components/TimePickerWheel';
 
-export interface MobileEventDrawerProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (event: Event) => void;
-    draftEvent: Event | null;
-    app: CalendarApp;
-}
-
-export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
+export const MobileEventDrawer: React.FC<MobileEventProps> = ({
     isOpen,
     onClose,
     onSave,
@@ -40,7 +32,7 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
     const [expandedPicker, setExpandedPicker] = useState<'start-date' | 'start-time' | 'end-date' | 'end-time' | null>(null);
 
     const calendars = app.getCalendars();
-    const calendarOptions: ColorOption[] = calendars.map(cal => ({
+    const calendarOptions: ColorOption[] = calendars.map((cal: CalendarType) => ({
         label: cal.name,
         value: cal.id
     }));
@@ -123,6 +115,11 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
         }
     }, [isOpen, draftEvent]);
 
+    const isEditing = React.useMemo(() => {
+        if (!draftEvent || !draftEvent.id) return false;
+        return app.getEvents().some(e => e.id === draftEvent.id);
+    }, [draftEvent, app, isOpen]); // Added isOpen to deps just in case, though app and draftEvent are the main ones.
+
     if (!isOpen) return null;
 
     const handleSave = () => {
@@ -190,7 +187,7 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[10000] flex items-end pointer-events-none">
+        <div className="fixed inset-0 z-10000 flex items-end pointer-events-none">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/30 pointer-events-auto"
@@ -206,17 +203,17 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                 {/* Header Actions */}
                 <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                     <button onClick={onClose} className="text-gray-500 hover:text-gray-700 px-2 py-1">{t('cancel')}</button>
-                    <span className="font-semibold text-lg">{t('newEvent')}</span>
+                    <span className="font-semibold text-lg">{isEditing ? t('editEvent') : t('newEvent')}</span>
                     <button
                         onClick={handleSave}
                         className="text-primary font-bold px-2 py-1"
                     >
-                        {t('create')}
+                        {isEditing ? t('done') : t('create')}
                     </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {/* Row 1: Title */}
+                    {/* Title */}
                     <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3">
                         <input
                             type="text"
@@ -228,7 +225,7 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                         />
                     </div>
 
-                    {/* Row 2: Calendar */}
+                    {/* Calendar */}
                     {calendars.length > 0 && (
                         <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center relative">
                             <span className="text-gray-700 dark:text-gray-300">{t('calendar')}</span>
@@ -242,13 +239,13 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                         </div>
                     )}
 
-                    {/* Row 3: All-day */}
+                    {/* All-day */}
                     <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center">
                         <span className="text-gray-700 dark:text-gray-300">{t('allDay')}</span>
                         <Switch checked={isAllDay} onChange={setIsAllDay} />
                     </div>
 
-                    {/* Row 4: Starts */}
+                    {/* Starts */}
                     <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
                         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
                             <span className="text-gray-700 dark:text-gray-300">{t('starts')}</span>
@@ -270,7 +267,7 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                             </div>
                         </div>
 
-                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-date' ? 'max-h-[400px]' : 'max-h-0'}`}>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-date' ? 'max-h-100' : 'max-h-0'}`}>
                             <div className="">
                                 <MiniCalendar
                                     currentDate={startDate}
@@ -281,14 +278,14 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                                 />
                             </div>
                         </div>
-                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-time' ? 'max-h-[300px]' : 'max-h-0'}`}>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-time' ? 'max-h-75' : 'max-h-0'}`}>
                             <div className="">
                                 <TimePickerWheel date={startDate} onChange={setStartDate} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Row 5: Ends */}
+                    {/* Ends */}
                     <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
                         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
                             <span className="text-gray-700 dark:text-gray-300">{t('ends')}</span>
@@ -327,13 +324,13 @@ export const MobileEventDrawer: React.FC<MobileEventDrawerProps> = ({
                         </div>
                     </div>
 
-                    {/* Row 6: Notes */}
+                    {/* Notes */}
                     <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3">
                         <textarea
                             placeholder={t('notesPlaceholder')}
                             value={notes}
                             onChange={e => setNotes(e.target.value)}
-                            className="w-full bg-transparent text-base placeholder-gray-400 focus:outline-none min-h-[80px]"
+                            className="w-full bg-transparent text-base placeholder-gray-400 focus:outline-none min-h-20"
                         />
                     </div>
 

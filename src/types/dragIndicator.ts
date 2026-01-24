@@ -62,6 +62,7 @@ export interface DragIndicatorProps {
   getLineColor: (color: string) => string;
   getDynamicPadding: (drag: DragRef) => string;
   locale?: string;
+  isMobile?: boolean;
 }
 
 export interface DragIndicatorRenderer {
@@ -115,6 +116,7 @@ export interface useDragProps extends Partial<DragConfig> {
   events: Event[];
   renderer?: DragIndicatorRenderer; // Required for Week/Day views
   app?: CalendarApp;
+  isMobile?: boolean;
 }
 
 // Unified drag state type definitions

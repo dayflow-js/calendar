@@ -50,6 +50,8 @@ const zh: Locale = {
     notes: '备注',
     titlePlaceholder: '标题',
     notesPlaceholder: '备注',
+    editEvent: '编辑日程',
+    done: '完成',
   }
 };
 

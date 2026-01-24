@@ -74,6 +74,8 @@ const DayView: React.FC<DayViewProps> = ({
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
 
+  const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
+
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
@@ -326,6 +328,7 @@ const DayView: React.FC<DayViewProps> = ({
     calculateNewEventLayout,
     calculateDragLayout,
     TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
+    isMobile,
   });
 
   const handleTouchStart = (e: React.TouchEvent, dayIndex: number) => {
@@ -490,7 +493,18 @@ const DayView: React.FC<DayViewProps> = ({
                       selectedEventId={selectedEvent?.id ?? null}
                       onEventSelect={(eventId: string | null) => {
                         const evt = events.find(e => e.id === eventId);
-                        setSelectedEvent(evt || null);
+                        if (isMobile && evt) {
+                          setDraftEvent(evt);
+                          setIsDrawerOpen(true);
+                        } else {
+                          setSelectedEvent(evt || null);
+                        }
+                      }}
+                      onEventLongPress={(eventId: string) => {
+                        if (isMobile) {
+                          const evt = events.find(e => e.id === eventId);
+                          setSelectedEvent(evt || null);
+                        }
                       }}
                       customDetailPanelContent={customDetailPanelContent}
                       customEventDetailDialog={customEventDetailDialog}
@@ -651,7 +665,18 @@ const DayView: React.FC<DayViewProps> = ({
                           selectedEventId={selectedEvent?.id ?? null}
                           onEventSelect={(eventId: string | null) => {
                             const evt = events.find(e => e.id === eventId);
-                            setSelectedEvent(evt || null);
+                            if (isMobile && evt) {
+                              setDraftEvent(evt);
+                              setIsDrawerOpen(true);
+                            } else {
+                              setSelectedEvent(evt || null);
+                            }
+                          }}
+                          onEventLongPress={(eventId: string) => {
+                            if (isMobile) {
+                              const evt = events.find(e => e.id === eventId);
+                              setSelectedEvent(evt || null);
+                            }
                           }}
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
@@ -745,14 +770,18 @@ const DayView: React.FC<DayViewProps> = ({
           </div>
         </div>
       </div>
-      <MobileEventDrawer
+      <MobileEventDrawerComponent
         isOpen={isDrawerOpen}
         onClose={() => {
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
         onSave={(updatedEvent) => {
-          app.addEvent(updatedEvent);
+          if (events.find(e => e.id === updatedEvent.id)) {
+            app.updateEvent(updatedEvent.id, updatedEvent);
+          } else {
+            app.addEvent(updatedEvent);
+          }
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}

@@ -50,6 +50,8 @@ const es: Locale = {
     notes: 'Notas',
     titlePlaceholder: 'Título',
     notesPlaceholder: 'Notas',
+    editEvent: 'Editar evento',
+    done: 'Hecho',
   }
 };
 

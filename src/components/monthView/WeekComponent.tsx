@@ -54,7 +54,7 @@ interface WeekComponentProps {
     e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
     event: Event
   ) => void;
-  onCreateStart: (e: React.MouseEvent, targetDate: Date) => void;
+  onCreateStart: (e: React.MouseEvent | React.TouchEvent, targetDate: Date) => void;
   onResizeStart: (
     e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
     event: Event,
@@ -66,6 +66,7 @@ interface WeekComponentProps {
   onSelectDate?: (date: Date) => void;
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
+  onEventLongPress?: (eventId: string) => void;
   detailPanelEventId?: string | null;
   onDetailPanelToggle?: (eventId: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
@@ -299,6 +300,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     onSelectDate,
     selectedEventId,
     onEventSelect,
+    onEventLongPress,
     detailPanelEventId,
     onDetailPanelToggle,
     customDetailPanelContent,
@@ -310,6 +312,9 @@ const WeekComponent = React.memo<WeekComponentProps>(
     const { t, locale } = useLocale();
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
     // Calculate layout parameters once per week render
     const layoutParams = useMemo(() => {
@@ -508,6 +513,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
               onDetailPanelOpen={onDetailPanelOpen}
               selectedEventId={selectedEventId}
               onEventSelect={onEventSelect}
+              onEventLongPress={onEventLongPress}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={onDetailPanelToggle}
               customDetailPanelContent={customDetailPanelContent}
@@ -529,6 +535,36 @@ const WeekComponent = React.memo<WeekComponentProps>(
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
           onDoubleClick={e => onCreateStart(e, day.date)}
+          onTouchStart={e => {
+            if (screenSize !== 'mobile') return;
+            const touch = e.touches[0];
+            const clientX = touch.clientX;
+            const clientY = touch.clientY;
+            touchStartPosRef.current = { x: clientX, y: clientY };
+
+            longPressTimerRef.current = setTimeout(() => {
+              onCreateStart(e, day.date);
+              longPressTimerRef.current = null;
+              if (navigator.vibrate) navigator.vibrate(50);
+            }, 500);
+          }}
+          onTouchMove={e => {
+            if (longPressTimerRef.current && touchStartPosRef.current) {
+              const dx = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
+              const dy = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
+              if (dx > 10 || dy > 10) {
+                clearTimeout(longPressTimerRef.current);
+                longPressTimerRef.current = null;
+              }
+            }
+          }}
+          onTouchEnd={() => {
+            if (longPressTimerRef.current) {
+              clearTimeout(longPressTimerRef.current);
+              longPressTimerRef.current = null;
+            }
+            touchStartPosRef.current = null;
+          }}
           onDragOver={onCalendarDragOver}
           onDrop={e => onCalendarDrop?.(e, day.date)}
         >
@@ -681,6 +717,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                         onDetailPanelOpen={onDetailPanelOpen}
                         selectedEventId={selectedEventId}
                         onEventSelect={onEventSelect}
+                        onEventLongPress={onEventLongPress}
                         detailPanelEventId={detailPanelEventId}
                         onDetailPanelToggle={onDetailPanelToggle}
                         customDetailPanelContent={customDetailPanelContent}

@@ -47,7 +47,9 @@ export type TranslationKey =
   | 'ends'
   | 'notes'
   | 'titlePlaceholder'
-  | 'notesPlaceholder';
+  | 'notesPlaceholder'
+  | 'editEvent'
+  | 'done';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

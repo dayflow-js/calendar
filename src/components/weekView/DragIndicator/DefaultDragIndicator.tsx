@@ -20,6 +20,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
     getLineColor,
     getDynamicPadding,
     color,
+    isMobile,
   }) => {
     return (
       <>
@@ -45,6 +46,18 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
             </div>
           )}
         </div>
+        {isMobile && (
+          <>
+            <div
+              className="absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+              style={{ borderColor: getLineColor(color || 'blue') }}
+            />
+            <div
+              className="absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+              style={{ borderColor: getLineColor(color || 'blue') }}
+            />
+          </>
+        )}
       </>
     );
   },

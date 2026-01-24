@@ -5,6 +5,7 @@ import { ViewSwitcherMode } from '../components/common/ViewHeader';
 import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
 import { CalendarRegistry } from '../core/calendarRegistry';
 import { Locale } from '../locale/types';
+import { MobileEventRenderer } from './mobileEvent';
 
 /**
  * View type enum
@@ -107,6 +108,7 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useSidebar?: boolean | SidebarConfig;
   useEventDetailDialog?: boolean;
+  customMobileEventRenderer?: MobileEventRenderer;
   locale?: string | Locale;
 }
 
@@ -182,6 +184,12 @@ export interface CalendarApp {
 
   // Get whether to use event detail dialog
   getUseEventDetailDialog: () => boolean;
+
+  // Get custom mobile event renderer
+  getCustomMobileEventRenderer: () => MobileEventRenderer | undefined;
+
+  // Update configuration dynamically
+  updateConfig: (config: Partial<CalendarAppConfig>) => void;
 
   // Theme management
   setTheme: (mode: ThemeMode) => void;

@@ -116,4 +116,9 @@ export type {
   CalendarSearchEvent,
 } from './types/search';
 
+export type {
+  MobileEventProps,
+  MobileEventRenderer,
+} from './types/mobileEvent';
+
 export { ViewType } from './types';

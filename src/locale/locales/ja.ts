@@ -50,6 +50,8 @@ const ja: Locale = {
     notes: 'メモ',
     titlePlaceholder: '予定名',
     notesPlaceholder: 'メモ',
+    editEvent: '予定を編集',
+    done: '完了',
   }
 };
 

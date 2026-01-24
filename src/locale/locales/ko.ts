@@ -50,6 +50,8 @@ const ko: Locale = {
     notes: '메모',
     titlePlaceholder: '제목',
     notesPlaceholder: '메모',
+    editEvent: '일정 편집',
+    done: '완료',
   }
 };
 

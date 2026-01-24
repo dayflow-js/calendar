@@ -764,25 +764,40 @@ export const useDragHandlers = (
             updateDragIndicator(drag.dayIndex, roundedStart, roundedEnd, false);
           }
         } else if (drag.mode === 'create') {
-          const newHour = roundToTimeStep(mouseHour);
-          const [newStartHour, newEndHour] =
-            clientY < drag.startY
-              ? [newHour, Math.max(newHour + TIME_STEP, drag.endHour)]
-              : [drag.startHour, Math.max(drag.startHour + TIME_STEP, newHour)];
+          if (options.isMobile) {
+            // Mobile: Move the creation block instead of resizing, centering it under the finger
+            const newHour = roundToTimeStep(mouseHour + (drag.hourOffset ?? 0));
+            // Ensure within bounds
+            const safeStartHour = Math.max(
+              FIRST_HOUR,
+              Math.min(LAST_HOUR - (drag.duration || 1), newHour)
+            );
+            
+            drag.startHour = safeStartHour;
+            drag.endHour = safeStartHour + (drag.duration || 1);
+          } else {
+            // Desktop: Resize behavior
+            const newHour = roundToTimeStep(mouseHour);
+            const [newStartHour, newEndHour] =
+              clientY < drag.startY
+                ? [newHour, Math.max(newHour + TIME_STEP, drag.endHour)]
+                : [drag.startHour, Math.max(drag.startHour + TIME_STEP, newHour)];
 
-          drag.startHour = newStartHour;
-          drag.endHour = newEndHour;
+            drag.startHour = newStartHour;
+            drag.endHour = newEndHour;
+          }
+          
           // Remove setDragState, only update at drag end
 
           const newEventLayout = calculateNewEventLayout?.(
             drag.dayIndex,
-            newStartHour,
-            newEndHour
+            drag.startHour,
+            drag.endHour
           );
           updateDragIndicator(
             drag.dayIndex,
-            newStartHour,
-            newEndHour,
+            drag.startHour,
+            drag.endHour,
             false,
             newEventLayout
           );
@@ -1140,6 +1155,10 @@ export const useDragHandlers = (
         const drag = dragRef.current;
         if (!drag) return;
         const roundedStart = roundToTimeStep(startHour);
+        const isMobile = !!options.isMobile;
+        const initialDuration = isMobile ? 1 : TIME_STEP * 4;
+        const hourOffset = isMobile ? -initialDuration / 2 : 0;
+        const adjustedStart = roundToTimeStep(startHour + hourOffset);
 
         Object.assign(drag, {
           active: true,
@@ -1148,12 +1167,14 @@ export const useDragHandlers = (
           startX: clientX,
           startY: clientY,
           dayIndex,
-          startHour: roundedStart,
-          endHour: roundedStart + TIME_STEP * 4,
+          startHour: adjustedStart,
+          endHour: adjustedStart + initialDuration,
           allDay: false,
           eventDate: currentWeekStart
             ? getDateByDayIndex(currentWeekStart, dayIndex)
             : new Date(),
+          duration: initialDuration,
+          hourOffset: hourOffset,
         });
 
         setDragState({

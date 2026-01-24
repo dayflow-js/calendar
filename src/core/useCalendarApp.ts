@@ -134,6 +134,11 @@ export function useCalendarApp(
     setEvents(app.getEvents());
   }, [app]);
 
+  // Synchronize configuration updates
+  useEffect(() => {
+    app.updateConfig(config);
+  }, [app, config]);
+
   // Wrapped methods to ensure state synchronization
   const changeView = useCallback(
     (view: ViewType) => {

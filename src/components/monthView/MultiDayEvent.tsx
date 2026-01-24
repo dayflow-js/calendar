@@ -47,6 +47,7 @@ interface MultiDayEventProps {
     event: Event,
     direction: string
   ) => void;
+  onEventLongPress?: (eventId: string) => void;
   isMobile?: boolean;
 }
 
@@ -77,6 +78,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
     isSelected = false,
     onMoveStart,
     onResizeStart,
+    onEventLongPress,
     isMobile = false,
   }) => {
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
@@ -120,6 +122,10 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
       touchStartPosRef.current = { x: clientX, y: clientY };
 
       longPressTimerRef.current = setTimeout(() => {
+        if (onEventLongPress) {
+          onEventLongPress(segment.event.id);
+        }
+
         const syntheticEvent = {
           preventDefault: () => { },
           stopPropagation: () => { },
@@ -314,6 +320,22 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
         onTouchEnd={handleTouchEnd}
         title={`${segment.event.title} (${formatDateConsistent(segment.event.start)} - ${formatDateConsistent(segment.event.end)})`}
       >
+        {isMobile && isSelected && (
+          <>
+            {segment.isFirstSegment && (
+              <div
+                className="absolute left-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none"
+                style={{ borderColor: getLineColor(calendarId) }}
+              />
+            )}
+            {segment.isLastSegment && (
+              <div
+                className="absolute right-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none"
+                style={{ borderColor: getLineColor(calendarId) }}
+              />
+            )}
+          </>
+        )}
         {renderResizeHandle('left')}
         <div
           className="flex-1 min-w-0"

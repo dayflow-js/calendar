@@ -33,5 +33,8 @@ export * from './hook';
 // Event detail panel types
 export * from './eventDetail';
 
+// Mobile event types
+export * from './mobileEvent';
+
 // Calendar types and Theme types
 export * from './calendarTypes';

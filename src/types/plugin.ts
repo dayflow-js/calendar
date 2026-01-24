@@ -67,6 +67,7 @@ export interface DragHookOptions extends Partial<DragConfig> {
     targetStartHour: number,
     targetEndHour: number
   ) => EventLayout | null;
+  isMobile?: boolean;
 }
 
 /**
