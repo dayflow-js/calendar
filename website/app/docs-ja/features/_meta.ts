@@ -4,14 +4,23 @@ const meta: MetaRecord = {
   'sidebar': {
     title: "サイドバー"
   },
-  'dark-mode': {
-    title: "ダークモード"
+  'calendar-header': {
+    title: "カレンダーヘッダー"
   },
   'event-dialog': {
     title: "イベントダイアログ"
   },
   'switcher-mode': {
-    title: "スイッチャーモード"
+    title: "切り替えモード"
+  },
+  'mobile-support': {
+    title: "モバイル対応"
+  },
+  'read-only': {
+    title: "読み取り専用モード"
+  },
+  'create-calendar': {
+    title: "カレンダー作成"
   },
   'custom-detail-dialog': {
     title: "カスタム詳細ダイアログ"

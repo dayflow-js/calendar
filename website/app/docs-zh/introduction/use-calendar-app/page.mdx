@@ -43,6 +43,9 @@ export function TeamCalendar() {
 | `locale`               | `string \| Locale`         | ❌   | `'en-US'`           | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。 |
 | `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                      |
 | `useEventDetailDialog` | `boolean`                  | ❌   | `false`             | 启用默认模态详情对话框而不是内联面板                                  |
+| `useCalendarHeader`    | `boolean \| Function`      | ❌   | `true`              | 启用默认页眉、隐藏页眉（`false`）或提供自定义渲染函数                 |
+| `readOnly`             | `boolean \| ReadOnlyConfig`| ❌   | `false`             | 禁用交互。可以是布尔值，也可以是用于细粒度控制（拖拽/查看）的配置对象 |
+| `customMobileEventRenderer` | `MobileEventRenderer` | ❌   | —                   | 用于替换默认移动端事件抽屉/对话框的自定义组件                         |
 
 ## 核心选项说明
 
@@ -89,6 +92,7 @@ const calendar = useCalendarApp({
 - `onDateChange(date)`：当前聚焦日期变化
 - `onVisibleMonthChange(date)`：月份视窗滚动，用于预加载数据
 - `onEventCreate/Update/Delete`：与服务端 CRUD 对接
+- `onMoreEventsClick(date)`：当月视图中的“+ X 更多”链接被点击时触发
 - `onCalendarCreate/onCalendarUpdate/onCalendarDelete`：日历增删改的回调，用于同步日历列表
 - `onCalendarMerge(sourceId, targetId)`：合并两个日历时触发（例如将“工作”合并到“个人”）
 - `onRender`：一次渲染完成后触发，适合性能监控
@@ -206,6 +210,25 @@ const calendar = useCalendarApp({
 
 - `true`：切换到模态详情对话框
 - 可与 `DayFlowCalendar` 的 `customEventDetailDialog` / `customDetailPanelContent` 协作，实现完全自定义的详情体验
+
+### useCalendarHeader
+
+- `true` (默认)：渲染内置的日历页眉。
+- `false`：完全隐藏页眉。
+- `(props) => ReactNode`：渲染自定义页眉。详见 [日历页眉](/docs-zh/features/calendar-header)。
+
+### readOnly
+
+- `true`：禁用所有修改（拖拽、创建、编辑）。
+- `ReadOnlyConfig`：细粒度控制。
+  - `draggable`：是否允许拖拽。
+  - `viewable`：是否允许打开事件详情。
+- 详见 [只读模式](/docs-zh/features/read-only)。
+
+### customMobileEventRenderer
+
+- 允许使用您自己的组件替换移动端的默认事件编辑抽屉。
+- 详见 [移动端支持](/docs-zh/features/mobile-support)。
 
 ## 高级配置示例
 

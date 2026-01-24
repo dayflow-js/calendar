@@ -1,0 +1,37 @@
+# Read-only Mode
+
+You can easily make the calendar read-only to prevent user modifications. This is useful for public calendars or display-only dashboards.
+
+## Basic Usage
+
+To enable read-only mode, pass `readOnly: true` to the calendar configuration.
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  readOnly: true, // Disables all interactions (dragging, creating, editing)
+});
+```
+
+## Fine-grained Control
+
+You can also provide a `ReadOnlyConfig` object to selectively disable certain features:
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  readOnly: {
+    draggable: false, // Disables drag-and-drop
+    viewable: true,   // Allows clicking to view event details (read-only mode)
+  },
+});
+```
+
+### Configuration Options
+
+| Option | Type | Description |
+| :--- | :--- | :--- |
+| `draggable` | `boolean` | Whether events can be moved or resized via drag-and-drop. |
+| `viewable` | `boolean` | Whether event details can be viewed (opens the detail panel/dialog). |
+
+When `readOnly` is active, the calendar will also hide "Create" buttons and other UI elements that would normally trigger changes.

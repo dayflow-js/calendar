@@ -43,6 +43,9 @@ export function TeamCalendar() {
 | `locale`               | `string \| Locale`         | ❌       | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
 | `useSidebar`           | `boolean \| SidebarConfig` | ❌       | `false`                | Enables the built-in sidebar or lets you customize width, collapse state, and renderer.                            |
 | `useEventDetailDialog` | `boolean`                  | ❌       | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
+| `useCalendarHeader`    | `boolean \| Function`      | ❌       | `true`                 | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                             |
+| `readOnly`             | `boolean \| ReadOnlyConfig`| ❌       | `false`                | Disables interactions. Can be a boolean or a config for fine-grained control (drag/view).                          |
+| `customMobileEventRenderer` | `MobileEventRenderer` | ❌       | —                      | Custom component to replace the default mobile event drawer/dialog.                                                |
 
 ## Key Options
 
@@ -71,6 +74,7 @@ export function TeamCalendar() {
 - `onDateChange(date)` fires whenever the focused date changes (navigation or selection).
 - `onVisibleMonthChange(date)` helps prefetch data as the visible month shifts.
 - `onEventCreate(event)`, `onEventUpdate(event)`, `onEventDelete(id)` mirror CRUD operations—ideal for syncing APIs.
+- `onMoreEventsClick(date)` fires when the "+ X more" link is clicked in Month view.
 - `onCalendarCreate(calendar)`, `onCalendarUpdate(calendar)`, `onCalendarDelete(id)` mirror calendar CRUD operations.
 - `onCalendarMerge(sourceId, targetId)` fires when merging two calendars (e.g., merging "Work" into "Personal").
 - `onRender()` executes when the calendar finishes a render pass (useful for instrumentation).
@@ -191,6 +195,25 @@ const calendar = useCalendarApp({
 
 - `true` turns on the default modal dialog (`DefaultEventDetailDialog`).
 - Combine with `customDetailPanelContent` or `customEventDetailDialog` on `DayFlowCalendar` to swap the UI while keeping the core state machine.
+
+### useCalendarHeader
+
+- `true` (default): Renders the built-in calendar header.
+- `false`: Hides the header entirely.
+- `(props) => ReactNode`: Renders a custom header. See [Calendar Header](/docs/features/calendar-header) for details.
+
+### readOnly
+
+- `true`: Disables all modifications (dragging, creating, editing).
+- `ReadOnlyConfig`: Fine-grained control.
+  - `draggable`: Whether dragging is allowed.
+  - `viewable`: Whether opening event details is allowed.
+- See [Read-only Mode](/docs/features/read-only) for details.
+
+### customMobileEventRenderer
+
+- Allows replacing the default bottom-drawer for mobile event editing with your own component.
+- See [Mobile Support](/docs/features/mobile-support) for details.
 
 ## Advanced Configuration Example
 

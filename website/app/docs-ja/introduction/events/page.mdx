@@ -23,6 +23,7 @@ import { Event } from '@dayflow/core';
 | `end` | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う | ✅ |
 | `description` | `string` | メモや詳細。表示方法は自由 | ❌ |
 | `allDay` | `boolean` | true なら終日イベントとして描画 | ❌ |
+| `icon` | `boolean \| ReactNode` | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`ReactNode`：カスタムアイコン | ❌ |
 | `calendarId` | `string` | 複数カレンダーを使う場合のカテゴリ ID | ❌ |
 | `meta` | `Record<string, any>` | 任意の追加データ（場所・参加者など） | ❌ |
 

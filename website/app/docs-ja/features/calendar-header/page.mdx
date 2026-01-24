@@ -1,0 +1,48 @@
+# カレンダーヘッダー
+
+カレンダーヘッダーは、ナビゲーションコントロール、表示切り替え、検索機能を提供します。その動作をカスタマイズしたり、完全に置き換えたりすることができます。
+
+## ヘッダーを非表示にする
+
+独自のナビゲーションを構築したい場合や、デフォルトのヘッダーが不要な場合は、無効にすることができます。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: false, // デフォルトのヘッダーを非表示にする
+});
+```
+
+## カスタムヘッダーコンポーネント
+
+カレンダーの状態やメソッドにアクセスしながら、独自のヘッダーをレンダリングするためのカスタムコンポーネント関数を提供できます。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: (props) => {
+    const { calendar, switcherMode } = props;
+    return (
+      <div className="custom-header">
+        <button onClick={() => calendar.goToToday()}>今日</button>
+        {/* カスタム UI をここに記述 */}
+      </div>
+    );
+  },
+});
+```
+
+### ヘッダーの Props
+
+カスタムレンダラーは以下の props を受け取ります：
+
+| Prop | 説明 |
+| :--- | :--- |
+| `calendar` | `CalendarApp` インスタンス。 |
+| `switcherMode` | 現在の表示切り替えモード（`buttons` または `select`）。 |
+| `onAddCalendar` | 新しいカレンダーを追加するためのハンドラー。 |
+| `onSearchChange` | 検索クエリを更新するためのハンドラー。 |
+| `onSearchClick` | 検索アイコンがクリックされた時のハンドラー。 |
+| `searchValue` | 現在の検索文字列。 |
+| `isSearchOpen` | 検索 UI が現在開いているかどうか。 |
+| `isEditable` | カレンダーが現在編集可能な状態かどうか。 |

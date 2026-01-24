@@ -42,6 +42,34 @@ The component receives the `calendar` object from `useCalendarApp`, reads the ac
 | `customDetailPanelContent` | `EventDetailContentRenderer` | ❌       | Replaces the default detail panel body when the built-in panel is used.                             |
 | `customEventDetailDialog`  | `EventDetailDialogRenderer`  | ❌       | Full override for the event detail dialog UI. Takes precedence over `useEventDetailDialog`.         |
 | `meta`                     | `Record<string, any>`        | ❌       | Arbitrary metadata forwarded to every view component (helpful for feature flags or layout hints).   |
+| `search`                   | `CalendarSearchProps`        | ❌       | Configuration for the built-in search functionality.                                                |
+
+## Search Configuration
+
+The `search` prop allows you to customize the built-in search behavior. By default, it searches event titles and descriptions locally.
+
+```tsx copy
+<DayFlowCalendar
+  calendar={calendar}
+  search={{
+    debounceDelay: 500,
+    emptyText: "No events found",
+    onSearch: async (keyword) => {
+      // Custom async search (e.g., from an API)
+      return fetch(`/api/search?q=${keyword}`).then(res => res.json());
+    }
+  }}
+/>
+```
+
+### Search Props
+
+| Option | Description |
+| :--- | :--- |
+| `debounceDelay` | Time in milliseconds to wait before triggering a search. |
+| `onSearch` | Async function to fetch results based on a keyword. |
+| `customSearch` | Synchronous function to filter events locally with custom logic. |
+| `emptyText` | Text to display when no results are found. |
 
 ## Customizing Container Styles
 

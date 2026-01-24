@@ -1,0 +1,48 @@
+# 日历页眉
+
+日历页眉提供导航控制、视图切换器和搜索功能。您可以自定义其行为或完全替换它。
+
+## 隐藏页眉
+
+如果您想构建自己的导航，或者只是不需要默认页眉，可以禁用它。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: false, // 隐藏默认页眉
+});
+```
+
+## 自定义页眉组件
+
+您可以提供一个自定义组件函数来渲染您自己的页眉，同时仍能访问日历的状态和方法。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: (props) => {
+    const { calendar, switcherMode } = props;
+    return (
+      <div className="custom-header">
+        <button onClick={() => calendar.goToToday()}>今天</button>
+        {/* 此处为您自定义的 UI */}
+      </div>
+    );
+  },
+});
+```
+
+### 页眉 Props
+
+自定义渲染器接收以下 props：
+
+| Prop | 描述 |
+| :--- | :--- |
+| `calendar` | `CalendarApp` 实例。 |
+| `switcherMode` | 当前视图切换器模式（`buttons` 或 `select`）。 |
+| `onAddCalendar` | 添加新日历的处理函数。 |
+| `onSearchChange` | 更新搜索查询的处理函数。 |
+| `onSearchClick` | 点击搜索图标时的处理函数。 |
+| `searchValue` | 当前搜索字符串。 |
+| `isSearchOpen` | 搜索 UI 当前是否打开。 |
+| `isEditable` | 日历当前是否处于可编辑状态。 |

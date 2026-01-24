@@ -1,0 +1,109 @@
+# カレンダー作成とコンテキストメニュー
+
+DayFlow は、サイドバーから直接カレンダーを管理するための組み込み機能を提供します。これには、新しいカレンダーの作成や、既存のカレンダーを管理するためのコンテキストメニューが含まれます。
+
+## カレンダーの作成
+
+デフォルトのサイドバーには、ユーザーが新しいカレンダーを作成できる「プラス」ボタンが含まれています。この機能は、**インライン（Inline）**と**モーダル（Modal）**の 2 つのモードをサポートしています。
+
+### 設定
+
+`useCalendarApp` の `useSidebar` オプションを介して、作成モードを設定できます。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    enabled: true,
+    createCalendarMode: 'inline', // 'inline' (デフォルト) または 'modal'
+  },
+});
+```
+
+### インラインモード (デフォルト)
+
+インラインモードでは、作成ボタンをクリックすると、即座に「無題」のカレンダーがリストに追加され、編集モードになります。ユーザーはサイドバーで直接名前を入力できます。カレンダーにはランダムな色が自動的に割り当てられます。
+
+### モーダルモード
+
+モーダルモードでは、作成ボタンをクリックするとダイアログが開き、ユーザーはカレンダー名を入力し、プリセットのパレットから色を選択できます。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    createCalendarMode: 'modal',
+  },
+});
+```
+
+### カスタム作成ダイアログ
+
+作成ダイアログにカスタム UI が必要な場合は、`renderCreateCalendarDialog` 関数を提供できます。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    createCalendarMode: 'modal',
+    renderCreateCalendarDialog: ({ onClose, onCreate }) => (
+      <MyCustomDialog
+        onCancel={onClose}
+        onConfirm={(name, color) => {
+          onCreate({
+            /* ... 新しいカレンダーオブジェクト ... */
+          });
+        }}
+      />
+    ),
+  },
+});
+```
+
+## コンテキストメニュー
+
+サイドバー内のカレンダーを右クリックすると、コンテキストメニューが開きます。
+
+### デフォルトのコンテキストメニュー
+
+デフォルトのコンテキストメニューでは、以下のオプションが提供されます。
+
+1.  **カラーピッカー**: カレンダーの色を変更できます。
+2.  **削除**: カレンダーを削除できます。
+
+### カスタムコンテキストメニュー
+
+`useSidebar` 設定で `renderCalendarContextMenu` 関数を提供することにより、コンテキストメニューをカスタマイズできます。これにより、メニュー項目とその動作を完全に制御できます。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    renderCalendarContextMenu: (calendar, onClose) => (
+      <>
+        <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+          {calendar.name}
+        </div>
+        <div className="my-1 h-px bg-gray-200" />
+        <div
+          className="flex cursor-pointer items-center px-3 py-2 text-sm hover:bg-gray-100"
+          onClick={() => {
+            console.log('カスタムアクション:', calendar.id);
+            onClose();
+          }}
+        >
+          カスタムアクション
+        </div>
+      </>
+    ),
+  },
+});
+```
+
+### API による制御
+
+`CalendarApp` インスタンスは、プログラムでカレンダーを管理するためのメソッドを公開しており、カスタムコンポーネントで使用できます。
+
+- `app.createCalendar(calendar: CalendarType)`: 新しいカレンダーを登録します。
+- `app.deleteCalendar(id: string)`: ID によってカレンダーを削除します。
+- `app.updateCalendar(id: string, updates: Partial<CalendarType>)`: カレンダーのプロパティ（名前、色など）を更新します。

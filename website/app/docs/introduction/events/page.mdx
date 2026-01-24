@@ -23,6 +23,7 @@ import { Event } from '@dayflow/core';
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | ✅ Yes   |
 | `description` | `string`                                                                 | Optional event description or notes                                                                               | ❌ No    |
 | `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | ❌ No    |
+| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | ❌ No    |
 | `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | ❌ No    |
 | `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | ❌ No    |
 

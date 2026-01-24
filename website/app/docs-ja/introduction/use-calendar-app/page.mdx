@@ -43,6 +43,9 @@ export function TeamCalendar() {
 | `locale`               | `string \| Locale`         | ❌   | `'en-US'`            | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。 |
 | `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。                       |
 | `useEventDetailDialog` | `boolean`                  | ❌   | `false`              | 詳細表示をモーダルダイアログに切り替える。                                           |
+| `useCalendarHeader`    | `boolean \| Function`      | ❌   | `true`               | デフォルトヘッダーの有効化、非表示（`false`）、またはカスタムレンダラーの指定。      |
+| `readOnly`             | `boolean \| ReadOnlyConfig`| ❌   | `false`              | インタラクションを無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。|
+| `customMobileEventRenderer` | `MobileEventRenderer` | ❌   | —                    | デフォルトのモバイル用イベントドロワー/ダイアログを置き換えるカスタムコンポーネント。 |
 
 ## それぞれのポイント
 
@@ -89,6 +92,7 @@ const calendar = useCalendarApp({
 | `onDateChange(date)`                                     | 選択日が変わったときに発火。日付連動のサイドバーなどに。       |
 | `onVisibleMonthChange(date)`                             | 表示月が変わったタイミングで呼ばれる。先読み API 呼び出しに。  |
 | `onEventCreate / onEventUpdate / onEventDelete`          | イベント CRUD を捕捉。バックエンドと同期。                     |
+| `onMoreEventsClick(date)`                                | 月ビューで「+ X 件」リンクがクリックされたときに発火。         |
 | `onCalendarCreate / onCalendarUpdate / onCalendarDelete` | カレンダーの追加・更新・削除を捕捉。                           |
 | `onCalendarMerge(sourceId, targetId)`                    | カレンダーのマージ操作を捕捉（例：「仕事」を「個人」に統合）。 |
 | `onRender()`                                             | レンダリング完了時に 1 度だけ発火。計測用。                    |
@@ -158,6 +162,25 @@ const calendar = useCalendarApp({
 
 - `true` にするとモーダルダイアログが有効になります。
 - `DayFlowCalendar` の `customEventDetailDialog` と組み合わせれば UI を完全に差し替えつつ、開閉ロジックはそのまま利用できます。
+
+### useCalendarHeader
+
+- `true` (デフォルト): 標準のカレンダーヘッダーをレンダリングします。
+- `false`: ヘッダーを完全に非表示にします。
+- `(props) => ReactNode`: カスタムヘッダーをレンダリングします。詳細は [カレンダーヘッダー](/docs-ja/features/calendar-header) を参照してください。
+
+### readOnly
+
+- `true`: すべての変更（ドラッグ、作成、編集）を無効にします。
+- `ReadOnlyConfig`: きめ細かな制御。
+  - `draggable`: ドラッグが可能かどうか。
+  - `viewable`: イベント詳細を開くことが可能かどうか。
+- 詳細は [読み取り専用モード](/docs-ja/features/read-only) を参照してください。
+
+### customMobileEventRenderer
+
+- モバイル用のデフォルトのイベント編集ドロワーを独自のコンポーネントで置き換えることができます。
+- 詳細は [モバイル対応](/docs-ja/features/mobile-support) を参照してください。
 
 ## 応用的な設定例
 

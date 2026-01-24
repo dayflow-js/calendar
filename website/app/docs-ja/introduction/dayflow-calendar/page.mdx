@@ -42,6 +42,34 @@ export function CalendarDemo() {
 | `customDetailPanelContent` | `EventDetailContentRenderer` | ❌ | 組み込み詳細パネルの中身だけを置き換える。 |
 | `customEventDetailDialog` | `EventDetailDialogRenderer` | ❌ | モーダル UI 全体をカスタム実装に差し替える。 |
 | `meta` | `Record<string, any>` | ❌ | すべてのビューへ受け渡したい任意の追加データ。 |
+| `search` | `CalendarSearchProps` | ❌ | 組み込み検索機能の設定。 |
+
+## 検索設定
+
+`search` プロップを使用すると、組み込みの検索動作をカスタマイズできます。デフォルトでは、イベントのタイトルと説明をローカルで検索します。
+
+```tsx copy
+<DayFlowCalendar
+  calendar={calendar}
+  search={{
+    debounceDelay: 500,
+    emptyText: "イベントが見つかりませんでした",
+    onSearch: async (keyword) => {
+      // カスタム非同期検索（例：APIから取得）
+      return fetch(`/api/search?q=${keyword}`).then(res => res.json());
+    }
+  }}
+/>
+```
+
+### 検索プロパティ
+
+| オプション | 説明 |
+| :--- | :--- |
+| `debounceDelay` | 検索を実行するまでの待機時間（ミリ秒）。 |
+| `onSearch` | キーワードに基づいて結果を取得する非同期関数。 |
+| `customSearch` | カスタムロジックを使用してローカルでイベントをフィルタリングする同期関数。 |
+| `emptyText` | 結果が見つからない場合に表示されるテキスト。 |
 
 ## コンテナスタイルを調整する
 

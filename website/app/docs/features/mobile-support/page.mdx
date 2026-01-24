@@ -1,0 +1,34 @@
+# Mobile Support
+
+DayFlow provides built-in support for mobile devices. The calendar automatically adapts its layout and interactions to provide a smooth experience on smaller screens.
+
+## Responsive Layouts
+
+All views (Day, Week, Month) are designed to be responsive:
+
+- **Month View**: Hides event times and uses compact "more events" indicators. It also employs gradient-fade truncation for event titles to maximize readability.
+- **Week & Day Views**: Automatically shrink the time column and simplify date labels to fit narrower widths.
+- **Sidebar**: The sidebar automatically collapses on mobile to save space, but remains accessible via a toggle.
+- **Header**: The view switcher automatically switches to `select` mode on mobile to prevent crowding.
+
+## Mobile Interactions
+
+DayFlow introduces mobile-specific interactions to make managing events easy:
+
+- **Long Press to Move**: On mobile, press and hold an event for 500ms to initiate a drag-and-drop move.
+- **Resize Indicators**: When an event is selected (via long press or tap), large touch-friendly handles appear at the corners for easy resizing.
+- **Event Drawer**: Tapping an event opens a bottom-sheet style drawer for viewing or editing details, providing a native-app feel.
+- **Search Dialog**: On mobile, clicking the search icon opens a full-screen search dialog with large results.
+
+## Customization
+
+You can provide a custom component for the mobile event drawer/dialog using the `customMobileEventRenderer` option.
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  customMobileEventRenderer: MyCustomMobileDrawer,
+});
+```
+
+The custom component will receive props like `isOpen`, `onClose`, `draftEvent`, and the `app` instance.

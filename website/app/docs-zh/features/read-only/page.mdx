@@ -1,0 +1,37 @@
+# 只读模式
+
+您可以轻松地将日历设置为只读模式，以防止用户修改。这对于公共日历或仅用于展示的仪表板非常有用。
+
+## 基本用法
+
+要启用只读模式，请在日历配置中传递 `readOnly: true`。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  readOnly: true, // 禁用所有交互（拖拽、创建、编辑）
+});
+```
+
+## 细粒度控制
+
+您还可以提供一个 `ReadOnlyConfig` 对象来选择性地禁用某些功能：
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  readOnly: {
+    draggable: false, // 禁用拖拽
+    viewable: true,   // 允许点击查看事件详情（只读模式）
+  },
+});
+```
+
+### 配置选项
+
+| 选项 | 类型 | 描述 |
+| :--- | :--- | :--- |
+| `draggable` | `boolean` | 是否可以通过拖拽移动事件或调整其大小。 |
+| `viewable` | `boolean` | 是否可以查看事件详情（打开详情面板/对话框）。 |
+
+当 `readOnly` 激活时，日历还会隐藏“创建”按钮和其他通常会触发更改的 UI 元素。

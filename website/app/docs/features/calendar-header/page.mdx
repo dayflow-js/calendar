@@ -1,0 +1,48 @@
+# Calendar Header
+
+The calendar header provides navigation controls, the view switcher, and search functionality. You can customize its behavior or replace it entirely.
+
+## Hiding the Header
+
+If you want to build your own navigation or just don't need the default header, you can disable it.
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: false, // Hides the default header
+});
+```
+
+## Custom Header Component
+
+You can provide a custom component function to render your own header while still having access to the calendar's state and methods.
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: (props) => {
+    const { calendar, switcherMode } = props;
+    return (
+      <div className="custom-header">
+        <button onClick={() => calendar.goToToday()}>Today</button>
+        {/* Your custom UI here */}
+      </div>
+    );
+  },
+});
+```
+
+### Header Props
+
+The custom renderer receives the following props:
+
+| Prop | Description |
+| :--- | :--- |
+| `calendar` | The `CalendarApp` instance. |
+| `switcherMode` | The current view switcher mode (`buttons` or `select`). |
+| `onAddCalendar` | Handler for adding a new calendar. |
+| `onSearchChange` | Handler for updating the search query. |
+| `onSearchClick` | Handler for when the search icon is clicked. |
+| `searchValue` | The current search string. |
+| `isSearchOpen` | Whether the search UI is currently open. |
+| `isEditable` | Whether the calendar is currently in an editable state. |

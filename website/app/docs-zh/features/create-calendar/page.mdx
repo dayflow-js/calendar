@@ -1,0 +1,109 @@
+# 创建日历与右键菜单
+
+DayFlow 提供内置能力，可以直接从侧边栏管理日历。这包括创建新日历以及用于管理现有日历的右键菜单（上下文菜单）。
+
+## 创建日历
+
+默认侧边栏包含一个“加号”按钮，允许用户创建新日历。此功能支持两种模式：**内联（Inline）**和**弹窗（Modal）**。
+
+### 配置
+
+您可以通过 `useCalendarApp` 中的 `useSidebar` 选项配置创建模式。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    enabled: true,
+    createCalendarMode: 'inline', // 'inline' (默认) 或 'modal'
+  },
+});
+```
+
+### 内联模式 (默认)
+
+在内联模式下，点击创建按钮会立即在列表中添加一个名为“未命名”的新日历，并使其进入编辑模式。用户可以直接在侧边栏中输入名称。系统会自动为该日历分配一个随机颜色。
+
+### 弹窗模式
+
+在弹窗模式下，点击创建按钮会打开一个对话框，用户可以在其中输入日历名称并从预设调色板中选择颜色。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    createCalendarMode: 'modal',
+  },
+});
+```
+
+### 自定义创建对话框
+
+如果您需要为创建对话框使用自定义 UI，可以提供 `renderCreateCalendarDialog` 函数。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    createCalendarMode: 'modal',
+    renderCreateCalendarDialog: ({ onClose, onCreate }) => (
+      <MyCustomDialog
+        onCancel={onClose}
+        onConfirm={(name, color) => {
+          onCreate({
+            /* ... 新日历对象 ... */
+          });
+        }}
+      />
+    ),
+  },
+});
+```
+
+## 右键菜单 (上下文菜单)
+
+右键点击侧边栏中的日历会打开一个右键菜单。
+
+### 默认右键菜单
+
+默认右键菜单提供以下选项：
+
+1.  **颜色选择器**：允许用户更改日历颜色。
+2.  **删除**：允许用户删除日历。
+
+### 自定义右键菜单
+
+您可以通过在 `useSidebar` 配置中提供 `renderCalendarContextMenu` 函数来自定义右键菜单。这让您可以完全控制菜单项及其行为。
+
+```tsx
+const calendar = useCalendarApp({
+  // ...
+  useSidebar: {
+    renderCalendarContextMenu: (calendar, onClose) => (
+      <>
+        <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+          {calendar.name}
+        </div>
+        <div className="my-1 h-px bg-gray-200" />
+        <div
+          className="flex cursor-pointer items-center px-3 py-2 text-sm hover:bg-gray-100"
+          onClick={() => {
+            console.log('自定义操作：', calendar.id);
+            onClose();
+          }}
+        >
+          自定义操作
+        </div>
+      </>
+    ),
+  },
+});
+```
+
+### API 控制
+
+`CalendarApp` 实例公开了以编程方式管理日历的方法，您可以在自定义组件中使用这些方法：
+
+- `app.createCalendar(calendar: CalendarType)`：注册新日历。
+- `app.deleteCalendar(id: string)`：通过 ID 删除日历。
+- `app.updateCalendar(id: string, updates: Partial<CalendarType>)`：更新日历属性（名称、颜色等）。
