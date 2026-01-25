@@ -2,6 +2,8 @@ import React from 'react';
 import { ViewType, CalendarHeaderProps } from '../../types';
 import ViewSwitcher from './ViewSwitcher';
 import { Plus, Search } from 'lucide-react';
+import { useResponsiveMonthConfig } from '../../hooks/virtualScroll';
+import { useLocale } from '../../locale/useLocale';
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   calendar,
@@ -15,6 +17,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 }) => {
   const isSwitcherCentered = switcherMode === 'buttons';
   const isDayView = calendar.state.currentView === ViewType.DAY;
+  const { screenSize } = useResponsiveMonthConfig();
+  const isMobile = screenSize === 'mobile';
+  const { t } = useLocale();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSearchChange?.(e.target.value);
@@ -37,7 +42,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           <button
             onClick={onAddCalendar}
             className="flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-            title="Add Calendar"
+            title={isMobile ? (t('newEvent') || 'New Event') : (t('createCalendar') || 'Add Calendar')}
           >
             <Plus className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           </button>

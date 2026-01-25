@@ -7,6 +7,7 @@ const meta: MetaRecord = {
       pagination: false
     }
   },
+  'v1.8': 'V1.8',
   'v1.7': 'V1.7',
   'v1.4': 'V1.4',
   'theme-customization': 'Theme Customization',

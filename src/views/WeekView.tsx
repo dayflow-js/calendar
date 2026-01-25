@@ -185,29 +185,33 @@ const WeekView: React.FC<WeekViewProps> = ({
   const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
 
   useEffect(() => {
-    if (app.state.highlightedEventId) {
-      setSelectedEventId(app.state.highlightedEventId);
+    const hasChanged = app.state.highlightedEventId !== prevHighlightedEventId.current;
 
-      // Auto scroll to highlighted event
-      const highlightedEvent = currentWeekEvents.find(
-        e => e.id === app.state.highlightedEventId
-      );
-      if (highlightedEvent && !highlightedEvent.allDay) {
-        const startHour = extractHourFromDate(highlightedEvent.start);
-        const scrollContainer = scrollerRef.current;
-        if (scrollContainer) {
-          const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
-          // Scroll with some padding using requestAnimationFrame for smoother performance
-          requestAnimationFrame(() => {
-            scrollContainer.scrollTo({
-              top: Math.max(0, top - 100),
-              behavior: 'smooth',
+    if (hasChanged) {
+      if (app.state.highlightedEventId) {
+        setSelectedEventId(app.state.highlightedEventId);
+
+        // Auto scroll to highlighted event
+        const highlightedEvent = currentWeekEvents.find(
+          e => e.id === app.state.highlightedEventId
+        );
+        if (highlightedEvent && !highlightedEvent.allDay) {
+          const startHour = extractHourFromDate(highlightedEvent.start);
+          const scrollContainer = scrollerRef.current;
+          if (scrollContainer) {
+            const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
+            // Scroll with some padding using requestAnimationFrame for smoother performance
+            requestAnimationFrame(() => {
+              scrollContainer.scrollTo({
+                top: Math.max(0, top - 100),
+                behavior: 'smooth',
+              });
             });
-          });
+          }
         }
+      } else {
+        setSelectedEventId(null);
       }
-    } else if (prevHighlightedEventId.current) {
-      setSelectedEventId(null);
     }
     prevHighlightedEventId.current = app.state.highlightedEventId;
   }, [
@@ -944,7 +948,8 @@ const WeekView: React.FC<WeekViewProps> = ({
                           detailPanelEventId={detailPanelEventId}
                           onEventSelect={(eventId: string | null) => {
                             const isViewable = app.getReadOnlyConfig().viewable !== false;
-                            if ((isMobile || isTouch) && eventId && isViewable) {
+                            const isReadOnly = app.state.readOnly;
+                            if ((isMobile || isTouch) && eventId && isViewable && !isReadOnly) {
                               const evt = events.find(e => e.id === eventId);
                               if (evt) {
                                 setDraftEvent(evt);
@@ -953,6 +958,10 @@ const WeekView: React.FC<WeekViewProps> = ({
                               }
                             }
                             setSelectedEventId(eventId);
+                            if (app.state.highlightedEventId) {
+                              app.highlightEvent(null);
+                              prevHighlightedEventId.current = null;
+                            }
                           }}
                           onEventLongPress={(eventId: string) => {
                             if (isMobile || isTouch) setSelectedEventId(eventId);

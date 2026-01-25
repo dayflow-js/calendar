@@ -137,34 +137,38 @@ const DayView: React.FC<DayViewProps> = ({
   const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
 
   useEffect(() => {
-    if (app.state.highlightedEventId) {
-      const currentEvents = app.getEvents();
-      const event = currentEvents.find(
-        e => e.id === app.state.highlightedEventId
-      );
-      if (event) {
-        setSelectedEvent(event);
+    const hasChanged = app.state.highlightedEventId !== prevHighlightedEventId.current;
 
-        // Auto scroll to highlighted event
-        if (!event.allDay) {
-          const startHour = extractHourFromDate(event.start);
-          const scrollContainer =
-            calendarRef.current?.querySelector('.calendar-content');
-          if (scrollContainer) {
-            const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
-            // Scroll with some padding using requestAnimationFrame for smoother performance
-            requestAnimationFrame(() => {
-              scrollContainer.scrollTo({
-                top: Math.max(0, top - 100),
-                behavior: 'smooth',
+    if (hasChanged) {
+      if (app.state.highlightedEventId) {
+        const currentEvents = app.getEvents();
+        const event = currentEvents.find(
+          e => e.id === app.state.highlightedEventId
+        );
+        if (event) {
+          setSelectedEvent(event);
+
+          // Auto scroll to highlighted event
+          if (!event.allDay) {
+            const startHour = extractHourFromDate(event.start);
+            const scrollContainer =
+              calendarRef.current?.querySelector('.calendar-content');
+            if (scrollContainer) {
+              const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
+              // Scroll with some padding using requestAnimationFrame for smoother performance
+              requestAnimationFrame(() => {
+                scrollContainer.scrollTo({
+                  top: Math.max(0, top - 100),
+                  behavior: 'smooth',
+                });
               });
-            });
+            }
           }
         }
+      } else {
+        // Only clear if previously had a highlighted event
+        setSelectedEvent(null);
       }
-    } else if (prevHighlightedEventId.current) {
-      // Only clear if previously had a highlighted event
-      setSelectedEvent(null);
     }
     prevHighlightedEventId.current = app.state.highlightedEventId;
   }, [
@@ -531,6 +535,10 @@ const DayView: React.FC<DayViewProps> = ({
                         } else {
                           const e = events.find(e => e.id === eventId);
                           setSelectedEvent(e || null);
+                          if (app.state.highlightedEventId) {
+                            app.highlightEvent(null);
+                            prevHighlightedEventId.current = null;
+                          }
                         }
                       }}
                       onEventLongPress={(eventId: string) => {
@@ -705,6 +713,10 @@ const DayView: React.FC<DayViewProps> = ({
                             } else {
                               const e = events.find(e => e.id === eventId);
                               setSelectedEvent(e || null);
+                              if (app.state.highlightedEventId) {
+                                app.highlightEvent(null);
+                                prevHighlightedEventId.current = null;
+                              }
                             }
                           }}
                           onEventLongPress={(eventId: string) => {

@@ -315,35 +315,36 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
       if (sidebarEnabled) return; // Cannot create events
       return;
     }
-    
-    if (sidebarEnabled) {
-      if (isMobile) {
-        // Mobile: Open Event Drawer
-        const now = new Date();
-        // Round to nearest next hour
-        now.setMinutes(0, 0, 0);
-        now.setHours(now.getHours() + 1);
-        
-        const end = new Date(now);
-        end.setHours(end.getHours() + 1);
 
-        const draft: Event = {
-          id: generateUniKey(),
-          title: '',
-          start: dateToZonedDateTime(now),
-          end: dateToZonedDateTime(end),
-          calendarId: app.getCalendars().find(c => c.isVisible !== false)?.id || app.getCalendars()[0]?.id,
-        };
-        setMobileDraftEvent(draft);
-        setIsMobileDrawerOpen(true);
+    if (isMobile) {
+      // Mobile: Open Event Drawer
+      const now = new Date();
+      // Round to nearest next hour
+      now.setMinutes(0, 0, 0);
+      now.setHours(now.getHours() + 1);
+
+      const end = new Date(now);
+      end.setHours(end.getHours() + 1);
+
+      const draft: Event = {
+        id: generateUniKey(),
+        title: '',
+        start: dateToZonedDateTime(now),
+        end: dateToZonedDateTime(end),
+        calendarId: app.getCalendars().find(c => c.isVisible !== false)?.id || app.getCalendars()[0]?.id,
+      };
+      setMobileDraftEvent(draft);
+      setIsMobileDrawerOpen(true);
+      return;
+    }
+
+    if (sidebarEnabled) {
+      // Desktop: Toggle popup
+      if (isQuickCreateOpen) {
+        setIsQuickCreateOpen(false);
       } else {
-        // Desktop: Toggle popup
-        if (isQuickCreateOpen) {
-          setIsQuickCreateOpen(false);
-        } else {
-          (quickCreateAnchorRef as any).current = e.currentTarget;
-          setIsQuickCreateOpen(true);
-        }
+        (quickCreateAnchorRef as any).current = e.currentTarget;
+        setIsQuickCreateOpen(true);
       }
     } else {
       // Sidebar disabled -> Add Button creates calendar
