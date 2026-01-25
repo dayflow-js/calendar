@@ -87,8 +87,6 @@ const WeekView: React.FC<WeekViewProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  console.log('screenSize', screenSize);
-
   const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
   // Utility function: Get week start time

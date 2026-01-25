@@ -46,7 +46,6 @@ export function InteractiveCalendar() {
     if (resolvedTheme === 'light') return 'light';
     return 'auto';
   }, [resolvedTheme]);
-  console.log('isMobile', isMobile);
 
   const calendar = useCalendarApp({
     views,
@@ -57,9 +56,11 @@ export function InteractiveCalendar() {
     calendars: calendarTypes,
     switcherMode: 'buttons',
     useSidebar: isMobile ? false : true,
-
     callbacks: {
-
+      onMoreEventsClick: (date: Date) => {
+        calendar.selectDate(date);
+        calendar.changeView(ViewType.DAY);
+      },
     },
     theme: { mode: themeMode },
   });
@@ -69,7 +70,7 @@ export function InteractiveCalendar() {
       <DayFlowCalendar
         calendar={calendar}
         className="w-full"
-        style={{ height: isMobile ? 550 : 750 }}
+        style={{ height: isMobile ? 550 : 760 }}
       />
       <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
         <strong>Tip:</strong> Try dragging events across weeks, resizing them in

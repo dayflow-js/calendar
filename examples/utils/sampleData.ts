@@ -89,6 +89,7 @@ const createAllDayEvent = (
   end: start.add({ days: span }),
   allDay: true,
   calendarId,
+  icon: true,
 });
 
 const baseAllDayDefinitions: Array<{
