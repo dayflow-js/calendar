@@ -53,7 +53,7 @@ const de: Locale = {
     editEvent: 'Ereignis bearbeiten',
     done: 'Fertig',
     quickCreateEvent: 'Ereignis schnell erstellen',
-    quickCreatePlaceholder: 'Titel',
+    quickCreatePlaceholder: 'Film am Freitag um 19 Uhr',
     noSuggestions: 'Tippen zum Erstellen',
     newCalendar: 'Neuer Kalender',
     refreshAll: 'Alles aktualisieren',

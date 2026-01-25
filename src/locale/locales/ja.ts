@@ -53,7 +53,7 @@ const ja: Locale = {
     editEvent: '予定を編集',
     done: '完了',
     quickCreateEvent: 'クイック作成',
-    quickCreatePlaceholder: 'タイトル',
+    quickCreatePlaceholder: '金曜日7時から映画',
     noSuggestions: '入力して作成',
     newCalendar: '新しいカレンダー',
     refreshAll: 'すべて更新',

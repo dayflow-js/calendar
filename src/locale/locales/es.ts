@@ -53,7 +53,7 @@ const es: Locale = {
     editEvent: 'Editar evento',
     done: 'Hecho',
     quickCreateEvent: 'Creación rápida de eventos',
-    quickCreatePlaceholder: 'Título',
+    quickCreatePlaceholder: 'Película a las 7pm el viernes',
     noSuggestions: 'Escribe para crear',
     newCalendar: 'Nuevo calendario',
     refreshAll: 'Actualizar todo',
