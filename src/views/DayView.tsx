@@ -73,6 +73,11 @@ const DayView: React.FC<DayViewProps> = ({
   const { t, locale } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
@@ -357,7 +362,7 @@ const DayView: React.FC<DayViewProps> = ({
   });
 
   const handleTouchStart = (e: React.TouchEvent, dayIndex: number) => {
-    if (!isMobile) return;
+    if (!isMobile && !isTouch) return;
     const touch = e.touches[0];
     const clientX = touch.clientX;
     const clientY = touch.clientY;
@@ -520,7 +525,7 @@ const DayView: React.FC<DayViewProps> = ({
                         const isViewable = app.getReadOnlyConfig().viewable !== false;
                         const isReadOnly = app.state.readOnly;
                         const evt = events.find(e => e.id === eventId);
-                        if (isMobile && evt && isViewable && !isReadOnly) {
+                        if ((isMobile || isTouch) && evt && isViewable && !isReadOnly) {
                           setDraftEvent(evt);
                           setIsDrawerOpen(true);
                         } else {
@@ -529,7 +534,7 @@ const DayView: React.FC<DayViewProps> = ({
                         }
                       }}
                       onEventLongPress={(eventId: string) => {
-                        if (isMobile) {
+                        if (isMobile || isTouch) {
                           const evt = events.find(e => e.id === eventId);
                           setSelectedEvent(evt || null);
                         }
@@ -538,6 +543,7 @@ const DayView: React.FC<DayViewProps> = ({
                       customEventDetailDialog={customEventDetailDialog}
                       app={app}
                       isMobile={isMobile}
+                      enableTouch={isTouch}
                     />
                   ))}
               </div>
@@ -693,7 +699,7 @@ const DayView: React.FC<DayViewProps> = ({
                           onEventSelect={(eventId: string | null) => {
                             const isViewable = app.getReadOnlyConfig().viewable !== false;
                             const evt = events.find(e => e.id === eventId);
-                            if (isMobile && evt && isViewable) {
+                            if ((isMobile || isTouch) && evt && isViewable) {
                               setDraftEvent(evt);
                               setIsDrawerOpen(true);
                             } else {
@@ -702,7 +708,7 @@ const DayView: React.FC<DayViewProps> = ({
                             }
                           }}
                           onEventLongPress={(eventId: string) => {
-                            if (isMobile) {
+                            if (isMobile || isTouch) {
                               const evt = events.find(e => e.id === eventId);
                               setSelectedEvent(evt || null);
                             }
@@ -711,6 +717,7 @@ const DayView: React.FC<DayViewProps> = ({
                           customEventDetailDialog={customEventDetailDialog}
                           app={app}
                           isMobile={isMobile}
+                          enableTouch={isTouch}
                         />
                       );
                     })}

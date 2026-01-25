@@ -120,7 +120,6 @@ export const useDragHandlers = (
       const readOnlyConfig = app?.getReadOnlyConfig();
       const isDraggable = readOnlyConfig?.draggable !== false;
       const isEditable = !app?.state.readOnly;
-      
       const drag = dragRef.current;
       if (!drag) return;
       if (drag.mode === 'move' && !isDraggable) return;
@@ -338,6 +337,7 @@ export const useDragHandlers = (
           // Get original event start and end time
           const originalStart = temporalToDate(event.start);
           const originalEnd = temporalToDate(event.end);
+          const wasAllDay = event.allDay;
 
           // Check if original event spans multiple days
           const isOriginallyMultiDay =
@@ -347,8 +347,8 @@ export const useDragHandlers = (
               event.allDay ?? false
             ) > 0;
 
-          if (isOriginallyMultiDay) {
-            // Multi-day event: keep original time and multi-day duration, only change date
+          if (isOriginallyMultiDay && !wasAllDay) {
+            // Multi-day event (originally REGULAR): keep original time and multi-day duration, only change date
             const newStartDate = new Date(originalStart);
             newStartDate.setDate(newStartDate.getDate() + dayOffset);
 
@@ -358,7 +358,7 @@ export const useDragHandlers = (
             newStart = dateToZonedDateTime(newStartDate);
             newEnd = dateToZonedDateTime(newEndDate);
           } else {
-            // Single-day event: use new time calculated during drag
+            // Single-day event OR Originally All-Day event (regardless of span):
             const newEventDate = currentWeekStart
               ? getDateByDayIndex(currentWeekStart, drag.dayIndex)
               : new Date();
@@ -798,7 +798,6 @@ export const useDragHandlers = (
               FIRST_HOUR,
               Math.min(LAST_HOUR - (drag.duration || 1), newHour)
             );
-            
             drag.startHour = safeStartHour;
             drag.endHour = safeStartHour + (drag.duration || 1);
           } else {
@@ -812,7 +811,7 @@ export const useDragHandlers = (
             drag.startHour = newStartHour;
             drag.endHour = newEndHour;
           }
-          
+
           // Remove setDragState, only update at drag end
 
           const newEventLayout = calculateNewEventLayout?.(

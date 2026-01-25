@@ -136,6 +136,11 @@ const MonthView: React.FC<MonthViewProps> = ({
 
   // Responsive configuration
   const { screenSize } = useResponsiveMonthConfig();
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
@@ -508,7 +513,7 @@ const MonthView: React.FC<MonthViewProps> = ({
               selectedEventId={selectedEventId}
               onEventSelect={(eventId: string | null) => {
                 const isViewable = app.getReadOnlyConfig().viewable !== false;
-                if (screenSize !== 'desktop' && eventId && isViewable) {
+                if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
                   const evt = events.find(e => e.id === eventId);
                   if (evt) {
                     setDraftEvent(evt);
@@ -519,7 +524,7 @@ const MonthView: React.FC<MonthViewProps> = ({
                 setSelectedEventId(eventId);
               }}
               onEventLongPress={(eventId: string) => {
-                if (screenSize !== 'desktop') setSelectedEventId(eventId);
+                if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
               }}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}
@@ -529,6 +534,7 @@ const MonthView: React.FC<MonthViewProps> = ({
               onCalendarDragOver={handleDragOver}
               calendarSignature={calendarSignature}
               app={app}
+              enableTouch={isTouch}
             />
           );
         })}

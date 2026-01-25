@@ -75,6 +75,7 @@ interface WeekComponentProps {
   onCalendarDragOver?: (e: React.DragEvent) => void;
   calendarSignature?: string;
   app: CalendarApp;
+  enableTouch?: boolean;
 }
 
 // Constants
@@ -308,6 +309,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
     onCalendarDrop,
     onCalendarDragOver,
     app,
+    enableTouch,
   }) => {
     const { t, locale } = useLocale();
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
@@ -520,6 +522,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
               customEventDetailDialog={customEventDetailDialog}
               app={app}
               isMobile={screenSize !== 'desktop'}
+              enableTouch={enableTouch}
             />
           );
         }
@@ -536,7 +539,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
           data-date={createDateString(day.date)}
           onDoubleClick={e => onCreateStart?.(e, day.date)}
           onTouchStart={e => {
-            if (screenSize !== 'mobile') return;
+            if (screenSize !== 'mobile' && !enableTouch) return;
             const touch = e.touches[0];
             const clientX = touch.clientX;
             const clientY = touch.clientY;
@@ -713,6 +716,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                         customEventDetailDialog={customEventDetailDialog}
                         app={app}
                         isMobile={screenSize !== 'desktop'}
+                        enableTouch={enableTouch}
                       />
                     ))}
                   </div>

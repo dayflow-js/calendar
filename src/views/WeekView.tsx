@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { CalendarApp } from '@/core';
 import {
   formatTime,
@@ -64,6 +64,33 @@ const WeekView: React.FC<WeekViewProps> = ({
   const events = app.getEvents();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
+  const sidebarWidth = screenSize === 'mobile' ? 48 : 80;
+  const [timeGridWidth, setTimeGridWidth] = useState(0);
+  const timeGridRef = React.useRef<HTMLDivElement>(null);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  useLayoutEffect(() => {
+    const timeGrid = timeGridRef.current;
+    if (!timeGrid) return;
+
+    const updateWidth = () => {
+      setTimeGridWidth(timeGrid.offsetWidth);
+    };
+
+    // Initial measurement before paint
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(timeGrid);
+
+    return () => observer.disconnect();
+  }, []);
+
+  console.log('screenSize', screenSize);
 
   const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
@@ -445,12 +472,12 @@ const WeekView: React.FC<WeekViewProps> = ({
     events: currentWeekEvents,
     calculateNewEventLayout,
     calculateDragLayout,
-    TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
+    TIME_COLUMN_WIDTH: sidebarWidth,
     isMobile,
   });
 
   const handleTouchStart = (e: React.TouchEvent, dayIndex: number, hour: number) => {
-    if (!isMobile) return;
+    if (!isMobile && !isTouch) return;
     const touch = e.touches[0];
     const clientX = touch.clientX;
     const clientY = touch.clientY;
@@ -584,129 +611,137 @@ const WeekView: React.FC<WeekViewProps> = ({
       <div className="flex flex-none border-b border-gray-200 dark:border-gray-700 relative z-10">
         {/* Top Frozen Content */}
         <div ref={topFrozenContentRef} className="flex-1 overflow-hidden relative">
-          <div className="flex flex-col" style={{ width: gridWidth === '100%' ? '100%' : `calc(1.75 * (100% - ${isMobile ? 48 : 80}px) + ${isMobile ? 48 : 80}px)`, minWidth: '100%' }}>
+          <div className="flex flex-col min-w-full">
             {/* Weekday titles row */}
-            <div className="flex">
-              {/* Header Spacer */}
-              <div className="w-12 md:w-20 shrink-0 border-b border-gray-200 dark:border-gray-700 sticky left-0 bg-white dark:bg-gray-900 z-20"></div>
-              {/* Weekday titles */}
-              <div className={`${weekDayHeader} flex-1`}>
-                {weekDaysLabels.map((day, i) => (
-                  <div
-                    key={i}
-                    className={`${weekDayCell} ${isMobile ? 'flex-col gap-0' : ''}`}
-                    style={columnStyle}
-                  >
-                    {isMobile ? (
-                      <>
-                        <div className="text-[11px] leading-tight text-gray-500 font-medium">
-                          {mobileWeekDaysLabels[i]}
-                        </div>
-                        <div className={`${dateNumber} w-7 h-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
-                          {weekDates[i].date}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="inline-flex items-center justify-center text-sm mt-1 mr-1">
-                          {day}
-                        </div>
-                        <div className={`${dateNumber} ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
-                          {weekDates[i].date}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
+            <div className="flex w-full">
+              <div className="flex shrink-0" style={{
+                width: timeGridWidth ? timeGridWidth + sidebarWidth : '100%',
+              }}>
+                {/* Header Spacer */}
+                <div className="w-12 md:w-20 shrink-0 sticky left-0 bg-white dark:bg-gray-900 z-20 border-b border-gray-200 dark:border-gray-700"></div>
+                {/* Weekday titles */}
+                <div className={`${weekDayHeader} flex-1`}>
+                  {weekDaysLabels.map((day, i) => (
+                    <div
+                      key={i}
+                      className={`${weekDayCell} ${isMobile ? 'flex-col gap-0' : ''}`}
+                      style={columnStyle}
+                    >
+                      {isMobile ? (
+                        <>
+                          <div className="text-[11px] leading-tight text-gray-500 font-medium">
+                            {mobileWeekDaysLabels[i]}
+                          </div>
+                          <div className={`${dateNumber} w-7 h-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
+                            {weekDates[i].date}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="inline-flex items-center justify-center text-sm mt-1 mr-1">
+                            {day}
+                          </div>
+                          <div className={`${dateNumber} ${weekDates[i].isToday ? miniCalendarToday : ''}`}>
+                            {weekDates[i].date}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
+              {/* Filler for Weekday Header */}
+              <div className="flex-1 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"></div>
             </div>
 
             {/* All-day event area row */}
-            <div className="flex" style={{
-              marginRight: `${isMobile ? 0 : 11}px`,
-            }}>
-              {/* All Day Label */}
-              <div className="w-12 md:w-20 shrink-0 flex items-center justify-end p-1 text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 select-none bg-white dark:bg-gray-900 sticky left-0 z-20">
-                {allDayLabelText}
-              </div>
+            <div className="flex w-full">
+              <div className="flex shrink-0" style={{
+                width: timeGridWidth ? timeGridWidth + sidebarWidth : '100%',
+              }}>
+                {/* All Day Label */}
+                <div className="w-12 md:w-20 shrink-0 flex items-center justify-end p-1 text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 select-none bg-white dark:bg-gray-900 sticky left-0 z-20 ">
+                  {allDayLabelText}
+                </div>
 
-              <div className={`${allDayRow} border-none flex-1`} ref={allDayRowRef} style={{ minHeight: `${allDayAreaHeight}px` }}>
-                <div className={allDayContent} style={{ minHeight: `${allDayAreaHeight}px` }}>
-                  {weekDaysLabels.map((_, dayIndex) => {
-                    const dropDate = new Date(currentWeekStart);
-                    dropDate.setDate(currentWeekStart.getDate() + dayIndex);
-                    return (
-                      <div
-                        key={`allday-${dayIndex}`}
-                        className={`${allDayCell}`}
-                        style={{ minHeight: `${allDayAreaHeight}px`, ...columnStyle }}
-                        onDoubleClick={e => handleCreateAllDayEvent?.(e, dayIndex)}
-                        onDragOver={handleDragOver}
-                        onDrop={e => {
-                          handleDrop(e, dropDate, undefined, true);
-                        }}
-                      />
-                    );
-                  })}
-
-                  {/* Multi-day event overlay */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {organizedAllDaySegments.map(segment => {
+                <div className={`${allDayRow} border-none flex-1`} ref={allDayRowRef} style={{ minHeight: `${allDayAreaHeight}px` }}>
+                  <div className={allDayContent} style={{ minHeight: `${allDayAreaHeight}px` }}>
+                    {weekDaysLabels.map((_, dayIndex) => {
+                      const dropDate = new Date(currentWeekStart);
+                      dropDate.setDate(currentWeekStart.getDate() + dayIndex);
                       return (
-                        <CalendarEvent
-                          key={segment.id}
-                          event={segment.event}
-                          segment={segment}
-                          segmentIndex={segment.row}
-                          isAllDay={true}
-                          isMultiDay={true}
-                          allDayHeight={ALL_DAY_HEIGHT}
-                          calendarRef={calendarRef}
-                          isBeingDragged={
-                            isDragging &&
-                            (dragState as WeekDayDragState)?.eventId ===
-                            segment.event.id &&
-                            (dragState as WeekDayDragState)?.mode === 'move'
-                          }
-                          hourHeight={HOUR_HEIGHT}
-                          firstHour={FIRST_HOUR}
-                          onMoveStart={handleMoveStart}
-                          onResizeStart={handleResizeStart}
-                          onEventUpdate={handleEventUpdate}
-                          onEventDelete={handleEventDelete}
-                          newlyCreatedEventId={newlyCreatedEventId}
-                          onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
-                          selectedEventId={selectedEventId}
-                          detailPanelEventId={detailPanelEventId}
-                          onEventSelect={(eventId: string | null) => {
-                            const isViewable = app.getReadOnlyConfig().viewable !== false;
-                            const isReadOnly = app.state.readOnly;
-                            if (isMobile && eventId && isViewable && !isReadOnly) {
-                              const evt = events.find(e => e.id === eventId);
-                              if (evt) {
-                                setDraftEvent(evt);
-                                setIsDrawerOpen(true);
-                                return;
-                              }
-                            }
-                            setSelectedEventId(eventId);
+                        <div
+                          key={`allday-${dayIndex}`}
+                          className={`${allDayCell} ${isMobile && dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
+                          style={{ minHeight: `${allDayAreaHeight}px`, ...columnStyle }} onDoubleClick={e => handleCreateAllDayEvent?.(e, dayIndex)}
+                          onDragOver={handleDragOver}
+                          onDrop={e => {
+                            handleDrop(e, dropDate, undefined, true);
                           }}
-                          onEventLongPress={(eventId: string) => {
-                            if (isMobile) setSelectedEventId(eventId);
-                          }}
-                          onDetailPanelToggle={(eventId: string | null) =>
-                            setDetailPanelEventId(eventId)
-                          }
-                          customDetailPanelContent={customDetailPanelContent}
-                          customEventDetailDialog={customEventDetailDialog}
-                          app={app}
-                          isMobile={isMobile}
                         />
                       );
                     })}
+                    {/* <div className='w-[11px]'></div> */}
+                    {/* Multi-day event overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {organizedAllDaySegments.map(segment => {
+                        return (
+                          <CalendarEvent
+                            key={segment.id}
+                            event={segment.event}
+                            segment={segment}
+                            segmentIndex={segment.row}
+                            isAllDay={true}
+                            isMultiDay={true}
+                            allDayHeight={ALL_DAY_HEIGHT}
+                            calendarRef={calendarRef}
+                            isBeingDragged={
+                              isDragging &&
+                              (dragState as WeekDayDragState)?.eventId ===
+                              segment.event.id &&
+                              (dragState as WeekDayDragState)?.mode === 'move'
+                            }
+                            hourHeight={HOUR_HEIGHT}
+                            firstHour={FIRST_HOUR}
+                            onMoveStart={handleMoveStart}
+                            onResizeStart={handleResizeStart}
+                            onEventUpdate={handleEventUpdate}
+                            onEventDelete={handleEventDelete}
+                            newlyCreatedEventId={newlyCreatedEventId}
+                            onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
+                            selectedEventId={selectedEventId}
+                            detailPanelEventId={detailPanelEventId}
+                            onEventSelect={(eventId: string | null) => {
+                              const isViewable = app.getReadOnlyConfig().viewable !== false;
+                              const isReadOnly = app.state.readOnly;
+                              if ((isMobile || isTouch) && eventId && isViewable && !isReadOnly) {
+                                const evt = events.find(e => e.id === eventId);
+                                if (evt) {
+                                  setDraftEvent(evt);
+                                  setIsDrawerOpen(true);
+                                  return;
+                                }
+                              } setSelectedEventId(eventId);
+                            }}
+                            onEventLongPress={(eventId: string) => {
+                              if (isMobile || isTouch) setSelectedEventId(eventId);
+                            }}
+                            onDetailPanelToggle={(eventId: string | null) =>
+                              setDetailPanelEventId(eventId)
+                            }
+                            customDetailPanelContent={customDetailPanelContent}
+                            customEventDetailDialog={customEventDetailDialog}
+                            app={app}
+                            isMobile={isMobile}
+                            enableTouch={isTouch}
+                          />);
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
+              {/* Filler for All Day Row */}
+              <div className="flex-1  bg-white dark:bg-gray-900"></div>
             </div>
           </div>
         </div>
@@ -750,7 +785,7 @@ const WeekView: React.FC<WeekViewProps> = ({
 
         {/* Scroller */}
         <div ref={scrollerRef} className="flex-1 overflow-auto relative calendar-content snap-x snap-mandatory" onScroll={handleScroll}>
-          <div className="relative flex" style={{ width: gridWidth, minWidth: '100%' }}>
+          <div ref={timeGridRef} className="relative flex" style={{ width: gridWidth, minWidth: '100%' }}>
             {/* Current time line */}
             {isCurrentWeek && currentTime &&
               (() => {
@@ -813,7 +848,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                     return (
                       <div
                         key={`${slotIndex}-${dayIndex}`}
-                        className={`${timeGridCell} snap-start`}
+                        className={`${timeGridCell} snap-start ${isMobile && dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
                         style={columnStyle}
                         onDoubleClick={e => {
                           handleCreateStart?.(e, dayIndex, slot.hour);
@@ -909,7 +944,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                           detailPanelEventId={detailPanelEventId}
                           onEventSelect={(eventId: string | null) => {
                             const isViewable = app.getReadOnlyConfig().viewable !== false;
-                            if (isMobile && eventId && isViewable) {
+                            if ((isMobile || isTouch) && eventId && isViewable) {
                               const evt = events.find(e => e.id === eventId);
                               if (evt) {
                                 setDraftEvent(evt);
@@ -920,7 +955,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                             setSelectedEventId(eventId);
                           }}
                           onEventLongPress={(eventId: string) => {
-                            if (isMobile) setSelectedEventId(eventId);
+                            if (isMobile || isTouch) setSelectedEventId(eventId);
                           }}
                           onDetailPanelToggle={(eventId: string | null) =>
                             setDetailPanelEventId(eventId)
@@ -930,6 +965,7 @@ const WeekView: React.FC<WeekViewProps> = ({
                           multiDaySegmentInfo={segmentInfo}
                           app={app}
                           isMobile={isMobile}
+                          enableTouch={isTouch}
                         />
                       );
                     })}

@@ -156,7 +156,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             } else if (drag.allDay && !isDayView) {
               const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
               const dayColumnWidth = `calc(${totalWidth} / 7)`;
-              
+
               indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
               indicator.style.top = `${sourceElement.offsetTop - 2}px`;
               indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
@@ -165,7 +165,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
               const containerEl = calendarRef.current?.querySelector('.calendar-content');
               const scrollLeft = containerEl?.scrollLeft || 0;
-              
+
               indicator.style.left = `${sourceRect.left - containerRect.left + scrollLeft}px`;
               indicator.style.top = `${top + 3}px`;
               indicator.style.width = `${sourceRect.width}px`;
@@ -207,18 +207,19 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
                 indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
                 indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
               } else {
-                const dayWidth = `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
-                indicator.style.left = `calc(${TIME_COLUMN_WIDTH}px + (${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
+                const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
+                const dayWidth = `calc(${totalWidth} / 7)`;
+                indicator.style.left = `calc((${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
                 indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
-              }
-              indicator.style.zIndex = String(1000);
+              } indicator.style.zIndex = String(1000);
             } else {
+              const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
               const dayColumnWidth = isDayView
                 ? `calc(100% - ${TIME_COLUMN_WIDTH}px)`
-                : `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
+                : `calc(${totalWidth} / 7)`;
               indicator.style.left = isDayView
                 ? `${TIME_COLUMN_WIDTH}px`
-                : `calc(${TIME_COLUMN_WIDTH}px + (${dayColumnWidth} * ${drag.dayIndex}))`;
+                : `calc(${dayColumnWidth} * ${drag.dayIndex})`;
               indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
             }
           }
@@ -345,7 +346,6 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             'rounded-xl',
             'rounded-sm'
           );
-          
           const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
 
           if (layout) {

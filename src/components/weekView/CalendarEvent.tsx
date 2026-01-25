@@ -92,6 +92,8 @@ interface CalendarEventProps {
   app?: CalendarApp;
   /** Whether the current view is in mobile mode */
   isMobile?: boolean;
+  /** Force enable touch interactions regardless of isMobile */
+  enableTouch?: boolean;
 }
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
@@ -125,7 +127,9 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   multiDaySegmentInfo,
   app,
   isMobile = false,
+  enableTouch,
 }) => {
+  const isTouchEnabled = enableTouch ?? isMobile;
   const [isSelected, setIsSelected] = useState(false);
   const [isPopping, setIsPopping] = useState(false);
   const detailPanelKey =
@@ -151,7 +155,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!onMoveStart || !isMobile) return;
+    if (!onMoveStart || !isTouchEnabled) return;
     e.stopPropagation();
 
     // Store initial position to detect movement
@@ -228,7 +232,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       longPressTimerRef.current = null;
     }
 
-    if (isMobile && touchStartPosRef.current) {
+    if (isTouchEnabled && touchStartPosRef.current) {
       e.preventDefault();
       e.stopPropagation();
 
@@ -1465,7 +1469,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           </>
         )}
 
-        {isMobile && isEventSelected && onResizeStart && isEditable && (
+        {isTouchEnabled && isEventSelected && onResizeStart && isEditable && (
           <>
             {/* Top-Right Indicator (Start Time) */}
             <div
@@ -1560,8 +1564,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
               color: getEventTextColor(calendarId, app?.getCalendarRegistry()),
             }),
         }}
-        onClick={isMobile ? undefined : handleClick}
-        onDoubleClick={isMobile ? undefined : handleDoubleClick}
+        onClick={isTouchEnabled ? undefined : handleClick}
+        onDoubleClick={isTouchEnabled ? undefined : handleDoubleClick}
         onMouseDown={onMoveStart ? (e) => {
           // If it's a multi-day event segment, special handling is needed
           if (multiDaySegmentInfo) {
