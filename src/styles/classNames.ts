@@ -375,6 +375,11 @@ export const flexBetween = 'flex justify-between items-center';
 /**
  * Spacing
  */
+export const m1 = 'm-1';
+export const mr1 = 'mr-1';
+export const mt3 = 'mt-3';
+export const mb2 = 'mb-2';
+export const mb3 = 'mb-3';
 export const p1 = 'p-1';
 export const p2 = 'p-2';
 export const p4 = 'p-4';
@@ -382,11 +387,6 @@ export const px1 = 'px-1';
 export const px2 = 'px-2';
 export const py1 = 'py-1';
 export const py2 = 'py-2';
-export const m1 = 'm-1';
-export const mr1 = 'mr-1';
-export const mt3 = 'mt-3';
-export const mb2 = 'mb-2';
-export const mb3 = 'mb-3';
 
 // ==================== Combined Style Utility Functions ====================
 

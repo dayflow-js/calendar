@@ -79,7 +79,7 @@ export function useDragForView(
   // If view is not supported or config is disabled, also gracefully degrade
   if (!isSupported) {
     console.info(
-      `ℹ️ Drag functionality is not supported for ${options.viewType} view.`
+      `Drag functionality is not supported for ${options.viewType} view.`
     );
   }
 

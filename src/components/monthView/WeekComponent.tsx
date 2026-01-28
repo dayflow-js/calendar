@@ -11,7 +11,7 @@ import {
 import { VirtualWeekItem } from '@/types/monthView';
 import { temporalToDate } from '@/utils/temporal';
 import { useLocale } from '@/locale';
-import CalendarEvent from '../weekView/CalendarEvent';
+import CalendarEvent from '../calendarEvent';
 import { analyzeMultiDayEventsForWeek } from './util';
 import { extractHourFromDate } from '@/utils/helpers';
 import { logger } from '@/utils/logger';

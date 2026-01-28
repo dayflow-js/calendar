@@ -1,60 +1,16 @@
 import { EventLayout, Event } from '@/types';
-import { extractHourFromDate, getEventEndHour } from '@/utils/helpers';
-
-interface LayoutWeekEvent extends Event {
-  parentId?: string;
-  children: string[];
-  // Cached hour values to avoid repeated calculations
-  _startHour?: number;
-  _endHour?: number;
-}
-
-function toLayoutEvent(event: Event): LayoutWeekEvent {
-  return {
-    ...event,
-    parentId: undefined,
-    children: [],
-    // Only calculate hour values for non-all-day events
-    _startHour: event.allDay ? 0 : extractHourFromDate(event.start),
-    _endHour: event.allDay ? 0 : getEventEndHour(event),
-  };
-}
-
-function getStartHour(event: LayoutWeekEvent): number {
-  return event._startHour ?? extractHourFromDate(event.start);
-}
-
-function getEndHour(event: LayoutWeekEvent): number {
-  return event._endHour ?? getEventEndHour(event);
-}
-
-const LAYOUT_CONFIG = {
-  PARALLEL_THRESHOLD: 0.25, // 15 minutes, parallel layout threshold
-  NESTED_THRESHOLD: 0.5, // 30 minutes, nested layout threshold
-  INDENT_STEP_PERCENT: 2.5, // Indent step percentage (replaces pixel values)
-  MIN_WIDTH: 25, // Minimum width percentage
-  MARGIN_BETWEEN: 1, // Margin between parallel events percentage
-  EDGE_MARGIN_PERCENT: 0.9, // Edge margin percentage (replaces pixel value calculation)
-} as const;
-
-interface LayoutNode {
-  event: LayoutWeekEvent;
-  children: LayoutNode[];
-  parent: LayoutNode | null;
-  depth: number;
-  isProcessed: boolean; // Mark cross-branch parallel nodes
-}
-
-interface ParallelGroup {
-  events: LayoutWeekEvent[];
-  startHour: number;
-  endHour: number;
-}
-
-interface LayoutCalculationParams {
-  containerWidth?: number; // Optional container width for scenarios requiring pixel-precise calculations
-  viewType?: 'week' | 'day'; // View type for adjusting indent step size
-}
+import {
+  LayoutWeekEvent,
+  LayoutNode,
+  ParallelGroup,
+  LayoutCalculationParams
+} from './types';
+import {
+  toLayoutEvent,
+  getStartHour,
+  getEndHour
+} from './utils';
+import { LAYOUT_CONFIG } from './constants';
 
 export class EventLayoutCalculator {
   /**
@@ -599,12 +555,7 @@ export class EventLayoutCalculator {
       getStartHour(child) < getEndHour(parent) &&
       this.eventsOverlap(parent, child);
 
-    const result = strictContain || overlapNesting;
-
-    if (result && !strictContain) {
-    }
-
-    return result;
+    return strictContain || overlapNesting;
   }
 
   /**
@@ -678,7 +629,6 @@ export class EventLayoutCalculator {
             if (alternateBranchRoot) {
               assignments.push({ child, parent: alternateBranchRoot });
               this.setParentChildRelation(alternateBranchRoot, child);
-            } else {
             }
           }
         }
@@ -804,16 +754,9 @@ export class EventLayoutCalculator {
             : 0;
         })
       );
-    // If all child events have the same duration, select rightmost parent node
-    const allChildrenTheSameDuration = children.every(e => {
-      const duration = getEndHour(e) - getStartHour(e);
-      return duration === currentChildDuration;
-    });
 
     if (currentChildDurationGraterThanAllOtherEvents) {
       return candidateParents[0];
-    } else if (allChildrenTheSameDuration) {
-      return candidateParents[candidateParents.length - 1]; // Select last one (rightmost)
     } else {
       return candidateParents[candidateParents.length - 1]; // Select last one (rightmost)
     }
@@ -965,9 +908,6 @@ export class EventLayoutCalculator {
     // Ensure width doesn't exceed parent event range
     if (nodeLeft + nodeWidth > baseLeft + availableWidth) {
       nodeWidth = baseLeft + availableWidth - nodeLeft;
-      console.warn(
-        `⚠️ ${node.event.title}'s width exceeds parent event range, adjusted to: ${nodeWidth.toFixed(1)}%`
-      );
     }
 
     // Set layout for current node
@@ -1279,10 +1219,6 @@ export class EventLayoutCalculator {
       leafNode.depth = newParent.depth + 1;
       newParent.children.push(leafNode);
       this.setParentChildRelation(newParent.event, leafNode.event);
-
-      if (shouldBeParallel) {
-      } else {
-      }
     }
   }
 
@@ -1359,9 +1295,6 @@ export class EventLayoutCalculator {
       } else {
         break;
       }
-    }
-
-    if (iteration >= maxIterations) {
     }
   }
 

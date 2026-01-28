@@ -7,10 +7,10 @@ node_modules
 coverage
 
 # Next.js
-website/.next
-website/out
 build
 dist
+website/.next
+website/out
 
 # Production
 *.log

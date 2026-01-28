@@ -15,8 +15,8 @@ import {
   EventDetailDialogRenderer,
   ViewType,
 } from '@/types';
-import CalendarEvent from '@/components/weekView/CalendarEvent';
-import { EventLayoutCalculator } from '@/components/EventLayout';
+import CalendarEvent from '@/components/calendarEvent';
+import { EventLayoutCalculator } from '@/components/eventLayout';
 import { useDragForView } from '@/plugins/dragPlugin';
 import { ViewType as DragViewType, WeekDayDragState } from '@/types';
 import { defaultDragConfig } from '@/core/config';

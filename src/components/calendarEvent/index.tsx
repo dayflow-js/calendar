@@ -4,25 +4,18 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
+import ReactDOM from 'react-dom';
 import {
-  formatEventTimeRange,
-  getLineColor,
   getSelectedBgColor,
   getEventBgColor,
   getEventTextColor,
   extractHourFromDate,
   getEventEndHour,
-  formatTime,
 } from '@/utils';
 import {
   Event,
   EventDetailPosition,
-  EventLayout,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
 } from '@/types';
-import { CalendarDays } from 'lucide-react';
-import { MultiDayEventSegment } from '../monthView/WeekComponent';
 import MultiDayEvent from '../monthView/MultiDayEvent';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
 import EventDetailPanelWithContent from '../common/EventDetailPanelWithContent';
@@ -31,70 +24,12 @@ import {
   eventShadow,
   allDayRounded,
   regularEventRounded,
-  monthAllDayContent,
-  monthRegularContent,
-  eventTitleSmall,
-  eventTime,
-  eventColorBar,
-  eventIcon,
-  resizeHandleTop,
-  resizeHandleBottom,
-  resizeHandleLeft,
-  resizeHandleRight,
-  textXs,
-  textGray500,
-  textGray800,
-  px1,
-  mr1,
 } from '@/styles/classNames';
-import ReactDOM from 'react-dom';
-import { CalendarApp } from '@/core';
-
-interface CalendarEventProps {
-  event: Event;
-  layout?: EventLayout;
-  isAllDay?: boolean;
-  allDayHeight?: number;
-  calendarRef: React.RefObject<HTMLDivElement>;
-  isBeingDragged?: boolean;
-  isBeingResized?: boolean;
-  isDayView?: boolean;
-  isMonthView?: boolean;
-  isMultiDay?: boolean;
-  segment?: MultiDayEventSegment;
-  segmentIndex?: number;
-  hourHeight: number;
-  firstHour: number;
-  newlyCreatedEventId?: string | null;
-  selectedEventId?: string | null;
-  detailPanelEventId?: string | null;
-  onMoveStart?: (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
-    event: Event
-  ) => void;
-  onResizeStart?: (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>,
-    event: Event,
-    direction: string
-  ) => void;
-  onEventUpdate: (updatedEvent: Event) => void;
-  onEventDelete: (eventId: string) => void;
-  onDetailPanelOpen?: () => void;
-  onEventSelect?: (eventId: string | null) => void;
-  onEventLongPress?: (eventId: string) => void;
-  onDetailPanelToggle?: (eventId: string | null) => void;
-  /** Custom event detail content component (content only, will be wrapped in default panel) */
-  customDetailPanelContent?: EventDetailContentRenderer;
-  /** Custom event detail dialog component (Dialog mode) */
-  customEventDetailDialog?: EventDetailDialogRenderer;
-  /** Multi-day regular event segment information */
-  multiDaySegmentInfo?: { startHour: number; endHour: number; isFirst: boolean; isLast: boolean; dayIndex?: number };
-  app?: CalendarApp;
-  /** Whether the current view is in mobile mode */
-  isMobile?: boolean;
-  /** Force enable touch interactions regardless of isMobile */
-  enableTouch?: boolean;
-}
+import { CalendarEventProps } from './types';
+import MonthRegularContent from './components/MonthRegularContent';
+import MonthAllDayContent from './components/MonthAllDayContent';
+import AllDayContent from './components/AllDayContent';
+import RegularEventContent from './components/RegularEventContent';
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
   event,
@@ -260,6 +195,66 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const isEditable = !app?.state.readOnly;
   const canOpenDetail = readOnlyConfig?.viewable !== false;
   const isDraggable = readOnlyConfig?.draggable !== false;
+
+  const getDayMetrics = (
+    dayIndex: number
+  ): { left: number; width: number } | null => {
+    if (!calendarRef.current) return null;
+
+    const calendarRect = calendarRef.current.getBoundingClientRect();
+
+    if (isMonthView) {
+      const dayColumnWidth = calendarRect.width / 7;
+      return {
+        left: calendarRect.left + dayIndex * dayColumnWidth,
+        width: dayColumnWidth,
+      };
+    }
+
+    const timeColumnWidth = isMobile ? 48 : 80;
+    if (isDayView) {
+      const dayColumnWidth = calendarRect.width - timeColumnWidth;
+      return {
+        left: calendarRect.left + timeColumnWidth,
+        width: dayColumnWidth,
+      };
+    }
+
+    const dayColumnWidth = (calendarRect.width - timeColumnWidth) / 7;
+    return {
+      left: calendarRect.left + timeColumnWidth + dayIndex * dayColumnWidth,
+      width: dayColumnWidth,
+    };
+  };
+
+  const setActiveDayIndex = (dayIndex: number | null) => {
+    selectedDayIndexRef.current = dayIndex;
+  };
+
+  const getActiveDayIndex = () => {
+    if (selectedDayIndexRef.current !== null) {
+      return selectedDayIndexRef.current;
+    }
+
+    if (detailPanelEventId === detailPanelKey) {
+      const keyParts = detailPanelKey.split('::');
+      const suffix = keyParts[keyParts.length - 1];
+      if (suffix.startsWith('day-')) {
+        const parsed = Number(suffix.replace('day-', ''));
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+    }
+
+    if (multiDaySegmentInfo?.dayIndex !== undefined) {
+      return multiDaySegmentInfo.dayIndex;
+    }
+    if (segment) {
+      return segment.startDayIndex;
+    }
+    return event.day ?? 0;
+  };
 
   const calculateEventStyle = () => {
     if (isMonthView) {
@@ -439,6 +434,29 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     };
   };
 
+  const getClickedDayIndex = (clientX: number): number | null => {
+    if (!calendarRef.current) return null;
+
+    const calendarRect = calendarRef.current.getBoundingClientRect();
+    if (isMonthView) {
+      const dayColumnWidth = calendarRect.width / 7;
+      const relativeX = clientX - calendarRect.left;
+      const index = Math.floor(relativeX / dayColumnWidth);
+      return Number.isFinite(index)
+        ? Math.max(0, Math.min(6, index))
+        : null;
+    }
+
+    const timeColumnWidth = isMobile ? 48 : 80;
+    const columnCount = isDayView ? 1 : 7;
+    const dayColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
+    const relativeX = clientX - calendarRect.left - timeColumnWidth;
+    const index = Math.floor(relativeX / dayColumnWidth);
+    return Number.isFinite(index)
+      ? Math.max(0, Math.min(columnCount - 1, index))
+      : null;
+  };
+
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -541,149 +559,6 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         resolve();
       }, 300);
     });
-  };
-
-  const handleDoubleClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    if (!canOpenDetail) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    // For MultiDayEvent, find the actual event element
-    let targetElement = e.currentTarget as HTMLDivElement;
-    if (isMultiDay) {
-      // Find the actual DOM element of MultiDayEvent (it's a direct child element)
-      const multiDayElement = targetElement.querySelector(
-        'div'
-      ) as HTMLDivElement;
-      if (multiDayElement) {
-        targetElement = multiDayElement;
-      }
-    }
-
-    selectedEventElementRef.current = targetElement;
-
-    if (isMultiDay) {
-      if (segment) {
-        const clickedDay = getClickedDayIndex(e.clientX);
-        if (clickedDay !== null) {
-          const clampedDay = Math.min(
-            Math.max(clickedDay, segment.startDayIndex),
-            segment.endDayIndex
-          );
-          setActiveDayIndex(clampedDay);
-        } else {
-          setActiveDayIndex(segment.startDayIndex);
-        }
-      } else if (multiDaySegmentInfo?.dayIndex !== undefined) {
-        setActiveDayIndex(multiDaySegmentInfo.dayIndex);
-      } else {
-        setActiveDayIndex(event.day ?? null);
-      }
-    } else {
-      setActiveDayIndex(event.day ?? null);
-    }
-
-    scrollEventToCenter().then(() => {
-      setIsSelected(true);
-      if (!isMobile) {
-        onDetailPanelToggle?.(detailPanelKey);
-        setDetailPanelPosition({
-          top: -9999,
-          left: -9999,
-          eventHeight: 0,
-          eventMiddleY: 0,
-          isSunday: false,
-        });
-        requestAnimationFrame(() => {
-          updatePanelPosition();
-        });
-      }
-    });
-  };
-
-  const getClickedDayIndex = (clientX: number): number | null => {
-    if (!calendarRef.current) return null;
-
-    const calendarRect = calendarRef.current.getBoundingClientRect();
-    if (isMonthView) {
-      const dayColumnWidth = calendarRect.width / 7;
-      const relativeX = clientX - calendarRect.left;
-      const index = Math.floor(relativeX / dayColumnWidth);
-      return Number.isFinite(index)
-        ? Math.max(0, Math.min(6, index))
-        : null;
-    }
-
-    const timeColumnWidth = isMobile ? 48 : 80;
-    const columnCount = isDayView ? 1 : 7;
-    const dayColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
-    const relativeX = clientX - calendarRect.left - timeColumnWidth;
-    const index = Math.floor(relativeX / dayColumnWidth);
-    return Number.isFinite(index)
-      ? Math.max(0, Math.min(columnCount - 1, index))
-      : null;
-  };
-
-  const getDayMetrics = (
-    dayIndex: number
-  ): { left: number; width: number } | null => {
-    if (!calendarRef.current) return null;
-
-    const calendarRect = calendarRef.current.getBoundingClientRect();
-
-    if (isMonthView) {
-      const dayColumnWidth = calendarRect.width / 7;
-      return {
-        left: calendarRect.left + dayIndex * dayColumnWidth,
-        width: dayColumnWidth,
-      };
-    }
-
-    const timeColumnWidth = isMobile ? 48 : 80;
-    if (isDayView) {
-      const dayColumnWidth = calendarRect.width - timeColumnWidth;
-      return {
-        left: calendarRect.left + timeColumnWidth,
-        width: dayColumnWidth,
-      };
-    }
-
-    const dayColumnWidth = (calendarRect.width - timeColumnWidth) / 7;
-    return {
-      left: calendarRect.left + timeColumnWidth + dayIndex * dayColumnWidth,
-      width: dayColumnWidth,
-    };
-  };
-
-  const setActiveDayIndex = (dayIndex: number | null) => {
-    selectedDayIndexRef.current = dayIndex;
-  };
-
-  const getActiveDayIndex = () => {
-    if (selectedDayIndexRef.current !== null) {
-      return selectedDayIndexRef.current;
-    }
-
-    if (detailPanelEventId === detailPanelKey) {
-      const keyParts = detailPanelKey.split('::');
-      const suffix = keyParts[keyParts.length - 1];
-      if (suffix.startsWith('day-')) {
-        const parsed = Number(suffix.replace('day-', ''));
-        if (!Number.isNaN(parsed)) {
-          return parsed;
-        }
-      }
-    }
-
-    if (multiDaySegmentInfo?.dayIndex !== undefined) {
-      return multiDaySegmentInfo.dayIndex;
-    }
-    if (segment) {
-      return segment.startDayIndex;
-    }
-    return event.day ?? 0;
   };
 
   const updatePanelPosition = useCallback(() => {
@@ -883,6 +758,66 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     detailPanelEventId,
     detailPanelKey,
   ]);
+
+  const handleDoubleClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (!canOpenDetail) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    // For MultiDayEvent, find the actual event element
+    let targetElement = e.currentTarget as HTMLDivElement;
+    if (isMultiDay) {
+      // Find the actual DOM element of MultiDayEvent (it's a direct child element)
+      const multiDayElement = targetElement.querySelector(
+        'div'
+      ) as HTMLDivElement;
+      if (multiDayElement) {
+        targetElement = multiDayElement;
+      }
+    }
+
+    selectedEventElementRef.current = targetElement;
+
+    if (isMultiDay) {
+      if (segment) {
+        const clickedDay = getClickedDayIndex(e.clientX);
+        if (clickedDay !== null) {
+          const clampedDay = Math.min(
+            Math.max(clickedDay, segment.startDayIndex),
+            segment.endDayIndex
+          );
+          setActiveDayIndex(clampedDay);
+        } else {
+          setActiveDayIndex(segment.startDayIndex);
+        }
+      } else if (multiDaySegmentInfo?.dayIndex !== undefined) {
+        setActiveDayIndex(multiDaySegmentInfo.dayIndex);
+      } else {
+        setActiveDayIndex(event.day ?? null);
+      }
+    } else {
+      setActiveDayIndex(event.day ?? null);
+    }
+
+    scrollEventToCenter().then(() => {
+      setIsSelected(true);
+      if (!isMobile) {
+        onDetailPanelToggle?.(detailPanelKey);
+        setDetailPanelPosition({
+          top: -9999,
+          left: -9999,
+          eventHeight: 0,
+          eventMiddleY: 0,
+          isSunday: false,
+        });
+        requestAnimationFrame(() => {
+          updatePanelPosition();
+        });
+      }
+    });
+  };
 
   const checkEventVisibility = useCallback(() => {
     if (
@@ -1244,12 +1179,6 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     );
   };
 
-  const getDynamicPadding = () => {
-    const duration =
-      getEventEndHour(event) - extractHourFromDate(event.start);
-    return duration <= 0.25 ? 'px-1 py-0' : 'p-1';
-  };
-
   const renderMonthMultiDayContent = () => {
     if (!segment) return null;
 
@@ -1275,219 +1204,34 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       return renderMonthMultiDayContent();
     }
 
-    const showIcon = event.icon !== false;
-    const customIcon = typeof event.icon !== 'boolean' ? event.icon : null;
-
-    return (
-      <div className={monthAllDayContent}>
-        {showIcon && (
-          customIcon ? (
-            <div className={`${mr1} shrink-0`}>{customIcon}</div>
-          ) : (
-            event.title.toLowerCase().includes('easter') ||
-              event.title.toLowerCase().includes('holiday') ? (
-              <span
-                className={`inline-block ${mr1} shrink-0 ${isEventSelected ? 'text-yellow-200' : 'text-yellow-600'}`}
-              >
-                ⭐
-              </span>
-            ) : (
-              <CalendarDays
-                className={`${eventIcon} ${isEventSelected ? 'text-white' : ''}`}
-              />
-            )
-          )
-        )}
-        <span className={`truncate ${isEventSelected ? 'text-white' : ''}`}>
-          {event.title}
-        </span>
-      </div>
-    );
+    return <MonthAllDayContent event={event} isEventSelected={isEventSelected} />;
   };
 
   const renderMonthRegularContent = () => {
-    const startTime = `${Math.floor(extractHourFromDate(event.start)).toString().padStart(2, '0')}:${Math.round(
-      (extractHourFromDate(event.start) % 1) * 60
-    )
-      .toString()
-      .padStart(2, '0')}`;
-
-    return (
-      <div className={monthRegularContent}>
-        <div className="flex items-center flex-1 min-w-0">
-          <span
-            style={{
-              backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()),
-            }}
-            className={`inline-block w-0.75 h-3 ${mr1} shrink-0 rounded-full`}
-          ></span>
-          <span
-            className={`whitespace-nowrap overflow-hidden block md:truncate mobile-mask-fade ${isEventSelected ? 'text-white' : ''}`}
-          >
-            {event.title}
-          </span>
-        </div>
-        <span
-          className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''} hidden md:block`}
-          style={!isEventSelected ? { opacity: 0.8 } : undefined}
-        >
-          {startTime}
-        </span>
-      </div>
-    );
+    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} />;
   };
 
   const renderAllDayContent = () => {
-    const showIcon = event.icon !== false;
-    const customIcon = typeof event.icon !== 'boolean' ? event.icon : null;
-
     return (
-      <div
-        className={`h-full flex items-center overflow-hidden pl-3 ${px1} py-0 relative group`}
-      >
-        {/* Left resize handle - only shown for single-day all-day events with onResizeStart */}
-        {onResizeStart && isEditable && (
-          <div
-            className={resizeHandleLeft}
-            onMouseDown={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              onResizeStart(e, event, 'left');
-            }}
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-        )}
-
-        {showIcon && (
-          customIcon ? (
-            <div className="mr-1 shrink-0">{customIcon}</div>
-          ) : (
-            <CalendarDays className={eventIcon} />
-          )
-        )}
-        <div
-          className={`${eventTitleSmall} pr-1`}
-          style={{ lineHeight: '1.2' }}
-        >
-          {event.title}
-        </div>
-
-        {/* Right resize handle - only shown for single-day all-day events with onResizeStart */}
-        {onResizeStart && isEditable && (
-          <div
-            className={resizeHandleRight}
-            onMouseDown={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              onResizeStart(e, event, 'right');
-            }}
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-        )}
-      </div>
+      <AllDayContent
+        event={event}
+        isEditable={!!isEditable}
+        onResizeStart={onResizeStart}
+      />
     );
   };
 
   const renderRegularEventContent = () => {
-    const startHour = multiDaySegmentInfo
-      ? multiDaySegmentInfo.startHour
-      : extractHourFromDate(event.start);
-    const endHour = multiDaySegmentInfo
-      ? multiDaySegmentInfo.endHour
-      : getEventEndHour(event);
-    const duration = endHour - startHour;
-    const isFirstSegment = multiDaySegmentInfo ? multiDaySegmentInfo.isFirst : true;
-    const isLastSegment = multiDaySegmentInfo ? multiDaySegmentInfo.isLast : true;
-
     return (
-      <>
-        <div
-          className={eventColorBar}
-          style={{ backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()) }}
-        />
-        <div
-          className={`h-full flex flex-col overflow-hidden pl-3 ${getDynamicPadding()}`}
-        >
-          <div
-            className={`${eventTitleSmall} pr-1`}
-            style={{
-              lineHeight: duration <= 0.25 ? '1.2' : 'normal',
-            }}
-          >
-            {event.title}
-          </div>
-          {duration > 0.5 && (
-            <div className={eventTime}>
-              {multiDaySegmentInfo
-                ? `${formatTime(startHour)} - ${formatTime(endHour)}`
-                : formatEventTimeRange(event)}
-            </div>
-          )}
-        </div>
-
-        {onResizeStart && isEditable && (
-          <>
-            {/* Only show top resize handle on the first segment */}
-            {isFirstSegment && (
-              <div
-                className={resizeHandleTop}
-                onMouseDown={e => onResizeStart(e, event, 'top')}
-              />
-            )}
-            {/* Only show bottom resize handle on the last segment */}
-            {isLastSegment && (
-              <div
-                className={resizeHandleBottom}
-                onMouseDown={e => onResizeStart(e, event, 'bottom')}
-              />
-            )}
-            {/* Right resize handle for multi-day events (only on the last segment) */}
-            {!isFirstSegment && isLastSegment && multiDaySegmentInfo && (
-              <div
-                className={resizeHandleRight}
-                onMouseDown={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onResizeStart(e, event, 'right');
-                }}
-                onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              />
-            )}
-          </>
-        )}
-
-        {isTouchEnabled && isEventSelected && onResizeStart && isEditable && (
-          <>
-            {/* Top-Right Indicator (Start Time) */}
-            <div
-              className="absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
-              style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
-              onTouchStart={(e) => {
-                e.stopPropagation();
-                onResizeStart(e, event, 'top');
-              }}
-            />
-            {/* Bottom-Left Indicator (End Time) */}
-            <div
-              className="absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
-              style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
-              onTouchStart={(e) => {
-                e.stopPropagation();
-                onResizeStart(e, event, 'bottom');
-              }}
-            />
-          </>
-        )}
-      </>
+      <RegularEventContent
+        event={event}
+        app={app}
+        multiDaySegmentInfo={multiDaySegmentInfo}
+        isEditable={!!isEditable}
+        isTouchEnabled={!!isTouchEnabled}
+        isEventSelected={isEventSelected}
+        onResizeStart={onResizeStart}
+      />
     );
   };
 

@@ -34,7 +34,7 @@ export {
 } from './hooks/virtualScroll/useVirtualMonthScroll';
 
 // Components
-export { default as CalendarEvent } from './components/weekView/CalendarEvent';
+export { default as CalendarEvent } from './components/calendarEvent';
 export { default as DefaultEventDetailPanel } from './components/common/DefaultEventDetailPanel';
 export { default as DefaultEventDetailDialog } from './components/common/DefaultEventDetailDialog';
 export { default as EventDetailPanelWithContent } from './components/common/EventDetailPanelWithContent';
@@ -48,7 +48,7 @@ export type {
   ColorOption,
   ColorPickerProps,
 } from './components/common/ColorPicker';
-export { EventLayoutCalculator } from './components/EventLayout';
+export { EventLayoutCalculator } from './components/eventLayout';
 
 // Utilities
 export * from './utils';

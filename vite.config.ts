@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  publicDir: 'public',
   root: '.',
   resolve: {
     alias: {
@@ -14,5 +15,4 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
-  publicDir: 'public',
 });

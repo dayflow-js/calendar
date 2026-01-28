@@ -19,7 +19,6 @@ export function normalizeLocale(locale: string): SupportedLang {
  */
 export function isValidLocale(locale: string): boolean {
   try {
-    // eslint-disable-next-line no-new
     new Intl.DateTimeFormat(locale);
     return true;
   } catch (e) {

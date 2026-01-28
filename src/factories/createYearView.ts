@@ -63,36 +63,5 @@ export const createYearView: ViewFactory<YearViewConfig> = (config = {}) => {
     config: finalConfig,
   };
 };
-// TODO remove
-// Convenient Year view configuration creation function
-export function createYearViewConfig(
-  overrides: Partial<YearViewConfig> = {}
-): YearViewConfig {
-  return { ...defaultYearViewConfig, ...overrides };
-}
-
-// Preset configurations
-export const yearViewPresets = {
-  // Standard configuration
-  standard: (): CalendarView => createYearView(),
-
-  // Disable virtual scroll (suitable for devices with better performance)
-  noVirtualScroll: (): CalendarView =>
-    createYearView({
-      enableVirtualScroll: false,
-      viewConfig: {
-        enableVirtualScroll: false,
-      },
-    }),
-
-  // Debug mode
-  debug: (): CalendarView =>
-    createYearView({
-      showDebugInfo: true,
-      viewConfig: {
-        showDebugInfo: true,
-      },
-    }),
-};
 
 export default createYearView;

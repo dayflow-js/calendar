@@ -30,6 +30,8 @@
     "typescript",
     "drag-drop",
     "react-calendar",
+    "react-full-calendar",
+    "react-big-calendar",
     "event-calendar",
     "day-view",
     "week-view",

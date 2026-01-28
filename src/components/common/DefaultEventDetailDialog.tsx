@@ -6,7 +6,7 @@ import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import { isEventEqual } from '../../utils/eventUtils';
 import ColorPicker, { ColorOption } from './ColorPicker';
-import RangePicker from './RangePicker';
+import RangePicker from '../rangePicker';
 import { CalendarApp } from '../../types';
 import { useLocale } from '@/locale';
 
