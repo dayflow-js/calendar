@@ -1,348 +1,307 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocale } from '@/locale';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { CalendarApp } from '@/core';
+import { useLocale } from '@/locale';
+import { Event, ViewType, MonthEventDragState } from '@/types';
+import { temporalToDate } from '@/utils/temporal';
+import ViewHeader from '@/components/common/ViewHeader';
+import CalendarEvent from '@/components/calendarEvent';
+import { useDragForView } from '@/plugins/dragPlugin';
 import {
-  useVirtualScroll,
-  useResponsiveConfig,
-  YearDataCache,
-  VIRTUAL_SCROLL_CONFIG,
-} from '@/hooks/virtualScroll';
-import { VirtualItem } from '@/types';
+  monthViewContainer,
+  scrollContainer,
+} from '@/styles/classNames';
 
 interface YearViewProps {
-  app: CalendarApp; // Required prop, provided by CalendarRenderer
+  app: CalendarApp;
+  calendarRef: React.RefObject<HTMLDivElement>;
 }
 
-interface MonthData {
-  year: number;
-  month: number;
-  monthName: string;
-  days: Array<{
-    date: number;
-    isCurrentMonth: boolean;
-    isToday: boolean;
-    isSelected: boolean;
-    fullDate: Date;
-  }>;
+interface YearDayCellProps {
+  date: Date;
+  events: Event[];
+  isToday: boolean;
+  locale: string;
+  onSelectDate: (date: Date) => void;
+  app: CalendarApp;
+  calendarRef: React.RefObject<HTMLDivElement>;
+  onMoveStart?: (e: React.MouseEvent | React.TouchEvent, event: Event) => void;
+  dragState: MonthEventDragState;
+  isDragging: boolean;
+  selectedEventId: string | null;
+  onEventSelect: (eventId: string | null) => void;
+  onDetailPanelToggle: (eventId: string | null) => void;
+  detailPanelEventId: string | null;
 }
 
-interface YearData {
-  year: number;
-  months: MonthData[];
-}
-
-import ViewHeader from '@/components/common/ViewHeader';
-
-// Main component
-const VirtualizedYearView: React.FC<YearViewProps> = ({ app }) => {
-  const { t, getWeekDaysLabels, locale } = useLocale();
-  const currentDate = app.getCurrentDate();
-
-  // Responsive configuration
-  const { yearHeight, screenSize } = useResponsiveConfig();
-
-  // State management
-  const [showDebugger, setShowDebugger] = useState(false);
-
-  // Cache and references
-  const yearDataCache = React.useRef(new YearDataCache<YearData>());
-  const todayRef = React.useRef(new Date());
-
-  // Virtual scroll
-  const {
-    currentYear,
-    isScrolling,
-    virtualData,
-    scrollElementRef,
-    handleScroll,
-    scrollToYear,
-    handlePreviousYear,
-    handleNextYear,
-    handleToday: virtualHandleToday,
-  } = useVirtualScroll({
-    currentDate,
-    yearHeight,
-  });
-
-  // High-performance month data generation
-  const generateMonthData = useCallback(
-    (year: number, month: number): MonthData => {
-      const firstDay = new Date(year, month, 1);
-      // const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const firstDayOfWeek =
-        firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-
-      const days = [];
-      const today = todayRef.current;
-      const selected = currentDate;
-
-      // Batch generate 42 days of data
-      for (let i = 0; i < 42; i++) {
-        const dayOffset = i - firstDayOfWeek;
-        const date = new Date(year, month, dayOffset + 1);
-        const dayNum = date.getDate();
-        const isCurrentMonth = date.getMonth() === month;
-
-        days.push({
-          date: dayNum,
-          isCurrentMonth,
-          isToday:
-            isCurrentMonth && date.toDateString() === today.toDateString(),
-          isSelected:
-            isCurrentMonth && date.toDateString() === selected.toDateString(),
-          fullDate: date,
-        });
-      }
-
-      const monthDate = new Date(year, month, 1);
-      const localizedMonthName = monthDate.toLocaleDateString(locale, { month: 'long' });
-
-      return { year, month, monthName: localizedMonthName, days };
-    },
-    [currentDate, locale]
-  );
-
-  // Cached year data retrieval
-  const getYearData = useCallback(
-    (year: number): YearData => {
-      let yearData = yearDataCache.current.get(year);
-
-      if (!yearData) {
-        const months = [];
-        for (let month = 0; month < 12; month++) {
-          months.push(generateMonthData(year, month));
-        }
-        yearData = { year, months };
-        yearDataCache.current.set(year, yearData);
-      }
-
-      return yearData;
-    },
-    [generateMonthData]
-  );
-
-  const weekDayLabels = useMemo(() => {
-    return getWeekDaysLabels(locale, 'narrow');
-  }, [locale, getWeekDaysLabels]);
-
-  // Navigation functions
-  const handleToday = useCallback(() => {
-    app.goToToday();
-    virtualHandleToday();
-  }, [app, virtualHandleToday]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return;
-
-      switch (e.key) {
-        case 'ArrowUp':
-          e.preventDefault();
-          handlePreviousYear();
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          handleNextYear();
-          break;
-        case 'Home':
-          e.preventDefault();
-          handleToday();
-          break;
-        case 'PageUp':
-          e.preventDefault();
-          const prev = Math.max(
-            VIRTUAL_SCROLL_CONFIG.MIN_YEAR,
-            currentYear - 5
-          );
-          scrollToYear(prev);
-          break;
-        case 'PageDown':
-          e.preventDefault();
-          const next = Math.min(
-            VIRTUAL_SCROLL_CONFIG.MAX_YEAR,
-            currentYear + 5
-          );
-          scrollToYear(next);
-          break;
-        case 'F12':
-          if (e.shiftKey) {
-            e.preventDefault();
-            setShowDebugger(!showDebugger);
-          }
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
-    currentYear,
-    handlePreviousYear,
-    handleNextYear,
-    handleToday,
-    scrollToYear,
-    showDebugger,
-  ]);
-
-  // Month component - optimized for mobile display
-  const MonthComponent = React.memo<{ monthData: MonthData }>(
-    ({ monthData }) => {
-      return (
-        <div className="h-fit">
-          <div
-            className={`text-red-600 font-semibold mb-2 sm:mb-3 ${screenSize === 'mobile' ? 'text-xs' : 'text-xs sm:text-sm'
-              } `}
-          >
-            {monthData.monthName}
-          </div>
-
-          <div className="grid grid-cols-7 gap-0 mb-1 sm:mb-2">
-            {weekDayLabels.map((day, i) => (
-              <div
-                key={i}
-                className={`text-center text-gray-500 py-0.5 text-xs w-10`}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 gap-0">
-            {monthData.days.map((day, i) => (
-              <button
-                key={i}
-                className={`
-                text-center rounded-sm transition-colors
-                w-10
-                ${screenSize === 'mobile'
-                    ? 'text-xs py-1 min-h-4.5'
-                    : 'text-xs py-1 sm:py-1.5 min-h-5 sm:min-h-6.5'
-                  }
-                ${day.isCurrentMonth
-                    ? 'text-gray-900 font-medium hover:bg-gray-100 active:bg-gray-200'
-                    : 'text-gray-300 cursor-not-allowed'
-                  }
-                ${day.isToday
-                    ? 'bg-red-500 text-white hover:bg-red-600 font-bold shadow-sm ring-2 ring-red-200'
-                    : ''
-                  }
-                ${day.isSelected && !day.isToday
-                    ? 'bg-red-100 text-red-600 font-semibold ring-1 ring-red-300'
-                    : ''
-                  }
-              `}
-                onClick={() =>
-                  day.isCurrentMonth && app.selectDate(day.fullDate)
-                }
-                disabled={!day.isCurrentMonth}
-              >
-                {day.date}
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    }
-  );
-
-  // Virtual year item
-  const VirtualYearItem = React.memo<{ item: VirtualItem }>(({ item }) => {
-    const yearData = getYearData(item.year);
-
-    return (
-      <div
-        className="absolute w-full"
-        style={{
-          top: item.top,
-          height: item.height,
-          contain: 'layout style paint',
-        }}
-      >
-        <div className="px-4 py-2 bg-white">
-          <div className="mx-auto px-8">
-            {/* Month grid - corrected to 3 rows 4 columns layout */}
-            <div
-              className={`grid gap-3 lg:gap-8 ${screenSize === 'mobile'
-                ? 'grid-cols-2 grid-rows-6' // Mobile: 2 columns 6 rows
-                : screenSize === 'tablet'
-                  ? 'grid-cols-3 grid-rows-4' // Tablet: 3 columns 4 rows
-                  : 'grid-cols-4 grid-rows-3' // Desktop: 4 columns 3 rows
-                }`}
-            >
-              {yearData.months.map(monthData => (
-                <MonthComponent
-                  key={`${monthData.year}-${monthData.month}`}
-                  monthData={monthData}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  });
-
-  MonthComponent.displayName = 'MonthComponent';
-  VirtualYearItem.displayName = 'VirtualYearItem';
+const YearDayCell: React.FC<YearDayCellProps> = React.memo(({
+  date,
+  events,
+  isToday,
+  locale,
+  onSelectDate,
+  app,
+  calendarRef,
+  onMoveStart,
+  dragState,
+  isDragging,
+  selectedEventId,
+  onEventSelect,
+  onDetailPanelToggle,
+  detailPanelEventId,
+}) => {
+  const day = date.getDate();
+  const isFirstDay = day === 1;
+  const monthLabel = date.toLocaleDateString(locale, { month: 'short' }).toUpperCase();
+  
+  // Calculate max events to show (approximate based on cell size)
+  // For Year view, we keep it tight.
+  const MAX_EVENTS = 3;
 
   return (
-    <div className="relative flex flex-col bg-white shadow-md w-full overflow-hidden h-full">
-      {/* Header navigation */}
-      <ViewHeader
-        calendar={app}
-        viewType="year"
-        currentDate={currentDate}
-        customTitle={currentYear.toString()}
-        onPrevious={() => {
-          app.goToPrevious();
-          handlePreviousYear();
-        }}
-        onNext={() => {
-          app.goToNext();
-          handleNextYear();
-        }}
-        onToday={handleToday}
-      />
-
-      {/* Scrolling year indicator */}
-      {isScrolling && (
-        <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-40 bg-white/95 backdrop-blur-sm py-2 px-4 rounded-lg shadow-lg border border-gray-200 transition-all duration-200 pointer-events-none">
-          <span className="text-xl font-bold text-gray-900">{currentYear}</span>
-        </div>
-      )}
-
-      {/* Virtual scroll container - completely seamless */}
-      <div
-        ref={scrollElementRef}
-        className="flex-1 overflow-auto bg-gray-50"
-        onScroll={handleScroll}
-        style={{
-          contain: 'layout style paint',
-          scrollBehavior: 'auto',
-        }}
-      >
-        <div className="relative" style={{ height: virtualData.totalHeight }}>
-          {virtualData.visibleItems.map(item => (
-            <VirtualYearItem key={item.year} item={item} />
-          ))}
-        </div>
+    <div
+      className={`
+        relative flex flex-col border border-gray-100 dark:border-gray-800
+        ${isFirstDay ? 'border-l-2 border-l-gray-300 dark:border-l-gray-600' : ''}
+        cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800
+        overflow-hidden bg-white dark:bg-gray-900
+      `}
+      style={{ aspectRatio: '1/1' }}
+      onClick={() => onSelectDate(date)}
+      // Enable drop target for drag plugin
+      data-date={date.toISOString().split('T')[0]} 
+    >
+      <div className="flex items-center px-1 py-1 gap-1 shrink-0">
+        <span
+          className={`text-[10px] font-medium ${isToday
+            ? 'bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center'
+            : 'text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          {day}
+        </span>
+        {isFirstDay && (
+          <span className="text-[10px] font-bold text-gray-500 leading-none">
+            {monthLabel}
+          </span>
+        )}
       </div>
 
-      {/* Progress indicator */}
-      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-30 hover:opacity-70 transition-opacity">
-        <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
-          {Math.round(
-            ((currentYear - VIRTUAL_SCROLL_CONFIG.MIN_YEAR) /
-              (VIRTUAL_SCROLL_CONFIG.MAX_YEAR -
-                VIRTUAL_SCROLL_CONFIG.MIN_YEAR)) *
-            100
-          )}
-          %
+      <div className="flex-1 px-1 flex flex-col gap-[1px] overflow-hidden">
+        {events.slice(0, MAX_EVENTS).map((event) => (
+          <CalendarEvent
+            key={event.id}
+            event={event}
+            app={app}
+            isMonthView={true}
+            calendarRef={calendarRef}
+            hourHeight={0}
+            firstHour={0}
+            onEventUpdate={(updated) => app.updateEvent(updated.id, updated)}
+            onEventDelete={(id) => app.deleteEvent(id)}
+            hideTime={true}
+            onMoveStart={onMoveStart}
+            isBeingDragged={
+              isDragging &&
+              dragState.eventId === event.id &&
+              dragState.mode === 'move'
+            }
+            selectedEventId={selectedEventId}
+            onEventSelect={onEventSelect}
+            detailPanelEventId={detailPanelEventId}
+            onDetailPanelToggle={onDetailPanelToggle}
+          />
+        ))}
+        {events.length > MAX_EVENTS && (
+          <div className="text-[9px] text-gray-400 pl-1 leading-tight">
+            +{events.length - MAX_EVENTS}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+YearDayCell.displayName = 'YearDayCell';
+
+const YearView: React.FC<YearViewProps> = ({
+  app,
+  calendarRef,
+}) => {
+  const { locale, getMonthLabels } = useLocale();
+  const currentDate = app.getCurrentDate();
+  const currentYear = currentDate.getFullYear();
+  const rawEvents = app.getEvents();
+  const scrollElementRef = useRef<HTMLDivElement>(null);
+  
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(null);
+
+  // Drag and Drop Hook
+  const {
+    handleMoveStart,
+    dragState,
+    isDragging,
+  } = useDragForView(app, {
+    calendarRef,
+    viewType: ViewType.YEAR,
+    onEventsUpdate: (updateFunc) => {
+      const newEvents = updateFunc(rawEvents);
+      newEvents.forEach(newEvent => {
+        const oldEvent = rawEvents.find(e => e.id === newEvent.id);
+        if (oldEvent && (oldEvent.start !== newEvent.start || oldEvent.end !== newEvent.end)) {
+          app.updateEvent(newEvent.id, newEvent);
+        }
+      });
+    },
+    currentWeekStart: new Date(),
+    events: rawEvents,
+    onEventCreate: () => {},
+    onEventEdit: () => {},
+  });
+
+  // Generate all days for the current year
+  const yearDays = useMemo(() => {
+    const days: Date[] = [];
+    const start = new Date(currentYear, 0, 1);
+    const end = new Date(currentYear, 11, 31);
+    
+    const current = new Date(start);
+    while (current <= end) {
+      days.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return days;
+  }, [currentYear]);
+
+  // Filter events for the current year
+  const yearEvents = useMemo(() => {
+    // Simple filter: Event must overlap with the current year
+    const yearStart = new Date(currentYear, 0, 1);
+    const yearEnd = new Date(currentYear, 11, 31, 23, 59, 59);
+
+    return rawEvents.filter(event => {
+       if (!event.start) return false;
+       const s = temporalToDate(event.start);
+       const e = event.end ? temporalToDate(event.end) : s;
+       return s <= yearEnd && e >= yearStart;
+    });
+  }, [rawEvents, currentYear]);
+
+  // Map events to days for faster rendering
+  // Note: This is a heavy operation, memoize carefully.
+  // For < 2000 events and 365 days, it's roughly 700k ops worst case, but realistically much less.
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, Event[]>();
+    
+    // Initialize map keys? No, just populate.
+    
+    yearEvents.forEach(event => {
+      const startFull = temporalToDate(event.start);
+      const endFull = event.end ? temporalToDate(event.end) : startFull;
+      
+      // Clamp to current year
+      let current = new Date(startFull);
+      if (current.getFullYear() < currentYear) current = new Date(currentYear, 0, 1);
+      
+      const endLoop = new Date(endFull);
+      if (endLoop.getFullYear() > currentYear) endLoop.setDate(31); // Optimization: just loop until end of year if needed, but handled by date comparison
+      
+      // We only care about date part
+      current.setHours(0,0,0,0);
+      const loopEndVal = endLoop.getTime();
+
+      // Safety break
+      let safety = 0;
+      while (current.getTime() <= loopEndVal && current.getFullYear() === currentYear && safety < 370) {
+         const key = current.toDateString();
+         if (!map.has(key)) map.set(key, []);
+         map.get(key)!.push(event);
+         
+         current.setDate(current.getDate() + 1);
+         safety++;
+      }
+    });
+    return map;
+  }, [yearEvents, currentYear]);
+
+  const getCustomTitle = () => {
+     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
+     return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+  };
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  return (
+    <div className={monthViewContainer}>
+      <ViewHeader
+        calendar={app}
+        viewType={ViewType.YEAR}
+        currentDate={currentDate}
+        customTitle={getCustomTitle()}
+        onPrevious={() => {
+          const newDate = new Date(currentDate);
+          newDate.setFullYear(newDate.getFullYear() - 1);
+          app.setCurrentDate(newDate);
+        }}
+        onNext={() => {
+          const newDate = new Date(currentDate);
+          newDate.setFullYear(newDate.getFullYear() + 1);
+          app.setCurrentDate(newDate);
+        }}
+        onToday={() => {
+          app.goToToday();
+        }}
+      />
+
+      <div
+        ref={scrollElementRef}
+        className={`${scrollContainer} p-4`}
+        style={{
+          overflow: 'hidden auto',
+        }}
+      >
+        <div 
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+            gap: '1px',
+            width: '100%',
+          }}
+        >
+          {yearDays.map((date) => {
+             const key = date.toDateString();
+             const dayEvents = eventsByDay.get(key) || [];
+             const isToday = date.getTime() === today.getTime();
+             
+             return (
+               <YearDayCell 
+                 key={date.getTime()}
+                 date={date}
+                 events={dayEvents}
+                 isToday={isToday}
+                 locale={locale}
+                 onSelectDate={(d) => {
+                   app.selectDate(d);
+                   app.changeView(ViewType.DAY);
+                 }}
+                 app={app}
+                 calendarRef={calendarRef}
+                 onMoveStart={handleMoveStart}
+                 dragState={dragState as MonthEventDragState}
+                 isDragging={isDragging}
+                 selectedEventId={selectedEventId}
+                 onEventSelect={setSelectedEventId}
+                 onDetailPanelToggle={setDetailPanelEventId}
+                 detailPanelEventId={detailPanelEventId}
+               />
+             );
+          })}
         </div>
       </div>
     </div>
   );
 };
 
-export default VirtualizedYearView;
+export default YearView;
+

@@ -12,12 +12,14 @@ interface MonthRegularContentProps {
   event: Event;
   app?: CalendarApp;
   isEventSelected: boolean;
+  hideTime?: boolean;
 }
 
 const MonthRegularContent: React.FC<MonthRegularContentProps> = ({
   event,
   app,
   isEventSelected,
+  hideTime,
 }) => {
   const startTime = `${Math.floor(extractHourFromDate(event.start)).toString().padStart(2, '0')}:${Math.round(
     (extractHourFromDate(event.start) % 1) * 60
@@ -40,12 +42,14 @@ const MonthRegularContent: React.FC<MonthRegularContentProps> = ({
           {event.title}
         </span>
       </div>
-      <span
-        className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''} hidden md:block`}
-        style={!isEventSelected ? { opacity: 0.8 } : undefined}
-      >
-        {startTime}
-      </span>
+      {!hideTime && (
+        <span
+          className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''} hidden md:block`}
+          style={!isEventSelected ? { opacity: 0.8 } : undefined}
+        >
+          {startTime}
+        </span>
+      )}
     </div>
   );
 };

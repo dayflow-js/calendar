@@ -48,6 +48,7 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
       createDayView(),
       createWeekView(),
       createMonthView(),
+      createYearView(),
     ],
     events: events,
     calendars: getWebsiteCalendars(),

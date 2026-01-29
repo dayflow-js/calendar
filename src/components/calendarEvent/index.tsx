@@ -63,6 +63,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   app,
   isMobile = false,
   enableTouch,
+  hideTime,
 }) => {
   const isTouchEnabled = enableTouch ?? isMobile;
   const [isSelected, setIsSelected] = useState(false);
@@ -1208,7 +1209,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   };
 
   const renderMonthRegularContent = () => {
-    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} />;
+    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} hideTime={hideTime} />;
   };
 
   const renderAllDayContent = () => {
