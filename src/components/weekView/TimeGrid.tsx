@@ -68,6 +68,7 @@ interface TimeGridProps {
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
   LAST_HOUR: number;
+  showStartOfDayLabel: boolean;
 }
 
 export const TimeGrid: React.FC<TimeGridProps> = ({
@@ -113,6 +114,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   HOUR_HEIGHT,
   FIRST_HOUR,
   LAST_HOUR,
+  showStartOfDayLabel,
 }) => {
   const columnStyle: React.CSSProperties = { flexShrink: 0 };
   const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
@@ -154,7 +156,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
           {timeSlots.map((slot, slotIndex) => (
             <div key={slotIndex} className={timeSlot}>
               <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                {slotIndex === 0 ? '' : slot.label}
+                {slotIndex === 0 ? (showStartOfDayLabel ? slot.label : '') : slot.label}
               </div>
             </div>
           ))}

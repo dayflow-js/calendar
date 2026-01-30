@@ -7,6 +7,7 @@ import { useLocale } from '@/locale';
 import {
   Event,
   DayViewProps,
+  ViewType,
 } from '@/types';
 import { EventLayoutCalculator } from '@/components/eventLayout';
 import { useDragForView } from '@/plugins/dragPlugin';
@@ -36,6 +37,7 @@ const DayView: React.FC<DayViewProps> = ({
   customEventDetailDialog,
   calendarRef,
   switcherMode = 'buttons',
+  config,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
   detailPanelEventId: propDetailPanelEventId,
@@ -45,6 +47,11 @@ const DayView: React.FC<DayViewProps> = ({
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
   const [isTouch, setIsTouch] = useState(false);
+  const appViewConfig = app.getViewConfig(ViewType.DAY) as { showAllDay?: boolean };
+  const showAllDay = (config as { showAllDay?: boolean } | undefined)?.showAllDay
+    ?? appViewConfig?.showAllDay
+    ?? true;
+  const showStartOfDayLabel = !showAllDay;
 
   useEffect(() => {
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -212,7 +219,7 @@ const DayView: React.FC<DayViewProps> = ({
     isDragging,
   } = useDragForView(app, {
     calendarRef,
-    allDayRowRef,
+    allDayRowRef: showAllDay ? allDayRowRef : undefined,
     viewType: DragViewType.DAY,
     onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => {
       const newEvents = updateFunc(currentDayEvents);
@@ -415,6 +422,8 @@ const DayView: React.FC<DayViewProps> = ({
         HOUR_HEIGHT={HOUR_HEIGHT}
         FIRST_HOUR={FIRST_HOUR}
         LAST_HOUR={LAST_HOUR}
+        showAllDay={showAllDay}
+        showStartOfDayLabel={showStartOfDayLabel}
       />
       <RightPanel
         app={app}

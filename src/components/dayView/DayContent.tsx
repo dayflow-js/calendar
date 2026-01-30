@@ -75,6 +75,8 @@ interface DayContentProps {
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
   LAST_HOUR: number;
+  showAllDay: boolean;
+  showStartOfDayLabel: boolean;
 }
 
 export const DayContent: React.FC<DayContentProps> = ({
@@ -121,6 +123,8 @@ export const DayContent: React.FC<DayContentProps> = ({
   HOUR_HEIGHT,
   FIRST_HOUR,
   LAST_HOUR,
+  showAllDay,
+  showStartOfDayLabel,
 }) => {
   const { t, locale } = useLocale();
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -171,90 +175,92 @@ export const DayContent: React.FC<DayContentProps> = ({
           />
         </div>
         {/* All-day event area */}
-        <div
-          className={`${allDayRow} pt-px`}
-          ref={allDayRowRef}
-          onContextMenu={(e) => handleContextMenu(e, true)}
-        >
-          <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs`} onContextMenu={e => e.preventDefault()}>{t('allDay')}</div>
-          <div className="flex flex-1 relative">
-            <div
-              className="w-full relative"
-              style={{ minHeight: `${allDayAreaHeight}px` }}
-              onMouseDown={e => {
-                const currentDayIndex = Math.floor(
-                  (currentDate.getTime() - currentWeekStart.getTime()) /
-                  (24 * 60 * 60 * 1000)
-                );
-                handleCreateAllDayEvent?.(e, currentDayIndex);
-              }}
-              onDoubleClick={e => {
-                const currentDayIndex = Math.floor(
-                  (currentDate.getTime() - currentWeekStart.getTime()) /
-                  (24 * 60 * 60 * 1000)
-                );
-                handleCreateAllDayEvent?.(e, currentDayIndex);
-              }}
-              onDragOver={handleDragOver}
-              onDrop={e => {
-                handleDrop(e, currentDate, undefined, true);
-              }}
-            >
-              {organizedAllDayEvents.map(event => (
-                <CalendarEventComponent
-                  key={event.id}
-                  event={event}
-                  isAllDay={true}
-                  isDayView={true}
-                  segmentIndex={event.row}
-                  allDayHeight={ALL_DAY_HEIGHT}
-                  calendarRef={calendarRef}
-                  isBeingDragged={
-                    isDragging &&
-                    (dragState as WeekDayDragState)?.eventId === event.id &&
-                    (dragState as WeekDayDragState)?.mode === 'move'
-                  }
-                  hourHeight={HOUR_HEIGHT}
-                  firstHour={FIRST_HOUR}
-                  onMoveStart={handleMoveStart}
-                  onEventUpdate={handleEventUpdate}
-                  onEventDelete={handleEventDelete}
-                  newlyCreatedEventId={newlyCreatedEventId}
-                  onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
-                  detailPanelEventId={detailPanelEventId}
-                  onDetailPanelToggle={(eventId: string | null) =>
-                    setDetailPanelEventId(eventId)
-                  }
-                  selectedEventId={selectedEventId}
-                  onEventSelect={(eventId: string | null) => {
-                    const isViewable = app.getReadOnlyConfig().viewable !== false;
-                    const isReadOnly = app.state.readOnly;
-                    const evt = events.find(e => e.id === eventId);
-                    if ((isMobile || isTouch) && evt && isViewable && !isReadOnly) {
-                      setDraftEvent(evt);
-                      setIsDrawerOpen(true);
-                    } else {
-                      setSelectedEventId(eventId);
-                      if (app.state.highlightedEventId) {
-                        app.highlightEvent(null);
-                        prevHighlightedEventId.current = null;
+        {showAllDay && (
+          <div
+            className={`${allDayRow} pt-px`}
+            ref={allDayRowRef}
+            onContextMenu={(e) => handleContextMenu(e, true)}
+          >
+            <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs`} onContextMenu={e => e.preventDefault()}>{t('allDay')}</div>
+            <div className="flex flex-1 relative">
+              <div
+                className="w-full relative"
+                style={{ minHeight: `${allDayAreaHeight}px` }}
+                onMouseDown={e => {
+                  const currentDayIndex = Math.floor(
+                    (currentDate.getTime() - currentWeekStart.getTime()) /
+                    (24 * 60 * 60 * 1000)
+                  );
+                  handleCreateAllDayEvent?.(e, currentDayIndex);
+                }}
+                onDoubleClick={e => {
+                  const currentDayIndex = Math.floor(
+                    (currentDate.getTime() - currentWeekStart.getTime()) /
+                    (24 * 60 * 60 * 1000)
+                  );
+                  handleCreateAllDayEvent?.(e, currentDayIndex);
+                }}
+                onDragOver={handleDragOver}
+                onDrop={e => {
+                  handleDrop(e, currentDate, undefined, true);
+                }}
+              >
+                {organizedAllDayEvents.map(event => (
+                  <CalendarEventComponent
+                    key={event.id}
+                    event={event}
+                    isAllDay={true}
+                    isDayView={true}
+                    segmentIndex={event.row}
+                    allDayHeight={ALL_DAY_HEIGHT}
+                    calendarRef={calendarRef}
+                    isBeingDragged={
+                      isDragging &&
+                      (dragState as WeekDayDragState)?.eventId === event.id &&
+                      (dragState as WeekDayDragState)?.mode === 'move'
+                    }
+                    hourHeight={HOUR_HEIGHT}
+                    firstHour={FIRST_HOUR}
+                    onMoveStart={handleMoveStart}
+                    onEventUpdate={handleEventUpdate}
+                    onEventDelete={handleEventDelete}
+                    newlyCreatedEventId={newlyCreatedEventId}
+                    onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
+                    detailPanelEventId={detailPanelEventId}
+                    onDetailPanelToggle={(eventId: string | null) =>
+                      setDetailPanelEventId(eventId)
+                    }
+                    selectedEventId={selectedEventId}
+                    onEventSelect={(eventId: string | null) => {
+                      const isViewable = app.getReadOnlyConfig().viewable !== false;
+                      const isReadOnly = app.state.readOnly;
+                      const evt = events.find(e => e.id === eventId);
+                      if ((isMobile || isTouch) && evt && isViewable && !isReadOnly) {
+                        setDraftEvent(evt);
+                        setIsDrawerOpen(true);
+                      } else {
+                        setSelectedEventId(eventId);
+                        if (app.state.highlightedEventId) {
+                          app.highlightEvent(null);
+                          prevHighlightedEventId.current = null;
+                        }
                       }
-                    }
-                  }}
-                  onEventLongPress={(eventId: string) => {
-                    if (isMobile || isTouch) {
-                      setSelectedEventId(eventId);
-                    }
-                  }}
-                  customDetailPanelContent={customDetailPanelContent} customEventDetailDialog={customEventDetailDialog}
-                  app={app}
-                  isMobile={isMobile}
-                  enableTouch={isTouch}
-                />
-              ))}
+                    }}
+                    onEventLongPress={(eventId: string) => {
+                      if (isMobile || isTouch) {
+                        setSelectedEventId(eventId);
+                      }
+                    }}
+                    customDetailPanelContent={customDetailPanelContent} customEventDetailDialog={customEventDetailDialog}
+                    app={app}
+                    isMobile={isMobile}
+                    enableTouch={isTouch}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Time grid and event area */}
         <div className={`${calendarContent} df-day-time-grid`} style={{ position: 'relative' }}>
@@ -299,7 +305,7 @@ export const DayContent: React.FC<DayContentProps> = ({
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
                   <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                    {slotIndex === 0 ? '' : slot.label}
+                    {slotIndex === 0 ? (showStartOfDayLabel ? slot.label : '') : slot.label}
                   </div>
                 </div>
               ))}

@@ -49,8 +49,30 @@ const defaultWeekViewConfig: WeekViewConfig = {
 
 // Week view factory function
 export const createWeekView: ViewFactory<WeekViewConfig> = (config = {}) => {
+  const finalViewConfig = {
+    ...defaultWeekViewConfig.viewConfig,
+    ...(config.viewConfig ?? {}),
+  };
+
+  if (config.showWeekends !== undefined) {
+    finalViewConfig.showWeekends = config.showWeekends;
+  }
+  if (config.showAllDay !== undefined) {
+    finalViewConfig.showAllDay = config.showAllDay;
+  }
+  if (config.startOfWeek !== undefined) {
+    finalViewConfig.startOfWeek = config.startOfWeek;
+  }
+  if (config.scrollToCurrentTime !== undefined) {
+    finalViewConfig.scrollToCurrentTime = config.scrollToCurrentTime;
+  }
+
   // Merge configuration
-  const finalConfig = { ...defaultWeekViewConfig, ...config };
+  const finalConfig = {
+    ...defaultWeekViewConfig,
+    ...config,
+    viewConfig: finalViewConfig,
+  };
 
   // Create adapter component
   const WeekViewAdapter: React.FC<ViewAdapterProps> = props => {

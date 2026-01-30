@@ -47,8 +47,27 @@ const defaultDayViewConfig: DayViewConfig = {
 
 // Day view factory function
 export const createDayView: ViewFactory<DayViewConfig> = (config = {}) => {
+  const finalViewConfig = {
+    ...defaultDayViewConfig.viewConfig,
+    ...(config.viewConfig ?? {}),
+  };
+
+  if (config.showMiniCalendar !== undefined) {
+    finalViewConfig.showMiniCalendar = config.showMiniCalendar;
+  }
+  if (config.showAllDay !== undefined) {
+    finalViewConfig.showAllDay = config.showAllDay;
+  }
+  if (config.scrollToCurrentTime !== undefined) {
+    finalViewConfig.scrollToCurrentTime = config.scrollToCurrentTime;
+  }
+
   // Merge configuration
-  const finalConfig = { ...defaultDayViewConfig, ...config };
+  const finalConfig = {
+    ...defaultDayViewConfig,
+    ...config,
+    viewConfig: finalViewConfig,
+  };
 
   // Create adapter component
   const DayViewAdapter: React.FC<ViewAdapterProps> = props => {
