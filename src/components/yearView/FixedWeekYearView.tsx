@@ -5,6 +5,7 @@ import React, {
   useState,
   useEffect,
 } from 'react';
+import { Temporal } from 'temporal-polyfill';
 import { CalendarApp } from '@/core';
 import { useLocale } from '@/locale';
 import {
@@ -23,6 +24,9 @@ interface FixedWeekYearViewProps {
   calendarRef: React.RefObject<HTMLDivElement>;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  config?: {
+    showTimedEventsInYearView?: boolean;
+  };
 }
 
 interface MonthEventSegment extends YearMultiDaySegment {
@@ -159,6 +163,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
   calendarRef,
   customDetailPanelContent,
   customEventDetailDialog,
+  config,
 }) => {
   const { locale, getWeekDaysLabels } = useLocale();
   const currentDate = app.getCurrentDate();
@@ -244,6 +249,36 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
     },
   });
 
+  // Get config value
+  const showTimedEvents = config?.showTimedEventsInYearView ?? false;
+
+  // Handle double click on cell - create all-day or timed event based on config
+  const handleCellDoubleClick = useCallback(
+    (e: React.MouseEvent, date: Date) => {
+      if (showTimedEvents) {
+        // Use default drag behavior for timed events
+        handleCreateStart?.(e, date);
+      } else {
+        // Create all-day event directly using Temporal.PlainDate
+        const plainDate = Temporal.PlainDate.from({
+          year: date.getFullYear(),
+          month: date.getMonth() + 1,
+          day: date.getDate(),
+        });
+        const newEvent: Event = {
+          id: `event-${Date.now()}`,
+          title: '',
+          start: plainDate,
+          end: plainDate,
+          allDay: true,
+        };
+        app.addEvent(newEvent);
+        setNewlyCreatedEventId(newEvent.id);
+      }
+    },
+    [showTimedEvents, handleCreateStart, app]
+  );
+
   // Generate week header labels
   const weekLabels = useMemo(() => {
     const labels = getWeekDaysLabels(locale, 'short');
@@ -276,11 +311,13 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
 
     return rawEvents.filter(event => {
       if (!event.start) return false;
+      // If showTimedEvents is false, only show all-day events
+      if (!showTimedEvents && !event.allDay) return false;
       const s = temporalToDate(event.start);
       const e = event.end ? temporalToDate(event.end) : s;
       return s <= yearEnd && e >= yearStart;
     });
-  }, [rawEvents, currentYear]);
+  }, [rawEvents, currentYear, showTimedEvents]);
 
   // Generate data for all 12 months with event segments
   const monthsData = useMemo(() => {
@@ -455,7 +492,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
                         ${isWeekend ? 'bg-primary/5 dark:bg-primary/10' : ''}
                       `}
                       onClick={() => app.selectDate(date)}
-                      onDoubleClick={e => handleCreateStart?.(e, date)}
+                      onDoubleClick={e => handleCellDoubleClick(e, date)}
                     >
                       <span
                         className={`

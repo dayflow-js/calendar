@@ -14,13 +14,13 @@ interface YearViewProps {
 }
 
 const YearView: React.FC<YearViewProps> = (props) => {
-  const mode = props.config?.mode || 'default';
+  const mode = props.config?.mode || 'year-canvas';
 
   if (mode === 'fixed-week') {
-    return <FixedWeekYearView {...props} />;
+    return <FixedWeekYearView {...props} config={props.config} />;
   }
 
-  return <DefaultYearView {...props} />;
+  return <DefaultYearView {...props} config={props.config} />;
 };
 
 export default YearView;

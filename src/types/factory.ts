@@ -131,7 +131,8 @@ export interface MonthViewConfig extends ViewFactoryConfig {
 export interface YearViewConfig extends ViewFactoryConfig {
   enableVirtualScroll?: boolean;
   showDebugInfo?: boolean;
-  mode?: 'default' | 'fixed-week';
+  mode?: 'year-canvas' | 'fixed-week';
+  showTimedEventsInYearView?: boolean;
 }
 
 /**

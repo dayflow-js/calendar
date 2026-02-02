@@ -53,7 +53,9 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [detailPanelPosition, setDetailPanelPosition] = useState<EventDetailPosition | null>(null);
 
-  const showDetailPanel = detailPanelEventId === event.id;
+  // Use segment.id to uniquely identify which segment's panel should be shown
+  // This prevents multiple panels from showing for multi-month events
+  const showDetailPanel = detailPanelEventId === segment.id;
   const isEditable = !app?.state.readOnly;
 
   const startPercent = (startCellIndex / columnsPerRow) * 100;
@@ -97,18 +99,19 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
       });
     }
 
-    onDetailPanelToggle?.(event.id);
+    onDetailPanelToggle?.(segment.id);
   };
 
   useEffect(() => {
-    if (newlyCreatedEventId === event.id && !showDetailPanel) {
+    // Only auto-open panel for the first segment of newly created events
+    if (newlyCreatedEventId === event.id && !showDetailPanel && isFirstSegment) {
       // Delay slightly to ensure layout is ready
       setTimeout(() => {
         showPanel();
         onDetailPanelOpen?.();
       }, 50);
     }
-  }, [newlyCreatedEventId, event.id, showDetailPanel, onDetailPanelOpen]);
+  }, [newlyCreatedEventId, event.id, showDetailPanel, onDetailPanelOpen, isFirstSegment]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -255,9 +258,9 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
       };
 
       return (
-        <div className="flex items-center min-w-0 w-full pointer-events-auto h-full">
+        <div className="df-year-event-content flex items-center min-w-0 w-full pointer-events-auto h-full">
           {segment.isFirstSegment && getEventIcon(event) && (
-            <div className="shrink-0 mr-1">
+            <div className="df-year-event-icon shrink-0 mr-1">
               <div
                 className="rounded-full p-0.5 text-white flex items-center justify-center"
                 style={{
@@ -273,7 +276,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
 
           <div className="flex-1 min-w-0">
             <div
-              className="font-medium text-[11px] leading-none whitespace-nowrap overflow-hidden"
+              className="df-year-event-title font-medium text-[11px] leading-none whitespace-nowrap overflow-hidden"
               style={{
                 maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
                 WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
@@ -297,20 +300,20 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
     const titleText = segment.isFirstSegment ? event.title : '';
 
     return (
-      <div className="w-full h-full flex items-center overflow-hidden gap-1 pointer-events-auto">
+      <div className="df-year-event-content w-full h-full flex items-center overflow-hidden gap-1 pointer-events-auto">
         {!isAllDay && (
           <span
             style={{ backgroundColor: lineColor }}
-            className="inline-block w-0.75 h-3 shrink-0 rounded-full"
+            className="df-year-event-indicator inline-block w-0.75 h-3 shrink-0 rounded-full"
           ></span>
         )}
         {isAllDay && icon && (
-          <div className="shrink-0 flex items-center justify-center opacity-80 scale-75">
+          <div className="df-year-event-icon shrink-0 flex items-center justify-center opacity-80 scale-75">
             {icon}
           </div>
         )}
         <span
-          className="w-full block font-medium whitespace-nowrap overflow-hidden leading-none"
+          className="df-year-event-title w-full block font-medium whitespace-nowrap overflow-hidden leading-none"
           style={{
             maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
@@ -326,7 +329,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
     <>
       <div
         ref={eventRef}
-        className="absolute z-30 text-[11px] px-1 overflow-hidden whitespace-nowrap cursor-pointer transition-colors group"
+        className="df-year-event absolute z-30 text-[11px] px-1 overflow-hidden whitespace-nowrap cursor-pointer transition-colors group"
         style={{
           left: `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`,
           top: `${TOP_OFFSET}px`,

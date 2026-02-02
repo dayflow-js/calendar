@@ -1,7 +1,8 @@
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import { Temporal } from 'temporal-polyfill';
 import { CalendarApp } from '@/core';
 import { useLocale } from '@/locale';
-import { ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer } from '@/types';
+import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useDragForView } from '@/plugins/dragPlugin';
@@ -26,6 +27,7 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
   calendarRef,
   customDetailPanelContent,
   customEventDetailDialog,
+  config,
 }) => {
   const { locale } = useLocale();
   const currentDate = app.getCurrentDate();
@@ -107,6 +109,36 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
     },
   });
 
+  // Get config value
+  const showTimedEvents = config?.showTimedEventsInYearView ?? false;
+
+  // Handle double click on cell - create all-day or timed event based on config
+  const handleCellDoubleClick = useCallback(
+    (e: React.MouseEvent | React.TouchEvent, date: Date) => {
+      if (showTimedEvents) {
+        // Use default drag behavior for timed events
+        handleCreateStart?.(e, date);
+      } else {
+        // Create all-day event directly using Temporal.PlainDate
+        const plainDate = Temporal.PlainDate.from({
+          year: date.getFullYear(),
+          month: date.getMonth() + 1,
+          day: date.getDate(),
+        });
+        const newEvent: Event = {
+          id: `event-${Date.now()}`,
+          title: '',
+          start: plainDate,
+          end: plainDate,
+          allDay: true,
+        };
+        app.addEvent(newEvent);
+        setNewlyCreatedEventId(newEvent.id);
+      }
+    },
+    [showTimedEvents, handleCreateStart, app]
+  );
+
   // Generate all days for the current year
   const yearDays = useMemo(() => {
     const days: Date[] = [];
@@ -134,11 +166,13 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
 
     return rawEvents.filter(event => {
       if (!event.start) return false;
+      // If showTimedEvents is false, only show all-day events
+      if (!showTimedEvents && !event.allDay) return false;
       const s = temporalToDate(event.start);
       const e = event.end ? temporalToDate(event.end) : s;
       return s <= yearEnd && e >= yearStart;
     });
-  }, [rawEvents, currentYear]);
+  }, [rawEvents, currentYear, showTimedEvents]);
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
@@ -191,7 +225,7 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
               dragState={dragState as MonthEventDragState}
               onMoveStart={handleMoveStart}
               onResizeStart={handleResizeStart}
-              onCreateStart={handleCreateStart}
+              onCreateStart={handleCellDoubleClick}
               selectedEventId={selectedEventId}
               onEventSelect={setSelectedEventId}
               onMoreEventsClick={app.onMoreEventsClick}
