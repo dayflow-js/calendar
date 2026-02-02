@@ -39,6 +39,14 @@ export const createYearView: ViewFactory<YearViewConfig> = (config = {}) => {
   // Merge configuration
   const finalConfig = { ...defaultYearViewConfig, ...config };
 
+  // Ensure mode is passed to viewConfig
+  if (config.mode) {
+    finalConfig.viewConfig = {
+      ...finalConfig.viewConfig,
+      mode: config.mode,
+    };
+  }
+
   // Create adapter component
   const YearViewAdapter: React.FC<ViewAdapterProps> = props => {
     return React.createElement(ViewAdapter, {
