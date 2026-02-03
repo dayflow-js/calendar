@@ -10,12 +10,12 @@
  * Used for the root container of WeekView and DayView
  */
 export const calendarContainer =
-  'relative flex flex-col bg-white dark:bg-gray-900 w-full overflow-hidden h-full';
+  'relative flex flex-col bg-white dark:bg-gray-900 w-full overflow-hidden h-full select-none';
 
 /**
  * MonthView container
  */
-export const monthViewContainer = 'h-full flex flex-col bg-white dark:bg-gray-900';
+export const monthViewContainer = 'h-full flex flex-col bg-white dark:bg-gray-900 select-none';
 
 // ==================== Navigation Bar Styles ====================
 

@@ -80,7 +80,7 @@ const MobileSearchDialog: React.FC<MobileSearchDialogProps> = ({
       </div>
 
       {/* Results List */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2 select-none">
         <SearchResultsList
           loading={loading}
           results={results}
