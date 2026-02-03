@@ -88,7 +88,8 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
     (clientY: number): boolean => {
       if (isMonthView || !allDayRowRef?.current) return false;
       const allDayRect = allDayRowRef.current.getBoundingClientRect();
-      return clientY >= allDayRect.top && clientY <= allDayRect.bottom;
+      // Considered in all-day area if within the row or above it (e.g. in header)
+      return clientY <= allDayRect.bottom;
     },
     [allDayRowRef, isMonthView]
   );

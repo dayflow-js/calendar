@@ -179,21 +179,20 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         } else {
           // Calculate position logic
           if (drag.allDay) {
-            const dayColumnWidth = isDayView
-              ? '100%'
-              : `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
             indicator.style.top = '2px';
             indicator.style.height = `${ALL_DAY_HEIGHT - 4}px`;
             indicator.style.marginBottom = '3px';
+            indicator.className = 'rounded-xl shadow-sm';
 
             if (isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
               indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - 2px)`;
             } else {
-              indicator.style.left = `calc(${TIME_COLUMN_WIDTH}px + (${dayColumnWidth} * ${drag.dayIndex}))`;
+              const totalWidth = isMobile ? '175%' : '100%';
+              const dayColumnWidth = `calc(${totalWidth} / 7)`;
+              indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
               indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
             }
-            indicator.className = 'rounded-xl shadow-sm';
           } else {
             const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
             const height = (drag.endHour - drag.startHour) * HOUR_HEIGHT;

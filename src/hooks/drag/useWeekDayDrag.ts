@@ -1,8 +1,9 @@
 // Week/Day view specific implementation
 import { useCallback } from 'react';
-import { ViewType, UseWeekDayDragParams, UseWeekDayDragReturn } from '../../types';
+import { ViewType, UseWeekDayDragParams, UseWeekDayDragReturn, Event } from '../../types';
 import { getDateByDayIndex } from '../../utils';
 import { useLocale } from '@/locale';
+import { dateToPlainDate } from '../../utils/temporal';
 
 export const useWeekDayDrag = (
   params: UseWeekDayDragParams
@@ -25,6 +26,28 @@ export const useWeekDayDrag = (
 
       e.preventDefault();
       e.stopPropagation();
+
+      if (e.type === 'dblclick') {
+        const eventDate = currentWeekStart
+          ? getDateByDayIndex(currentWeekStart, dayIndex)
+          : new Date();
+        const startTemporal = dateToPlainDate(eventDate);
+        const endTemporal = dateToPlainDate(eventDate);
+
+        const newEvent: Event = {
+          id: String(Date.now()),
+          title: t('newAllDayEvent'),
+          day: dayIndex,
+          start: startTemporal,
+          end: endTemporal,
+          calendarId: 'blue',
+          allDay: true,
+        };
+
+        options.onEventCreate(newEvent);
+        return;
+      }
+
       if (dragRef.current?.active) return;
 
       const drag = dragRef.current;
@@ -51,19 +74,24 @@ export const useWeekDayDrag = (
         endHour: 0,
         allDay: true,
       });
-      createDragIndicator(drag, 'blue', t('newAllDayEvent'));
+
+      // Do not create indicator immediately for drag (mousedown), wait for move
+      drag.indicatorVisible = false;
+      
+      drag.sourceElement = null; // Clear source element
+      
       document.addEventListener('mousemove', handleDragMove);
       document.addEventListener('mouseup', handleDragEnd);
     },
     [
       isMonthView,
-      createDragIndicator,
       currentWeekStart,
       handleDragEnd,
       handleDragMove,
       dragRef,
       setDragState,
-      app?.state.locale
+      app?.state.locale,
+      options
     ]
   );
 
