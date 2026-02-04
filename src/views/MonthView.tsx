@@ -252,6 +252,7 @@ const MonthView: React.FC<MonthViewProps> = ({
       }
     },
     onEventEdit: (event: Event) => {
+      // double-click create event then auto open detail panel
       setNewlyCreatedEventId(event.id);
     },
     currentWeekStart,

@@ -225,6 +225,9 @@ export class CalendarApp implements ICalendarApp {
       case ViewType.MONTH:
         newDate.setMonth(newDate.getMonth() - 1);
         break;
+      case ViewType.YEAR:
+        newDate.setFullYear(newDate.getFullYear() - 1);
+        break;
     }
     this.setCurrentDate(newDate);
   };
@@ -240,6 +243,9 @@ export class CalendarApp implements ICalendarApp {
         break;
       case ViewType.MONTH:
         newDate.setMonth(newDate.getMonth() + 1);
+        break;
+      case ViewType.YEAR:
+        newDate.setFullYear(newDate.getFullYear() + 1);
         break;
     }
     this.setCurrentDate(newDate);

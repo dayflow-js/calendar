@@ -1,0 +1,173 @@
+# 全局 CSS 类
+
+DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历组件的外观。这些类旨在方便地进行样式定制，无需修改核心库。
+
+## 目录
+
+- [通用类](#通用)
+- [日视图类](#日视图)
+- [周视图类](#周视图)
+- [年视图类](#年视图)
+
+---
+
+## 通用
+
+所有日历视图中使用的通用 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-calendar` | 日历主容器 |
+| `df-header` | 日历头部区域 |
+| `df-navigation` | 导航控件容器 |
+
+---
+
+## 日视图
+
+日视图特有的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-day-view` | 日视图容器 |
+| `df-day-event` | 日视图中的单个事件 |
+| `df-day-time-grid` | 时间网格容器 |
+
+---
+
+## 周视图
+
+周视图特有的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-week-view` | 周视图容器 |
+| `df-week-event` | 周视图中的单个事件 |
+| `df-week-header` | 带有星期名称的周头部 |
+
+---
+
+## 年视图
+
+年视图特有的 CSS 类。这些类特别适用于自定义年度概览中的事件外观。
+
+| 类名 | 描述 |
+|------|------|
+| `df-year-event` | 事件外层容器 - 包裹整个事件元素 |
+| `df-year-event-content` | 事件内容容器 - 包含图标、标题和其他内容 |
+| `df-year-event-title` | 事件标题文本 - 用于自定义标题对齐、字体等 |
+| `df-year-event-icon` | 事件图标容器 - 用于全天事件图标 |
+| `df-year-event-indicator` | 定时事件颜色指示器 - 定时事件的颜色点/条 |
+| `df-year-view-weekend-header` | 固定周布局中的周末头部（周六/周日） |
+| `df-year-view-weekend-cell` | 固定周布局中的周末网格单元格（空白或日期） |
+
+### 年视图自定义示例
+
+#### 居中对齐事件标题
+
+```css
+.df-year-event-title {
+  text-align: center;
+}
+```
+
+#### 自定义周末背景色
+
+```css
+/* 自定义年视图中的周末背景色 */
+.df-year-view-weekend-header,
+.df-year-view-weekend-cell {
+  background-color: #f0f9ff; /* 浅蓝色 */
+}
+
+/* 深色模式调整 */
+.dark .df-year-view-weekend-header,
+.dark .df-year-view-weekend-cell {
+  background-color: rgba(30, 58, 138, 0.2); /* 带透明度的深蓝色 */
+}
+```
+
+#### 自定义悬停时的事件背景
+
+```css
+.df-year-event:hover {
+  filter: brightness(0.95);
+}
+```
+
+#### 隐藏事件图标
+
+```css
+.df-year-event-icon {
+  display: none;
+}
+```
+
+#### 自定义定时事件指示器样式
+
+```css
+.df-year-event-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+```
+
+#### 完整自定义示例
+
+```css
+/* 自定义年视图事件样式 */
+.df-year-event {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.df-year-event-content {
+  padding: 2px 4px;
+}
+
+.df-year-event-title {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+/* 深色模式调整 */
+.dark .df-year-event {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+```
+
+---
+
+## 使用技巧
+
+1. **特异性**: 如果样式未生效，可能需要增加特异性：
+   ```css
+   .your-calendar-wrapper .df-year-event-title {
+     text-align: center;
+   }
+   ```
+
+2. **深色模式**: 自定义时务必考虑深色模式：
+   ```css
+   .df-year-event-title {
+     color: #333;
+   }
+   .dark .df-year-event-title {
+     color: #eee;
+   }
+   ```
+
+3. **响应式设计**: 使用媒体查询适配不同屏幕尺寸：
+   ```css
+   @media (max-width: 768px) {
+     .df-year-event-title {
+       font-size: 9px;
+     }
+   }
+   ```
+
+## 相关文档
+
+- [主题自定义](/docs-zh/guides/theme-customization) - 高级主题选项
+- [深色模式](/docs-zh/features/dark-mode) - 深色模式配置

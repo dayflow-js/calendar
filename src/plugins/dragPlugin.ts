@@ -19,7 +19,7 @@ export function createDragPlugin(
     enableResize: true,
     enableCreate: true,
     enableAllDayCreate: true,
-    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH],
+    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH, ViewType.YEAR],
     ...config,
   };
 
@@ -125,7 +125,7 @@ export function createDragConfig(
     enableResize: true,
     enableCreate: true,
     enableAllDayCreate: true,
-    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH],
+    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH, ViewType.YEAR],
     ...overrides,
   };
 }

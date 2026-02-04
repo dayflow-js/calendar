@@ -80,7 +80,7 @@ export const useDragHandlers = (
     getTargetDateFromPosition,
   } = common;
 
-  const isMonthView = viewType === ViewType.MONTH;
+  const isDateGridView = viewType === ViewType.MONTH || viewType === ViewType.YEAR;
   const isDayView = viewType === ViewType.DAY;
 
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -134,6 +134,25 @@ export const useDragHandlers = (
       const { clientX, clientY } = getClientCoordinates(e);
 
       if (!drag || !drag.active) return;
+
+      // Deferred indicator creation for move mode
+      if (drag.mode === 'move' && !drag.indicatorVisible) {
+        const distance = Math.hypot(
+          clientX - drag.startX,
+          clientY - drag.startY
+        );
+
+        if (distance < 3) return;
+
+        createDragIndicator(
+          drag,
+          drag.calendarId,
+          drag.title,
+          null,
+          drag.sourceElement || undefined
+        );
+        drag.indicatorVisible = true;
+      }
 
       // Set cursor based on drag mode and direction
       if (drag.mode === 'resize') {
@@ -285,6 +304,17 @@ export const useDragHandlers = (
     if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable) return;
 
     document.body.style.cursor = 'default';
+
+    // If dragging but threshold not met (indicator not visible), treat as click/cancel
+    if (drag.mode === 'move' && !drag.indicatorVisible) {
+      document.removeEventListener('mousemove', handleUniversalDragMove);
+      document.removeEventListener('mouseup', handleUniversalDragEnd);
+      document.removeEventListener('touchmove', handleUniversalDragMove, { capture: true });
+      document.removeEventListener('touchend', handleUniversalDragEnd);
+      resetDragState();
+      return;
+    }
+
     if (drag.mode !== 'move' || !drag.eventId) return;
 
     let finalStartHour = drag.startHour;
@@ -431,7 +461,7 @@ export const useDragHandlers = (
 
       // Set cursor based on drag mode and direction
       if (drag.mode === 'resize') {
-        if (isMonthView || drag.allDay) {
+        if (isDateGridView || drag.allDay) {
           // MonthView or AllDay event resize (horizontal)
           document.body.style.cursor = 'ew-resize';
         } else {
@@ -443,7 +473,7 @@ export const useDragHandlers = (
         document.body.style.cursor = 'grabbing';
       }
 
-      if (isMonthView) {
+      if (isDateGridView) {
         // Month view drag logic
         if (drag.mode !== 'resize') {
           if (drag.mode === 'move') {
@@ -554,8 +584,12 @@ export const useDragHandlers = (
         } else if (drag.mode === 'move') {
           // Move logic
           if (drag.originalStartDate && drag.originalEndDate) {
+            // Normalize original start date to midnight to ensure consistent day difference calculation
+            const normalizedOriginalStart = new Date(drag.originalStartDate);
+            normalizedOriginalStart.setHours(0, 0, 0, 0);
+
             const dragOffsetDays = daysDifference(
-              drag.originalStartDate,
+              normalizedOriginalStart,
               targetDate
             );
             const newStartDate = addDaysToDate(
@@ -588,6 +622,27 @@ export const useDragHandlers = (
         handleDirectScroll(clientY);
         drag.lastClientY = clientY;
         const mouseHour = pixelYToHour(clientY);
+
+        // Handle All-Day Create Drag
+        if (drag.mode === 'create' && drag.allDay) {
+          const distance = Math.hypot(
+            clientX - drag.startX,
+            clientY - drag.startY
+          );
+
+          if (!drag.indicatorVisible) {
+            if (distance < 3) return;
+            createDragIndicator(drag, 'blue', t('newAllDayEvent'));
+            drag.indicatorVisible = true;
+          }
+
+          // Update day index based on horizontal position
+          const newDayIndex = isDayView ? drag.dayIndex : getColumnDayIndex(clientX);
+          drag.dayIndex = newDayIndex;
+
+          updateDragIndicator(newDayIndex, 0, 0, true);
+          return;
+        }
 
         if (drag.mode === 'resize') {
           if (drag.allDay) {
@@ -869,7 +924,7 @@ export const useDragHandlers = (
       }
     },
     [
-      isMonthView,
+      isDateGridView,
       isDayView,
       updateDragIndicator,
       getTargetDateFromPosition,
@@ -904,11 +959,21 @@ export const useDragHandlers = (
 
       document.body.style.cursor = 'default';
 
+      // If dragging but threshold not met (indicator not visible), treat as click/cancel
+      if ((drag.mode === 'move' || drag.mode === 'create') && !drag.indicatorVisible) {
+        document.removeEventListener('mousemove', handleDragMove);
+        document.removeEventListener('mouseup', handleDragEnd);
+        document.removeEventListener('touchmove', handleDragMove, { capture: true });
+        document.removeEventListener('touchend', handleDragEnd);
+        resetDragState();
+        return;
+      }
+
       const { clientX, clientY } = getClientCoordinates(e);
 
       if (!drag || !drag.active) return;
 
-      if (isMonthView) {
+      if (isDateGridView) {
         // Month view drag end logic
         if (
           drag.mode === 'resize' &&
@@ -1082,17 +1147,23 @@ export const useDragHandlers = (
             finalStartHour
           ) as Date;
           const endDate = createDateWithHour(eventDate, finalEndHour) as Date;
-          const startTemporal = dateToZonedDateTime(startDate);
-          const endTemporal = dateToZonedDateTime(endDate);
+
+          const isAllDay = drag.allDay;
+          const startTemporal = isAllDay
+            ? dateToPlainDate(startDate)
+            : dateToZonedDateTime(startDate);
+          const endTemporal = isAllDay
+            ? dateToPlainDate(endDate)
+            : dateToZonedDateTime(endDate);
 
           onEventCreate?.({
             id: String(Date.now()),
-            title: t('newEvent'),
+            title: isAllDay ? t('newAllDayEvent') : t('newEvent'),
             day: drag.dayIndex,
             start: startTemporal,
             end: endTemporal,
             calendarId: 'blue',
-            allDay: false,
+            allDay: isAllDay,
           });
         } else if (drag.mode === 'move' || drag.mode === 'resize') {
           // Update state at drag end (Week/Day view)
@@ -1136,7 +1207,7 @@ export const useDragHandlers = (
       resetDragState();
     },
     [
-      isMonthView,
+      isDateGridView,
       handleDragMove,
       removeDragIndicator,
       resetDragState,
@@ -1165,7 +1236,7 @@ export const useDragHandlers = (
 
       const { clientX, clientY } = getClientCoordinates(e);
 
-      if (isMonthView) {
+      if (isDateGridView) {
         // Month view create event
         const [targetDate] = args as [Date];
         // Set default time to 9:00-10:00
@@ -1247,7 +1318,7 @@ export const useDragHandlers = (
       }
     },
     [
-      isMonthView,
+      isDateGridView,
       onEventCreate,
       onEventEdit,
       currentWeekStart,
@@ -1263,10 +1334,8 @@ export const useDragHandlers = (
   // Move event start - complete version
   const handleMoveStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent, event: Event) => {
-      if (app?.getReadOnlyConfig().draggable === false) return;
-
       // Prevent scrolling on touch devices
-      if (e.cancelable) {
+      if (e.cancelable && ('touches' in e || 'changedTouches' in e)) {
         e.preventDefault();
       }
       e.stopPropagation();
@@ -1278,7 +1347,7 @@ export const useDragHandlers = (
       if (!drag) return;
       const sourceElement = e.currentTarget as HTMLElement;
 
-      if (isMonthView) {
+      if (isDateGridView) {
         // Month view move start
         currentDragRef.current = {
           x: clientX - sourceElement.getBoundingClientRect().left,
@@ -1388,6 +1457,8 @@ export const useDragHandlers = (
           eventDate: eventStartDate,
           eventDurationDays: eventDurationDays, // Save original multi-day count
           startDragDayIndex: currentDayIndex, // Save dayIndex when drag starts
+          calendarId: event.calendarId,
+          title: event.title,
         });
 
         if (!event.allDay) {
@@ -1411,15 +1482,8 @@ export const useDragHandlers = (
           allDay: event.allDay || false,
         });
 
-        createDragIndicator(
-          drag,
-          event.calendarId,
-          event.title,
-          null,
-          sourceElement
-        );
         drag.sourceElement = sourceElement;
-        drag.indicatorVisible = true;
+        drag.indicatorVisible = false;
 
         // Week/Day view uses cross-region drag support
         document.addEventListener('mousemove', handleUniversalDragMove);
@@ -1429,7 +1493,7 @@ export const useDragHandlers = (
       }
     },
     [
-      isMonthView,
+      isDateGridView,
       createDragIndicator,
       handleDragEnd,
       handleDragMove,
@@ -1459,7 +1523,7 @@ export const useDragHandlers = (
       const drag = dragRef.current;
       if (!drag) return;
 
-      if (isMonthView) {
+      if (isDateGridView) {
         // Month view resize start
         const originalDate = temporalToDate(event.start);
         const initialStartDate = temporalToDate(event.start);
@@ -1571,7 +1635,7 @@ export const useDragHandlers = (
       document.addEventListener('touchend', handleDragEnd);
     },
     [
-      isMonthView,
+      isDateGridView,
       handleDragMove,
       handleDragEnd,
       pixelYToHour,

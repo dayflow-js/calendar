@@ -51,7 +51,10 @@ export interface DragHookOptions extends Partial<DragConfig> {
   calendarRef: React.RefObject<HTMLDivElement | null>;
   allDayRowRef?: React.RefObject<HTMLDivElement | null>;
   viewType: ViewType;
-  onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => void;
+  onEventsUpdate: (
+    updateFunc: (events: Event[]) => Event[],
+    isResizing?: boolean
+  ) => void;
   onEventCreate: (event: Event) => void;
   onEventEdit: (event: Event) => void;
   currentWeekStart: Date;

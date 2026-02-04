@@ -433,7 +433,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
   return (
     <ThemeProvider initialTheme={theme} onThemeChange={handleThemeChange}>
       <div
-        className={`calendar-container relative flex flex-row h-full overflow-hidden ${className ?? ''}`}
+        className={`calendar-container relative flex flex-row h-full overflow-hidden select-none ${className ?? ''}`}
         style={{ height: 800, ...style }}
       >
         {sidebarEnabled && (

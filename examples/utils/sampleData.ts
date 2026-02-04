@@ -137,5 +137,68 @@ export const generateSampleEvents = (): Event[] => {
     );
   });
 
+  // Annual events for Year View demonstration
+  const currentYear = today.year;
+  const annualEvents = [
+    // Jan: New Year & Kickoff
+    { month: 1, day: 1, span: 3, calendarId: 'personal', title: 'New Year Holiday' },
+    { month: 1, day: 15, span: 5, calendarId: 'team', title: 'Annual Kickoff Week' },
+    { month: 1, day: 25, span: 3, calendarId: 'learning', title: 'Goal Setting Workshop' },
+
+    // Feb-Mar: Work Focus
+    { month: 2, day: 5, span: 4, calendarId: 'team', title: 'Q1 Strategy Offsite' },
+    { month: 2, day: 14, span: 3, calendarId: 'personal', title: 'Valentine\'s Trip' },
+    { month: 2, day: 26, span: 4, calendarId: 'learning', title: 'Tech Conference' },
+    { month: 3, day: 10, span: 4, calendarId: 'team', title: 'Design Sprint Week' },
+    { month: 3, day: 24, span: 4, calendarId: 'marketing', title: 'Product Launch Week' },
+    
+    // Apr-May: Conferences & Holidays
+    { month: 4, day: 12, span: 5, calendarId: 'travel', title: 'Spring Team Building' },
+    { month: 4, day: 25, span: 3, calendarId: 'personal', title: 'Anniversary Trip' },
+    { month: 5, day: 1, span: 3, calendarId: 'personal', title: 'Labour Day Holiday' },
+    { month: 5, day: 15, span: 4, calendarId: 'learning', title: 'Developer Summit' },
+    { month: 5, day: 28, span: 3, calendarId: 'marketing', title: 'Brand Workshop' },
+
+    // Jun-Jul: Travel & Vacation
+    { month: 6, day: 10, span: 4, calendarId: 'support', title: 'Quarterly Review' },
+    { month: 6, day: 15, span: 14, calendarId: 'travel', title: 'Summer Vacation (Europe)' },
+    { month: 7, day: 8, span: 4, calendarId: 'team', title: 'Mid-Year Review Week' },
+    { month: 7, day: 20, span: 5, calendarId: 'wellness', title: 'Hiking Trip' },
+
+    // Aug-Sep: Projects & Learning
+    { month: 8, day: 12, span: 6, calendarId: 'team', title: 'Hackathon Week' },
+    { month: 8, day: 25, span: 3, calendarId: 'wellness', title: 'Wellness Retreat' },
+    { month: 9, day: 5, span: 3, calendarId: 'learning', title: 'Leadership Training' },
+    { month: 9, day: 18, span: 4, calendarId: 'travel', title: 'Client Roadshow' },
+
+    // Oct-Nov: Q4 Push
+    { month: 10, day: 10, span: 5, calendarId: 'team', title: 'Q4 Planning Week' },
+    { month: 10, day: 31, span: 3, calendarId: 'personal', title: 'Halloween Weekend' },
+    { month: 11, day: 15, span: 5, calendarId: 'marketing', title: 'Black Friday Prep' },
+    { month: 11, day: 24, span: 3, calendarId: 'personal', title: 'Thanksgiving Holiday' },
+
+    // Dec: Holidays
+    { month: 12, day: 10, span: 3, calendarId: 'team', title: 'Year End Party Trip' },
+    { month: 12, day: 24, span: 5, calendarId: 'personal', title: 'Christmas Holiday' },
+    { month: 12, day: 29, span: 4, calendarId: 'travel', title: 'New Year Ski Trip' },
+  ];
+
+  annualEvents.forEach((def, index) => {
+    try {
+      const start = Temporal.PlainDate.from({ year: currentYear, month: def.month, day: def.day });
+      events.push(
+        createAllDayEvent(
+          start,
+          def.span,
+          2000 + index, // Use a high base index to avoid collisions
+          def.calendarId,
+          def.title
+        )
+      );
+    } catch (e) {
+      // Ignore invalid dates (e.g. leap years edge cases in simple config)
+    }
+  });
+
   return events;
 };

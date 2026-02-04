@@ -84,34 +84,6 @@ const ROW_SPACING = 17;
 const MULTI_DAY_TOP_OFFSET = 33;
 const MORE_TEXT_HEIGHT = 20; // Height reserved for the "+ x more" indicator
 
-/**
- * Calculate how many single-day events can be shown inside a cell.
- * Ideal case: show 4 events plus the "+ x more" indicator.
- * When the height is limited, gradually reduce the number of events.
- */
-const calculateMaxEventsToShow = (weekHeight: number): number => {
-  // Reserve the top portion for the date label/multi-day layer offset
-  const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET;
-
-  if (availableHeight <= 0) {
-    return 0;
-  }
-
-  const eventHeight = ROW_SPACING;
-  const maxEventsWithoutCap = Math.floor(availableHeight / eventHeight);
-  const cappedEvents = Math.max(0, Math.min(4, maxEventsWithoutCap));
-
-  // If we're not limited by the hard cap of 4 events, ensure there's space for the "+ x more" line
-  if (
-    cappedEvents === maxEventsWithoutCap &&
-    availableHeight - cappedEvents * eventHeight < MORE_TEXT_HEIGHT
-  ) {
-    return Math.max(0, cappedEvents - 1);
-  }
-
-  return cappedEvents;
-};
-
 // Organize multi-day event segments
 const organizeMultiDaySegments = (multiDaySegments: MultiDayEventSegment[]) => {
   const sortedSegments = [...multiDaySegments].sort((a, b) => {
@@ -179,8 +151,13 @@ const organizeMultiDaySegments = (multiDaySegments: MultiDayEventSegment[]) => {
 };
 
 // Build render event list (multi-day regular events will be rendered through segment, skipping here)
-const constructRenderEvents = (events: Event[]): Event[] => {
+const constructRenderEvents = (events: Event[], weekStart: Date): Event[] => {
   const renderEvents: Event[] = [];
+
+  // Calculate week end time
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
 
   events.forEach(event => {
     // Ensure events have start and end fields
@@ -223,8 +200,17 @@ const constructRenderEvents = (events: Event[]): Event[] => {
 
     // Multi-day all-day events: create event instances for each day (keeping old logic for all-day events)
     if (isMultiDay && event.allDay) {
-      const current = new Date(start);
-      while (current <= end) {
+      // Optimize: Only generate instances for days within the current week
+      let current = new Date(start);
+      if (current < weekStart) {
+        current = new Date(weekStart);
+        // Reset time to ensure we start at the beginning of the day
+        current.setHours(0, 0, 0, 0);
+      }
+
+      const loopEnd = end > weekEnd ? weekEnd : end;
+
+      while (current <= loopEnd) {
         const currentTemporal = Temporal.PlainDate.from({
           year: current.getFullYear(),
           month: current.getMonth() + 1,
@@ -380,8 +366,8 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
     // Build render events
     const constructedRenderEvents = useMemo(
-      () => constructRenderEvents(events),
-      [events]
+      () => constructRenderEvents(events, weekData.startDate),
+      [events, weekData.startDate]
     );
 
     // Organize multi-day event segments
@@ -403,6 +389,43 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
       return counts;
     }, [organizedMultiDaySegments]);
+
+    // Calculate effective max layers for multi-day overlay
+    // If any day needs "+ x more" indicator, we must use maxSlotsWithMore for the overlay
+    const effectiveMaxLayers = useMemo(() => {
+      // Check if any day has more events than maxSlots
+      for (const day of weekData.days) {
+        // Get events for this day from constructedRenderEvents
+        const dayEvents = constructedRenderEvents.filter(event => {
+          if (!event.start || !event.end) {
+            return temporalToDate(event.start).toDateString() === day.date.toDateString();
+          }
+          const startDate = temporalToDate(event.start);
+          const endDate = temporalToDate(event.end);
+          if (!event.allDay) {
+            const endHasTime = endDate.getHours() !== 0 || endDate.getMinutes() !== 0 || endDate.getSeconds() !== 0;
+            if (!endHasTime) {
+              const durationMs = endDate.getTime() - startDate.getTime();
+              const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+              if (durationMs > 0 && durationMs < ONE_DAY_MS) {
+                return startDate.toDateString() === day.date.toDateString();
+              }
+            }
+          }
+          return (
+            startDate.toDateString() === day.date.toDateString() ||
+            endDate.toDateString() === day.date.toDateString()
+          );
+        });
+
+        if (dayEvents.length > layoutParams.maxSlots) {
+          // This day needs "+ x more", so use maxSlotsWithMore for the whole week
+          return layoutParams.maxSlotsWithMore;
+        }
+      }
+      // No day needs "+ x more", use maxSlots
+      return layoutParams.maxSlots;
+    }, [weekData.days, constructedRenderEvents, layoutParams.maxSlots, layoutParams.maxSlotsWithMore]);
 
     // Calculate the height of the multi-day event area
     const multiDayAreaHeight = useMemo(
@@ -471,8 +494,10 @@ const WeekComponent = React.memo<WeekComponentProps>(
       // Create render array and layer array
       const renderElements: React.JSX.Element[] = [];
 
-      const placeholderCount = dayLayerCounts[dayIndex] ?? 0;
-      for (let layerIndex = 0; layerIndex < placeholderCount; layerIndex++) {
+      const maxPlaceholders = displayCount;
+      const actualPlaceholders = Math.min(dayLayerCounts[dayIndex] ?? 0, maxPlaceholders);
+
+      for (let layerIndex = 0; layerIndex < actualPlaceholders; layerIndex++) {
         renderElements.push(
           <div
             key={`placeholder-layer-${layerIndex}-${day.date.getTime()}`}
@@ -605,7 +630,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline text-center md:text-left font-medium md:font-normal"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline text-center md:text-left font-medium md:font-normal relative z-20 bg-white dark:bg-gray-900"
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {
@@ -672,7 +697,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
                   zIndex: 10,
                 }}
               >
-                {organizedMultiDaySegments.map((layer, layerIndex) => (
+                {organizedMultiDaySegments.slice(0, effectiveMaxLayers).map((layer, layerIndex) => (
                   <div key={`layer-${layerIndex}`} className="absolute inset-0">
                     {layer.map(segment => (
                       <CalendarEvent

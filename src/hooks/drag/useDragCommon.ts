@@ -88,7 +88,8 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
     (clientY: number): boolean => {
       if (isMonthView || !allDayRowRef?.current) return false;
       const allDayRect = allDayRowRef.current.getBoundingClientRect();
-      return clientY >= allDayRect.top && clientY <= allDayRect.bottom;
+      // Considered in all-day area if within the row or above it (e.g. in header)
+      return clientY <= allDayRect.bottom;
     },
     [allDayRowRef, isMonthView]
   );
@@ -110,7 +111,11 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
 
   const getTargetDateFromPosition = useCallback(
     (clientX: number, clientY: number): Date | null => {
-      if (viewType !== ViewType.MONTH || !calendarRef.current) return null;
+      if (
+        (viewType !== ViewType.MONTH && viewType !== ViewType.YEAR) ||
+        !calendarRef.current
+      )
+        return null;
 
       const element = document.elementFromPoint(clientX, clientY);
       if (!element) return null;

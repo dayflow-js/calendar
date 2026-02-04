@@ -2,10 +2,10 @@ import type { MetaRecord } from 'nextra'
 
 const meta: MetaRecord = {
   'theme-customization': {
-    title: "主题自定义指南"
+    title: 'Theme Customization'
   },
   'global-css': {
-    title: "全局 CSS 类"
+    title: 'Global CSS Classes'
   }
 }
 

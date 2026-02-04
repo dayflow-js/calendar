@@ -90,6 +90,9 @@ export interface UnifiedDragRef extends DragRef {
   currentSegmentDays?: number;
   // dayIndex when dragging starts (for cross-day event fragment dragging)
   startDragDayIndex?: number;
+  // Event properties needed for deferred indicator creation
+  calendarId?: string;
+  title?: string;
 }
 
 export interface useDragProps extends Partial<DragConfig> {

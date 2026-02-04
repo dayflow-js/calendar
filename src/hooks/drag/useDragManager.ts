@@ -36,7 +36,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     isMobile,
   } = options;
 
-  const isMonthView = viewType === ViewType.MONTH;
+  const isDateGridView = viewType === ViewType.MONTH || viewType === ViewType.YEAR;
   const isDayView = viewType === ViewType.DAY;
 
   const dragIndicatorRef = useRef<HTMLDivElement | null>(null);
@@ -73,12 +73,12 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
       removeDragIndicator();
 
       const indicator = document.createElement('div');
-      indicator.style.position = isMonthView ? 'fixed' : 'absolute';
+      indicator.style.position = isDateGridView ? 'fixed' : 'absolute';
       indicator.style.pointerEvents = 'none';
       indicator.style.zIndex = '1000';
 
-      if (isMonthView) {
-        // Month view indicator logic
+      if (isDateGridView) {
+        // indicator logic
         indicator.style.opacity = '0.9';
 
         let indicatorWidth: number;
@@ -179,21 +179,20 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         } else {
           // Calculate position logic
           if (drag.allDay) {
-            const dayColumnWidth = isDayView
-              ? '100%'
-              : `calc((100% - ${TIME_COLUMN_WIDTH}px) / 7)`;
             indicator.style.top = '2px';
             indicator.style.height = `${ALL_DAY_HEIGHT - 4}px`;
             indicator.style.marginBottom = '3px';
+            indicator.className = 'rounded-xl shadow-sm';
 
             if (isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
               indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - 2px)`;
             } else {
-              indicator.style.left = `calc(${TIME_COLUMN_WIDTH}px + (${dayColumnWidth} * ${drag.dayIndex}))`;
+              const totalWidth = isMobile ? '175%' : '100%';
+              const dayColumnWidth = `calc(${totalWidth} / 7)`;
+              indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
               indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
             }
-            indicator.className = 'rounded-xl shadow-sm';
           } else {
             const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
             const height = (drag.endHour - drag.startHour) * HOUR_HEIGHT;
@@ -270,7 +269,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     },
     [
       removeDragIndicator,
-      isMonthView,
+      isDateGridView,
       isDayView,
       allDayRowRef,
       calendarRef,
@@ -291,8 +290,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
       const indicator = dragIndicatorRef.current;
       if (!indicator) return;
 
-      if (isMonthView) {
-        // Month view: update position
+      if (isDateGridView) {
         const [clientX, clientY] = args as [number, number];
         const width = parseFloat(indicator.style.width) || 120;
         const height = parseFloat(indicator.style.height) || 22;
@@ -303,7 +301,6 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           indicator.style.transition = 'none';
         });
       } else {
-        // Week/Day view: update position and size
         const [dayIndex, startHour, endHour, isAllDay = false, layout] =
           args as [number, number, number, boolean?, EventLayout?];
 
@@ -403,7 +400,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
       }
     },
     [
-      isMonthView,
+      isDateGridView,
       allDayRowRef,
       formatTime,
       calendarRef,

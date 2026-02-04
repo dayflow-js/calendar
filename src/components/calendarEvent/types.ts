@@ -51,4 +51,6 @@ export interface CalendarEventProps {
   isMobile?: boolean;
   /** Force enable touch interactions regardless of isMobile */
   enableTouch?: boolean;
+  /** Whether to hide the time in the event display (Month view regular events only) */
+  hideTime?: boolean;
 }

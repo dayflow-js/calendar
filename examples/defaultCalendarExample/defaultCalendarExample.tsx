@@ -48,6 +48,9 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
       createDayView(),
       createWeekView(),
       createMonthView(),
+      createYearView({
+        mode: 'fixed-week',
+      }),
     ],
     events: events,
     calendars: getWebsiteCalendars(),
@@ -144,7 +147,7 @@ export function CalendarTypesExample() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
