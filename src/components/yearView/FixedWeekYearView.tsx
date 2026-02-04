@@ -330,8 +330,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
     for (let month = 0; month < 12; month++) {
       const monthStart = new Date(currentYear, month, 1);
       const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-      const startDay = monthStart.getDay();
-      const paddingStart = startDay;
+      const paddingStart =  monthStart.getDay();
 
       const days: (Date | null)[] = [];
 
@@ -402,15 +401,24 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
         const hScrollbar = el.offsetHeight - el.clientHeight;
         // Vertical scrollbar width = offsetWidth - clientWidth
         const vScrollbar = el.offsetWidth - el.clientWidth;
-        setScrollbarHeight(hScrollbar);
-        setScrollbarWidth(vScrollbar);
+
+        setScrollbarHeight(prev => (prev !== hScrollbar ? hScrollbar : prev));
+        setScrollbarWidth(prev => (prev !== vScrollbar ? vScrollbar : prev));
       }
     };
 
+    const el = contentRef.current;
+    if (!el) return;
+    // Initial measure
     measureScrollbars();
-    // Re-measure on resize
-    window.addEventListener('resize', measureScrollbars);
-    return () => window.removeEventListener('resize', measureScrollbars);
+    const observer = new ResizeObserver(() => {
+      measureScrollbars();
+    });
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
   }, [monthsData]); // Re-measure when content changes
 
   return (
@@ -493,7 +501,11 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
       </div>
 
       {/* Days Grid Content - Scrollable */}
-      <div ref={contentRef} className="overflow-auto" onScroll={handleContentScroll}>
+      <div
+        ref={contentRef}
+        className="overflow-auto"
+        onScroll={handleContentScroll}
+      >
         <div className="flex flex-col" style={{ minWidth: '1352px' }}>
           {monthsData.map(month => (
             <div

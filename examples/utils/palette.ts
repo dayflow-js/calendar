@@ -141,7 +141,7 @@ export const getWebsiteCalendars = (): CalendarType[] =>
     name: item.name,
     icon: item.icon,
     colors: {
-      eventColor: `${item.color}20`,
+      eventColor: `${item.color}30`,
       eventSelectedColor: `${item.color}`,
       lineColor: item.color,
       textColor: item.color,
