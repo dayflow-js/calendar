@@ -10,19 +10,19 @@
  * Used for the root container of WeekView and DayView
  */
 export const calendarContainer =
-  'relative flex flex-col bg-white dark:bg-gray-900 w-full overflow-hidden h-full select-none';
+  'df-calendar relative flex flex-col bg-white dark:bg-gray-900 w-full overflow-hidden h-full select-none';
 
 /**
  * MonthView container
  */
-export const monthViewContainer = 'h-full flex flex-col bg-white dark:bg-gray-900 select-none';
+export const monthViewContainer = 'df-month-view h-full flex flex-col bg-white dark:bg-gray-900 select-none';
 
 // ==================== Navigation Bar Styles ====================
 
 /**
  * Top navigation bar container
  */
-export const headerContainer = 'p-2 flex justify-between';
+export const headerContainer = 'df-header p-2 flex justify-between';
 
 /**
  * Title text style
@@ -39,7 +39,7 @@ export const headerSubtitle = 'mt-3 text-gray-600 dark:text-gray-400';
 /**
  * Navigation button container
  */
-export const buttonGroup = 'flex items-center';
+export const buttonGroup = 'df-navigation flex items-center';
 
 /**
  * Navigation button (forward/backward)
@@ -73,7 +73,7 @@ export const weekGrid = 'grid grid-cols-7';
  * Week title row (MonthView)
  */
 export const weekHeaderRow =
-  'sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700';
+  'df-week-header-row sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700';
 
 /**
  * Weekday labels
@@ -83,19 +83,19 @@ export const dayLabel = 'text-right text-gray-500 dark:text-gray-400 text-sm py-
 /**
  * WeekView week title
  */
-export const weekDayHeader = 'flex border-b border-gray-200 dark:border-gray-700';
+export const weekDayHeader = 'df-week-header flex border-b border-gray-200 dark:border-gray-700';
 
 /**
  * WeekView week title cell
  */
 export const weekDayCell =
-  'flex flex-1 justify-center items-center text-center text-gray-500 dark:text-gray-400 text-sm p-1 select-none';
+  'df-week-day-cell flex flex-1 justify-center items-center text-center text-gray-500 dark:text-gray-400 text-sm p-1 select-none';
 
 /**
  * Date number style
  */
 export const dateNumber =
-  'inline-flex items-center justify-center h-6 w-6 rounded-full text-sm mt-1 select-none';
+  'df-date-number inline-flex items-center justify-center h-6 w-6 rounded-full text-sm mt-1 select-none';
 
 // ==================== Scroll Area Styles ====================
 
@@ -107,7 +107,37 @@ export const scrollContainer = 'flex-1 overflow-auto will-change-scroll';
 /**
  * Month view 6-row grid container - fixed 6-row equal height layout
  */
-export const monthGrid6Rows = 'grid grid-rows-6 h-full overflow-hidden';
+export const monthGrid6Rows = 'df-month-grid grid grid-rows-6 h-full overflow-hidden';
+
+/**
+ * Month day cell
+ */
+export const monthDayCell =
+  'df-month-day-cell relative flex flex-col border-r border-gray-200 dark:border-gray-700 last:border-r-0';
+
+/**
+ * Month date number container
+ */
+export const monthDateNumberContainer =
+  'df-month-date-number-container flex items-center justify-between px-2 h-[33px] relative z-20';
+
+/**
+ * Month date number
+ */
+export const monthDateNumber =
+  'df-month-date-number inline-flex items-center justify-center h-6 min-w-6 rounded-full text-sm font-medium whitespace-nowrap px-1';
+
+/**
+ * Month more events indicator
+ */
+export const monthMoreEvents =
+  'df-month-more-events text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline text-center md:text-left font-medium md:font-normal relative z-20 bg-white dark:bg-gray-900';
+
+/**
+ * Month title (sticky)
+ */
+export const monthTitle =
+  'df-month-title absolute top-10 left-0 z-30 bg-white/50 dark:bg-gray-900/50 py-2 px-2 duration-300';
 
 /**
  * Calendar content area (week/day view)
@@ -124,67 +154,67 @@ export const scrollbarHide = 'scrollbar-hide';
 /**
  * Time column container
  */
-export const timeColumn = 'flex-shrink-0 border-gray-200 dark:border-gray-700';
+export const timeColumn = 'df-time-column flex-shrink-0 border-gray-200 dark:border-gray-700';
 
 /**
  * Time slot
  */
-export const timeSlot = 'relative h-[4.5rem] flex';
+export const timeSlot = 'df-time-slot relative h-[4.5rem] flex';
 
 /**
  * Time label
  */
-export const timeLabel = 'absolute -top-2.5 right-2 text-[12px] text-gray-500 dark:text-gray-400 select-none';
+export const timeLabel = 'df-time-label absolute -top-2.5 right-2 text-[12px] text-gray-500 dark:text-gray-400 select-none';
 
 /**
  * Time grid row
  */
 export const timeGridRow =
-  'h-[4.5rem] border-t first:border-none border-gray-200 dark:border-gray-700 flex';
+  'df-time-grid-row h-[4.5rem] border-t first:border-none border-gray-200 dark:border-gray-700 flex';
 
 /**
  * Time grid cell
  */
-export const timeGridCell = 'flex-1 relative border-r border-gray-200 dark:border-gray-700 select-none';
+export const timeGridCell = 'df-time-grid-cell flex-1 relative border-r border-gray-200 dark:border-gray-700 select-none';
 
 /**
  * Current time line container
  */
-export const currentTimeLine = 'absolute left-0 top-0 flex pointer-events-none';
+export const currentTimeLine = 'df-current-time-line absolute left-0 top-0 flex pointer-events-none';
 
 /**
  * Current time label
  */
 export const currentTimeLabel =
-  'ml-2 text-primary-foreground text-xs font-bold px-1.5 bg-primary rounded-sm';
+  'df-current-time-label ml-2 text-primary-foreground text-xs font-bold px-1.5 bg-primary rounded-sm';
 
 /**
  * Current time line bar
  */
-export const currentTimeLineBar = 'h-0.5 w-full bg-primary relative';
+export const currentTimeLineBar = 'df-current-time-bar h-0.5 w-full bg-primary relative';
 
 // ==================== All-Day Event Area ====================
 
 /**
  * All-day event row container
  */
-export const allDayRow = 'flex items-center border-b border-gray-200 dark:border-gray-700 sticky';
+export const allDayRow = 'df-all-day-row flex items-center border-b border-gray-200 dark:border-gray-700 sticky';
 
 /**
  * All-day event label
  */
 export const allDayLabel =
-  'flex-shrink-0 p-1 text-xs font-medium text-gray-500 dark:text-gray-400 flex justify-end select-none';
+  'df-all-day-label flex-shrink-0 p-1 text-xs font-medium text-gray-500 dark:text-gray-400 flex justify-end select-none';
 
 /**
  * All-day event content area
  */
-export const allDayContent = 'flex flex-1 relative';
+export const allDayContent = 'df-all-day-content flex flex-1 relative';
 
 /**
  * All-day event cell
  */
-export const allDayCell = 'flex-1 border-r border-gray-200 dark:border-gray-700 relative';
+export const allDayCell = 'df-all-day-cell flex-1 border-r border-gray-200 dark:border-gray-700 relative';
 
 // ==================== Event Styles ====================
 
@@ -192,7 +222,7 @@ export const allDayCell = 'flex-1 border-r border-gray-200 dark:border-gray-700 
  * Base event style
  */
 export const baseEvent =
-  'calendar-event select-none pointer-events-auto px-0.5';
+  'df-event calendar-event select-none pointer-events-auto px-0.5';
 
 /**
  * Event shadow
@@ -239,18 +269,18 @@ export const monthRegularContent =
 /**
  * Event title (small)
  */
-export const eventTitleSmall = 'font-medium text-xs truncate pr-1';
+export const eventTitleSmall = 'df-event-title font-medium text-xs truncate pr-1';
 
 /**
  * Event time text
  */
-export const eventTime = 'text-xs opacity-80 truncate';
+export const eventTime = 'df-event-time text-xs opacity-80 truncate';
 
 /**
  * Event color bar
  */
 export const eventColorBar =
-  'absolute left-1 top-1 bottom-1 w-[3px] rounded-full';
+  'df-event-color-bar absolute left-1 top-1 bottom-1 w-[3px] rounded-full';
 
 /**
  * Event icon
@@ -288,24 +318,24 @@ export const resizeHandleRight =
 /**
  * Mini calendar container
  */
-export const miniCalendarContainer = 'px-2 border-b border-gray-200 dark:border-gray-700';
+export const miniCalendarContainer = 'df-mini-calendar px-2 border-b border-gray-200 dark:border-gray-700';
 
 /**
  * Mini calendar grid
  */
 export const miniCalendarGrid =
-  'grid grid-cols-7 gap-1 text-xs justify-items-center';
+  'df-mini-calendar-grid grid grid-cols-7 gap-1 text-xs justify-items-center';
 
 /**
  * Mini calendar weekday title
  */
 export const miniCalendarDayHeader =
-  'text-center text-gray-500 dark:text-gray-400 font-medium py-1 h-6 w-6';
+  'df-mini-calendar-header text-center text-gray-500 dark:text-gray-400 font-medium py-1 h-6 w-6';
 
 /**
  * Mini calendar date cell base style
  */
-export const miniCalendarDay = 'text-center py-1 rounded text-xs h-6 w-6';
+export const miniCalendarDay = 'df-mini-calendar-day text-center py-1 rounded text-xs h-6 w-6';
 
 /**
  * Mini calendar current month date
@@ -327,6 +357,101 @@ export const miniCalendarToday = 'bg-primary rounded-full text-primary-foregroun
  */
 export const miniCalendarSelected =
   'bg-secondary text-secondary-foreground rounded-full font-medium';
+
+// ==================== Navigation Button Styles ====================
+
+/**
+ * Calendar navigation button (prev/next arrows)
+ * Used in TodayBox component for navigation
+ */
+export const calendarNavButton =
+  'df-nav-button calendar-nav-button group relative inline-flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
+
+/**
+ * Calendar today button
+ * Used in TodayBox component for "Today" button
+ */
+export const calendarTodayButton =
+  'df-today-button calendar-today-button inline-flex items-center justify-center px-4 h-7 text-sm font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
+
+/**
+ * Navigation button icon size
+ */
+export const navButtonIcon = 'h-4 w-4 transition-transform group-hover:scale-110';
+
+// ==================== Panel & Dialog Styles ====================
+
+/**
+ * Fixed event detail panel
+ * Used in DefaultEventDetailPanel, EventDetailPanelWithContent
+ */
+export const eventDetailPanel =
+  'df-event-detail-panel fixed bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg';
+
+/**
+ * Event detail dialog overlay
+ * Used in DefaultEventDetailDialog
+ */
+export const dialogOverlay =
+  'df-dialog-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+/**
+ * Event detail dialog container
+ */
+export const dialogContainer =
+  'df-dialog-container relative bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-lg p-6 max-w-md w-full mx-4';
+
+/**
+ * Dropdown panel (ViewSwitcher, ColorPicker)
+ */
+export const dropdownPanel =
+  'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-900/50 overflow-hidden';
+
+/**
+ * Color picker dropdown
+ */
+export const colorPickerDropdown =
+  'bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 origin-top-right animate-in fade-in zoom-in-95';
+
+// ==================== Time Grid Boundary Styles ====================
+
+/**
+ * Time grid bottom boundary (midnight line)
+ * Used in TimeGrid.tsx and DayContent.tsx
+ */
+export const timeGridBoundary = 'h-3 border-t border-gray-200 dark:border-gray-700 relative';
+
+/**
+ * Midnight time label
+ */
+export const midnightLabel = 'absolute -top-2.5 text-[12px] text-gray-500 dark:text-gray-400';
+
+// ==================== Sidebar Styles ====================
+
+/**
+ * Sidebar container
+ */
+export const sidebarContainer =
+  'df-sidebar flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900';
+
+/**
+ * Mobile fullscreen overlay
+ */
+export const mobileFullscreen = 'fixed inset-0 z-9999 bg-white dark:bg-gray-900 flex flex-col';
+
+// ==================== Form Input Styles ====================
+
+/**
+ * Search input
+ */
+export const searchInput =
+  'pl-9 pr-8 py-1 h-7 text-sm border border-slate-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition resize-none';
+
+/**
+ * Icon button (square, no text)
+ */
+export const iconButton =
+  'flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors';
 
 // ==================== Utility Styles ====================
 

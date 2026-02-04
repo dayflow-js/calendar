@@ -1259,14 +1259,21 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   };
 
   const getRenderClass = () => {
+    let classes = baseEvent;
+    if (isDayView) {
+      classes += ' df-day-event';
+    } else if (!isMonthView) {
+      classes += ' df-week-event';
+    }
+
     if (isMonthView) {
       return `
-        ${baseEvent}
+        ${classes}
         ${isAllDay ? getAllDayClass() : getDefaultEventClass()}
         `;
     }
     return `
-          ${baseEvent}
+          ${classes}
           ${eventShadow}
           ${isAllDay ? getAllDayClass() : getDefaultEventClass()}
         `;

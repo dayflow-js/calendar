@@ -7,7 +7,12 @@ DayFlow は、カレンダーコンポーネントの外観をカスタマイズ
 - [共通クラス](#共通)
 - [日ビュークラス](#日ビュー)
 - [週ビュークラス](#週ビュー)
+- [月ビュークラス](#月ビュー)
 - [年ビュークラス](#年ビュー)
+- [ミニカレンダークラス](#ミニカレンダー)
+- [サイドバークラス](#サイドバー)
+- [ナビゲーションクラス](#ナビゲーション)
+- [イベント詳細クラス](#イベント詳細)
 
 ---
 
@@ -20,6 +25,18 @@ DayFlow は、カレンダーコンポーネントの外観をカスタマイズ
 | `df-calendar` | カレンダーメインコンテナ |
 | `df-header` | カレンダーヘッダーセクション |
 | `df-navigation` | ナビゲーションコントロールコンテナ |
+| `df-event` | すべてのイベントの基本クラス |
+| `df-event-title` | イベントタイトルテキスト |
+| `df-event-time` | イベント時間テキスト |
+| `df-event-color-bar` | イベント左側のカラーバー |
+| `df-all-day-row` | 終日イベント行コンテナ |
+| `df-all-day-label` | 終日ラベルテキスト |
+| `df-all-day-content` | 終日イベントコンテンツエリア |
+| `df-all-day-cell` | 個別の終日イベントセル |
+| `df-date-number` | 日付番号の表示 |
+| `df-current-time-line` | 現在時刻インジケーターラインコンテナ |
+| `df-current-time-label` | 現在時刻ラベルテキスト |
+| `df-current-time-bar` | 現在時刻の水平線 |
 
 ---
 
@@ -32,6 +49,12 @@ DayFlow は、カレンダーコンポーネントの外観をカスタマイズ
 | `df-day-view` | 日ビューコンテナ |
 | `df-day-event` | 日ビューの個別イベント |
 | `df-day-time-grid` | タイムグリッドコンテナ |
+| `df-time-column` | 時間列（時間を表示する左サイドバー） |
+| `df-time-slot` | 個別のタイムスロットコンテナ（左列） |
+| `df-time-label` | 時間ラベルテキスト（例：「13:00」） |
+| `df-time-grid-row` | タイムグリッドの水平行 |
+| `df-time-grid-cell` | タイムグリッドの個別セル |
+| `df-right-panel` | 日ビューの右パネル（ミニカレンダー + イベントリスト） |
 
 ---
 
@@ -43,7 +66,30 @@ DayFlow は、カレンダーコンポーネントの外観をカスタマイズ
 |----------|------|
 | `df-week-view` | 週ビューコンテナ |
 | `df-week-event` | 週ビューの個別イベント |
-| `df-week-header` | 曜日名付きの週ヘッダー |
+| `df-week-header` | 曜日名付きの週ヘッダーコンテナ |
+| `df-week-header-row` | 曜日名を含む固定ヘッダー行 |
+| `df-week-day-cell` | ヘッダーの個別曜日セル |
+| `df-time-column` | 時間列（時間を表示する左サイドバー） |
+| `df-time-slot` | 個別のタイムスロットコンテナ（左列） |
+| `df-time-label` | 時間ラベルテキスト |
+| `df-time-grid-row` | タイムグリッドの水平行 |
+| `df-time-grid-cell` | タイムグリッドの個別セル |
+
+---
+
+## 月ビュー
+
+月ビュー専用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-month-view` | 月ビューコンテナ |
+| `df-month-grid` | 月ビューのメイングリッドコンテナ |
+| `df-month-day-cell` | 月ビューの個別日付セル |
+| `df-month-date-number-container` | 日付番号エリアのコンテナ |
+| `df-month-date-number` | 月ビューの日付番号 |
+| `df-month-more-events` | 非表示イベントの「+ x件」インジケーター |
+| `df-month-title` | スクロール時のフローティング月タイトル |
 
 ---
 
@@ -61,109 +107,130 @@ DayFlow は、カレンダーコンポーネントの外観をカスタマイズ
 | `df-year-view-weekend-header` | 固定週レイアウトの週末曜日ヘッダー（土曜日/日曜日） |
 | `df-year-view-weekend-cell` | 固定週レイアウトの週末グリッドセル（空または日付） |
 
-### 年ビューカスタマイズ例
+---
 
-#### イベントタイトルを中央揃え
+## ミニカレンダー
 
-```css
-.df-year-event-title {
-  text-align: center;
-}
-```
+ミニカレンダーコンポーネント（通常サイドバーまたは日ビューに配置）用の CSS クラス。
 
-#### 週末の背景色をカスタマイズ
-
-```css
-/* 年ビューの週末の背景色をカスタマイズ */
-.df-year-view-weekend-header,
-.df-year-view-weekend-cell {
-  background-color: #f0f9ff; /* 薄い青 */
-}
-
-/* ダークモード調整 */
-.dark .df-year-view-weekend-header,
-.dark .df-year-view-weekend-cell {
-  background-color: rgba(30, 58, 138, 0.2); /* 不透明度付きのダークブルー */
-}
-```
-
-#### ホバー時のイベント背景をカスタマイズ
-
-```css
-.df-year-event:hover {
-  filter: brightness(0.95);
-}
-```
-
-#### イベントアイコンを非表示
-
-```css
-.df-year-event-icon {
-  display: none;
-}
-```
-
-#### 時間指定イベントのインジケータースタイルをカスタマイズ
-
-```css
-.df-year-event-indicator {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-```
-
-#### フルカスタマイズ例
-
-```css
-/* 年ビューイベントのカスタムスタイル */
-.df-year-event {
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.df-year-event-content {
-  padding: 2px 4px;
-}
-
-.df-year-event-title {
-  font-weight: 600;
-  font-size: 10px;
-}
-
-/* ダークモード調整 */
-.dark .df-year-event {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-```
+| クラス名 | 説明 |
+|----------|------|
+| `df-mini-calendar` | ミニカレンダーコンテナ |
+| `df-mini-calendar-grid` | 日付グリッドコンテナ |
+| `df-mini-calendar-header` | 曜日ヘッダーセル（例：「月」、「火」） |
+| `df-mini-calendar-day` | 個別の日付セル |
 
 ---
 
+## サイドバー
+
+サイドバーコンポーネント用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-sidebar` | サイドバーコンテナ |
+| `df-calendar-list` | カレンダーリストコンテナ |
+| `df-calendar-list-item` | リスト内の個別カレンダー項目 |
+
+---
+
+## ナビゲーション
+
+ナビゲーションボタン用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-nav-button` | ナビゲーション矢印ボタン（前へ/次へ） |
+| `df-today-button` | 「今日」ボタン |
+
+---
+
+## イベント詳細
+
+イベント詳細パネルとダイアログ用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-event-detail-panel` | フローティングイベント詳細パネル |
+| `df-dialog-overlay` | ダイアログ背景オーバーレイ |
+| `df-dialog-container` | ダイアログコンテンツコンテナ |
+
+---
+
+## カスタマイズ方法
+
+外観をカスタマイズするには、グローバル CSS ファイルでこれらのクラスをターゲットにします。DayFlow は内部で Tailwind CSS を使用しているため、スタイルが上書きされる場合は `!important` を使用するか、セレクターの詳細度を上げる必要がある場合があります。
+
+### 例
+
+```css
+/* すべてのイベントの角丸を変更 */
+.df-event {
+  border-radius: 8px !important;
+}
+
+/* 現在時刻インジケーターをカスタマイズ */
+.df-current-time-line {
+  z-index: 100;
+}
+.df-current-time-bar {
+  height: 3px !important;
+  background-color: #ef4444 !important;
+}
+
+/* 特定のビューをカスタマイズ */
+.df-day-view .df-event {
+  border-left: 4px solid #3b82f6;
+}
+
+/* サイドバーのスタイル設定 */
+.df-sidebar {
+  background-color: #f8fafc !important;
+}
+
+/* ミニカレンダーのスタイル設定 */
+.df-mini-calendar-day:hover {
+  background-color: #e2e8f0;
+}
+
+/* ダークモードの上書き */
+.dark .df-calendar {
+  background-color: #111827;
+}
+
+/* イベント詳細パネルのスタイル設定 */
+.df-event-detail-panel {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+```
+
 ## 使用のヒント
 
-1. **詳細度**: スタイルが適用されない場合、詳細度を上げる必要があるかもしれません：
+1. **詳細度**: スタイルが適用されない場合は、カレンダーをカスタムクラスでラップして詳細度を上げてください：
    ```css
-   .your-calendar-wrapper .df-year-event-title {
-     text-align: center;
-   }
+   .my-custom-calendar .df-event { ... }
    ```
 
-2. **ダークモード**: カスタマイズ時は常にダークモードを考慮してください：
-   ```css
-   .df-year-event-title {
-     color: #333;
-   }
-   .dark .df-year-event-title {
-     color: #eee;
-   }
-   ```
-
-3. **レスポンシブデザイン**: 異なる画面サイズに対応するためメディアクエリを使用：
+2. **レスポンシブデザイン**: メディアクエリを使用して、モバイルデバイス向けにスタイルを調整します：
    ```css
    @media (max-width: 768px) {
-     .df-year-event-title {
-       font-size: 9px;
-     }
+     .df-event-title { font-size: 10px; }
+     .df-time-label { font-size: 10px; }
+   }
+   ```
+
+3. **ダークモード**: `.dark` セレクターを使用してダークモード専用のスタイルを設定します：
+   ```css
+   .dark .df-month-day-cell {
+     border-color: #374151;
+   }
+   ```
+
+4. **CSS 変数**: DayFlow は色に CSS カスタムプロパティを使用しています。グローバルな色の変更にはこれらを上書きします：
+   ```css
+   :root {
+     --primary: #3b82f6;
+     --primary-foreground: #ffffff;
    }
    ```
 

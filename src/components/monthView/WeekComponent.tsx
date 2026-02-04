@@ -15,6 +15,13 @@ import CalendarEvent from '../calendarEvent';
 import { analyzeMultiDayEventsForWeek } from './util';
 import { extractHourFromDate } from '@/utils/helpers';
 import { logger } from '@/utils/logger';
+import {
+  monthDayCell,
+  monthDateNumberContainer,
+  monthDateNumber,
+  monthMoreEvents,
+  monthTitle,
+} from '@/styles/classNames';
 
 export interface MultiDayEventSegment {
   id: string;
@@ -557,7 +564,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
         <div
           key={`day-${day.date.getTime()}`}
           className={`
-          relative flex flex-col border-r border-gray-200 dark:border-gray-700 last:border-r-0
+          ${monthDayCell}
           ${!belongsToCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-100'}
         `}
           style={{ height: weekHeightPx }}
@@ -597,13 +604,13 @@ const WeekComponent = React.memo<WeekComponentProps>(
           onDrop={e => onCalendarDrop?.(e, day.date)}
         >
           {/* Date number area */}
-          <div className="flex items-center justify-between px-2 h-[33px] relative z-20">
+          <div className={monthDateNumberContainer}>
             <div className="flex-1" />
             <div className="flex items-center">
               {(
                 <span
                   className={`
-                    inline-flex items-center justify-center h-6 min-w-6 rounded-full text-sm font-medium whitespace-nowrap px-1
+                    ${monthDateNumber}
                     ${day.isToday
                       ? 'bg-primary text-primary-foreground'
                       : belongsToCurrentMonth
@@ -630,7 +637,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline text-center md:text-left font-medium md:font-normal relative z-20 bg-white dark:bg-gray-900"
+                className={monthMoreEvents}
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {
@@ -666,7 +673,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
         {firstDayOfMonth && (
           <div
             className={`
-            absolute top-10 left-0 z-30 bg-white/50 dark:bg-gray-900/50 py-2 px-2 duration-300
+            ${monthTitle}
             ${shouldShowMonthTitle ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
           `}
             style={{

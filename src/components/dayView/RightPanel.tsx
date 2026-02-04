@@ -52,7 +52,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
 
   return (
     <div
-      className={`hidden md:block flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
+      className={`df-right-panel hidden md:block flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
     >
       <div className={`${flexCol} h-full`}>
         {/* Mini calendar */}

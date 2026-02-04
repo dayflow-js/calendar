@@ -21,6 +21,7 @@ import {
   timeGridCell,
   currentTimeLine,
   currentTimeLabel,
+  timeGridBoundary,
 } from '@/styles/classNames';
 import { analyzeMultiDayRegularEvent } from '@/components/monthView/util';
 
@@ -237,7 +238,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
             ))}
 
             {/* Bottom boundary */}
-            <div className="h-3 border-t border-gray-200 dark:border-gray-700 flex relative">
+            <div className={`${timeGridBoundary} flex`}>
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`24-${dayIndex}`}

@@ -7,7 +7,12 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 - [通用类](#通用)
 - [日视图类](#日视图)
 - [周视图类](#周视图)
+- [月视图类](#月视图)
 - [年视图类](#年视图)
+- [迷你日历类](#迷你日历)
+- [侧边栏类](#侧边栏)
+- [导航类](#导航)
+- [事件详情类](#事件详情)
 
 ---
 
@@ -20,6 +25,18 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 | `df-calendar` | 日历主容器 |
 | `df-header` | 日历头部区域 |
 | `df-navigation` | 导航控件容器 |
+| `df-event` | 所有事件的基础类 |
+| `df-event-title` | 事件标题文本 |
+| `df-event-time` | 事件时间文本 |
+| `df-event-color-bar` | 事件左侧的颜色条 |
+| `df-all-day-row` | 全天事件行容器 |
+| `df-all-day-label` | 全天标签文本 |
+| `df-all-day-content` | 全天事件内容区域 |
+| `df-all-day-cell` | 单个全天事件单元格 |
+| `df-date-number` | 日期数字显示 |
+| `df-current-time-line` | 当前时间指示线容器 |
+| `df-current-time-label` | 当前时间标签文本 |
+| `df-current-time-bar` | 当前时间水平线 |
 
 ---
 
@@ -32,6 +49,12 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 | `df-day-view` | 日视图容器 |
 | `df-day-event` | 日视图中的单个事件 |
 | `df-day-time-grid` | 时间网格容器 |
+| `df-time-column` | 时间列（左侧显示小时的侧边栏） |
+| `df-time-slot` | 单个时间槽容器（左侧列） |
+| `df-time-label` | 时间标签文本（例如 "1 PM"） |
+| `df-time-grid-row` | 时间网格中的水平行 |
+| `df-time-grid-cell` | 时间网格中的单个单元格 |
+| `df-right-panel` | 日视图右侧面板（迷你日历 + 事件列表） |
 
 ---
 
@@ -43,7 +66,30 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 |------|------|
 | `df-week-view` | 周视图容器 |
 | `df-week-event` | 周视图中的单个事件 |
-| `df-week-header` | 带有星期名称的周头部 |
+| `df-week-header` | 带有星期名称的周头部容器 |
+| `df-week-header-row` | 包含星期名称的固定标题行 |
+| `df-week-day-cell` | 头部中的单个星期单元格 |
+| `df-time-column` | 时间列（左侧显示小时的侧边栏） |
+| `df-time-slot` | 单个时间槽容器（左侧列） |
+| `df-time-label` | 时间标签文本 |
+| `df-time-grid-row` | 时间网格中的水平行 |
+| `df-time-grid-cell` | 时间网格中的单个单元格 |
+
+---
+
+## 月视图
+
+月视图特有的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-month-view` | 月视图容器 |
+| `df-month-grid` | 月视图的主要网格容器 |
+| `df-month-day-cell` | 月视图中的单个日期单元格 |
+| `df-month-date-number-container` | 日期数字区域的容器 |
+| `df-month-date-number` | 月视图中的日期数字 |
+| `df-month-more-events` | 隐藏事件的 "+ x 更多" 指示器 |
+| `df-month-title` | 滚动时的浮动月份标题 |
 
 ---
 
@@ -61,109 +107,130 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 | `df-year-view-weekend-header` | 固定周布局中的周末头部（周六/周日） |
 | `df-year-view-weekend-cell` | 固定周布局中的周末网格单元格（空白或日期） |
 
-### 年视图自定义示例
+---
 
-#### 居中对齐事件标题
+## 迷你日历
 
-```css
-.df-year-event-title {
-  text-align: center;
-}
-```
+迷你日历组件（通常位于侧边栏或日视图）的 CSS 类。
 
-#### 自定义周末背景色
-
-```css
-/* 自定义年视图中的周末背景色 */
-.df-year-view-weekend-header,
-.df-year-view-weekend-cell {
-  background-color: #f0f9ff; /* 浅蓝色 */
-}
-
-/* 深色模式调整 */
-.dark .df-year-view-weekend-header,
-.dark .df-year-view-weekend-cell {
-  background-color: rgba(30, 58, 138, 0.2); /* 带透明度的深蓝色 */
-}
-```
-
-#### 自定义悬停时的事件背景
-
-```css
-.df-year-event:hover {
-  filter: brightness(0.95);
-}
-```
-
-#### 隐藏事件图标
-
-```css
-.df-year-event-icon {
-  display: none;
-}
-```
-
-#### 自定义定时事件指示器样式
-
-```css
-.df-year-event-indicator {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-```
-
-#### 完整自定义示例
-
-```css
-/* 自定义年视图事件样式 */
-.df-year-event {
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.df-year-event-content {
-  padding: 2px 4px;
-}
-
-.df-year-event-title {
-  font-weight: 600;
-  font-size: 10px;
-}
-
-/* 深色模式调整 */
-.dark .df-year-event {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-```
+| 类名 | 描述 |
+|------|------|
+| `df-mini-calendar` | 迷你日历容器 |
+| `df-mini-calendar-grid` | 日期网格容器 |
+| `df-mini-calendar-header` | 星期标题单元格（例如 "一", "二"） |
+| `df-mini-calendar-day` | 单个日期单元格 |
 
 ---
 
+## 侧边栏
+
+侧边栏组件的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-sidebar` | 侧边栏容器 |
+| `df-calendar-list` | 日历列表容器 |
+| `df-calendar-list-item` | 列表中的单个日历项 |
+
+---
+
+## 导航
+
+导航按钮的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-nav-button` | 导航箭头按钮（上一个/下一个） |
+| `df-today-button` | "今天" 按钮 |
+
+---
+
+## 事件详情
+
+事件详情面板和对话框的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-event-detail-panel` | 浮动事件详情面板 |
+| `df-dialog-overlay` | 对话框背景遮罩 |
+| `df-dialog-container` | 对话框内容容器 |
+
+---
+
+## 如何自定义
+
+要自定义外观，您可以在全局 CSS 文件中针对这些类进行设置。由于 DayFlow 内部使用 Tailwind CSS，如果您的样式被覆盖，您可能需要使用 `!important` 或增加选择器特异性。
+
+### 示例
+
+```css
+/* 更改所有事件的圆角 */
+.df-event {
+  border-radius: 8px !important;
+}
+
+/* 自定义当前时间指示器 */
+.df-current-time-line {
+  z-index: 100;
+}
+.df-current-time-bar {
+  height: 3px !important;
+  background-color: #ef4444 !important;
+}
+
+/* 自定义特定视图 */
+.df-day-view .df-event {
+  border-left: 4px solid #3b82f6;
+}
+
+/* 设置侧边栏样式 */
+.df-sidebar {
+  background-color: #f8fafc !important;
+}
+
+/* 设置迷你日历样式 */
+.df-mini-calendar-day:hover {
+  background-color: #e2e8f0;
+}
+
+/* 深色模式覆盖 */
+.dark .df-calendar {
+  background-color: #111827;
+}
+
+/* 设置事件详情面板样式 */
+.df-event-detail-panel {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+```
+
 ## 使用技巧
 
-1. **特异性**: 如果样式未生效，可能需要增加特异性：
+1. **特异性**: 如果样式未生效，可以通过在日历外层包裹一个自定义类来增加特异性：
    ```css
-   .your-calendar-wrapper .df-year-event-title {
-     text-align: center;
-   }
+   .my-custom-calendar .df-event { ... }
    ```
 
-2. **深色模式**: 自定义时务必考虑深色模式：
-   ```css
-   .df-year-event-title {
-     color: #333;
-   }
-   .dark .df-year-event-title {
-     color: #eee;
-   }
-   ```
-
-3. **响应式设计**: 使用媒体查询适配不同屏幕尺寸：
+2. **响应式设计**: 使用媒体查询为移动设备调整样式：
    ```css
    @media (max-width: 768px) {
-     .df-year-event-title {
-       font-size: 9px;
-     }
+     .df-event-title { font-size: 10px; }
+     .df-time-label { font-size: 10px; }
+   }
+   ```
+
+3. **深色模式**: 使用 `.dark` 选择器为深色模式设置特定样式：
+   ```css
+   .dark .df-month-day-cell {
+     border-color: #374151;
+   }
+   ```
+
+4. **CSS 变量**: DayFlow 使用 CSS 自定义属性来设置颜色。覆盖它们可以进行全局颜色更改：
+   ```css
+   :root {
+     --primary: #3b82f6;
+     --primary-foreground: #ffffff;
    }
    ```
 

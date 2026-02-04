@@ -4,6 +4,7 @@ import ViewSwitcher from './ViewSwitcher';
 import { Plus, Search } from 'lucide-react';
 import { useResponsiveMonthConfig } from '../../hooks/virtualScroll';
 import { useLocale } from '../../locale/useLocale';
+import { iconButton, searchInput, textGray500 } from '../../styles/classNames';
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   calendar,
@@ -41,10 +42,10 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         {onAddCalendar && isEditable && (
           <button
             onClick={onAddCalendar}
-            className="flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            className={iconButton}
             title={isMobile ? (t('newEvent') || 'New Event') : (t('createCalendar') || 'Add Calendar')}
           >
-            <Plus className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Plus className={`h-4 w-4 ${textGray500}`} />
           </button>
         )}
       </div>
@@ -64,7 +65,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         {/* Mobile Search Icon */}
         <button
           onClick={onSearchClick}
-          className="md:hidden flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+          className={`md:hidden ${iconButton}`}
         >
           <Search width={16} height={16} />
         </button>
@@ -81,7 +82,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             placeholder="Search"
             value={searchValue}
             onChange={handleSearchChange}
-            className="pl-9 pr-8 py-1 h-7 text-sm border border-slate-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400  focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition resize-none w-48"
+            className={`${searchInput} w-48`}
           />
           {searchValue && (
             <button

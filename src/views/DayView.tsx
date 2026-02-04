@@ -364,7 +364,7 @@ const DayView: React.FC<DayViewProps> = ({
   }, []);
 
   return (
-    <div className={`flex h-full ${bgGray50}`}>
+    <div className={`df-day-view flex h-full ${bgGray50}`}>
       <DayContent
         app={app}
         currentDate={currentDate}

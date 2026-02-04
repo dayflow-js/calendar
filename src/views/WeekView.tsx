@@ -376,7 +376,7 @@ const WeekView: React.FC<WeekViewProps> = ({
   const gridWidth = isMobile ? '175%' : '100%';
 
   return (
-    <div className={calendarContainer}>
+    <div className={`${calendarContainer} df-week-view`}>
       {/* Header navigation */}
       <ViewHeader
         calendar={app}

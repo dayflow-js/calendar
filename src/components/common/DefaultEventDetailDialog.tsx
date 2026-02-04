@@ -9,6 +9,7 @@ import ColorPicker, { ColorOption } from './ColorPicker';
 import RangePicker from '../rangePicker';
 import { CalendarApp } from '../../types';
 import { useLocale } from '@/locale';
+import { dialogContainer } from '@/styles/classNames';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: CalendarApp;
@@ -162,7 +163,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
 
       {/* Dialog - relative positioning ensures it appears above backdrop */}
       <div
-        className="relative bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 rounded-lg p-6 max-w-md w-full mx-4"
+        className={dialogContainer}
       >
         {/* Close button */}
         <button

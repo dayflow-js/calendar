@@ -4,6 +4,7 @@ import SearchResultsList from './SearchResultsList';
 import { CalendarSearchEvent } from '../../types/search';
 import { ArrowLeft, X } from 'lucide-react';
 import { useLocale } from '@/locale';
+import { mobileFullscreen, borderBottom } from '@/styles/classNames';
 
 interface MobileSearchDialogProps {
   isOpen: boolean;
@@ -50,9 +51,9 @@ const MobileSearchDialog: React.FC<MobileSearchDialogProps> = ({
   if (!isOpen || typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 bg-white dark:bg-gray-900 flex flex-col">
+    <div className={mobileFullscreen}>
       {/* Header with Back button and Search Input */}
-      <div className="flex items-center p-2 border-b border-gray-200 dark:border-gray-700 gap-2">
+      <div className={`flex items-center p-2 ${borderBottom} gap-2`}>
         <button
           onClick={onClose}
           className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"

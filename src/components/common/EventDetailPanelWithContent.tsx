@@ -6,6 +6,7 @@ import {
 } from '../../types/eventDetail';
 import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
+import { eventDetailPanel } from '@/styles/classNames';
 
 /**
  * Event detail panel wrapper for rendering custom content in the default panel
@@ -162,7 +163,7 @@ export const EventDetailPanelWithContent: React.FC<
     const panelContent = (
       <div
         ref={panelRef}
-        className="fixed bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+        className={`${eventDetailPanel} p-3`}
         data-event-detail-panel="true"
         style={{
           top: `${position.top}px`,

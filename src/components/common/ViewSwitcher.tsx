@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CalendarApp, ViewType } from '../../types';
 import { useLocale } from '@/locale';
 import { ChevronDown } from 'lucide-react';
+import { dropdownPanel, textGray500 } from '@/styles/classNames';
 
 interface ViewSwitcherProps {
   calendar: CalendarApp;
@@ -54,14 +55,14 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
         >
           <span className="text-gray-900 dark:text-gray-100">{t(currentView as any)}</span>
           <span
-            className={`text-gray-500 dark:text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            className={`${textGray500} transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           >
             <ChevronDown width={16} height={16} />
           </span>
         </button>
 
         {isOpen && (
-          <div className="absolute top-full mt-1 left-0 z-50 w-full min-w-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-900/50 overflow-hidden animate-in">
+          <div className={`absolute top-full mt-1 left-0 z-50 w-full min-w-30 ${dropdownPanel} animate-in`}>
             <div className="py-1" role="listbox">
               {registeredViews.map(viewType => (
                 <button

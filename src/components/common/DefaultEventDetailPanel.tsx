@@ -13,6 +13,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
 import { CalendarApp } from '@/core';
 import { useLocale } from '@/locale';
+import { eventDetailPanel } from '@/styles/classNames';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
   app?: CalendarApp;
@@ -253,7 +254,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
   const panelContent = (
     <div
       ref={panelRef}
-      className="fixed bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg p-4 "
+      className={`${eventDetailPanel} p-4`}
       data-event-detail-panel="true"
       style={{
         top: `${position.top}px`,

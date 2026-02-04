@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronsUpDown, Check } from 'lucide-react';
 import { getDefaultCalendarRegistry, CalendarRegistry } from '../../core/calendarRegistry';
+import { colorPickerDropdown } from '@/styles/classNames';
 
 export interface ColorOption {
   label: string;
@@ -105,7 +106,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         <div
           data-color-picker-dropdown="true"
           style={dropdownStyle}
-          className="bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 origin-top-right animate-in fade-in zoom-in-95"
+          className={colorPickerDropdown}
         >
           {options.map(opt => (
             <div

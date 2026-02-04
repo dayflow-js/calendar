@@ -29,6 +29,8 @@ import {
   currentTimeLineBar,
   bgGray50,
   flexCol,
+  timeGridBoundary,
+  midnightLabel,
 } from '@/styles/classNames';
 
 interface DayContentProps {
@@ -223,7 +225,7 @@ export const DayContent: React.FC<DayContentProps> = ({
         </div>
 
         {/* Time grid and event area */}
-        <div className={calendarContent} style={{ position: 'relative' }}>
+        <div className={`${calendarContent} df-day-time-grid`} style={{ position: 'relative' }}>
           <div className="relative flex">
             {/* Current time line */}
             {isToday && currentTime &&
@@ -331,8 +333,8 @@ export const DayContent: React.FC<DayContentProps> = ({
               ))}
 
               {/* Bottom boundary */}
-              <div className="h-3 border-t border-gray-200 dark:border-gray-700 relative">
-                <div className="absolute -top-2.5 -left-9 text-[12px] text-gray-500 dark:text-gray-400">
+              <div className={timeGridBoundary}>
+                <div className={`${midnightLabel} -left-9`}>
                   00:00
                 </div>
               </div>

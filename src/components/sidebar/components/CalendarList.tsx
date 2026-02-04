@@ -173,7 +173,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
 
 
   return (
-    <div className="flex-1 overflow-y-auto px-2 pb-3">
+    <div className="df-calendar-list flex-1 overflow-y-auto px-2 pb-3">
       <ul className="space-y-1 relative">
         {calendars.map(calendar => {
           const isVisible = calendar.isVisible !== false;
@@ -185,7 +185,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({
           return (
             <li
               key={calendar.id}
-              className="relative"
+              className="df-calendar-list-item relative"
               onDragOver={(e) => handleDragOver(e, calendar.id)}
               onDragLeave={handleDragLeave}
               onDrop={() => handleDrop(calendar)}

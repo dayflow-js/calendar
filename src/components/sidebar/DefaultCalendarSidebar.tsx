@@ -17,6 +17,7 @@ import { MergeMenuItem } from './components/MergeMenuItem';
 import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
 import { useLocale } from '@/locale';
+import { sidebarContainer } from '@/styles/classNames';
 
 const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   app,
@@ -203,8 +204,8 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   const isDraggable = readOnlyConfig.draggable !== false;
 
   return (
-    <div 
-      className="flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900"
+    <div
+      className={sidebarContainer}
       onContextMenu={isEditable ? handleSidebarContextMenu : undefined}
     >
       <SidebarHeader
