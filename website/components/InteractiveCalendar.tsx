@@ -11,6 +11,7 @@ import {
   createDragPlugin,
   CalendarType,
   ViewType,
+  createYearView,
 } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
@@ -37,7 +38,7 @@ export function InteractiveCalendar() {
   const dragPlugin = createDragPlugin();
 
   const views = useMemo(
-    () => [createDayView(), createWeekView(), createMonthView()],
+    () => [createDayView(), createWeekView(), createMonthView(), createYearView({ mode: 'fixed-week' })],
     []
   );
 

@@ -1,4 +1,4 @@
-import type { CalendarColors, CalendarType } from '@dayflow/core';
+import { CalendarType, CalendarColors } from '../../src';
 
 interface PaletteCalendar extends Pick<CalendarType, 'id' | 'name' | 'icon'> {
   color: string;
@@ -141,12 +141,10 @@ export const getWebsiteCalendars = (): CalendarType[] =>
     name: item.name,
     icon: item.icon,
     colors: {
-      eventColor: `${item.color}20`,
+      eventColor: `${item.color}30`,
       eventSelectedColor: `${item.color}`,
       lineColor: item.color,
       textColor: item.color,
     },
     isVisible: true,
   }));
-
-

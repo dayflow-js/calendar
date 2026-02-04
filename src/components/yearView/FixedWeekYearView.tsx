@@ -16,6 +16,7 @@ import {
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import { useDragForView } from '@/plugins/dragPlugin';
+import ViewHeader from '@/components/common/ViewHeader';
 import { YearMultiDayEvent } from './YearMultiDayEvent';
 import { YearMultiDaySegment } from './utils';
 
@@ -330,7 +331,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
     for (let month = 0; month < 12; month++) {
       const monthStart = new Date(currentYear, month, 1);
       const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-      const paddingStart =  monthStart.getDay();
+      const paddingStart = monthStart.getDay();
 
       const days: (Date | null)[] = [];
 
@@ -421,15 +422,43 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
     };
   }, [monthsData]); // Re-measure when content changes
 
+  const getCustomTitle = () => {
+    const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
+    return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+  };
+
   return (
     <div
-      className="h-full bg-white dark:bg-gray-900 overflow-hidden border-t border-gray-200 dark:border-gray-700 select-none"
+      className="h-full bg-white dark:bg-gray-900 overflow-hidden select-none"
       style={{
         display: 'grid',
         gridTemplateColumns: '3rem 1fr',
-        gridTemplateRows: 'auto 1fr',
+        gridTemplateRows: 'auto auto 1fr',
       }}
     >
+      {/* Year Header */}
+      <div className="col-span-2">
+        <ViewHeader
+          calendar={app}
+          viewType={ViewType.YEAR}
+          currentDate={currentDate}
+          customTitle={getCustomTitle()}
+          onPrevious={() => {
+            const newDate = new Date(currentDate);
+            newDate.setFullYear(newDate.getFullYear() - 1);
+            app.setCurrentDate(newDate);
+          }}
+          onNext={() => {
+            const newDate = new Date(currentDate);
+            newDate.setFullYear(newDate.getFullYear() + 1);
+            app.setCurrentDate(newDate);
+          }}
+          onToday={() => {
+            app.goToToday();
+          }}
+        />
+      </div>
+
       {/* Corner - Fixed */}
       <div className="bg-gray-50 dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-800 z-30" />
 
@@ -455,10 +484,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
               return (
                 <div
                   key={i}
-                  className={`text-center py-2 text-[10px] font-semibold tracking-wider border-r border-gray-200 dark:border-gray-700 ${isWeekend
-                    ? 'text-primary bg-primary/5'
-                    : 'text-gray-400 dark:text-gray-500'
-                    }`}
+                  className={`text-center py-2 text-[10px] font-bold tracking-wider border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 ${isWeekend ? 'df-year-view-weekend-header' : ''}`}
                 >
                   {label}
                 </div>
@@ -528,7 +554,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
                     return (
                       <div
                         key={`empty-${dayIndex}`}
-                        className="bg-gray-50/80 dark:bg-gray-800/40 border-r border-b border-gray-200 dark:border-gray-700"
+                        className={`bg-gray-50/80 dark:bg-gray-800/40 border-r border-b border-gray-200 dark:border-gray-700 ${isWeekend ? 'df-year-view-weekend-cell' : ''}`}
                       />
                     );
                   }
@@ -544,8 +570,8 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
                       data-date={dateString}
                       className={`
                         relative flex items-start justify-end p-0.5 border-r border-b border-gray-200 dark:border-gray-700
-                        cursor-pointer hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors
-                        ${isWeekend ? 'bg-primary/5 dark:bg-primary/10' : ''}
+                        cursor-pointer hover:bg-blue-100 dark:hover:bg-primary/20 transition-colors
+                        ${isWeekend ? 'bg-blue-50 dark:bg-blue-900/30 df-year-view-weekend-cell' : ''}
                       `}
                       onClick={() => app.selectDate(date)}
                       onDoubleClick={e => handleCellDoubleClick(e, date)}

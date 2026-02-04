@@ -133,23 +133,23 @@ function MyCalendar() {
 
 ### Year View
 
-The year view displays all 12 months of a year in a grid layout.
+The year view provides a comprehensive annual overview using a "Fixed Week" layout. Unlike traditional year views that just show 12 small calendars, DayFlow's Year View renders a continuous grid where you can visualize multi-day events spanning across days, weeks, and even months.
 
 **Best for:**
 
-- Long-term planning
-- Viewing annual overview
-- Quick date selection
-- Holiday and milestone visualization
+- Long-term planning and roadmapping
+- Visualizing project timelines and holidays
+- Annual leave management
+- High-level schedule overview
 
 **Features:**
 
-- Virtual scrolling for multiple years
-- Responsive grid layout (desktop: 4×3, tablet: 3×4, mobile: 2×6)
-- Quick navigation (keyboard support)
-- Current day highlighting
-- Selected date highlighting
-- Keyboard shortcuts (Arrow keys, Home, PageUp/Down)
+- **Continuous Grid Layout:** Displays the entire year in a scrollable, unified grid.
+- **Multi-day Event Visualization:** Events are rendered as continuous bars, making it easy to see duration and overlaps.
+- **Drag and Drop:** Full support for moving and resizing events directly in the year view.
+- **Event Creation:** Double-click any day to create a new event.
+- **Virtual Scrolling:** Optimized performance for rendering thousands of events.
+- **Timed Events:** Option to show or hide timed events (dots/indicators) alongside all-day events.
 
 ```tsx copy {10}
 import {
@@ -161,7 +161,11 @@ import {
 
 function MyCalendar() {
   const calendar = useCalendarApp({
-    views: [createYearView()],
+    views: [
+      createYearView({
+        showTimedEventsInYearView: true, // Optional: show timed events
+      }),
+    ],
     defaultView: ViewType.YEAR,
     initialDate: new Date(),
   });
