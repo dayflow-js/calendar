@@ -1,0 +1,173 @@
+# Global CSS Classes
+
+DayFlow provides a set of CSS classes with the `df-` prefix that allow you to customize the appearance of calendar components. These classes are designed for easy styling customization without modifying the core library.
+
+## Table of Contents
+
+- [Common Classes](#common)
+- [Day View Classes](#day-view)
+- [Week View Classes](#week-view)
+- [Year View Classes](#year-view)
+
+---
+
+## Common
+
+Common CSS classes used across all calendar views.
+
+| Class Name | Description |
+|------------|-------------|
+| `df-calendar` | Main calendar container |
+| `df-header` | Calendar header section |
+| `df-navigation` | Navigation controls container |
+
+---
+
+## Day View
+
+CSS classes specific to the Day View.
+
+| Class Name | Description |
+|------------|-------------|
+| `df-day-view` | Day view container |
+| `df-day-event` | Individual event in day view |
+| `df-day-time-grid` | Time grid container |
+
+---
+
+## Week View
+
+CSS classes specific to the Week View.
+
+| Class Name | Description |
+|------------|-------------|
+| `df-week-view` | Week view container |
+| `df-week-event` | Individual event in week view |
+| `df-week-header` | Week header with day names |
+
+---
+
+## Year View
+
+CSS classes specific to the Year View. These are particularly useful for customizing event appearance in the year overview.
+
+| Class Name | Description |
+|------------|-------------|
+| `df-year-event` | Event outer container - wraps the entire event element |
+| `df-year-event-content` | Event content container - contains icon, title, and other content |
+| `df-year-event-title` | Event title text - use this to customize title alignment, font, etc. |
+| `df-year-event-icon` | Event icon container - for all-day event icons |
+| `df-year-event-indicator` | Timed event color indicator - the colored dot/bar for timed events |
+| `df-year-view-weekend-header` | Weekend day headers (Saturday/Sunday) in Fixed Week layout |
+| `df-year-view-weekend-cell` | Weekend grid cells (empty or date) in Fixed Week layout |
+
+### Year View Customization Examples
+
+#### Center-align event titles
+
+```css
+.df-year-event-title {
+  text-align: center;
+}
+```
+
+#### Custom Weekend Background
+
+```css
+/* Customize weekend background in Year View */
+.df-year-view-weekend-header,
+.df-year-view-weekend-cell {
+  background-color: #f0f9ff; /* Light blue */
+}
+
+/* Dark mode adjustment */
+.dark .df-year-view-weekend-header,
+.dark .df-year-view-weekend-cell {
+  background-color: rgba(30, 58, 138, 0.2); /* Dark blue with opacity */
+}
+```
+
+#### Custom event background on hover
+
+```css
+.df-year-event:hover {
+  filter: brightness(0.95);
+}
+```
+
+#### Hide event icons
+
+```css
+.df-year-event-icon {
+  display: none;
+}
+```
+
+#### Custom indicator style for timed events
+
+```css
+.df-year-event-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+```
+
+#### Full customization example
+
+```css
+/* Custom year view event styling */
+.df-year-event {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.df-year-event-content {
+  padding: 2px 4px;
+}
+
+.df-year-event-title {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+/* Dark mode adjustments */
+.dark .df-year-event {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+```
+
+---
+
+## Usage Tips
+
+1. **Specificity**: If your styles don't apply, you may need to increase specificity:
+   ```css
+   .your-calendar-wrapper .df-year-event-title {
+     text-align: center;
+   }
+   ```
+
+2. **Dark Mode**: Always consider dark mode when customizing:
+   ```css
+   .df-year-event-title {
+     color: #333;
+   }
+   .dark .df-year-event-title {
+     color: #eee;
+   }
+   ```
+
+3. **Responsive Design**: Use media queries for different screen sizes:
+   ```css
+   @media (max-width: 768px) {
+     .df-year-event-title {
+       font-size: 9px;
+     }
+   }
+   ```
+
+## Related Documentation
+
+- [Theme Customization](/docs/guides/theme-customization) - Advanced theming options
+- [Dark Mode](/docs/features/dark-mode) - Dark mode configuration

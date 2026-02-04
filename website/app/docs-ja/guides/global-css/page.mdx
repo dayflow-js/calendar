@@ -1,0 +1,173 @@
+# グローバル CSS クラス
+
+DayFlow は、カレンダーコンポーネントの外観をカスタマイズできる `df-` プレフィックス付きの CSS クラスセットを提供しています。これらのクラスは、コアライブラリを変更せずに簡単にスタイルをカスタマイズできるように設計されています。
+
+## 目次
+
+- [共通クラス](#共通)
+- [日ビュークラス](#日ビュー)
+- [週ビュークラス](#週ビュー)
+- [年ビュークラス](#年ビュー)
+
+---
+
+## 共通
+
+すべてのカレンダービューで使用される共通 CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-calendar` | カレンダーメインコンテナ |
+| `df-header` | カレンダーヘッダーセクション |
+| `df-navigation` | ナビゲーションコントロールコンテナ |
+
+---
+
+## 日ビュー
+
+日ビュー専用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-day-view` | 日ビューコンテナ |
+| `df-day-event` | 日ビューの個別イベント |
+| `df-day-time-grid` | タイムグリッドコンテナ |
+
+---
+
+## 週ビュー
+
+週ビュー専用の CSS クラス。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-week-view` | 週ビューコンテナ |
+| `df-week-event` | 週ビューの個別イベント |
+| `df-week-header` | 曜日名付きの週ヘッダー |
+
+---
+
+## 年ビュー
+
+年ビュー専用の CSS クラス。これらは年間概要でのイベント外観のカスタマイズに特に便利です。
+
+| クラス名 | 説明 |
+|----------|------|
+| `df-year-event` | イベント外側コンテナ - イベント要素全体をラップ |
+| `df-year-event-content` | イベントコンテンツコンテナ - アイコン、タイトル、その他のコンテンツを含む |
+| `df-year-event-title` | イベントタイトルテキスト - タイトルの配置、フォントなどをカスタマイズ |
+| `df-year-event-icon` | イベントアイコンコンテナ - 終日イベントのアイコン用 |
+| `df-year-event-indicator` | 時間指定イベントの色インジケーター - 時間指定イベントの色付きドット/バー |
+| `df-year-view-weekend-header` | 固定週レイアウトの週末曜日ヘッダー（土曜日/日曜日） |
+| `df-year-view-weekend-cell` | 固定週レイアウトの週末グリッドセル（空または日付） |
+
+### 年ビューカスタマイズ例
+
+#### イベントタイトルを中央揃え
+
+```css
+.df-year-event-title {
+  text-align: center;
+}
+```
+
+#### 週末の背景色をカスタマイズ
+
+```css
+/* 年ビューの週末の背景色をカスタマイズ */
+.df-year-view-weekend-header,
+.df-year-view-weekend-cell {
+  background-color: #f0f9ff; /* 薄い青 */
+}
+
+/* ダークモード調整 */
+.dark .df-year-view-weekend-header,
+.dark .df-year-view-weekend-cell {
+  background-color: rgba(30, 58, 138, 0.2); /* 不透明度付きのダークブルー */
+}
+```
+
+#### ホバー時のイベント背景をカスタマイズ
+
+```css
+.df-year-event:hover {
+  filter: brightness(0.95);
+}
+```
+
+#### イベントアイコンを非表示
+
+```css
+.df-year-event-icon {
+  display: none;
+}
+```
+
+#### 時間指定イベントのインジケータースタイルをカスタマイズ
+
+```css
+.df-year-event-indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+```
+
+#### フルカスタマイズ例
+
+```css
+/* 年ビューイベントのカスタムスタイル */
+.df-year-event {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.df-year-event-content {
+  padding: 2px 4px;
+}
+
+.df-year-event-title {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+/* ダークモード調整 */
+.dark .df-year-event {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+```
+
+---
+
+## 使用のヒント
+
+1. **詳細度**: スタイルが適用されない場合、詳細度を上げる必要があるかもしれません：
+   ```css
+   .your-calendar-wrapper .df-year-event-title {
+     text-align: center;
+   }
+   ```
+
+2. **ダークモード**: カスタマイズ時は常にダークモードを考慮してください：
+   ```css
+   .df-year-event-title {
+     color: #333;
+   }
+   .dark .df-year-event-title {
+     color: #eee;
+   }
+   ```
+
+3. **レスポンシブデザイン**: 異なる画面サイズに対応するためメディアクエリを使用：
+   ```css
+   @media (max-width: 768px) {
+     .df-year-event-title {
+       font-size: 9px;
+     }
+   }
+   ```
+
+## 関連ドキュメント
+
+- [テーマカスタマイズ](/docs-ja/guides/theme-customization) - 高度なテーマオプション
+- [ダークモード](/docs-ja/features/dark-mode) - ダークモード設定

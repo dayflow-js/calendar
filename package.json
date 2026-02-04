@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/core",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

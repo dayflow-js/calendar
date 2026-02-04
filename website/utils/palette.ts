@@ -1,4 +1,4 @@
-import { CalendarType, CalendarColors } from '../../src';
+import { CalendarType, CalendarColors } from '@dayflow/core';
 
 interface PaletteCalendar extends Pick<CalendarType, 'id' | 'name' | 'icon'> {
   color: string;
