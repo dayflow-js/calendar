@@ -397,11 +397,32 @@ const WeekComponent = React.memo<WeekComponentProps>(
       return counts;
     }, [organizedMultiDaySegments]);
 
+    // Track which specific layers are occupied by multi-day events for each day
+    // This allows single-day events to fill "gaps" in the multi-day event layers
+    const dayOccupiedLayers = useMemo(() => {
+      const occupied: Set<number>[] = Array.from({ length: 7 }, () => new Set());
+
+      organizedMultiDaySegments.forEach((layer, layerIndex) => {
+        layer.forEach(segment => {
+          for (let dayIndex = segment.startDayIndex; dayIndex <= segment.endDayIndex; dayIndex++) {
+            if (dayIndex >= 0 && dayIndex < 7) {
+              occupied[dayIndex].add(layerIndex);
+            }
+          }
+        });
+      });
+
+      return occupied;
+    }, [organizedMultiDaySegments]);
+
     // Calculate effective max layers for multi-day overlay
     // If any day needs "+ x more" indicator, we must use maxSlotsWithMore for the overlay
     const effectiveMaxLayers = useMemo(() => {
-      // Check if any day has more events than maxSlots
-      for (const day of weekData.days) {
+      const allSegments = organizedMultiDaySegments.flat();
+      // Check if any day has more total visual slots than maxSlots
+      // Timed events can fill gaps in multi-day layers, so we need to calculate properly
+      for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+        const day = weekData.days[dayIndex];
         // Get events for this day from constructedRenderEvents
         const dayEvents = constructedRenderEvents.filter(event => {
           if (!event.start || !event.end) {
@@ -425,14 +446,34 @@ const WeekComponent = React.memo<WeekComponentProps>(
           );
         });
 
-        if (dayEvents.length > layoutParams.maxSlots) {
+        // Filter out all-day events that have segments (they're already counted in multi-day layers)
+        const timedEvents = dayEvents.filter(event => {
+          if (!event.allDay) return true;
+          const hasSegment = allSegments.some(seg => seg.originalEventId === event.id);
+          return !hasSegment;
+        });
+        // Calculate total slots needed considering that timed events can fill gaps
+        const occupiedLayers = dayOccupiedLayers[dayIndex];
+        const maxOccupiedLayer = dayLayerCounts[dayIndex] - 1;
+        // Count gaps (empty layers within the multi-day range)
+        let gapCount = 0;
+        for (let i = 0; i <= maxOccupiedLayer; i++) {
+          if (!occupiedLayers.has(i)) {
+            gapCount++;
+          }
+        }
+        // Timed events first fill gaps, then extend beyond maxOccupiedLayer
+        const timedEventsAfterGaps = Math.max(0, timedEvents.length - gapCount);
+        const totalVisualSlots = (maxOccupiedLayer + 1) + timedEventsAfterGaps;
+
+        if (totalVisualSlots > layoutParams.maxSlots) {
           // This day needs "+ x more", so use maxSlotsWithMore for the whole week
           return layoutParams.maxSlotsWithMore;
         }
       }
       // No day needs "+ x more", use maxSlots
       return layoutParams.maxSlots;
-    }, [weekData.days, constructedRenderEvents, layoutParams.maxSlots, layoutParams.maxSlotsWithMore]);
+    }, [weekData.days, constructedRenderEvents, organizedMultiDaySegments, dayLayerCounts, dayOccupiedLayers, layoutParams.maxSlots, layoutParams.maxSlotsWithMore]);
 
     // Calculate the height of the multi-day event area
     const multiDayAreaHeight = useMemo(
@@ -485,49 +526,76 @@ const WeekComponent = React.memo<WeekComponentProps>(
       const dayEvents = getEventsForDay(day.date);
       const sortedEvents = sortDayEvents(dayEvents);
 
-      const totalEvents = sortedEvents.length;
-      let displayCount = 0;
+      // Filter out all-day events that are rendered as multi-day segments (they occupy their own layer)
+      // This prevents double-counting: they already take a layer via segment, shouldn't also count as single-day
+      const allSegments = organizedMultiDaySegments.flat();
+      const timedEventsOnly = sortedEvents.filter(event => {
+        if (!event.allDay) return true; // Keep all timed events
+        // Check if this all-day event has a segment (rendered separately in overlay)
+        const hasSegment = allSegments.some(seg => seg.originalEventId === event.id);
+        return !hasSegment; // Only keep all-day events WITHOUT segments
+      });
 
-      if (totalEvents <= layoutParams.maxSlots) {
-        displayCount = totalEvents;
-      } else {
-        displayCount = layoutParams.maxSlotsWithMore;
+      // Get which layers are occupied by multi-day events for this day
+      const occupiedLayers = dayOccupiedLayers[dayIndex];
+      const maxOccupiedLayer = (dayLayerCounts[dayIndex] ?? 0) - 1;
+
+      // Find gaps (empty layers within the multi-day range that can be filled by timed events)
+      const gapLayers: number[] = [];
+      for (let i = 0; i <= maxOccupiedLayer; i++) {
+        if (!occupiedLayers.has(i)) {
+          gapLayers.push(i);
+        }
       }
 
-      const displayEvents = sortedEvents.slice(0, displayCount);
-      const hiddenEventsCount = totalEvents - displayCount;
-      const hasMoreEvents = hiddenEventsCount > 0;
+      // Calculate total slots needed:
+      // - Timed events first fill gaps in multi-day layers
+      // - Remaining timed events extend beyond maxOccupiedLayer
+      const totalTimedEvents = timedEventsOnly.length;
+      const eventsInGaps = Math.min(totalTimedEvents, gapLayers.length);
+      const eventsAfterMultiDay = Math.max(0, totalTimedEvents - gapLayers.length);
+      const totalSlotsNeeded = Math.max(maxOccupiedLayer + 1, 0) + eventsAfterMultiDay;
 
-      // Create render array and layer array
+      // Determine if we need "+ x more"
+      const hasMoreEvents = totalSlotsNeeded > layoutParams.maxSlots;
+      const displaySlotLimit = hasMoreEvents ? layoutParams.maxSlotsWithMore : layoutParams.maxSlots;
+
+      // Calculate how many timed events we can display
+      // Available slots for timed events = gaps within limit + slots after maxOccupiedLayer within limit
+      const gapsWithinLimit = gapLayers.filter(l => l < displaySlotLimit).length;
+      const slotsAfterMultiDayWithinLimit = Math.max(0, displaySlotLimit - Math.max(maxOccupiedLayer + 1, 0));
+      const displayCount = Math.min(totalTimedEvents, gapsWithinLimit + slotsAfterMultiDayWithinLimit);
+
+      const displayEvents = timedEventsOnly.slice(0, displayCount);
+      const hiddenEventsCount = totalTimedEvents - displayCount;
+
+      // Create render array - we need to interleave placeholders and timed events
       const renderElements: React.JSX.Element[] = [];
 
-      const maxPlaceholders = displayCount;
-      const actualPlaceholders = Math.min(dayLayerCounts[dayIndex] ?? 0, maxPlaceholders);
+      // Build a slot-based layout: for each slot, either placeholder (multi-day occupied) or timed event
+      let timedEventIndex = 0;
+      const slotsToRender = Math.min(displaySlotLimit, totalSlotsNeeded);
 
-      for (let layerIndex = 0; layerIndex < actualPlaceholders; layerIndex++) {
-        renderElements.push(
-          <div
-            key={`placeholder-layer-${layerIndex}-${day.date.getTime()}`}
-            className="shrink-0"
-            style={{
-              height: `${ROW_SPACING}px`,
-              minHeight: `${ROW_SPACING}px`,
-            }}
-          />
-        );
-      }
+      for (let slot = 0; slot < slotsToRender; slot++) {
+        if (occupiedLayers.has(slot)) {
+          // This slot is occupied by a multi-day event - add placeholder
+          renderElements.push(
+            <div
+              key={`placeholder-layer-${slot}-${day.date.getTime()}`}
+              className="shrink-0"
+              style={{
+                height: `${ROW_SPACING}px`,
+                minHeight: `${ROW_SPACING}px`,
+              }}
+            />
+          );
+        } else if (timedEventIndex < displayEvents.length) {
+          // This slot is a gap or after multi-day layers - fill with timed event
+          const event = displayEvents[timedEventIndex];
 
-      displayEvents.forEach((event, index) => {
-        const segment = organizedMultiDaySegments
-          .flat()
-          .find(seg => seg.originalEventId === event.id);
-
-        if (event.allDay && segment) {
-          return;
-        } else {
           renderElements.push(
             <CalendarEvent
-              key={`${event.id}-${event.day}-${extractHourFromDate(event.start)}-${index}`}
+              key={`${event.id}-${event.day}-${extractHourFromDate(event.start)}-${timedEventIndex}`}
               event={event}
               isAllDay={!!event.allDay}
               isMonthView={true}
@@ -557,8 +625,9 @@ const WeekComponent = React.memo<WeekComponentProps>(
               enableTouch={enableTouch}
             />
           );
+          timedEventIndex++;
         }
-      });
+      }
 
       return (
         <div
