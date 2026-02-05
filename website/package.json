@@ -11,13 +11,13 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@dayflow/core": "^2.0.3",
+    "@dayflow/core": "^2.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.552.0",
-    "next": "15.5.9",
-    "nextra": "^4.6.0",
-    "nextra-theme-docs": "^4.6.0",
+    "next": "^16.1.6",
+    "nextra": "^4.6.1",
+    "nextra-theme-docs": "^4.6.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1",
