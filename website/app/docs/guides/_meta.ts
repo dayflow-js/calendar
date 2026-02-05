@@ -1,12 +1,12 @@
 import type { MetaRecord } from 'nextra'
 
 const meta: MetaRecord = {
+  'global-css': {
+    title: 'Global CSS Classes'
+  },
   'theme-customization': {
     title: 'Theme Customization'
   },
-  'global-css': {
-    title: 'Global CSS Classes'
-  }
 }
 
 export default meta
