@@ -56,7 +56,10 @@ export function InteractiveCalendar() {
     events,
     calendars: calendarTypes,
     switcherMode: 'buttons',
-    useSidebar: isMobile ? false : true,
+    useSidebar: {
+      enabled: !isMobile,
+      colorPickerMode: 'blossom',
+    },
     callbacks: {
       onMoreEventsClick: (date: Date) => {
         calendar.selectDate(date);

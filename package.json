@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/core",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -65,6 +65,7 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
+    "@dayflow/blossom-color-picker": "^1.0.3",
     "react-color": "^2.19.3",
     "temporal-polyfill": "^0.3.0",
     "tslib": "^2.8.1"
