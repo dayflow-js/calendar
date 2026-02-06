@@ -115,7 +115,7 @@ const WeekView: React.FC<WeekViewProps> = ({
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
     if (topFrozenContentRef.current) {
-      topFrozenContentRef.current.scrollLeft = scrollLeft;
+      topFrozenContentRef.current.style.transform = `translateX(${-scrollLeft}px)`;
     }
     if (leftFrozenContentRef.current) {
       leftFrozenContentRef.current.style.transform = `translateY(${-scrollTop}px)`;
@@ -394,7 +394,6 @@ const WeekView: React.FC<WeekViewProps> = ({
         weekDates={weekDates}
         currentWeekStart={currentWeekStart}
         timeGridWidth={timeGridWidth}
-        sidebarWidth={sidebarWidth}
         allDayAreaHeight={allDayAreaHeight}
         organizedAllDaySegments={organizedAllDaySegments}
         allDayLabelText={allDayLabelText}

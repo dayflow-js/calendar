@@ -43,7 +43,8 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
 
   const dragPlugin = useMemo(() => createDragPlugin(), []);
 
-  const config = useMemo(() => ({
+
+  const calendar = useCalendarApp({
     views: [
       createDayView(),
       createWeekView(),
@@ -57,9 +58,13 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
     defaultCalendar: 'work',
     plugins: [dragPlugin],
     defaultView: ViewType.MONTH,
+
     theme: { mode: 'auto' as const },
     // switcherMode: 'select' as const,
-    useSidebar: window.innerWidth < 768 ? false : true,
+    useSidebar: {
+      createCalendarMode: 'modal',
+      colorPickerMode: 'blossom',
+    },
     // readOnly: true,
     callbacks: {
       onEventCreate: async (event: any) => {
@@ -90,9 +95,7 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
         console.log('merge calendar:', sourceId, targetId);
       },
     }
-  }), [events, dragPlugin, useCustomMobileEditor, isMobile]);
-
-  const calendar = useCalendarApp(config);
+  });
 
   calendarRef.current = calendar;
 
