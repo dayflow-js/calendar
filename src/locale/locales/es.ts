@@ -58,6 +58,11 @@ const es: Locale = {
     newCalendar: 'Nuevo calendario',
     refreshAll: 'Actualizar todo',
     tomorrow: 'Mañana',
+    importCalendar: 'Importar calendario',
+    exportCalendar: 'Exportar calendario',
+    addSchedule: 'Añadir evento',
+    importCalendarMessage: 'Este calendario contiene nuevos eventos. Seleccione un calendario de destino.',
+    ok: 'Aceptar',
   }
 };
 

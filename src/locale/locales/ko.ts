@@ -58,6 +58,11 @@ const ko: Locale = {
     newCalendar: '새 캘린더',
     refreshAll: '모두 새로 고침',
     tomorrow: '내일',
+    importCalendar: '캘린더 가져오기',
+    exportCalendar: '캘린더 내보내기',
+    addSchedule: '일정 추가',
+    importCalendarMessage: '이 캘린더에는 새로운 일정이 포함되어 있습니다. 대상 캘린더를 선택하세요.',
+    ok: '확인',
   }
 };
 

@@ -58,6 +58,11 @@ const ja: Locale = {
     newCalendar: '新しいカレンダー',
     refreshAll: 'すべて更新',
     tomorrow: '明日',
+    importCalendar: 'カレンダーをインポート',
+    exportCalendar: 'カレンダーをエクスポート',
+    addSchedule: '予定を追加',
+    importCalendarMessage: 'このカレンダーには新しい予定が含まれています。ターゲットカレンダーを選択してください。',
+    ok: 'OK',
   }
 };
 

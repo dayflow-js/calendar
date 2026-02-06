@@ -58,6 +58,11 @@ const zh: Locale = {
     newCalendar: '新增日历',
     refreshAll: '全部刷新',
     tomorrow: '明天',
+    importCalendar: '导入日历',
+    exportCalendar: '导出日历',
+    addSchedule: '添加日程',
+    importCalendarMessage: '该日历包含新日程。请选取目标日历',
+    ok: '好',
   }
 };
 

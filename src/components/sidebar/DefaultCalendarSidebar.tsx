@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { CalendarSidebarRenderProps } from '../../types';
+import { CalendarSidebarRenderProps, Event } from '../../types';
 import ContextMenu, {
   ContextMenuItem,
   ContextMenuSeparator,
@@ -17,9 +17,11 @@ import { MiniCalendar } from '../common/MiniCalendar';
 import { MergeMenuItem } from './components/MergeMenuItem';
 import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
+import { ImportCalendarDialog, NEW_CALENDAR_ID } from './components/ImportCalendarDialog';
 import { useLocale } from '@/locale';
 import { sidebarContainer } from '@/styles/classNames';
-// import { importICSFile, downloadICS } from '@/utils/ics';
+import { importICSFile, downloadICS } from '@/utils/ics';
+import { generateUniKey } from '@/utils/utilityFunctions';
 
 const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   app,
@@ -115,6 +117,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     calendarId: string;
     step: 'initial' | 'confirm_delete';
   } | null>(null);
+
+  // Import Calendar State
+  const [importState, setImportState] = useState<{ events: Event[]; filename: string } | null>(null);
 
   const handleContextMenu = useCallback((e: React.MouseEvent, calendarId: string) => {
     e.preventDefault();
@@ -227,42 +232,71 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   }, [deleteState]);
 
   // Import Calendar handler
-  // const handleImportClick = useCallback(() => {
-  //   fileInputRef.current?.click();
-  //   handleCloseSidebarContextMenu();
-  // }, [handleCloseSidebarContextMenu]);
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click();
+    handleCloseSidebarContextMenu();
+  }, [handleCloseSidebarContextMenu]);
 
-  // const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  //   const result = await importICSFile(file);
-  //   if (result.success && result.events.length > 0) {
-  //     result.events.forEach(event => {
-  //       app.addEvent(event);
-  //     });
-  //   }
+    const result = await importICSFile(file);
+    if (result.success && result.events.length > 0) {
+      setImportState({
+        events: result.events,
+        filename: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+      });
+    }
 
-  //   // Reset file input
-  //   if (fileInputRef.current) {
-  //     fileInputRef.current.value = '';
-  //   }
-  // }, [app]);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, []);
 
-  // // Export Calendar handler
-  // const handleExportCalendar = useCallback(() => {
-  //   if (contextMenu) {
-  //     const calendar = calendars.find(c => c.id === contextMenu.calendarId);
-  //     if (calendar) {
-  //       const events = app.getEvents().filter(e => e.calendarId === calendar.id);
-  //       downloadICS(events, {
-  //         calendarName: calendar.name,
-  //         filename: calendar.name || 'calendar',
-  //       });
-  //     }
-  //     handleCloseContextMenu();
-  //   }
-  // }, [contextMenu, calendars, app, handleCloseContextMenu]);
+  const handleImportConfirm = useCallback((targetCalendarId: string) => {
+    if (importState) {
+      let finalCalendarId = targetCalendarId;
+
+      if (targetCalendarId === NEW_CALENDAR_ID) {
+        // Create new calendar
+        const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#6b7280'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        const { colors: calendarColors, darkColors } = getCalendarColorsForHex(randomColor);
+
+        finalCalendarId = generateUniKey();
+        app.createCalendar({
+          id: finalCalendarId,
+          name: importState.filename,
+          isDefault: false,
+          colors: calendarColors,
+          darkColors: darkColors,
+          isVisible: true,
+        });
+      }
+
+      importState.events.forEach(event => {
+        app.addEvent({ ...event, calendarId: finalCalendarId });
+      });
+      setImportState(null);
+    }
+  }, [app, importState]);
+
+  // Export Calendar handler
+  const handleExportCalendar = useCallback(() => {
+    if (contextMenu) {
+      const calendar = calendars.find(c => c.id === contextMenu.calendarId);
+      if (calendar) {
+        const events = app.getEvents().filter(e => e.calendarId === calendar.id);
+        downloadICS(events, {
+          calendarName: calendar.name,
+          filename: calendar.name || 'calendar',
+        });
+      }
+      handleCloseContextMenu();
+    }
+  }, [contextMenu, calendars, app, handleCloseContextMenu]);
 
   const sourceCalendarName = mergeState ? calendars.find(c => c.id === mergeState.sourceId)?.name || 'Unknown' : '';
   const targetCalendarName = mergeState ? calendars.find(c => c.id === mergeState.targetId)?.name || 'Unknown' : '';
@@ -345,13 +379,13 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
                 currentCalendarId={contextMenu.calendarId}
                 onMergeSelect={handleMergeSelect}
               />
-              {/* <ContextMenuItem onClick={handleExportCalendar}>
-                {t('exportCalendar') || 'Export Calendar'}
-              </ContextMenuItem> */}
               <ContextMenuItem
                 onClick={handleDeleteCalendar}
               >
                 {t('delete')}
+              </ContextMenuItem>
+              <ContextMenuItem onClick={handleExportCalendar}>
+                {t('exportCalendar') || 'Export Calendar'}
               </ContextMenuItem>
               <ContextMenuSeparator />
               <ContextMenuColorPicker
@@ -381,9 +415,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           >
             {t('newCalendar') || 'New Calendar'}
           </ContextMenuItem>
-          {/* <ContextMenuItem onClick={handleImportClick}>
+          <ContextMenuItem onClick={handleImportClick}>
             {t('importCalendar') || 'Import Calendar'}
-          </ContextMenuItem> */}
+          </ContextMenuItem>
           <ContextMenuItem
             onClick={() => {
               app.triggerRender();
@@ -397,13 +431,23 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
       )}
 
       {/* Hidden file input for ICS import */}
-      {/* <input
+      <input
         ref={fileInputRef}
         type="file"
         accept=".ics"
         style={{ display: 'none' }}
         onChange={handleFileChange}
-      /> */}
+      />
+
+      {importState && createPortal(
+        <ImportCalendarDialog
+          calendars={calendars}
+          filename={importState.filename}
+          onConfirm={handleImportConfirm}
+          onCancel={() => setImportState(null)}
+        />,
+        document.body
+      )}
 
       {mergeState && createPortal(
         <MergeCalendarDialog

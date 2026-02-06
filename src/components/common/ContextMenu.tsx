@@ -12,15 +12,27 @@ interface ContextMenuProps {
 
 const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
   ({ x, y, onClose, children, className }, ref) => {
+    const internalRef = useRef<HTMLDivElement>(null);
+
+    // Sync external ref with internal ref
+    const setRefs = (node: HTMLDivElement | null) => {
+      (internalRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    };
+
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        if (ref && 'current' in ref && ref.current && !ref.current.contains(event.target as Node)) {
+        if (internalRef.current && !internalRef.current.contains(event.target as Node)) {
           onClose();
         }
       };
 
       // Use mousedown to capture clicks outside immediately
-      document.addEventListener('mousedown', handleClickOutside);
+      document.body.addEventListener('mousedown', handleClickOutside);
 
       // Also close on scroll or window resize
       const handleScrollOrResize = () => onClose();
@@ -28,11 +40,11 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       window.addEventListener('resize', handleScrollOrResize);
 
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
+        document.body.removeEventListener('mousedown', handleClickOutside);
         window.removeEventListener('scroll', handleScrollOrResize, true);
         window.removeEventListener('resize', handleScrollOrResize);
       };
-    }, [onClose, ref]);
+    }, [onClose]);
 
     // Ensure menu stays within viewport
     const style: React.CSSProperties = {
@@ -40,13 +52,9 @@ const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       left: x,
     };
 
-    // Simple viewport adjustment logic could be added here if needed
-    // For now rely on user providing reasonable x,y or allow CSS to handle basic constraints if possible,
-    // but usually absolute positioning requires manual calculation for edge cases.
-
     return createPortal(
       <div
-        ref={ref}
+        ref={setRefs}
         className={`fixed z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
         style={style}
         onContextMenu={(e) => e.preventDefault()}

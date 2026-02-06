@@ -55,7 +55,12 @@ export type TranslationKey =
   | 'noSuggestions'
   | 'newCalendar'
   | 'refreshAll'
-  | 'tomorrow';
+  | 'tomorrow'
+  | 'importCalendar'
+  | 'exportCalendar'
+  | 'addSchedule'
+  | 'importCalendarMessage'
+  | 'ok';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

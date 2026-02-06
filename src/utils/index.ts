@@ -56,3 +56,6 @@ export * from './eventHelpers';
 
 // Search utilities
 export * from './searchUtils';
+
+// ICS utilities
+export * from './ics';

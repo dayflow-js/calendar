@@ -1,5 +1,5 @@
 import { Temporal } from 'temporal-polyfill';
-import { isPlainDate } from '../utils/temporal';
+import { isPlainDate } from './temporalTypeGuards';
 
 const TOKEN_REGEX = /(YYYY|YY|MM|DD|HH|mm)/g;
 

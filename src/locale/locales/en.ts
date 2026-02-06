@@ -58,6 +58,11 @@ const en: Locale = {
     newCalendar: 'New Calendar',
     refreshAll: 'Refresh All',
     tomorrow: 'Tomorrow',
+    importCalendar: 'Import Calendar',
+    exportCalendar: 'Export Calendar',
+    addSchedule: 'Add Schedule',
+    importCalendarMessage: 'This calendar contains new events. Please select a target calendar.',
+    ok: 'OK',
   }
 };
 
