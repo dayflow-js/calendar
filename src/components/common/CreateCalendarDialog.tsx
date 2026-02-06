@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { PhotoshopPicker, ColorResult } from 'react-color';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
+import { BlossomColorPicker, DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { cancelButton } from '@/styles/classNames';
 import { useLocale } from '@/locale';
 
-const COLORS = [
+// Colors for default mode (react-color)
+const PICKER_DEFAULT_COLORS = [
   '#ea426b',
   '#f19a38',
   '#f7cf46',
@@ -21,21 +23,60 @@ const COLORS = [
 export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
   onClose,
   onCreate,
+  colorPickerMode = 'default',
 }) => {
+  const { t } = useLocale();
+  const { effectiveTheme } = useTheme();
   const [name, setName] = useState('');
-  const [selectedColor, setSelectedColor] = useState(
-    COLORS[Math.floor(Math.random() * COLORS.length)]
+
+  // State for default mode (react-color)
+  const [defaultSelectedColor, setDefaultSelectedColor] = useState(
+    PICKER_DEFAULT_COLORS[Math.floor(Math.random() * PICKER_DEFAULT_COLORS.length)]
   );
   const [showPicker, setShowPicker] = useState(false);
   const [previousColor, setPreviousColor] = useState('');
-  const { effectiveTheme } = useTheme();
-  const { t } = useLocale();
+
+  // Pick a random initial color from all colors for blossom mode
+  const initialColorData = useMemo(() => {
+    const randomColor = DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
+
+    // Default to 'outer' as the simplified DEFAULT_COLORS might not have layer info
+    const layer = (randomColor as any).layer || 'outer';
+
+    // Calculate slider position from the petal's lightness
+    const sliderValue = lightnessToSliderValue(randomColor.l);
+
+    return {
+      hue: randomColor.h,
+      saturation: sliderValue, // This is now the slider position
+      lightness: randomColor.l,
+      alpha: 100,
+      layer: layer as 'inner' | 'outer'
+    };
+  }, []);
+
+  // State for blossom mode
+  const [blossomSelectedColor, setBlossomSelectedColor] = useState<{
+    hex: string;
+    hue: number;
+    saturation: number;
+    lightness?: number;
+    alpha: number;
+    layer: 'inner' | 'outer';
+  } | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const { colors, darkColors } = getCalendarColorsForHex(selectedColor);
+    let hex: string;
+    if (colorPickerMode === 'blossom') {
+      hex = blossomSelectedColor?.hex ?? hslToHex(initialColorData.hue, initialColorData.saturation, initialColorData.lightness);
+    } else {
+      hex = defaultSelectedColor;
+    }
+
+    const { colors, darkColors } = getCalendarColorsForHex(hex);
 
     const newCalendar: CalendarType = {
       id: generateUniKey(),
@@ -51,11 +92,11 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
   };
 
   const handleColorChange = (color: ColorResult) => {
-    setSelectedColor(color.hex);
+    setDefaultSelectedColor(color.hex);
   };
 
   const handleOpenPicker = () => {
-    setPreviousColor(selectedColor);
+    setPreviousColor(defaultSelectedColor);
     setShowPicker(true);
   };
 
@@ -64,7 +105,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
   };
 
   const handleCancel = () => {
-    setSelectedColor(previousColor);
+    setDefaultSelectedColor(previousColor);
     setShowPicker(false);
   };
 
@@ -107,66 +148,99 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
 
   return createPortal(
     <div className="fixed inset-0 z-10000 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-background animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-white dark:bg-slate-900 animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+        <h2 className={`text-lg font-semibold text-gray-900 dark:text-white ${colorPickerMode === 'blossom' ? 'mb-6' : 'mb-4'}`}>
           {t('createCalendar')}
         </h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="h-9 w-9 rounded-md border border-gray-200 shadow-sm dark:border-gray-600"
-                style={{ backgroundColor: selectedColor }}
-              />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
-                placeholder={t('calendarNamePlaceholder')}
-                autoFocus
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <div className="grid grid-cols-7 gap-6">
-              {COLORS.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${selectedColor === color
-                    ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800' : ''
-                    }`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
+          {colorPickerMode === 'blossom' ? (
+            // Blossom mode UI
+            <div className="mb-8 flex items-center gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
+                  placeholder={t('calendarNamePlaceholder')}
+                  autoFocus
                 />
-              ))}
-            </div>
+              </div>
 
-            <div className="mt-2 relative">
-              <button
-                type="button"
-                onClick={handleOpenPicker}
-                className="flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800"
-              >
-                {t('customColor')}
-              </button>
-
-              {showPicker && (
-                <div className="absolute left-0 top-full z-10001 mt-2">
-                  <PhotoshopPicker
-                    color={selectedColor}
-                    onChange={handleColorChange}
-                    onAccept={handleAccept}
-                    onCancel={handleCancel}
-                    styles={pickerStyles}
+              <div className="w-9 h-9 relative shrink-0">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <BlossomColorPicker
+                    defaultValue={initialColorData}
+                    coreSize={36}
+                    petalSize={32}
+                    openOnHover={false}
+                    onChange={(color) => setBlossomSelectedColor(color)}
+                    onCollapse={(color) => setBlossomSelectedColor(color)}
+                    className="z-50"
                   />
                 </div>
-              )}
+              </div>
             </div>
-          </div>
+          ) : (
+            // Default mode UI (react-color)
+            <>
+              <div className="mb-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-9 w-9 rounded-md border border-gray-200 shadow-sm dark:border-gray-600"
+                    style={{ backgroundColor: defaultSelectedColor }}
+                  />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
+                    placeholder={t('calendarNamePlaceholder')}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="grid grid-cols-7 gap-6">
+                  {PICKER_DEFAULT_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${defaultSelectedColor === color
+                        ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800' : ''
+                        }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setDefaultSelectedColor(color)}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-2 relative">
+                  <button
+                    type="button"
+                    onClick={handleOpenPicker}
+                    className="flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:bg-slate-100 dark:focus:bg-slate-800"
+                  >
+                    {t('customColor')}
+                  </button>
+
+                  {showPicker && (
+                    <div className="absolute left-0 top-full z-10001 mt-2">
+                      <PhotoshopPicker
+                        color={defaultSelectedColor}
+                        onChange={handleColorChange}
+                        onAccept={handleAccept}
+                        onCancel={handleCancel}
+                        styles={pickerStyles}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="flex justify-end space-x-3">
             <button
@@ -179,7 +253,7 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
             <button
               type="submit"
               disabled={!name.trim()}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
             >
               {t('create')}
             </button>

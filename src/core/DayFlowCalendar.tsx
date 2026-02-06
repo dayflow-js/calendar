@@ -386,6 +386,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
     editingCalendarId,
     setEditingCalendarId,
     onCreateCalendar: handleCreateCalendar,
+    colorPickerMode: sidebarConfig.colorPickerMode,
   };
 
   const renderSidebarContent = () => {
@@ -528,6 +529,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
                 setShowCreateDialog(false);
                 refreshSidebar();
               },
+              colorPickerMode: sidebarConfig.colorPickerMode,
             })
           ) : (
             <CreateCalendarDialog
@@ -537,6 +539,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
                 setShowCreateDialog(false);
                 refreshSidebar();
               }}
+              colorPickerMode={sidebarConfig.colorPickerMode}
             />
           ))}
       </div>

@@ -10,53 +10,55 @@ interface ContextMenuProps {
   className?: string;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, onClose, children, className }) => {
-  const menuRef = useRef<HTMLDivElement>(null);
+const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
+  ({ x, y, onClose, children, className }, ref) => {
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (ref && 'current' in ref && ref.current && !ref.current.contains(event.target as Node)) {
+          onClose();
+        }
+      };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        onClose();
-      }
+      // Use mousedown to capture clicks outside immediately
+      document.addEventListener('mousedown', handleClickOutside);
+
+      // Also close on scroll or window resize
+      const handleScrollOrResize = () => onClose();
+      window.addEventListener('scroll', handleScrollOrResize, true);
+      window.addEventListener('resize', handleScrollOrResize);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('scroll', handleScrollOrResize, true);
+        window.removeEventListener('resize', handleScrollOrResize);
+      };
+    }, [onClose, ref]);
+
+    // Ensure menu stays within viewport
+    const style: React.CSSProperties = {
+      top: y,
+      left: x,
     };
 
-    // Use mousedown to capture clicks outside immediately
-    document.addEventListener('mousedown', handleClickOutside);
+    // Simple viewport adjustment logic could be added here if needed
+    // For now rely on user providing reasonable x,y or allow CSS to handle basic constraints if possible,
+    // but usually absolute positioning requires manual calculation for edge cases.
 
-    // Also close on scroll or window resize
-    const handleScrollOrResize = () => onClose();
-    window.addEventListener('scroll', handleScrollOrResize, true);
-    window.addEventListener('resize', handleScrollOrResize);
+    return createPortal(
+      <div
+        ref={ref}
+        className={`fixed z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
+        style={style}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        {children}
+      </div>,
+      document.body
+    );
+  }
+);
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('scroll', handleScrollOrResize, true);
-      window.removeEventListener('resize', handleScrollOrResize);
-    };
-  }, [onClose]);
-
-  // Ensure menu stays within viewport
-  const style: React.CSSProperties = {
-    top: y,
-    left: x,
-  };
-
-  // Simple viewport adjustment logic could be added here if needed
-  // For now rely on user providing reasonable x,y or allow CSS to handle basic constraints if possible,
-  // but usually absolute positioning requires manual calculation for edge cases.
-
-  return createPortal(
-    <div
-      ref={menuRef}
-      className={`fixed z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
-      style={style}
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      {children}
-    </div>,
-    document.body
-  );
-};
+ContextMenu.displayName = 'ContextMenu';
 
 export const ContextMenuItem: React.FC<{
   onClick: () => void;

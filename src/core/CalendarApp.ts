@@ -52,6 +52,7 @@ const resolveSidebarConfig = (
     createCalendarMode,
     renderCalendarContextMenu,
     renderCreateCalendarDialog,
+    colorPickerMode,
   } = input;
 
   return {
@@ -62,6 +63,7 @@ const resolveSidebarConfig = (
     createCalendarMode,
     renderCalendarContextMenu,
     renderCreateCalendarDialog,
+    colorPickerMode,
   };
 };
 

@@ -61,6 +61,7 @@ export interface CalendarCallbacks {
 export interface CreateCalendarDialogProps {
   onClose: () => void;
   onCreate: (calendar: CalendarType) => void;
+  colorPickerMode?: 'blossom' | 'default';
 }
 
 export interface CalendarHeaderProps {
@@ -91,6 +92,7 @@ export interface CalendarSidebarRenderProps {
   editingCalendarId?: string | null;
   setEditingCalendarId?: (id: string | null) => void;
   onCreateCalendar?: () => void;
+  colorPickerMode?: 'blossom' | 'default';
 }
 
 /**
@@ -104,6 +106,8 @@ export interface SidebarConfig {
   renderCalendarContextMenu?: (calendar: CalendarType, onClose: () => void) => React.ReactNode;
   createCalendarMode?: 'inline' | 'modal';
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => React.ReactNode;
+  /** Color picker mode: 'blossom' for BlossomColorPicker, 'default' for react-color */
+  colorPickerMode?: 'blossom' | 'default';
 }
 
 /**

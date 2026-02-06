@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarSidebarRenderProps } from '../../types';
 import ContextMenu, {
@@ -8,7 +8,8 @@ import ContextMenu, {
   ContextMenuColorPicker,
 } from '../common/ContextMenu';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
-import { SketchPicker } from 'react-color';
+import { BlossomColorPicker, hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
+import { SketchPicker, ColorResult } from 'react-color';
 // common component
 import { SidebarHeader } from './components/SidebarHeader';
 import { CalendarList } from './components/CalendarList';
@@ -18,6 +19,7 @@ import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
 import { useLocale } from '@/locale';
 import { sidebarContainer } from '@/styles/classNames';
+// import { importICSFile, downloadICS } from '@/utils/ics';
 
 const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   app,
@@ -29,6 +31,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   editingCalendarId: propEditingCalendarId,
   setEditingCalendarId: propSetEditingCalendarId,
   onCreateCalendar,
+  colorPickerMode = 'default',
 }) => {
   const { t } = useLocale();
   const visibleMonthDate = app.getVisibleMonth();
@@ -38,6 +41,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
   const [localEditingCalendarId, setLocalEditingCalendarId] = useState<string | null>(null);
   const editingCalendarId = propEditingCalendarId !== undefined ? propEditingCalendarId : localEditingCalendarId;
   const setEditingCalendarId = propSetEditingCalendarId || setLocalEditingCalendarId;
+  // File input ref for import
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Visible Month State
   const [visibleMonth, setVisibleMonth] = useState<Date>(() => {
@@ -84,9 +90,22 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     x: number;
     y: number;
     calendarId: string;
-    initialColor: string;
-    currentColor: string;
+    initialColor: { hue: number; saturation: number; lightness: number; alpha: number; layer: 'inner' | 'outer' };
+    currentColor: string; // For react-color mode
   } | null>(null);
+
+  const [isBlossomExpanded, setIsBlossomExpanded] = useState(false);
+
+  useEffect(() => {
+    if (customColorPicker && colorPickerMode === 'blossom') {
+      const timer = setTimeout(() => {
+        setIsBlossomExpanded(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      setIsBlossomExpanded(false);
+    }
+  }, [customColorPicker, colorPickerMode]);
 
   // Merge Calendar State
   const [mergeState, setMergeState] = useState<{ sourceId: string; targetId: string } | null>(null);
@@ -147,11 +166,24 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     if (contextMenu) {
       const calendar = calendars.find(c => c.id === contextMenu.calendarId);
       if (calendar) {
+        const { h, s, l } = hexToHsl(calendar.colors.lineColor);
+        // Calculate slider position from lightness
+        const sliderValue = lightnessToSliderValue(l);
+
+        let x = contextMenu.x;
+        let y = contextMenu.y;
+
+        if (contextMenuRef.current) {
+          const rect = contextMenuRef.current.getBoundingClientRect();
+          x = rect.left + rect.width / 2;
+          y = rect.top + rect.height / 2;
+        }
+
         setCustomColorPicker({
-          x: contextMenu.x,
-          y: contextMenu.y,
+          x,
+          y,
           calendarId: contextMenu.calendarId,
-          initialColor: calendar.colors.lineColor,
+          initialColor: { hue: h, saturation: sliderValue, lightness: l, alpha: 100, layer: 'outer' },
           currentColor: calendar.colors.lineColor,
         });
       }
@@ -194,6 +226,43 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     }
   }, [deleteState]);
 
+  // Import Calendar handler
+  // const handleImportClick = useCallback(() => {
+  //   fileInputRef.current?.click();
+  //   handleCloseSidebarContextMenu();
+  // }, [handleCloseSidebarContextMenu]);
+
+  // const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+
+  //   const result = await importICSFile(file);
+  //   if (result.success && result.events.length > 0) {
+  //     result.events.forEach(event => {
+  //       app.addEvent(event);
+  //     });
+  //   }
+
+  //   // Reset file input
+  //   if (fileInputRef.current) {
+  //     fileInputRef.current.value = '';
+  //   }
+  // }, [app]);
+
+  // // Export Calendar handler
+  // const handleExportCalendar = useCallback(() => {
+  //   if (contextMenu) {
+  //     const calendar = calendars.find(c => c.id === contextMenu.calendarId);
+  //     if (calendar) {
+  //       const events = app.getEvents().filter(e => e.calendarId === calendar.id);
+  //       downloadICS(events, {
+  //         calendarName: calendar.name,
+  //         filename: calendar.name || 'calendar',
+  //       });
+  //     }
+  //     handleCloseContextMenu();
+  //   }
+  // }, [contextMenu, calendars, app, handleCloseContextMenu]);
 
   const sourceCalendarName = mergeState ? calendars.find(c => c.id === mergeState.sourceId)?.name || 'Unknown' : '';
   const targetCalendarName = mergeState ? calendars.find(c => c.id === mergeState.targetId)?.name || 'Unknown' : '';
@@ -218,9 +287,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           <CalendarList
             calendars={calendars}
             onToggleVisibility={toggleCalendarVisibility}
-            onReorder={isDraggable ? app.reorderCalendars : () => {}}
-            onRename={isEditable ? (id, newName) => app.updateCalendar(id, { name: newName }) : () => {}}
-            onContextMenu={isEditable ? handleContextMenu : () => {}}
+            onReorder={isDraggable ? app.reorderCalendars : () => { }}
+            onRename={isEditable ? (id, newName) => app.updateCalendar(id, { name: newName }) : () => { }}
+            onContextMenu={isEditable ? handleContextMenu : () => { }}
             editingId={editingCalendarId}
             setEditingId={setEditingCalendarId}
             activeContextMenuCalendarId={contextMenu?.calendarId}
@@ -242,9 +311,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
         <CalendarList
           calendars={calendars}
           onToggleVisibility={toggleCalendarVisibility}
-          onReorder={isDraggable ? app.reorderCalendars : () => {}}
-          onRename={isEditable ? (id, newName) => app.updateCalendar(id, { name: newName }) : () => {}}
-          onContextMenu={isEditable ? handleContextMenu : () => {}}
+          onReorder={isDraggable ? app.reorderCalendars : () => { }}
+          onRename={isEditable ? (id, newName) => app.updateCalendar(id, { name: newName }) : () => { }}
+          onContextMenu={isEditable ? handleContextMenu : () => { }}
           editingId={editingCalendarId}
           setEditingId={setEditingCalendarId}
           activeContextMenuCalendarId={contextMenu?.calendarId}
@@ -255,6 +324,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
 
       {contextMenu && (
         <ContextMenu
+          ref={contextMenuRef}
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={handleCloseContextMenu}
@@ -275,6 +345,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
                 currentCalendarId={contextMenu.calendarId}
                 onMergeSelect={handleMergeSelect}
               />
+              {/* <ContextMenuItem onClick={handleExportCalendar}>
+                {t('exportCalendar') || 'Export Calendar'}
+              </ContextMenuItem> */}
               <ContextMenuItem
                 onClick={handleDeleteCalendar}
               >
@@ -308,6 +381,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           >
             {t('newCalendar') || 'New Calendar'}
           </ContextMenuItem>
+          {/* <ContextMenuItem onClick={handleImportClick}>
+            {t('importCalendar') || 'Import Calendar'}
+          </ContextMenuItem> */}
           <ContextMenuItem
             onClick={() => {
               app.triggerRender();
@@ -319,6 +395,15 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
         </ContextMenu>,
         document.body
       )}
+
+      {/* Hidden file input for ICS import */}
+      {/* <input
+        ref={fileInputRef}
+        type="file"
+        accept=".ics"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      /> */}
 
       {mergeState && createPortal(
         <MergeCalendarDialog
@@ -350,27 +435,48 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
           onMouseDown={() => setCustomColorPicker(null)}
         >
           <div
-            className="absolute rounded-md bg-white shadow-xl border border-gray-200 dark:bg-slate-800 dark:border-gray-700"
+            className="absolute flex items-center justify-center"
             style={{
               top: customColorPicker.y,
-              left: customColorPicker.x
+              left: customColorPicker.x,
+              transform: 'translate(-50%, -50%)'
             }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <SketchPicker
-              width='220px'
-              color={customColorPicker.currentColor}
-              onChange={(color) => {
-                setCustomColorPicker(prev => prev ? { ...prev, currentColor: color.hex } : null);
-              }}
-              onChangeComplete={(color) => {
-                const { colors, darkColors } = getCalendarColorsForHex(color.hex);
-                app.updateCalendar(customColorPicker.calendarId, {
-                  colors,
-                  darkColors
-                });
-              }}
-            />
+            {colorPickerMode === 'blossom' ? (
+              <BlossomColorPicker
+                defaultValue={customColorPicker.initialColor}
+                coreSize={28}
+                petalSize={28}
+                initialExpanded={isBlossomExpanded}
+                openOnHover={false}
+                onChange={(color) => {
+                  const { colors, darkColors } = getCalendarColorsForHex(color.hex);
+                  app.updateCalendar(customColorPicker.calendarId, {
+                    colors,
+                    darkColors
+                  });
+                }}
+                onCollapse={() => setCustomColorPicker(null)}
+              />
+            ) : (
+              <div className="rounded-md bg-white shadow-xl border border-gray-200 dark:bg-slate-800 dark:border-gray-700">
+                <SketchPicker
+                  width="220px"
+                  color={customColorPicker.currentColor}
+                  onChange={(color: ColorResult) => {
+                    setCustomColorPicker(prev => prev ? { ...prev, currentColor: color.hex } : null);
+                  }}
+                  onChangeComplete={(color: ColorResult) => {
+                    const { colors, darkColors } = getCalendarColorsForHex(color.hex);
+                    app.updateCalendar(customColorPicker.calendarId, {
+                      colors,
+                      darkColors
+                    });
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>,
         document.body
