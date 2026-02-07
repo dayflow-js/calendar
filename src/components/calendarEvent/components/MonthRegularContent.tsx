@@ -1,6 +1,6 @@
 import React from 'react';
 import { Event } from '@/types';
-import { CalendarApp } from '@/core';
+import { CalendarApp } from '@/types';
 import { getLineColor, extractHourFromDate } from '@/utils';
 import {
   monthRegularContent,

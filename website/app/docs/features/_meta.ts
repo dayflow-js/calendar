@@ -13,9 +13,6 @@ const meta: MetaRecord = {
   'switcher-mode': {
     title: "Switcher Mode"
   },
-  'mobile-support': {
-    title: "Mobile Support"
-  },
   'read-only': {
     title: "Read-only Mode"
   },

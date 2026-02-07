@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer } from '@/types';
-import { CalendarApp } from '@/core';
+import React, { useMemo, useState } from 'react';
+import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer, CalendarApp } from '@/types';
 import { YearDayCell } from './YearDayCell';
 import { YearMultiDayEvent } from './YearMultiDayEvent';
 import { analyzeMultiDayEventsForRow } from './utils';
+import { GridContextMenu } from '@/components/contextMenu';
 
 interface YearRowComponentProps {
   rowDays: Date[];
@@ -59,6 +59,14 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent, date: Date) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, date });
+  };
+
   const segments = useMemo(() => {
     return analyzeMultiDayEventsForRow(events, rowDays, columnsPerRow);
   }, [events, rowDays, columnsPerRow]);
@@ -88,9 +96,9 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
       // Check each column this segment spans
       for (let i = start; i <= end; i++) {
         const count = colCounts[i];
-        // If column has more than MAX, we must reserve the last slot (MAX-1) for "More"
+        // If column has more than MAX, must reserve the last slot (MAX-1) for "More"
         // So valid indices are 0 to MAX-2.
-        // If column has <= MAX, we can use 0 to MAX-1.
+        // If column has <= MAX, can use 0 to MAX-1.
         const maxAllowedIndex = count > MAX_VISIBLE_ROWS
           ? MAX_VISIBLE_ROWS - 2
           : MAX_VISIBLE_ROWS - 1;
@@ -116,7 +124,7 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
 
 
   return (
-    <div className="relative w-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${columnsPerRow}, 1fr)` }}>
+    <div className="relative w-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${columnsPerRow}, 1fr)` }} onContextMenu={e => e.preventDefault()}>
       {/* Background Cells */}
       {rowDays.map((date, index) => {
         const isToday = date.getTime() === today.getTime();
@@ -132,6 +140,7 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
             onCreateStart={onCreateStart}
             onMoreEventsClick={onMoreEventsClick}
             moreCount={moreCounts[index]}
+            onContextMenu={handleContextMenu}
           />
         );
       })}
@@ -143,6 +152,7 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
           left: 0,
           right: 0
         }}
+        onContextMenu={e => e.preventDefault()}
       >
         <div className="relative w-full h-full">
           {visibleSegments.map((segment) => (
@@ -168,6 +178,27 @@ export const YearRowComponent: React.FC<YearRowComponentProps> = React.memo(({
           ))}
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.YEAR}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            if (onCreateStart) {
+              const syntheticEvent = {
+                preventDefault: () => { },
+                stopPropagation: () => { },
+                clientX: contextMenu.x,
+                clientY: contextMenu.y,
+              } as unknown as React.MouseEvent;
+              onCreateStart(syntheticEvent, contextMenu.date);
+            }
+          }}
+        />
+      )}
     </div>
   );
 });

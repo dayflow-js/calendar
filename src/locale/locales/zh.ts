@@ -63,6 +63,10 @@ const zh: Locale = {
     addSchedule: '添加日程',
     importCalendarMessage: '该日历包含新日程。请选取目标日历',
     ok: '好',
+    cut: '剪切',
+    copy: '复制',
+    pasteHere: '粘贴在此处',
+    eventSummary: '简介',
   }
 };
 

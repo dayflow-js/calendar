@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { CalendarApp } from '../core';
-import { Event, CalendarColors } from '../types';
+import { Event, CalendarColors, CalendarApp } from '../types';
 import { Temporal } from 'temporal-polyfill';
 import { useLocale } from '@/locale';
 

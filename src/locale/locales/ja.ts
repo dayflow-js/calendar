@@ -63,6 +63,10 @@ const ja: Locale = {
     addSchedule: '予定を追加',
     importCalendarMessage: 'このカレンダーには新しい予定が含まれています。ターゲットカレンダーを選択してください。',
     ok: 'OK',
+    cut: '切り取り',
+    copy: 'コピー',
+    pasteHere: 'ここに貼り付け',
+    eventSummary: '概要',
   }
 };
 

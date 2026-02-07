@@ -11,7 +11,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@dayflow/core": "^2.0.6",
+    "@dayflow/core": "^2.0.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.552.0",

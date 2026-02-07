@@ -13,9 +13,6 @@ const meta: MetaRecord = {
   'switcher-mode': {
     title: "切り替えモード"
   },
-  'mobile-support': {
-    title: "モバイル対応"
-  },
   'read-only': {
     title: "読み取り専用モード"
   },

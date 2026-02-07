@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarSidebarRenderProps, Event } from '../../types';
-import ContextMenu, {
+import {
+  ContextMenu,
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuLabel,
   ContextMenuColorPicker,
-} from '../common/ContextMenu';
+} from '@/components/contextMenu';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { BlossomColorPicker, hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
 import { SketchPicker, ColorResult } from 'react-color';
@@ -171,6 +172,7 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     if (contextMenu) {
       const calendar = calendars.find(c => c.id === contextMenu.calendarId);
       if (calendar) {
+        // TODO s unused
         const { h, s, l } = hexToHsl(calendar.colors.lineColor);
         // Calculate slider position from lightness
         const sliderValue = lightnessToSliderValue(l);
@@ -242,8 +244,8 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     if (!file) return;
 
     const result = await importICSFile(file);
-    
-    // Show dialog if we found at least one valid event, even if there were some parsing errors
+
+    // Show dialog if found at least one valid event, even if there were some parsing errors
     if (result.events.length > 0) {
       setImportState({
         events: result.events,

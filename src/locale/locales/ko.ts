@@ -63,6 +63,10 @@ const ko: Locale = {
     addSchedule: '일정 추가',
     importCalendarMessage: '이 캘린더에는 새로운 일정이 포함되어 있습니다. 대상 캘린더를 선택하세요.',
     ok: '확인',
+    cut: '잘라내기',
+    copy: '복사',
+    pasteHere: '여기에 붙여넣기',
+    eventSummary: '요약',
   }
 };
 

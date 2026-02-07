@@ -3,7 +3,6 @@ import React from 'react';
 import { ViewAdapter } from './ViewAdapter';
 import DayView from '../views/DayView';
 import {
-  CalendarView,
   DayViewConfig,
   ViewAdapterProps,
   ViewFactory,
@@ -64,6 +63,10 @@ export const createDayView: ViewFactory<DayViewConfig> = (config = {}) => {
       calendarRef: props.calendarRef,
       switcherMode: props.switcherMode,
       meta: props.meta,
+      selectedEventId: props.selectedEventId,
+      onEventSelect: props.onEventSelect,
+      detailPanelEventId: props.detailPanelEventId,
+      onDetailPanelToggle: props.onDetailPanelToggle,
     });
   };
 

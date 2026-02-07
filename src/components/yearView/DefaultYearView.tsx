@@ -1,14 +1,14 @@
 import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { Temporal } from 'temporal-polyfill';
-import { CalendarApp } from '@/core';
 import { useLocale } from '@/locale';
-import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer } from '@/types';
+import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer, CalendarApp } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useDragForView } from '@/plugins/dragPlugin';
 import {
   monthViewContainer,
   scrollContainer,
+  scrollbarHide,
 } from '@/styles/classNames';
 import { groupDaysIntoRows } from '@/components/yearView/utils';
 import { YearRowComponent } from '@/components/yearView/YearRowComponent';
@@ -20,6 +20,10 @@ export interface YearViewProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
   //TOOD: eslint-disable-next-line @typescript-eslint/no-explicit-any
   config?: any;
+  selectedEventId?: string | null;
+  onEventSelect?: (eventId: string | null) => void;
+  detailPanelEventId?: string | null;
+  onDetailPanelToggle?: (eventId: string | null) => void;
 }
 
 export const DefaultYearView: React.FC<YearViewProps> = ({
@@ -28,8 +32,12 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   config,
+  selectedEventId: propSelectedEventId,
+  onEventSelect: propOnEventSelect,
+  detailPanelEventId: propDetailPanelEventId,
+  onDetailPanelToggle: propOnDetailPanelToggle,
 }) => {
-  const { locale } = useLocale();
+  const { t, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const currentYear = currentDate.getFullYear();
   const rawEvents = app.getEvents();
@@ -43,8 +51,28 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
   });
   const [isLayoutReady, setIsLayoutReady] = useState(false);
 
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+
+  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
+  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+
+  const setSelectedEventId = (id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  };
+
+  const setDetailPanelEventId = (id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  };
+
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -79,6 +107,18 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
     observer.observe(container);
     return () => observer.disconnect();
   }, []);
+
+  // Sync highlighted event from app state
+  const prevHighlightedEventId = useRef(app.state.highlightedEventId);
+
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      setSelectedEventId(app.state.highlightedEventId);
+    } else if (prevHighlightedEventId.current) {
+      setSelectedEventId(null);
+    }
+    prevHighlightedEventId.current = app.state.highlightedEventId;
+  }, [app.state.highlightedEventId]);
 
   // Drag and Drop Hook
   const {
@@ -127,7 +167,7 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
         });
         const newEvent: Event = {
           id: `event-${Date.now()}`,
-          title: '',
+          title: t('newEvent') || 'New Event',
           start: plainDate,
           end: plainDate,
           allDay: true,
@@ -180,7 +220,7 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
   };
 
   return (
-    <div className={monthViewContainer}>
+    <div className={monthViewContainer} onContextMenu={e => e.preventDefault()}>
       <ViewHeader
         calendar={app}
         viewType={ViewType.YEAR}
@@ -203,7 +243,7 @@ export const DefaultYearView: React.FC<YearViewProps> = ({
 
       <div
         ref={scrollElementRef}
-        className={`${scrollContainer}`}
+        className={`${scrollContainer} ${scrollbarHide}`}
         style={{
           overflow: 'hidden auto',
         }}

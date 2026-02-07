@@ -192,6 +192,8 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex-1">
               <input
+                id={`event-dialog-title-${editedEvent.id}`}
+                name="title"
                 type="text"
                 value={editedEvent.title}
                 readOnly={!isEditable}
@@ -266,6 +268,8 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
           <div className="mb-4">
             <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
             <textarea
+              id={`event-dialog-note-${editedEvent.id}`}
+              name="note"
               value={editedEvent.description ?? ''}
               readOnly={!isEditable}
               disabled={!isEditable}

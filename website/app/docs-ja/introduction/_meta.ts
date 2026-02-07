@@ -22,6 +22,9 @@ const meta: MetaRecord = {
   'use-calendar-app': {
     title: 'useCalendarApp'
   },
+  'keyboard-shortcuts': {
+    title: 'キーボードショートカット'
+  },
 }
 
 export default meta

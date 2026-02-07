@@ -63,6 +63,10 @@ const de: Locale = {
     addSchedule: 'Termin hinzufügen',
     importCalendarMessage: 'Dieser Kalender enthält neue Termine. Bitte wählen Sie einen Zielkalender.',
     ok: 'OK',
+    cut: 'Ausschneiden',
+    copy: 'Kopieren',
+    pasteHere: 'Hier einfügen',
+    eventSummary: 'Zusammenfassung',
   }
 };
 

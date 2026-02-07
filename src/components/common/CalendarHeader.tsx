@@ -36,11 +36,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         ? 'border-gray-200 dark:border-gray-700'
         : 'border-transparent'
         }`}
+      onContextMenu={e => e.preventDefault()}
     >
       {/* Left Section: Add Calendar Button Only */}
       <div className="flex flex-1 items-center mb-1">
         {onAddCalendar && isEditable && (
           <button
+            id="dayflow-add-event-btn"
             onClick={onAddCalendar}
             className={iconButton}
             title={isMobile ? (t('newEvent') || 'New Event') : (t('createCalendar') || 'Add Calendar')}
@@ -78,6 +80,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             </span>
           </div>
           <input
+            id="dayflow-search-input"
             type="text"
             placeholder="Search"
             value={searchValue}

@@ -27,7 +27,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         )}
       </button>
       {!isCollapsed && (
-        <div className='flex flex-1 justify-between items-center'>
+        <div className='flex flex-1 justify-between items-center ml-3'>
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
             {t('calendars')}
           </span>

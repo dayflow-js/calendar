@@ -9,7 +9,7 @@ const navbar = (
   <Navbar
     logo={<BrandLogo />}
     projectLink="https://github.com/dayflow-js/dayflow"
-    chatLink="https://discord.gg/jc37N4xw"
+    chatLink="https://discord.gg/9vdFZKJqBb"
   >
     <LanguageSwitcher />
   </Navbar>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Event } from '../../types';
 import {
   getLineColor,
@@ -87,6 +87,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
     isEditable = true,
     viewable = true,
   }) => {
+    const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
 
     const startPercent = (segment.startDayIndex / 7) * 100;
@@ -104,6 +105,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
       if (!isDraggable && !viewable) return;
       e.preventDefault();
       e.stopPropagation();
+      setIsPressed(true);
 
       const target = e.target as HTMLElement;
       const isResizeHandle = target.closest('.resize-handle');
@@ -113,6 +115,14 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
       }
     };
 
+    const handleMouseUp = () => {
+      setIsPressed(false);
+    };
+
+    const handleMouseLeave = () => {
+      setIsPressed(false);
+    };
+
     // Long press handling
     const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
     const touchStartPosRef = React.useRef<{ x: number; y: number } | null>(null);
@@ -120,6 +130,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
     const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
       if (!onMoveStart || !isMobile || (!isDraggable && !viewable)) return;
       e.stopPropagation();
+      setIsPressed(true);
 
       const touch = e.touches[0];
       const clientX = touch.clientX;
@@ -158,11 +169,13 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
           clearTimeout(longPressTimerRef.current);
           longPressTimerRef.current = null;
           touchStartPosRef.current = null;
+          setIsPressed(false);
         }
       }
     };
 
     const handleTouchEnd = () => {
+      setIsPressed(false);
       if (longPressTimerRef.current) {
         clearTimeout(longPressTimerRef.current);
         longPressTimerRef.current = null;
@@ -308,7 +321,7 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
           borderRadius: getBorderRadius(segment.segmentType),
           pointerEvents: 'auto',
           zIndex: 10,
-          ...(isSelected || isDragging
+          ...(isSelected || isDragging || isPressed
             ? {
               backgroundColor: getSelectedBgColor(calendarId),
               color: '#fff',
@@ -321,6 +334,8 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
         }}
         data-segment-days={segmentDays}
         onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

@@ -63,6 +63,10 @@ const es: Locale = {
     addSchedule: 'Añadir evento',
     importCalendarMessage: 'Este calendario contiene nuevos eventos. Seleccione un calendario de destino.',
     ok: 'Aceptar',
+    cut: 'Cortar',
+    copy: 'Copiar',
+    pasteHere: 'Pegar aquí',
+    eventSummary: 'Resumen',
   }
 };
 

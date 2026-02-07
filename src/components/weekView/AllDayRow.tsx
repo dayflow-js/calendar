@@ -1,12 +1,12 @@
-import React from 'react';
-import { CalendarApp } from '@/core';
+import React, { useState } from 'react';
+import { CalendarApp } from '@/types';
 import CalendarEventComponent from '@/components/calendarEvent';
-import { useLocale } from '@/locale';
 import {
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   WeekDayDragState,
+  ViewType,
 } from '@/types';
 import {
   allDayRow,
@@ -17,6 +17,7 @@ import {
   dateNumber,
   miniCalendarToday,
 } from '@/styles/classNames';
+import { GridContextMenu } from '@/components/contextMenu';
 
 interface AllDayRowProps {
   app: CalendarApp;
@@ -103,11 +104,27 @@ export const AllDayRow: React.FC<AllDayRowProps> = ({
   setIsDrawerOpen,
 }) => {
   const columnStyle: React.CSSProperties = { flexShrink: 0 };
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent, dayIndex: number) => {
+    e.preventDefault();
+    if (isMobile) return;
+
+    const date = new Date(currentWeekStart);
+    date.setDate(currentWeekStart.getDate() + dayIndex);
+    date.setHours(0, 0, 0, 0);
+
+    setContextMenu({ x: e.clientX, y: e.clientY, date });
+  };
 
   return (
-    <div className="flex flex-none border-b border-gray-200 dark:border-gray-700 relative z-10">
+    <div className="flex flex-none border-b border-gray-200 dark:border-gray-700 relative z-10"
+      onContextMenu={e => e.preventDefault()}
+    >
       {/* Left Frozen Column - outside scroll area, matching TimeGrid sidebar */}
-      <div className="w-12 md:w-20 shrink-0 bg-white dark:bg-gray-900 z-20 flex flex-col">
+      <div className="w-12 md:w-20 shrink-0 bg-white dark:bg-gray-900 z-20 flex flex-col"
+        onContextMenu={e => e.preventDefault()}
+      >
         {/* Header spacer - flexes to match weekday header height */}
         <div className="flex-1 border-b border-gray-200 dark:border-gray-700"></div>
         {/* All Day Label */}
@@ -174,6 +191,7 @@ export const AllDayRow: React.FC<AllDayRowProps> = ({
                     onDrop={e => {
                       handleDrop(e, dropDate, undefined, true);
                     }}
+                    onContextMenu={e => handleContextMenu(e, dayIndex)}
                   />
                 );
               })}
@@ -236,6 +254,23 @@ export const AllDayRow: React.FC<AllDayRowProps> = ({
           </div>
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.WEEK}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            const currentDayIndex = Math.floor(
+              (contextMenu.date.getTime() - currentWeekStart.getTime()) /
+              (24 * 60 * 60 * 1000)
+            );
+            handleCreateAllDayEvent?.({ clientX: contextMenu.x, clientY: contextMenu.y } as any, currentDayIndex);
+          }}
+        />
+      )}
     </div>
   );
 };

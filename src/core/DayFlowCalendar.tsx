@@ -31,6 +31,7 @@ import { LocaleMessages, LocaleCode, Locale } from '../locale/types';
 import { getCalendarColorsForHex } from './calendarRegistry';
 import { generateUniKey } from '../utils/helpers';
 import { temporalToDate, dateToZonedDateTime } from '../utils/temporal';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
 
@@ -112,6 +113,28 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [mobileDraftEvent, setMobileDraftEvent] = useState<Event | null>(null);
+
+  // Global Selection State
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(null);
+
+  // Enable Keyboard Shortcuts
+  useKeyboardShortcuts({
+    app,
+    selectedEventId,
+    setSelectedEventId,
+    detailPanelEventId,
+    setDetailPanelEventId,
+    isDrawerOpen: isMobileDrawerOpen,
+    setIsDrawerOpen: setIsMobileDrawerOpen,
+  });
+
+  // Sync highlighting from search results to selection
+  useEffect(() => {
+    if (app.state.highlightedEventId) {
+      setSelectedEventId(app.state.highlightedEventId);
+    }
+  }, [app.state.highlightedEventId]);
 
   // Theme state
   const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
@@ -371,6 +394,10 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
     switcherMode: app.state.switcherMode,
     calendarRef,
     meta,
+    selectedEventId,
+    onEventSelect: setSelectedEventId,
+    detailPanelEventId,
+    onDetailPanelToggle: setDetailPanelEventId,
   };
 
   const sidebarProps: CalendarSidebarRenderProps = {

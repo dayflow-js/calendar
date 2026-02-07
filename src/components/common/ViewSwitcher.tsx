@@ -49,7 +49,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       <div className="relative inline-block" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 mb-1 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-1 transition-all duration-200 shadow-sm min-w-30 justify-between"
+          className="flex items-center gap-2 px-3 mb-1 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
@@ -71,7 +71,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
                     calendar.changeView(viewType);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm transition-colors duration-150 ${currentView === viewType
+                  className={`w-full text-left px-3 py-2 text-sm transition-colors duration-150 focus:outline-none ${currentView === viewType
                     ? 'bg-primary/10 text-primary font-medium'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }`}
@@ -109,7 +109,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       {registeredViews.map(viewType => (
         <button
           key={viewType}
-          className={`px-4 h-6 text-sm font-medium rounded-md transition-all duration-200 ${currentView === viewType
+          className={`px-4 h-6 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none ${currentView === viewType
             ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}

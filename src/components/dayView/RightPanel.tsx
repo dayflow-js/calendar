@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarApp } from '@/core';
+import { CalendarApp } from '@/types';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import TodayBox from '@/components/common/TodayBox';
 import { useLocale } from '@/locale';
@@ -53,6 +53,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
   return (
     <div
       className={`df-right-panel hidden md:block flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
+      onContextMenu={e => e.preventDefault()}
     >
       <div className={`${flexCol} h-full`}>
         {/* Mini calendar */}

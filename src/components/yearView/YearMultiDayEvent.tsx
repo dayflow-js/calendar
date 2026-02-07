@@ -1,12 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition } from '@/types';
-import { getEventBgColor, getEventTextColor, getSelectedBgColor, getLineColor, formatTime, extractHourFromDate, getEventEndHour } from '@/utils';
+import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition, CalendarApp } from '@/types';
+import { getEventBgColor, getEventTextColor, getSelectedBgColor, getLineColor } from '@/utils';
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from './utils';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
 import EventDetailPanelWithContent from '../common/EventDetailPanelWithContent';
-import { CalendarApp } from '@/core';
+import { EventContextMenu } from '@/components/contextMenu';
 
 interface YearMultiDayEventProps {
   segment: YearMultiDaySegment;
@@ -52,6 +52,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
   const eventRef = useRef<HTMLDivElement>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [detailPanelPosition, setDetailPanelPosition] = useState<EventDetailPosition | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Use segment.id to uniquely identify which segment's panel should be shown
   // This prevents multiple panels from showing for multi-month events
@@ -74,21 +75,96 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
   const TOP_OFFSET = visualRowIndex * ROW_SPACING;
   const HORIZONTAL_MARGIN = 2; // Match MultiDayEvent
 
-  const showPanel = () => {
-    const rect = eventRef.current?.getBoundingClientRect();
-    if (rect) {
-      // Basic positioning logic - can be enhanced
-      const panelHeight = 200; // estimated
-      const panelWidth = 300; // estimated
-      let top = rect.bottom + 10;
-      let left = rect.left;
+  const updatePanelPosition = useCallback(() => {
+    if (!eventRef.current || !calendarRef?.current) return;
 
-      // Adjust if off screen
-      if (top + panelHeight > window.innerHeight) {
-        top = rect.top - panelHeight - 10;
+    const calendarRect = calendarRef.current.getBoundingClientRect();
+    const rect = eventRef.current.getBoundingClientRect();
+
+    const boundaryWidth = Math.min(window.innerWidth, calendarRect.right);
+    const boundaryHeight = Math.min(window.innerHeight, calendarRect.bottom);
+
+    requestAnimationFrame(() => {
+      if (!detailPanelRef.current) {
+        // Retry once if ref not ready
+        requestAnimationFrame(() => {
+          if (!detailPanelRef.current) return;
+          const panelRect = detailPanelRef.current.getBoundingClientRect();
+          const panelWidth = panelRect.width || 340;
+          const panelHeight = panelRect.height || 240;
+
+          let left: number, top: number;
+
+          const spaceOnRight = boundaryWidth - rect.right;
+          const spaceOnLeft = rect.left - calendarRect.left;
+
+          if (spaceOnRight >= panelWidth + 20) {
+            left = rect.right + 10;
+          } else if (spaceOnLeft >= panelWidth + 20) {
+            left = rect.left - panelWidth - 10;
+          } else {
+            if (spaceOnRight > spaceOnLeft) {
+              left = Math.max(calendarRect.left + 10, boundaryWidth - panelWidth - 10);
+            } else {
+              left = calendarRect.left + 10;
+            }
+          }
+
+          const idealTop = rect.top - panelHeight / 2 + rect.height / 2;
+          const topBoundary = Math.max(10, calendarRect.top + 10);
+          const bottomBoundary = boundaryHeight - 10;
+
+          if (idealTop < topBoundary) {
+            top = topBoundary;
+          } else if (idealTop + panelHeight > bottomBoundary) {
+            top = Math.max(topBoundary, bottomBoundary - panelHeight);
+          } else {
+            top = idealTop;
+          }
+
+          setDetailPanelPosition({
+            top,
+            left,
+            eventHeight: rect.height,
+            eventMiddleY: rect.top + rect.height / 2,
+            isSunday: left < rect.left,
+          });
+        });
+        return;
       }
-      if (left + panelWidth > window.innerWidth) {
-        left = window.innerWidth - panelWidth - 10;
+
+      const panelRect = detailPanelRef.current.getBoundingClientRect();
+      // Use fallback dimensions if measurement fails or returns 0 to prevent shrinking at screen edges
+      const panelWidth = panelRect.width || 340;
+      const panelHeight = panelRect.height || 240;
+
+      let left: number, top: number;
+
+      const spaceOnRight = boundaryWidth - rect.right;
+      const spaceOnLeft = rect.left - calendarRect.left;
+
+      if (spaceOnRight >= panelWidth + 20) {
+        left = rect.right + 10;
+      } else if (spaceOnLeft >= panelWidth + 20) {
+        left = rect.left - panelWidth - 10;
+      } else {
+        if (spaceOnRight > spaceOnLeft) {
+          left = Math.max(calendarRect.left + 10, boundaryWidth - panelWidth - 10);
+        } else {
+          left = calendarRect.left + 10;
+        }
+      }
+
+      const idealTop = rect.top - panelHeight / 2 + rect.height / 2;
+      const topBoundary = Math.max(10, calendarRect.top + 10);
+      const bottomBoundary = boundaryHeight - 10;
+
+      if (idealTop < topBoundary) {
+        top = topBoundary;
+      } else if (idealTop + panelHeight > bottomBoundary) {
+        top = Math.max(topBoundary, bottomBoundary - panelHeight);
+      } else {
+        top = idealTop;
       }
 
       setDetailPanelPosition({
@@ -96,9 +172,12 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
         left,
         eventHeight: rect.height,
         eventMiddleY: rect.top + rect.height / 2,
+        isSunday: left < rect.left,
       });
-    }
+    });
+  }, [calendarRef, detailPanelPosition]);
 
+  const showPanel = () => {
     onDetailPanelToggle?.(segment.id);
   };
 
@@ -112,6 +191,39 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
       }, 50);
     }
   }, [newlyCreatedEventId, event.id, showDetailPanel, onDetailPanelOpen, isFirstSegment]);
+
+  // Handle panel positioning when opened
+  useEffect(() => {
+    if (showDetailPanel && !detailPanelPosition) {
+      setDetailPanelPosition({
+        top: -9999,
+        left: -9999,
+        eventHeight: 0,
+        eventMiddleY: 0,
+        isSunday: false,
+      });
+      requestAnimationFrame(() => {
+        updatePanelPosition();
+      });
+    }
+  }, [showDetailPanel, detailPanelPosition, updatePanelPosition]);
+
+  // Update position on scroll or resize
+  useEffect(() => {
+    if (!showDetailPanel) return;
+
+    const handleUpdate = () => {
+      updatePanelPosition();
+    };
+
+    window.addEventListener('scroll', handleUpdate, true);
+    window.addEventListener('resize', handleUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', handleUpdate, true);
+      window.removeEventListener('resize', handleUpdate);
+    };
+  }, [showDetailPanel, updatePanelPosition]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -143,6 +255,15 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
     e.preventDefault();
     e.stopPropagation();
     showPanel();
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onEventSelect) {
+      onEventSelect(event.id);
+    }
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
   };
 
   const renderResizeHandle = (position: 'left' | 'right') => {
@@ -347,6 +468,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         onTouchStart={handleTouchStart}
+        onContextMenu={handleContextMenu}
         title={event.title}
       >
         {renderResizeHandle('left')}
@@ -354,6 +476,17 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
         {renderResizeHandle('right')}
       </div>
       {renderDetailPanel()}
+      {contextMenuPosition && app && (
+        <EventContextMenu
+          event={event}
+          x={contextMenuPosition.x}
+          y={contextMenuPosition.y}
+          onClose={() => setContextMenuPosition(null)}
+          app={app}
+          onDetailPanelToggle={onDetailPanelToggle}
+          detailPanelKey={segment.id}
+        />
+      )}
     </>
   );
 };

@@ -22,6 +22,9 @@ const meta: MetaRecord = {
   'use-calendar-app': {
     title: 'useCalendarApp'
   },
+  'keyboard-shortcuts': {
+    title: '键盘快捷键'
+  },
 }
 
 export default meta
