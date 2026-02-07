@@ -6,7 +6,6 @@ import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
 import { BlossomColorPicker, DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
 import { useTheme } from '../../contexts/ThemeContext';
-import { cancelButton } from '@/styles/classNames';
 import { useLocale } from '@/locale';
 
 // Colors for default mode (react-color)
@@ -159,10 +158,12 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
             <div className="mb-8 flex items-center gap-4">
               <div className="flex-1">
                 <input
+                  id="blossom-calendar-name"
+                  name="calendar-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
+                  className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                   placeholder={t('calendarNamePlaceholder')}
                   autoFocus
                 />
@@ -192,10 +193,12 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
                     style={{ backgroundColor: defaultSelectedColor }}
                   />
                   <input
+                    id="default-calendar-name"
+                    name="calendar-name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:border-primary dark:focus:ring-primary"
+                    className="w-full flex-1 border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     placeholder={t('calendarNamePlaceholder')}
                     autoFocus
                   />
@@ -242,18 +245,18 @@ export const CreateCalendarDialog: React.FC<CreateCalendarDialogProps> = ({
             </>
           )}
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-end space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className={cancelButton}
+              className="px-2 py-1 border border-slate-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-medium transition"
             >
               {t('cancel')}
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+              className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-xs font-medium transition disabled:opacity-50"
             >
               {t('create')}
             </button>

@@ -268,6 +268,8 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex-1">
           <input
+            id={`event-title-${event.id}`}
+            name="title"
             type="text"
             value={event.title}
             readOnly={!isEditable}
@@ -344,6 +346,8 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
       <div className="mb-3">
         <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
         <textarea
+          id={`event-note-${event.id}`}
+          name="note"
           value={event.description ?? ''}
           readOnly={!isEditable}
           disabled={!isEditable}

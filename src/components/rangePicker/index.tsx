@@ -734,6 +734,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <input
             type="text"
+            name="range-start"
             value={inputValues[0]}
             onChange={handleInputChange('start')}
             onFocus={() => openPanelForField('start')}
@@ -757,6 +758,7 @@ const RangePicker: React.FC<RangePickerProps> = ({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <input
             type="text"
+            name="range-end"
             value={inputValues[1]}
             onChange={handleInputChange('end')}
             onFocus={() => openPanelForField('end')}

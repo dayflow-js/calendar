@@ -26,6 +26,7 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
     };
 
     useEffect(() => {
+      const handleCloseAll = () => onClose();
       const handleClickOutside = (event: MouseEvent) => {
         if (internalRef.current && !internalRef.current.contains(event.target as Node)) {
           // Check if the click is within a submenu
@@ -37,8 +38,15 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         }
       };
 
+      // Close other menus when this one mounts
+      window.dispatchEvent(new CustomEvent('dayflow-close-all-menus'));
+
+      // Listen for close-all event from other menus
+      window.addEventListener('dayflow-close-all-menus', handleCloseAll);
       // Use mousedown to capture clicks outside immediately
-      document.body.addEventListener('mousedown', handleClickOutside);
+      document.body.addEventListener('mousedown', handleClickOutside, { capture: true });
+      // Also capture right-clicks outside
+      document.body.addEventListener('contextmenu', handleClickOutside, { capture: true });
 
       // Also close on scroll or window resize
       const handleScrollOrResize = () => onClose();
@@ -46,7 +54,9 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       window.addEventListener('resize', handleScrollOrResize);
 
       return () => {
-        document.body.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('dayflow-close-all-menus', handleCloseAll);
+        document.body.removeEventListener('mousedown', handleClickOutside, { capture: true });
+        document.body.removeEventListener('contextmenu', handleClickOutside, { capture: true });
         window.removeEventListener('scroll', handleScrollOrResize, true);
         window.removeEventListener('resize', handleScrollOrResize);
       };
