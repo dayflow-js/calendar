@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { CalendarApp } from '@/core';
+import React, { useRef, useState } from 'react';
+import { CalendarApp } from '@/types';
 import { useLocale } from '@/locale';
 import {
   Event,
@@ -13,9 +13,8 @@ import ViewHeader from '@/components/common/ViewHeader';
 import CalendarEventComponent from '@/components/calendarEvent';
 import {
   formatTime,
-  extractHourFromDate,
-  getEventEndHour,
 } from '@/utils';
+import { GridContextMenu } from '@/components/contextMenu';
 import {
   allDayRow,
   allDayLabel,
@@ -27,7 +26,6 @@ import {
   currentTimeLine,
   currentTimeLabel,
   currentTimeLineBar,
-  bgGray50,
   flexCol,
   timeGridBoundary,
   midnightLabel,
@@ -125,25 +123,60 @@ export const DayContent: React.FC<DayContentProps> = ({
   LAST_HOUR,
 }) => {
   const { t, locale } = useLocale();
-  const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+  const prevHighlightedEventId = useRef(app.state.highlightedEventId);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent, isAllDay: boolean) => {
+    e.preventDefault();
+    if (isMobile) return;
+
+    const date = new Date(currentDate);
+
+    if (!isAllDay) {
+      const rect = calendarRef.current?.querySelector('.calendar-content')?.getBoundingClientRect();
+      if (rect) {
+        const relativeY = e.clientY - rect.top + (calendarRef.current?.querySelector('.calendar-content') as HTMLElement)?.scrollTop || 0;
+        const floatHour = relativeY / HOUR_HEIGHT + FIRST_HOUR;
+        const h = Math.floor(floatHour);
+        const m = Math.floor((floatHour - h) * 60);
+
+        const snappedMinutes = Math.round(m / 15) * 15;
+        const finalHour = snappedMinutes === 60 ? h + 1 : h;
+        const finalMinutes = snappedMinutes === 60 ? 0 : snappedMinutes;
+
+        date.setHours(finalHour, finalMinutes, 0, 0);
+      }
+    } else {
+      date.setHours(0, 0, 0, 0);
+    }
+
+    setContextMenu({ x: e.clientX, y: e.clientY, date });
+  };
 
   return (
     <div
       className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full md:w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
+      onContextMenu={e => e.preventDefault()}
     >
       <div className={`relative ${flexCol} h-full`}>
         {/* Fixed navigation bar */}
-        <ViewHeader
-          calendar={app}
-          viewType={ViewType.DAY}
-          currentDate={currentDate}
-          customSubtitle={currentDate.toLocaleDateString(locale, {
-            weekday: 'long',
-          })}
-        />
+        <div onContextMenu={e => e.preventDefault()}>
+          <ViewHeader
+            calendar={app}
+            viewType={ViewType.DAY}
+            currentDate={currentDate}
+            customSubtitle={currentDate.toLocaleDateString(locale, {
+              weekday: 'long',
+            })}
+          />
+        </div>
         {/* All-day event area */}
-        <div className={`${allDayRow} pt-px`} ref={allDayRowRef}>
-          <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs`}>{t('allDay')}</div>
+        <div
+          className={`${allDayRow} pt-px`}
+          ref={allDayRowRef}
+          onContextMenu={(e) => handleContextMenu(e, true)}
+        >
+          <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs`} onContextMenu={e => e.preventDefault()}>{t('allDay')}</div>
           <div className="flex flex-1 relative">
             <div
               className="w-full relative"
@@ -213,8 +246,7 @@ export const DayContent: React.FC<DayContentProps> = ({
                       setSelectedEventId(eventId);
                     }
                   }}
-                  customDetailPanelContent={customDetailPanelContent}
-                  customEventDetailDialog={customEventDetailDialog}
+                  customDetailPanelContent={customDetailPanelContent} customEventDetailDialog={customEventDetailDialog}
                   app={app}
                   isMobile={isMobile}
                   enableTouch={isTouch}
@@ -263,7 +295,7 @@ export const DayContent: React.FC<DayContentProps> = ({
               })()}
 
             {/* Time column */}
-            <div className={`${timeColumn} w-12 md:w-20`}>
+            <div className={`${timeColumn} w-12 md:w-20`} onContextMenu={e => e.preventDefault()}>
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
                   <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
@@ -328,7 +360,7 @@ export const DayContent: React.FC<DayContentProps> = ({
                     const dropHour = Math.floor(FIRST_HOUR + relativeY / HOUR_HEIGHT);
                     handleDrop(e, currentDate, dropHour);
                   }}
-                  onContextMenu={e => isMobile && e.preventDefault()}
+                  onContextMenu={(e) => handleContextMenu(e, false)}
                 />
               ))}
 
@@ -403,6 +435,38 @@ export const DayContent: React.FC<DayContentProps> = ({
           </div>
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.DAY}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            if (handleCreateStart) {
+              const currentDayIndex = Math.floor(
+                (currentDate.getTime() - currentWeekStart.getTime()) /
+                (24 * 60 * 60 * 1000)
+              );
+              const isAllDay = contextMenu.date.getHours() === 0 && contextMenu.date.getMinutes() === 0;
+
+              if (isAllDay) {
+                handleCreateAllDayEvent?.({ clientX: contextMenu.x, clientY: contextMenu.y } as any, currentDayIndex);
+              } else {
+                const preciseHour = contextMenu.date.getHours() + contextMenu.date.getMinutes() / 60;
+                const syntheticEvent = {
+                  preventDefault: () => { },
+                  stopPropagation: () => { },
+                  clientX: contextMenu.x,
+                  clientY: contextMenu.y,
+                } as unknown as React.MouseEvent;
+                handleCreateStart(syntheticEvent, currentDayIndex, preciseHour);
+              }
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

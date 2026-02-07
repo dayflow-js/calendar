@@ -30,6 +30,7 @@ import MonthRegularContent from './components/MonthRegularContent';
 import MonthAllDayContent from './components/MonthAllDayContent';
 import AllDayContent from './components/AllDayContent';
 import RegularEventContent from './components/RegularEventContent';
+import { EventContextMenu } from '@/components/contextMenu';
 
 const CalendarEvent: React.FC<CalendarEventProps> = ({
   event,
@@ -67,6 +68,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
 }) => {
   const isTouchEnabled = enableTouch ?? isMobile;
   const [isSelected, setIsSelected] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [isPopping, setIsPopping] = useState(false);
   const detailPanelKey =
     isMultiDay && segment
@@ -90,9 +93,19 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onEventSelect) {
+      onEventSelect(event.id);
+    }
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
+  };
+
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!onMoveStart || !isTouchEnabled) return;
     e.stopPropagation();
+    setIsPressed(true);
 
     // Store initial position to detect movement
     const touch = e.touches[0];
@@ -158,11 +171,13 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         clearTimeout(longPressTimerRef.current);
         longPressTimerRef.current = null;
         touchStartPosRef.current = null;
+        setIsPressed(false);
       }
     }
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    setIsPressed(false);
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
@@ -190,7 +205,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   };
 
   const isEventSelected =
-    selectedEventId !== undefined ? selectedEventId === event.id : isSelected;
+    (selectedEventId !== undefined ? selectedEventId === event.id : isSelected) || isPressed || isBeingDragged;
 
   const readOnlyConfig = app?.getReadOnlyConfig();
   const isEditable = !app?.state.readOnly;
@@ -260,7 +275,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const calculateEventStyle = () => {
     if (isMonthView) {
       return {
-        opacity: isBeingDragged ? 0.3 : 1,
+        opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
         transform: isPopping ? 'scale(1.15)' : undefined,
         transition: 'transform 0.1s ease-in-out',
@@ -271,7 +286,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     if (isAllDay) {
       const styles: any = {
         height: `${allDayHeight - 4}px`,
-        opacity: isBeingDragged ? 0.3 : 1,
+        opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
         transform: isPopping ? 'scale(1.12)' : undefined,
         transition: 'transform 0.1s ease-in-out',
@@ -332,7 +347,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       top: `${top + 3}px`,
       height: `${height - 4}px`,
       position: 'absolute' as const,
-      opacity: isBeingDragged ? 0.3 : 1,
+      opacity: 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
       transform: isPopping ? 'scale(1.12)' : undefined,
       transition: 'transform 0.1s ease-in-out',
@@ -375,8 +390,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           const eventWidth = eventRect?.width;
 
           if (eventVisibility === 'sticky-top') {
-            const contentTop = contentRect ? contentRect.top : calendarRect.top;
-            let topPosition = contentTop;
+            let topPosition = contentRect ? contentRect.top : calendarRect.top;;
             topPosition = Math.max(topPosition, 0);
             topPosition = Math.max(topPosition, calendarRect.top);
             topPosition = Math.min(topPosition, calendarRect.bottom - 6);
@@ -393,10 +407,9 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
             };
           }
 
-          const contentBottom = contentRect
+          let bottomPosition = contentRect
             ? contentRect.bottom
             : calendarRect.bottom;
-          let bottomPosition = contentBottom;
           bottomPosition = Math.min(bottomPosition, window.innerHeight);
           bottomPosition = Math.min(bottomPosition, calendarRect.bottom);
           bottomPosition = Math.max(bottomPosition, calendarRect.top + 6);
@@ -965,6 +978,21 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   ]);
 
   useEffect(() => {
+    if (showDetailPanel && !detailPanelPosition && !isMobile) {
+      setDetailPanelPosition({
+        top: -9999,
+        left: -9999,
+        eventHeight: 0,
+        eventMiddleY: 0,
+        isSunday: false,
+      });
+      requestAnimationFrame(() => {
+        updatePanelPosition();
+      });
+    }
+  }, [showDetailPanel, detailPanelPosition, updatePanelPosition, isMobile]);
+
+  useEffect(() => {
     if (!isEventSelected && !showDetailPanel) return;
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -1216,7 +1244,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     return (
       <AllDayContent
         event={event}
-        isEditable={!!isEditable}
+        isEditable={isEditable}
         onResizeStart={onResizeStart}
       />
     );
@@ -1228,8 +1256,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         event={event}
         app={app}
         multiDaySegmentInfo={multiDaySegmentInfo}
-        isEditable={!!isEditable}
-        isTouchEnabled={!!isTouchEnabled}
+        isEditable={isEditable}
+        isTouchEnabled={isTouchEnabled}
         isEventSelected={isEventSelected}
         onResizeStart={onResizeStart}
       />
@@ -1313,34 +1341,40 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
             }),
         }}
         onClick={isTouchEnabled ? undefined : handleClick}
+        onContextMenu={isTouchEnabled ? undefined : handleContextMenu}
         onDoubleClick={isTouchEnabled ? undefined : handleDoubleClick}
-        onMouseDown={onMoveStart ? (e) => {
-          // If it's a multi-day event segment, special handling is needed
-          if (multiDaySegmentInfo) {
-            // Temporarily modify the event object to make it appear to start on the current segment's day
-            const adjustedEvent = {
-              ...event,
-              day: multiDaySegmentInfo.dayIndex ?? event.day,
-              // To calculate dragging, we need to store segment information
-              _segmentInfo: multiDaySegmentInfo
-            };
-            onMoveStart(e, adjustedEvent as Event);
-          } else if (isMultiDay && segment) {
-            // Handle MultiDayEventSegment (e.g. WeekView all-day events)
-            const adjustedEvent = {
-              ...event,
-              day: segment.startDayIndex,
-              _segmentInfo: {
-                dayIndex: segment.startDayIndex,
-                isFirst: segment.isFirstSegment,
-                isLast: segment.isLastSegment
-              }
-            };
-            onMoveStart(e, adjustedEvent as Event);
-          } else {
-            onMoveStart(e, event);
+        onMouseDown={(e) => {
+          if (!isTouchEnabled) setIsPressed(true);
+          if (onMoveStart) {
+            // If it's a multi-day event segment, special handling is needed
+            if (multiDaySegmentInfo) {
+              // Temporarily modify the event object to make it appear to start on the current segment's day
+              const adjustedEvent = {
+                ...event,
+                day: multiDaySegmentInfo.dayIndex ?? event.day,
+                // To calculate dragging, need to store segment information
+                _segmentInfo: multiDaySegmentInfo
+              };
+              onMoveStart(e, adjustedEvent as Event);
+            } else if (isMultiDay && segment) {
+              // Handle MultiDayEventSegment (e.g. WeekView all-day events)
+              const adjustedEvent = {
+                ...event,
+                day: segment.startDayIndex,
+                _segmentInfo: {
+                  dayIndex: segment.startDayIndex,
+                  isFirst: segment.isFirstSegment,
+                  isLast: segment.isLastSegment
+                }
+              };
+              onMoveStart(e, adjustedEvent as Event);
+            } else {
+              onMoveStart(e, event);
+            }
           }
-        } : undefined}
+        }}
+        onMouseUp={() => !isTouchEnabled && setIsPressed(false)}
+        onMouseLeave={() => !isTouchEnabled && setIsPressed(false)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -1362,6 +1396,17 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         />
       )}
       {renderDetailPanel()}
+      {contextMenuPosition && app && (
+        <EventContextMenu
+          event={event}
+          x={contextMenuPosition.x}
+          y={contextMenuPosition.y}
+          onClose={() => setContextMenuPosition(null)}
+          app={app}
+          onDetailPanelToggle={onDetailPanelToggle}
+          detailPanelKey={detailPanelKey}
+        />
+      )}
     </>
   );
 };

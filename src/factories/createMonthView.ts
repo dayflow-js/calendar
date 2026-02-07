@@ -4,7 +4,6 @@ import {
   MonthViewConfig,
   ViewAdapterProps,
   ViewFactory,
-  CalendarView,
   ViewType,
 } from '../types';
 import { ViewAdapter } from './ViewAdapter';
@@ -72,6 +71,10 @@ export const createMonthView: ViewFactory<MonthViewConfig> = (config = {}) => {
       calendarRef: props.calendarRef,
       switcherMode: props.switcherMode,
       meta: props.meta,
+      selectedEventId: props.selectedEventId,
+      detailPanelEventId: props.detailPanelEventId,
+      onEventSelect: props.onEventSelect,
+      onDetailPanelToggle: props.onDetailPanelToggle,
     });
   };
 

@@ -96,7 +96,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
     viewType === 'day' ? customSubtitle || getDefaultSubtitle() : null;
 
   return (
-    <div className={headerContainer} style={{ position: 'relative' }}>
+    <div className={headerContainer} style={{ position: 'relative' }} onContextMenu={e => e.preventDefault()}>
       <div className="flex-1">
         {/* For Year view: show sticky year if available, otherwise show title */}
         {viewType === 'year' && stickyYear ? (

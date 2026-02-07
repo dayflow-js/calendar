@@ -11,7 +11,7 @@ import CalendarPicker, { CalendarOption } from './CalendarPicker';
 import RangePicker from '../rangePicker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
-import { CalendarApp } from '@/core';
+import { CalendarApp } from '@/types';
 import { useLocale } from '@/locale';
 import { eventDetailPanel } from '@/styles/classNames';
 

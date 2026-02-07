@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { CalendarApp } from '@/core';
 import {
   formatTime,
   extractHourFromDate,
@@ -7,15 +6,12 @@ import {
 import { useLocale } from '@/locale';
 import {
   Event,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ViewType,
+  DayViewProps,
 } from '@/types';
 import { EventLayoutCalculator } from '@/components/eventLayout';
 import { useDragForView } from '@/plugins/dragPlugin';
 import { ViewType as DragViewType } from '@/types';
 import { defaultDragConfig } from '@/core/config';
-import ViewHeader, { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { temporalToDate } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
@@ -34,23 +30,18 @@ import {
   calculateDragLayout
 } from '@/components/dayView/util';
 
-interface DayViewProps {
-  app: CalendarApp; // Required prop, provided by CalendarRenderer
-  customDetailPanelContent?: EventDetailContentRenderer; // Custom event detail content
-  customEventDetailDialog?: EventDetailDialogRenderer; // Custom event detail dialog
-  calendarRef: React.RefObject<HTMLDivElement>; // The DOM reference of the entire calendar passed from CalendarRenderer
-  switcherMode?: ViewSwitcherMode;
-}
-
 const DayView: React.FC<DayViewProps> = ({
   app,
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
   switcherMode = 'buttons',
+  selectedEventId: propSelectedEventId,
+  onEventSelect: propOnEventSelect,
+  detailPanelEventId: propDetailPanelEventId,
+  onDetailPanelToggle: propOnDetailPanelToggle,
 }) => {
   const events = app.getEvents();
-  const { t, locale } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
   const [isTouch, setIsTouch] = useState(false);
@@ -62,10 +53,31 @@ const DayView: React.FC<DayViewProps> = ({
   const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
-    null
-  );
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+
+  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
+  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+
+  const selectedEvent = useMemo(() => {
+    return selectedEventId ? events.find(e => e.id === selectedEventId) || null : null;
+  }, [selectedEventId, events]);
+
+  const setSelectedEventId = (id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  };
+
+  const setDetailPanelEventId = (id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  };
 
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
@@ -77,8 +89,6 @@ const DayView: React.FC<DayViewProps> = ({
 
   const currentDate = app.getCurrentDate();
   const visibleMonthDate = app.getVisibleMonth();
-  const visibleYear = visibleMonthDate.getFullYear();
-  const visibleMonthIndex = visibleMonthDate.getMonth();
   // Visible Month State
   const [visibleMonth, setVisibleMonth] = useState(currentDate);
   const prevDateRef = useRef(currentDate.getTime());
@@ -109,7 +119,6 @@ const DayView: React.FC<DayViewProps> = ({
     HOUR_HEIGHT,
     FIRST_HOUR,
     LAST_HOUR,
-    TIME_COLUMN_WIDTH,
     ALL_DAY_HEIGHT,
   } = defaultDragConfig;
 
@@ -121,33 +130,30 @@ const DayView: React.FC<DayViewProps> = ({
 
     if (hasChanged) {
       if (app.state.highlightedEventId) {
+        // setSelectedEventId is called here, but should be careful about loops if propOnEventSelect updates app state
+        // In this case, highlight comes from app state, so just sync local selection
+        setSelectedEventId(app.state.highlightedEventId);
+
         const currentEvents = app.getEvents();
         const event = currentEvents.find(
           e => e.id === app.state.highlightedEventId
         );
-        if (event) {
-          setSelectedEvent(event);
-
-          // Auto scroll to highlighted event
-          if (!event.allDay) {
-            const startHour = extractHourFromDate(event.start);
-            const scrollContainer =
-              calendarRef.current?.querySelector('.calendar-content');
-            if (scrollContainer) {
-              const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
-              // Scroll with some padding using requestAnimationFrame for smoother performance
-              requestAnimationFrame(() => {
-                scrollContainer.scrollTo({
-                  top: Math.max(0, top - 100),
-                  behavior: 'smooth',
-                });
+        if (event && !event.allDay) {
+          const startHour = extractHourFromDate(event.start);
+          const scrollContainer =
+            calendarRef.current?.querySelector('.calendar-content');
+          if (scrollContainer) {
+            const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
+            requestAnimationFrame(() => {
+              scrollContainer.scrollTo({
+                top: Math.max(0, top - 100),
+                behavior: 'smooth',
               });
-            }
+            });
           }
         }
       } else {
-        // Only clear if previously had a highlighted event
-        setSelectedEvent(null);
+        setSelectedEventId(null);
       }
     }
     prevHighlightedEventId.current = app.state.highlightedEventId;
@@ -377,15 +383,8 @@ const DayView: React.FC<DayViewProps> = ({
         eventLayouts={eventLayouts}
         isToday={isToday}
         currentTime={currentTime}
-        selectedEventId={selectedEvent ? selectedEvent.id : null}
-        setSelectedEventId={(id) => {
-          if (id) {
-            const e = events.find(ev => ev.id === id);
-            setSelectedEvent(e || null);
-          } else {
-            setSelectedEvent(null);
-          }
-        }}
+        selectedEventId={selectedEventId}
+        setSelectedEventId={setSelectedEventId}
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         detailPanelEventId={detailPanelEventId}
@@ -423,7 +422,7 @@ const DayView: React.FC<DayViewProps> = ({
         visibleMonth={visibleMonth}
         currentDayEvents={currentDayEvents}
         selectedEvent={selectedEvent}
-        setSelectedEvent={setSelectedEvent}
+        setSelectedEvent={(e) => setSelectedEventId(e ? e.id : null)}
         handleMonthChange={handleMonthChange}
         handleDateSelect={handleDateSelect}
         switcherMode={switcherMode}

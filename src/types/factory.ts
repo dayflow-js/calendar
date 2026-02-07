@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // View factory type definitions
 import React from 'react';
-import { CalendarView, ViewType, UseCalendarAppReturn } from './core';
+import { CalendarView, ViewType, CalendarApp } from './core';
 import { Event } from './event';
 import { EventLayout } from './layout';
 import {
@@ -16,24 +16,37 @@ import { ViewSwitcherMode } from '../components/common/ViewHeader';
  */
 export interface BaseViewProps {
   // Core application instance
-  app: UseCalendarAppReturn['app'];
+  app: CalendarApp;
 
   // Base state
-  currentDate: Date;
-  currentView: ViewType;
-  events: Event[];
+  currentDate?: Date; // Optional as they might be derived or passed via app
+  currentView?: ViewType;
+  events?: Event[];
 
-  // Event management
-  onEventUpdate: (event: Event) => void;
-  onEventDelete: (eventId: string) => void;
-  onEventCreate: (event: Event) => void;
+  // Event management - Optional as they can be derived from app
+  onEventUpdate?: (event: Event) => void;
+  onEventDelete?: (eventId: string) => void;
+  onEventCreate?: (event: Event) => void;
 
   // Navigation control
-  onDateChange: (date: Date) => void;
-  onViewChange: (view: ViewType) => void;
+  onDateChange?: (date: Date) => void;
+  onViewChange?: (view: ViewType) => void;
 
   // View-specific configuration
-  config: Record<string, any>;
+  config?: Record<string, any>;
+  
+  // Selection control
+  selectedEventId?: string | null;
+  onEventSelect?: (eventId: string | null) => void;
+  detailPanelEventId?: string | null;
+  onDetailPanelToggle?: (eventId: string | null) => void;
+
+  // Customization
+  customDetailPanelContent?: EventDetailContentRenderer;
+  customEventDetailDialog?: EventDetailDialogRenderer;
+  calendarRef: React.RefObject<HTMLDivElement>;
+  switcherMode?: ViewSwitcherMode;
+  meta?: Record<string, any>;
 }
 
 /**
@@ -44,8 +57,6 @@ export interface DayViewProps extends BaseViewProps {
   showMiniCalendar?: boolean;
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
-  selectedEvent?: Event | null;
-  onEventSelect?: (event: Event | null) => void;
 }
 
 /**
@@ -139,17 +150,11 @@ export interface YearViewConfig extends ViewFactoryConfig {
  * View adapter Props
  * Adapter properties for wrapping original components
  */
-export interface ViewAdapterProps {
+export interface ViewAdapterProps extends BaseViewProps {
   viewType: ViewType;
   originalComponent: React.ComponentType<any>;
-  app: UseCalendarAppReturn['app'];
   config: ViewFactoryConfig;
   className?: string;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
-  calendarRef: React.RefObject<HTMLDivElement>; // DOM reference for the entire calendar
-  switcherMode?: ViewSwitcherMode;
-  meta?: Record<string, any>; // Additional metadata
 }
 
 /**
@@ -157,7 +162,7 @@ export interface ViewAdapterProps {
  * Properties for integrating drag functionality into views
  */
 export interface DragIntegrationProps {
-  app: UseCalendarAppReturn['app'];
+  app: CalendarApp;
   viewType: ViewType;
   calendarRef: React.RefObject<HTMLDivElement>;
   allDayRowRef?: React.RefObject<HTMLDivElement>;
@@ -183,7 +188,7 @@ export interface DragIntegrationProps {
  * Properties for integrating virtual scroll functionality into views
  */
 export interface VirtualScrollIntegrationProps {
-  app: UseCalendarAppReturn['app'];
+  app: CalendarApp;
   currentDate: Date;
   weekHeight?: number;
   onCurrentMonthChange?: (month: string, year: number) => void;

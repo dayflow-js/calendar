@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition } from '@/types';
-import { getEventBgColor, getEventTextColor, getSelectedBgColor, getLineColor, formatTime, extractHourFromDate, getEventEndHour } from '@/utils';
+import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition, CalendarApp } from '@/types';
+import { getEventBgColor, getEventTextColor, getSelectedBgColor, getLineColor } from '@/utils';
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from './utils';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
 import EventDetailPanelWithContent from '../common/EventDetailPanelWithContent';
-import { CalendarApp } from '@/core';
+import { EventContextMenu } from '@/components/contextMenu';
 
 interface YearMultiDayEventProps {
   segment: YearMultiDaySegment;
@@ -52,6 +52,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
   const eventRef = useRef<HTMLDivElement>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [detailPanelPosition, setDetailPanelPosition] = useState<EventDetailPosition | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Use segment.id to uniquely identify which segment's panel should be shown
   // This prevents multiple panels from showing for multi-month events
@@ -113,6 +114,13 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
     }
   }, [newlyCreatedEventId, event.id, showDetailPanel, onDetailPanelOpen, isFirstSegment]);
 
+  // Handle panel positioning when opened via external trigger (like context menu)
+  useEffect(() => {
+    if (showDetailPanel && !detailPanelPosition) {
+      showPanel();
+    }
+  }, [showDetailPanel, detailPanelPosition]);
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -143,6 +151,15 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
     e.preventDefault();
     e.stopPropagation();
     showPanel();
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onEventSelect) {
+      onEventSelect(event.id);
+    }
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
   };
 
   const renderResizeHandle = (position: 'left' | 'right') => {
@@ -347,6 +364,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         onTouchStart={handleTouchStart}
+        onContextMenu={handleContextMenu}
         title={event.title}
       >
         {renderResizeHandle('left')}
@@ -354,6 +372,17 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
         {renderResizeHandle('right')}
       </div>
       {renderDetailPanel()}
+      {contextMenuPosition && app && (
+        <EventContextMenu
+          event={event}
+          x={contextMenuPosition.x}
+          y={contextMenuPosition.y}
+          onClose={() => setContextMenuPosition(null)}
+          app={app}
+          onDetailPanelToggle={onDetailPanelToggle}
+          detailPanelKey={segment.id}
+        />
+      )}
     </>
   );
 };

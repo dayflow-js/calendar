@@ -3,8 +3,8 @@ import {
   EventLayout,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
+  CalendarApp,
 } from '@/types';
-import { CalendarApp } from '@/core';
 import { MultiDayEventSegment } from '../monthView/WeekComponent';
 
 export interface CalendarEventProps {

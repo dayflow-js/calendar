@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
-import { CalendarApp } from '@/core';
 import {
   MonthEventDragState,
   Event,
   ViewType,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
+  CalendarApp,
 } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { temporalToDate } from '@/utils/temporal';
@@ -22,6 +22,7 @@ import {
   monthMoreEvents,
   monthTitle,
 } from '@/styles/classNames';
+import { GridContextMenu } from '@/components/contextMenu';
 
 export interface MultiDayEventSegment {
   id: string;
@@ -211,7 +212,7 @@ const constructRenderEvents = (events: Event[], weekStart: Date): Event[] => {
       let current = new Date(start);
       if (current < weekStart) {
         current = new Date(weekStart);
-        // Reset time to ensure we start at the beginning of the day
+        // Reset time to ensure start at the beginning of the day
         current.setHours(0, 0, 0, 0);
       }
 
@@ -310,6 +311,13 @@ const WeekComponent = React.memo<WeekComponentProps>(
 
     const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
     const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+    const handleContextMenu = (e: React.MouseEvent, date: Date) => {
+      e.preventDefault();
+      if (screenSize === 'mobile') return;
+      setContextMenu({ x: e.clientX, y: e.clientY, date });
+    };
 
     // Calculate layout parameters once per week render
     const layoutParams = useMemo(() => {
@@ -416,11 +424,11 @@ const WeekComponent = React.memo<WeekComponentProps>(
     }, [organizedMultiDaySegments]);
 
     // Calculate effective max layers for multi-day overlay
-    // If any day needs "+ x more" indicator, we must use maxSlotsWithMore for the overlay
+    // If any day needs "+ x more" indicator, must use maxSlotsWithMore for the overlay
     const effectiveMaxLayers = useMemo(() => {
       const allSegments = organizedMultiDaySegments.flat();
       // Check if any day has more total visual slots than maxSlots
-      // Timed events can fill gaps in multi-day layers, so we need to calculate properly
+      // Timed events can fill gaps in multi-day layers, so need to calculate properly
       for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
         const day = weekData.days[dayIndex];
         // Get events for this day from constructedRenderEvents
@@ -556,11 +564,11 @@ const WeekComponent = React.memo<WeekComponentProps>(
       const eventsAfterMultiDay = Math.max(0, totalTimedEvents - gapLayers.length);
       const totalSlotsNeeded = Math.max(maxOccupiedLayer + 1, 0) + eventsAfterMultiDay;
 
-      // Determine if we need "+ x more"
+      // Determine if need "+ x more"
       const hasMoreEvents = totalSlotsNeeded > layoutParams.maxSlots;
       const displaySlotLimit = hasMoreEvents ? layoutParams.maxSlotsWithMore : layoutParams.maxSlots;
 
-      // Calculate how many timed events we can display
+      // Calculate how many timed events can display
       // Available slots for timed events = gaps within limit + slots after maxOccupiedLayer within limit
       const gapsWithinLimit = gapLayers.filter(l => l < displaySlotLimit).length;
       const slotsAfterMultiDayWithinLimit = Math.max(0, displaySlotLimit - Math.max(maxOccupiedLayer + 1, 0));
@@ -569,7 +577,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
       const displayEvents = timedEventsOnly.slice(0, displayCount);
       const hiddenEventsCount = totalTimedEvents - displayCount;
 
-      // Create render array - we need to interleave placeholders and timed events
+      // Create render array - need to interleave placeholders and timed events
       const renderElements: React.JSX.Element[] = [];
 
       // Build a slot-based layout: for each slot, either placeholder (multi-day occupied) or timed event
@@ -671,6 +679,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
           }}
           onDragOver={onCalendarDragOver}
           onDrop={e => onCalendarDrop?.(e, day.date)}
+          onContextMenu={e => handleContextMenu(e, day.date)}
         >
           {/* Date number area */}
           <div className={monthDateNumberContainer}>
@@ -749,6 +758,7 @@ const WeekComponent = React.memo<WeekComponentProps>(
               transition: 'opacity 0.5s ease',
               maxWidth: 'fit-content',
             }}
+            onContextMenu={e => e.preventDefault()}
           >
             <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {localizedMonthYear}
@@ -821,6 +831,27 @@ const WeekComponent = React.memo<WeekComponentProps>(
             )}
           </div>
         </div>
+        {contextMenu && (
+          <GridContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            date={contextMenu.date}
+            viewType={ViewType.MONTH}
+            onClose={() => setContextMenu(null)}
+            app={app}
+            onCreateEvent={() => {
+              if (onCreateStart) {
+                const syntheticEvent = {
+                  preventDefault: () => { },
+                  stopPropagation: () => { },
+                  clientX: contextMenu.x,
+                  clientY: contextMenu.y,
+                } as unknown as React.MouseEvent;
+                onCreateStart(syntheticEvent, contextMenu.date);
+              }
+            }}
+          />
+        )}
       </div>
     );
   }

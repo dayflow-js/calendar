@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { CalendarApp } from '@/core';
+import React, { useState } from 'react';
+import { CalendarApp } from '@/types';
 import CalendarEventComponent from '@/components/calendarEvent';
 import {
   formatTime,
   getEventsForDay,
-  extractHourFromDate,
 } from '@/utils';
-import { useLocale } from '@/locale';
 import {
   EventLayout,
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   WeekDayDragState,
+  ViewType,
 } from '@/types';
 import {
   timeSlot,
@@ -24,6 +23,7 @@ import {
   timeGridBoundary,
 } from '@/styles/classNames';
 import { analyzeMultiDayRegularEvent } from '@/components/monthView/util';
+import { GridContextMenu } from '@/components/contextMenu';
 
 interface TimeGridProps {
   app: CalendarApp;
@@ -116,11 +116,40 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
 }) => {
   const columnStyle: React.CSSProperties = { flexShrink: 0 };
   const prevHighlightedEventId = React.useRef(app.state.highlightedEventId);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent, dayIndex: number, hour: number) => {
+    e.preventDefault();
+    if (isMobile) return;
+
+    const date = new Date(currentWeekStart);
+    date.setDate(currentWeekStart.getDate() + dayIndex);
+
+    if (timeGridRef.current) {
+      const rect = timeGridRef.current.getBoundingClientRect();
+      const relativeY = e.clientY - rect.top;
+      // Convert relativeY to hours based on grid scale
+      const floatHour = relativeY / HOUR_HEIGHT + FIRST_HOUR;
+      const h = Math.floor(floatHour);
+      const m = Math.floor((floatHour - h) * 60);
+
+      // Snap to 15 minutes for better UX
+      const snappedMinutes = Math.round(m / 15) * 15;
+      const finalHour = snappedMinutes === 60 ? h + 1 : h;
+      const finalMinutes = snappedMinutes === 60 ? 0 : snappedMinutes;
+
+      date.setHours(finalHour, finalMinutes, 0, 0);
+    } else {
+      date.setHours(hour, 0, 0, 0);
+    }
+
+    setContextMenu({ x: e.clientX, y: e.clientY, date });
+  };
 
   return (
     <div className="flex flex-1 overflow-hidden relative">
       {/* Left Frozen Column */}
-      <div className="w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10">
+      <div className="w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10" onContextMenu={e => e.preventDefault()}>
         <div ref={leftFrozenContentRef}>
           {timeSlots.map((slot, slotIndex) => (
             <div key={slotIndex} className={timeSlot}>
@@ -230,7 +259,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
                       onDrop={e => {
                         handleDrop(e, dropDate, slot.hour);
                       }}
-                      onContextMenu={e => isMobile && e.preventDefault()}
+                      onContextMenu={e => handleContextMenu(e, dayIndex, slot.hour)}
                     />
                   );
                 })}
@@ -351,6 +380,38 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
           </div>
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.WEEK}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            if (handleCreateStart) {
+              // Calculate dayIndex relative to currentWeekStart
+              const startOfDay = new Date(currentWeekStart);
+              startOfDay.setHours(0, 0, 0, 0);
+              const targetDate = new Date(contextMenu.date);
+              targetDate.setHours(0, 0, 0, 0);
+              
+              const diffTime = targetDate.getTime() - startOfDay.getTime();
+              const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+              const preciseHour = contextMenu.date.getHours() + contextMenu.date.getMinutes() / 60;
+
+              const syntheticEvent = {
+                preventDefault: () => { },
+                stopPropagation: () => { },
+                clientX: contextMenu.x,
+                clientY: contextMenu.y,
+              } as unknown as React.MouseEvent;
+
+              handleCreateStart(syntheticEvent, diffDays, preciseHour);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

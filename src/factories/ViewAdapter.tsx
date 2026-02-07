@@ -17,6 +17,10 @@ export const ViewAdapter: React.FC<ViewAdapterProps> = ({
   calendarRef,
   switcherMode,
   meta,
+  selectedEventId,
+  detailPanelEventId,
+  onEventSelect,
+  onDetailPanelToggle,
 }) => {
   // Get plugin services
   const eventsService = app.getPlugin<EventsService>('events');
@@ -106,6 +110,15 @@ export const ViewAdapter: React.FC<ViewAdapterProps> = ({
       onDateChange: handleDateChange,
       onViewChange: handleViewChange,
       config: mergedConfig,
+      customDetailPanelContent,
+      customEventDetailDialog,
+      calendarRef,
+      switcherMode,
+      meta,
+      selectedEventId,
+      detailPanelEventId,
+      onEventSelect,
+      onDetailPanelToggle,
     }),
     [
       app,
@@ -118,6 +131,15 @@ export const ViewAdapter: React.FC<ViewAdapterProps> = ({
       handleDateChange,
       handleViewChange,
       mergedConfig,
+      customDetailPanelContent,
+      customEventDetailDialog,
+      calendarRef,
+      switcherMode,
+      meta,
+      selectedEventId,
+      detailPanelEventId,
+      onEventSelect,
+      onDetailPanelToggle,
     ]
   );
 
@@ -178,13 +200,6 @@ export const ViewAdapter: React.FC<ViewAdapterProps> = ({
       // Pass plugin services (if original component needs them)
       eventsService,
       dragService,
-      // Pass custom detail panel
-      customDetailPanelContent,
-      customEventDetailDialog,
-      // Pass calendarRef and meta
-      calendarRef,
-      switcherMode,
-      meta,
     };
   }, [
     currentDate,
@@ -198,11 +213,6 @@ export const ViewAdapter: React.FC<ViewAdapterProps> = ({
     viewProps,
     eventsService,
     dragService,
-    customDetailPanelContent,
-    customEventDetailDialog,
-    calendarRef,
-    switcherMode,
-    meta,
   ]);
 
   return <OriginalComponent {...compatProps} />;

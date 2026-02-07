@@ -60,7 +60,11 @@ export type TranslationKey =
   | 'exportCalendar'
   | 'addSchedule'
   | 'importCalendarMessage'
-  | 'ok';
+  | 'ok'
+  | 'cut'
+  | 'copy'
+  | 'pasteHere'
+  | 'eventSummary';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

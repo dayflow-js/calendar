@@ -9,6 +9,7 @@ interface YearDayCellProps {
   onCreateStart?: (e: React.MouseEvent | React.TouchEvent, targetDate: Date) => void;
   onMoreEventsClick?: (date: Date) => void;
   moreCount?: number;
+  onContextMenu?: (e: React.MouseEvent, date: Date) => void;
 }
 
 export const YearDayCell: React.FC<YearDayCellProps> = React.memo(({
@@ -19,6 +20,7 @@ export const YearDayCell: React.FC<YearDayCellProps> = React.memo(({
   onCreateStart,
   onMoreEventsClick,
   moreCount = 0,
+  onContextMenu,
 }) => {
   const { t } = useLocale();
   const day = date.getDate();
@@ -36,6 +38,11 @@ export const YearDayCell: React.FC<YearDayCellProps> = React.memo(({
       style={{ aspectRatio: '1/1' }}
       onClick={() => onSelectDate(date)}
       onDoubleClick={(e) => onCreateStart?.(e, date)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onContextMenu?.(e, date);
+      }}
       data-date={dateString}
     >
       <div className="flex items-center px-1 py-1 shrink-0 h-6">

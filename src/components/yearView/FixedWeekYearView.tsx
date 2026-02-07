@@ -6,19 +6,21 @@ import React, {
   useEffect,
 } from 'react';
 import { Temporal } from 'temporal-polyfill';
-import { CalendarApp } from '@/core';
 import { useLocale } from '@/locale';
 import {
   Event,
   ViewType,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
+  CalendarApp,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import { useDragForView } from '@/plugins/dragPlugin';
 import ViewHeader from '@/components/common/ViewHeader';
 import { YearMultiDayEvent } from './YearMultiDayEvent';
 import { YearMultiDaySegment } from './utils';
+import { GridContextMenu } from '@/components/contextMenu';
+import { scrollbarHide } from '@/styles/classNames';
 
 interface FixedWeekYearViewProps {
   app: CalendarApp;
@@ -28,6 +30,10 @@ interface FixedWeekYearViewProps {
   config?: {
     showTimedEventsInYearView?: boolean;
   };
+  selectedEventId?: string | null;
+  onEventSelect?: (eventId: string | null) => void;
+  detailPanelEventId?: string | null;
+  onDetailPanelToggle?: (eventId: string | null) => void;
 }
 
 interface MonthEventSegment extends YearMultiDaySegment {
@@ -165,8 +171,12 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   config,
+  selectedEventId: propSelectedEventId,
+  onEventSelect: propOnEventSelect,
+  detailPanelEventId: propDetailPanelEventId,
+  onDetailPanelToggle: propOnDetailPanelToggle,
 }) => {
-  const { locale, getWeekDaysLabels } = useLocale();
+  const { t, locale, getWeekDaysLabels } = useLocale();
   const currentDate = app.getCurrentDate();
   const currentYear = currentDate.getFullYear();
   const rawEvents = app.getEvents();
@@ -183,13 +193,39 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
   const [scrollbarHeight, setScrollbarHeight] = useState(0);
 
   // State for event selection and detail panel
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
-    null
-  );
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+
+  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
+  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+
+  const setSelectedEventId = (id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  };
+
+  const setDetailPanelEventId = (id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  };
+
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
+
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent, date: Date) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, date });
+  };
 
   // Click outside handler
   useEffect(() => {
@@ -273,7 +309,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
         });
         const newEvent: Event = {
           id: `event-${Date.now()}`,
-          title: '',
+          title: t('newEvent') || 'New Event',
           start: plainDate,
           end: plainDate,
           allDay: true,
@@ -435,6 +471,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
         gridTemplateColumns: '3rem 1fr',
         gridTemplateRows: 'auto auto 1fr',
       }}
+      onContextMenu={e => e.preventDefault()}
     >
       {/* Year Header */}
       <div className="col-span-2">
@@ -529,7 +566,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
       {/* Days Grid Content - Scrollable */}
       <div
         ref={contentRef}
-        className="overflow-auto"
+        className={`overflow-auto ${scrollbarHide}`}
         onScroll={handleContentScroll}
       >
         <div className="flex flex-col" style={{ minWidth: '1352px' }}>
@@ -575,6 +612,7 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
                       `}
                       onClick={() => app.selectDate(date)}
                       onDoubleClick={e => handleCellDoubleClick(e, date)}
+                      onContextMenu={e => handleContextMenu(e, date)}
                     >
                       <span
                         className={`
@@ -629,6 +667,25 @@ export const FixedWeekYearView: React.FC<FixedWeekYearViewProps> = ({
           ))}
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.YEAR}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            const syntheticEvent = {
+              preventDefault: () => { },
+              stopPropagation: () => { },
+              clientX: contextMenu.x,
+              clientY: contextMenu.y,
+            } as unknown as React.MouseEvent;
+            handleCellDoubleClick(syntheticEvent, contextMenu.date);
+          }}
+        />
+      )}
     </div>
   );
 };

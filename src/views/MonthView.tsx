@@ -1,13 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { CalendarApp } from '@/core';
 import { extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';
 import {
   Event,
   MonthEventDragState,
   ViewType,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
+  MonthViewProps,
 } from '@/types';
 import {
   useVirtualMonthScroll,
@@ -27,18 +25,15 @@ import {
   scrollContainer,
 } from '@/styles/classNames';
 
-interface MonthViewProps {
-  app: CalendarApp; // Required prop, provided by CalendarRenderer
-  customDetailPanelContent?: EventDetailContentRenderer; // Custom event detail content
-  customEventDetailDialog?: EventDetailDialogRenderer; // Custom event detail dialog
-  calendarRef: React.RefObject<HTMLDivElement>; // The DOM reference of the entire calendar passed from CalendarRenderer
-}
-
 const MonthView: React.FC<MonthViewProps> = ({
   app,
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
+  selectedEventId: propSelectedEventId,
+  onEventSelect: propOnEventSelect,
+  detailPanelEventId: propDetailPanelEventId,
+  onDetailPanelToggle: propOnDetailPanelToggle,
 }) => {
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
@@ -161,7 +156,27 @@ const MonthView: React.FC<MonthViewProps> = ({
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
 
   // Selected event ID, used for cross-week MultiDayEvent selected state synchronization
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+
+  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
+  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+
+  const setSelectedEventId = (id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  };
+
+  const setDetailPanelEventId = (id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  };
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -175,11 +190,6 @@ const MonthView: React.FC<MonthViewProps> = ({
     }
     prevHighlightedEventId.current = app.state.highlightedEventId;
   }, [app.state.highlightedEventId]);
-
-  // Detail panel event ID, used to control displaying only one detail panel
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
-    null
-  );
 
   // Calculate the week start time for the current date (used for event day field calculation)
   const currentWeekStart = useMemo(() => {
@@ -375,7 +385,7 @@ const MonthView: React.FC<MonthViewProps> = ({
           if (calculatedWeekHeight !== previousWeekHeightRef.current) {
             const currentScrollTop = element.scrollTop;
             if (currentScrollTop > 0) {
-              // Calculate which week we're currently showing
+              // Calculate which week currently showing
               const currentWeekIndex = Math.round(currentScrollTop / previousWeekHeightRef.current);
               // Recalculate scrollTop with new weekHeight
               const newScrollTop = currentWeekIndex * calculatedWeekHeight;
@@ -450,7 +460,7 @@ const MonthView: React.FC<MonthViewProps> = ({
         }}
       />
 
-      <div className={weekHeaderRow}>
+      <div className={weekHeaderRow} onContextMenu={e => e.preventDefault()}>
         <div className={`${weekGrid} px-2`}>
           {weekDaysLabels.map((day, i) => (
             <div key={i} className={dayLabel}>

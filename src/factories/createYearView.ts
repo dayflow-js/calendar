@@ -4,7 +4,6 @@ import {
   YearViewConfig,
   ViewFactory,
   ViewAdapterProps,
-  CalendarView,
   ViewType,
 } from '../types';
 import { ViewAdapter } from './ViewAdapter';
@@ -59,6 +58,10 @@ export const createYearView: ViewFactory<YearViewConfig> = (config = {}) => {
       customEventDetailDialog: props.customEventDetailDialog,
       calendarRef: props.calendarRef,
       meta: props.meta,
+      selectedEventId: props.selectedEventId,
+      detailPanelEventId: props.detailPanelEventId,
+      onEventSelect: props.onEventSelect,
+      onDetailPanelToggle: props.onDetailPanelToggle,
     });
   };
 
