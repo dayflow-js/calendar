@@ -242,7 +242,9 @@ const DefaultCalendarSidebar: React.FC<CalendarSidebarRenderProps> = ({
     if (!file) return;
 
     const result = await importICSFile(file);
-    if (result.success && result.events.length > 0) {
+    
+    // Show dialog if we found at least one valid event, even if there were some parsing errors
+    if (result.events.length > 0) {
       setImportState({
         events: result.events,
         filename: file.name.replace(/\.[^/.]+$/, ''), // Remove extension

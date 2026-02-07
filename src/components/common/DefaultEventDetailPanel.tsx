@@ -7,7 +7,7 @@ import {
 } from '../../types';
 import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
-import ColorPicker, { ColorOption } from './ColorPicker';
+import CalendarPicker, { CalendarOption } from './CalendarPicker';
 import RangePicker from '../rangePicker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { resolveAppliedTheme } from '../../utils/themeUtils';
@@ -49,7 +49,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
   const arrowBorderColor = isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
   // Get visible calendar type options
-  const colorOptions: ColorOption[] = useMemo(() => {
+  const colorOptions: CalendarOption[] = useMemo(() => {
     const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
     return registry.getVisible().map((cal: CalendarType) => ({
       label: cal.name,
@@ -282,7 +282,7 @@ const DefaultEventDetailPanel: React.FC<DefaultEventDetailPanelProps> = ({
           />
         </div>
         {isEditable && (
-          <ColorPicker
+          <CalendarPicker
             options={colorOptions}
             value={event.calendarId || 'blue'}
             onChange={value => {

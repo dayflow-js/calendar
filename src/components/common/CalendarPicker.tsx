@@ -2,15 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronsUpDown, Check } from 'lucide-react';
 import { getDefaultCalendarRegistry, CalendarRegistry } from '../../core/calendarRegistry';
-import { colorPickerDropdown } from '@/styles/classNames';
+import { calendarPickerDropdown } from '@/styles/classNames';
 
-export interface ColorOption {
+export interface CalendarOption {
   label: string;
   value: string; // calendar ID
 }
 
-export interface ColorPickerProps {
-  options: ColorOption[];
+export interface CalendarPickerProps {
+  options: CalendarOption[];
   value: string;
   onChange: (value: string) => void;
   registry?: CalendarRegistry;
@@ -18,10 +18,10 @@ export interface ColorPickerProps {
 }
 
 /**
- * ColorPicker Component
- * Used to select label colors in calendar or task systems
+ * CalendarPicker Component
+ * Used to select which calendar an event belongs to
  */
-export const ColorPicker: React.FC<ColorPickerProps> = ({
+export const CalendarPicker: React.FC<CalendarPickerProps> = ({
   options,
   value,
   onChange,
@@ -62,7 +62,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       if (
         pickerRef.current &&
         !pickerRef.current.contains(e.target as Node) &&
-        !(e.target as HTMLElement).closest('[data-color-picker-dropdown]')
+        !(e.target as HTMLElement).closest('[data-calendar-picker-dropdown]')
       ) {
         setIsOpen(false);
       }
@@ -104,9 +104,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     if (variant === 'mobile') {
       return createPortal(
         <div
-          data-color-picker-dropdown="true"
+          data-calendar-picker-dropdown="true"
           style={dropdownStyle}
-          className={colorPickerDropdown}
+          className={calendarPickerDropdown}
         >
           {options.map(opt => (
             <div
@@ -133,7 +133,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
     return createPortal(
       <ul
-        data-color-picker-dropdown="true"
+        data-calendar-picker-dropdown="true"
         style={dropdownStyle}
         className="bg-white dark:bg-gray-700 rounded-md shadow-lg dark:shadow-gray-900/50 overflow-hidden border border-gray-200 dark:border-gray-600 transition-all duration-200 origin-top-left animate-in fade-in zoom-in-95"
       >
@@ -204,4 +204,4 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   );
 };
 
-export default ColorPicker;
+export default CalendarPicker;

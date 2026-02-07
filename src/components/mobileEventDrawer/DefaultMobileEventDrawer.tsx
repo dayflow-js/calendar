@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Event, MobileEventProps, CalendarType } from '@/types';
 import { MiniCalendar } from '../common/MiniCalendar';
-import { ColorPicker, ColorOption } from '../common/ColorPicker';
+import { CalendarPicker, CalendarOption } from '../common/CalendarPicker';
 import { formatTime, isEventEqual } from '@/utils';
 import { useLocale } from '@/locale';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
@@ -60,7 +60,7 @@ export const MobileEventDrawer: React.FC<MobileEventProps> = ({
     }, [isOpen, draftEvent, app]);
 
     const calendars = app.getCalendars();
-    const calendarOptions: ColorOption[] = calendars.map((cal: CalendarType) => ({
+    const calendarOptions: CalendarOption[] = calendars.map((cal: CalendarType) => ({
         label: cal.name,
         value: cal.id
     }));
@@ -297,7 +297,7 @@ export const MobileEventDrawer: React.FC<MobileEventProps> = ({
                     {calendars.length > 0 && (
                         <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center relative">
                             <span className="text-gray-700 dark:text-gray-300">{t('calendar')}</span>
-                            <ColorPicker
+                            <CalendarPicker
                                 options={calendarOptions}
                                 value={calendarId}
                                 onChange={setCalendarId}

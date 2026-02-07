@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarType } from '../../../types';
-import { cancelButton, colorPickerDropdown } from '@/styles/classNames';
+import { cancelButton, calendarPickerDropdown } from '@/styles/classNames';
 import { useLocale } from '@/locale';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
@@ -67,7 +67,7 @@ export const ImportCalendarDialog: React.FC<ImportCalendarDialogProps> = ({
     return createPortal(
       <div
         ref={dropdownRef}
-        className={`fixed z-[110] mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 transition-all duration-200 origin-top ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        className={`fixed z-110 mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-lg border border-gray-200 dark:border-slate-700 dark:bg-slate-800 transition-all duration-200 origin-top ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
         style={{
           top: rect.bottom,
@@ -113,7 +113,7 @@ export const ImportCalendarDialog: React.FC<ImportCalendarDialogProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900">
         <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           {t('addSchedule') || 'Add Schedule'}

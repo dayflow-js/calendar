@@ -408,9 +408,9 @@ export const dropdownPanel =
   'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-900/50 overflow-hidden';
 
 /**
- * Color picker dropdown
+ * Calendar picker dropdown (for selecting calendar for an event)
  */
-export const colorPickerDropdown =
+export const calendarPickerDropdown =
   'bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 origin-top-right animate-in fade-in zoom-in-95';
 
 // ==================== Time Grid Boundary Styles ====================

@@ -5,7 +5,7 @@ import { EventDetailDialogProps } from '../../types/eventDetail';
 import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import { isEventEqual } from '../../utils/eventUtils';
-import ColorPicker, { ColorOption } from './ColorPicker';
+import CalendarPicker, { CalendarOption } from './CalendarPicker';
 import RangePicker from '../rangePicker';
 import { CalendarApp } from '../../types';
 import { useLocale } from '@/locale';
@@ -37,7 +37,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
   }, [event]);
 
   // Get visible calendar type options
-  const colorOptions: ColorOption[] = useMemo(() => {
+  const colorOptions: CalendarOption[] = useMemo(() => {
     const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
     return registry.getVisible().map(cal => ({
       label: cal.name,
@@ -206,7 +206,7 @@ const DefaultEventDetailDialog: React.FC<DefaultEventDetailDialogProps> = ({
               />
             </div>
             {isEditable && (
-              <ColorPicker
+              <CalendarPicker
                 options={colorOptions}
                 value={editedEvent.calendarId || 'blue'}
                 onChange={value => {
