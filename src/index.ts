@@ -43,11 +43,11 @@ export type {
   ViewHeaderType,
   ViewSwitcherMode,
 } from './components/common/ViewHeader';
-export { default as ColorPicker } from './components/common/ColorPicker';
+export { default as CalendarPicker } from './components/common/CalendarPicker';
 export type {
-  ColorOption,
-  ColorPickerProps,
-} from './components/common/ColorPicker';
+  CalendarOption,
+  CalendarPickerProps,
+} from './components/common/CalendarPicker';
 export { EventLayoutCalculator } from './components/eventLayout';
 
 // Utilities

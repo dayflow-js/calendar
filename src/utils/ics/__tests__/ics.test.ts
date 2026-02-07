@@ -38,24 +38,24 @@ END:VCALENDAR`;
   describe('parseICS', () => {
     it('should parse a simple ICS string correctly', () => {
       const result = parseICS(simpleICS, { generateNewIds: false });
-      
+
       expect(result.success).toBe(true);
       expect(result.events.length).toBe(1);
-      
+
       const event = result.events[0];
       expect(event.title).toBe('Test Event');
       expect(event.description).toBe('This is a test event');
       expect(event.meta?.location).toBe('Test Location');
       expect(event.meta?.categories).toEqual(['Work', 'Meeting']);
       expect(event.meta?.originalUid).toBe('test-uid-123');
-      
+
       // Check dates (converted to ZonedDateTime in parser)
       // The parser uses local/default TZ for floating times.
       // We can check if fields match.
       expect(event.start.year).toBe(2025);
       expect(event.start.month).toBe(1);
       expect(event.start.day).toBe(15);
-      expect(event.start.hour).toBe(10);
+      expect((event.start as Temporal.ZonedDateTime).hour).toBe(10);
     });
 
     it('should handle all-day events', () => {
@@ -69,14 +69,14 @@ END:VCALENDAR`;
 
       const result = parseICS(allDayICS);
       expect(result.events[0].allDay).toBe(true);
-      expect(result.events[0].start.hour).toBe(0);
+      expect((result.events[0].start as Temporal.ZonedDateTime).hour).toBe(0);
     });
   });
 
   describe('generateICS', () => {
     it('should generate ICS string containing event details', () => {
       const ics = generateICS([mockEvent]);
-      
+
       expect(ics).toContain('BEGIN:VCALENDAR');
       expect(ics).toContain('BEGIN:VEVENT');
       expect(ics).toContain('SUMMARY:Test Event');
@@ -91,23 +91,23 @@ END:VCALENDAR`;
     it('should preserve event data after generate -> parse', () => {
       // Generate
       const generatedICS = generateICS([mockEvent]);
-      
+
       // Parse back
       const result = parseICS(generatedICS, { generateNewIds: false });
-      
+
       expect(result.success).toBe(true);
       expect(result.events.length).toBe(1);
-      
+
       const parsedEvent = result.events[0];
-      
+
       expect(parsedEvent.title).toBe(mockEvent.title);
       expect(parsedEvent.description).toBe(mockEvent.description);
       expect(parsedEvent.meta?.location).toBe(mockEvent.meta?.location);
-      
+
       // Date comparison might need care due to types (PlainDateTime vs ZonedDateTime)
       // But values should match
       expect(parsedEvent.start.year).toBe(mockEvent.start.year);
-      expect(parsedEvent.start.minute).toBe(mockEvent.start.minute);
+      expect((parsedEvent.start as any).minute).toBe((mockEvent.start as any).minute);
     });
   });
 });

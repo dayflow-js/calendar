@@ -976,9 +976,9 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         '[data-event-detail-dialog]'
       );
 
-      // Check if clicked inside RangePicker popup or ColorPicker dropdown
+      // Check if clicked inside RangePicker popup or CalendarPicker dropdown
       const clickedInsideRangePickerPopup = target.closest('[data-range-picker-popup]');
-      const clickedInsideColorPickerDropdown = target.closest('[data-color-picker-dropdown]');
+      const clickedInsideCalendarPickerDropdown = target.closest('[data-calendar-picker-dropdown]');
 
       if (showDetailPanel) {
         if (
@@ -987,7 +987,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           !clickedInsidePanel &&
           !clickedInsideDetailDialog &&
           !clickedInsideRangePickerPopup &&
-          !clickedInsideColorPickerDropdown
+          !clickedInsideCalendarPickerDropdown
         ) {
           if (onEventSelect) {
             onEventSelect(null);
@@ -996,7 +996,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           setIsSelected(false);
           onDetailPanelToggle?.(null);
         }
-      } else if (isEventSelected && !clickedInsideEvent && !clickedOnSameEvent && !clickedInsideColorPickerDropdown) {
+      } else if (isEventSelected && !clickedInsideEvent && !clickedOnSameEvent && !clickedInsideCalendarPickerDropdown) {
         if (onEventSelect) {
           onEventSelect(null);
         }

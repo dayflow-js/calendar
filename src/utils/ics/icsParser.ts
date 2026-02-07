@@ -14,7 +14,7 @@ import {
   ICSImportResult,
 } from './types';
 import { parseICSDate } from './icsDateUtils';
-import { isPlainDate } from '../temporalTypeGuards';
+import { isPlainDate, isPlainDateTime } from '../temporalTypeGuards';
 
 /**
  * Main function to parse ICS content string
@@ -39,7 +39,8 @@ export function parseICS(
     // 1. Unfold lines (handle split lines starting with space/tab)
     // RFC 5545 3.1: Content lines are delimited by CRLF.
     // Lines longer than 75 characters SHOULD be folded.
-    const unfoldedContent = icsContent.replace(/\r\n[ \t]/g, '');
+    // Mac/Unix might use \n only, so handle both.
+    const unfoldedContent = icsContent.replace(/(\r\n|\n|\r)[ \t]/g, '');
 
     // 2. Split into lines and normalize line endings
     const lines = unfoldedContent.split(/\r\n|\n|\r/);
@@ -84,14 +85,15 @@ function extractVEvents(lines: string[]): string[][] {
 
   for (const line of lines) {
     const trimmed = line.trim();
+    const upperLine = trimmed.toUpperCase();
 
-    if (trimmed === 'BEGIN:VEVENT') {
+    if (upperLine.startsWith('BEGIN:VEVENT')) {
       inVEvent = true;
       currentEventLines = [];
       continue;
     }
 
-    if (trimmed === 'END:VEVENT') {
+    if (upperLine.startsWith('END:VEVENT')) {
       if (inVEvent && currentEventLines) {
         vevents.push(currentEventLines);
       }
@@ -123,20 +125,21 @@ function parseVEventLines(lines: string[]): ICSVEvent {
     const propertyPart = line.substring(0, colonIndex);
     const value = line.substring(colonIndex + 1);
 
-    const [name, ...params] = propertyPart.split(';');
+    const [rawName, ...params] = propertyPart.split(';');
+    const name = rawName.trim().toUpperCase();
 
     // Parse parameters
     const paramObj: Record<string, string> = {};
     params.forEach((p) => {
       const [key, val] = p.split('=');
       if (key && val) {
-        paramObj[key.toUpperCase()] = val;
+        paramObj[key.trim().toUpperCase()] = val.trim();
       }
     });
 
-    switch (name.toUpperCase()) {
+    switch (name) {
       case 'UID':
-        event.uid = value;
+        event.uid = value.trim();
         break;
       case 'SUMMARY':
         event.summary = unescapeICSValue(value);
@@ -148,21 +151,21 @@ function parseVEventLines(lines: string[]): ICSVEvent {
         event.location = unescapeICSValue(value);
         break;
       case 'DTSTART':
-        event.dtstart = value;
+        event.dtstart = value.trim();
         event.dtstartParams = {
           value: paramObj['VALUE'] as any,
           tzid: paramObj['TZID'],
         };
         break;
       case 'DTEND':
-        event.dtend = value;
+        event.dtend = value.trim();
         event.dtendParams = {
           value: paramObj['VALUE'] as any,
           tzid: paramObj['TZID'],
         };
         break;
       case 'CATEGORIES':
-        event.categories = value.split(',').map((c) => unescapeICSValue(c));
+        event.categories = value.split(',').map((c) => unescapeICSValue(c.trim()));
         break;
     }
   }
@@ -230,14 +233,36 @@ function convertToDayFlowEvent(
   // Normalize to ZonedDateTime as DayFlow expects
   const tz = defaultTimeZone || Temporal.Now.timeZoneId();
 
-  let finalStart = startTemporal;
-  let finalEnd = endTemporal;
+  let finalStart: Temporal.ZonedDateTime;
+  let finalEnd: Temporal.ZonedDateTime;
 
   if (isPlainDate(startTemporal)) {
     finalStart = startTemporal.toZonedDateTime({
       timeZone: tz,
       plainTime: '00:00:00',
     });
+  } else if (isPlainDateTime(startTemporal)) {
+    // Manual conversion if toZonedDateTime is missing or fails
+    try {
+        if (typeof (startTemporal as any).toZonedDateTime === 'function') {
+            finalStart = (startTemporal as any).toZonedDateTime(tz);
+        } else {
+            throw new Error('toZonedDateTime missing');
+        }
+    } catch {
+        finalStart = Temporal.ZonedDateTime.from({
+            year: startTemporal.year,
+            month: startTemporal.month,
+            day: startTemporal.day,
+            hour: startTemporal.hour,
+            minute: startTemporal.minute,
+            second: startTemporal.second,
+            millisecond: startTemporal.millisecond,
+            timeZone: tz
+        });
+    }
+  } else {
+    finalStart = startTemporal;
   }
 
   if (isPlainDate(endTemporal)) {
@@ -246,6 +271,27 @@ function convertToDayFlowEvent(
       timeZone: tz,
       plainTime: '00:00:00',
     });
+  } else if (isPlainDateTime(endTemporal)) {
+    try {
+        if (typeof (endTemporal as any).toZonedDateTime === 'function') {
+            finalEnd = (endTemporal as any).toZonedDateTime(tz);
+        } else {
+             throw new Error('toZonedDateTime missing');
+        }
+    } catch {
+        finalEnd = Temporal.ZonedDateTime.from({
+            year: endTemporal.year,
+            month: endTemporal.month,
+            day: endTemporal.day,
+            hour: endTemporal.hour,
+            minute: endTemporal.minute,
+            second: endTemporal.second,
+            millisecond: endTemporal.millisecond,
+            timeZone: tz
+        });
+    }
+  } else {
+    finalEnd = endTemporal as Temporal.ZonedDateTime;
   }
 
   return {
@@ -253,8 +299,8 @@ function convertToDayFlowEvent(
     calendarId,
     title: icsEvent.summary || '(No Title)',
     description: icsEvent.description,
-    start: finalStart as Temporal.ZonedDateTime, // Force cast for now, assuming conversion
-    end: finalEnd as Temporal.ZonedDateTime,
+    start: finalStart,
+    end: finalEnd,
     allDay,
     // Add extra properties to meta
     meta: {
