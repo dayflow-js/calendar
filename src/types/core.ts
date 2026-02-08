@@ -170,6 +170,7 @@ export interface CalendarApp {
   // View management
   changeView: (view: ViewType) => void;
   getCurrentView: () => CalendarView;
+  getViewConfig: (viewType: ViewType) => Record<string, unknown>;
 
   // Date management
   setCurrentDate: (date: Date) => void;

@@ -41,7 +41,10 @@ const createAppWithEvent = (override?: Partial<CalendarAppConfig>) => {
 };
 
 describe('WeekView all-day multi-day events', () => {
-  const renderWeekView = (app: CalendarApp) => {
+  const renderWeekView = (
+    app: CalendarApp,
+    config?: Record<string, unknown>
+  ) => {
     const calendarRef = React.createRef<HTMLDivElement>();
 
     render(
@@ -52,6 +55,7 @@ describe('WeekView all-day multi-day events', () => {
             calendarRef={calendarRef}
             customDetailPanelContent={undefined}
             customEventDetailDialog={undefined}
+            config={config}
           />
         </div>
       </ThemeProvider>
@@ -146,5 +150,13 @@ describe('WeekView all-day multi-day events', () => {
       expect(event.start.toString()).toBe(crossWeekEventStart.toString());
       expect(event.end.toString()).toBe(crossWeekEventEnd.toString());
     });
+  });
+
+  it('hides all-day row when showAllDay is false', () => {
+    const app = createAppWithEvent();
+    renderWeekView(app, { showAllDay: false });
+
+    expect(screen.queryByText('All day')).not.toBeInTheDocument();
+    expect(screen.queryByText('Event A')).not.toBeInTheDocument();
   });
 });

@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { ViewAdapter } from './ViewAdapter';
 import WeekView from '../views/WeekView';
+import { buildFactoryViewConfig } from './viewConfigUtils';
 
 // Default Week view configuration
 const defaultWeekViewConfig: WeekViewConfig = {
@@ -37,20 +38,23 @@ const defaultWeekViewConfig: WeekViewConfig = {
     enableAutoRecalculate: true,
     enableValidation: true,
   },
-
-  // View specific configuration
-  viewConfig: {
-    showWeekends: true,
-    showAllDay: true,
-    startOfWeek: 1,
-    scrollToCurrentTime: true,
-  },
 };
 
 // Week view factory function
 export const createWeekView: ViewFactory<WeekViewConfig> = (config = {}) => {
+  const finalViewConfig = buildFactoryViewConfig(defaultWeekViewConfig, config, [
+    'showWeekends',
+    'showAllDay',
+    'startOfWeek',
+    'scrollToCurrentTime',
+  ]);
+
   // Merge configuration
-  const finalConfig = { ...defaultWeekViewConfig, ...config };
+  const finalConfig = {
+    ...defaultWeekViewConfig,
+    ...config,
+    viewConfig: finalViewConfig,
+  };
 
   // Create adapter component
   const WeekViewAdapter: React.FC<ViewAdapterProps> = props => {

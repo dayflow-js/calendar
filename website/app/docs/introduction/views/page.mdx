@@ -85,6 +85,14 @@ function MyCalendar() {
 }
 ```
 
+To hide the all-day row in week view:
+
+```tsx copy
+const calendar = useCalendarApp({
+  views: [createWeekView({ showAllDay: false })],
+});
+```
+
 ### Day View
 
 The day view focuses on a single day with detailed time slots, perfect for managing daily schedules.
@@ -129,6 +137,14 @@ function MyCalendar() {
 
   return <DayFlowCalendar calendar={calendar} />;
 }
+```
+
+To hide the all-day row in day view:
+
+```tsx copy
+const calendar = useCalendarApp({
+  views: [createDayView({ showAllDay: false })],
+});
 ```
 
 ### Year View

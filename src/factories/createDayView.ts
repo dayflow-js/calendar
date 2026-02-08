@@ -8,6 +8,7 @@ import {
   ViewFactory,
   ViewType,
 } from '../types';
+import { buildFactoryViewConfig } from './viewConfigUtils';
 
 // Default Day view configuration
 const defaultDayViewConfig: DayViewConfig = {
@@ -36,19 +37,22 @@ const defaultDayViewConfig: DayViewConfig = {
     enableAutoRecalculate: true,
     enableValidation: true,
   },
-
-  // View specific configuration
-  viewConfig: {
-    showMiniCalendar: true,
-    showAllDay: true,
-    scrollToCurrentTime: true,
-  },
 };
 
 // Day view factory function
 export const createDayView: ViewFactory<DayViewConfig> = (config = {}) => {
+  const finalViewConfig = buildFactoryViewConfig(defaultDayViewConfig, config, [
+    'showMiniCalendar',
+    'showAllDay',
+    'scrollToCurrentTime',
+  ]);
+
   // Merge configuration
-  const finalConfig = { ...defaultDayViewConfig, ...config };
+  const finalConfig = {
+    ...defaultDayViewConfig,
+    ...config,
+    viewConfig: finalViewConfig,
+  };
 
   // Create adapter component
   const DayViewAdapter: React.FC<ViewAdapterProps> = props => {
