@@ -65,7 +65,7 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
-    "@dayflow/blossom-color-picker": "^1.0.3",
+    "@dayflow/blossom-color-picker-react": "^1.0.1",
     "react-color": "^2.19.3",
     "temporal-polyfill": "^0.3.0",
     "tslib": "^2.8.1"

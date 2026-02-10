@@ -4,7 +4,7 @@ import { CalendarApp } from '@/types';
 import { getLineColor, extractHourFromDate } from '@/utils';
 import {
   monthRegularContent,
-  mr1,
+  monthEventColorBar,
   textXs,
 } from '@/styles/classNames';
 
@@ -30,12 +30,12 @@ const MonthRegularContent: React.FC<MonthRegularContentProps> = ({
   return (
     <div className={monthRegularContent}>
       <div className="flex items-center flex-1 min-w-0">
-        <span
+        <div
           style={{
             backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()),
           }}
-          className={`inline-block w-0.75 h-3 ${mr1} shrink-0 rounded-full`}
-        ></span>
+          className={monthEventColorBar}
+        />
         <span
           className={`whitespace-nowrap overflow-hidden block md:truncate mobile-mask-fade ${isEventSelected ? 'text-white' : ''}`}
         >

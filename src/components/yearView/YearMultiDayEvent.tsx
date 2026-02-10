@@ -457,7 +457,7 @@ export const YearMultiDayEvent: React.FC<YearMultiDayEventProps> = ({
           height: `${EVENT_HEIGHT}px`,
           backgroundColor: bgColor,
           color: textColor,
-          opacity: isDragging ? 0.6 : 1,
+          opacity: 1,
           width: `calc(${widthPercent}% - ${HORIZONTAL_MARGIN * 2}px)`,
           pointerEvents: isDragging ? 'none' : 'auto',
           borderRadius: getBorderRadius(),

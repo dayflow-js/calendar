@@ -58,6 +58,15 @@ interface DayFlowCalendarProps {
   customMessages?: LocaleMessages;
   /** Search configuration */
   search?: CalendarSearchProps;
+  /** Render slot for the top-left overlay area (e.g., Electron title bar icons next to native traffic lights).
+   *  Render function variant provides sidebar state for toggle functionality. */
+  titleBarSlot?: React.ReactNode | ((context: {
+    isCollapsed: boolean;
+    toggleCollapsed: () => void;
+  }) => React.ReactNode);
+  /** Header left padding (px) when sidebar is collapsed.
+   *  Also causes sidebar to collapse fully to 0px instead of the default 50px mini sidebar. */
+  collapsedSafeAreaLeft?: number;
 }
 
 const CalendarInternalLocaleProvider: React.FC<{
@@ -87,6 +96,8 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
   customEventDetailDialog,
   meta,
   search: searchConfig,
+  titleBarSlot,
+  collapsedSafeAreaLeft,
 }) => {
   const app = calendar.app;
   const currentView = app.getCurrentView();
@@ -430,9 +441,11 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
     sidebarConfig?.width,
     DEFAULT_SIDEBAR_WIDTH
   );
-  const miniSidebarWidth = '50px';
+  const miniSidebarWidth = collapsedSafeAreaLeft != null ? '0px' : '50px';
 
   const headerConfig = app.getCalendarHeaderConfig();
+
+  const safeAreaLeft = collapsedSafeAreaLeft != null && isCollapsed ? collapsedSafeAreaLeft : 0;
 
   const headerProps = {
     calendar: app,
@@ -446,6 +459,7 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
     searchValue: searchKeyword,
     isSearchOpen: isSearchOpen,
     isEditable: !app.state.readOnly,
+    ...(safeAreaLeft > 0 ? { safeAreaLeft } : {}),
   };
 
   const renderHeader = () => {
@@ -464,6 +478,15 @@ const CalendarLayout: React.FC<DayFlowCalendarProps> = ({
         className={`calendar-container relative flex flex-row h-full overflow-hidden select-none ${className ?? ''}`}
         style={{ height: 800, ...style }}
       >
+        {titleBarSlot && (
+          typeof titleBarSlot === 'function'
+            ? titleBarSlot({
+                isCollapsed,
+                toggleCollapsed: () => setIsCollapsed(prev => !prev),
+              })
+            : titleBarSlot
+        )}
+
         {sidebarEnabled && (
           <aside
             className={`absolute top-0 bottom-0 left-0 z-0 h-full`}

@@ -11,6 +11,7 @@ import {
   getEventEndHour,
 } from '../../utils';
 import { getEventIcon } from '../../components/monthView/util';
+import { monthEventColorBar } from '../../styles/classNames';
 
 export interface MultiDayEventSegment {
   id: string;
@@ -278,8 +279,8 @@ export const MultiDayEvent = React.memo<MultiDayEventProps>(
 
       return (
         <div className="relative flex items-center min-w-0 w-full pointer-events-auto">
-          <span
-            className="inline-block w-0.75 h-3 rounded-full shrink-0 mr-1"
+          <div
+            className={monthEventColorBar}
             style={{ backgroundColor: getLineColor(calendarId) }}
           />
           <div className="flex items-center min-w-0 flex-1">
