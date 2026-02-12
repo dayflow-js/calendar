@@ -9,7 +9,7 @@ import {
   ContextMenuColorPicker,
 } from '@/components/contextMenu';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
-import { BlossomColorPicker, hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
+import { BlossomColorPicker, hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker-react';
 import { SketchPicker, ColorResult } from 'react-color';
 // common component
 import { SidebarHeader } from './components/SidebarHeader';

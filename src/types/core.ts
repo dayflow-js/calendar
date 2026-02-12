@@ -74,6 +74,8 @@ export interface CalendarHeaderProps {
   searchValue?: string;
   isSearchOpen?: boolean;
   isEditable?: boolean;
+  /** Left safe area padding (px) to avoid overlapping with traffic light buttons in macMode */
+  safeAreaLeft?: number;
 }
 
 /**

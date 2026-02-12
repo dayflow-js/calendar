@@ -15,6 +15,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   searchValue = '',
   isSearchOpen = false,
   isEditable = true,
+  safeAreaLeft,
 }) => {
   const isSwitcherCentered = switcherMode === 'buttons';
   const isDayView = calendar.state.currentView === ViewType.DAY;
@@ -32,14 +33,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-between px-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${isDayView || isSearchOpen
+      className={`df-header flex items-center justify-between pr-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${isDayView || isSearchOpen
         ? 'border-gray-200 dark:border-gray-700'
         : 'border-transparent'
         }`}
+      style={{ paddingLeft: safeAreaLeft || 8, transition: 'padding-left 160ms ease-in-out' }}
       onContextMenu={e => e.preventDefault()}
     >
       {/* Left Section: Add Calendar Button Only */}
-      <div className="flex flex-1 items-center mb-1">
+      <div className="flex items-center mb-1">
         {onAddCalendar && isEditable && (
           <button
             id="dayflow-add-event-btn"
@@ -63,7 +65,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       {!isSwitcherCentered && (
         <ViewSwitcher mode={switcherMode} calendar={calendar} />
       )}
-      <div className={`flex ${switcherMode === 'select' ? 'ml-2' : 'flex-1'} items-center justify-end gap-3 mb-1 pb-1 h-6`}>
+      <div className={`flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}>
         {/* Mobile Search Icon */}
         <button
           onClick={onSearchClick}

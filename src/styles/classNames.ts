@@ -22,7 +22,7 @@ export const monthViewContainer = 'df-month-view h-full flex flex-col bg-white d
 /**
  * Top navigation bar container
  */
-export const headerContainer = 'df-header p-2 flex justify-between';
+export const headerContainer = 'p-2 flex justify-between';
 
 /**
  * Title text style
@@ -277,10 +277,16 @@ export const eventTitleSmall = 'df-event-title font-medium text-xs truncate pr-1
 export const eventTime = 'df-event-time text-xs opacity-80 truncate';
 
 /**
- * Event color bar
+ * Event color bar (Day/Week view timed events)
  */
 export const eventColorBar =
   'df-event-color-bar absolute left-1 top-1 bottom-1 w-[3px] rounded-full';
+
+/**
+ * Event color bar (Month view regular events)
+ */
+export const monthEventColorBar =
+  'df-month-event-color-bar inline-block w-0.75 h-3 mr-1 shrink-0 rounded-full';
 
 /**
  * Event icon
@@ -433,6 +439,21 @@ export const midnightLabel = 'absolute -top-2.5 text-[12px] text-gray-500 dark:t
  */
 export const sidebarContainer =
   'df-sidebar flex h-full flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900';
+
+/**
+ * Sidebar header
+ */
+export const sidebarHeader = 'df-sidebar-header flex items-center px-2 py-2';
+
+/**
+ * Sidebar header toggle button
+ */
+export const sidebarHeaderToggle = 'df-sidebar-header-toggle flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800';
+
+/**
+ * Sidebar header title
+ */
+export const sidebarHeaderTitle = 'df-sidebar-header-title text-sm font-semibold text-gray-700 dark:text-gray-200';
 
 /**
  * Mobile fullscreen overlay

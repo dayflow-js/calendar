@@ -5,6 +5,7 @@ import WeekView from '@/views/WeekView';
 import { CalendarApp } from '@/core';
 import { ViewType, CalendarAppConfig } from '@/types';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { defaultDragConfig, defaultViewConfigs } from '@/core/config';
 
 jest.mock('@/plugins/dragPlugin', () => ({
   useDragForView: () => ({
@@ -47,11 +48,17 @@ describe('WeekView all-day multi-day events', () => {
   ) => {
     const calendarRef = React.createRef<HTMLDivElement>();
 
+    const mockConfig = {
+      ...defaultDragConfig,
+      ...defaultViewConfigs.week,
+    };
+
     render(
       <ThemeProvider initialTheme={app.getTheme()}>
         <div ref={calendarRef}>
           <WeekView
             app={app}
+            config={mockConfig}
             calendarRef={calendarRef}
             customDetailPanelContent={undefined}
             customEventDetailDialog={undefined}

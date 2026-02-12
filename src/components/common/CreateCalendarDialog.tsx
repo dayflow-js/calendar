@@ -4,7 +4,7 @@ import { PhotoshopPicker, ColorResult } from 'react-color';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
-import { BlossomColorPicker, DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
+import { BlossomColorPicker, DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLocale } from '@/locale';
 
