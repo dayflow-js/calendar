@@ -164,7 +164,7 @@ export const timeSlot = 'df-time-slot relative h-[4.5rem] flex';
 /**
  * Time label
  */
-export const timeLabel = 'df-time-label absolute -top-3.5 right-2 text-[12px] text-gray-500 dark:text-gray-400 select-none';
+export const timeLabel = 'df-time-label absolute top-0 -translate-y-1/2 right-2 text-[12px] text-gray-500 dark:text-gray-400 select-none';
 
 /**
  * Time grid row
@@ -180,7 +180,7 @@ export const timeGridCell = 'df-time-grid-cell flex-1 relative border-r border-g
 /**
  * Current time line container
  */
-export const currentTimeLine = 'df-current-time-line absolute left-0 top-0 flex pointer-events-none';
+export const currentTimeLine = 'df-current-time-line absolute left-0 top-0 w-full flex pointer-events-none';
 
 /**
  * Current time label
@@ -425,12 +425,12 @@ export const calendarPickerDropdown =
  * Time grid bottom boundary (midnight line)
  * Used in TimeGrid.tsx and DayContent.tsx
  */
-export const timeGridBoundary = 'h-1.5 border-t border-gray-200 dark:border-gray-700 relative';
+export const timeGridBoundary = 'h-3 border-t border-gray-200 dark:border-gray-700 relative';
 
 /**
  * Midnight time label
  */
-export const midnightLabel = 'absolute -top-2.5 text-[12px] text-gray-500 dark:text-gray-400';
+export const midnightLabel = 'absolute top-0 -translate-y-1/2 text-[12px] text-gray-500 dark:text-gray-400';
 
 // ==================== Sidebar Styles ====================
 

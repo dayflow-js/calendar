@@ -24,7 +24,7 @@ export const DefaultColorPicker = ({ color, onChange }: DefaultColorPickerProps)
   }, [color]);
 
   return (
-    <div className="flex justify-center p-4 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="flex justify-center">
       <BlossomColorPicker
         defaultValue={blossomValue}
         coreSize={36}

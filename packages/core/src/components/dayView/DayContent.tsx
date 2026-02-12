@@ -292,10 +292,11 @@ export const DayContent = ({
                   <div
                     className={currentTimeLine}
                     style={{
-                      top: `calc(0.75rem + ${topPx}px)`,
+                      top: `${topPx}px`,
                       width: '100%',
                       height: 0,
                       zIndex: 20,
+                      marginTop: '0.75rem',
                     }}
                   >
                     <div

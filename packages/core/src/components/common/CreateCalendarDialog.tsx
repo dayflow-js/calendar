@@ -245,26 +245,26 @@ export const CreateCalendarDialog = ({
                           styles: pickerStyles
                         }}
                         defaultContent={
-                          <div className="p-2 bg-white dark:bg-slate-900 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div >
                             <DefaultColorPicker
                               color={defaultSelectedColor}
                               onChange={handleColorChange}
                             />
                             <div className="mt-2 flex justify-end gap-2">
-                               <button
-                                  type="button"
-                                  onClick={handleCancel}
-                                  className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                               >
-                                  {t('cancel')}
-                               </button>
-                               <button
-                                  type="button"
-                                  onClick={handleAccept}
-                                  className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:opacity-90"
-                               >
-                                  OK
-                               </button>
+                              <button
+                                type="button"
+                                onClick={handleCancel}
+                                className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                              >
+                                {t('cancel')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleAccept}
+                                className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:opacity-90"
+                              >
+                                OK
+                              </button>
                             </div>
                           </div>
                         }

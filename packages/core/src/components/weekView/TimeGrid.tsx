@@ -182,7 +182,7 @@ export const TimeGrid = ({
               return (
                 <div
                   className="absolute left-0 w-full z-20 pointer-events-none flex items-center justify-end"
-                  style={{ top: `${topPx}px`, transform: 'translateY(-50%)' }}
+                  style={{ top: `${topPx}px`, transform: 'translateY(-50%)', marginTop: '0.75rem' }}
                 >
                   <div className={currentTimeLabel}>{formatTime(hours)}</div>
                 </div>
