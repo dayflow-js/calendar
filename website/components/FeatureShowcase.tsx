@@ -20,6 +20,8 @@ import {
   createDayView,
   createDragPlugin,
   ViewType,
+} from '@dayflow/react';
+import {
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
@@ -194,10 +196,10 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   return (
     <div className="rounded-xl dark:border-slate-700 bg-white dark:bg-slate-900 ">
       <DayFlowCalendar
-        calendar={calendar}
+        app={calendar.app}
         className={`w-full ${className}`}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
+        eventDetailContent={customDetailPanelContent}
+        eventDetailDialog={customEventDetailDialog}
       />
     </div>
   );
@@ -216,7 +218,7 @@ export const SwitcherModeShowcase: React.FC = () => (
 
 export const CustomDetailPanelShowcase: React.FC = () => {
   const detailPanel: EventDetailContentRenderer = useCallback(
-    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+    ({ event, onEventDelete, onEventUpdate, onClose }: any) => {
       const meta = event.meta ?? {};
       const isFavorite = Boolean(meta.favorite);
 
@@ -311,7 +313,7 @@ export const EventDialogShowcase: React.FC = () => {
 
 export const CustomDetailDialogShowcase: React.FC = () => {
   const customDialog: EventDetailDialogRenderer = useCallback(
-    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }) => {
+    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }: any) => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};

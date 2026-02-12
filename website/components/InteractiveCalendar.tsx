@@ -9,10 +9,10 @@ import {
   createWeekView,
   createMonthView,
   createDragPlugin,
-  CalendarType,
   ViewType,
   createYearView,
-} from '@dayflow/core';
+} from '@dayflow/react';
+import { CalendarType } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
 import { getWebsiteCalendars } from '@/utils/palette';
@@ -72,7 +72,7 @@ export function InteractiveCalendar() {
   return (
     <div className="w-full">
       <DayFlowCalendar
-        calendar={calendar}
+        app={calendar.app}
         className="w-full"
         style={{ height: isMobile ? 550 : 760 }}
       />

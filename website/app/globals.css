@@ -1,8 +1,14 @@
-/* TODO: Fix @import 'tailwindcss'; issue*/
-/* @import 'tailwindcss'; */
+@import "tailwindcss";
 @import 'tw-animate-css';
 
-@layer l-base {
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+}
+
+@layer base {
   :root {
     --accent: 217 91% 60%;
   }
@@ -11,17 +17,6 @@
 .nextra-banner-container {
   @apply bg-[linear-gradient(1deg,#383838,#212121)];
 }
-
-/* Code block container
-.nextra-code > div:first-child {
-  @apply bg-gray-200 dark:bg-zinc-900;
-  border: none;
-}
-
-.nextra-code pre {
-  @apply bg-gray-100 dark:bg-zinc-800;
-  box-shadow: none;
-} */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {

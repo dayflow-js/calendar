@@ -12,7 +12,12 @@ const withNextra = nextra({
 const nextConfig: NextConfig = {
   output: 'export',
   basePath: process.env.BASE_PATH || '',
-  outputFileTracingRoot: path.join(process.cwd()),
+  outputFileTracingRoot: path.join(process.cwd(), '..'),
+  transpilePackages: ['@dayflow/core', '@dayflow/react'],
+  // @ts-ignore
+  turbopack: {
+    root: path.join(process.cwd(), '..'),
+  },
   images: {
     unoptimized: true, // Required for static export
   },

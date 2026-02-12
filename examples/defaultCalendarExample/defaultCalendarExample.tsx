@@ -5,20 +5,12 @@ import {
   createMonthView,
   createWeekView,
   createDayView,
-  CalendarType,
-  Event,
   createDragPlugin,
   createYearView,
-  CalendarApp,
-  ja,
-  ko,
-  zh,
-  fr,
   ViewType,
-  MobileEventProps,
-  t
-} from '../../src';
-import { Sun, Moon, X } from 'lucide-react';
+} from '@dayflow/react';
+import { Event } from '@dayflow/core';
+import { Sun, Moon } from 'lucide-react';
 import { generateSampleEvents } from '../utils/sampleData';
 import { getWebsiteCalendars } from '../utils/palette';
 
@@ -101,7 +93,7 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
 
   return (
     <div>
-      <DayFlowCalendar calendar={calendar} />
+      <DayFlowCalendar app={calendar.app} />
     </div>
   );
 };

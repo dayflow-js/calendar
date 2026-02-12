@@ -10,20 +10,22 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { useCalendarApp } from '@dayflow/core';
-import { DayFlowCalendar } from '@dayflow/core';
-import { createMonthView } from '@dayflow/core';
-import { createWeekView } from '@dayflow/core';
-import { createDayView } from '@dayflow/core';
-import { createDragPlugin } from '@dayflow/core';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  createDayView,
+  createDragPlugin,
+  ViewType,
+} from '@dayflow/react';
 import {
   CalendarType,
   CalendarSidebarRenderProps,
   Event,
   SidebarConfig,
-  ViewType,
+  temporalToDate,
 } from '@dayflow/core';
-import { temporalToDate } from '@dayflow/core';
 import { getWebsiteCalendars } from '@/utils/palette';
 
 const SIDEBAR_CALENDAR_IDS = new Set([
@@ -314,7 +316,7 @@ export const SidebarBasicsShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar calendar={calendar} className="h-155 w-full" />
+      <DayFlowCalendar app={calendar.app} className="h-155 w-full" />
     </ShowcaseWrapper>
   );
 };
@@ -333,7 +335,7 @@ export const SidebarCustomShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar calendar={calendar} className="h-155 w-full" />
+      <DayFlowCalendar app={calendar.app} className="h-155 w-full" />
     </ShowcaseWrapper>
   );
 };
