@@ -49,7 +49,7 @@
   "homepage": "https://github.com/dayflow-js/dayflow#readme",
   "scripts": {
     "dev": "vite --port 5529",
-    "build": "rollup -c --bundleConfigAsCjs",
+    "build": "rollup -c --bundleConfigAsCjs && node scripts/strip-css-layers.js",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",

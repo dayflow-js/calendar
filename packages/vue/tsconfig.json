@@ -5,6 +5,7 @@
     "rootDir": "src",
     "jsx": "preserve",
     "moduleResolution": "node",
+    "allowImportingTsExtensions": false,
     "paths": {
       "@dayflow/core": ["../core/dist/index.d.ts"]
     }

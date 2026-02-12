@@ -51,7 +51,7 @@ export default {
       inject: false,
       extract: 'styles.css',
       config: {
-        path: './postcss.config.js',
+        path: './postcss.build.js',
       },
       use: {
         sass: false,

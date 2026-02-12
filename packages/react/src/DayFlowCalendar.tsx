@@ -1,35 +1,35 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, type CSSProperties, type ReactNode, type FC } from 'react';
 import { createPortal } from 'react-dom';
-import { CalendarRenderer, ICalendarApp, CustomRendering } from '@dayflow/core';
+import { CalendarRenderer, type ICalendarApp, type CustomRendering } from '@dayflow/core';
 
 export interface DayFlowCalendarProps {
   app: ICalendarApp;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   /** Custom event content renderer (React) */
-  eventContent?: (args: { event: any; isAllDay: boolean; isMobile: boolean }) => React.ReactNode;
+  eventContent?: (args: { event: any; isAllDay: boolean; isMobile: boolean }) => ReactNode;
   /** Custom event detail panel content (React) */
-  eventDetailContent?: (args: { event: any; position: any; onClose: () => void }) => React.ReactNode;
+  eventDetailContent?: (args: { event: any; position: any; onClose: () => void }) => ReactNode;
   /** Custom event detail dialog (React) */
-  eventDetailDialog?: (args: { event: any; isOpen: boolean; onClose: () => void; onEventUpdate: any; onEventDelete: any; isAllDay: boolean; app: any }) => React.ReactNode;
+  eventDetailDialog?: (args: { event: any; isOpen: boolean; onClose: () => void; onEventUpdate: any; onEventDelete: any; isAllDay: boolean; app: any }) => ReactNode;
   /** Custom calendar header content (React) */
-  headerContent?: (args: any) => React.ReactNode;
+  headerContent?: (args: any) => ReactNode;
   /** Custom create calendar dialog (React) */
-  createCalendarDialog?: (args: { onClose: () => void; onCreate: (calendar: any) => void; colorPickerMode?: string }) => React.ReactNode;
+  createCalendarDialog?: (args: { onClose: () => void; onCreate: (calendar: any) => void; colorPickerMode?: string }) => ReactNode;
   /** Title bar slot (React) */
-  titleBarSlot?: React.ReactNode | ((context: { isCollapsed: boolean; toggleCollapsed: () => void }) => React.ReactNode);
+  titleBarSlot?: ReactNode | ((context: { isCollapsed: boolean; toggleCollapsed: () => void }) => ReactNode);
   /** Custom color picker renderer (React) */
-  colorPicker?: (args: any) => React.ReactNode;
+  colorPicker?: (args: any) => ReactNode;
   /** Custom color picker wrapper renderer (React) */
-  colorPickerWrapper?: (args: any) => React.ReactNode;
+  colorPickerWrapper?: (args: any) => ReactNode;
 }
 
-export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
+export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   app,
   className,
   style,
   ...renderProps
-}) => {
+}: DayFlowCalendarProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CalendarRenderer | null>(null);
   const [customRenderings, setCustomRenderings] = useState<Map<string, CustomRendering>>(new Map());
@@ -55,7 +55,7 @@ export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
 
   // Portals for custom content
   const portals = useMemo(() => {
-    return Array.from(customRenderings.values()).map((rendering) => {
+    return Array.from(customRenderings.values()).map((rendering: CustomRendering) => {
       const { id, containerEl, generatorName, generatorArgs } = rendering;
       
       // Look up the generator in renderProps
