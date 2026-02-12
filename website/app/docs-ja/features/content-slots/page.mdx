@@ -1,0 +1,105 @@
+# コンテンツスロット (Content Slots)
+
+DayFlow はスロットベースのアーキテクチャを採用しており、使用しているフレームワーク（React、Vue など）からカスタム UI コンポーネントをコア日暦エンジンに直接注入できます。
+
+これは `ContentSlot` メカニズムによって実現されています。コアエンジンはほとんどの UI 要素にデフォルトの実装（Preact を使用）を提供していますが、アプリケーションのデザインに合わせたり、特定のライブラリを使用したりするためにこれらを上書きできます。
+
+## 仕組み
+
+1. **コアがスロットを定義**: `@dayflow/core` の内部で、特定の UI 領域が `ContentSlot` でラップされています。各スロットには `generatorName` と `generatorArgs` があります。
+2. **アダプターがスロットを橋渡し**: フレームワークアダプター（`@dayflow/react`, `@dayflow/vue`）がこれらのスロットを購読します。
+3. **実装を提供**: `DayFlowCalendar` コンポーネントにコンポーネントまたはレンダー関数を渡します。アダプターは、コアで定義された正確な場所にコンポーネントをポータル（転送）します。
+
+## 利用可能なスロット
+
+| ジェネレーター名 | 説明 | 引数 |
+| :--- | :--- | :--- |
+| `eventContent` | イベントカードの内部コンテンツ。 | `{ event, isAllDay, isMobile }` |
+| `eventDetailContent` | イベントクリック時に表示されるパネル/詳細コンテンツ。 | `{ event, position, onClose }` |
+| `colorPicker` | サイドバーで使用される小型のカラーピッカー。 | `{ color, onChange, variant: 'sketch' }` |
+| `colorPickerWrapper` | ダイアログで使用されるフル機能のカラーピッカー。 | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
+| `headerContent` | カレンダーヘッダーのカスタムコンテンツ。 | `{ view, date, ... }` |
+| `titleBarSlot` | サイドバーのタイトルバー内の追加コンテンツ。 | `{ isCollapsed, toggleCollapsed }` |
+
+## 例: カスタムカラーピッカーの注入
+
+デフォルトでは、DayFlow は組み込みの `BlossomColorPicker` を使用します。`react-color` や `vue-color` などのライブラリを使用したい場合は、`colorPicker` スロットを使用して注入できます。
+
+### React の例
+
+`react-color` をインストールします:
+```bash
+npm install react-color
+```
+
+`DayFlowCalendar` に注入します:
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react';
+import { SketchPicker, PhotoshopPicker } from 'react-color';
+
+function MyCalendar() {
+  return (
+    <DayFlowCalendar
+      app={app}
+      colorPicker={(args) => (
+        <SketchPicker
+          color={args.color}
+          onChange={(color) => args.onChange({ hex: color.hex })}
+          width="220px"
+        />
+      )}
+      colorPickerWrapper={(args) => (
+        <PhotoshopPicker
+          color={args.color}
+          onChange={(color) => args.onChange({ hex: color.hex })}
+          onAccept={() => args.onAccept?.()}
+          onCancel={() => args.onCancel?.()}
+        />
+      )}
+    />
+  );
+}
+```
+
+### Vue の例
+
+`vue-color` をインストールします:
+```bash
+npm install vue-color
+```
+
+スロットを使用して注入します:
+
+```vue
+<template>
+  <DayFlowCalendar :app="app">
+    <template #colorPicker="args">
+      <Sketch
+        :value="args.color"
+        @input="(val) => args.onChange({ hex: val.hex })"
+      />
+    </template>
+    
+    <template #colorPickerWrapper="args">
+      <Photoshop
+        :value="args.color"
+        @input="(val) => args.onChange({ hex: val.hex })"
+        @ok="args.onAccept"
+        @cancel="args.onCancel"
+      />
+    </template>
+  </DayFlowCalendar>
+</template>
+
+<script setup>
+import { DayFlowCalendar } from '@dayflow/vue';
+import { Sketch, Photoshop } from 'vue-color';
+</script>
+```
+
+## このアプローチの利点
+
+- **クリーンな依存関係**: コアパッケージは軽量に保たれ、特定の UI ライブラリを強制しません。
+- **完全な制御**: `generatorArgs` を介してすべての内部データにアクセスでき、レンダリングする内容は完全に自由です。
+- **フレームワークネイティブ**: アプリの他の部分と同じフレームワークでカスタムコンポーネントを作成できます。

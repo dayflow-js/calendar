@@ -25,6 +25,9 @@ const meta: MetaRecord = {
   'custom-detail-panel': {
     title: "自定义详情面板"
   },
+  'content-slots': {
+    title: "内容插槽 (Content Slots)"
+  }
 }
 
 export default meta

@@ -25,6 +25,9 @@ const meta: MetaRecord = {
   'custom-detail-panel': {
     title: "Custom Detail Panel"
   },
+  'content-slots': {
+    title: "Content Slots"
+  }
 }
 
 export default meta
