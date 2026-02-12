@@ -1,5 +1,4 @@
 // View factory type definitions
-import React from "react";
 import { CalendarView, ViewType, ICalendarApp } from "./core";
 import { Event } from "./event";
 import { EventLayout } from "./layout";

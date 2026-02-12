@@ -13,6 +13,7 @@ interface MonthRegularContentProps {
   app?: ICalendarApp;
   isEventSelected: boolean;
   hideTime?: boolean;
+  isMobile?: boolean;
 }
 
 const MonthRegularContent = ({
@@ -20,6 +21,7 @@ const MonthRegularContent = ({
   app,
   isEventSelected,
   hideTime,
+  isMobile,
 }: MonthRegularContentProps) => {
   const startTime = `${Math.floor(extractHourFromDate(event.start)).toString().padStart(2, '0')}:${Math.round(
     (extractHourFromDate(event.start) % 1) * 60
@@ -37,14 +39,14 @@ const MonthRegularContent = ({
           className={monthEventColorBar}
         />
         <span
-          className={`whitespace-nowrap overflow-hidden block md:truncate mobile-mask-fade ${isEventSelected ? 'text-white' : ''}`}
+          className={`whitespace-nowrap overflow-hidden block ${isMobile ? 'mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
         >
           {event.title}
         </span>
       </div>
-      {!hideTime && (
+      {!hideTime && !isMobile && (
         <span
-          className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''} hidden md:block`}
+          className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''}`}
           style={!isEventSelected ? { opacity: 0.8 } : undefined}
         >
           {startTime}

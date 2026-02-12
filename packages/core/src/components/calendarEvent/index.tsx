@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import {
   useRef,
   useState,
@@ -1291,7 +1290,7 @@ const CalendarEvent = ({
   };
 
   const renderMonthRegularContent = () => {
-    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} hideTime={hideTime} />;
+    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} hideTime={hideTime} isMobile={isMobile} />;
   };
 
   const renderAllDayContent = () => {

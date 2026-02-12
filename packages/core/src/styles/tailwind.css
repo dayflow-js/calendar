@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@dayflow/blossom-color-picker/styles.css';
 
 @variant dark (.dark &);
 

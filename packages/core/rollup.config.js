@@ -72,10 +72,9 @@ export default {
     'react',
     'react-dom',
     'react/jsx-runtime',
-    'react-color',
     'lucide-react',
     'temporal-polyfill',
     'tslib',
-    '@dayflow/blossom-color-picker-react',
+    '@dayflow/blossom-color-picker',
   ],
 };

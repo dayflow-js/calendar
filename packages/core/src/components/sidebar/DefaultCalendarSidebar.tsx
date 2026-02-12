@@ -10,8 +10,10 @@ import {
   ContextMenuColorPicker,
 } from '@/components/contextMenu';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
-import { BlossomColorPicker, hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker-react';
-import { SketchPicker, ColorResult } from 'react-color';
+import { BlossomColorPicker } from '../common/BlossomColorPicker';
+import { hexToHsl, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
+import { ContentSlot } from '../../renderer/ContentSlot';
+import { DefaultColorPicker } from '../common/DefaultColorPicker';
 // common component
 import { SidebarHeader } from './components/SidebarHeader';
 import { CalendarList } from './components/CalendarList';
@@ -509,22 +511,38 @@ const DefaultCalendarSidebar = ({
                 onCollapse={() => setCustomColorPicker(null)}
               />
             ) : (
-              <div className="rounded-md bg-white shadow-xl border border-gray-200 dark:bg-slate-800 dark:border-gray-700">
-                {h(SketchPicker as any, {
-                  width: "220px",
+              <ContentSlot
+                generatorName="colorPicker"
+                generatorArgs={{
+                  variant: 'sketch',
                   color: customColorPicker.currentColor,
-                  onChange: (color: ColorResult) => {
+                  onChange: (color: { hex: string }) => {
                     setCustomColorPicker(prev => prev ? { ...prev, currentColor: color.hex } : null);
                   },
-                  onChangeComplete: (color: ColorResult) => {
+                  onChangeComplete: (color: { hex: string }) => {
                     const { colors, darkColors } = getCalendarColorsForHex(color.hex);
                     app.updateCalendar(customColorPicker.calendarId, {
                       colors,
                       darkColors
                     });
                   }
-                })}
-              </div>
+                }}
+                defaultContent={
+                  <div className="rounded-md bg-white shadow-xl border border-gray-200 dark:bg-slate-800 dark:border-gray-700 p-2">
+                    <DefaultColorPicker
+                      color={customColorPicker.currentColor}
+                      onChange={(color) => {
+                        setCustomColorPicker(prev => prev ? { ...prev, currentColor: color.hex } : null);
+                        const { colors, darkColors } = getCalendarColorsForHex(color.hex);
+                        app.updateCalendar(customColorPicker.calendarId, {
+                          colors,
+                          darkColors
+                        });
+                      }}
+                    />
+                  </div>
+                }
+              />
             )}
           </div>
         </div>,

@@ -131,7 +131,7 @@ export const monthDateNumber =
  * Month more events indicator
  */
 export const monthMoreEvents =
-  'df-month-more-events text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline text-center md:text-left font-medium md:font-normal relative z-20 bg-white dark:bg-gray-900';
+  'df-month-more-events text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline relative z-20 bg-white dark:bg-gray-900';
 
 /**
  * Month title (sticky)

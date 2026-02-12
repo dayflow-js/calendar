@@ -1,11 +1,13 @@
 import { h } from 'preact';
 import { useState, useMemo } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
-import { PhotoshopPicker, ColorResult } from 'react-color';
+import { ContentSlot } from '../../renderer/ContentSlot';
+import { DefaultColorPicker } from './DefaultColorPicker';
 import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
-import { BlossomColorPicker, DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker-react';
+import { BlossomColorPicker } from './BlossomColorPicker';
+import { DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLocale } from '@/locale';
 
@@ -91,7 +93,7 @@ export const CreateCalendarDialog = ({
     onClose();
   };
 
-  const handleColorChange = (color: ColorResult) => {
+  const handleColorChange = (color: { hex: string }) => {
     setDefaultSelectedColor(color.hex);
   };
 
@@ -232,13 +234,41 @@ export const CreateCalendarDialog = ({
 
                   {showPicker && (
                     <div className="absolute left-0 top-full z-10001 mt-2">
-                      {h(PhotoshopPicker as any, {
-                        color: defaultSelectedColor,
-                        onChange: handleColorChange,
-                        onAccept: handleAccept,
-                        onCancel: handleCancel,
-                        styles: pickerStyles as any,
-                      })}
+                      <ContentSlot
+                        generatorName="colorPickerWrapper"
+                        generatorArgs={{
+                          variant: 'photoshop',
+                          color: defaultSelectedColor,
+                          onChange: handleColorChange,
+                          onAccept: handleAccept,
+                          onCancel: handleCancel,
+                          styles: pickerStyles
+                        }}
+                        defaultContent={
+                          <div className="p-2 bg-white dark:bg-slate-900 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700">
+                            <DefaultColorPicker
+                              color={defaultSelectedColor}
+                              onChange={handleColorChange}
+                            />
+                            <div className="mt-2 flex justify-end gap-2">
+                               <button
+                                  type="button"
+                                  onClick={handleCancel}
+                                  className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                               >
+                                  {t('cancel')}
+                               </button>
+                               <button
+                                  type="button"
+                                  onClick={handleAccept}
+                                  className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:opacity-90"
+                               >
+                                  OK
+                               </button>
+                            </div>
+                          </div>
+                        }
+                      />
                     </div>
                   )}
                 </div>

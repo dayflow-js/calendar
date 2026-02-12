@@ -23,6 +23,7 @@ import {
   monthDateNumber,
   monthMoreEvents,
   monthTitle,
+  cn,
 } from '@/styles/classNames';
 import { GridContextMenu } from '@/components/contextMenu';
 
@@ -714,7 +715,10 @@ const WeekComponent = memo(
             {/* More events indicator */}
             {hasMoreEvents && (
               <div
-                className={monthMoreEvents}
+                className={cn(
+                  monthMoreEvents,
+                  screenSize === 'desktop' ? 'text-left font-normal' : 'text-center font-medium'
+                )}
                 onClick={e => {
                   e.stopPropagation();
                   if (onMoreEventsClick) {
@@ -725,7 +729,7 @@ const WeekComponent = memo(
                   }
                 }}
               >
-                +{hiddenEventsCount} <span className="hidden md:inline">{t('more')}</span>
+                +{hiddenEventsCount}{screenSize === 'desktop' ? ` ${t('more')}` : ''}
               </div>
             )}
           </div>

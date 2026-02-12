@@ -18,6 +18,10 @@ export interface DayFlowCalendarProps {
   createCalendarDialog?: (args: { onClose: () => void; onCreate: (calendar: any) => void; colorPickerMode?: string }) => React.ReactNode;
   /** Title bar slot (React) */
   titleBarSlot?: React.ReactNode | ((context: { isCollapsed: boolean; toggleCollapsed: () => void }) => React.ReactNode);
+  /** Custom color picker renderer (React) */
+  colorPicker?: (args: any) => React.ReactNode;
+  /** Custom color picker wrapper renderer (React) */
+  colorPickerWrapper?: (args: any) => React.ReactNode;
 }
 
 export const DayFlowCalendar: React.FC<DayFlowCalendarProps> = ({
