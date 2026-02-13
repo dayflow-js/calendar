@@ -453,25 +453,25 @@ export const CalendarRoot = ({
           className={`calendar-container relative flex flex-row h-full overflow-hidden select-none ${className ?? ''}`}
           style={{ height: 800, ...style }}
         >
-                  <ContentSlot
-                    store={customRenderingStore}
-                    generatorName="titleBarSlot"
-                    generatorArgs={{
-                      isCollapsed,
-                      toggleCollapsed: () => setIsCollapsed(prev => !prev),
-                    }}
-                    defaultContent={
-                      titleBarSlot && (
-                        typeof titleBarSlot === 'function'
-                          ? titleBarSlot({
-                              isCollapsed,
-                              toggleCollapsed: () => setIsCollapsed(prev => !prev),
-                            })
-                          : titleBarSlot
-                      )
-                    }
-                  />
-                    {sidebarEnabled && (
+          <ContentSlot
+            store={customRenderingStore}
+            generatorName="titleBarSlot"
+            generatorArgs={{
+              isCollapsed,
+              toggleCollapsed: () => setIsCollapsed(prev => !prev),
+            }}
+            defaultContent={
+              titleBarSlot && (
+                typeof titleBarSlot === 'function'
+                  ? titleBarSlot({
+                    isCollapsed,
+                    toggleCollapsed: () => setIsCollapsed(prev => !prev),
+                  })
+                  : titleBarSlot
+              )
+            }
+          />
+          {sidebarEnabled && (
             <aside
               className={`absolute top-0 bottom-0 left-0 z-0 h-full`}
               style={{
@@ -554,44 +554,44 @@ export const CalendarRoot = ({
             app={app}
           />
 
-        {showCreateDialog && (
-          <ContentSlot
-            store={customRenderingStore}
-            generatorName="createCalendarDialog"
-            generatorArgs={{
-              onClose: () => setShowCreateDialog(false),
-              onCreate: (newCalendar: any) => {
-                app.createCalendar(newCalendar);
-                setShowCreateDialog(false);
-                refreshSidebar();
-              },
-              colorPickerMode: sidebarConfig.colorPickerMode,
-            }}
-            defaultContent={
-              sidebarConfig.renderCreateCalendarDialog ? (
-                sidebarConfig.renderCreateCalendarDialog({
-                  onClose: () => setShowCreateDialog(false),
-                  onCreate: (newCalendar: any) => {
-                    app.createCalendar(newCalendar);
-                    setShowCreateDialog(false);
-                    refreshSidebar();
-                  },
-                  colorPickerMode: sidebarConfig.colorPickerMode,
-                })
-              ) : (
-                <CreateCalendarDialog
-                  onClose={() => setShowCreateDialog(false)}
-                  onCreate={newCalendar => {
-                    app.createCalendar(newCalendar);
-                    setShowCreateDialog(false);
-                    refreshSidebar();
-                  }}
-                  colorPickerMode={sidebarConfig.colorPickerMode}
-                />
-              )
-            }
-          />
-        )}
+          {showCreateDialog && (
+            <ContentSlot
+              store={customRenderingStore}
+              generatorName="createCalendarDialog"
+              generatorArgs={{
+                onClose: () => setShowCreateDialog(false),
+                onCreate: (newCalendar: any) => {
+                  app.createCalendar(newCalendar);
+                  setShowCreateDialog(false);
+                  refreshSidebar();
+                },
+                colorPickerMode: sidebarConfig.colorPickerMode,
+              }}
+              defaultContent={
+                sidebarConfig.renderCreateCalendarDialog ? (
+                  sidebarConfig.renderCreateCalendarDialog({
+                    onClose: () => setShowCreateDialog(false),
+                    onCreate: (newCalendar: any) => {
+                      app.createCalendar(newCalendar);
+                      setShowCreateDialog(false);
+                      refreshSidebar();
+                    },
+                    colorPickerMode: sidebarConfig.colorPickerMode,
+                  })
+                ) : (
+                  <CreateCalendarDialog
+                    onClose={() => setShowCreateDialog(false)}
+                    onCreate={newCalendar => {
+                      app.createCalendar(newCalendar);
+                      setShowCreateDialog(false);
+                      refreshSidebar();
+                    }}
+                    colorPickerMode={sidebarConfig.colorPickerMode}
+                  />
+                )
+              }
+            />
+          )}
         </div>
       </CalendarInternalLocaleProvider>
     </ThemeProvider>

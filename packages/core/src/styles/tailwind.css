@@ -1,135 +1,102 @@
-@import 'tailwindcss';
+@import 'tailwindcss/preflight' layer(base);
+@import 'tailwindcss/theme' layer(theme);
+@import 'tailwindcss/utilities';
+
+/* Force scanning of all relevant source code files to extract utility classes */
+@source "../**/*.{ts,tsx}";
+@source "../../../packages/*/src/**/*.{ts,tsx}";
+
 @import '@dayflow/blossom-color-picker/styles.css';
 
 @variant dark (.dark &);
+
+/* Ensure that the base variables can be correctly parsed even without Tailwind */
+:root {
+  color-scheme: light dark;
+}
+
+/* Define default CSS variables with low specificity using :where() */
+:where(:root) {
+  /* Light mode colors */
+  --color-background: rgb(255 255 255);
+  --color-foreground: rgb(46 46 46);
+  --color-hover: rgb(245 245 245);
+  --color-border: rgb(229 229 229);
+  --color-card: rgb(255 255 255);
+  --color-card-foreground: rgb(46 46 46);
+  --color-muted: rgb(243 244 246);
+  --color-muted-foreground: rgb(107 114 128);
+
+  /* Theme Colors */
+  --color-primary: rgb(46 46 46);
+  --color-primary-foreground: rgb(255 255 255);
+  --color-secondary: rgb(100 116 139);
+  --color-secondary-foreground: rgb(255 255 255);
+
+  /* Destructive */
+  --color-destructive: rgb(212 36 34);
+  --color-destructive-foreground: rgb(255 255 255);
+}
+
+:where(.dark) {
+  /* Dark mode colors */
+  --color-background: rgb(21 21 21);
+  --color-hover: rgb(28 28 28);
+  --color-foreground: rgb(229 229 229);
+  --color-card: rgb(31 41 55);
+  --color-card-foreground: rgb(229 229 229);
+  --color-border: rgb(56 56 56);
+  --color-muted: rgb(55 65 81);
+  --color-muted-foreground: rgb(156 163 175);
+
+  --color-primary: rgb(229 229 229);
+  --color-primary-foreground: rgb(23 23 23);
+  --color-secondary: rgb(156 163 175);
+  --color-secondary-foreground: rgb(23 23 23);
+
+  /* Destructive */
+  --color-destructive: rgb(147 70 69);
+  --color-destructive-foreground: rgb(254 242 242);
+}
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Static fallbacks for build-time @apply. */
-  --color-background: #ffffff;
-  --color-foreground: #2e2e2e;
-  --color-hover: #f5f5f5;
-  --color-border: #e5e5e5;
-  --color-card: #ffffff;
-  --color-card-foreground: #2e2e2e;
-  --color-muted: #f3f4f6;
-  --color-muted-foreground: #6b7280;
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-hover: var(--color-hover);
+  --color-border: var(--color-border);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
 
-  --color-primary: #2e2e2e;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #64748b;
-  --color-secondary-foreground: #ffffff;
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
 
-  --color-destructive: #d42422;
-  --color-destructive-foreground: #ffffff;
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
 }
 
-/* 
- * Use :where(:root) to provide low-specificity defaults.
- * This allows users to easily override them in their own CSS.
- */
-:where(:root) {
-  --df-primary: rgb(46 46 46);
-  --df-primary-foreground: rgb(255 255 255);
-  --df-secondary: rgb(100 116 139);
-  --df-secondary-foreground: rgb(255 255 255);
-  --df-destructive: rgb(212 36 34);
-  --df-destructive-foreground: rgb(255 255 255);
-
-  --df-background: rgb(255 255 255);
-  --df-foreground: rgb(46 46 46);
-  --df-hover: rgb(245 245 245);
-  --df-border: rgb(229 229 229);
-  --df-card: rgb(255 255 255);
-  --df-card-foreground: rgb(46 46 46);
-  --df-muted: rgb(243 244 246);
-  --df-muted-foreground: rgb(107 114 128);
-
-  --color-primary: var(--df-primary);
-  --color-primary-foreground: var(--df-primary-foreground);
-  --color-secondary: var(--df-secondary);
-  --color-secondary-foreground: var(--df-secondary-foreground);
-  --color-destructive: var(--df-destructive);
-  --color-destructive-foreground: var(--df-destructive-foreground);
-
-  --color-background: var(--df-background);
-  --color-foreground: var(--df-foreground);
-  --color-hover: var(--df-hover);
-  --color-border: var(--df-border);
-  --color-card: var(--df-card);
-  --color-card-foreground: var(--df-card-foreground);
-  --color-muted: var(--df-muted);
-  --color-muted-foreground: var(--df-muted-foreground);
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    --color-background: rgb(17 24 39);
+    --color-foreground: rgb(243 244 246);
+    --color-border: rgb(55 65 81);
+    --color-card: rgb(31 41 55);
+    --color-card-foreground: rgb(243 244 246);
+    --color-muted: rgb(55 65 81);
+    --color-muted-foreground: rgb(156 163 175);
+  }
 }
 
-:where(.dark) {
-  --df-primary: rgb(229 229 229);
-  --df-primary-foreground: rgb(23 23 23);
-  --df-secondary: rgb(156 163 175);
-  --df-secondary-foreground: rgb(23 23 23);
-  --df-destructive: rgb(147 70 69);
-  --df-destructive-foreground: rgb(254 242 242);
-
-  --df-background: rgb(21 21 21);
-  --df-hover: rgb(28 28 28);
-  --df-foreground: rgb(229 229 229);
-  --df-card: rgb(31 41 55);
-  --df-card-foreground: rgb(229 229 229);
-  --df-border: rgb(56 56 56);
-  --df-muted: rgb(55 65 81);
-  --df-muted-foreground: rgb(156 163 175);
-
-  --color-primary: var(--df-primary);
-  --color-primary-foreground: var(--df-primary-foreground);
-  --color-secondary: var(--df-secondary);
-  --color-secondary-foreground: var(--df-secondary-foreground);
-  --color-destructive: var(--df-destructive);
-  --color-destructive-foreground: var(--df-destructive-foreground);
-
-  --color-background: var(--df-background);
-  --color-foreground: var(--df-foreground);
-  --color-hover: var(--df-hover);
-  --color-border: var(--df-border);
-  --color-card: var(--df-card);
-  --color-card-foreground: var(--df-card-foreground);
-  --color-muted: var(--df-muted);
-  --color-muted-foreground: var(--df-muted-foreground);
-}
-
-.dark {
-  --df-primary: rgb(229 229 229);
-  --df-primary-foreground: rgb(23 23 23);
-  --df-secondary: rgb(156 163 175);
-  --df-secondary-foreground: rgb(23 23 23);
-  --df-destructive: rgb(147 70 69);
-  --df-destructive-foreground: rgb(254 242 242);
-
-  --df-background: rgb(21 21 21);
-  --df-hover: rgb(28 28 28);
-  --df-foreground: rgb(229 229 229);
-  --df-card: rgb(31 41 55);
-  --df-card-foreground: rgb(229 229 229);
-  --df-border: rgb(56 56 56);
-  --df-muted: rgb(55 65 81);
-  --df-muted-foreground: rgb(156 163 175);
-
-  --color-primary: var(--df-primary);
-  --color-primary-foreground: var(--df-primary-foreground);
-  --color-secondary: var(--df-secondary);
-  --color-secondary-foreground: var(--df-secondary-foreground);
-  --color-destructive: var(--df-destructive);
-  --color-destructive-foreground: var(--df-destructive-foreground);
-
-  --color-background: var(--df-background);
-  --color-foreground: var(--df-foreground);
-  --color-hover: var(--df-hover);
-  --color-border: var(--df-border);
-  --color-card: var(--df-card);
-  --color-card-foreground: var(--df-card-foreground);
-  --color-muted: var(--df-muted);
-  --color-muted-foreground: var(--df-muted-foreground);
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==================== Component Layer ==================== */
@@ -314,36 +281,34 @@
   scrollbar-width: none; /* Firefox */
 }
 
-/* Scope scrollbar styles to calendar container */
-.calendar-container ::-webkit-scrollbar {
+/* Custom 2px scrollbar */
+::-webkit-scrollbar {
   width: 2px;
   height: 2px;
 }
 
-.calendar-container * {
+* {
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: #d1d5db transparent; /* Firefox */
 }
 
-.calendar-container.dark *,
-.dark .calendar-container * {
+.dark * {
   scrollbar-color: #4b5563 transparent; /* Firefox */
 }
 
-.calendar-container ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.calendar-container ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #d1d5db; /* gray-300 */
   border-radius: 1px;
 }
 
-.calendar-container.dark ::-webkit-scrollbar-thumb,
-.dark .calendar-container ::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #4b5563; /* gray-600 */
 }
 
-.calendar-container ::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #9ca3af; /* gray-400 */
 }
