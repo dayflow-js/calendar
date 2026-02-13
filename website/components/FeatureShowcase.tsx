@@ -26,6 +26,8 @@ import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   CalendarType,
+  EventDetailContentProps,
+  EventDetailDialogProps,
 } from '@dayflow/core';
 import { CALENDAR_SIDE_PANEL, getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
@@ -218,7 +220,7 @@ export const SwitcherModeShowcase: React.FC = () => (
 
 export const CustomDetailPanelShowcase: React.FC = () => {
   const detailPanel: EventDetailContentRenderer = useCallback(
-    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+    ({ event, onEventDelete, onEventUpdate, onClose }: EventDetailContentProps) => {
       const meta = event.meta ?? {};
       const isFavorite = Boolean(meta.favorite);
 
@@ -313,7 +315,7 @@ export const EventDialogShowcase: React.FC = () => {
 
 export const CustomDetailDialogShowcase: React.FC = () => {
   const customDialog: EventDetailDialogRenderer = useCallback(
-    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }) => {
+    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }: EventDetailDialogProps) => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};

@@ -1,14 +1,19 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import 'tw-animate-css';
+@import '@dayflow/core/dist/styles.css';
 
-@theme {
-  --color-primary: #3b82f6;
-  --color-primary-foreground: #ffffff;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
+/* Map Tailwind's semantic colors to DayFlow's variables to prevent theme conflicts */
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
 }
 
-@layer base {
+@layer l-base {
   :root {
     --accent: 217 91% 60%;
   }
@@ -18,16 +23,16 @@
   @apply bg-[linear-gradient(1deg,#383838,#212121)];
 }
 
-/* Hide sidebar footer entirely */
-.nextra-sidebar-footer,
-[class*="nextra-sidebar-footer"],
-.x\:bottom-0.nextra-sidebar-footer {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
+/* Code block container
+.nextra-code > div:first-child {
+  @apply bg-gray-200 dark:bg-zinc-900;
+  border: none;
 }
+
+.nextra-code pre {
+  @apply bg-gray-100 dark:bg-zinc-800;
+  box-shadow: none;
+} */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {

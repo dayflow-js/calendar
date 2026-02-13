@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BrandLogo } from '@/components/BrandLogo';
 
-const banner = <Banner storageKey="nextra-banner">Welcome to DayFlow 🎉</Banner>;
+// const banner = <Banner storageKey="nextra-banner">Welcome to DayFlow 🎉</Banner>;
 const navbar = (
   <Navbar
     logo={<BrandLogo />}
@@ -25,7 +25,7 @@ export default async function BlogLayout({
 }) {
   return (
     <Layout
-      banner={banner}
+      // banner={banner}
       navbar={navbar}
       pageMap={await getPageMap('/blog')}
       docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
