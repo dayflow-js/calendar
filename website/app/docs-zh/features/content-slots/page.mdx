@@ -41,7 +41,7 @@ import { SketchPicker, PhotoshopPicker } from 'react-color';
 function MyCalendar() {
   return (
     <DayFlowCalendar
-      app={app}
+      calendar={calendar}
       colorPicker={(args) => (
         <SketchPicker
           color={args.color}
@@ -73,7 +73,7 @@ npm install vue-color
 
 ```vue
 <template>
-  <DayFlowCalendar :app="app">
+  <DayFlowCalendar :calendar="calendar">
     <template #colorPicker="args">
       <Sketch
         :value="args.color"

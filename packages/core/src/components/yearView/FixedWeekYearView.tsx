@@ -544,12 +544,12 @@ export const FixedWeekYearView = ({
         ref={monthLabelsRef}
         className="overflow-hidden bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700"
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col min-h-full">
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400"
-              style={{ height: `${month.minHeight}px` }}
+              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 flex-grow shrink-0"
+              style={{ minHeight: `${month.minHeight}px` }}
             >
               {month.monthName}
             </div>
@@ -570,12 +570,12 @@ export const FixedWeekYearView = ({
         className={`overflow-auto ${scrollbarHide}`}
         onScroll={handleContentScroll}
       >
-        <div className="flex flex-col" style={{ minWidth: '1352px' }}>
+        <div className="flex flex-col min-h-full" style={{ minWidth: '1352px' }}>
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="relative"
-              style={{ height: `${month.minHeight}px` }}
+              className="relative flex-grow shrink-0"
+              style={{ minHeight: `${month.minHeight}px` }}
             >
               {/* Background grid cells */}
               <div

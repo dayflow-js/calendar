@@ -195,7 +195,7 @@ export const generateSampleEvents = (): Event[] => {
           def.title
         )
       );
-    } catch (e) {
+    } catch {
       // Ignore invalid dates (e.g. leap years edge cases in simple config)
     }
   });

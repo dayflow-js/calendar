@@ -1,11 +1,11 @@
-import { defineComponent, h, ref, onMounted, onUnmounted, shallowRef, PropType, Teleport } from 'vue';
-import { CalendarRenderer, ICalendarApp, CustomRendering } from '@dayflow/core';
+import { defineComponent, h, ref, onMounted, onUnmounted, shallowRef, PropType, Teleport, computed } from 'vue';
+import { CalendarRenderer, ICalendarApp, CustomRendering, UseCalendarAppReturn } from '@dayflow/core';
 
 export const DayFlowCalendar = defineComponent({
   name: 'DayFlowCalendar',
   props: {
-    app: {
-      type: Object as PropType<ICalendarApp>,
+    calendar: {
+      type: Object as PropType<ICalendarApp | UseCalendarAppReturn>,
       required: true,
     },
     className: {
@@ -22,10 +22,15 @@ export const DayFlowCalendar = defineComponent({
     const renderer = shallowRef<CalendarRenderer | null>(null);
     const customRenderings = ref<CustomRendering[]>([]);
 
+    // Extract underlying app instance
+    const app = computed(() => {
+      return (props.calendar as any).app || props.calendar;
+    });
+
     onMounted(() => {
       if (!container.value) return;
 
-      const r = new CalendarRenderer(props.app);
+      const r = new CalendarRenderer(app.value);
       renderer.value = r;
       r.mount(container.value);
 

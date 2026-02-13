@@ -72,7 +72,7 @@ export function InteractiveCalendar() {
   return (
     <div className="w-full">
       <DayFlowCalendar
-        app={calendar.app}
+        calendar={calendar}
         className="w-full"
         style={{ height: isMobile ? 550 : 760 }}
       />

@@ -245,7 +245,7 @@ export const MultiDayEvent = memo(
             )}
 
             <div className="flex-1 min-w-0">
-              <div className="truncate font-medium text-xs">
+              <div className="truncate text-xs">
                 {getDisplayText()}
               </div>
             </div>

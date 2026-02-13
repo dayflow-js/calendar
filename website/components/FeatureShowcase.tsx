@@ -196,7 +196,7 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   return (
     <div className="rounded-xl dark:border-slate-700 bg-white dark:bg-slate-900 ">
       <DayFlowCalendar
-        app={calendar.app}
+        calendar={calendar}
         className={`w-full ${className}`}
         eventDetailContent={customDetailPanelContent}
         eventDetailDialog={customEventDetailDialog}
@@ -218,7 +218,7 @@ export const SwitcherModeShowcase: React.FC = () => (
 
 export const CustomDetailPanelShowcase: React.FC = () => {
   const detailPanel: EventDetailContentRenderer = useCallback(
-    ({ event, onEventDelete, onEventUpdate, onClose }: any) => {
+    ({ event, onEventDelete, onEventUpdate, onClose }) => {
       const meta = event.meta ?? {};
       const isFavorite = Boolean(meta.favorite);
 
@@ -313,7 +313,7 @@ export const EventDialogShowcase: React.FC = () => {
 
 export const CustomDetailDialogShowcase: React.FC = () => {
   const customDialog: EventDetailDialogRenderer = useCallback(
-    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }: any) => {
+    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }) => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};

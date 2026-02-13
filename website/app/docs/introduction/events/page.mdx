@@ -16,16 +16,16 @@ import { Event } from '@dayflow/core';
 ```
 
 | Property      | Type                                                                     | Description                                                                                                       | Required |
-| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------- |
-| `id`          | `string`                                                                 | Unique identifier for the event                                                                                   | ✅ Yes   |
-| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                             | ✅ Yes   |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | ✅ Yes   |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | ✅ Yes   |
-| `description` | `string`                                                                 | Optional event description or notes                                                                               | ❌ No    |
-| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | ❌ No    |
-| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | ❌ No    |
-| `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | ❌ No    |
-| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | ❌ No    |
+|---------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|----------|
+| `id`          | `string`                                                                 | Unique identifier for the event                                                                                   | ✅ Yes    |
+| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                             | ✅ Yes    |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | ✅ Yes    |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | ✅ Yes    |
+| `description` | `string`                                                                 | Optional event description or notes                                                                               | ❌ No     |
+| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | ❌ No     |
+| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | ❌ No     |
+| `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | ❌ No     |
+| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | ❌ No     |
 
 ## Creating Events
 
@@ -427,4 +427,4 @@ For detailed information about date/time handling, see:
 
 - [Views](/docs/introduction/views) - Understanding calendar views
 - [Plugins](/docs/introduction/plugins) - Event management with plugins
-- [Getting Started](/docs/introduction/getting-started) - Basic usage examples
+- [Getting Started](/docs/introduction/introduction) - Basic usage examples

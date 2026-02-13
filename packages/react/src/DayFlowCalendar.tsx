@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState, useMemo, type CSSProperties, type ReactNode, type FC } from 'react';
 import { createPortal } from 'react-dom';
-import { CalendarRenderer, type ICalendarApp, type CustomRendering } from '@dayflow/core';
+import { CalendarRenderer, type ICalendarApp, type CustomRendering, type UseCalendarAppReturn } from '@dayflow/core';
 
 export interface DayFlowCalendarProps {
-  app: ICalendarApp;
+  calendar: ICalendarApp | UseCalendarAppReturn;
   className?: string;
   style?: CSSProperties;
   /** Custom event content renderer (React) */
@@ -25,7 +25,7 @@ export interface DayFlowCalendarProps {
 }
 
 export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
-  app,
+  calendar,
   className,
   style,
   ...renderProps
@@ -33,6 +33,9 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CalendarRenderer | null>(null);
   const [customRenderings, setCustomRenderings] = useState<Map<string, CustomRendering>>(new Map());
+
+  // Extract the underlying app instance
+  const app = (calendar as any).app || calendar;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -57,16 +60,16 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   const portals = useMemo(() => {
     return Array.from(customRenderings.values()).map((rendering: CustomRendering) => {
       const { id, containerEl, generatorName, generatorArgs } = rendering;
-      
+
       // Look up the generator in renderProps
       const generator = (renderProps as any)[generatorName];
-      
+
       if (!generator) {
         return null;
       }
 
-      const content = typeof generator === 'function' 
-        ? generator(generatorArgs) 
+      const content = typeof generator === 'function'
+        ? generator(generatorArgs)
         : generator;
 
       return createPortal(content, containerEl, id);

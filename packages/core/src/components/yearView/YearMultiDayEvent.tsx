@@ -398,7 +398,7 @@ export const YearMultiDayEvent = ({
 
           <div className="flex-1 min-w-0">
             <div
-              className="df-year-event-title font-medium text-[12px] leading-none whitespace-nowrap overflow-hidden"
+              className="df-year-event-title text-[12px] leading-none whitespace-nowrap overflow-hidden"
               style={{
                 maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
                 WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
