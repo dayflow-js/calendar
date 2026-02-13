@@ -7,6 +7,8 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
   const [, setTick] = useState(0);
 
   useEffect(() => {
+    if (!app) return;
+    
     // Subscribe to state changes to trigger React re-renders
     const unsubscribe = app.subscribe(() => {
       setTick((tick: number) => tick + 1);

@@ -2,6 +2,7 @@ import { Footer, Layout, Navbar } from 'nextra-theme-docs';
 import { Banner } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { BrandLogo } from '@/components/BrandLogo';
 
 const banner = <Banner storageKey="nextra-banner">Welcome to DayFlow 🎉</Banner>;
@@ -12,6 +13,7 @@ const navbar = (
     chatLink="https://discord.gg/9vdFZKJqBb"
   >
     <LanguageSwitcher />
+    <ThemeToggle />
   </Navbar>
 );
 const footer = <Footer>MIT {new Date().getFullYear()} © DayFlow.</Footer>;
@@ -28,6 +30,9 @@ export default async function BlogLayout({
       pageMap={await getPageMap('/blog')}
       docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
       footer={footer}
+      sidebar={{
+        toggleButton: false
+      }}
       nextThemes={{
         defaultTheme: "system",
         storageKey: "theme"

@@ -11,8 +11,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@dayflow/core": "file:../packages/core/dayflow-core-3.0.0.tgz",
-    "@dayflow/react": "file:../packages/react/dayflow-react-3.0.0-alpha.0.tgz",
+    "@dayflow/core": "file:../packages/core/dayflow-core-3.0.0-alpha.1.tgz",
+    "@dayflow/react": "file:../packages/react/dayflow-react-3.0.0-alpha.1.tgz",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.552.0",

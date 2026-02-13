@@ -35,10 +35,10 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   const [customRenderings, setCustomRenderings] = useState<Map<string, CustomRendering>>(new Map());
 
   // Extract the underlying app instance
-  const app = (calendar as any).app || calendar;
+  const app = (calendar as any)?.app || calendar;
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !app) return;
 
     const renderer = new CalendarRenderer(app);
     rendererRef.current = renderer;

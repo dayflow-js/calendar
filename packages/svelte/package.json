@@ -1,27 +1,25 @@
 {
-  "name": "@dayflow/react",
-  "version": "3.0.0-alpha.1",
+  "name": "@dayflow/svelte",
+  "version": "3.0.0-alpha.0",
   "type": "module",
-  "description": "React adapter for DayFlow calendar",
+  "description": "Svelte adapter for DayFlow calendar",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "typecheck": "svelte-check"
   },
   "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
+    "svelte": ">=3.0.0",
     "@dayflow/core": "workspace:*"
   },
   "devDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "svelte": "^4.2.19",
     "@dayflow/core": "workspace:*",
     "typescript": "^5.7.2",
     "rollup": "^4.29.1",
@@ -29,8 +27,9 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "rollup-plugin-svelte": "^7.2.2",
+    "svelte-preprocess": "^6.0.3",
+    "svelte-check": "^4.1.1",
+    "@tsconfig/svelte": "^5.0.4"
   }
 }
