@@ -43,14 +43,6 @@ const defaultMonthViewConfig: MonthViewConfig = {
     enableKeyboardNavigation: true,
     supportedViews: [ViewType.MONTH],
   },
-
-  // View specific configuration
-  viewConfig: {
-    showOtherMonth: true,
-    weekHeight: 120,
-    showWeekNumbers: false,
-    enableVirtualScroll: true,
-  },
 };
 
 // Month view factory function

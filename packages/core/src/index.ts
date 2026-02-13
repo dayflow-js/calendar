@@ -27,4 +27,5 @@ export { createDragPlugin } from './plugins/dragPlugin';
 export { createEventsPlugin } from './plugins/eventsPlugin';
 
 // Styles
+import './styles/tailwind.css';
 // Note: consumers should import '@dayflow/core/dist/styles.css'

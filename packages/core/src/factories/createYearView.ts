@@ -25,12 +25,6 @@ const defaultYearViewConfig: YearViewConfig = {
     enableAutoRecalculate: false,
     enableValidation: true,
   },
-
-  // View specific configuration
-  viewConfig: {
-    enableVirtualScroll: true,
-    showDebugInfo: false,
-  },
 };
 
 // Year view factory function
