@@ -62,7 +62,7 @@ export function LiveDemo() {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
-            href="/docs/getting-started"
+            href="/docs/introduction"
             className="inline-flex items-center justify-center rounded-full bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-400"
           >
             Read the docs
