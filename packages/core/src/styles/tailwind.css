@@ -113,40 +113,8 @@ body {
     }
   }
 
-  .calendar-header {
-    @apply flex justify-between items-center p-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700;
-  }
-
-  .calendar-grid {
-    @apply flex-grow relative overflow-y-auto;
-  }
-
-  .calendar-weekdays {
-    @apply grid grid-cols-7 border-b border-gray-200 dark:border-gray-700;
-  }
-
-  .calendar-day-label {
-    @apply flex-1 text-center text-gray-500 dark:text-gray-400 text-sm p-1;
-  }
-
   .calendar-time-column {
-    @apply w-20 flex-shrink-0 border-gray-200 dark:border-gray-700;
-  }
-
-  .calendar-time-slot {
-    @apply relative h-[4.5rem] flex;
-  }
-
-  .calendar-time-row {
-    @apply h-[4.5rem] border-t first:border-none border-gray-200 dark:border-gray-700 flex;
-  }
-
-  .calendar-time-cell {
-    @apply flex-1 relative border-r border-gray-200 dark:border-gray-700;
-  }
-
-  .calendar-all-day-row {
-    @apply flex items-center border-b border-gray-200 dark:border-gray-700;
+    @apply w-20 shrink-0 border-gray-200 dark:border-gray-700;
   }
 
   .calendar-nav-button {
@@ -155,18 +123,6 @@ body {
 
   .calendar-today-button {
     @apply px-4 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors;
-  }
-
-  .calendar-event-base {
-    @apply select-none pointer-events-auto cursor-pointer transition-all;
-  }
-
-  .mini-calendar-grid {
-    @apply grid grid-cols-7 gap-1 text-xs justify-items-center;
-  }
-
-  .mini-calendar-day {
-    @apply text-center py-1 rounded text-xs h-6 w-6 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
   }
 
   .calendar-checkbox {
@@ -279,14 +235,14 @@ body {
 }
 
 /* Hide scrollbar but allow scrolling */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+/*.scrollbar-hide::-webkit-scrollbar {*/
+/*  display: none;*/
+/*}*/
 
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
+/*.scrollbar-hide {*/
+/*  -ms-overflow-style: none; !* IE and Edge *!*/
+/*  scrollbar-width: none; !* Firefox *!*/
+/*}*/
 
 /* Custom 2px scrollbar */
 ::-webkit-scrollbar {
@@ -318,4 +274,16 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af; /* gray-400 */
+}
+
+.df-header-left {
+  flex: 1;
+}
+
+.df-header-mid {
+  flex: 1;
+}
+
+.df-header-right {
+  flex: 1;
 }

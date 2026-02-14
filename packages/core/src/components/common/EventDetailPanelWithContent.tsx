@@ -163,6 +163,7 @@ export const EventDetailPanelWithContent = ({
         ref={panelRef}
         className={`${eventDetailPanel} p-3`}
         data-event-detail-panel="true"
+        data-event-id={event.id}
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,

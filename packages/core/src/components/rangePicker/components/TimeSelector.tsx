@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 import { pad } from '../../../utils/rangePicker';
 import { ZonedRange } from '../types';
 import { HOURS, MINUTES } from '../constants';
+import { scrollbarHide } from '@/styles/classNames';
 
 interface TimeSelectorProps {
   focusedField: 'start' | 'end';
@@ -35,14 +36,14 @@ const TimeSelector = ({
   return (
     <div className="flex flex-col rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm sm:w-28">
       <div className="flex border-b border-slate-100 dark:border-gray-600 justify-center">
-        <div className='text-lg py-1 text-slate-700 dark:text-gray-300'>{current.hour.toString().padStart(2, '0')}:{current.minute.toString().padStart(2, '0')}</div>
+        <div className='text-base py-1.5 text-slate-700 dark:text-gray-300'>{current.hour.toString().padStart(2, '0')}:{current.minute.toString().padStart(2, '0')}</div>
       </div>
 
       {/* Hour and Minute Selectors */}
       <div className="flex p-1">
         <div className="w-14">
           <div
-            className="h-72 overflow-y-auto rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700"
+            className={`h-72 overflow-y-auto ${scrollbarHide} rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700`}
             role="listbox"
             aria-label="Hour"
             ref={element => {
@@ -75,7 +76,7 @@ const TimeSelector = ({
         </div>
         <div className="w-14">
           <div
-            className="h-72 overflow-y-auto rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700"
+            className={`h-72 overflow-y-auto ${scrollbarHide} rounded-md border border-slate-100 dark:border-gray-600 bg-white dark:bg-gray-700`}
             role="listbox"
             aria-label="Minute"
             ref={element => {

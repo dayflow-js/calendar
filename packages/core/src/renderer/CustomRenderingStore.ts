@@ -9,6 +9,7 @@ export type CustomRenderingListener = (map: Map<string, CustomRendering>) => voi
 
 export class CustomRenderingStore {
   private renderings = new Map<string, CustomRendering>();
+  private overrides = new Set<string>();
   private listeners = new Set<CustomRenderingListener>();
 
   /**
@@ -27,6 +28,22 @@ export class CustomRenderingStore {
     if (this.renderings.delete(id)) {
       this.notify();
     }
+  }
+
+  /**
+   * Set the list of generator names that have custom overrides.
+   * Called by framework adapters (React/Vue/etc.)
+   */
+  setOverrides(names: string[]): void {
+    this.overrides = new Set(names);
+    this.notify();
+  }
+
+  /**
+   * Check if a specific generator has a custom override.
+   */
+  isOverridden(generatorName: string): boolean {
+    return this.overrides.has(generatorName);
   }
 
   /**

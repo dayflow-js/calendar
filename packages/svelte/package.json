@@ -1,13 +1,15 @@
 {
   "name": "@dayflow/svelte",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0-alpha.1",
   "type": "module",
   "description": "Svelte adapter for DayFlow calendar",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "svelte": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -15,11 +17,11 @@
     "typecheck": "svelte-check"
   },
   "peerDependencies": {
-    "svelte": ">=3.0.0",
+    "svelte": "^4.0.0 || ^5.0.0",
     "@dayflow/core": "workspace:*"
   },
   "devDependencies": {
-    "svelte": "^4.2.19",
+    "svelte": "^5.0.0",
     "@dayflow/core": "workspace:*",
     "typescript": "^5.7.2",
     "rollup": "^4.29.1",

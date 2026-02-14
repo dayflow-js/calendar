@@ -59,12 +59,12 @@ const CalendarGrid = ({
 
   return (
     <>
-      <div className="grid grid-cols-7 gap-1 px-3 pb-3 pt-2 text-center text-[12px] uppercase tracking-wide text-slate-400 dark:text-gray-500">
+      <div className="grid grid-cols-7 gap-1 px-1 pb-3 pt-2 text-center text-[12px] uppercase tracking-wide text-slate-400 dark:text-gray-500">
         {weekDayLabels.map((day: any, index: any) => (
           <span key={index}>{day}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-2 px-1 ">
+      <div className="grid grid-cols-7 gap-1 px-1 ">
         {calendarDays.map(renderDayCell)}
       </div>
     </>

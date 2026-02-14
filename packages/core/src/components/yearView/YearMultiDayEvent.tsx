@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useRef, useState, useEffect, useCallback } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition, ICalendarApp } from '@/types';

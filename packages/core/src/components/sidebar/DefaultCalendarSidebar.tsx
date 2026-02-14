@@ -518,6 +518,11 @@ const DefaultCalendarSidebar = ({
                   color: customColorPicker.currentColor,
                   onChange: (color: { hex: string }) => {
                     setCustomColorPicker(prev => prev ? { ...prev, currentColor: color.hex } : null);
+                    const { colors, darkColors } = getCalendarColorsForHex(color.hex);
+                    app.updateCalendar(customColorPicker.calendarId, {
+                      colors,
+                      darkColors
+                    });
                   },
                   onChangeComplete: (color: { hex: string }) => {
                     const { colors, darkColors } = getCalendarColorsForHex(color.hex);

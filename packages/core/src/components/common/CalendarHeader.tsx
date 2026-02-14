@@ -65,7 +65,7 @@ const CalendarHeader = ({
           onContextMenu={e => e.preventDefault()}
         >
           {/* Left Section: Add Calendar Button Only */}
-          <div className="flex items-center mb-1">
+          <div className="df-header-left flex items-center mb-1">
             {onAddCalendar && isEditable && (
               <button
                 id="dayflow-add-event-btn"
@@ -79,7 +79,7 @@ const CalendarHeader = ({
           </div>
 
           {/* Middle Section: ViewSwitcher (if mode is buttons) */}
-          <div className="flex-1 flex justify-center">
+          <div className="df-header-mid flex-1 flex justify-center">
             {isSwitcherCentered && (
               <ViewSwitcher mode={switcherMode} calendar={calendar} />
             )}
@@ -89,7 +89,7 @@ const CalendarHeader = ({
           {!isSwitcherCentered && (
             <ViewSwitcher mode={switcherMode} calendar={calendar} />
           )}
-          <div className={`flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}>
+          <div className={`df-header-right flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}>
             {/* Mobile Search Icon */}
             <button
               onClick={onSearchClick}

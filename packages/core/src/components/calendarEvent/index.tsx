@@ -1054,7 +1054,14 @@ const CalendarEvent = ({
           setIsSelected(false);
           onDetailPanelToggle?.(null);
         }
-      } else if (isEventSelected && !clickedInsideEvent && !clickedOnSameEvent && !clickedInsideCalendarPickerDropdown) {
+      } else if (
+        isEventSelected &&
+        !clickedInsideEvent &&
+        !clickedOnSameEvent &&
+        !clickedInsideDetailDialog &&
+        !clickedInsideRangePickerPopup &&
+        !clickedInsideCalendarPickerDropdown
+      ) {
         if (onEventSelect) {
           onEventSelect(null);
         }

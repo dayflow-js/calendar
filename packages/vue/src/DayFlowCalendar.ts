@@ -30,6 +30,9 @@ export const DayFlowCalendar = defineComponent({
         customRenderings.value = Array.from(renderings.values());
       });
 
+      // Synchronize slot overrides
+      r.getCustomRenderingStore().setOverrides(Object.keys(slots));
+
       onUnmounted(() => {
         unsubscribe();
         r.unmount();

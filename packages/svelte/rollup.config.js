@@ -11,7 +11,7 @@ export default {
     {
       file: 'dist/index.js',
       format: 'es',
-      sourcemap: false
+      sourcemap: true
     }
   ],
   plugins: [
@@ -32,5 +32,11 @@ export default {
     commonjs(),
     terser()
   ],
-  external: ['svelte', '@dayflow/core', 'svelte/internal']
+  external: (id) => id === 'svelte' || id.startsWith('svelte/') || id === '@dayflow/core',
+  onwarn(warning, warn) {
+    if (warning.code === 'CIRCULAR_DEPENDENCY' && warning.ids && warning.ids[0].includes('node_modules')) {
+      return;
+    }
+    warn(warning);
+  }
 };

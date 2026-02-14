@@ -93,7 +93,7 @@ export const CalendarRoot = ({
   collapsedSafeAreaLeft,
 }: CalendarRootProps) => {
   const customRenderingStore = useContext(CustomRenderingContext);
-  const [, setTick] = useState(0);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     return app.subscribe(() => {
@@ -287,7 +287,7 @@ export const CalendarRoot = ({
 
   const calendars = useMemo(
     () => app.getCalendars(),
-    [app, sidebarVersion]
+    [app, sidebarVersion, tick]
   );
 
   const handleToggleCalendarVisibility = useCallback(

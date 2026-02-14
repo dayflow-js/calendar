@@ -52,6 +52,13 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
     };
   }, [app]);
 
+  useEffect(() => {
+    if (!rendererRef.current) return;
+    const store = rendererRef.current.getCustomRenderingStore();
+    const activeOverrides = Object.keys(renderProps).filter(key => (renderProps as any)[key] !== undefined);
+    store.setOverrides(activeOverrides);
+  }, [renderProps]);
+
   // Portals for custom content
   const portals = useMemo(() => {
     return Array.from(customRenderings.values()).map((rendering: CustomRendering) => {

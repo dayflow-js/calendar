@@ -44,6 +44,10 @@
     unsubscribe = renderer.getCustomRenderingStore().subscribe((renderings) => {
       customRenderings = Array.from(renderings.values());
     });
+
+    // Synchronize slot overrides
+    const activeOverrides = Object.keys(renderProps).filter(key => renderProps[key] !== null);
+    renderer.getCustomRenderingStore().setOverrides(activeOverrides);
   });
 
   onDestroy(() => {

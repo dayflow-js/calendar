@@ -44,13 +44,14 @@ export function ContentSlot({ generatorName, generatorArgs, defaultContent, stor
   }, [store, generatorName, JSON.stringify(generatorArgs)]); // Use JSON.stringify for deep comparison of args if needed
 
   const isEventSlot = generatorName === 'eventContent';
+  const isOverridden = store?.isOverridden(generatorName);
 
   return (
     <div
       ref={containerRef}
       className={`df-content-slot ${isEventSlot ? 'flex-1 flex flex-col h-full' : ''}`}
     >
-      {defaultContent}
+      {!isOverridden && defaultContent}
     </div>
   );
 }
