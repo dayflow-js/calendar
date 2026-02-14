@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { Check } from '../../common/Icons';
 import {
   ContextMenu,

@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useEffect, useMemo } from 'preact/hooks';
 import { Event, MobileEventProps, CalendarType } from '@/types';
 import { MiniCalendar } from '../common/MiniCalendar';

@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { YearViewProps } from '@/types';
 import { DefaultYearView } from '@/components/yearView/DefaultYearView';
 import { FixedWeekYearView } from '@/components/yearView/FixedWeekYearView';

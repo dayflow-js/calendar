@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { LocaleContext } from './LocaleContext';
 import { t as translate } from './translator';

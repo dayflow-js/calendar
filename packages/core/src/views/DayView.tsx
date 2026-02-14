@@ -1,5 +1,3 @@
-import { h } from 'preact';
-import { Fragment } from 'preact';
 import {
   useState,
   useEffect,

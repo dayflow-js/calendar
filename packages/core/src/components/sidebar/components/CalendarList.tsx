@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { CalendarType } from '../../../types';
 

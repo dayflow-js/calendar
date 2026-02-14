@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import {
   useMemo,
   useRef,

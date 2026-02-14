@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useRef, useEffect, useContext } from 'preact/hooks';
 import { CustomRenderingContext } from './CustomRenderingContext';
 

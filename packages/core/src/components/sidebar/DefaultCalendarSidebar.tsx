@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useCallback, useEffect, useState, useRef } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { CalendarSidebarRenderProps, Event } from '../../types';

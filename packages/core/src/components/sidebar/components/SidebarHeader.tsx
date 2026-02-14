@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { PanelRightClose, PanelRightOpen, Plus } from '../../common/Icons';
 import { useLocale } from '@/locale';
 import {

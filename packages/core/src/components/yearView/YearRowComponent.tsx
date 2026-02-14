@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { memo } from 'preact/compat';
 import {

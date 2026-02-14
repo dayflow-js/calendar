@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useMemo } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { ContentSlot } from '../../renderer/ContentSlot';

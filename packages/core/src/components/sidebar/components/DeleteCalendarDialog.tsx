@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import { CalendarType } from '../../../types';
 import { cancelButton } from '@/styles/classNames';

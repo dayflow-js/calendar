@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { ContextMenu, ContextMenuItem } from './Primitives';
 import { useLocale } from '@/locale';
 import { ICalendarApp, ViewType } from '@/types';

@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { Event } from '@/types';
 import { ICalendarApp } from '@/types';
 import {

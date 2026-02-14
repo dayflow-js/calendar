@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import TodayBox from './TodayBox';
 import {
   headerContainer,

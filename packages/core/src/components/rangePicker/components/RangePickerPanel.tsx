@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { RefObject } from 'preact';
 import { Temporal } from 'temporal-polyfill';
 import { ZonedRange } from '../types';

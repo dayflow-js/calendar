@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useRef } from 'preact/hooks';
 import { ICalendarApp } from '@/types';
 import CalendarEventComponent from '@/components/calendarEvent';

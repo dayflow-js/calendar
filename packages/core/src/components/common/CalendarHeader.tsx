@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useContext, useCallback } from 'preact/hooks';
 import { ViewType, CalendarHeaderProps } from '../../types';
 import ViewSwitcher from './ViewSwitcher';

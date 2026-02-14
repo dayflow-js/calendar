@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
 import { extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';

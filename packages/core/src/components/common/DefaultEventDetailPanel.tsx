@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { Temporal } from 'temporal-polyfill';

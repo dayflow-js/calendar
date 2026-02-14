@@ -1,5 +1,3 @@
-import { h } from 'preact';
-
 interface SwitchProps {
   checked: boolean;
   onChange: (v: boolean) => void;

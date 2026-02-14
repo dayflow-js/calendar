@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useMemo, useCallback } from 'preact/hooks';
 import {
   ViewType,

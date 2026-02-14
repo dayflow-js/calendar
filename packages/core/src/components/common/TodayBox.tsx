@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { ChevronLeft, ChevronRight } from './Icons';
 import { useLocale } from '@/locale';
 import {

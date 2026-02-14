@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { Loader2 } from '../common/Icons';
 import { CalendarSearchEvent } from '../../types/search';
@@ -99,7 +98,7 @@ const SearchResultsList = ({
                   : end.toLocaleTimeString(locale, timeOpt);
 
                 return (
-                  <Fragment key={event.id}>
+                  <div key={event.id}>
                     <div
                       className="p-2 mx-2 mb-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group"
                       onClick={() => onResultClick?.(event)}
@@ -127,7 +126,7 @@ const SearchResultsList = ({
                       </div>
                     </div>
                     <div className="mx-2 border-b border-gray-200 dark:border-gray-700" />
-                  </Fragment>
+                  </div>
                 );
               })}
             </div>

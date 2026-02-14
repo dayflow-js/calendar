@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import SearchResultsList from './SearchResultsList';
 import { CalendarSearchEvent } from '../../types/search';
 

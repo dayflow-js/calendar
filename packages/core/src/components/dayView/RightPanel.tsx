@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { ICalendarApp } from '@/types';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import TodayBox from '@/components/common/TodayBox';

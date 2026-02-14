@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useRef } from 'preact/hooks';
 import { memo } from 'preact/compat';
 import { Event } from '../../types';

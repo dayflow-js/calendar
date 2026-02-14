@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useRef, useEffect } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import SearchResultsList from './SearchResultsList';

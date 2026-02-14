@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { ICalendarApp } from '@/types';
 import { useLocale } from '@/locale';

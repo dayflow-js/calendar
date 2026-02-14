@@ -1,5 +1,5 @@
 import { cancelButton } from '@/styles/classNames';
-import { h } from 'preact';
+
 import { useLocale } from '@/locale';
 
 interface MergeCalendarDialogProps {

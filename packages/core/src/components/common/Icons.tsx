@@ -1,5 +1,3 @@
-import { h, Fragment } from 'preact';
-
 interface IconProps {
   className?: string;
   width?: number;

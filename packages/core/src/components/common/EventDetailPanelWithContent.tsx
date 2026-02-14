@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { createPortal } from 'preact/compat';
 import {
   EventDetailPanelProps,

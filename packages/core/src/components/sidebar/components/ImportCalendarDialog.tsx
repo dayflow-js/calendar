@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useRef, useEffect } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { CalendarType } from '../../../types';

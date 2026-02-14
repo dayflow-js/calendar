@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { Event } from '../../types';
 import { Calendar } from '../common/Icons';
 import { daysDifference } from '../../utils';
