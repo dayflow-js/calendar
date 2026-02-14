@@ -66,7 +66,10 @@ const EventContextMenu = ({
   };
 
   // Custom user slot
-  const customContent = (app as any).callbacks?.renderEventContextMenu?.(event, onClose);
+  const customContent = (app as any).callbacks?.renderEventContextMenu?.(
+    event,
+    onClose
+  );
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
@@ -76,7 +79,7 @@ const EventContextMenu = ({
           {t('calendars') || 'Calendars'}
         </ContextMenuSubTrigger>
         <ContextMenuSubContent>
-          {calendars.map((cal) => {
+          {calendars.map(cal => {
             const isSelected = cal.id === event.calendarId;
             return (
               <ContextMenuItem
@@ -92,7 +95,9 @@ const EventContextMenu = ({
                       className="w-3 h-3 rounded-sm shrink-0"
                       style={{ backgroundColor: cal.colors.lineColor }}
                     />
-                    <span className={`truncate ${isSelected ? 'font-semibold' : ''}`}>
+                    <span
+                      className={`truncate ${isSelected ? 'font-semibold' : ''}`}
+                    >
                       {cal.name}
                     </span>
                   </div>
@@ -109,9 +114,7 @@ const EventContextMenu = ({
       <ContextMenuItem onClick={handleDelete} danger>
         {t('delete') || 'Delete'}
       </ContextMenuItem>
-      <ContextMenuItem onClick={handleCut}>
-        {t('cut') || 'Cut'}
-      </ContextMenuItem>
+      <ContextMenuItem onClick={handleCut}>{t('cut') || 'Cut'}</ContextMenuItem>
       <ContextMenuItem onClick={handleCopy}>
         {t('copy') || 'Copy'}
       </ContextMenuItem>

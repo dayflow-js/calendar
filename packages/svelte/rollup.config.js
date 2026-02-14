@@ -11,32 +11,37 @@ export default {
     {
       file: 'dist/index.js',
       format: 'es',
-      sourcemap: true
-    }
+      sourcemap: true,
+    },
   ],
   plugins: [
     svelte({
       preprocess: sveltePreprocess(),
-      emitCss: false
+      emitCss: false,
     }),
     resolve({
       browser: true,
       dedupe: ['svelte'],
-      extensions: ['.mjs', '.js', '.ts', '.svelte']
+      extensions: ['.mjs', '.js', '.ts', '.svelte'],
     }),
     typescript({
       tsconfig: './tsconfig.json',
       declaration: true,
-      declarationDir: 'dist'
+      declarationDir: 'dist',
     }),
     commonjs(),
-    terser()
+    terser(),
   ],
-  external: (id) => id === 'svelte' || id.startsWith('svelte/') || id === '@dayflow/core',
+  external: id =>
+    id === 'svelte' || id.startsWith('svelte/') || id === '@dayflow/core',
   onwarn(warning, warn) {
-    if (warning.code === 'CIRCULAR_DEPENDENCY' && warning.ids && warning.ids[0].includes('node_modules')) {
+    if (
+      warning.code === 'CIRCULAR_DEPENDENCY' &&
+      warning.ids &&
+      warning.ids[0].includes('node_modules')
+    ) {
       return;
     }
     warn(warning);
-  }
+  },
 };

@@ -302,11 +302,14 @@ export class CalendarApp implements ICalendarApp {
 
   // Event management
 
-  public applyEventsChanges = (changes: {
-    add?: Event[];
-    update?: Array<{ id: string; updates: Partial<Event> }>;
-    delete?: string[];
-  }, isPending?: boolean): void => {
+  public applyEventsChanges = (
+    changes: {
+      add?: Event[];
+      update?: Array<{ id: string; updates: Partial<Event> }>;
+      delete?: string[];
+    },
+    isPending?: boolean
+  ): void => {
     if (!this.isInternalEditable() && !isPending) return;
 
     if (isPending) {
@@ -354,8 +357,10 @@ export class CalendarApp implements ICalendarApp {
 
     if (!isPending) {
       // Trigger individual callbacks if needed, though usually used for batch
-      if (changes.add) changes.add.forEach(e => this.callbacks.onEventCreate?.(e));
-      if (changes.delete) changes.delete.forEach(id => this.callbacks.onEventDelete?.(id));
+      if (changes.add)
+        changes.add.forEach(e => this.callbacks.onEventCreate?.(e));
+      if (changes.delete)
+        changes.delete.forEach(id => this.callbacks.onEventDelete?.(id));
       if (changes.update && this.callbacks.onEventUpdate) {
         changes.update.forEach(({ id }) => {
           const updated = this.state.events.find(e => e.id === id);
@@ -669,7 +674,10 @@ export class CalendarApp implements ICalendarApp {
       // We update callbacks but don't trigger re-render as they don't affect visual state
       this.callbacks = { ...this.callbacks, ...config.callbacks };
     }
-    if (config.theme?.mode !== undefined && config.theme.mode !== this.getTheme()) {
+    if (
+      config.theme?.mode !== undefined &&
+      config.theme.mode !== this.getTheme()
+    ) {
       this.setTheme(config.theme.mode);
       // setTheme already triggers re-render via onRender callback
     }

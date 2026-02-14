@@ -107,7 +107,9 @@ END:VCALENDAR`;
       // Date comparison might need care due to types (PlainDateTime vs ZonedDateTime)
       // But values should match
       expect(parsedEvent.start.year).toBe(mockEvent.start.year);
-      expect((parsedEvent.start as any).minute).toBe((mockEvent.start as any).minute);
+      expect((parsedEvent.start as any).minute).toBe(
+        (mockEvent.start as any).minute
+      );
     });
   });
 });

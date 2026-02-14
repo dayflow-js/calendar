@@ -26,11 +26,7 @@ export const MergeCalendarDialog = ({
           {t('mergeConfirmMessage', { sourceName, targetName })}
         </p>
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className={cancelButton}
-          >
+          <button type="button" onClick={onCancel} className={cancelButton}>
             {t('cancel')}
           </button>
           <button

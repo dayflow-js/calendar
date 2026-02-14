@@ -54,9 +54,13 @@ export class CalendarRenderer {
     if (!this.container) return;
 
     render(
-      h(CustomRenderingContext.Provider, {
-        value: this.customRenderingStore,
-      }, h(CalendarRoot, { app: this.app })),
+      h(
+        CustomRenderingContext.Provider,
+        {
+          value: this.customRenderingStore,
+        },
+        h(CalendarRoot, { app: this.app })
+      ),
       this.container
     );
   }

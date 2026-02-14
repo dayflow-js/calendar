@@ -54,7 +54,9 @@ export const parseTemporalString = (
   }
 
   const match = trimmed.match(regExp);
-  const groups = match?.groups as Record<string, string | undefined> | undefined;
+  const groups = match?.groups as
+    | Record<string, string | undefined>
+    | undefined;
 
   if (!groups) {
     return null;
@@ -188,8 +190,7 @@ export const normalizeToZoned = (
       minute: candidate?.minute ?? fallbackTemporal?.minute ?? 0,
       second: candidate?.second ?? fallbackTemporal?.second ?? 0,
       millisecond: candidate?.millisecond ?? fallbackTemporal?.millisecond ?? 0,
-      microsecond:
-        candidate?.microsecond ?? fallbackTemporal?.microsecond ?? 0,
+      microsecond: candidate?.microsecond ?? fallbackTemporal?.microsecond ?? 0,
       nanosecond: candidate?.nanosecond ?? fallbackTemporal?.nanosecond ?? 0,
     });
   }

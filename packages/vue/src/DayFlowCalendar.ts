@@ -1,5 +1,20 @@
-import { defineComponent, h, ref, onMounted, onUnmounted, shallowRef, PropType, Teleport, computed } from 'vue';
-import { CalendarRenderer, ICalendarApp, CustomRendering, UseCalendarAppReturn } from '@dayflow/core';
+import {
+  defineComponent,
+  h,
+  ref,
+  onMounted,
+  onUnmounted,
+  shallowRef,
+  PropType,
+  Teleport,
+  computed,
+} from 'vue';
+import {
+  CalendarRenderer,
+  ICalendarApp,
+  CustomRendering,
+  UseCalendarAppReturn,
+} from '@dayflow/core';
 
 export const DayFlowCalendar = defineComponent({
   name: 'DayFlowCalendar',
@@ -26,7 +41,7 @@ export const DayFlowCalendar = defineComponent({
       renderer.value = r;
       r.mount(container.value);
 
-      const unsubscribe = r.getCustomRenderingStore().subscribe((renderings) => {
+      const unsubscribe = r.getCustomRenderingStore().subscribe(renderings => {
         customRenderings.value = Array.from(renderings.values());
       });
 
@@ -42,11 +57,16 @@ export const DayFlowCalendar = defineComponent({
 
     return () => [
       h('div', { ref: container, class: 'df-calendar-wrapper' }),
-      ...customRenderings.value.map(rendering => 
-        h(Teleport, { to: rendering.containerEl }, {
-          default: () => slots[rendering.generatorName]?.(rendering.generatorArgs)
-        })
-      )
+      ...customRenderings.value.map(rendering =>
+        h(
+          Teleport,
+          { to: rendering.containerEl },
+          {
+            default: () =>
+              slots[rendering.generatorName]?.(rendering.generatorArgs),
+          }
+        )
+      ),
     ];
   },
 });

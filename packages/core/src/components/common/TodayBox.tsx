@@ -28,10 +28,7 @@ const TodayBox = ({
       >
         <ChevronLeft className={navButtonIcon} />
       </button>
-      <button
-        className={calendarTodayButton}
-        onClick={handleToday}
-      >
+      <button className={calendarTodayButton} onClick={handleToday}>
         {t('today')}
       </button>
       <button

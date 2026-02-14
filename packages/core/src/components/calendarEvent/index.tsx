@@ -13,10 +13,7 @@ import {
   extractHourFromDate,
   getEventEndHour,
 } from '@/utils';
-import {
-  Event,
-  EventDetailPosition,
-} from '@/types';
+import { Event, EventDetailPosition } from '@/types';
 import MultiDayEvent from '../monthView/MultiDayEvent';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
 import { EventDetailPanelWithContent } from '../common/EventDetailPanelWithContent';
@@ -73,7 +70,10 @@ const CalendarEvent = ({
   const isTouchEnabled = enableTouch ?? isMobile;
   const [isSelected, setIsSelected] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [isPopping, setIsPopping] = useState(false);
   const detailPanelKey =
     isMultiDay && segment
@@ -128,8 +128,8 @@ const CalendarEvent = ({
 
       // Create a compatible event object
       const syntheticEvent = {
-        preventDefault: () => { },
-        stopPropagation: () => { },
+        preventDefault: () => {},
+        stopPropagation: () => {},
         currentTarget: currentTarget,
         touches: [{ clientX, clientY }],
         cancelable: false,
@@ -139,7 +139,7 @@ const CalendarEvent = ({
         const adjustedEvent = {
           ...event,
           day: multiDaySegmentInfo.dayIndex ?? event.day,
-          _segmentInfo: multiDaySegmentInfo
+          _segmentInfo: multiDaySegmentInfo,
         };
         onMoveStart(syntheticEvent, adjustedEvent as Event);
       } else if (isMultiDay && segment) {
@@ -149,8 +149,8 @@ const CalendarEvent = ({
           _segmentInfo: {
             dayIndex: segment.startDayIndex,
             isFirst: segment.isFirstSegment,
-            isLast: segment.isLastSegment
-          }
+            isLast: segment.isLastSegment,
+          },
         };
         onMoveStart(syntheticEvent, adjustedEvent as Event);
       } else {
@@ -209,7 +209,11 @@ const CalendarEvent = ({
   };
 
   const isEventSelected =
-    (selectedEventId !== undefined ? selectedEventId === event.id : isSelected) || isPressed || isBeingDragged;
+    (selectedEventId !== undefined
+      ? selectedEventId === event.id
+      : isSelected) ||
+    isPressed ||
+    isBeingDragged;
 
   const readOnlyConfig = app?.getReadOnlyConfig();
   const isEditable = !app?.state.readOnly;
@@ -283,7 +287,7 @@ const CalendarEvent = ({
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
         transform: isPopping ? 'scale(1.15)' : undefined,
         transition: 'transform 0.1s ease-in-out',
-        cursor: isDraggable ? 'pointer' : (canOpenDetail ? 'pointer' : 'default'),
+        cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
     }
 
@@ -294,14 +298,19 @@ const CalendarEvent = ({
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
         transform: isPopping ? 'scale(1.12)' : undefined,
         transition: 'transform 0.1s ease-in-out',
-        cursor: isDraggable ? 'pointer' : (canOpenDetail ? 'pointer' : 'default'),
+        cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
 
       // Calculate vertical offset (for multi-row all-day events)
       const topOffset = segmentIndex * allDayHeight;
       Object.assign(styles, { top: `${topOffset}px` });
       if (isDayView) {
-        Object.assign(styles, { width: '100%', left: '0px', right: '2px', position: 'absolute' });
+        Object.assign(styles, {
+          width: '100%',
+          left: '0px',
+          right: '2px',
+          position: 'absolute',
+        });
       } else if (isMultiDay && segment) {
         const spanDays = segment.endDayIndex - segment.startDayIndex + 1;
         const widthPercent = (spanDays / 7) * 100;
@@ -342,10 +351,7 @@ const CalendarEvent = ({
       : getEventEndHour(event);
 
     const top = (startHour - firstHour) * hourHeight;
-    const height = Math.max(
-      (endHour - startHour) * hourHeight,
-      hourHeight / 4
-    );
+    const height = Math.max((endHour - startHour) * hourHeight, hourHeight / 4);
 
     const baseStyle = {
       top: `${top + 3}px`,
@@ -355,7 +361,7 @@ const CalendarEvent = ({
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
       transform: isPopping ? 'scale(1.12)' : undefined,
       transition: 'transform 0.1s ease-in-out',
-      cursor: isDraggable ? 'pointer' : (canOpenDetail ? 'pointer' : 'default'),
+      cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
     };
 
     if (isEventSelected && showDetailPanel) {
@@ -365,11 +371,16 @@ const CalendarEvent = ({
       ) {
         const calendarRect = calendarRef.current?.getBoundingClientRect();
         if (calendarRect) {
-          const activeDayIndex = multiDaySegmentInfo?.dayIndex ?? getActiveDayIndex();
+          const activeDayIndex =
+            multiDaySegmentInfo?.dayIndex ?? getActiveDayIndex();
           const timeColumnWidth = isMobile ? 48 : 80;
           const columnCount = isDayView ? 1 : 7;
-          let dayColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
-          let dayStartX = calendarRect.left + timeColumnWidth + (isDayView ? 0 : activeDayIndex * dayColumnWidth);
+          let dayColumnWidth =
+            (calendarRect.width - timeColumnWidth) / columnCount;
+          let dayStartX =
+            calendarRect.left +
+            timeColumnWidth +
+            (isDayView ? 0 : activeDayIndex * dayColumnWidth);
 
           if (isMonthView) {
             dayColumnWidth = calendarRect.width / 7;
@@ -389,13 +400,15 @@ const CalendarEvent = ({
               calendarRef.current?.querySelector('.calendar-renderer');
           }
           const contentRect = scrollContainer?.getBoundingClientRect();
-          const parentRect = eventRef.current?.parentElement?.getBoundingClientRect();
+          const parentRect =
+            eventRef.current?.parentElement?.getBoundingClientRect();
           let stickyLeft: number;
           let stickyWidth: number;
 
           if (parentRect && parentRect.width > 0) {
             if (layout) {
-              stickyLeft = parentRect.left + (layout.left / 100) * parentRect.width;
+              stickyLeft =
+                parentRect.left + (layout.left / 100) * parentRect.width;
               stickyWidth = isDayView
                 ? (layout.width / 100) * parentRect.width
                 : ((layout.width - 1) / 100) * parentRect.width;
@@ -412,7 +425,8 @@ const CalendarEvent = ({
             stickyWidth = currentDayColumnWidth - 3;
 
             if (layout) {
-              stickyLeft = currentDayStartX + (layout.left / 100) * currentDayColumnWidth;
+              stickyLeft =
+                currentDayStartX + (layout.left / 100) * currentDayColumnWidth;
               stickyWidth = isDayView
                 ? (layout.width / 100) * currentDayColumnWidth
                 : ((layout.width - 1) / 100) * currentDayColumnWidth;
@@ -420,7 +434,7 @@ const CalendarEvent = ({
           }
 
           if (eventVisibility === 'sticky-top') {
-            let topPosition = contentRect ? contentRect.top : calendarRect.top;;
+            let topPosition = contentRect ? contentRect.top : calendarRect.top;
             topPosition = Math.max(topPosition, 0);
             topPosition = Math.max(topPosition, calendarRect.top);
             topPosition = Math.min(topPosition, calendarRect.bottom - 6);
@@ -486,9 +500,7 @@ const CalendarEvent = ({
       const dayColumnWidth = calendarRect.width / 7;
       const relativeX = clientX - calendarRect.left;
       const index = Math.floor(relativeX / dayColumnWidth);
-      return Number.isFinite(index)
-        ? Math.max(0, Math.min(6, index))
-        : null;
+      return Number.isFinite(index) ? Math.max(0, Math.min(6, index)) : null;
     }
 
     const timeColumnWidth = isMobile ? 48 : 80;
@@ -705,7 +717,8 @@ const CalendarEvent = ({
       if (isMonthView && isMultiDay && segment) {
         const metrics = getDayMetrics(positionDayIndex);
         const dayColumnWidth = metrics?.width ?? calendarRect.width / 7;
-        const selectedDayLeft = metrics?.left ??
+        const selectedDayLeft =
+          metrics?.left ??
           calendarRect.left + positionDayIndex * dayColumnWidth;
         const selectedDayRight = selectedDayLeft + dayColumnWidth;
         eventRect = {
@@ -722,15 +735,22 @@ const CalendarEvent = ({
       }
 
       if (
-        (eventVisibility === 'sticky-top' || eventVisibility === 'sticky-bottom') &&
+        (eventVisibility === 'sticky-top' ||
+          eventVisibility === 'sticky-bottom') &&
         !isMonthView
       ) {
-        const activeDayIndex = multiDaySegmentInfo?.dayIndex ?? getActiveDayIndex();
+        const activeDayIndex =
+          multiDaySegmentInfo?.dayIndex ?? getActiveDayIndex();
         const timeColumnWidth = isMobile ? 48 : 80;
         const columnCount = isDayView ? 1 : 7;
-        const defaultColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
+        const defaultColumnWidth =
+          (calendarRect.width - timeColumnWidth) / columnCount;
         const metrics = getDayMetrics(activeDayIndex);
-        const baseLeft = metrics ? metrics.left : calendarRect.left + timeColumnWidth + activeDayIndex * defaultColumnWidth;
+        const baseLeft = metrics
+          ? metrics.left
+          : calendarRect.left +
+            timeColumnWidth +
+            activeDayIndex * defaultColumnWidth;
         const baseWidth = metrics ? metrics.width : defaultColumnWidth;
         const segmentWidth = Math.max(
           0,
@@ -803,9 +823,7 @@ const CalendarEvent = ({
     detailPanelKey,
   ]);
 
-  const handleDoubleClick = (
-    e: any
-  ) => {
+  const handleDoubleClick = (e: any) => {
     if (!canOpenDetail) return;
     e.preventDefault();
     e.stopPropagation();
@@ -1028,15 +1046,20 @@ const CalendarEvent = ({
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const clickedInsideEvent = eventRef.current?.contains(target);
-      const clickedOnSameEvent = target.closest(`[data-event-id="${event.id}"]`) !== null;
+      const clickedOnSameEvent =
+        target.closest(`[data-event-id="${event.id}"]`) !== null;
       const clickedInsidePanel = detailPanelRef.current?.contains(target);
       const clickedInsideDetailDialog = target.closest(
         '[data-event-detail-dialog]'
       );
 
       // Check if clicked inside RangePicker popup or CalendarPicker dropdown
-      const clickedInsideRangePickerPopup = target.closest('[data-range-picker-popup]');
-      const clickedInsideCalendarPickerDropdown = target.closest('[data-calendar-picker-dropdown]');
+      const clickedInsideRangePickerPopup = target.closest(
+        '[data-range-picker-popup]'
+      );
+      const clickedInsideCalendarPickerDropdown = target.closest(
+        '[data-calendar-picker-dropdown]'
+      );
 
       if (showDetailPanel) {
         if (
@@ -1076,7 +1099,13 @@ const CalendarEvent = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isEventSelected, showDetailPanel, onEventSelect, onDetailPanelToggle, event.id]);
+  }, [
+    isEventSelected,
+    showDetailPanel,
+    onEventSelect,
+    onDetailPanelToggle,
+    event.id,
+  ]);
 
   useEffect(() => {
     if (isMultiDay && segment && !segment.isFirstSegment) {
@@ -1207,12 +1236,10 @@ const CalendarEvent = ({
           store={customRenderingStore}
           generatorName="eventDetailDialog"
           generatorArgs={dialogProps}
-          defaultContent={
-            createPortal(
-              <DialogComponent {...dialogProps} />,
-              portalTarget
-            )
-          }
+          defaultContent={createPortal(
+            <DialogComponent {...dialogProps} />,
+            portalTarget
+          )}
         />
       );
     }
@@ -1224,7 +1251,11 @@ const CalendarEvent = ({
         <ContentSlot
           store={customRenderingStore}
           generatorName="eventDetailContent"
-          generatorArgs={{ event, position: detailPanelPosition, onClose: handleClose }}
+          generatorArgs={{
+            event,
+            position: detailPanelPosition,
+            onClose: handleClose,
+          }}
           defaultContent={
             <EventDetailPanelWithContent
               event={event}
@@ -1248,7 +1279,11 @@ const CalendarEvent = ({
       <ContentSlot
         store={customRenderingStore}
         generatorName="eventDetailContent"
-        generatorArgs={{ event, position: detailPanelPosition, onClose: handleClose }}
+        generatorArgs={{
+          event,
+          position: detailPanelPosition,
+          onClose: handleClose,
+        }}
         defaultContent={
           <DefaultEventDetailPanel
             event={event}
@@ -1278,7 +1313,7 @@ const CalendarEvent = ({
         isDragging={isBeingDragged || isEventSelected}
         isResizing={isBeingResized}
         isSelected={isEventSelected}
-        onMoveStart={onMoveStart || (() => { })}
+        onMoveStart={onMoveStart || (() => {})}
         onResizeStart={onResizeStart}
         isMobile={isMobile}
         isDraggable={isDraggable}
@@ -1293,11 +1328,21 @@ const CalendarEvent = ({
       return renderMonthMultiDayContent();
     }
 
-    return <MonthAllDayContent event={event} isEventSelected={isEventSelected} />;
+    return (
+      <MonthAllDayContent event={event} isEventSelected={isEventSelected} />
+    );
   };
 
   const renderMonthRegularContent = () => {
-    return <MonthRegularContent event={event} app={app} isEventSelected={isEventSelected} hideTime={hideTime} isMobile={isMobile} />;
+    return (
+      <MonthRegularContent
+        event={event}
+        app={app}
+        isEventSelected={isEventSelected}
+        hideTime={hideTime}
+        isMobile={isMobile}
+      />
+    );
   };
 
   const renderAllDayContent = () => {
@@ -1373,14 +1418,27 @@ const CalendarEvent = ({
 
   const renderEvent = () => {
     const defaultContent = isMonthView
-      ? (isMultiDay && segment ? renderMonthMultiDayContent() : (event.allDay ? renderMonthAllDayContent() : renderMonthRegularContent()))
-      : (event.allDay ? renderAllDayContent() : renderRegularEventContent());
+      ? isMultiDay && segment
+        ? renderMonthMultiDayContent()
+        : event.allDay
+          ? renderMonthAllDayContent()
+          : renderMonthRegularContent()
+      : event.allDay
+        ? renderAllDayContent()
+        : renderRegularEventContent();
 
     return (
       <ContentSlot
         store={customRenderingStore}
         generatorName="eventContent"
-        generatorArgs={{ event, isAllDay, isMobile, isMonthView, segment, layout }}
+        generatorArgs={{
+          event,
+          isAllDay,
+          isMobile,
+          isMonthView,
+          segment,
+          layout,
+        }}
         defaultContent={defaultContent}
       />
     );
@@ -1398,18 +1456,27 @@ const CalendarEvent = ({
           ...calculateEventStyle(),
           ...(isEventSelected
             ? {
-              backgroundColor: getSelectedBgColor(calendarId, app?.getCalendarRegistry()),
-              color: '#fff',
-            }
+                backgroundColor: getSelectedBgColor(
+                  calendarId,
+                  app?.getCalendarRegistry()
+                ),
+                color: '#fff',
+              }
             : {
-              backgroundColor: getEventBgColor(calendarId, app?.getCalendarRegistry()),
-              color: getEventTextColor(calendarId, app?.getCalendarRegistry()),
-            }),
+                backgroundColor: getEventBgColor(
+                  calendarId,
+                  app?.getCalendarRegistry()
+                ),
+                color: getEventTextColor(
+                  calendarId,
+                  app?.getCalendarRegistry()
+                ),
+              }),
         }}
         onClick={isTouchEnabled ? undefined : handleClick}
         onContextMenu={isTouchEnabled ? undefined : handleContextMenu}
         onDblClick={isTouchEnabled ? undefined : handleDoubleClick}
-        onMouseDown={(e) => {
+        onMouseDown={e => {
           if (!isTouchEnabled) setIsPressed(true);
           if (onMoveStart) {
             // If it's a multi-day event segment, special handling is needed
@@ -1419,7 +1486,7 @@ const CalendarEvent = ({
                 ...event,
                 day: multiDaySegmentInfo.dayIndex ?? event.day,
                 // To calculate dragging, need to store segment information
-                _segmentInfo: multiDaySegmentInfo
+                _segmentInfo: multiDaySegmentInfo,
               };
               onMoveStart(e, adjustedEvent as Event);
             } else if (isMultiDay && segment) {
@@ -1430,8 +1497,8 @@ const CalendarEvent = ({
                 _segmentInfo: {
                   dayIndex: segment.startDayIndex,
                   isFirst: segment.isFirstSegment,
-                  isLast: segment.isLastSegment
-                }
+                  isLast: segment.isLastSegment,
+                },
               };
               onMoveStart(e, adjustedEvent as Event);
             } else {

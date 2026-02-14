@@ -27,12 +27,16 @@ const ja: Locale = {
     newAllDayCalendarEvent: '新規 {calendarName} 終日予定',
     save: '保存',
     deleteCalendar: 'カレンダー "{calendarName}" を削除しますか？',
-    deleteCalendarMessage: 'カレンダー "{calendarName}" を削除しますか？それともイベントを別の既存のカレンダーにマージしますか？',
+    deleteCalendarMessage:
+      'カレンダー "{calendarName}" を削除しますか？それともイベントを別の既存のカレンダーにマージしますか？',
     merge: 'マージ',
-    confirmDeleteTitle: 'カレンダー "{calendarName}" を削除してもよろしいですか？',
-    confirmDeleteMessage: 'このカレンダーを削除すると、関連するすべてのイベントも削除されます。',
+    confirmDeleteTitle:
+      'カレンダー "{calendarName}" を削除してもよろしいですか？',
+    confirmDeleteMessage:
+      'このカレンダーを削除すると、関連するすべてのイベントも削除されます。',
     mergeConfirmTitle: '"{sourceName}" を "{targetName}" にマージしますか？',
-    mergeConfirmMessage: '"{sourceName}" を "{targetName}" にマージしてもよろしいですか？これにより、"{sourceName}" のすべてのイベントが "{targetName}" に移動し、"{sourceName}" は削除されます。この操作は元に戻せません。',
+    mergeConfirmMessage:
+      '"{sourceName}" を "{targetName}" にマージしてもよろしいですか？これにより、"{sourceName}" のすべてのイベントが "{targetName}" に移動し、"{sourceName}" は削除されます。この操作は元に戻せません。',
     expandSidebar: 'カレンダーサイドバーを展開',
     collapseSidebar: 'カレンダーサイドバーを折りたたむ',
     calendars: 'カレンダー',
@@ -61,13 +65,14 @@ const ja: Locale = {
     importCalendar: 'カレンダーをインポート',
     exportCalendar: 'カレンダーをエクスポート',
     addSchedule: '予定を追加',
-    importCalendarMessage: 'このカレンダーには新しい予定が含まれています。ターゲットカレンダーを選択してください。',
+    importCalendarMessage:
+      'このカレンダーには新しい予定が含まれています。ターゲットカレンダーを選択してください。',
     ok: 'OK',
     cut: '切り取り',
     copy: 'コピー',
     pasteHere: 'ここに貼り付け',
     eventSummary: '概要',
-  }
+  },
 };
 
 export default ja;

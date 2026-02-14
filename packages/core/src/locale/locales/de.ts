@@ -27,12 +27,16 @@ const de: Locale = {
     newAllDayCalendarEvent: 'Neues ganztägiges Ereignis in {calendarName}',
     save: 'Speichern',
     deleteCalendar: '"{calendarName}" löschen?',
-    deleteCalendarMessage: 'Möchten Sie "{calendarName}" löschen oder dessen Ereignisse in einen anderen bestehenden Kalender zusammenführen?',
+    deleteCalendarMessage:
+      'Möchten Sie "{calendarName}" löschen oder dessen Ereignisse in einen anderen bestehenden Kalender zusammenführen?',
     merge: 'Zusammenführen',
-    confirmDeleteTitle: 'Sind Sie sicher, dass Sie den Kalender "{calendarName}" löschen möchten?',
-    confirmDeleteMessage: 'Wenn Sie diesen Kalender löschen, werden auch alle damit verbundenen Ereignisse gelöscht.',
+    confirmDeleteTitle:
+      'Sind Sie sicher, dass Sie den Kalender "{calendarName}" löschen möchten?',
+    confirmDeleteMessage:
+      'Wenn Sie diesen Kalender löschen, werden auch alle damit verbundenen Ereignisse gelöscht.',
     mergeConfirmTitle: '"{sourceName}" mit "{targetName}" zusammenführen?',
-    mergeConfirmMessage: 'Sind Sie sicher, dass Sie "{sourceName}" mit "{targetName}" zusammenführen möchten? Dadurch werden alle Ereignisse von "{sourceName}" nach "{targetName}" verschoben und "{sourceName}" wird gelöscht. Dies kann nicht rückgängig gemacht werden.',
+    mergeConfirmMessage:
+      'Sind Sie sicher, dass Sie "{sourceName}" mit "{targetName}" zusammenführen möchten? Dadurch werden alle Ereignisse von "{sourceName}" nach "{targetName}" verschoben und "{sourceName}" wird gelöscht. Dies kann nicht rückgängig gemacht werden.',
     expandSidebar: 'Kalender-Seitenleiste erweitern',
     collapseSidebar: 'Kalender-Seitenleiste einklappen',
     calendars: 'Kalender',
@@ -61,13 +65,14 @@ const de: Locale = {
     importCalendar: 'Kalender importieren',
     exportCalendar: 'Kalender exportieren',
     addSchedule: 'Termin hinzufügen',
-    importCalendarMessage: 'Dieser Kalender enthält neue Termine. Bitte wählen Sie einen Zielkalender.',
+    importCalendarMessage:
+      'Dieser Kalender enthält neue Termine. Bitte wählen Sie einen Zielkalender.',
     ok: 'OK',
     cut: 'Ausschneiden',
     copy: 'Kopieren',
     pasteHere: 'Hier einfügen',
     eventSummary: 'Zusammenfassung',
-  }
+  },
 };
 
 export default de;

@@ -67,7 +67,7 @@ const MobileSearchDialog = ({
             type="text"
             placeholder={t('search') || 'Search'}
             value={keyword}
-            onChange={(e) => {
+            onChange={e => {
               const val = (e.target as HTMLInputElement).value;
               if (val !== keyword) onSearchChange(val);
             }}
@@ -92,7 +92,7 @@ const MobileSearchDialog = ({
           loading={loading}
           results={results}
           keyword={keyword}
-          onResultClick={(e) => {
+          onResultClick={e => {
             onResultClick?.(e);
           }}
           emptyText={emptyText}

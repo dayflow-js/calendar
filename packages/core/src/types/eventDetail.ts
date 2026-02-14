@@ -36,8 +36,7 @@ export interface EventDetailPanelProps {
 /**
  * Custom event detail panel renderer (full panel including positioning and styling)
  */
-export type EventDetailPanelRenderer =
-  any;
+export type EventDetailPanelRenderer = any;
 
 /**
  * Event detail content Props (excluding panel container, content only)
@@ -58,8 +57,7 @@ export interface EventDetailContentProps {
 /**
  * Custom event detail content renderer (content only, will be wrapped in default panel)
  */
-export type EventDetailContentRenderer =
-  any;
+export type EventDetailContentRenderer = any;
 
 /**
  * Event detail dialog Props
@@ -83,5 +81,4 @@ export interface EventDetailDialogProps {
 /**
  * Custom event detail dialog renderer (Dialog/Modal mode)
  */
-export type EventDetailDialogRenderer =
-  any;
+export type EventDetailDialogRenderer = any;

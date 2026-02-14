@@ -63,7 +63,14 @@ export interface UseDragStateReturn {
 
   // State
   dragState: MonthDragState | WeekDayDragState;
-  setDragState: (val: MonthDragState | WeekDayDragState | ((prev: MonthDragState | WeekDayDragState) => MonthDragState | WeekDayDragState)) => void;
+  setDragState: (
+    val:
+      | MonthDragState
+      | WeekDayDragState
+      | ((
+          prev: MonthDragState | WeekDayDragState
+        ) => MonthDragState | WeekDayDragState)
+  ) => void;
 
   // Methods
   resetDragState: () => void;
@@ -118,11 +125,7 @@ export interface UseDragHandlersReturn {
   handleDragEnd: (e: MouseEvent | TouchEvent) => void;
   handleCreateStart: (e: any | any, ...args: (Date | number)[]) => void;
   handleMoveStart: (e: any | any, event: Event) => void;
-  handleResizeStart: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  handleResizeStart: (e: any | any, event: Event, direction: string) => void;
   handleUniversalDragMove: (e: MouseEvent | TouchEvent) => void;
   handleUniversalDragEnd: (e?: MouseEvent | TouchEvent) => void;
 }

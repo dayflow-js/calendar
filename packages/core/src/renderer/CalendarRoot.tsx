@@ -57,14 +57,20 @@ interface CalendarRootProps {
   meta?: Record<string, any>;
   customMessages?: LocaleMessages;
   search?: CalendarSearchProps;
-  titleBarSlot?: TNode | ((context: {
-    isCollapsed: boolean;
-    toggleCollapsed: () => void;
-  }) => TNode);
+  titleBarSlot?:
+    | TNode
+    | ((context: {
+        isCollapsed: boolean;
+        toggleCollapsed: () => void;
+      }) => TNode);
   collapsedSafeAreaLeft?: number;
 }
 
-const CalendarInternalLocaleProvider = ({ locale, messages, children }: {
+const CalendarInternalLocaleProvider = ({
+  locale,
+  messages,
+  children,
+}: {
   locale: LocaleCode | Locale;
   messages?: LocaleMessages;
   children: any;
@@ -124,12 +130,17 @@ export const CalendarRoot = ({
   const [mobileDraftEvent, setMobileDraftEvent] = useState<Event | null>(null);
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(null);
+  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
+    null
+  );
 
-  const handleDateSelect = useCallback((date: Date) => {
-    app.setCurrentDate(date);
-    setSelectedEventId(null);
-  }, [app]);
+  const handleDateSelect = useCallback(
+    (date: Date) => {
+      app.setCurrentDate(date);
+      setSelectedEventId(null);
+    },
+    [app]
+  );
 
   useKeyboardShortcuts({
     app,
@@ -332,44 +343,49 @@ export const CalendarRoot = ({
     refreshSidebar();
   }, [app, sidebarConfig.createCalendarMode, t, refreshSidebar]);
 
-  const handleAddButtonClick = useCallback((e: any) => {
-    const isEditable = !app.state.readOnly;
-    if (!isEditable) {
-      if (sidebarEnabled) return;
-      return;
-    }
-
-    if (isMobile) {
-      const now = new Date();
-      now.setMinutes(0, 0, 0);
-      now.setHours(now.getHours() + 1);
-
-      const end = new Date(now);
-      end.setHours(end.getHours() + 1);
-
-      const draft: Event = {
-        id: generateUniKey(),
-        title: '',
-        start: dateToZonedDateTime(now),
-        end: dateToZonedDateTime(end),
-        calendarId: app.getCalendars().find(c => c.isVisible !== false)?.id || app.getCalendars()[0]?.id,
-      };
-      setMobileDraftEvent(draft);
-      setIsMobileDrawerOpen(true);
-      return;
-    }
-
-    if (sidebarEnabled) {
-      if (isQuickCreateOpen) {
-        setIsQuickCreateOpen(false);
-      } else {
-        (quickCreateAnchorRef as any).current = e.currentTarget;
-        setIsQuickCreateOpen(true);
+  const handleAddButtonClick = useCallback(
+    (e: any) => {
+      const isEditable = !app.state.readOnly;
+      if (!isEditable) {
+        if (sidebarEnabled) return;
+        return;
       }
-    } else {
-      handleCreateCalendar();
-    }
-  }, [sidebarEnabled, isMobile, isQuickCreateOpen, handleCreateCalendar, app]);
+
+      if (isMobile) {
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        now.setHours(now.getHours() + 1);
+
+        const end = new Date(now);
+        end.setHours(end.getHours() + 1);
+
+        const draft: Event = {
+          id: generateUniKey(),
+          title: '',
+          start: dateToZonedDateTime(now),
+          end: dateToZonedDateTime(end),
+          calendarId:
+            app.getCalendars().find(c => c.isVisible !== false)?.id ||
+            app.getCalendars()[0]?.id,
+        };
+        setMobileDraftEvent(draft);
+        setIsMobileDrawerOpen(true);
+        return;
+      }
+
+      if (sidebarEnabled) {
+        if (isQuickCreateOpen) {
+          setIsQuickCreateOpen(false);
+        } else {
+          (quickCreateAnchorRef as any).current = e.currentTarget;
+          setIsQuickCreateOpen(true);
+        }
+      } else {
+        handleCreateCalendar();
+      }
+    },
+    [sidebarEnabled, isMobile, isQuickCreateOpen, handleCreateCalendar, app]
+  );
 
   const calendarRef = useRef<HTMLDivElement>(null!);
 
@@ -426,7 +442,8 @@ export const CalendarRoot = ({
 
   const headerConfig = app.getCalendarHeaderConfig();
 
-  const safeAreaLeft = collapsedSafeAreaLeft != null && isCollapsed ? collapsedSafeAreaLeft : 0;
+  const safeAreaLeft =
+    collapsedSafeAreaLeft != null && isCollapsed ? collapsedSafeAreaLeft : 0;
 
   const headerProps = {
     calendar: app,
@@ -451,7 +468,8 @@ export const CalendarRoot = ({
     return h(CalendarHeader, headerProps);
   };
 
-  const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent =
+    app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
   return (
     <ThemeProvider initialTheme={theme} onThemeChange={handleThemeChange}>
@@ -459,9 +477,7 @@ export const CalendarRoot = ({
         locale={app.state.locale}
         messages={customMessages}
       >
-        <div
-          className="df-calendar-container relative flex flex-row overflow-hidden select-none"
-        >
+        <div className="df-calendar-container relative flex flex-row overflow-hidden select-none">
           <ContentSlot
             store={customRenderingStore}
             generatorName="titleBarSlot"
@@ -470,14 +486,13 @@ export const CalendarRoot = ({
               toggleCollapsed: () => setIsCollapsed(prev => !prev),
             }}
             defaultContent={
-              titleBarSlot && (
-                typeof titleBarSlot === 'function'
-                  ? titleBarSlot({
+              titleBarSlot &&
+              (typeof titleBarSlot === 'function'
+                ? titleBarSlot({
                     isCollapsed,
                     toggleCollapsed: () => setIsCollapsed(prev => !prev),
                   })
-                  : titleBarSlot
-              )
+                : titleBarSlot)
             }
           />
           {sidebarEnabled && (

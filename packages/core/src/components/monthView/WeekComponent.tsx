@@ -34,12 +34,12 @@ export interface MultiDayEventSegment {
   startDayIndex: number;
   endDayIndex: number;
   segmentType:
-  | 'start'
-  | 'middle'
-  | 'end'
-  | 'single'
-  | 'start-week-end'
-  | 'end-week-start';
+    | 'start'
+    | 'middle'
+    | 'end'
+    | 'single'
+    | 'start-week-end'
+    | 'end-week-start';
   totalDays: number;
   segmentIndex: number;
   isFirstSegment: boolean;
@@ -61,16 +61,9 @@ interface WeekComponentProps {
   calendarRef: any;
   onEventUpdate: (updatedEvent: Event) => void;
   onEventDelete: (eventId: string) => void;
-  onMoveStart?: (
-    e: any | any,
-    event: Event
-  ) => void;
+  onMoveStart?: (e: any | any, event: Event) => void;
   onCreateStart?: (e: any | any, targetDate: Date) => void;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
   onDetailPanelOpen: () => void;
   onMoreEventsClick?: (date: Date) => void;
   onChangeView?: (view: ViewType) => void;
@@ -82,7 +75,12 @@ interface WeekComponentProps {
   onDetailPanelToggle?: (eventId: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  onCalendarDrop?: (e: any, dropDate: Date, dropHour?: number, isAllDay?: boolean) => Event | null;
+  onCalendarDrop?: (
+    e: any,
+    dropDate: Date,
+    dropHour?: number,
+    isAllDay?: boolean
+  ) => Event | null;
   onCalendarDragOver?: (e: any) => void;
   calendarSignature?: string;
   app: ICalendarApp;
@@ -188,7 +186,10 @@ const constructRenderEvents = (events: Event[], weekStart: Date): Event[] => {
     // the end date should be adjusted to the same day as the start date to avoid misidentifying as a multi-day event
     let adjustedEndDate = new Date(endDate);
     if (!event.allDay) {
-      const endHasTime = end.getHours() !== 0 || end.getMinutes() !== 0 || end.getSeconds() !== 0;
+      const endHasTime =
+        end.getHours() !== 0 ||
+        end.getMinutes() !== 0 ||
+        end.getSeconds() !== 0;
       if (!endHasTime) {
         // The end time is 00:00:00, check the duration
         const durationMs = end.getTime() - start.getTime();
@@ -202,7 +203,8 @@ const constructRenderEvents = (events: Event[], weekStart: Date): Event[] => {
     }
 
     // Check if it is a multi-day event (using the adjusted end date)
-    const isMultiDay = startDate.toDateString() !== adjustedEndDate.toDateString();
+    const isMultiDay =
+      startDate.toDateString() !== adjustedEndDate.toDateString();
 
     // Multi-day regular events: rendered through segment, skipping here
     if (isMultiDay && !event.allDay) {
@@ -314,7 +316,11 @@ const WeekComponent = memo(
 
     const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
     const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
-    const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+    const [contextMenu, setContextMenu] = useState<{
+      x: number;
+      y: number;
+      date: Date;
+    } | null>(null);
 
     const handleContextMenu = (e: any, date: Date) => {
       e.preventDefault();
@@ -328,10 +334,16 @@ const WeekComponent = memo(
       if (availableHeight <= 0) return { maxSlots: 0, maxSlotsWithMore: 0 };
 
       const hardCap = 4;
-      const maxSlots = Math.min(hardCap, Math.floor(availableHeight / ROW_SPACING));
+      const maxSlots = Math.min(
+        hardCap,
+        Math.floor(availableHeight / ROW_SPACING)
+      );
 
       const spaceForMore = availableHeight - MORE_TEXT_HEIGHT;
-      const maxSlotsWithMore = Math.min(hardCap, Math.max(0, Math.floor(spaceForMore / ROW_SPACING)));
+      const maxSlotsWithMore = Math.min(
+        hardCap,
+        Math.max(0, Math.floor(spaceForMore / ROW_SPACING))
+      );
 
       return { maxSlots, maxSlotsWithMore };
     }, [weekHeight]);
@@ -399,7 +411,11 @@ const WeekComponent = memo(
 
       organizedMultiDaySegments.forEach((layer, layerIndex) => {
         layer.forEach(segment => {
-          for (let dayIndex = segment.startDayIndex; dayIndex <= segment.endDayIndex; dayIndex++) {
+          for (
+            let dayIndex = segment.startDayIndex;
+            dayIndex <= segment.endDayIndex;
+            dayIndex++
+          ) {
             counts[dayIndex] = Math.max(counts[dayIndex], layerIndex + 1);
           }
         });
@@ -411,11 +427,18 @@ const WeekComponent = memo(
     // Track which specific layers are occupied by multi-day events for each day
     // This allows single-day events to fill "gaps" in the multi-day event layers
     const dayOccupiedLayers = useMemo(() => {
-      const occupied: Set<number>[] = Array.from({ length: 7 }, () => new Set());
+      const occupied: Set<number>[] = Array.from(
+        { length: 7 },
+        () => new Set()
+      );
 
       organizedMultiDaySegments.forEach((layer, layerIndex) => {
         layer.forEach(segment => {
-          for (let dayIndex = segment.startDayIndex; dayIndex <= segment.endDayIndex; dayIndex++) {
+          for (
+            let dayIndex = segment.startDayIndex;
+            dayIndex <= segment.endDayIndex;
+            dayIndex++
+          ) {
             if (dayIndex >= 0 && dayIndex < 7) {
               occupied[dayIndex].add(layerIndex);
             }
@@ -437,12 +460,18 @@ const WeekComponent = memo(
         // Get events for this day from constructedRenderEvents
         const dayEvents = constructedRenderEvents.filter(event => {
           if (!event.start || !event.end) {
-            return temporalToDate(event.start).toDateString() === day.date.toDateString();
+            return (
+              temporalToDate(event.start).toDateString() ===
+              day.date.toDateString()
+            );
           }
           const startDate = temporalToDate(event.start);
           const endDate = temporalToDate(event.end);
           if (!event.allDay) {
-            const endHasTime = endDate.getHours() !== 0 || endDate.getMinutes() !== 0 || endDate.getSeconds() !== 0;
+            const endHasTime =
+              endDate.getHours() !== 0 ||
+              endDate.getMinutes() !== 0 ||
+              endDate.getSeconds() !== 0;
             if (!endHasTime) {
               const durationMs = endDate.getTime() - startDate.getTime();
               const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -460,7 +489,9 @@ const WeekComponent = memo(
         // Filter out all-day events that have segments (they're already counted in multi-day layers)
         const timedEvents = dayEvents.filter(event => {
           if (!event.allDay) return true;
-          const hasSegment = allSegments.some(seg => seg.originalEventId === event.id);
+          const hasSegment = allSegments.some(
+            seg => seg.originalEventId === event.id
+          );
           return !hasSegment;
         });
         // Calculate total slots needed considering that timed events can fill gaps
@@ -475,7 +506,7 @@ const WeekComponent = memo(
         }
         // Timed events first fill gaps, then extend beyond maxOccupiedLayer
         const timedEventsAfterGaps = Math.max(0, timedEvents.length - gapCount);
-        const totalVisualSlots = (maxOccupiedLayer + 1) + timedEventsAfterGaps;
+        const totalVisualSlots = maxOccupiedLayer + 1 + timedEventsAfterGaps;
 
         if (totalVisualSlots > layoutParams.maxSlots) {
           // This day needs "+ x more", so use maxSlotsWithMore for the whole week
@@ -484,7 +515,15 @@ const WeekComponent = memo(
       }
       // No day needs "+ x more", use maxSlots
       return layoutParams.maxSlots;
-    }, [weekData.days, constructedRenderEvents, organizedMultiDaySegments, dayLayerCounts, dayOccupiedLayers, layoutParams.maxSlots, layoutParams.maxSlotsWithMore]);
+    }, [
+      weekData.days,
+      constructedRenderEvents,
+      organizedMultiDaySegments,
+      dayLayerCounts,
+      dayOccupiedLayers,
+      layoutParams.maxSlots,
+      layoutParams.maxSlotsWithMore,
+    ]);
 
     // Calculate the height of the multi-day event area
     const multiDayAreaHeight = useMemo(
@@ -507,7 +546,10 @@ const WeekComponent = memo(
 
         // For normal events, check if they end at midnight and have a duration less than 24 hours
         if (!event.allDay) {
-          const endHasTime = endDate.getHours() !== 0 || endDate.getMinutes() !== 0 || endDate.getSeconds() !== 0;
+          const endHasTime =
+            endDate.getHours() !== 0 ||
+            endDate.getMinutes() !== 0 ||
+            endDate.getSeconds() !== 0;
           if (!endHasTime) {
             const durationMs = endDate.getTime() - startDate.getTime();
             const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -526,14 +568,19 @@ const WeekComponent = memo(
     };
 
     // Render date cell
-    const renderDayCell = (day: (typeof weekData.days)[0], dayIndex: number) => {
+    const renderDayCell = (
+      day: (typeof weekData.days)[0],
+      dayIndex: number
+    ) => {
       // We need to parse currentMonth (localized string) back to month index, OR compare strings
       // Comparing localized month strings is safer than trying to parse back
-      const dayMonthName = day.date.toLocaleDateString(locale, { month: (locale.startsWith('zh') || locale.startsWith('ja')) ? 'short' : 'long' });
+      const dayMonthName = day.date.toLocaleDateString(locale, {
+        month:
+          locale.startsWith('zh') || locale.startsWith('ja') ? 'short' : 'long',
+      });
 
       const belongsToCurrentMonth =
-        dayMonthName === currentMonth &&
-        day.year === currentYear;
+        dayMonthName === currentMonth && day.year === currentYear;
       const dayEvents = getEventsForDay(day.date);
       const sortedEvents = sortDayEvents(dayEvents);
 
@@ -543,7 +590,9 @@ const WeekComponent = memo(
       const timedEventsOnly = sortedEvents.filter(event => {
         if (!event.allDay) return true; // Keep all timed events
         // Check if this all-day event has a segment (rendered separately in overlay)
-        const hasSegment = allSegments.some(seg => seg.originalEventId === event.id);
+        const hasSegment = allSegments.some(
+          seg => seg.originalEventId === event.id
+        );
         return !hasSegment; // Only keep all-day events WITHOUT segments
       });
 
@@ -564,18 +613,32 @@ const WeekComponent = memo(
       // - Remaining timed events extend beyond maxOccupiedLayer
       const totalTimedEvents = timedEventsOnly.length;
       const eventsInGaps = Math.min(totalTimedEvents, gapLayers.length);
-      const eventsAfterMultiDay = Math.max(0, totalTimedEvents - gapLayers.length);
-      const totalSlotsNeeded = Math.max(maxOccupiedLayer + 1, 0) + eventsAfterMultiDay;
+      const eventsAfterMultiDay = Math.max(
+        0,
+        totalTimedEvents - gapLayers.length
+      );
+      const totalSlotsNeeded =
+        Math.max(maxOccupiedLayer + 1, 0) + eventsAfterMultiDay;
 
       // Determine if need "+ x more"
       const hasMoreEvents = totalSlotsNeeded > layoutParams.maxSlots;
-      const displaySlotLimit = hasMoreEvents ? layoutParams.maxSlotsWithMore : layoutParams.maxSlots;
+      const displaySlotLimit = hasMoreEvents
+        ? layoutParams.maxSlotsWithMore
+        : layoutParams.maxSlots;
 
       // Calculate how many timed events can display
       // Available slots for timed events = gaps within limit + slots after maxOccupiedLayer within limit
-      const gapsWithinLimit = gapLayers.filter(l => l < displaySlotLimit).length;
-      const slotsAfterMultiDayWithinLimit = Math.max(0, displaySlotLimit - Math.max(maxOccupiedLayer + 1, 0));
-      const displayCount = Math.min(totalTimedEvents, gapsWithinLimit + slotsAfterMultiDayWithinLimit);
+      const gapsWithinLimit = gapLayers.filter(
+        l => l < displaySlotLimit
+      ).length;
+      const slotsAfterMultiDayWithinLimit = Math.max(
+        0,
+        displaySlotLimit - Math.max(maxOccupiedLayer + 1, 0)
+      );
+      const displayCount = Math.min(
+        totalTimedEvents,
+        gapsWithinLimit + slotsAfterMultiDayWithinLimit
+      );
 
       const displayEvents = timedEventsOnly.slice(0, displayCount);
       const hiddenEventsCount = totalTimedEvents - displayCount;
@@ -645,8 +708,12 @@ const WeekComponent = memo(
           key={`day-${day.date.getTime()}`}
           className={cn(
             monthDayCell,
-            !belongsToCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-100',
-            screenSize !== 'desktop' && dayIndex === 6 ? 'border-r-0' : 'last:border-r'
+            !belongsToCurrentMonth
+              ? 'text-gray-400 dark:text-gray-600'
+              : 'text-gray-800 dark:text-gray-100',
+            screenSize !== 'desktop' && dayIndex === 6
+              ? 'border-r-0'
+              : 'last:border-r'
           )}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
@@ -666,8 +733,12 @@ const WeekComponent = memo(
           }}
           onTouchMove={e => {
             if (longPressTimerRef.current && touchStartPosRef.current) {
-              const dx = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
-              const dy = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
+              const dx = Math.abs(
+                e.touches[0].clientX - touchStartPosRef.current.x
+              );
+              const dy = Math.abs(
+                e.touches[0].clientY - touchStartPosRef.current.y
+              );
               if (dx > 10 || dy > 10) {
                 clearTimeout(longPressTimerRef.current);
                 longPressTimerRef.current = null;
@@ -687,26 +758,27 @@ const WeekComponent = memo(
         >
           {/* Date number area */}
           <div className={monthDateNumberContainer}>
-            {(
+            {
               <span
                 className={`
                     ${monthDateNumber}
-                    ${day.isToday
-                    ? 'bg-primary text-primary-foreground'
-                    : belongsToCurrentMonth
-                      ? 'text-gray-900 dark:text-gray-100'
-                      : 'text-gray-400 dark:text-gray-600'
-                  }
+                    ${
+                      day.isToday
+                        ? 'bg-primary text-primary-foreground'
+                        : belongsToCurrentMonth
+                          ? 'text-gray-900 dark:text-gray-100'
+                          : 'text-gray-400 dark:text-gray-600'
+                    }
                   `}
               >
-                {
-                  day.day === 1 && screenSize === 'desktop' ? (day.date.toLocaleDateString(locale, {
-                    month: 'short',
-                    day: 'numeric',
-                  })) : day.day
-                }
+                {day.day === 1 && screenSize === 'desktop'
+                  ? day.date.toLocaleDateString(locale, {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : day.day}
               </span>
-            )}
+            }
           </div>
 
           {/* Event display area */}
@@ -718,7 +790,9 @@ const WeekComponent = memo(
               <div
                 className={cn(
                   monthMoreEvents,
-                  screenSize === 'desktop' ? 'text-left font-normal' : 'text-center font-medium'
+                  screenSize === 'desktop'
+                    ? 'text-left font-normal'
+                    : 'text-center font-medium'
                 )}
                 onClick={e => {
                   e.stopPropagation();
@@ -730,7 +804,8 @@ const WeekComponent = memo(
                   }
                 }}
               >
-                +{hiddenEventsCount}{screenSize === 'desktop' ? ` ${t('more')}` : ''}
+                +{hiddenEventsCount}
+                {screenSize === 'desktop' ? ` ${t('more')}` : ''}
               </div>
             )}
           </div>
@@ -787,50 +862,55 @@ const WeekComponent = memo(
                   zIndex: 10,
                 }}
               >
-                {organizedMultiDaySegments.slice(0, effectiveMaxLayers).map((layer, layerIndex) => (
-                  <div key={`layer-${layerIndex}`} className="absolute inset-0">
-                    {layer.map(segment => (
-                      <CalendarEvent
-                        key={segment.id}
-                        event={segment.event}
-                        isAllDay={!!segment.event.allDay}
-                        segment={segment}
-                        segmentIndex={layerIndex}
-                        isMonthView={true}
-                        isMultiDay={true}
-                        calendarRef={calendarRef}
-                        hourHeight={72}
-                        firstHour={0}
-                        onEventUpdate={onEventUpdate}
-                        onEventDelete={onEventDelete}
-                        onMoveStart={onMoveStart}
-                        onResizeStart={onResizeStart}
-                        isBeingDragged={
-                          isDragging &&
-                          dragState.eventId === segment.event.id &&
-                          dragState.mode === 'move'
-                        }
-                        isBeingResized={
-                          isDragging &&
-                          dragState.eventId === segment.event.id &&
-                          dragState.mode === 'resize'
-                        }
-                        newlyCreatedEventId={newlyCreatedEventId}
-                        onDetailPanelOpen={onDetailPanelOpen}
-                        selectedEventId={selectedEventId}
-                        onEventSelect={onEventSelect}
-                        onEventLongPress={onEventLongPress}
-                        detailPanelEventId={detailPanelEventId}
-                        onDetailPanelToggle={onDetailPanelToggle}
-                        customDetailPanelContent={customDetailPanelContent}
-                        customEventDetailDialog={customEventDetailDialog}
-                        app={app}
-                        isMobile={screenSize !== 'desktop'}
-                        enableTouch={enableTouch}
-                      />
-                    ))}
-                  </div>
-                ))}
+                {organizedMultiDaySegments
+                  .slice(0, effectiveMaxLayers)
+                  .map((layer, layerIndex) => (
+                    <div
+                      key={`layer-${layerIndex}`}
+                      className="absolute inset-0"
+                    >
+                      {layer.map(segment => (
+                        <CalendarEvent
+                          key={segment.id}
+                          event={segment.event}
+                          isAllDay={!!segment.event.allDay}
+                          segment={segment}
+                          segmentIndex={layerIndex}
+                          isMonthView={true}
+                          isMultiDay={true}
+                          calendarRef={calendarRef}
+                          hourHeight={72}
+                          firstHour={0}
+                          onEventUpdate={onEventUpdate}
+                          onEventDelete={onEventDelete}
+                          onMoveStart={onMoveStart}
+                          onResizeStart={onResizeStart}
+                          isBeingDragged={
+                            isDragging &&
+                            dragState.eventId === segment.event.id &&
+                            dragState.mode === 'move'
+                          }
+                          isBeingResized={
+                            isDragging &&
+                            dragState.eventId === segment.event.id &&
+                            dragState.mode === 'resize'
+                          }
+                          newlyCreatedEventId={newlyCreatedEventId}
+                          onDetailPanelOpen={onDetailPanelOpen}
+                          selectedEventId={selectedEventId}
+                          onEventSelect={onEventSelect}
+                          onEventLongPress={onEventLongPress}
+                          detailPanelEventId={detailPanelEventId}
+                          onDetailPanelToggle={onDetailPanelToggle}
+                          customDetailPanelContent={customDetailPanelContent}
+                          customEventDetailDialog={customEventDetailDialog}
+                          app={app}
+                          isMobile={screenSize !== 'desktop'}
+                          enableTouch={enableTouch}
+                        />
+                      ))}
+                    </div>
+                  ))}
               </div>
             )}
           </div>
@@ -846,8 +926,8 @@ const WeekComponent = memo(
             onCreateEvent={() => {
               if (onCreateStart) {
                 const syntheticEvent = {
-                  preventDefault: () => { },
-                  stopPropagation: () => { },
+                  preventDefault: () => {},
+                  stopPropagation: () => {},
                   clientX: contextMenu.x,
                   clientY: contextMenu.y,
                 } as unknown as any;

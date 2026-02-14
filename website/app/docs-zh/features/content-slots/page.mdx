@@ -12,14 +12,14 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 
 ## 可用插槽
 
-| 生成器名称 | 描述 | 参数 |
-| :--- | :--- | :--- |
-| `eventContent` | 日历事件卡片的内部内容。 | `{ event, isAllDay, isMobile }` |
-| `eventDetailContent` | 点击事件时弹出的面板/详情内容。 | `{ event, position, onClose }` |
-| `colorPicker` | 侧边栏中使用的小型颜色选择器。 | `{ color, onChange, variant: 'sketch' }` |
+| 生成器名称           | 描述                               | 参数                                                            |
+| :------------------- | :--------------------------------- | :-------------------------------------------------------------- |
+| `eventContent`       | 日历事件卡片的内部内容。           | `{ event, isAllDay, isMobile }`                                 |
+| `eventDetailContent` | 点击事件时弹出的面板/详情内容。    | `{ event, position, onClose }`                                  |
+| `colorPicker`        | 侧边栏中使用的小型颜色选择器。     | `{ color, onChange, variant: 'sketch' }`                        |
 | `colorPickerWrapper` | 对话框中使用功能完整的颜色选择器。 | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `headerContent` | 日历头部（Header）的自定义内容。 | `{ view, date, ... }` |
-| `titleBarSlot` | 侧边栏标题栏中的额外内容。 | `{ isCollapsed, toggleCollapsed }` |
+| `headerContent`      | 日历头部（Header）的自定义内容。   | `{ view, date, ... }`                                           |
+| `titleBarSlot`       | 侧边栏标题栏中的额外内容。         | `{ isCollapsed, toggleCollapsed }`                              |
 
 ## 示例：注入自定义颜色选择器
 
@@ -28,6 +28,7 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 ### React 示例
 
 安装 `react-color`:
+
 ```bash
 npm install react-color
 ```
@@ -42,17 +43,17 @@ function MyCalendar() {
   return (
     <DayFlowCalendar
       calendar={calendar}
-      colorPicker={(args) => (
+      colorPicker={args => (
         <SketchPicker
           color={args.color}
-          onChange={(color) => args.onChange({ hex: color.hex })}
+          onChange={color => args.onChange({ hex: color.hex })}
           width="220px"
         />
       )}
-      colorPickerWrapper={(args) => (
+      colorPickerWrapper={args => (
         <PhotoshopPicker
           color={args.color}
-          onChange={(color) => args.onChange({ hex: color.hex })}
+          onChange={color => args.onChange({ hex: color.hex })}
           onAccept={() => args.onAccept?.()}
           onCancel={() => args.onCancel?.()}
         />
@@ -65,6 +66,7 @@ function MyCalendar() {
 ### Vue 示例
 
 安装 `vue-color`:
+
 ```bash
 npm install vue-color
 ```
@@ -77,14 +79,14 @@ npm install vue-color
     <template #colorPicker="args">
       <Sketch
         :value="args.color"
-        @input="(val) => args.onChange({ hex: val.hex })"
+        @input="val => args.onChange({ hex: val.hex })"
       />
     </template>
-    
+
     <template #colorPickerWrapper="args">
       <Photoshop
         :value="args.color"
-        @input="(val) => args.onChange({ hex: val.hex })"
+        @input="val => args.onChange({ hex: val.hex })"
         @ok="args.onAccept"
         @cancel="args.onCancel"
       />

@@ -1,6 +1,19 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from 'preact/hooks';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from 'preact/hooks';
 import { CalendarApp } from './CalendarApp';
-import { CalendarAppConfig, UseCalendarAppReturn, ViewType, CalendarType, SidebarConfig, ReadOnlyConfig } from '../types';
+import {
+  CalendarAppConfig,
+  UseCalendarAppReturn,
+  ViewType,
+  CalendarType,
+  SidebarConfig,
+  ReadOnlyConfig,
+} from '../types';
 import { Event } from '../types';
 import { isDeepEqual } from '../utils/helpers';
 
@@ -25,7 +38,7 @@ export function useCalendarApp(
   // Component re-render trigger
   const [, forceUpdate] = useState({});
   const updateTimerRef = useRef<number | null>(null);
-  
+
   const triggerUpdate = useCallback(() => {
     if (updateTimerRef.current !== null) return;
     updateTimerRef.current = requestAnimationFrame(() => {
@@ -271,7 +284,8 @@ export function useCalendarApp(
     undo,
     getCalendars: () => app.getCalendars(),
     createCalendar: (calendar: CalendarType) => app.createCalendar(calendar),
-    mergeCalendars: (sourceId: string, targetId: string) => app.mergeCalendars(sourceId, targetId),
+    mergeCalendars: (sourceId: string, targetId: string) =>
+      app.mergeCalendars(sourceId, targetId),
     setCalendarVisibility,
     setAllCalendarsVisibility,
     getAllEvents: () => app.getAllEvents(),

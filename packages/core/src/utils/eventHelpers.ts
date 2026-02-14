@@ -66,7 +66,6 @@ export interface CreateTimezoneEventParams {
   meta?: Record<string, any>;
 }
 
-
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -79,7 +78,10 @@ function normalizeLocalTime(
   allDay: boolean = false
 ): Temporal.PlainDate | Temporal.PlainDateTime {
   // Already Temporal type - return as is
-  if (time instanceof Temporal.PlainDate || time instanceof Temporal.PlainDateTime) {
+  if (
+    time instanceof Temporal.PlainDate ||
+    time instanceof Temporal.PlainDateTime
+  ) {
     return time;
   }
 

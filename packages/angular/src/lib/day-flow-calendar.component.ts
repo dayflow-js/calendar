@@ -1,40 +1,52 @@
-import { 
-  Component, 
-  Input, 
-  ElementRef, 
-  ViewChild, 
-  OnChanges, 
-  OnDestroy, 
+import {
+  Component,
+  Input,
+  ElementRef,
+  ViewChild,
+  OnChanges,
+  OnDestroy,
   AfterViewInit,
   SimpleChanges,
   ChangeDetectionStrategy,
   TemplateRef,
-  ChangeDetectorRef
+  ChangeDetectorRef,
 } from '@angular/core';
-import { 
-  CalendarRenderer, 
-  ICalendarApp, 
-  UseCalendarAppReturn, 
-  CustomRendering 
+import {
+  CalendarRenderer,
+  ICalendarApp,
+  UseCalendarAppReturn,
+  CustomRendering,
 } from '@dayflow/core';
 
 @Component({
   selector: 'dayflow-calendar',
   template: `
     <div #container class="df-calendar-wrapper"></div>
-    
+
     <!-- Hidden area to render Angular templates before they are portaled -->
     <div style="display: none">
-      <ng-container *ngFor="let rendering of customRenderings; trackBy: trackById">
-        <div *ngIf="getTemplate(rendering.generatorName)" [dayflowPortal]="rendering.containerEl">
-          <ng-container *ngTemplateOutlet="getTemplate(rendering.generatorName)!; context: { $implicit: rendering.generatorArgs }"></ng-container>
+      <ng-container
+        *ngFor="let rendering of customRenderings; trackBy: trackById"
+      >
+        <div
+          *ngIf="getTemplate(rendering.generatorName)"
+          [dayflowPortal]="rendering.containerEl"
+        >
+          <ng-container
+            *ngTemplateOutlet="
+              getTemplate(rendering.generatorName)!;
+              context: { $implicit: rendering.generatorArgs }
+            "
+          ></ng-container>
         </div>
       </ng-container>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DayFlowCalendarComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class DayFlowCalendarComponent
+  implements AfterViewInit, OnChanges, OnDestroy
+{
   @Input() calendar!: ICalendarApp | UseCalendarAppReturn;
 
   // Templates for custom content injection
@@ -80,10 +92,12 @@ export class DayFlowCalendarComponent implements AfterViewInit, OnChanges, OnDes
     this.renderer = new CalendarRenderer(this.app);
     this.renderer.mount(this.container.nativeElement);
 
-    this.unsubscribe = this.renderer.getCustomRenderingStore().subscribe((renderings) => {
-      this.customRenderings = Array.from(renderings.values());
-      this.cdr.markForCheck();
-    });
+    this.unsubscribe = this.renderer
+      .getCustomRenderingStore()
+      .subscribe(renderings => {
+        this.customRenderings = Array.from(renderings.values());
+        this.cdr.markForCheck();
+      });
   }
 
   private destroyCalendar() {
@@ -102,7 +116,7 @@ export class DayFlowCalendarComponent implements AfterViewInit, OnChanges, OnDes
       createCalendarDialog: this.createCalendarDialog,
       titleBarSlot: this.titleBarSlot,
       colorPicker: this.colorPicker,
-      colorPickerWrapper: this.colorPickerWrapper
+      colorPickerWrapper: this.colorPickerWrapper,
     };
     return templates[name] || null;
   }

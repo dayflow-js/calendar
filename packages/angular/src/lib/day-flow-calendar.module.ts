@@ -4,16 +4,8 @@ import { DayFlowCalendarComponent } from './day-flow-calendar.component';
 import { DayFlowPortalDirective } from './day-flow-portal.directive';
 
 @NgModule({
-  declarations: [
-    DayFlowCalendarComponent,
-    DayFlowPortalDirective
-  ],
-  imports: [
-    CommonModule
-  ],
-  exports: [
-    DayFlowCalendarComponent,
-    DayFlowPortalDirective
-  ]
+  declarations: [DayFlowCalendarComponent, DayFlowPortalDirective],
+  imports: [CommonModule],
+  exports: [DayFlowCalendarComponent, DayFlowPortalDirective],
 })
-export class DayFlowCalendarModule { }
+export class DayFlowCalendarModule {}

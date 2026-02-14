@@ -27,12 +27,16 @@ const es: Locale = {
     newAllDayCalendarEvent: 'Nuevo evento de todo el día en {calendarName}',
     save: 'Guardar',
     deleteCalendar: '¿Eliminar "{calendarName}"?',
-    deleteCalendarMessage: '¿Quieres eliminar "{calendarName}" o fusionar sus eventos en otro calendario existente?',
+    deleteCalendarMessage:
+      '¿Quieres eliminar "{calendarName}" o fusionar sus eventos en otro calendario existente?',
     merge: 'Fusionar',
-    confirmDeleteTitle: '¿Seguro que quieres eliminar el calendario "{calendarName}"?',
-    confirmDeleteMessage: 'Si eliminas este calendario, también se eliminarán todos los eventos asociados.',
+    confirmDeleteTitle:
+      '¿Seguro que quieres eliminar el calendario "{calendarName}"?',
+    confirmDeleteMessage:
+      'Si eliminas este calendario, también se eliminarán todos los eventos asociados.',
     mergeConfirmTitle: '¿Fusionar "{sourceName}" con "{targetName}"?',
-    mergeConfirmMessage: '¿Seguro que quieres fusionar "{sourceName}" con "{targetName}"? Esto moverá todos los eventos de "{sourceName}" a "{targetName}" y se eliminará "{sourceName}". Esta acción no se puede deshacer.',
+    mergeConfirmMessage:
+      '¿Seguro que quieres fusionar "{sourceName}" con "{targetName}"? Esto moverá todos los eventos de "{sourceName}" a "{targetName}" y se eliminará "{sourceName}". Esta acción no se puede deshacer.',
     expandSidebar: 'Expandir barra lateral del calendario',
     collapseSidebar: 'Contraer barra lateral del calendario',
     calendars: 'Calendarios',
@@ -61,13 +65,14 @@ const es: Locale = {
     importCalendar: 'Importar calendario',
     exportCalendar: 'Exportar calendario',
     addSchedule: 'Añadir evento',
-    importCalendarMessage: 'Este calendario contiene nuevos eventos. Seleccione un calendario de destino.',
+    importCalendarMessage:
+      'Este calendario contiene nuevos eventos. Seleccione un calendario de destino.',
     ok: 'Aceptar',
     cut: 'Cortar',
     copy: 'Copiar',
     pasteHere: 'Pegar aquí',
     eventSummary: 'Resumen',
-  }
+  },
 };
 
 export default es;

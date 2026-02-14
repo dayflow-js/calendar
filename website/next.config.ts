@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import nextra from 'nextra';
 import path from 'path';
 
@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
-  webpack: (config) => {
+  webpack: config => {
     config.resolve.fallback = { fs: false, path: false };
     return config;
   },

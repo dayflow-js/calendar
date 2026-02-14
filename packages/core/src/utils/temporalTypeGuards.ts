@@ -14,9 +14,7 @@ import { Temporal } from 'temporal-polyfill';
 /**
  * Check if temporal is PlainDate (date only, no time)
  */
-export function isPlainDate(
-  temporal: any
-): temporal is Temporal.PlainDate {
+export function isPlainDate(temporal: any): temporal is Temporal.PlainDate {
   return (
     temporal !== null &&
     typeof temporal === 'object' &&
@@ -68,7 +66,11 @@ export function isZonedDateTime(
  * Handles all three Temporal types and native Date uniformly
  */
 export function temporalToDate(
-  temporal: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime | Date
+  temporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date
 ): Date {
   if (temporal instanceof Date) {
     return temporal;
@@ -101,9 +103,21 @@ export function temporalToDate(
         return new Date(instant.epochMilliseconds);
       }
       // Fallback for plain objects that look like ZonedDateTime (from JSON)
-      return new Date(temporal.year, temporal.month - 1, temporal.day, temporal.hour, temporal.minute);
+      return new Date(
+        temporal.year,
+        temporal.month - 1,
+        temporal.day,
+        temporal.hour,
+        temporal.minute
+      );
     } catch (e) {
-      return new Date(temporal.year, temporal.month - 1, temporal.day, temporal.hour, temporal.minute);
+      return new Date(
+        temporal.year,
+        temporal.month - 1,
+        temporal.day,
+        temporal.hour,
+        temporal.minute
+      );
     }
   }
 
@@ -187,7 +201,11 @@ export function plainDateToDate(pd: Temporal.PlainDate): Date {
  * @returns Hour number (0-24, with decimals, e.g., 14.5 = 14:30)
  */
 export function extractHourFromTemporal(
-  temporal: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime | Date
+  temporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date
 ): number {
   if (temporal instanceof Date) {
     return temporal.getHours() + temporal.getMinutes() / 60;
@@ -216,11 +234,21 @@ export function setHourInTemporal(
   const minutes = Math.round((hour - hours) * 60);
 
   if (isZonedDateTime(temporal)) {
-    return temporal.with({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
+    return temporal.with({
+      hour: hours,
+      minute: minutes,
+      second: 0,
+      millisecond: 0,
+    });
   }
 
   // PlainDateTime
-  return temporal.with({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
+  return temporal.with({
+    hour: hours,
+    minute: minutes,
+    second: 0,
+    millisecond: 0,
+  });
 }
 
 // ============================================================================
@@ -231,8 +259,16 @@ export function setHourInTemporal(
  * Check if two Temporal objects represent the same day
  */
 export function isSameTemporal(
-  t1: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime | Date,
-  t2: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime | Date
+  t1:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date,
+  t2:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date
 ): boolean {
   if (t1 instanceof Date && t2 instanceof Date) {
     return (
@@ -253,7 +289,11 @@ export function isSameTemporal(
  * Get PlainDate from any Temporal type or Date
  */
 export function getPlainDate(
-  temporal: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime | Date
+  temporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date
 ): Temporal.PlainDate {
   if (temporal instanceof Date) {
     return dateToPlainDate(temporal);

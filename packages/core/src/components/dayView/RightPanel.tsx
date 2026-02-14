@@ -66,10 +66,7 @@ export const RightPanel = ({
         <div className={miniCalendarContainer}>
           <div>
             <div className="flex items-center justify-end gap-2">
-              <div
-                className={headerContainer}
-                style={{ position: 'relative' }}
-              >
+              <div className={headerContainer} style={{ position: 'relative' }}>
                 <div>
                   <h1 className={headerTitle}>&nbsp;</h1>
                 </div>
@@ -93,7 +90,9 @@ export const RightPanel = ({
         {/* Event details area */}
         <div className={`flex-1 overflow-y-auto`}>
           <div className={`${p4}`}>
-            <h3 className={`${textLg} font-semibold ${mb3} sticky top-0 bg-white dark:bg-gray-900 z-10 py-2`}>
+            <h3
+              className={`${textLg} font-semibold ${mb3} sticky top-0 bg-white dark:bg-gray-900 z-10 py-2`}
+            >
               {currentDate.toLocaleDateString(locale, {
                 weekday: 'long',
                 month: 'long',
@@ -102,9 +101,7 @@ export const RightPanel = ({
             </h3>
 
             {sortedEvents.length === 0 ? (
-              <p className={`${textGray500} ${textSm}`}>
-                {t('noEvents')}
-              </p>
+              <p className={`${textGray500} ${textSm}`}>{t('noEvents')}</p>
             ) : (
               <div className="space-y-2">
                 {sortedEvents.map((event: any) => (
@@ -131,7 +128,9 @@ export const RightPanel = ({
                       </div>
                     )}
                     {event.allDay && (
-                      <div className={`${textXs} ${textGray600}`}>{t('allDay')}</div>
+                      <div className={`${textXs} ${textGray600}`}>
+                        {t('allDay')}
+                      </div>
                     )}
                   </div>
                 ))}

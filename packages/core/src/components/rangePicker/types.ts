@@ -6,7 +6,7 @@ export type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
 export interface RangePickerProps {
   value: [
     Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
-    Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+    Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
   ];
   format?: string;
   showTimeFormat?: string;

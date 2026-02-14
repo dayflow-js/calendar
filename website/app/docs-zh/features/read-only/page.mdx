@@ -22,16 +22,16 @@ const calendar = useCalendarApp({
   views: [createMonthView()],
   readOnly: {
     draggable: false, // 禁用拖拽
-    viewable: true,   // 允许点击查看事件详情（只读模式）
+    viewable: true, // 允许点击查看事件详情（只读模式）
   },
 });
 ```
 
 ### 配置选项
 
-| 选项 | 类型 | 描述 |
-| :--- | :--- | :--- |
-| `draggable` | `boolean` | 是否可以通过拖拽移动事件或调整其大小。 |
-| `viewable` | `boolean` | 是否可以查看事件详情（打开详情面板/对话框）。 |
+| 选项        | 类型      | 描述                                          |
+| :---------- | :-------- | :-------------------------------------------- |
+| `draggable` | `boolean` | 是否可以通过拖拽移动事件或调整其大小。        |
+| `viewable`  | `boolean` | 是否可以查看事件详情（打开详情面板/对话框）。 |
 
 当 `readOnly` 激活时，日历还会隐藏“创建”按钮和其他通常会触发更改的 UI 元素。

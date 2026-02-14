@@ -10,10 +10,7 @@ import type { TranslationKey, LocaleCode } from './types';
  * 3. Fall back to English dictionary.
  * 4. Fall back to the key itself.
  */
-export function t(
-  key: TranslationKey,
-  locale: LocaleCode = 'en-US'
-): string {
+export function t(key: TranslationKey, locale: LocaleCode = 'en-US'): string {
   // 1. Try Intl API for specific keys
   if (['today', 'day', 'week', 'month', 'year'].includes(key)) {
     const intl = getIntlLabel(key as any, locale);

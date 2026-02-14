@@ -37,7 +37,12 @@ export function InteractiveCalendar() {
   const dragPlugin = createDragPlugin();
 
   const views = useMemo(
-    () => [createDayView(), createWeekView(), createMonthView(), createYearView({ mode: 'fixed-week' })],
+    () => [
+      createDayView(),
+      createWeekView(),
+      createMonthView(),
+      createYearView({ mode: 'fixed-week' }),
+    ],
     []
   );
 
@@ -70,9 +75,7 @@ export function InteractiveCalendar() {
 
   return (
     <div className="w-full">
-      <DayFlowCalendar
-        calendar={calendar}
-      />
+      <DayFlowCalendar calendar={calendar} />
       <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
         <strong>Tip:</strong> Try dragging events across weeks, resizing them in
         Week view, or switching to Month view to see all-day scheduling in

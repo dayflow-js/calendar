@@ -7,7 +7,7 @@ import {
   groupSearchResults,
   getSearchHeaderInfo,
   getDateObj,
-  normalizeDate
+  normalizeDate,
 } from '../../utils/searchUtils';
 
 interface SearchResultsListProps {
@@ -67,22 +67,32 @@ const SearchResultsList = ({
 
   return (
     <div className="space-y-6">
-      {groupedEvents.map((group) => {
-        const { title, colorClass } = getSearchHeaderInfo(group.date, today, locale, t);
+      {groupedEvents.map(group => {
+        const { title, colorClass } = getSearchHeaderInfo(
+          group.date,
+          today,
+          locale,
+          t
+        );
 
         return (
           <div key={group.date.getTime()}>
-            <h3 className={`px-2 text-sm font-medium mb-4 sticky top-0 bg-white dark:bg-gray-900 py-1 z-10 ${colorClass} border-b border-gray-200 dark:border-gray-700`}>
+            <h3
+              className={`px-2 text-sm font-medium mb-4 sticky top-0 bg-white dark:bg-gray-900 py-1 z-10 ${colorClass} border-b border-gray-200 dark:border-gray-700`}
+            >
               {title}
             </h3>
             <div className="flex flex-col">
-              {group.events.map((event) => {
+              {group.events.map(event => {
                 const start = getTime(event.start);
                 const end = getTime(event.end);
 
-                const timeOpt: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+                const timeOpt: Intl.DateTimeFormatOptions = {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                };
                 const startTimeStr = event.allDay
-                  ? (t('allDay') || 'All Day')
+                  ? t('allDay') || 'All Day'
                   : start.toLocaleTimeString(locale, timeOpt);
                 const endTimeStr = event.allDay
                   ? ''

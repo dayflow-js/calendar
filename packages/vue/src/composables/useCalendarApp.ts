@@ -1,9 +1,15 @@
 import { onUnmounted, reactive } from 'vue';
-import { CalendarApp, CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+import {
+  CalendarApp,
+  CalendarAppConfig,
+  UseCalendarAppReturn,
+} from '@dayflow/core';
 
-export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn {
+export function useCalendarApp(
+  config: CalendarAppConfig
+): UseCalendarAppReturn {
   const app = new CalendarApp(config);
-  
+
   // Use reactive state to trigger Vue re-renders
   const state = reactive({
     currentView: app.state.currentView,
@@ -11,7 +17,7 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
     events: app.getEvents(),
   });
 
-  const unsubscribe = app.subscribe((updatedApp) => {
+  const unsubscribe = app.subscribe(updatedApp => {
     state.currentView = updatedApp.state.currentView;
     state.currentDate = updatedApp.state.currentDate;
     state.events = updatedApp.getEvents();
@@ -24,10 +30,16 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
   return {
     app,
     // Use computed or simple reactive access
-    get currentView() { return state.currentView },
-    get currentDate() { return state.currentDate },
-    get events() { return state.events },
-    
+    get currentView() {
+      return state.currentView;
+    },
+    get currentDate() {
+      return state.currentDate;
+    },
+    get events() {
+      return state.events;
+    },
+
     // Bind methods to app
     applyEventsChanges: app.applyEventsChanges.bind(app),
     changeView: app.changeView.bind(app),
@@ -49,7 +61,11 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
     highlightEvent: app.highlightEvent.bind(app),
     setVisibleMonth: app.setVisibleMonth.bind(app),
     getVisibleMonth: app.getVisibleMonth.bind(app),
-    get sidebarConfig() { return app.getSidebarConfig() },
-    get readOnlyConfig() { return app.getReadOnlyConfig() },
+    get sidebarConfig() {
+      return app.getSidebarConfig();
+    },
+    get readOnlyConfig() {
+      return app.getReadOnlyConfig();
+    },
   } as UseCalendarAppReturn;
 }

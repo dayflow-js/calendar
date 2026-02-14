@@ -1,7 +1,10 @@
 // Shared utility hook providing common utility functions for drag operations
 import { useCallback, useMemo } from 'preact/hooks';
 import { useDragProps, ViewType, UseDragCommonReturn } from '../../types';
-import { daysDifference as utilsDaysDifference, addDays as utilsAddDays } from '../../utils';
+import {
+  daysDifference as utilsDaysDifference,
+  addDays as utilsAddDays,
+} from '../../utils';
 
 export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
   const {
@@ -46,7 +49,8 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
     (x: number) => {
       if (isMonthView || !calendarRef.current) return 0;
 
-      const calendarContent = calendarRef.current.querySelector('.calendar-content');
+      const calendarContent =
+        calendarRef.current.querySelector('.calendar-content');
       if (!calendarContent) return 0;
 
       const contentRect = calendarContent.getBoundingClientRect();
@@ -55,7 +59,7 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
 
       if (isWeekView) {
         // WeekView on mobile has 175% width
-        const totalWidth = (isMobile) ? containerWidth * 1.75 : containerWidth;
+        const totalWidth = isMobile ? containerWidth * 1.75 : containerWidth;
         const dayColumnWidth = totalWidth / 7;
 
         // Determine relative X including scroll
@@ -102,12 +106,9 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
   const ONE_DAY_MS = useMemo(() => 24 * 60 * 60 * 1000, []);
 
   // Use unified functions from utils
-  const daysDifference = useCallback(
-    (date1: Date, date2: Date): number => {
-      return utilsDaysDifference(date1, date2);
-    },
-    []
-  );
+  const daysDifference = useCallback((date1: Date, date2: Date): number => {
+    return utilsDaysDifference(date1, date2);
+  }, []);
 
   const addDaysToDate = useCallback((date: Date, days: number): Date => {
     return utilsAddDays(date, days);

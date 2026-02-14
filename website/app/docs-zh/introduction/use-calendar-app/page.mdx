@@ -28,24 +28,24 @@ export function TeamCalendar() {
 
 ## 配置概览
 
-| 选项                   | 类型                       | 必需 | 默认值              | 描述                                                                  |
-| ---------------------- | -------------------------- | ---- | ------------------- | --------------------------------------------------------------------- |
-| `views`                | `CalendarView[]`           | 必填 | —                   | 注册视图定义（例如 `createMonthView()`）。至少需要一个视图            |
-| `plugins`              | `CalendarPlugin[]`         | 可选 | `[]`                | 安装可选插件（拖拽辅助、快捷键等）。每个插件在安装期间接收 app 实例   |
-| `events`               | `Event[]`                  | 可选 | `[]`                | 初始事件数据。之后使用 `addEvent`/`updateEvent` 来修改状态            |
-| `callbacks`            | `CalendarCallbacks`        | 可选 | `{}`                | 在视图、日期或事件更改时触发的生命周期钩子——非常适合与 API 同步       |
-| `defaultView`          | `ViewType`                 | 可选 | `ViewType.WEEK`     | 首先加载的视图；必须存在于 `views` 中                                 |
-| `initialDate`          | `Date`                     | 可选 | `new Date()`        | 起始焦点日期（也初始化可见月份计算）                                  |
-| `switcherMode`         | `'buttons' \| 'select'`    | 可选 | `'buttons'`         | 控制内置视图切换器在标题中的渲染方式                                  |
-| `calendars`            | `CalendarType[]`           | 可选 | `[]`                | 注册日历类别（工作、个人等）及其颜色和可见性                          |
-| `defaultCalendar`      | `string`                   | 可选 | 第一个可见日历      | 创建新事件时使用的 ID                                                 |
-| `theme`                | `ThemeConfig`              | 可选 | `{ mode: 'light' }` | 设置全局主题模式和可选的令牌覆盖                                      |
-| `locale`               | `string \| Locale`         | 可选 | `'en-US'`           | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。 |
-| `useSidebar`           | `boolean \| SidebarConfig` | 可选 | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                      |
-| `useEventDetailDialog` | `boolean`                  | 可选 | `false`             | 启用默认模态详情对话框而不是内联面板                                  |
-| `useCalendarHeader`    | `boolean \| Function`      | 可选 | `true`              | 启用默认页眉、隐藏页眉（`false`）或提供自定义渲染函数                 |
-| `readOnly`             | `boolean \| ReadOnlyConfig`| 可选 | `false`             | 禁用交互。可以是布尔值，也可以是用于细粒度控制（拖拽/查看）的配置对象 |
-| `customMobileEventRenderer` | `MobileEventRenderer` | 可选 | —                   | 用于替换默认移动端事件抽屉/对话框的自定义组件                         |
+| 选项                        | 类型                        | 必需 | 默认值              | 描述                                                                  |
+| --------------------------- | --------------------------- | ---- | ------------------- | --------------------------------------------------------------------- |
+| `views`                     | `CalendarView[]`            | 必填 | —                   | 注册视图定义（例如 `createMonthView()`）。至少需要一个视图            |
+| `plugins`                   | `CalendarPlugin[]`          | 可选 | `[]`                | 安装可选插件（拖拽辅助、快捷键等）。每个插件在安装期间接收 app 实例   |
+| `events`                    | `Event[]`                   | 可选 | `[]`                | 初始事件数据。之后使用 `addEvent`/`updateEvent` 来修改状态            |
+| `callbacks`                 | `CalendarCallbacks`         | 可选 | `{}`                | 在视图、日期或事件更改时触发的生命周期钩子——非常适合与 API 同步       |
+| `defaultView`               | `ViewType`                  | 可选 | `ViewType.WEEK`     | 首先加载的视图；必须存在于 `views` 中                                 |
+| `initialDate`               | `Date`                      | 可选 | `new Date()`        | 起始焦点日期（也初始化可见月份计算）                                  |
+| `switcherMode`              | `'buttons' \| 'select'`     | 可选 | `'buttons'`         | 控制内置视图切换器在标题中的渲染方式                                  |
+| `calendars`                 | `CalendarType[]`            | 可选 | `[]`                | 注册日历类别（工作、个人等）及其颜色和可见性                          |
+| `defaultCalendar`           | `string`                    | 可选 | 第一个可见日历      | 创建新事件时使用的 ID                                                 |
+| `theme`                     | `ThemeConfig`               | 可选 | `{ mode: 'light' }` | 设置全局主题模式和可选的令牌覆盖                                      |
+| `locale`                    | `string \| Locale`          | 可选 | `'en-US'`           | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。 |
+| `useSidebar`                | `boolean \| SidebarConfig`  | 可选 | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                      |
+| `useEventDetailDialog`      | `boolean`                   | 可选 | `false`             | 启用默认模态详情对话框而不是内联面板                                  |
+| `useCalendarHeader`         | `boolean \| Function`       | 可选 | `true`              | 启用默认页眉、隐藏页眉（`false`）或提供自定义渲染函数                 |
+| `readOnly`                  | `boolean \| ReadOnlyConfig` | 可选 | `false`             | 禁用交互。可以是布尔值，也可以是用于细粒度控制（拖拽/查看）的配置对象 |
+| `customMobileEventRenderer` | `MobileEventRenderer`       | 可选 | —                   | 用于替换默认移动端事件抽屉/对话框的自定义组件                         |
 
 ## 核心选项说明
 

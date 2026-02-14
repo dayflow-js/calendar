@@ -24,9 +24,7 @@ import {
 } from '../../utils/temporal';
 
 // Helper function to get client coordinates from Mouse or Touch events
-const getClientCoordinates = (
-  e: any
-) => {
+const getClientCoordinates = (e: any) => {
   let clientX, clientY;
   if ('touches' in e && e.touches.length > 0) {
     clientX = e.touches[0].clientX;
@@ -80,7 +78,8 @@ export const useDragHandlers = (
     getTargetDateFromPosition,
   } = common;
 
-  const isDateGridView = viewType === ViewType.MONTH || viewType === ViewType.YEAR;
+  const isDateGridView =
+    viewType === ViewType.MONTH || viewType === ViewType.YEAR;
   const isDayView = viewType === ViewType.DAY;
 
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -123,7 +122,8 @@ export const useDragHandlers = (
       const drag = dragRef.current;
       if (!drag) return;
       if (drag.mode === 'move' && !isDraggable) return;
-      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable) return;
+      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable)
+        return;
 
       // Prevent scrolling on touch devices
       if (e.cancelable) {
@@ -301,7 +301,8 @@ export const useDragHandlers = (
     const isEditable = !app?.state.readOnly;
 
     if (drag.mode === 'move' && !isDraggable) return;
-    if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable) return;
+    if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable)
+      return;
 
     document.body.style.cursor = 'default';
 
@@ -309,7 +310,9 @@ export const useDragHandlers = (
     if (drag.mode === 'move' && !drag.indicatorVisible) {
       document.removeEventListener('mousemove', handleUniversalDragMove);
       document.removeEventListener('mouseup', handleUniversalDragEnd);
-      document.removeEventListener('touchmove', handleUniversalDragMove, { capture: true });
+      document.removeEventListener('touchmove', handleUniversalDragMove, {
+        capture: true,
+      });
       document.removeEventListener('touchend', handleUniversalDragEnd);
       resetDragState();
       return;
@@ -356,9 +359,7 @@ export const useDragHandlers = (
 
           const newEndDate = new Date(newStartDate);
           if (drag.eventDurationDays && drag.eventDurationDays > 0) {
-            newEndDate.setDate(
-              newEndDate.getDate() + drag.eventDurationDays
-            );
+            newEndDate.setDate(newEndDate.getDate() + drag.eventDurationDays);
           }
 
           newStart = dateToPlainDate(newStartDate);
@@ -422,7 +423,9 @@ export const useDragHandlers = (
 
     document.removeEventListener('mousemove', handleUniversalDragMove);
     document.removeEventListener('mouseup', handleUniversalDragEnd);
-    document.removeEventListener('touchmove', handleUniversalDragMove, { capture: true });
+    document.removeEventListener('touchmove', handleUniversalDragMove, {
+      capture: true,
+    });
     document.removeEventListener('touchend', handleUniversalDragEnd);
     removeDragIndicator();
     resetDragState();
@@ -447,7 +450,8 @@ export const useDragHandlers = (
       const isEditable = !app?.state.readOnly;
 
       if (drag.mode === 'move' && !isDraggable) return;
-      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable) return;
+      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable)
+        return;
 
       // Prevent scrolling on touch devices
       if (e.cancelable) {
@@ -572,11 +576,11 @@ export const useDragHandlers = (
               prev.map(event =>
                 event.id === drag.eventId
                   ? {
-                    ...event,
-                    start: newStartTemporal,
-                    end: newEndTemporal,
-                    title: event.title,
-                  }
+                      ...event,
+                      start: newStartTemporal,
+                      end: newEndTemporal,
+                      title: event.title,
+                    }
                   : event
               ),
             drag.mode
@@ -637,7 +641,9 @@ export const useDragHandlers = (
           }
 
           // Update day index based on horizontal position
-          const newDayIndex = isDayView ? drag.dayIndex : getColumnDayIndex(clientX);
+          const newDayIndex = isDayView
+            ? drag.dayIndex
+            : getColumnDayIndex(clientX);
           drag.dayIndex = newDayIndex;
 
           updateDragIndicator(newDayIndex, 0, 0, true);
@@ -861,7 +867,10 @@ export const useDragHandlers = (
             const [newStartHour, newEndHour] =
               clientY < drag.startY
                 ? [newHour, Math.max(newHour + TIME_STEP, drag.endHour)]
-                : [drag.startHour, Math.max(drag.startHour + TIME_STEP, newHour)];
+                : [
+                    drag.startHour,
+                    Math.max(drag.startHour + TIME_STEP, newHour),
+                  ];
 
             drag.startHour = newStartHour;
             drag.endHour = newEndHour;
@@ -955,15 +964,21 @@ export const useDragHandlers = (
       const isEditable = !app?.state.readOnly;
 
       if (drag.mode === 'move' && !isDraggable) return;
-      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable) return;
+      if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable)
+        return;
 
       document.body.style.cursor = 'default';
 
       // If dragging but threshold not met (indicator not visible), treat as click/cancel
-      if ((drag.mode === 'move' || drag.mode === 'create') && !drag.indicatorVisible) {
+      if (
+        (drag.mode === 'move' || drag.mode === 'create') &&
+        !drag.indicatorVisible
+      ) {
         document.removeEventListener('mousemove', handleDragMove);
         document.removeEventListener('mouseup', handleDragEnd);
-        document.removeEventListener('touchmove', handleDragMove, { capture: true });
+        document.removeEventListener('touchmove', handleDragMove, {
+          capture: true,
+        });
         document.removeEventListener('touchend', handleDragEnd);
         resetDragState();
         return;
@@ -1006,11 +1021,11 @@ export const useDragHandlers = (
             prev.map(event =>
               event.id === drag.eventId
                 ? {
-                  ...event,
-                  start: newStartTemporal,
-                  end: newEndTemporal,
-                  title: event.title,
-                }
+                    ...event,
+                    start: newStartTemporal,
+                    end: newEndTemporal,
+                    title: event.title,
+                  }
                 : event
             )
           );
@@ -1021,7 +1036,9 @@ export const useDragHandlers = (
               ? temporalToDate(drag.originalEvent.start)
               : null;
 
-            const hasMoved = originalEventStart && originalEventStart.getTime() !== drag.originalStartDate.getTime();
+            const hasMoved =
+              originalEventStart &&
+              originalEventStart.getTime() !== drag.originalStartDate.getTime();
 
             if (hasMoved) {
               // Update state at drag end (month view)
@@ -1049,19 +1066,18 @@ export const useDragHandlers = (
                 prev.map(event =>
                   event.id === drag.eventId
                     ? {
-                      ...event,
-                      start: newStartTemporal,
-                      end: newEndTemporal,
-                      title: event.title,
-                    }
+                        ...event,
+                        start: newStartTemporal,
+                        end: newEndTemporal,
+                        title: event.title,
+                      }
                     : event
                 )
               );
             }
           } else {
             const finalTargetDate =
-              getTargetDateFromPosition(clientX, clientY) ||
-              drag.targetDate;
+              getTargetDateFromPosition(clientX, clientY) || drag.targetDate;
             if (drag.eventId && finalTargetDate) {
               // Update state at drag end (month view)
               setDragState(prev => {
@@ -1187,9 +1203,9 @@ export const useDragHandlers = (
               prev.map(event =>
                 event.id === drag.eventId
                   ? {
-                    ...event,
-                    day: drag.dayIndex,
-                  }
+                      ...event,
+                      day: drag.dayIndex,
+                    }
                   : event
               )
             );
@@ -1202,7 +1218,9 @@ export const useDragHandlers = (
 
       document.removeEventListener('mousemove', handleDragMove);
       document.removeEventListener('mouseup', handleDragEnd);
-      document.removeEventListener('touchmove', handleDragMove, { capture: true });
+      document.removeEventListener('touchmove', handleDragMove, {
+        capture: true,
+      });
       document.removeEventListener('touchend', handleDragEnd);
       removeDragIndicator();
       drag.indicatorVisible = false;
@@ -1316,7 +1334,10 @@ export const useDragHandlers = (
         drag.indicatorVisible = true;
         document.addEventListener('mousemove', handleDragMove);
         document.addEventListener('mouseup', handleDragEnd);
-        document.addEventListener('touchmove', handleDragMove, { capture: true, passive: false });
+        document.addEventListener('touchmove', handleDragMove, {
+          capture: true,
+          passive: false,
+        });
         document.addEventListener('touchend', handleDragEnd);
       }
     },
@@ -1369,7 +1390,7 @@ export const useDragHandlers = (
           endDate.setHours(0, 0, 0, 0);
           eventDurationDays = Math.floor(
             (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000) +
-            1
+              1
           );
 
           // Ensure AllDay event eventDurationDays is at least 1 day
@@ -1410,7 +1431,10 @@ export const useDragHandlers = (
 
         document.addEventListener('mousemove', handleDragMove);
         document.addEventListener('mouseup', handleDragEnd);
-        document.addEventListener('touchmove', handleDragMove, { capture: true, passive: false });
+        document.addEventListener('touchmove', handleDragMove, {
+          capture: true,
+          passive: false,
+        });
         document.addEventListener('touchend', handleDragEnd);
       } else {
         // Week/Day view move start
@@ -1491,7 +1515,10 @@ export const useDragHandlers = (
         // Week/Day view uses cross-region drag support
         document.addEventListener('mousemove', handleUniversalDragMove);
         document.addEventListener('mouseup', handleUniversalDragEnd);
-        document.addEventListener('touchmove', handleUniversalDragMove, { capture: true, passive: false });
+        document.addEventListener('touchmove', handleUniversalDragMove, {
+          capture: true,
+          passive: false,
+        });
         document.addEventListener('touchend', handleUniversalDragEnd);
       }
     },
@@ -1634,7 +1661,10 @@ export const useDragHandlers = (
 
       document.addEventListener('mousemove', handleDragMove);
       document.addEventListener('mouseup', handleDragEnd);
-      document.addEventListener('touchmove', handleDragMove, { capture: true, passive: false });
+      document.addEventListener('touchmove', handleDragMove, {
+        capture: true,
+        passive: false,
+      });
       document.addEventListener('touchend', handleDragEnd);
     },
     [

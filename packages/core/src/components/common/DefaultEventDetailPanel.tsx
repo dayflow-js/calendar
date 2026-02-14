@@ -2,10 +2,7 @@ import { h } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { Temporal } from 'temporal-polyfill';
-import {
-  EventDetailPanelProps,
-  CalendarType,
-} from '../../types';
+import { EventDetailPanelProps, CalendarType } from '../../types';
 import { isPlainDate } from '../../utils/temporal';
 import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
 import CalendarPicker, { CalendarOption } from './CalendarPicker';
@@ -40,7 +37,10 @@ const DefaultEventDetailPanel = ({
   const { t } = useLocale();
 
   // Check if dark mode is active (either via theme context or DOM class)
-  const isDark = appliedTheme === 'dark' || (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+  const isDark =
+    appliedTheme === 'dark' ||
+    (typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark'));
   const isEditable = !app?.state.readOnly;
   const isViewable = app?.getReadOnlyConfig().viewable !== false;
 
@@ -51,7 +51,9 @@ const DefaultEventDetailPanel = ({
 
   // Get visible calendar type options
   const colorOptions: CalendarOption[] = useMemo(() => {
-    const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
+    const registry = app
+      ? app.getCalendarRegistry()
+      : getDefaultCalendarRegistry();
     return registry.getVisible().map((cal: CalendarType) => ({
       label: cal.name,
       value: cal.id,
@@ -266,7 +268,9 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('eventTitle')}</span>
+      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+        {t('eventTitle')}
+      </span>
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex-1">
           <input
@@ -302,7 +306,9 @@ const DefaultEventDetailPanel = ({
 
       {isAllDay ? (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('dateRange')}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+            {t('dateRange')}
+          </div>
           <RangePicker
             value={[event.start, event.end]}
             format="YYYY-MM-DD"
@@ -317,14 +323,16 @@ const DefaultEventDetailPanel = ({
         </div>
       ) : (
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('timeRange')}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+            {t('timeRange')}
+          </div>
           <RangePicker
             value={[event.start, event.end]}
-            timeZone={
-              eventTimeZone
-            }
+            timeZone={eventTimeZone}
             disabled={!isEditable}
-            onChange={(nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]) => {
+            onChange={(
+              nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
+            ) => {
               const [start, end] = nextRange;
               onEventUpdate({
                 ...event,
@@ -332,7 +340,9 @@ const DefaultEventDetailPanel = ({
                 end,
               });
             }}
-            onOk={(nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]) => {
+            onOk={(
+              nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
+            ) => {
               const [start, end] = nextRange;
               onEventUpdate({
                 ...event,
@@ -346,7 +356,9 @@ const DefaultEventDetailPanel = ({
       )}
 
       <div className="mb-3">
-        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
+        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+          {t('note')}
+        </span>
         <textarea
           id={`event-note-${event.id}`}
           name="note"

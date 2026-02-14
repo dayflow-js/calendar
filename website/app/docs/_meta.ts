@@ -1,4 +1,4 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   introduction: {
@@ -12,9 +12,9 @@ const meta: MetaRecord = {
       toc: false,
       timestamp: false,
       breadcrumb: false,
-      copyPage: false
-    }
+      copyPage: false,
+    },
   },
-}
+};
 
-export default meta
+export default meta;

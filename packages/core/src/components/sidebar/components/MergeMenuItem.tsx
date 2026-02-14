@@ -64,36 +64,35 @@ export const MergeMenuItem = ({
         <span>{t('merge')}</span>
         <ChevronRight className="h-4 w-4" />
       </div>
-      {isHovered && createPortal(
-        <div
-          ref={submenuRef}
-          className="fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-slate-800 dark:bg-slate-950 animate-in fade-in-0 zoom-in-95 duration-100"
-          style={{ top: position.y, left: position.x }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          {availableCalendars.map(calendar => (
-            <div
-              key={calendar.id}
-              className="flex items-center cursor-pointer rounded-sm px-3 py-1 text-[12px] text-slate-900 hover:bg-primary hover:text-white dark:text-slate-50 dark:hover:bg-primary dark:hover:text-white transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMergeSelect(calendar.id);
-              }}
-            >
+      {isHovered &&
+        createPortal(
+          <div
+            ref={submenuRef}
+            className="fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-slate-800 dark:bg-slate-950 animate-in fade-in-0 zoom-in-95 duration-100"
+            style={{ top: position.y, left: position.x }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onMouseDown={e => e.stopPropagation()}
+          >
+            {availableCalendars.map(calendar => (
               <div
-                className="mr-2 h-3 w-3 rounded-sm shrink-0"
-                style={{ backgroundColor: calendar.colors.lineColor }}
-              />
-              <span className="truncate">
-                {calendar.name || calendar.id}
-              </span>
-            </div>
-          ))}
-        </div>,
-        document.body
-      )}
+                key={calendar.id}
+                className="flex items-center cursor-pointer rounded-sm px-3 py-1 text-[12px] text-slate-900 hover:bg-primary hover:text-white dark:text-slate-50 dark:hover:bg-primary dark:hover:text-white transition-colors"
+                onClick={e => {
+                  e.stopPropagation();
+                  onMergeSelect(calendar.id);
+                }}
+              >
+                <div
+                  className="mr-2 h-3 w-3 rounded-sm shrink-0"
+                  style={{ backgroundColor: calendar.colors.lineColor }}
+                />
+                <span className="truncate">{calendar.name || calendar.id}</span>
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
     </>
   );
 };

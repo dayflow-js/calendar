@@ -159,11 +159,7 @@ export interface useDragReturn {
   handleCreateAllDayEvent?: (e: any, dayIndex: number) => void; // Week/Day views
   handleCreateStart: (e: any | any, ...args: (Date | number)[]) => void;
   handleMoveStart: (e: any | any, event: Event) => void;
-  handleResizeStart: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  handleResizeStart: (e: any | any, event: Event, direction: string) => void;
   dragState: MonthDragState | WeekDayDragState;
   isDragging: boolean;
   // Week/Day view specific

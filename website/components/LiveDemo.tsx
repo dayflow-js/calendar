@@ -16,9 +16,9 @@ export function LiveDemo() {
             A lightweight and elegant full calendar component for the web
           </h1>
           <p className="mt-4 text-base text-slate-600 dark:text-slate-400 sm:text-lg">
-            DayFlow provides production-ready calendar views, drag-and-drop,
-            and a modular architecture so you can focus on your product, not
-            date math.
+            DayFlow provides production-ready calendar views, drag-and-drop, and
+            a modular architecture so you can focus on your product, not date
+            math.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
@@ -40,9 +40,7 @@ export function LiveDemo() {
       <section className="space-y-6 py-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-semibold">
-              Try it in your browser
-            </h2>
+            <h2 className="text-3xl font-semibold">Try it in your browser</h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Switch views, drag events, and explore the plugin architecture
               live.

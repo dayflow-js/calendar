@@ -1,5 +1,5 @@
 import { h, Fragment } from 'preact';
-import { 
+import {
   useMemo,
   useRef,
   useCallback,
@@ -194,11 +194,21 @@ export const FixedWeekYearView = ({
   const [scrollbarHeight, setScrollbarHeight] = useState(0);
 
   // State for event selection and detail panel
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null
+  );
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<
+    string | null
+  >(null);
 
-  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
-  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+  const selectedEventId =
+    propSelectedEventId !== undefined
+      ? propSelectedEventId
+      : internalSelectedId;
+  const detailPanelEventId =
+    propDetailPanelEventId !== undefined
+      ? propDetailPanelEventId
+      : internalDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -220,7 +230,11 @@ export const FixedWeekYearView = ({
     null
   );
 
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    date: Date;
+  } | null>(null);
 
   const handleContextMenu = (e: any, date: Date) => {
     e.preventDefault();
@@ -417,18 +431,15 @@ export const FixedWeekYearView = ({
   }, [currentYear, locale, totalColumns, yearEvents]);
 
   // Handle scroll synchronization
-  const handleContentScroll = useCallback(
-    (e: any) => {
-      const target = e.currentTarget;
-      if (weekLabelsRef.current) {
-        weekLabelsRef.current.scrollLeft = target.scrollLeft;
-      }
-      if (monthLabelsRef.current) {
-        monthLabelsRef.current.scrollTop = target.scrollTop;
-      }
-    },
-    []
-  );
+  const handleContentScroll = useCallback((e: any) => {
+    const target = e.currentTarget;
+    if (weekLabelsRef.current) {
+      weekLabelsRef.current.scrollLeft = target.scrollLeft;
+    }
+    if (monthLabelsRef.current) {
+      monthLabelsRef.current.scrollTop = target.scrollTop;
+    }
+  }, []);
 
   // Measure scrollbar dimensions to sync the sidebar/header padding
   useEffect(() => {
@@ -570,7 +581,10 @@ export const FixedWeekYearView = ({
         className={`overflow-auto ${scrollbarHide}`}
         onScroll={handleContentScroll}
       >
-        <div className="flex flex-col min-h-full" style={{ minWidth: '1352px' }}>
+        <div
+          className="flex flex-col min-h-full"
+          style={{ minWidth: '1352px' }}
+        >
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
@@ -618,9 +632,10 @@ export const FixedWeekYearView = ({
                       <span
                         className={`
                           text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full
-                          ${isToday
-                            ? 'bg-primary text-primary-foreground font-bold shadow-sm'
-                            : 'text-gray-700 dark:text-gray-300'
+                          ${
+                            isToday
+                              ? 'bg-primary text-primary-foreground font-bold shadow-sm'
+                              : 'text-gray-700 dark:text-gray-300'
                           }
                         `}
                       >
@@ -678,8 +693,8 @@ export const FixedWeekYearView = ({
           app={app}
           onCreateEvent={() => {
             const syntheticEvent = {
-              preventDefault: () => { },
-              stopPropagation: () => { },
+              preventDefault: () => {},
+              stopPropagation: () => {},
               clientX: contextMenu.x,
               clientY: contextMenu.y,
             } as unknown as any;

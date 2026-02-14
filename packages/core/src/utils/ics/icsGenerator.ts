@@ -35,12 +35,12 @@ export function generateICS(
   lines.push('CALSCALE:GREGORIAN');
   lines.push('METHOD:PUBLISH');
   lines.push(`X-WR-CALNAME:${escapeICSValue(calendarName)}`);
-  
-  // Note: We skip complex VTIMEZONE definitions for now and rely on 
+
+  // Note: We skip complex VTIMEZONE definitions for now and rely on
   // UTC (Z) or standard TZIDs that most clients accept.
 
   // 2. VEVENTs
-  events.forEach((event) => {
+  events.forEach(event => {
     lines.push(...generateVEvent(event));
   });
 
@@ -66,7 +66,7 @@ export function downloadICS(
 
   const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', filename);
@@ -100,9 +100,11 @@ function generateVEvent(event: Event): string[] {
 
   // SUMMARY & DESCRIPTION
   lines.push(formatProperty('SUMMARY', escapeICSValue(event.title)));
-  
+
   if (event.description) {
-    lines.push(formatProperty('DESCRIPTION', escapeICSValue(event.description)));
+    lines.push(
+      formatProperty('DESCRIPTION', escapeICSValue(event.description))
+    );
   }
 
   // LOCATION
@@ -131,15 +133,15 @@ function formatProperty(
   params?: Record<string, string>
 ): string {
   let line = name;
-  
+
   if (params) {
     Object.entries(params).forEach(([key, val]) => {
       line += `;${key}=${val}`;
     });
   }
-  
+
   line += `:${value}`;
-  
+
   // Fold line if longer than 75 chars (RFC 5545)
   return foldLine(line);
 }
@@ -149,22 +151,22 @@ function formatProperty(
  */
 function foldLine(line: string): string {
   if (line.length <= 75) return line;
-  
+
   // Simple folding: split at 75 chars
-  
+
   const chunks = [];
   let remaining = line;
-  
+
   // First chunk 75 chars
   chunks.push(remaining.slice(0, 75));
   remaining = remaining.slice(75);
-  
+
   // Subsequent chunks 74 chars (prefixed with space)
   while (remaining.length > 0) {
     chunks.push(' ' + remaining.slice(0, 74));
     remaining = remaining.slice(74);
   }
-  
+
   return chunks.join('\r\n');
 }
 

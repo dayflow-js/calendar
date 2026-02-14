@@ -4,25 +4,11 @@ DayFlow は「すぐに触れるカレンダー体験」を目指して設計さ
 
 ### DayFlow のインストール
 
-
-
 フレームワークとパッケージマネージャーを選択して、インストールコマンドを取得します。
-
-
 
 <FrameworkInstall />
 
-
-
-
-
-
-
 ### DayFlow のスタイルを読み込む
-
-
-
-
 
 Tailwind だけでは DayFlow のレイアウトは完成しません。アプリのエントリーポイントでスタイルシートを 1 行追加してください。
 
@@ -36,7 +22,7 @@ CSS でまとめて読み込みたい場合は次のように記述できます�
 @import '@dayflow/core/dist/styles.css';
 ```
 
-import { Tabs } from 'nextra/components'
+import { Tabs } from 'nextra/components';
 
 ## 基本的な使い方
 
@@ -75,6 +61,7 @@ import { Tabs } from 'nextra/components'
       );
     }
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```vue copy
@@ -84,9 +71,9 @@ import { Tabs } from 'nextra/components'
 
     <script setup>
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
-    import { 
-      createDayView, 
-      createWeekView, 
+    import {
+      createDayView,
+      createWeekView,
       createMonthView,
       createEvent,
       createAllDayEvent
@@ -108,6 +95,7 @@ import { Tabs } from 'nextra/components'
     });
     </script>
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```typescript copy
@@ -145,6 +133,7 @@ import { Tabs } from 'nextra/components'
       };
     }
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```svelte copy
@@ -176,6 +165,7 @@ import { Tabs } from 'nextra/components'
 
     <DayFlowCalendar {calendar} />
     ```
+
   </Tabs.Tab>
 </FrameworkTabs>
 

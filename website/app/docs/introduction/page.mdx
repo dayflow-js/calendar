@@ -26,7 +26,7 @@ Alternatively, you can import it in your CSS file:
 @import '@dayflow/core/dist/styles.css';
 ```
 
-import { Tabs } from 'nextra/components'
+import { Tabs } from 'nextra/components';
 
 ## Basic Usage
 
@@ -68,6 +68,7 @@ Select your framework to see how to integrate DayFlow into your application.
       );
     }
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```vue copy
@@ -77,9 +78,9 @@ Select your framework to see how to integrate DayFlow into your application.
 
     <script setup>
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
-    import { 
-      createDayView, 
-      createWeekView, 
+    import {
+      createDayView,
+      createWeekView,
       createMonthView,
       createDragPlugin,
       createEventsPlugin,
@@ -104,6 +105,7 @@ Select your framework to see how to integrate DayFlow into your application.
     });
     </script>
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```typescript copy
@@ -144,6 +146,7 @@ Select your framework to see how to integrate DayFlow into your application.
       };
     }
     ```
+
   </Tabs.Tab>
   <Tabs.Tab>
     ```svelte copy
@@ -178,6 +181,7 @@ Select your framework to see how to integrate DayFlow into your application.
 
     <DayFlowCalendar {calendar} />
     ```
+
   </Tabs.Tab>
 </FrameworkTabs>
 

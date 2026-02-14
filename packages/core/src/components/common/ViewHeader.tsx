@@ -96,11 +96,21 @@ const ViewHeader = ({
     viewType === 'day' ? customSubtitle || getDefaultSubtitle() : null;
 
   return (
-    <div className={headerContainer} style={{ position: 'relative' }} onContextMenu={e => e.preventDefault()}>
+    <div
+      className={headerContainer}
+      style={{ position: 'relative' }}
+      onContextMenu={e => e.preventDefault()}
+    >
       <div className="flex-1">
         {/* For Year view: show sticky year if available, otherwise show title */}
         {viewType === 'year' && stickyYear ? (
-          <div style={{ position: 'relative', overflow: 'hidden', height: '1.5em' }}>
+          <div
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              height: '1.5em',
+            }}
+          >
             {/* Current sticky year - being pushed up */}
             <h1
               className={headerTitle}

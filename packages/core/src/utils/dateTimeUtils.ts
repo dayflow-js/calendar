@@ -28,7 +28,11 @@ import {
  * @returns Hour number (0-24, supports decimals)
  */
 export const extractHourFromDate = (
-  dateTime: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  dateTime:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): number => {
   if (dateTime instanceof Date) {
     const hours = dateTime.getHours();
@@ -45,7 +49,11 @@ export const extractHourFromDate = (
  * @returns Date or Temporal (PlainDateTime or ZonedDateTime)
  */
 export const createDateWithHour = (
-  baseDateTime: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
+  baseDateTime:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime,
   hour: number
 ): Date | Temporal.PlainDateTime | Temporal.ZonedDateTime => {
   if (baseDateTime instanceof Date) {
@@ -64,7 +72,11 @@ export const createDateWithHour = (
  * @returns Start of day
  */
 export const getStartOfDay = (
-  dateTime: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  dateTime:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): Date | Temporal.ZonedDateTime => {
   if (dateTime instanceof Date) {
     const newDate = new Date(dateTime);
@@ -80,7 +92,11 @@ export const getStartOfDay = (
  * @returns End of day
  */
 export const getEndOfDay = (
-  dateTime: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  dateTime:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): Date | Temporal.ZonedDateTime => {
   if (dateTime instanceof Date) {
     const newDate = new Date(dateTime);
@@ -97,8 +113,16 @@ export const getEndOfDay = (
  * @returns Whether they are the same day
  */
 export const isSameDay = (
-  date1: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
-  date2: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  date1:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime,
+  date2:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): boolean => {
   if (date1 instanceof Date && date2 instanceof Date) {
     return (
@@ -140,8 +164,16 @@ export const isSameDay = (
  * @returns Whether it's a multi-day event
  */
 export const isMultiDayEvent = (
-  start: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
-  end: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  start:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime,
+  end:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): boolean => {
   return !isSameDay(start, end);
 };

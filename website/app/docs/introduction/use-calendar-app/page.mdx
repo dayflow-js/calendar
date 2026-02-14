@@ -28,24 +28,24 @@ export function TeamCalendar() {
 
 ## Configuration Overview
 
-| Option                 | Type                       | Required | Default                | Description                                                                                                        |
-| ---------------------- | -------------------------- | -------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `views`                | `CalendarView[]`           | Required | —                      | Registers the view definitions (e.g., `createMonthView()`). At least one view is required.                         |
-| `plugins`              | `CalendarPlugin[]`         | Optional | `[]`                   | Installs optional plugins (drag helpers, shortcuts, etc.). Each plugin receives the app instance during `install`. |
-| `events`               | `Event[]`                  | Optional | `[]`                   | Initial event payload. Use `addEvent`/`updateEvent` afterward to mutate state.                                     |
-| `callbacks`            | `CalendarCallbacks`        | Optional | `{}`                   | Lifecycle hooks that fire when views, dates, or events change—perfect for syncing with APIs.                       |
-| `defaultView`          | `ViewType`                 | Optional | `ViewType.WEEK`        | View that loads first; must exist in `views`.                                                                      |
-| `initialDate`          | `Date`                     | Optional | `new Date()`           | Starting focus date (also seeds visible month calculations).                                                       |
-| `switcherMode`         | `'buttons' \| 'select'`    | Optional | `'buttons'`            | Controls how the built-in view switcher renders in headers.                                                        |
-| `calendars`            | `CalendarType[]`           | Optional | `[]`                   | Registers calendar categories (Work, Personal, etc.) with colors and visibility.                                   |
-| `defaultCalendar`      | `string`                   | Optional | First visible calendar | ID used when new events are created.                                                                               |
-| `theme`                | `ThemeConfig`              | Optional | `{ mode: 'light' }`    | Sets global theme mode and optional token overrides.                                                               |
-| `locale`               | `string \| Locale`         | Optional | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
-| `useSidebar`           | `boolean \| SidebarConfig` | Optional | `false`                | Enables the built-in sidebar or lets you customize width, collapse state, and renderer.                            |
-| `useEventDetailDialog` | `boolean`                  | Optional | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
-| `useCalendarHeader`    | `boolean \| Function`      | Optional | `true`                 | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                             |
-| `readOnly`             | `boolean \| ReadOnlyConfig`| Optional | `false`                | Disables interactions. Can be a boolean or a config for fine-grained control (drag/view).                          |
-| `customMobileEventRenderer` | `MobileEventRenderer` | Optional | —                      | Custom component to replace the default mobile event drawer/dialog.                                                |
+| Option                      | Type                        | Required | Default                | Description                                                                                                        |
+| --------------------------- | --------------------------- | -------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `views`                     | `CalendarView[]`            | Required | —                      | Registers the view definitions (e.g., `createMonthView()`). At least one view is required.                         |
+| `plugins`                   | `CalendarPlugin[]`          | Optional | `[]`                   | Installs optional plugins (drag helpers, shortcuts, etc.). Each plugin receives the app instance during `install`. |
+| `events`                    | `Event[]`                   | Optional | `[]`                   | Initial event payload. Use `addEvent`/`updateEvent` afterward to mutate state.                                     |
+| `callbacks`                 | `CalendarCallbacks`         | Optional | `{}`                   | Lifecycle hooks that fire when views, dates, or events change—perfect for syncing with APIs.                       |
+| `defaultView`               | `ViewType`                  | Optional | `ViewType.WEEK`        | View that loads first; must exist in `views`.                                                                      |
+| `initialDate`               | `Date`                      | Optional | `new Date()`           | Starting focus date (also seeds visible month calculations).                                                       |
+| `switcherMode`              | `'buttons' \| 'select'`     | Optional | `'buttons'`            | Controls how the built-in view switcher renders in headers.                                                        |
+| `calendars`                 | `CalendarType[]`            | Optional | `[]`                   | Registers calendar categories (Work, Personal, etc.) with colors and visibility.                                   |
+| `defaultCalendar`           | `string`                    | Optional | First visible calendar | ID used when new events are created.                                                                               |
+| `theme`                     | `ThemeConfig`               | Optional | `{ mode: 'light' }`    | Sets global theme mode and optional token overrides.                                                               |
+| `locale`                    | `string \| Locale`          | Optional | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
+| `useSidebar`                | `boolean \| SidebarConfig`  | Optional | `false`                | Enables the built-in sidebar or lets you customize width, collapse state, and renderer.                            |
+| `useEventDetailDialog`      | `boolean`                   | Optional | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
+| `useCalendarHeader`         | `boolean \| Function`       | Optional | `true`                 | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                             |
+| `readOnly`                  | `boolean \| ReadOnlyConfig` | Optional | `false`                | Disables interactions. Can be a boolean or a config for fine-grained control (drag/view).                          |
+| `customMobileEventRenderer` | `MobileEventRenderer`       | Optional | —                      | Custom component to replace the default mobile event drawer/dialog.                                                |
 
 ## Key Options
 

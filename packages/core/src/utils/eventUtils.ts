@@ -419,7 +419,10 @@ export const createEventWithZonedDateTime = (
  * @param event2 Second event
  * @returns Whether events are equal in content
  */
-export const isEventEqual = (event1: Event | null, event2: Event | null): boolean => {
+export const isEventEqual = (
+  event1: Event | null,
+  event2: Event | null
+): boolean => {
   if (event1 === event2) return true;
   if (!event1 || !event2) return false;
 

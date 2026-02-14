@@ -1,7 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
-import { CalendarApp, CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+import {
+  CalendarApp,
+  CalendarAppConfig,
+  UseCalendarAppReturn,
+} from '@dayflow/core';
 
-export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn {
+export function useCalendarApp(
+  config: CalendarAppConfig
+): UseCalendarAppReturn {
   // Use useMemo to ensure app is only created once
   const app = useMemo(() => new CalendarApp(config), []);
   const [, setTick] = useState(0);

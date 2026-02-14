@@ -72,7 +72,10 @@ export const analyzeMultiDayEventsForWeek = (
     // adjust the end date to the same day as the start date to avoid misidentifying as a multi-day event
     let adjustedEventEndDate = new Date(eventEndDate);
     if (!event.allDay) {
-      const endHasTime = eventEndFull.getHours() !== 0 || eventEndFull.getMinutes() !== 0 || eventEndFull.getSeconds() !== 0;
+      const endHasTime =
+        eventEndFull.getHours() !== 0 ||
+        eventEndFull.getMinutes() !== 0 ||
+        eventEndFull.getSeconds() !== 0;
       if (!endHasTime) {
         // End time is 00:00:00, check duration
         const durationMs = eventEndFull.getTime() - eventStartFull.getTime();
@@ -132,7 +135,10 @@ export const analyzeMultiDayEventsForWeek = (
     } else {
       // For regular events, if original end time's hours, minutes, and seconds are all 0, the event ended at the start of the day
       // In this case, the end date should be decreased by 1 day
-      const endHasTime = eventEndFull.getHours() !== 0 || eventEndFull.getMinutes() !== 0 || eventEndFull.getSeconds() !== 0;
+      const endHasTime =
+        eventEndFull.getHours() !== 0 ||
+        eventEndFull.getMinutes() !== 0 ||
+        eventEndFull.getSeconds() !== 0;
       if (endHasTime) {
         // Has specific time, use end of day
         eventEnd = new Date(eventEndDate);
@@ -209,7 +215,13 @@ export const analyzeMultiDayEventsForWeek = (
 export const analyzeMultiDayRegularEvent = (
   event: Event,
   weekStart: Date
-): { dayIndex: number; startHour: number; endHour: number; isFirst: boolean; isLast: boolean }[] => {
+): {
+  dayIndex: number;
+  startHour: number;
+  endHour: number;
+  isFirst: boolean;
+  isLast: boolean;
+}[] => {
   if (event.allDay) return [];
 
   const eventStart = temporalToDate(event.start);
@@ -246,7 +258,13 @@ export const analyzeMultiDayRegularEvent = (
   const lastDayOffset = endHasExplicitTime ? daySpan : Math.max(0, daySpan - 1);
 
   // Generate segments for each day
-  const segments: { dayIndex: number; startHour: number; endHour: number; isFirst: boolean; isLast: boolean }[] = [];
+  const segments: {
+    dayIndex: number;
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+  }[] = [];
 
   for (let i = 0; i <= lastDayOffset; i++) {
     const currentDate = new Date(startDate);
@@ -278,7 +296,7 @@ export const analyzeMultiDayRegularEvent = (
       startHour,
       endHour,
       isFirst,
-      isLast
+      isLast,
     });
   }
 

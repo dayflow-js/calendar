@@ -15,13 +15,22 @@ export default defineConfig({
       '@dayflow/react': resolve(__dirname, '../react/src/index.ts'),
       'preact/hooks': resolve(workspaceRoot, 'node_modules/preact/hooks'),
       'preact/compat': resolve(workspaceRoot, 'node_modules/preact/compat'),
-      'preact/jsx-runtime': resolve(workspaceRoot, 'node_modules/preact/jsx-runtime'),
-      'preact/jsx-dev-runtime': resolve(workspaceRoot, 'node_modules/preact/jsx-runtime'), // Preact usually uses same for dev
+      'preact/jsx-runtime': resolve(
+        workspaceRoot,
+        'node_modules/preact/jsx-runtime'
+      ),
+      'preact/jsx-dev-runtime': resolve(
+        workspaceRoot,
+        'node_modules/preact/jsx-runtime'
+      ), // Preact usually uses same for dev
       'preact/debug': resolve(workspaceRoot, 'node_modules/preact/debug'),
-      'preact': resolve(workspaceRoot, 'node_modules/preact'),
-      'react': resolve(workspaceRoot, 'node_modules/preact/compat'),
+      preact: resolve(workspaceRoot, 'node_modules/preact'),
+      react: resolve(workspaceRoot, 'node_modules/preact/compat'),
       'react-dom': resolve(workspaceRoot, 'node_modules/preact/compat'),
-      'react/jsx-runtime': resolve(workspaceRoot, 'node_modules/preact/compat/jsx-runtime')
+      'react/jsx-runtime': resolve(
+        workspaceRoot,
+        'node_modules/preact/compat/jsx-runtime'
+      ),
     },
   },
   server: {

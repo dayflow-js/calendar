@@ -3,15 +3,15 @@ import { useRef, useEffect, useContext } from 'preact/hooks';
 import { CustomRenderingContext } from './CustomRenderingContext';
 
 interface ContentSlotProps {
-  generatorName: string;   // e.g. 'eventContent'
-  generatorArgs?: any;      // e.g. { event, view }
-  defaultContent?: any;     // Preact vnode as fallback
+  generatorName: string; // e.g. 'eventContent'
+  generatorArgs?: any; // e.g. { event, view }
+  defaultContent?: any; // Preact vnode as fallback
   store?: any;
 }
 
 let guid = 0;
 function generateId() {
-  return 'df-slot-' + (guid++);
+  return 'df-slot-' + guid++;
 }
 
 /**
@@ -19,7 +19,12 @@ function generateId() {
  * If a framework adapter (React/Vue) is present, it will portal its content into this <div>.
  * Otherwise, it displays defaultContent.
  */
-export function ContentSlot({ generatorName, generatorArgs, defaultContent, store: propStore }: ContentSlotProps) {
+export function ContentSlot({
+  generatorName,
+  generatorArgs,
+  defaultContent,
+  store: propStore,
+}: ContentSlotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contextStore = useContext(CustomRenderingContext);
   const store = propStore || contextStore;

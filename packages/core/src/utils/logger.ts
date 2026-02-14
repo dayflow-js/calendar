@@ -12,7 +12,11 @@ class Logger {
     this.isDevelopment = process.env.NODE_ENV !== 'production';
   }
 
-  private formatMessage(level: LogLevel, message: string, ...args: any[]): void {
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    ...args: any[]
+  ): void {
     if (!this.isDevelopment) return;
 
     const timestamp = new Date().toISOString();

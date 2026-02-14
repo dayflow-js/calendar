@@ -1,12 +1,12 @@
 // View factory type definitions
-import { CalendarView, ViewType, ICalendarApp } from "./core";
-import { Event } from "./event";
-import { EventLayout } from "./layout";
+import { CalendarView, ViewType, ICalendarApp } from './core';
+import { Event } from './event';
+import { EventLayout } from './layout';
 import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
-} from "./eventDetail";
-import { ViewSwitcherMode } from "../components/common/ViewHeader";
+} from './eventDetail';
+import { ViewSwitcherMode } from '../components/common/ViewHeader';
 
 /**
  * Common Props interface for view components
@@ -145,7 +145,7 @@ export interface MonthViewConfig extends ViewFactoryConfig {
 export interface YearViewConfig extends ViewFactoryConfig {
   enableVirtualScroll?: boolean;
   showDebugInfo?: boolean;
-  mode?: "year-canvas" | "fixed-week";
+  mode?: 'year-canvas' | 'fixed-week';
   showTimedEventsInYearView?: boolean;
 }
 

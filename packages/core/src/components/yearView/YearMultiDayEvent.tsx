@@ -1,7 +1,18 @@
 import { useRef, useState, useEffect, useCallback } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
-import { Event, EventDetailContentRenderer, EventDetailDialogRenderer, EventDetailPosition, ICalendarApp } from '@/types';
-import { getEventBgColor, getEventTextColor, getSelectedBgColor, getLineColor } from '@/utils';
+import {
+  Event,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  EventDetailPosition,
+  ICalendarApp,
+} from '@/types';
+import {
+  getEventBgColor,
+  getEventTextColor,
+  getSelectedBgColor,
+  getLineColor,
+} from '@/utils';
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from './utils';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
@@ -14,11 +25,7 @@ interface YearMultiDayEventProps {
   isDragging: boolean;
   isSelected: boolean;
   onMoveStart?: (e: any | any, event: Event) => void;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
   onEventSelect?: (eventId: string | null) => void;
   detailPanelEventId?: string | null;
   onDetailPanelToggle?: (eventId: string | null) => void;
@@ -47,12 +54,23 @@ export const YearMultiDayEvent = ({
   app,
   calendarRef,
 }: YearMultiDayEventProps) => {
-  const { event, startCellIndex, endCellIndex, visualRowIndex, isFirstSegment, isLastSegment } = segment;
+  const {
+    event,
+    startCellIndex,
+    endCellIndex,
+    visualRowIndex,
+    isFirstSegment,
+    isLastSegment,
+  } = segment;
 
   const eventRef = useRef<HTMLDivElement>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
-  const [detailPanelPosition, setDetailPanelPosition] = useState<EventDetailPosition | null>(null);
-  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [detailPanelPosition, setDetailPanelPosition] =
+    useState<EventDetailPosition | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Use segment.id to uniquely identify which segment's panel should be shown
   // This prevents multiple panels from showing for multi-month events
@@ -60,11 +78,14 @@ export const YearMultiDayEvent = ({
   const isEditable = !app?.state.readOnly;
 
   const startPercent = (startCellIndex / columnsPerRow) * 100;
-  const widthPercent = ((endCellIndex - startCellIndex + 1) / columnsPerRow) * 100;
+  const widthPercent =
+    ((endCellIndex - startCellIndex + 1) / columnsPerRow) * 100;
 
   // Basic styling
   const calendarId = event.calendarId || 'blue';
-  const bgColor = isSelected ? getSelectedBgColor(calendarId) : getEventBgColor(calendarId);
+  const bgColor = isSelected
+    ? getSelectedBgColor(calendarId)
+    : getEventBgColor(calendarId);
   const textColor = isSelected ? '#fff' : getEventTextColor(calendarId);
   const lineColor = getLineColor(calendarId);
   const isAllDay = !!event.allDay;
@@ -104,7 +125,10 @@ export const YearMultiDayEvent = ({
             left = rect.left - panelWidth - 10;
           } else {
             if (spaceOnRight > spaceOnLeft) {
-              left = Math.max(calendarRect.left + 10, boundaryWidth - panelWidth - 10);
+              left = Math.max(
+                calendarRect.left + 10,
+                boundaryWidth - panelWidth - 10
+              );
             } else {
               left = calendarRect.left + 10;
             }
@@ -149,7 +173,10 @@ export const YearMultiDayEvent = ({
         left = rect.left - panelWidth - 10;
       } else {
         if (spaceOnRight > spaceOnLeft) {
-          left = Math.max(calendarRect.left + 10, boundaryWidth - panelWidth - 10);
+          left = Math.max(
+            calendarRect.left + 10,
+            boundaryWidth - panelWidth - 10
+          );
         } else {
           left = calendarRect.left + 10;
         }
@@ -183,14 +210,24 @@ export const YearMultiDayEvent = ({
 
   useEffect(() => {
     // Only auto-open panel for the first segment of newly created events
-    if (newlyCreatedEventId === event.id && !showDetailPanel && isFirstSegment) {
+    if (
+      newlyCreatedEventId === event.id &&
+      !showDetailPanel &&
+      isFirstSegment
+    ) {
       // Delay slightly to ensure layout is ready
       setTimeout(() => {
         showPanel();
         onDetailPanelOpen?.();
       }, 50);
     }
-  }, [newlyCreatedEventId, event.id, showDetailPanel, onDetailPanelOpen, isFirstSegment]);
+  }, [
+    newlyCreatedEventId,
+    event.id,
+    showDetailPanel,
+    onDetailPanelOpen,
+    isFirstSegment,
+  ]);
 
   // Handle panel positioning when opened
   useEffect(() => {
@@ -268,12 +305,11 @@ export const YearMultiDayEvent = ({
 
   const renderResizeHandle = (position: 'left' | 'right') => {
     const isLeft = position === 'left';
-    const shouldShow = isLeft
-      ? isFirstSegment
-      : isLastSegment;
+    const shouldShow = isLeft ? isFirstSegment : isLastSegment;
 
     // Only allow resizing for all-day events in Year View
-    if (!event.allDay || !shouldShow || !onResizeStart || !isEditable) return null;
+    if (!event.allDay || !shouldShow || !onResizeStart || !isEditable)
+      return null;
 
     return (
       <div
@@ -307,18 +343,17 @@ export const YearMultiDayEvent = ({
         isAllDay,
         onClose: handleClose,
         app: app!,
-        onEventUpdate: (updated: Event) => app?.updateEvent(updated.id, updated),
+        onEventUpdate: (updated: Event) =>
+          app?.updateEvent(updated.id, updated),
         onEventDelete: (id: string) => app?.deleteEvent(id),
       };
 
-      if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+      if (typeof window === 'undefined' || typeof document === 'undefined')
+        return null;
       const portalTarget = document.body;
       if (!portalTarget) return null;
 
-      return createPortal(
-        <DialogComponent {...dialogProps} />,
-        portalTarget
-      );
+      return createPortal(<DialogComponent {...dialogProps} />, portalTarget);
     }
 
     if (!detailPanelPosition) return null;
@@ -332,8 +367,8 @@ export const YearMultiDayEvent = ({
           isAllDay={isAllDay}
           onClose={handleClose}
           contentRenderer={customDetailPanelContent}
-          onEventUpdate={(updated) => app?.updateEvent(updated.id, updated)}
-          onEventDelete={(id) => app?.deleteEvent(id)}
+          onEventUpdate={updated => app?.updateEvent(updated.id, updated)}
+          onEventDelete={id => app?.deleteEvent(id)}
           eventVisibility="visible"
           calendarRef={calendarRef}
           selectedEventElementRef={eventRef}
@@ -349,8 +384,8 @@ export const YearMultiDayEvent = ({
         isAllDay={isAllDay}
         onClose={handleClose}
         app={app}
-        onEventUpdate={(updated) => app?.updateEvent(updated.id, updated)}
-        onEventDelete={(id) => app?.deleteEvent(id)}
+        onEventUpdate={updated => app?.updateEvent(updated.id, updated)}
+        onEventDelete={id => app?.deleteEvent(id)}
         eventVisibility="visible"
         calendarRef={calendarRef}
         selectedEventElementRef={eventRef}
@@ -399,8 +434,10 @@ export const YearMultiDayEvent = ({
             <div
               className="df-year-event-title text-[12px] leading-none whitespace-nowrap overflow-hidden"
               style={{
-                maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
+                maskImage:
+                  'linear-gradient(to right, black 70%, transparent 100%)',
+                WebkitMaskImage:
+                  'linear-gradient(to right, black 70%, transparent 100%)',
               }}
             >
               {getDisplayText()}
@@ -437,7 +474,8 @@ export const YearMultiDayEvent = ({
           className="df-year-event-title w-full block font-medium whitespace-nowrap overflow-hidden leading-none"
           style={{
             maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to right, black 70%, transparent 100%)',
           }}
         >
           {titleText}

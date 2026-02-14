@@ -1,6 +1,10 @@
 // Calendar Registry - Manages calendar types and color resolution
 
-import { CalendarType, ThemeMode, CalendarColors } from '../types/calendarTypes';
+import {
+  CalendarType,
+  ThemeMode,
+  CalendarColors,
+} from '../types/calendarTypes';
 
 /**
  * Default calendar types
@@ -265,7 +269,12 @@ export class CalendarRegistry {
    */
   reorder(fromIndex: number, toIndex: number): void {
     const entries = Array.from(this.calendars.entries());
-    if (fromIndex < 0 || fromIndex >= entries.length || toIndex < 0 || toIndex >= entries.length) {
+    if (
+      fromIndex < 0 ||
+      fromIndex >= entries.length ||
+      toIndex < 0 ||
+      toIndex >= entries.length
+    ) {
       return;
     }
 
@@ -487,7 +496,10 @@ export function setDefaultCalendarRegistry(registry: CalendarRegistry): void {
  * Get calendar colors for a specific hex color
  * Tries to match with default calendar types, otherwise generates generic colors
  */
-export function getCalendarColorsForHex(hex: string): { colors: CalendarColors, darkColors?: CalendarColors } {
+export function getCalendarColorsForHex(hex: string): {
+  colors: CalendarColors;
+  darkColors?: CalendarColors;
+} {
   const match = DEFAULT_CALENDAR_TYPES.find(
     c => c.colors.lineColor.toLowerCase() === hex.toLowerCase()
   );
@@ -497,16 +509,16 @@ export function getCalendarColorsForHex(hex: string): { colors: CalendarColors, 
 
   return {
     colors: {
-        eventColor: hex + '1A', // ~10% opacity
-        eventSelectedColor: hex,
-        lineColor: hex,
-        textColor: hex,
+      eventColor: hex + '1A', // ~10% opacity
+      eventSelectedColor: hex,
+      lineColor: hex,
+      textColor: hex,
     },
     darkColors: {
-        eventColor: hex + 'CC', // ~80% opacity
-        eventSelectedColor: hex,
-        lineColor: hex,
-        textColor: '#ffffff',
-    }
+      eventColor: hex + 'CC', // ~80% opacity
+      eventSelectedColor: hex,
+      lineColor: hex,
+      textColor: '#ffffff',
+    },
   };
 }

@@ -89,12 +89,7 @@ export const ViewAdapter = ({
 
   // Merge configuration
   const mergedConfig = useMemo(() => {
-    const {
-      dragConfig,
-      eventsConfig,
-      virtualScrollConfig,
-      ...rest
-    } = config;
+    const { dragConfig, eventsConfig, virtualScrollConfig, ...rest } = config;
 
     const baseConfig = {
       ...rest,

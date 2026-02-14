@@ -1,14 +1,14 @@
-import { 
-  Directive, 
-  Input, 
-  ElementRef, 
-  OnChanges, 
-  SimpleChanges, 
-  OnDestroy 
+import {
+  Directive,
+  Input,
+  ElementRef,
+  OnChanges,
+  SimpleChanges,
+  OnDestroy,
 } from '@angular/core';
 
 @Directive({
-  selector: '[dayflowPortal]'
+  selector: '[dayflowPortal]',
 })
 export class DayFlowPortalDirective implements OnChanges, OnDestroy {
   @Input('dayflowPortal') targetEl!: HTMLElement;

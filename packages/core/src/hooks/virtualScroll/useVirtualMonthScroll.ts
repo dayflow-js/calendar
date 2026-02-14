@@ -1,4 +1,10 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'preact/hooks';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'preact/hooks';
 import { WeeksData } from '../../types';
 import { generateWeekData, generateWeekRange } from '../../utils';
 import {
@@ -79,7 +85,7 @@ export const useResponsiveMonthConfig = () => {
       // Update global cache
       cachedConfig = newConfig;
 
-      // fix: In the mobile month view, when events are initially rendered, only the event start time is shown, 
+      // fix: In the mobile month view, when events are initially rendered, only the event start time is shown,
       // but it should show only the event title instead.
       // always sync local state on mount/resize, but skip if effectively the same
       setConfig(prev => {
@@ -115,11 +121,16 @@ export const useVirtualMonthScroll = ({
     null
   );
 
-  const getMonthName = useCallback((monthIndex: number, year: number) => {
-    const date = new Date(year, monthIndex, 1);
-    const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
-    return date.toLocaleDateString(locale, { month: isAsian ? 'short' : 'long' });
-  }, [locale]);
+  const getMonthName = useCallback(
+    (monthIndex: number, year: number) => {
+      const date = new Date(year, monthIndex, 1);
+      const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
+      return date.toLocaleDateString(locale, {
+        month: isAsian ? 'short' : 'long',
+      });
+    },
+    [locale]
+  );
 
   const initialWeeksData = useMemo(() => {
     const firstDayOfMonth = new Date(currentDate);
@@ -453,13 +464,13 @@ export const useVirtualMonthScroll = ({
       if (targetWeekStart < firstWeek.startDate) {
         weeksDiff = Math.ceil(
           (firstWeek.startDate.getTime() - targetWeekStart.getTime()) /
-          (7 * 24 * 60 * 60 * 1000)
+            (7 * 24 * 60 * 60 * 1000)
         );
         needsPastData = true;
       } else if (targetWeekStart > lastWeek.startDate) {
         weeksDiff = Math.ceil(
           (targetWeekStart.getTime() - lastWeek.startDate.getTime()) /
-          (7 * 24 * 60 * 60 * 1000)
+            (7 * 24 * 60 * 60 * 1000)
         );
         needsFutureData = true;
       }
@@ -541,14 +552,22 @@ export const useVirtualMonthScroll = ({
     // use weeksData which contains month info.
     const displayWeek = weeksData[virtualData.displayStartIndex];
     const firstDayOfDisplay = displayWeek.days[0].date;
-    const targetDate = new Date(firstDayOfDisplay.getFullYear(), firstDayOfDisplay.getMonth() - 1, 1);
+    const targetDate = new Date(
+      firstDayOfDisplay.getFullYear(),
+      firstDayOfDisplay.getMonth() - 1,
+      1
+    );
     scrollToDate(targetDate);
   }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 
   const handleNextMonth = useCallback(() => {
     const displayWeek = weeksData[virtualData.displayStartIndex];
     const firstDayOfDisplay = displayWeek.days[0].date;
-    const targetDate = new Date(firstDayOfDisplay.getFullYear(), firstDayOfDisplay.getMonth() + 1, 1);
+    const targetDate = new Date(
+      firstDayOfDisplay.getFullYear(),
+      firstDayOfDisplay.getMonth() + 1,
+      1
+    );
     scrollToDate(targetDate);
   }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 

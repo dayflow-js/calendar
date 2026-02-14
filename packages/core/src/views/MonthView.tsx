@@ -1,13 +1,8 @@
-import { h } from "preact";
-import {  useState, useMemo, useEffect, useRef } from 'preact/hooks';
+import { h } from 'preact';
+import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
 import { extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';
-import {
-  Event,
-  MonthEventDragState,
-  ViewType,
-  MonthViewProps,
-} from '@/types';
+import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
 import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
@@ -39,7 +34,10 @@ const MonthView = ({
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
-  const calendarSignature = app.getCalendars().map(c => c.id + c.colors.lineColor).join('-');
+  const calendarSignature = app
+    .getCalendars()
+    .map(c => c.id + c.colors.lineColor)
+    .join('-');
   const previousEventsRef = useRef<Event[] | null>(null);
   const DEFAULT_WEEK_HEIGHT = 119;
   // Stabilize events reference so week calculations do not rerun on every scroll frame
@@ -138,7 +136,8 @@ const MonthView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent =
+    app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
@@ -157,11 +156,21 @@ const MonthView = ({
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
 
   // Selected event ID, used for cross-week MultiDayEvent selected state synchronization
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null
+  );
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<
+    string | null
+  >(null);
 
-  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
-  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+  const selectedEventId =
+    propSelectedEventId !== undefined
+      ? propSelectedEventId
+      : internalSelectedId;
+  const detailPanelEventId =
+    propDetailPanelEventId !== undefined
+      ? propDetailPanelEventId
+      : internalDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -235,10 +244,10 @@ const MonthView = ({
           (temporalToDate(oldEvent.start).getTime() !==
             temporalToDate(e.start).getTime() ||
             temporalToDate(oldEvent.end).getTime() !==
-            temporalToDate(e.end).getTime() ||
+              temporalToDate(e.end).getTime() ||
             oldEvent.day !== e.day ||
             extractHourFromDate(oldEvent.start) !==
-            extractHourFromDate(e.start) ||
+              extractHourFromDate(e.start) ||
             extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
             oldEvent.title !== e.title ||
             // for All day events
@@ -248,11 +257,14 @@ const MonthView = ({
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      app.applyEventsChanges({
-        delete: eventsToDelete.map(e => e.id),
-        add: eventsToAdd,
-        update: eventsToUpdate.map(e => ({ id: e.id, updates: e }))
-      }, isResizing);
+      app.applyEventsChanges(
+        {
+          delete: eventsToDelete.map(e => e.id),
+          add: eventsToAdd,
+          update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+        },
+        isResizing
+      );
     },
     onEventCreate: (event: Event) => {
       if (screenSize !== 'desktop') {
@@ -298,7 +310,10 @@ const MonthView = ({
     weekHeight,
     onCurrentMonthChange: (monthName: string, year: number) => {
       const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
-      const localizedMonths = getMonthLabels(locale, isAsian ? 'short' : 'long');
+      const localizedMonths = getMonthLabels(
+        locale,
+        isAsian ? 'short' : 'long'
+      );
       const monthIndex = localizedMonths.indexOf(monthName);
 
       if (monthIndex >= 0) {
@@ -307,7 +322,7 @@ const MonthView = ({
     },
     initialWeeksToLoad: 156,
     locale: locale,
-    isEnabled: isWeekHeightInitialized
+    isEnabled: isWeekHeightInitialized,
   });
 
   const previousStartIndexRef = useRef(0);
@@ -354,7 +369,9 @@ const MonthView = ({
     const total = virtualData.totalHeight;
     const WEEKS_TO_LOAD = 16;
     const occupied =
-      effectiveStartIndex * weekHeight + WEEKS_TO_LOAD * weekHeight + remainingSpace;
+      effectiveStartIndex * weekHeight +
+      WEEKS_TO_LOAD * weekHeight +
+      remainingSpace;
     return Math.max(0, total - occupied);
   }, [
     virtualData.totalHeight,
@@ -387,7 +404,9 @@ const MonthView = ({
             const currentScrollTop = element.scrollTop;
             if (currentScrollTop > 0) {
               // Calculate which week currently showing
-              const currentWeekIndex = Math.round(currentScrollTop / previousWeekHeightRef.current);
+              const currentWeekIndex = Math.round(
+                currentScrollTop / previousWeekHeightRef.current
+              );
               // Recalculate scrollTop with new weekHeight
               const newScrollTop = currentWeekIndex * calculatedWeekHeight;
 
@@ -437,7 +456,9 @@ const MonthView = ({
   // TODO: remove getCustomTitle and using app.currentDate to fixed
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
-    return isAsianLocale ? `${currentYear}年${currentMonth}` : `${currentMonth} ${currentYear}`;
+    return isAsianLocale
+      ? `${currentYear}年${currentMonth}`
+      : `${currentMonth} ${currentYear}`;
   };
 
   return (
@@ -494,9 +515,9 @@ const MonthView = ({
           const adjustedItem =
             index === 5
               ? {
-                ...item,
-                height: item.height + remainingSpace,
-              }
+                  ...item,
+                  height: item.height + remainingSpace,
+                }
               : item;
 
           return (
@@ -525,7 +546,11 @@ const MonthView = ({
               selectedEventId={selectedEventId}
               onEventSelect={(eventId: string | null) => {
                 const isViewable = app.getReadOnlyConfig().viewable !== false;
-                if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
+                if (
+                  (screenSize !== 'desktop' || isTouch) &&
+                  eventId &&
+                  isViewable
+                ) {
                   const evt = events.find(e => e.id === eventId);
                   if (evt) {
                     setDraftEvent(evt);
@@ -536,7 +561,8 @@ const MonthView = ({
                 setSelectedEventId(eventId);
               }}
               onEventLongPress={(eventId: string) => {
-                if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
+                if (screenSize !== 'desktop' || isTouch)
+                  setSelectedEventId(eventId);
               }}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}

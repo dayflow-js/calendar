@@ -24,15 +24,20 @@ const fr: Locale = {
     newEvent: 'Nouvel événement',
     newAllDayEvent: 'Nouvel événement toute la journée',
     newCalendarEvent: 'Nouvel événement dans {calendarName}',
-    newAllDayCalendarEvent: 'Nouvel événement toute la journée dans {calendarName}',
+    newAllDayCalendarEvent:
+      'Nouvel événement toute la journée dans {calendarName}',
     save: 'Enregistrer',
     deleteCalendar: 'Supprimer "{calendarName}" ?',
-    deleteCalendarMessage: 'Voulez-vous supprimer "{calendarName}" ou fusionner ses événements dans un autre calendrier existant ?',
+    deleteCalendarMessage:
+      'Voulez-vous supprimer "{calendarName}" ou fusionner ses événements dans un autre calendrier existant ?',
     merge: 'Fusionner',
-    confirmDeleteTitle: 'Êtes-vous sûr de vouloir supprimer le calendrier "{calendarName}" ?',
-    confirmDeleteMessage: 'Si vous supprimez ce calendrier, tous les événements associés seront également supprimés.',
+    confirmDeleteTitle:
+      'Êtes-vous sûr de vouloir supprimer le calendrier "{calendarName}" ?',
+    confirmDeleteMessage:
+      'Si vous supprimez ce calendrier, tous les événements associés seront également supprimés.',
     mergeConfirmTitle: 'Fusionner "{sourceName}" avec "{targetName}" ?',
-    mergeConfirmMessage: 'Êtes-vous sûr de vouloir fusionner "{sourceName}" avec "{targetName}" ? Cela déplacera tous les événements de "{sourceName}" vers "{targetName}" et "{sourceName}" sera supprimé. Cette action est irréversible.',
+    mergeConfirmMessage:
+      'Êtes-vous sûr de vouloir fusionner "{sourceName}" avec "{targetName}" ? Cela déplacera tous les événements de "{sourceName}" vers "{targetName}" et "{sourceName}" sera supprimé. Cette action est irréversible.',
     expandSidebar: 'Développer la barre latérale',
     collapseSidebar: 'Réduire la barre latérale',
     calendars: 'Calendriers',
@@ -50,7 +55,7 @@ const fr: Locale = {
     notes: 'Notes',
     titlePlaceholder: 'Titre',
     notesPlaceholder: 'Notes',
-    editEvent: 'Modifier l\'événement',
+    editEvent: "Modifier l'événement",
     done: 'Terminé',
     quickCreateEvent: 'Création rapide',
     quickCreatePlaceholder: 'Film à 19h vendredi',
@@ -61,13 +66,14 @@ const fr: Locale = {
     importCalendar: 'Importer un calendrier',
     exportCalendar: 'Exporter le calendrier',
     addSchedule: 'Ajouter un événement',
-    importCalendarMessage: 'Ce calendrier contient de nouveaux événements. Veuillez sélectionner un calendrier cible.',
+    importCalendarMessage:
+      'Ce calendrier contient de nouveaux événements. Veuillez sélectionner un calendrier cible.',
     ok: 'OK',
     cut: 'Couper',
     copy: 'Copier',
     pasteHere: 'Coller ici',
     eventSummary: 'Résumé',
-  }
+  },
 };
 
 export default fr;

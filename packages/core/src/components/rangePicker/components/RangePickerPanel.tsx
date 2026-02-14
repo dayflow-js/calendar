@@ -52,11 +52,7 @@ const RangePickerPanel = ({
   const endDate = draftRange[1].toPlainDate();
 
   return (
-    <div
-      ref={popupRef}
-      style={getPopupStyle()}
-      data-range-picker-popup="true"
-    >
+    <div ref={popupRef} style={getPopupStyle()} data-range-picker-popup="true">
       <div
         className="space-y-3 rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-3"
         style={{
@@ -74,25 +70,25 @@ const RangePickerPanel = ({
               onYearChange={onYearChange}
             />
             <CalendarGrid
-                calendarDays={calendarDays}
-                visibleMonth={visibleMonth}
-                startDate={startDate}
-                endDate={endDate}
-                weekDayLabels={weekDayLabels}
-                disabled={disabled}
-                onDaySelect={onDaySelect}
+              calendarDays={calendarDays}
+              visibleMonth={visibleMonth}
+              startDate={startDate}
+              endDate={endDate}
+              weekDayLabels={weekDayLabels}
+              disabled={disabled}
+              onDaySelect={onDaySelect}
             />
           </div>
 
           {isTimeEnabled && (
             <div className="flex flex-1 justify-end sm:w-32">
               <TimeSelector
-                  focusedField={focusedField}
-                  draftRange={draftRange}
-                  disabled={disabled}
-                  onHourSelect={onHourSelect}
-                  onMinuteSelect={onMinuteSelect}
-                  timeListRefs={timeListRefs}
+                focusedField={focusedField}
+                draftRange={draftRange}
+                disabled={disabled}
+                onHourSelect={onHourSelect}
+                onMinuteSelect={onMinuteSelect}
+                timeListRefs={timeListRefs}
               />
             </div>
           )}

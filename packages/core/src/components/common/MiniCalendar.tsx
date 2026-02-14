@@ -76,8 +76,8 @@ export const MiniCalendar = ({
 
   return (
     <div className="px-3 py-3">
-      {
-        showHeader ? <div className="mb-3 flex items-center justify-between">
+      {showHeader ? (
+        <div className="mb-3 flex items-center justify-between">
           <button
             type="button"
             className="flex h-7 w-7 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800"
@@ -97,11 +97,16 @@ export const MiniCalendar = ({
           >
             <ChevronRight className="h-4 w-4" />
           </button>
-        </div> : ''
-      }
+        </div>
+      ) : (
+        ''
+      )}
       <div className={miniCalendarGrid}>
         {weekdayLabels.map((label, index) => (
-          <div key={`weekday-${index}`} className={`${miniCalendarDayHeader} text-gray-500 dark:text-gray-400`}>
+          <div
+            key={`weekday-${index}`}
+            className={`${miniCalendarDayHeader} text-gray-500 dark:text-gray-400`}
+          >
             {label}
           </div>
         ))}
@@ -111,11 +116,12 @@ export const MiniCalendar = ({
             key={day.fullDate.getTime()}
             className={`
               ${miniCalendarDay}
-              ${day.isToday
-                ? miniCalendarToday
-                : day.isCurrentMonth
-                  ? miniCalendarCurrentMonth
-                  : miniCalendarOtherMonth
+              ${
+                day.isToday
+                  ? miniCalendarToday
+                  : day.isCurrentMonth
+                    ? miniCalendarCurrentMonth
+                    : miniCalendarOtherMonth
               }
               ${day.isSelected && !day.isToday ? miniCalendarSelected : ''}
             `}

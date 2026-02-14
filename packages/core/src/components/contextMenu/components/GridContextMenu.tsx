@@ -34,13 +34,15 @@ const GridContextMenu = ({
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
-      <ContextMenuItem onClick={() => { onCreateEvent(); onClose(); }}>
+      <ContextMenuItem
+        onClick={() => {
+          onCreateEvent();
+          onClose();
+        }}
+      >
         {t('newEvent') || 'New Event'}
       </ContextMenuItem>
-      <ContextMenuItem 
-        onClick={handlePaste} 
-        disabled={!hasCopiedEvent}
-      >
+      <ContextMenuItem onClick={handlePaste} disabled={!hasCopiedEvent}>
         {t('pasteHere') || 'Paste Here'}
       </ContextMenuItem>
     </ContextMenu>

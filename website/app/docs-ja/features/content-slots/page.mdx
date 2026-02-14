@@ -12,14 +12,14 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 
 ## 利用可能なスロット
 
-| ジェネレーター名 | 説明 | 引数 |
-| :--- | :--- | :--- |
-| `eventContent` | イベントカードの内部コンテンツ。 | `{ event, isAllDay, isMobile }` |
-| `eventDetailContent` | イベントクリック時に表示されるパネル/詳細コンテンツ。 | `{ event, position, onClose }` |
-| `colorPicker` | サイドバーで使用される小型のカラーピッカー。 | `{ color, onChange, variant: 'sketch' }` |
-| `colorPickerWrapper` | ダイアログで使用されるフル機能のカラーピッカー。 | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `headerContent` | カレンダーヘッダーのカスタムコンテンツ。 | `{ view, date, ... }` |
-| `titleBarSlot` | サイドバーのタイトルバー内の追加コンテンツ。 | `{ isCollapsed, toggleCollapsed }` |
+| ジェネレーター名     | 説明                                                  | 引数                                                            |
+| :------------------- | :---------------------------------------------------- | :-------------------------------------------------------------- |
+| `eventContent`       | イベントカードの内部コンテンツ。                      | `{ event, isAllDay, isMobile }`                                 |
+| `eventDetailContent` | イベントクリック時に表示されるパネル/詳細コンテンツ。 | `{ event, position, onClose }`                                  |
+| `colorPicker`        | サイドバーで使用される小型のカラーピッカー。          | `{ color, onChange, variant: 'sketch' }`                        |
+| `colorPickerWrapper` | ダイアログで使用されるフル機能のカラーピッカー。      | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
+| `headerContent`      | カレンダーヘッダーのカスタムコンテンツ。              | `{ view, date, ... }`                                           |
+| `titleBarSlot`       | サイドバーのタイトルバー内の追加コンテンツ。          | `{ isCollapsed, toggleCollapsed }`                              |
 
 ## 例: カスタムカラーピッカーの注入
 
@@ -28,6 +28,7 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 ### React の例
 
 `react-color` をインストールします:
+
 ```bash
 npm install react-color
 ```
@@ -42,17 +43,17 @@ function MyCalendar() {
   return (
     <DayFlowCalendar
       calendar={calendar}
-      colorPicker={(args) => (
+      colorPicker={args => (
         <SketchPicker
           color={args.color}
-          onChange={(color) => args.onChange({ hex: color.hex })}
+          onChange={color => args.onChange({ hex: color.hex })}
           width="220px"
         />
       )}
-      colorPickerWrapper={(args) => (
+      colorPickerWrapper={args => (
         <PhotoshopPicker
           color={args.color}
-          onChange={(color) => args.onChange({ hex: color.hex })}
+          onChange={color => args.onChange({ hex: color.hex })}
           onAccept={() => args.onAccept?.()}
           onCancel={() => args.onCancel?.()}
         />
@@ -65,6 +66,7 @@ function MyCalendar() {
 ### Vue の例
 
 `vue-color` をインストールします:
+
 ```bash
 npm install vue-color
 ```
@@ -77,14 +79,14 @@ npm install vue-color
     <template #colorPicker="args">
       <Sketch
         :value="args.color"
-        @input="(val) => args.onChange({ hex: val.hex })"
+        @input="val => args.onChange({ hex: val.hex })"
       />
     </template>
-    
+
     <template #colorPickerWrapper="args">
       <Photoshop
         :value="args.color"
-        @input="(val) => args.onChange({ hex: val.hex })"
+        @input="val => args.onChange({ hex: val.hex })"
         @ok="args.onAccept"
         @cancel="args.onCancel"
       />

@@ -19,7 +19,12 @@ export function createDragPlugin(
     enableResize: true,
     enableCreate: true,
     enableAllDayCreate: true,
-    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH, ViewType.YEAR],
+    supportedViews: [
+      ViewType.DAY,
+      ViewType.WEEK,
+      ViewType.MONTH,
+      ViewType.YEAR,
+    ],
     ...config,
   };
 
@@ -61,9 +66,9 @@ export function useDragForView(
     );
 
     return {
-      handleMoveStart: () => { }, // Disable move
-      handleCreateStart: () => { }, // Disable create
-      handleResizeStart: () => { }, // Disable resize
+      handleMoveStart: () => {}, // Disable move
+      handleCreateStart: () => {}, // Disable create
+      handleResizeStart: () => {}, // Disable resize
       handleCreateAllDayEvent: undefined,
       dragState: result.dragState,
       isDragging: false, // Never in dragging state
@@ -87,11 +92,11 @@ export function useDragForView(
     handleMoveStart:
       isSupported && config.enableDrag && isDraggable
         ? result.handleMoveStart
-        : () => { },
+        : () => {},
     handleCreateStart:
       isSupported && config.enableCreate && isEditable
         ? result.handleCreateStart
-        : () => { },
+        : () => {},
     handleResizeStart:
       isSupported && config.enableResize && isEditable
         ? result.handleResizeStart
@@ -99,7 +104,7 @@ export function useDragForView(
     handleCreateAllDayEvent:
       isSupported && config.enableAllDayCreate && isEditable
         ? result.handleCreateAllDayEvent
-        : () => { },
+        : () => {},
     dragState: result.dragState,
     isDragging: isSupported && isDraggable ? result.isDragging : false,
   };
@@ -125,7 +130,12 @@ export function createDragConfig(
     enableResize: true,
     enableCreate: true,
     enableAllDayCreate: true,
-    supportedViews: [ViewType.DAY, ViewType.WEEK, ViewType.MONTH, ViewType.YEAR],
+    supportedViews: [
+      ViewType.DAY,
+      ViewType.WEEK,
+      ViewType.MONTH,
+      ViewType.YEAR,
+    ],
     ...overrides,
   };
 }

@@ -1,7 +1,14 @@
 import { useEffect } from 'preact/hooks';
 import { ICalendarApp } from '@/types';
 import { clipboardStore } from '@/utils/clipboardStore';
-import { generateUniKey, temporalToDate, dateToZonedDateTime, dateToPlainDate, getWeekRange, extractHourFromDate } from '@/utils';
+import {
+  generateUniKey,
+  temporalToDate,
+  dateToZonedDateTime,
+  dateToPlainDate,
+  getWeekRange,
+  extractHourFromDate,
+} from '@/utils';
 import { Event, ViewType } from '@/types';
 import { Temporal } from 'temporal-polyfill';
 
@@ -27,7 +34,11 @@ export const useKeyboardShortcuts = ({
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
       const activeElement = document.activeElement;
-      const isTyping = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || (activeElement as HTMLElement).isContentEditable);
+      const isTyping =
+        activeElement &&
+        (activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA' ||
+          (activeElement as HTMLElement).isContentEditable);
 
       // 1. Search (Cmd/Ctrl + F)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
@@ -100,7 +111,9 @@ export const useKeyboardShortcuts = ({
               const event = app.getEvents().find(e => e.id === selectedEventId);
               if (event) {
                 try {
-                  await navigator.clipboard.writeText(JSON.stringify(event, null, 2));
+                  await navigator.clipboard.writeText(
+                    JSON.stringify(event, null, 2)
+                  );
                   clipboardStore.setEvent(event);
                 } catch (err) {
                   console.error('Failed to copy event', err);
@@ -113,7 +126,9 @@ export const useKeyboardShortcuts = ({
               const event = app.getEvents().find(e => e.id === selectedEventId);
               if (event) {
                 try {
-                  await navigator.clipboard.writeText(JSON.stringify(event, null, 2));
+                  await navigator.clipboard.writeText(
+                    JSON.stringify(event, null, 2)
+                  );
                   clipboardStore.setEvent(event);
                   app.deleteEvent(event.id);
                   setSelectedEventId(null);
@@ -129,19 +144,19 @@ export const useKeyboardShortcuts = ({
             break;
         }
       }
-      
+
       // 7. Delete (Backspace/Delete)
       if (e.key === 'Backspace' || e.key === 'Delete') {
-         // Only delete if not editing text
-         if (isTyping) {
-           return;
-         }
-         
-         if (selectedEventId) {
-            app.deleteEvent(selectedEventId);
-            setSelectedEventId(null);
-            setDetailPanelEventId(null);
-         }
+        // Only delete if not editing text
+        if (isTyping) {
+          return;
+        }
+
+        if (selectedEventId) {
+          app.deleteEvent(selectedEventId);
+          setSelectedEventId(null);
+          setDetailPanelEventId(null);
+        }
       }
     };
 
@@ -151,66 +166,72 @@ export const useKeyboardShortcuts = ({
         if (!eventData) {
           const text = await navigator.clipboard.readText();
           if (text) {
-             try {
-                eventData = JSON.parse(text);
-             } catch (e) {
-                // Not JSON or invalid
-             }
+            try {
+              eventData = JSON.parse(text);
+            } catch (e) {
+              // Not JSON or invalid
+            }
           }
         }
 
         if (eventData && typeof eventData === 'object' && eventData.title) {
-           const originalStart = temporalToDate(eventData.start as any);
-           const originalEnd = temporalToDate(eventData.end as any);
-           const duration = originalEnd.getTime() - originalStart.getTime();
+          const originalStart = temporalToDate(eventData.start as any);
+          const originalEnd = temporalToDate(eventData.end as any);
+          const duration = originalEnd.getTime() - originalStart.getTime();
 
-           // 1. Determine target date
-           let targetStart = new Date();
-           
-           // If an event is currently selected, use its date as the base
-           // This covers the case: Copy -> (still selected) -> Paste
-           if (selectedEventId) {
-             const selectedEvent = app.getEvents().find(e => e.id === selectedEventId);
-             if (selectedEvent) {
-               targetStart = temporalToDate(selectedEvent.start);
-             } else {
-               targetStart = new Date(app.getCurrentDate());
-             }
-           } else {
-             // If no event is selected (e.g., clicked empty grid), use current app date
-             // Always fetch from app instance to get the freshest value
-             targetStart = new Date(app.getCurrentDate());
-           }
-           
-           // 2. Preserve original time from copied event
-           targetStart.setHours(
-             originalStart.getHours(),
-             originalStart.getMinutes(),
-             originalStart.getSeconds(),
-             0
-           );
+          // 1. Determine target date
+          let targetStart = new Date();
 
-           const targetEnd = new Date(targetStart.getTime() + (duration > 0 ? duration : 3600000));
-           const { _segmentInfo, ...cleanEventData } = eventData as any;
+          // If an event is currently selected, use its date as the base
+          // This covers the case: Copy -> (still selected) -> Paste
+          if (selectedEventId) {
+            const selectedEvent = app
+              .getEvents()
+              .find(e => e.id === selectedEventId);
+            if (selectedEvent) {
+              targetStart = temporalToDate(selectedEvent.start);
+            } else {
+              targetStart = new Date(app.getCurrentDate());
+            }
+          } else {
+            // If no event is selected (e.g., clicked empty grid), use current app date
+            // Always fetch from app instance to get the freshest value
+            targetStart = new Date(app.getCurrentDate());
+          }
 
-           const newEvent: Event = {
-             ...cleanEventData,
-             id: generateUniKey(),
-             start: eventData.allDay 
-               ? dateToPlainDate(targetStart) 
-               : dateToZonedDateTime(targetStart, Temporal.Now.timeZoneId()),
-             end: eventData.allDay 
-               ? dateToPlainDate(targetEnd) 
-               : dateToZonedDateTime(targetEnd, Temporal.Now.timeZoneId()),
-             calendarId: eventData.calendarId && app.getCalendarRegistry().has(eventData.calendarId)
-               ? eventData.calendarId
-               : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
-           };
+          // 2. Preserve original time from copied event
+          targetStart.setHours(
+            originalStart.getHours(),
+            originalStart.getMinutes(),
+            originalStart.getSeconds(),
+            0
+          );
 
-           app.addEvent(newEvent);
-           // Select the new event
-           setSelectedEventId(newEvent.id);
-           app.highlightEvent(newEvent.id);
+          const targetEnd = new Date(
+            targetStart.getTime() + (duration > 0 ? duration : 3600000)
+          );
+          const { _segmentInfo, ...cleanEventData } = eventData as any;
+
+          const newEvent: Event = {
+            ...cleanEventData,
+            id: generateUniKey(),
+            start: eventData.allDay
+              ? dateToPlainDate(targetStart)
+              : dateToZonedDateTime(targetStart, Temporal.Now.timeZoneId()),
+            end: eventData.allDay
+              ? dateToPlainDate(targetEnd)
+              : dateToZonedDateTime(targetEnd, Temporal.Now.timeZoneId()),
+            calendarId:
+              eventData.calendarId &&
+              app.getCalendarRegistry().has(eventData.calendarId)
+                ? eventData.calendarId
+                : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
+          };
+
+          app.addEvent(newEvent);
+          // Select the new event
+          setSelectedEventId(newEvent.id);
+          app.highlightEvent(newEvent.id);
         }
       } catch (err) {
         console.error('Failed to paste', err);
@@ -231,24 +252,32 @@ export const useKeyboardShortcuts = ({
           return s.toDateString() === currentDate.toDateString();
         });
       } else if (currentView === ViewType.WEEK) {
-        const { monday: start, sunday: end } = getWeekRange(currentDate); 
+        const { monday: start, sunday: end } = getWeekRange(currentDate);
         visibleEvents = events.filter(e => {
-           const s = temporalToDate(e.start);
-           return s >= start && s <= end;
+          const s = temporalToDate(e.start);
+          return s >= start && s <= end;
         });
       } else if (currentView === ViewType.MONTH) {
         const visibleMonth = app.getVisibleMonth();
-        const start = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
-        const end = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0);
+        const start = new Date(
+          visibleMonth.getFullYear(),
+          visibleMonth.getMonth(),
+          1
+        );
+        const end = new Date(
+          visibleMonth.getFullYear(),
+          visibleMonth.getMonth() + 1,
+          0
+        );
         visibleEvents = events.filter(e => {
-           const s = temporalToDate(e.start);
-           return s >= start && s <= end;
+          const s = temporalToDate(e.start);
+          return s >= start && s <= end;
         });
       } else if (currentView === ViewType.YEAR) {
-         const year = currentDate.getFullYear();
-         visibleEvents = events.filter(e => {
-            return temporalToDate(e.start).getFullYear() === year;
-         });
+        const year = currentDate.getFullYear();
+        visibleEvents = events.filter(e => {
+          return temporalToDate(e.start).getFullYear() === year;
+        });
       }
 
       // Sort events chronologically
@@ -266,7 +295,9 @@ export const useKeyboardShortcuts = ({
 
       let nextIndex = 0;
       if (selectedEventId) {
-        const currentIndex = visibleEvents.findIndex(e => e.id === selectedEventId);
+        const currentIndex = visibleEvents.findIndex(
+          e => e.id === selectedEventId
+        );
         if (currentIndex !== -1) {
           if (reverse) {
             nextIndex = currentIndex - 1;

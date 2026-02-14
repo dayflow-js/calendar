@@ -20,7 +20,7 @@ You can provide a custom component function to render your own header while stil
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: (props) => {
+  useCalendarHeader: props => {
     const { calendar, switcherMode } = props;
     return (
       <div className="custom-header">
@@ -36,13 +36,13 @@ const calendar = useCalendarApp({
 
 The custom renderer receives the following props:
 
-| Prop | Description |
-| :--- | :--- |
-| `calendar` | The `CalendarApp` instance. |
-| `switcherMode` | The current view switcher mode (`buttons` or `select`). |
-| `onAddCalendar` | Handler for adding a new calendar. |
-| `onSearchChange` | Handler for updating the search query. |
-| `onSearchClick` | Handler for when the search icon is clicked. |
-| `searchValue` | The current search string. |
-| `isSearchOpen` | Whether the search UI is currently open. |
-| `isEditable` | Whether the calendar is currently in an editable state. |
+| Prop             | Description                                             |
+| :--------------- | :------------------------------------------------------ |
+| `calendar`       | The `CalendarApp` instance.                             |
+| `switcherMode`   | The current view switcher mode (`buttons` or `select`). |
+| `onAddCalendar`  | Handler for adding a new calendar.                      |
+| `onSearchChange` | Handler for updating the search query.                  |
+| `onSearchClick`  | Handler for when the search icon is clicked.            |
+| `searchValue`    | The current search string.                              |
+| `isSearchOpen`   | Whether the search UI is currently open.                |
+| `isEditable`     | Whether the calendar is currently in an editable state. |

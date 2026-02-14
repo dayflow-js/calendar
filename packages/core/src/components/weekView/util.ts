@@ -1,11 +1,11 @@
 import { Event, EventLayout } from '@/types';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
-import {
-  createDateWithHour,
-  getDateByDayIndex,
-} from '@/utils';
+import { createDateWithHour, getDateByDayIndex } from '@/utils';
 import { EventLayoutCalculator } from '@/components/eventLayout';
-import { analyzeMultiDayRegularEvent, analyzeMultiDayEventsForWeek } from '@/components/monthView/util';
+import {
+  analyzeMultiDayRegularEvent,
+  analyzeMultiDayEventsForWeek,
+} from '@/components/monthView/util';
 
 // ... existing code ...
 
@@ -27,7 +27,8 @@ export const calculateEventLayouts = (
       if (segments.length > 0) {
         const segment = segments.find(s => s.dayIndex === day);
         if (segment) {
-          const segmentEndHour = segment.endHour >= 24 ? 23.99 : segment.endHour;
+          const segmentEndHour =
+            segment.endHour >= 24 ? 23.99 : segment.endHour;
 
           const virtualEvent: Event = {
             ...event,
@@ -74,7 +75,10 @@ export const getWeekStart = (date: Date): Date => {
 };
 
 // Filter events for the current week
-export const filterWeekEvents = (events: Event[], currentWeekStart: Date): Event[] => {
+export const filterWeekEvents = (
+  events: Event[],
+  currentWeekStart: Date
+): Event[] => {
   const weekEnd = new Date(currentWeekStart);
   weekEnd.setDate(currentWeekStart.getDate() + 6);
   weekEnd.setHours(23, 59, 59, 999);
@@ -91,8 +95,7 @@ export const filterWeekEvents = (events: Event[], currentWeekStart: Date): Event
   return filtered.map(event => {
     const eventDate = temporalToDate(event.start);
     const dayDiff = Math.floor(
-      (eventDate.getTime() - currentWeekStart.getTime()) /
-      (24 * 60 * 60 * 1000)
+      (eventDate.getTime() - currentWeekStart.getTime()) / (24 * 60 * 60 * 1000)
     );
     const correctDay = Math.max(0, Math.min(6, dayDiff));
 
@@ -104,8 +107,14 @@ export const filterWeekEvents = (events: Event[], currentWeekStart: Date): Event
 };
 
 // Organize all-day segments
-export const organizeAllDaySegments = (currentWeekEvents: Event[], currentWeekStart: Date) => {
-  const multiDaySegments = analyzeMultiDayEventsForWeek(currentWeekEvents, currentWeekStart);
+export const organizeAllDaySegments = (
+  currentWeekEvents: Event[],
+  currentWeekStart: Date
+) => {
+  const multiDaySegments = analyzeMultiDayEventsForWeek(
+    currentWeekEvents,
+    currentWeekStart
+  );
   const segments = multiDaySegments.filter((seg: any) => seg.event.allDay);
 
   segments.sort((a: any, b: any) => {
@@ -117,7 +126,8 @@ export const organizeAllDaySegments = (currentWeekEvents: Event[], currentWeekSt
     return bDays - aDays;
   });
 
-  const segmentsWithRow: Array<(typeof multiDaySegments)[0] & { row: number }> = [];
+  const segmentsWithRow: Array<(typeof multiDaySegments)[0] & { row: number }> =
+    [];
 
   segments.forEach((segment: any) => {
     let row = 0;

@@ -7,7 +7,11 @@ import { getCalendarColorsForHex } from '../../core/calendarRegistry';
 import { generateUniKey } from '../../utils/helpers';
 import { CalendarType, CreateCalendarDialogProps } from '../../types';
 import { BlossomColorPicker } from './BlossomColorPicker';
-import { DEFAULT_COLORS, hslToHex, lightnessToSliderValue } from '@dayflow/blossom-color-picker';
+import {
+  DEFAULT_COLORS,
+  hslToHex,
+  lightnessToSliderValue,
+} from '@dayflow/blossom-color-picker';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLocale } from '@/locale';
 
@@ -33,14 +37,17 @@ export const CreateCalendarDialog = ({
 
   // State for default mode (react-color)
   const [defaultSelectedColor, setDefaultSelectedColor] = useState(
-    PICKER_DEFAULT_COLORS[Math.floor(Math.random() * PICKER_DEFAULT_COLORS.length)]
+    PICKER_DEFAULT_COLORS[
+      Math.floor(Math.random() * PICKER_DEFAULT_COLORS.length)
+    ]
   );
   const [showPicker, setShowPicker] = useState(false);
   const [previousColor, setPreviousColor] = useState('');
 
   // Pick a random initial color from all colors for blossom mode
   const initialColorData = useMemo(() => {
-    const randomColor = DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
+    const randomColor =
+      DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
 
     // Default to 'outer' as the simplified DEFAULT_COLORS might not have layer info
     const layer = (randomColor as any).layer || 'outer';
@@ -53,7 +60,7 @@ export const CreateCalendarDialog = ({
       saturation: sliderValue, // This is now the slider position
       lightness: randomColor.l,
       alpha: 100,
-      layer: layer as 'inner' | 'outer'
+      layer: layer as 'inner' | 'outer',
     };
   }, []);
 
@@ -73,7 +80,13 @@ export const CreateCalendarDialog = ({
 
     let hex: string;
     if (colorPickerMode === 'blossom') {
-      hex = blossomSelectedColor?.hex ?? hslToHex(initialColorData.hue, initialColorData.saturation, initialColorData.lightness);
+      hex =
+        blossomSelectedColor?.hex ??
+        hslToHex(
+          initialColorData.hue,
+          initialColorData.saturation,
+          initialColorData.lightness
+        );
     } else {
       hex = defaultSelectedColor;
     }
@@ -116,7 +129,8 @@ export const CreateCalendarDialog = ({
     default: {
       picker: {
         background: isDark ? '#1e293b' : '#ffffff',
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        boxShadow:
+          '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         borderRadius: '0.5rem',
         border: isDark ? '1px solid #4b5563' : '1px solid #e5e7eb',
       },
@@ -142,7 +156,7 @@ export const CreateCalendarDialog = ({
       },
       actions: {
         borderTop: isDark ? '1px solid #4b5563' : '1px solid #e5e7eb',
-      }
+      },
     },
   };
 
@@ -150,8 +164,13 @@ export const CreateCalendarDialog = ({
 
   return createPortal(
     <div className="fixed inset-0 z-10000 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-white dark:bg-slate-900 animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-        <h2 className={`text-lg font-semibold text-gray-900 dark:text-white ${colorPickerMode === 'blossom' ? 'mb-6' : 'mb-4'}`}>
+      <div
+        className="w-full max-w-sm rounded-lg p-6 shadow-xl bg-white dark:bg-slate-900 animate-in fade-in zoom-in-95"
+        onClick={e => e.stopPropagation()}
+      >
+        <h2
+          className={`text-lg font-semibold text-gray-900 dark:text-white ${colorPickerMode === 'blossom' ? 'mb-6' : 'mb-4'}`}
+        >
           {t('createCalendar')}
         </h2>
 
@@ -165,7 +184,7 @@ export const CreateCalendarDialog = ({
                   name="calendar-name"
                   type="text"
                   value={name}
-                  onChange={(e) => setName((e.target as HTMLInputElement).value)}
+                  onChange={e => setName((e.target as HTMLInputElement).value)}
                   className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                   placeholder={t('calendarNamePlaceholder')}
                   autoFocus
@@ -179,8 +198,8 @@ export const CreateCalendarDialog = ({
                     coreSize={36}
                     petalSize={32}
                     openOnHover={false}
-                    onChange={(color) => setBlossomSelectedColor(color)}
-                    onCollapse={(color) => setBlossomSelectedColor(color)}
+                    onChange={color => setBlossomSelectedColor(color)}
+                    onCollapse={color => setBlossomSelectedColor(color)}
                     className="z-50"
                   />
                 </div>
@@ -200,7 +219,9 @@ export const CreateCalendarDialog = ({
                     name="calendar-name"
                     type="text"
                     value={name}
-                    onChange={(e) => setName((e.target as HTMLInputElement).value)}
+                    onChange={e =>
+                      setName((e.target as HTMLInputElement).value)
+                    }
                     className="w-full flex-1 border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     placeholder={t('calendarNamePlaceholder')}
                     autoFocus
@@ -210,13 +231,15 @@ export const CreateCalendarDialog = ({
 
               <div className="mb-6">
                 <div className="grid grid-cols-7 gap-6">
-                  {PICKER_DEFAULT_COLORS.map((color) => (
+                  {PICKER_DEFAULT_COLORS.map(color => (
                     <button
                       key={color}
                       type="button"
-                      className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${defaultSelectedColor === color
-                        ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800' : ''
-                        }`}
+                      className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
+                        defaultSelectedColor === color
+                          ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800'
+                          : ''
+                      }`}
                       style={{ backgroundColor: color }}
                       onClick={() => setDefaultSelectedColor(color)}
                     />
@@ -242,10 +265,10 @@ export const CreateCalendarDialog = ({
                           onChange: handleColorChange,
                           onAccept: handleAccept,
                           onCancel: handleCancel,
-                          styles: pickerStyles
+                          styles: pickerStyles,
                         }}
                         defaultContent={
-                          <div >
+                          <div>
                             <DefaultColorPicker
                               color={defaultSelectedColor}
                               onChange={handleColorChange}

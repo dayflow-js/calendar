@@ -1,11 +1,13 @@
 export interface CustomRendering {
   id: string;
-  containerEl: HTMLElement;       // The placeholder div created by Preact
-  generatorName: string;          // e.g. 'eventContent', 'titleBarSlot'
-  generatorArgs: any;             // Arguments passed to the framework-specific generator
+  containerEl: HTMLElement; // The placeholder div created by Preact
+  generatorName: string; // e.g. 'eventContent', 'titleBarSlot'
+  generatorArgs: any; // Arguments passed to the framework-specific generator
 }
 
-export type CustomRenderingListener = (map: Map<string, CustomRendering>) => void;
+export type CustomRenderingListener = (
+  map: Map<string, CustomRendering>
+) => void;
 
 export class CustomRenderingStore {
   private renderings = new Map<string, CustomRendering>();

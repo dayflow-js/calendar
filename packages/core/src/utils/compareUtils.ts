@@ -9,7 +9,12 @@ export function isDeepEqual(a: any, b: any): boolean {
     return a.getTime() === b.getTime();
   }
 
-  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
+  if (
+    typeof a !== 'object' ||
+    a === null ||
+    typeof b !== 'object' ||
+    b === null
+  ) {
     return false;
   }
 

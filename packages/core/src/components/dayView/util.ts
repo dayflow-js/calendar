@@ -3,7 +3,11 @@ import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 import { EventLayoutCalculator } from '@/components/eventLayout';
 
 // Filter events for the current day
-export const filterDayEvents = (events: Event[], currentDate: Date, currentWeekStart: Date): Event[] => {
+export const filterDayEvents = (
+  events: Event[],
+  currentDate: Date,
+  currentWeekStart: Date
+): Event[] => {
   const dayStart = new Date(currentDate);
   dayStart.setHours(0, 0, 0, 0);
 
@@ -28,8 +32,7 @@ export const filterDayEvents = (events: Event[], currentDate: Date, currentWeekS
   return filtered.map(event => {
     const eventDate = temporalToDate(event.start);
     const dayDiff = Math.floor(
-      (eventDate.getTime() - currentWeekStart.getTime()) /
-      (24 * 60 * 60 * 1000)
+      (eventDate.getTime() - currentWeekStart.getTime()) / (24 * 60 * 60 * 1000)
     );
     const correctDay = Math.max(0, Math.min(6, dayDiff));
 
@@ -41,7 +44,10 @@ export const filterDayEvents = (events: Event[], currentDate: Date, currentWeekS
 };
 
 // Normalize events for layout calculation (clamping to current day)
-export const normalizeLayoutEvents = (currentDayEvents: Event[], currentDate: Date): Event[] => {
+export const normalizeLayoutEvents = (
+  currentDayEvents: Event[],
+  currentDate: Date
+): Event[] => {
   const dayStart = new Date(currentDate);
   dayStart.setHours(0, 0, 0, 0);
   const nextDay = new Date(dayStart);
@@ -70,7 +76,7 @@ export const normalizeLayoutEvents = (currentDayEvents: Event[], currentDate: Da
         ...event,
         start: modified ? newStart : event.start,
         end: modified ? newEnd : event.end,
-        day: 0 // Force all events to same day index for collision detection
+        day: 0, // Force all events to same day index for collision detection
       };
     });
 };
@@ -78,7 +84,7 @@ export const normalizeLayoutEvents = (currentDayEvents: Event[], currentDate: Da
 // Organize all-day events into rows
 export const organizeAllDayEvents = (currentDayEvents: Event[]) => {
   const allDayEvents = currentDayEvents.filter(e => e.allDay);
-  
+
   allDayEvents.sort((a, b) => {
     const aStart = temporalToDate(a.start);
     const bStart = temporalToDate(b.start);
@@ -169,7 +175,12 @@ export const calculateDragLayout = (
 
   const viewDate = new Date(currentDate);
   const startD = new Date(viewDate);
-  startD.setHours(Math.floor(targetStartHour), (targetStartHour % 1) * 60, 0, 0);
+  startD.setHours(
+    Math.floor(targetStartHour),
+    (targetStartHour % 1) * 60,
+    0,
+    0
+  );
   const endD = new Date(viewDate);
   endD.setHours(Math.floor(targetEndHour), (targetEndHour % 1) * 60, 0, 0);
 
@@ -177,7 +188,7 @@ export const calculateDragLayout = (
     ...draggedEvent,
     start: dateToZonedDateTime(startD),
     end: dateToZonedDateTime(endD),
-    day: 0
+    day: 0,
   };
 
   const dayEvents = [...otherEvents, modifiedDraggedEvent];

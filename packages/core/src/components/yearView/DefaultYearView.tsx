@@ -1,8 +1,21 @@
 import { h, Fragment } from 'preact';
-import { useMemo, useRef, useEffect, useState, useCallback } from 'preact/hooks';
+import {
+  useMemo,
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+} from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 import { useLocale } from '@/locale';
-import { Event, ViewType, MonthEventDragState, EventDetailContentRenderer, EventDetailDialogRenderer, ICalendarApp } from '@/types';
+import {
+  Event,
+  ViewType,
+  MonthEventDragState,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  ICalendarApp,
+} from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useDragForView } from '@/plugins/dragPlugin';
@@ -52,11 +65,21 @@ export const DefaultYearView = ({
   });
   const [isLayoutReady, setIsLayoutReady] = useState(false);
 
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null
+  );
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<
+    string | null
+  >(null);
 
-  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
-  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+  const selectedEventId =
+    propSelectedEventId !== undefined
+      ? propSelectedEventId
+      : internalSelectedId;
+  const detailPanelEventId =
+    propDetailPanelEventId !== undefined
+      ? propDetailPanelEventId
+      : internalDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -74,7 +97,9 @@ export const DefaultYearView = ({
     }
   };
 
-  const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(null);
+  const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -97,7 +122,7 @@ export const DefaultYearView = ({
     const container = scrollElementRef.current;
     if (!container) return;
 
-    const observer = new ResizeObserver((entries) => {
+    const observer = new ResizeObserver(entries => {
       const width = entries[0].contentRect.width;
       const minCellWidth = 80; // Consistent with previous minmax
       const cols = Math.floor(width / minCellWidth);
@@ -135,17 +160,20 @@ export const DefaultYearView = ({
       const newEvents = updateFunc(rawEvents);
       newEvents.forEach(newEvent => {
         const oldEvent = rawEvents.find(e => e.id === newEvent.id);
-        if (oldEvent && (oldEvent.start !== newEvent.start || oldEvent.end !== newEvent.end)) {
+        if (
+          oldEvent &&
+          (oldEvent.start !== newEvent.start || oldEvent.end !== newEvent.end)
+        ) {
           app.updateEvent(newEvent.id, newEvent, isResizing);
         }
       });
     },
     currentWeekStart: new Date(),
     events: rawEvents,
-    onEventCreate: (event) => {
+    onEventCreate: event => {
       app.addEvent(event);
     },
-    onEventEdit: (event) => {
+    onEventEdit: event => {
       setNewlyCreatedEventId(event.id);
     },
   });
@@ -251,7 +279,10 @@ export const DefaultYearView = ({
       >
         <div
           className="w-full flex flex-col border-t border-l border-gray-100 dark:border-gray-800"
-          style={{ opacity: isLayoutReady ? 1 : 0, transition: 'opacity 0.2s ease' }}
+          style={{
+            opacity: isLayoutReady ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+          }}
         >
           {rows.map((rowDays, index) => (
             <YearRowComponent
@@ -276,7 +307,8 @@ export const DefaultYearView = ({
               onDetailPanelToggle={setDetailPanelEventId}
               customDetailPanelContent={customDetailPanelContent}
               customEventDetailDialog={customEventDetailDialog}
-            />))}
+            />
+          ))}
         </div>
       </div>
     </div>

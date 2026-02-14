@@ -27,12 +27,15 @@ const CalendarHeader = ({
   const isMobile = screenSize === 'mobile';
   const { t } = useLocale();
 
-  const handleSearchChange = useCallback((e: any) => {
-    const newValue = e.target.value;
-    if (newValue !== searchValue) {
-      onSearchChange?.(newValue);
-    }
-  }, [onSearchChange, searchValue]);
+  const handleSearchChange = useCallback(
+    (e: any) => {
+      const newValue = e.target.value;
+      if (newValue !== searchValue) {
+        onSearchChange?.(newValue);
+      }
+    },
+    [onSearchChange, searchValue]
+  );
 
   const handleClearSearch = () => {
     onSearchChange?.('');
@@ -57,11 +60,15 @@ const CalendarHeader = ({
       generatorArgs={headerProps}
       defaultContent={
         <div
-          className={`df-header flex items-center justify-between pr-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${isDayView || isSearchOpen
-            ? 'border-gray-200 dark:border-gray-700'
-            : 'border-transparent'
-            }`}
-          style={{ paddingLeft: safeAreaLeft || 8, transition: 'padding-left 160ms ease-in-out' }}
+          className={`df-header flex items-center justify-between pr-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${
+            isDayView || isSearchOpen
+              ? 'border-gray-200 dark:border-gray-700'
+              : 'border-transparent'
+          }`}
+          style={{
+            paddingLeft: safeAreaLeft || 8,
+            transition: 'padding-left 160ms ease-in-out',
+          }}
           onContextMenu={e => e.preventDefault()}
         >
           {/* Left Section: Add Calendar Button Only */}
@@ -71,7 +78,11 @@ const CalendarHeader = ({
                 id="dayflow-add-event-btn"
                 onClick={onAddCalendar}
                 className={iconButton}
-                title={isMobile ? (t('newEvent') || 'New Event') : (t('createCalendar') || 'Add Calendar')}
+                title={
+                  isMobile
+                    ? t('newEvent') || 'New Event'
+                    : t('createCalendar') || 'Add Calendar'
+                }
               >
                 <Plus className={`h-4 w-4 ${textGray500}`} />
               </button>
@@ -89,7 +100,9 @@ const CalendarHeader = ({
           {!isSwitcherCentered && (
             <ViewSwitcher mode={switcherMode} calendar={calendar} />
           )}
-          <div className={`df-header-right flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}>
+          <div
+            className={`df-header-right flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}
+          >
             {/* Mobile Search Icon */}
             <button
               onClick={onSearchClick}

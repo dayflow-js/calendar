@@ -1,6 +1,11 @@
 // Week/Day view specific implementation
 import { useCallback } from 'preact/hooks';
-import { ViewType, UseWeekDayDragParams, UseWeekDayDragReturn, Event } from '../../types';
+import {
+  ViewType,
+  UseWeekDayDragParams,
+  UseWeekDayDragReturn,
+  Event,
+} from '../../types';
 import { getDateByDayIndex } from '../../utils';
 import { useLocale } from '@/locale';
 import { dateToPlainDate } from '../../utils/temporal';
@@ -77,9 +82,9 @@ export const useWeekDayDrag = (
 
       // Do not create indicator immediately for drag (mousedown), wait for move
       drag.indicatorVisible = false;
-      
+
       drag.sourceElement = null; // Clear source element
-      
+
       document.addEventListener('mousemove', handleDragMove);
       document.addEventListener('mouseup', handleDragEnd);
     },
@@ -91,7 +96,7 @@ export const useWeekDayDrag = (
       dragRef,
       setDragState,
       app?.state.locale,
-      options
+      options,
     ]
   );
 

@@ -29,7 +29,10 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     useEffect(() => {
       const handleCloseAll = () => onClose();
       const handleClickOutside = (event: MouseEvent) => {
-        if (internalRef.current && !internalRef.current.contains(event.target as Node)) {
+        if (
+          internalRef.current &&
+          !internalRef.current.contains(event.target as Node)
+        ) {
           // Check if the click is within a submenu
           const target = event.target as HTMLElement;
           if (target.closest('[data-submenu-content]')) {
@@ -45,9 +48,13 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
       // Listen for close-all event from other menus
       window.addEventListener('dayflow-close-all-menus', handleCloseAll);
       // Use mousedown to capture clicks outside immediately
-      document.body.addEventListener('mousedown', handleClickOutside, { capture: true });
+      document.body.addEventListener('mousedown', handleClickOutside, {
+        capture: true,
+      });
       // Also capture right-clicks outside
-      document.body.addEventListener('contextmenu', handleClickOutside, { capture: true });
+      document.body.addEventListener('contextmenu', handleClickOutside, {
+        capture: true,
+      });
 
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
@@ -63,8 +70,12 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
       return () => {
         window.removeEventListener('dayflow-close-all-menus', handleCloseAll);
-        document.body.removeEventListener('mousedown', handleClickOutside, { capture: true });
-        document.body.removeEventListener('contextmenu', handleClickOutside, { capture: true });
+        document.body.removeEventListener('mousedown', handleClickOutside, {
+          capture: true,
+        });
+        document.body.removeEventListener('contextmenu', handleClickOutside, {
+          capture: true,
+        });
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('scroll', handleScrollOrResize, true);
         window.removeEventListener('resize', handleScrollOrResize);
@@ -82,7 +93,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
         ref={setRefs}
         className={`fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
         style={style}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={e => e.preventDefault()}
         data-context-menu-root="true"
       >
         {children}
@@ -94,7 +105,13 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
 ContextMenu.displayName = 'ContextMenu';
 
-export const ContextMenuItem = ({ onClick, children, icon, danger, disabled }: {
+export const ContextMenuItem = ({
+  onClick,
+  children,
+  icon,
+  danger,
+  disabled,
+}: {
   onClick: () => void;
   children: any;
   icon?: any;
@@ -104,14 +121,17 @@ export const ContextMenuItem = ({ onClick, children, icon, danger, disabled }: {
   return (
     <div
       className={`relative flex cursor-default select-none items-center rounded-sm px-3 py-0.5 text-[12px] outline-none transition-colors group
-        ${disabled
-          ? 'pointer-events-none opacity-50'
-          : 'focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white'}
-        ${danger
-          ? 'text-destructive focus:text-destructive-foreground focus:bg-destructive hover:bg-destructive hover:text-destructive-foreground'
-          : 'text-slate-900 dark:text-slate-50'
+        ${
+          disabled
+            ? 'pointer-events-none opacity-50'
+            : 'focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white'
+        }
+        ${
+          danger
+            ? 'text-destructive focus:text-destructive-foreground focus:bg-destructive hover:bg-destructive hover:text-destructive-foreground'
+            : 'text-slate-900 dark:text-slate-50'
         }`}
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation();
         if (!disabled) onClick();
       }}
@@ -195,7 +215,9 @@ export const ContextMenuSubTrigger: any = ({ children, icon, isOpen }: any) => {
     >
       {icon && <span className="mr-2 h-4 w-4">{icon}</span>}
       <span className="grow text-left">{children}</span>
-      <ChevronRight className={`ml-auto h-4 w-4 ${isOpen ? 'text-white opacity-100' : 'opacity-60'}`} />
+      <ChevronRight
+        className={`ml-auto h-4 w-4 ${isOpen ? 'text-white opacity-100' : 'opacity-60'}`}
+      />
     </div>
   );
 };
@@ -254,23 +276,30 @@ const COLORS = [
   '#957e5e',
 ];
 
-export const ContextMenuColorPicker = ({ selectedColor, onSelect, onCustomColor }: {
+export const ContextMenuColorPicker = ({
+  selectedColor,
+  onSelect,
+  onCustomColor,
+}: {
   selectedColor?: string;
   onSelect: (color: string) => void;
   onCustomColor?: () => void;
 }) => {
   const { t } = useLocale();
   return (
-    <div >
+    <div>
       <div className="grid grid-cols-7 gap-2 p-1 px-3">
-        {COLORS.map((color) => (
+        {COLORS.map(color => (
           <button
             key={color}
             type="button"
-            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary dark:focus:ring-offset-slate-800 ${selectedColor?.toLowerCase() === color.toLowerCase() ? 'ring-2 ring-offset-1 ring-primary dark:ring-offset-slate-800' : ''
-              }`}
+            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary dark:focus:ring-offset-slate-800 ${
+              selectedColor?.toLowerCase() === color.toLowerCase()
+                ? 'ring-2 ring-offset-1 ring-primary dark:ring-offset-slate-800'
+                : ''
+            }`}
             style={{ backgroundColor: color }}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onSelect(color);
             }}
@@ -281,7 +310,7 @@ export const ContextMenuColorPicker = ({ selectedColor, onSelect, onCustomColor 
       {onCustomColor && (
         <div
           className="mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white transition-colors"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             onCustomColor();
           }}

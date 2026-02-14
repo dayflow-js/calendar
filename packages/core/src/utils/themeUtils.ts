@@ -18,11 +18,7 @@
  * // Returns: 'p-4 rounded bg-white text-black dark:bg-gray-900 dark:text-white'
  * ```
  */
-export const themeCn = (
-  base: string,
-  light: string,
-  dark: string
-): string => {
+export const themeCn = (base: string, light: string, dark: string): string => {
   const darkClasses = dark
     .split(' ')
     .filter(Boolean)
@@ -68,14 +64,18 @@ export const themeClasses = {
   focus: 'focus:ring-primary',
 
   // Input styles
-  input: 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100',
+  input:
+    'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100',
   inputFocus: 'focus:border-primary focus:ring-primary',
 
   // Button styles
   buttonPrimary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  buttonSecondary: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600',
-  buttonDanger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-  buttonSuccess: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800',
+  buttonSecondary:
+    'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600',
+  buttonDanger:
+    'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+  buttonSuccess:
+    'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800',
 
   // Shadow
   shadow: 'shadow-sm dark:shadow-gray-900/50',

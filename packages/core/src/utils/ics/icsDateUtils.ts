@@ -98,7 +98,10 @@ export function parseICSDate(
  * @returns Object with value and optional params
  */
 export function formatICSDate(
-  temporal: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
+  temporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime,
   allDay: boolean = false
 ): { value: string; params?: Record<string, string> } {
   // All-day event

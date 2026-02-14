@@ -1,33 +1,33 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
-  'sidebar': {
-    title: "サイドバー"
+  sidebar: {
+    title: 'サイドバー',
   },
   'calendar-header': {
-    title: "カレンダーヘッダー"
+    title: 'カレンダーヘッダー',
   },
   'event-dialog': {
-    title: "イベントダイアログ"
+    title: 'イベントダイアログ',
   },
   'switcher-mode': {
-    title: "切り替えモード"
+    title: '切り替えモード',
   },
   'read-only': {
-    title: "読み取り専用モード"
+    title: '読み取り専用モード',
   },
   'create-calendar': {
-    title: "カレンダー作成"
+    title: 'カレンダー作成',
   },
   'custom-detail-dialog': {
-    title: "カスタム詳細ダイアログ"
+    title: 'カスタム詳細ダイアログ',
   },
   'custom-detail-panel': {
-    title: "カスタム詳細パネル"
+    title: 'カスタム詳細パネル',
   },
   'content-slots': {
-    title: "コンテンツスロット (Content Slots)"
-  }
-}
+    title: 'コンテンツスロット (Content Slots)',
+  },
+};
 
-export default meta
+export default meta;

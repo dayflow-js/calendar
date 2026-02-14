@@ -11,10 +11,18 @@ interface ColorSwatchProps {
   darkLabel: string;
 }
 
-const ColorSwatch: React.FC<ColorSwatchProps> = ({ name, lightColor, darkColor, lightLabel, darkLabel }) => {
+const ColorSwatch: React.FC<ColorSwatchProps> = ({
+  name,
+  lightColor,
+  darkColor,
+  lightLabel,
+  darkLabel,
+}) => {
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{name}</div>
+      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        {name}
+      </div>
       <div className="grid grid-cols-2 gap-2">
         {/* Light mode color */}
         <div className="flex flex-col gap-1">
@@ -25,7 +33,9 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({ name, lightColor, darkColor, 
           <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
             {lightColor}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-500">{lightLabel}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-500">
+            {lightLabel}
+          </div>
         </div>
         {/* Dark mode color */}
         <div className="flex flex-col gap-1">
@@ -36,7 +46,9 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({ name, lightColor, darkColor, 
           <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
             {darkColor}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-500">{darkLabel}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-500">
+            {darkLabel}
+          </div>
         </div>
       </div>
     </div>
@@ -58,7 +70,8 @@ const translations = {
     light: 'Light',
     dark: 'Dark',
     tip: 'Tip:',
-    wcagNote: 'All colors meet WCAG AA contrast requirements for both light and dark backgrounds, ensuring good readability.',
+    wcagNote:
+      'All colors meet WCAG AA contrast requirements for both light and dark backgrounds, ensuring good readability.',
   },
   zh: {
     blue: '蓝色',
@@ -74,7 +87,8 @@ const translations = {
     light: '浅色',
     dark: '深色',
     tip: '提示：',
-    wcagNote: '所有颜色都符合 WCAG AA 对比度标准，确保在浅色和深色背景下都具有良好的可读性。',
+    wcagNote:
+      '所有颜色都符合 WCAG AA 对比度标准，确保在浅色和深色背景下都具有良好的可读性。',
   },
   ja: {
     blue: 'ブルー',
@@ -90,7 +104,8 @@ const translations = {
     light: 'ライト',
     dark: 'ダーク',
     tip: 'ヒント：',
-    wcagNote: 'すべての色はWCAG AAコントラスト基準を満たしており、明暗どちらの背景でも読みやすくなっています。',
+    wcagNote:
+      'すべての色はWCAG AAコントラスト基準を満たしており、明暗どちらの背景でも読みやすくなっています。',
   },
 };
 
@@ -98,8 +113,11 @@ export const DefaultColorPalette: React.FC = () => {
   const pathname = usePathname();
 
   // Detect language from pathname
-  const lang = pathname?.startsWith('/docs-zh') ? 'zh' :
-                pathname?.startsWith('/docs-ja') ? 'ja' : 'en';
+  const lang = pathname?.startsWith('/docs-zh')
+    ? 'zh'
+    : pathname?.startsWith('/docs-ja')
+      ? 'ja'
+      : 'en';
 
   const t = translations[lang];
 
@@ -119,7 +137,7 @@ export const DefaultColorPalette: React.FC = () => {
   return (
     <div className="not-prose my-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {colors.map((color) => (
+        {colors.map(color => (
           <ColorSwatch
             key={color.key}
             name={t[color.key as keyof typeof t] as string}

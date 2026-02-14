@@ -34,12 +34,13 @@ export default [
           '@': path.resolve('./src'),
         },
       }),
-          commonjs(),
-          typescript({
-            tsconfig: './tsconfig.build.json',
-            declaration: false,
-            exclude: [
-              'src/app/**',          '**/*.test.ts',
+      commonjs(),
+      typescript({
+        tsconfig: './tsconfig.build.json',
+        declaration: false,
+        exclude: [
+          'src/app/**',
+          '**/*.test.ts',
           '**/*.test.tsx',
           '**/*.spec.ts',
           '**/*.spec.tsx',

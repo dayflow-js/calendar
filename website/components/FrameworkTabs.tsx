@@ -8,7 +8,10 @@ const frameworks = [
     id: 'react',
     name: 'React',
     icon: (
-      <svg viewBox="-11.5 -10.23177 23 20.46354" className="w-4 h-4 inline-block mr-2">
+      <svg
+        viewBox="-11.5 -10.23177 23 20.46354"
+        className="w-4 h-4 inline-block mr-2"
+      >
         <circle cx="0" cy="0" r="2.05" fill="#61DAFB" />
         <g stroke="#61DAFB" strokeWidth="1" fill="none">
           <ellipse rx="11" ry="4.2" />
@@ -23,8 +26,14 @@ const frameworks = [
     name: 'Vue',
     icon: (
       <svg viewBox="0 0 256 221" className="w-4 h-4 inline-block mr-2">
-        <path fill="#41B883" d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0h47.36Z" />
-        <path fill="#35495E" d="M0 0l128 220.8L256 0h-51.2L128 132.48L54.4 0H0Z" />
+        <path
+          fill="#41B883"
+          d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0h47.36Z"
+        />
+        <path
+          fill="#35495E"
+          d="M0 0l128 220.8L256 0h-51.2L128 132.48L54.4 0H0Z"
+        />
         <path fill="#41B883" d="M97.92 0L128 51.2L158.08 0h-60.16Z" />
       </svg>
     ),
@@ -34,9 +43,18 @@ const frameworks = [
     name: 'Angular',
     icon: (
       <svg viewBox="0 0 250 250" className="w-4 h-4 inline-block mr-2">
-        <path fill="#DD0031" d="M125 30L31.9 63.2l14.2 123.1L125 230l78.9-43.7 14.2-123.1z" />
-        <path fill="#C3002F" d="M125 30v22.2l76 2.7l-13.9 120.4L125 218.4v11.6l78.9-43.7 14.2-123.1z" />
-        <path fill="#FFF" d="M125 52.1L66.8 182.6h21.7l11.7-29.2h49.4l11.7 29.2h21.8L125 52.1zm24.6 101.2h-49.2L125 94.2l24.6 59.1z" />
+        <path
+          fill="#DD0031"
+          d="M125 30L31.9 63.2l14.2 123.1L125 230l78.9-43.7 14.2-123.1z"
+        />
+        <path
+          fill="#C3002F"
+          d="M125 30v22.2l76 2.7l-13.9 120.4L125 218.4v11.6l78.9-43.7 14.2-123.1z"
+        />
+        <path
+          fill="#FFF"
+          d="M125 52.1L66.8 182.6h21.7l11.7-29.2h49.4l11.7 29.2h21.8L125 52.1zm24.6 101.2h-49.2L125 94.2l24.6 59.1z"
+        />
       </svg>
     ),
   },
@@ -62,9 +80,5 @@ export function FrameworkTabs({ children }: { children: React.ReactNode }) {
     </div>
   ));
 
-  return (
-    <Tabs items={items}>
-      {children}
-    </Tabs>
-  );
+  return <Tabs items={items}>{children}</Tabs>;
 }

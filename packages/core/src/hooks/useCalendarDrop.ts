@@ -43,7 +43,12 @@ export function useCalendarDrop(
   }, []);
 
   const handleDrop = useCallback(
-    (e: any, dropDate: Date, dropHour?: number, isAllDay?: boolean): Event | null => {
+    (
+      e: any,
+      dropDate: Date,
+      dropHour?: number,
+      isAllDay?: boolean
+    ): Event | null => {
       e.preventDefault();
 
       // Get calendar data from drag event
@@ -111,7 +116,9 @@ export function useCalendarDrop(
         const newEvent: Event = {
           id: eventId,
           title: allDay
-            ? t('newAllDayCalendarEvent', { calendarName: dragData.calendarName })
+            ? t('newAllDayCalendarEvent', {
+                calendarName: dragData.calendarName,
+              })
             : t('newCalendarEvent', { calendarName: dragData.calendarName }),
           description: '',
           start,

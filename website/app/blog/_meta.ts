@@ -1,11 +1,11 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   index: {
     title: 'Blog',
     theme: {
-      pagination: false
-    }
+      pagination: false,
+    },
   },
   'v1.8': 'V1.8',
   'v1.7': 'V1.7',
@@ -16,9 +16,9 @@ const meta: MetaRecord = {
       sidebar: false,
       toc: false,
       breadcrumb: false,
-      pagination: true
-    }
-  }
-}
+      pagination: true,
+    },
+  },
+};
 
-export default meta
+export default meta;

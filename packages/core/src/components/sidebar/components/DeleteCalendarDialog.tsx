@@ -63,9 +63,13 @@ export const DeleteCalendarDialog = ({
                         >
                           <div
                             className="mr-2 h-3 w-3 rounded-sm shrink-0"
-                            style={{ backgroundColor: calendar.colors.lineColor }}
+                            style={{
+                              backgroundColor: calendar.colors.lineColor,
+                            }}
                           />
-                          <span className="whitespace-nowrap">{calendar.name || calendar.id}</span>
+                          <span className="whitespace-nowrap">
+                            {calendar.name || calendar.id}
+                          </span>
                         </div>
                       ))}
                   </div>

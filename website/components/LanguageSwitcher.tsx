@@ -9,7 +9,7 @@ import { getBasePath } from '../utils/basePath';
 const locales = [
   { code: 'en', name: 'English' },
   { code: 'zh', name: '中文' },
-  { code: 'ja', name: '日本語' }
+  { code: 'ja', name: '日本語' },
 ];
 
 export function LanguageSwitcher() {
@@ -81,7 +81,12 @@ export function LanguageSwitcher() {
 
     // Handle root path first
     if (path === '/' || path === '') {
-      newPath = newLocale === 'zh' ? '/docs-zh/introduction' : newLocale === 'ja' ? '/docs-ja/introduction' : '/docs/introduction';
+      newPath =
+        newLocale === 'zh'
+          ? '/docs-zh/introduction'
+          : newLocale === 'ja'
+            ? '/docs-ja/introduction'
+            : '/docs/introduction';
     } else {
       // Remove any existing locale prefix to get the content path
       let contentPath = path;
@@ -161,7 +166,7 @@ export function LanguageSwitcher() {
           />
           <div className={dropdownClasses}>
             <div className="py-1" role="menu" aria-orientation="vertical">
-              {locales.map((locale) => (
+              {locales.map(locale => (
                 <button
                   key={locale.code}
                   onClick={() => {
@@ -170,14 +175,23 @@ export function LanguageSwitcher() {
                   }}
                   className={clsx(
                     itemClasses,
-                    currentLocale === locale.code && (isDarkMode ? 'bg-gray-800/60' : 'bg-gray-50')
+                    currentLocale === locale.code &&
+                      (isDarkMode ? 'bg-gray-800/60' : 'bg-gray-50')
                   )}
                   role="menuitem"
                 >
                   <span>{locale.name}</span>
                   {currentLocale === locale.code && (
-                    <svg className="ml-auto h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="ml-auto h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </button>

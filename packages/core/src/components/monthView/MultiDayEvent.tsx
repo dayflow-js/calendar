@@ -22,12 +22,12 @@ export interface MultiDayEventSegment {
   startDayIndex: number;
   endDayIndex: number;
   segmentType:
-  | 'start'
-  | 'middle'
-  | 'end'
-  | 'single'
-  | 'start-week-end'
-  | 'end-week-start';
+    | 'start'
+    | 'middle'
+    | 'end'
+    | 'single'
+    | 'start-week-end'
+    | 'end-week-start';
   totalDays: number;
   segmentIndex: number;
   isFirstSegment: boolean;
@@ -41,15 +41,8 @@ interface MultiDayEventProps {
   isDragging: boolean;
   isResizing?: boolean;
   isSelected?: boolean;
-  onMoveStart: (
-    e: any | any,
-    event: Event
-  ) => void;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onMoveStart: (e: any | any, event: Event) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
   onEventLongPress?: (eventId: string) => void;
   isMobile?: boolean;
   isDraggable?: boolean;
@@ -102,9 +95,7 @@ export const MultiDayEvent = memo(
     const adjustedLeft = `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`;
     const adjustedWidth = `calc(${widthPercent}% - ${HORIZONTAL_MARGIN * 2}px)`;
 
-    const handleMouseDown = (
-      e: any
-    ) => {
+    const handleMouseDown = (e: any) => {
       if (!isDraggable && !viewable) return;
       e.preventDefault();
       e.stopPropagation();
@@ -148,8 +139,8 @@ export const MultiDayEvent = memo(
         }
 
         const syntheticEvent = {
-          preventDefault: () => { },
-          stopPropagation: () => { },
+          preventDefault: () => {},
+          stopPropagation: () => {},
           currentTarget,
           touches: [{ clientX, clientY }],
           cancelable: false,
@@ -222,8 +213,7 @@ export const MultiDayEvent = memo(
         const getDisplayText = () => {
           if (segment.isFirstSegment) return segment.event.title;
           if (segment.segmentType === 'middle') return '···';
-          if (segment.isLastSegment && segment.totalDays > 1)
-            return '···';
+          if (segment.isLastSegment && segment.totalDays > 1) return '···';
           return segment.event.title;
         };
 
@@ -245,17 +235,14 @@ export const MultiDayEvent = memo(
             )}
 
             <div className="flex-1 min-w-0">
-              <div className="truncate text-xs">
-                {getDisplayText()}
-              </div>
+              <div className="truncate text-xs">{getDisplayText()}</div>
             </div>
 
-            {segment.isLastSegment &&
-              segment.segmentType !== 'single' && (
-                <div className="shrink-0 ml-1 text-white/80 dark:text-white/90">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80"></div>
-                </div>
-              )}
+            {segment.isLastSegment && segment.segmentType !== 'single' && (
+              <div className="shrink-0 ml-1 text-white/80 dark:text-white/90">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80"></div>
+              </div>
+            )}
           </div>
         );
       }
@@ -272,11 +259,11 @@ export const MultiDayEvent = memo(
       const startTimeStyle =
         segmentDays > 1
           ? {
-            position: 'absolute' as const,
-            right: `calc(${remainingPercent}% + ${HORIZONTAL_MARGIN}px)`,
-            top: '50%',
-            transform: 'translateY(-50%)',
-          }
+              position: 'absolute' as const,
+              right: `calc(${remainingPercent}% + ${HORIZONTAL_MARGIN}px)`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }
           : undefined;
 
       return (
@@ -288,22 +275,26 @@ export const MultiDayEvent = memo(
           <div className="flex items-center min-w-0 flex-1">
             <span
               className={`whitespace-nowrap overflow-hidden block ${isMobile ? 'mobile-mask-fade' : 'truncate'} font-medium text-xs`}
-            >{titleText}</span>
+            >
+              {titleText}
+            </span>
           </div>
           {segment.isFirstSegment && !isMobile && (
             <span
-              className={`${startTimeClass} ${segmentDays === 1 ? 'ml-2' : ''
-                }`}
+              className={`${startTimeClass} ${segmentDays === 1 ? 'ml-2' : ''}`}
               style={startTimeStyle}
             >
               {startTimeText}
             </span>
           )}
-          {segment.isLastSegment && !segment.event.allDay && endHour !== 24 && !isMobile && (
-            <span className="text-xs font-medium whitespace-nowrap ml-auto">
-              {`ends ${endTimeText}`}
-            </span>
-          )}
+          {segment.isLastSegment &&
+            !segment.event.allDay &&
+            endHour !== 24 &&
+            !isMobile && (
+              <span className="text-xs font-medium whitespace-nowrap ml-auto">
+                {`ends ${endTimeText}`}
+              </span>
+            )}
         </div>
       );
     };
@@ -326,14 +317,14 @@ export const MultiDayEvent = memo(
           zIndex: 10,
           ...(isSelected || isDragging || isPressed
             ? {
-              backgroundColor: getSelectedBgColor(calendarId),
-              color: '#fff',
-            }
+                backgroundColor: getSelectedBgColor(calendarId),
+                color: '#fff',
+              }
             : {
-              backgroundColor: getEventBgColor(calendarId),
-              color: getEventTextColor(calendarId),
-            }),
-          cursor: isDraggable ? 'pointer' : (viewable ? 'pointer' : 'default'),
+                backgroundColor: getEventBgColor(calendarId),
+                color: getEventTextColor(calendarId),
+              }),
+          cursor: isDraggable ? 'pointer' : viewable ? 'pointer' : 'default',
         }}
         data-segment-days={segmentDays}
         onMouseDown={handleMouseDown}
@@ -364,7 +355,7 @@ export const MultiDayEvent = memo(
         <div
           className="flex-1 min-w-0"
           style={{
-            cursor: isResizing ? 'ew-resize' : 'pointer'
+            cursor: isResizing ? 'ew-resize' : 'pointer',
           }}
         >
           {renderEventContent()}

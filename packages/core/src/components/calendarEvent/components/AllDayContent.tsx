@@ -12,11 +12,7 @@ import {
 interface AllDayContentProps {
   event: Event;
   isEditable: boolean;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
 }
 
 const AllDayContent = ({
@@ -47,17 +43,13 @@ const AllDayContent = ({
         />
       )}
 
-      {showIcon && (
-        customIcon ? (
+      {showIcon &&
+        (customIcon ? (
           <div className="mr-1 shrink-0">{customIcon}</div>
         ) : (
           <CalendarDays className={eventIcon} />
-        )
-      )}
-      <div
-        className={`${eventTitleSmall} pr-1`}
-        style={{ lineHeight: '1.2' }}
-      >
+        ))}
+      <div className={`${eventTitleSmall} pr-1`} style={{ lineHeight: '1.2' }}>
         {event.title}
       </div>
 

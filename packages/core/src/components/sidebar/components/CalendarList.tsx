@@ -41,28 +41,39 @@ export const CalendarList = ({
 
   // Drag state
   const [isDragging, setIsDragging] = useState(false);
-  const [draggedCalendarId, setDraggedCalendarId] = useState<string | null>(null);
-  const [dropTarget, setDropTarget] = useState<{ id: string; position: 'top' | 'bottom' } | null>(null);
+  const [draggedCalendarId, setDraggedCalendarId] = useState<string | null>(
+    null
+  );
+  const [dropTarget, setDropTarget] = useState<{
+    id: string;
+    position: 'top' | 'bottom';
+  } | null>(null);
 
-  const handleDragStart = useCallback((calendar: CalendarType, e: any) => {
-    // Prevent dragging when editing or not draggable
-    if (editingId || !isDraggable) {
-      e.preventDefault();
-      return;
-    }
-    setIsDragging(true);
-    setDraggedCalendarId(calendar.id);
+  const handleDragStart = useCallback(
+    (calendar: CalendarType, e: any) => {
+      // Prevent dragging when editing or not draggable
+      if (editingId || !isDraggable) {
+        e.preventDefault();
+        return;
+      }
+      setIsDragging(true);
+      setDraggedCalendarId(calendar.id);
 
-    // Store calendar data for drop handling
-    const dragData = {
-      calendarId: calendar.id,
-      calendarName: calendar.name,
-      calendarColors: calendar.colors,
-      calendarIcon: calendar.icon,
-    };
-    e.dataTransfer.setData('application/x-dayflow-calendar', JSON.stringify(dragData));
-    e.dataTransfer.effectAllowed = 'copy';
-  }, [editingId]);
+      // Store calendar data for drop handling
+      const dragData = {
+        calendarId: calendar.id,
+        calendarName: calendar.name,
+        calendarColors: calendar.colors,
+        calendarIcon: calendar.icon,
+      };
+      e.dataTransfer.setData(
+        'application/x-dayflow-calendar',
+        JSON.stringify(dragData)
+      );
+      e.dataTransfer.effectAllowed = 'copy';
+    },
+    [editingId]
+  );
 
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -70,65 +81,74 @@ export const CalendarList = ({
     setDropTarget(null);
   }, []);
 
-  const handleDragOver = useCallback((e: any, targetId: string) => {
-    e.preventDefault();
-    if (draggedCalendarId === targetId) {
-      setDropTarget(null);
-      return;
-    }
+  const handleDragOver = useCallback(
+    (e: any, targetId: string) => {
+      e.preventDefault();
+      if (draggedCalendarId === targetId) {
+        setDropTarget(null);
+        return;
+      }
 
-    const targetIndex = calendars.findIndex(c => c.id === targetId);
-    const isLast = targetIndex === calendars.length - 1;
+      const targetIndex = calendars.findIndex(c => c.id === targetId);
+      const isLast = targetIndex === calendars.length - 1;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const isTopHalf = e.clientY < rect.top + rect.height / 2;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const isTopHalf = e.clientY < rect.top + rect.height / 2;
 
-    if (isLast) {
-      setDropTarget({
-        id: targetId,
-        position: isTopHalf ? 'top' : 'bottom',
-      });
-    } else {
-      setDropTarget({
-        id: targetId,
-        position: 'top',
-      });
-    }
-  }, [draggedCalendarId, calendars]);
+      if (isLast) {
+        setDropTarget({
+          id: targetId,
+          position: isTopHalf ? 'top' : 'bottom',
+        });
+      } else {
+        setDropTarget({
+          id: targetId,
+          position: 'top',
+        });
+      }
+    },
+    [draggedCalendarId, calendars]
+  );
 
   const handleDragLeave = useCallback(() => {
     setDropTarget(null);
   }, []);
 
-  const handleDrop = useCallback((targetCalendar: CalendarType) => {
-    if (!draggedCalendarId || !dropTarget) return;
-    if (draggedCalendarId === targetCalendar.id) return;
+  const handleDrop = useCallback(
+    (targetCalendar: CalendarType) => {
+      if (!draggedCalendarId || !dropTarget) return;
+      if (draggedCalendarId === targetCalendar.id) return;
 
-    const fromIndex = calendars.findIndex(c => c.id === draggedCalendarId);
-    let toIndex = calendars.findIndex(c => c.id === targetCalendar.id);
+      const fromIndex = calendars.findIndex(c => c.id === draggedCalendarId);
+      let toIndex = calendars.findIndex(c => c.id === targetCalendar.id);
 
-    // Adjust target index based on position
-    if (dropTarget.position === 'bottom') {
-      toIndex += 1;
-    }
+      // Adjust target index based on position
+      if (dropTarget.position === 'bottom') {
+        toIndex += 1;
+      }
 
-    // Adjust for removal of the item
-    if (toIndex > fromIndex) {
-      toIndex -= 1;
-    }
+      // Adjust for removal of the item
+      if (toIndex > fromIndex) {
+        toIndex -= 1;
+      }
 
-    if (fromIndex !== -1 && toIndex !== -1) {
-      onReorder(fromIndex, toIndex);
-    }
-    setDropTarget(null);
-  }, [draggedCalendarId, dropTarget, calendars, onReorder]);
+      if (fromIndex !== -1 && toIndex !== -1) {
+        onReorder(fromIndex, toIndex);
+      }
+      setDropTarget(null);
+    },
+    [draggedCalendarId, dropTarget, calendars, onReorder]
+  );
 
-  const handleRenameStart = useCallback((calendar: CalendarType) => {
-    if (!isEditable) return;
-    isProcessedRef.current = false;
-    setEditingId(calendar.id);
-    setEditingName(calendar.name);
-  }, [setEditingId, isEditable]);
+  const handleRenameStart = useCallback(
+    (calendar: CalendarType) => {
+      if (!isEditable) return;
+      isProcessedRef.current = false;
+      setEditingId(calendar.id);
+      setEditingName(calendar.name);
+    },
+    [setEditingId, isEditable]
+  );
 
   const handleRenameChange = useCallback((e: any) => {
     setEditingName(e.target.value);
@@ -156,13 +176,16 @@ export const CalendarList = ({
     setEditingName('');
   }, [setEditingId]);
 
-  const handleRenameKeyDown = useCallback((e: any) => {
-    if (e.key === 'Enter') {
-      handleRenameSave();
-    } else if (e.key === 'Escape') {
-      handleRenameCancel();
-    }
-  }, [handleRenameSave, handleRenameCancel]);
+  const handleRenameKeyDown = useCallback(
+    (e: any) => {
+      if (e.key === 'Enter') {
+        handleRenameSave();
+      } else if (e.key === 'Escape') {
+        handleRenameCancel();
+      }
+    },
+    [handleRenameSave, handleRenameCancel]
+  );
 
   useEffect(() => {
     if (editingId && editInputRef.current) {
@@ -180,7 +203,6 @@ export const CalendarList = ({
     }
   }, [editingId, calendars]);
 
-
   return (
     <div className="df-calendar-list flex-1 overflow-y-auto px-2 pb-3">
       <ul className="space-y-1 relative">
@@ -189,26 +211,29 @@ export const CalendarList = ({
           const calendarColor = calendar.colors?.lineColor || '#3b82f6';
           const showIcon = Boolean(calendar.icon);
           const isDropTarget = dropTarget?.id === calendar.id;
-          const isActive = activeContextMenuCalendarId === calendar.id || editingId === calendar.id;
+          const isActive =
+            activeContextMenuCalendarId === calendar.id ||
+            editingId === calendar.id;
 
           return (
             <li
               key={calendar.id}
               className="df-calendar-list-item relative"
-              onDragOver={(e) => handleDragOver(e, calendar.id)}
+              onDragOver={e => handleDragOver(e, calendar.id)}
               onDragLeave={handleDragLeave}
               onDrop={() => handleDrop(calendar)}
-              onContextMenu={(e) => onContextMenu(e, calendar.id)}
+              onContextMenu={e => onContextMenu(e, calendar.id)}
             >
               {isDropTarget && dropTarget.position === 'top' && (
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none" />
               )}
               <div
                 draggable={isDraggable && !editingId}
-                onDragStart={(e) => handleDragStart(calendar, e)}
+                onDragStart={e => handleDragStart(calendar, e)}
                 onDragEnd={handleDragEnd}
-                className={`rounded transition ${draggedCalendarId === calendar.id ? 'opacity-50' : ''
-                  } ${isDraggable ? 'cursor-grab' : 'cursor-default'}`}
+                className={`rounded transition ${
+                  draggedCalendarId === calendar.id ? 'opacity-50' : ''
+                } ${isDraggable ? 'cursor-grab' : 'cursor-default'}`}
               >
                 <div
                   className={`group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800 ${isActive ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
@@ -217,12 +242,17 @@ export const CalendarList = ({
                   <input
                     type="checkbox"
                     className="calendar-checkbox cursor-pointer shrink-0"
-                    style={{
-                      '--checkbox-color': calendarColor,
-                    } as any}
+                    style={
+                      {
+                        '--checkbox-color': calendarColor,
+                      } as any
+                    }
                     checked={isVisible}
                     onChange={event =>
-                      onToggleVisibility(calendar.id, (event.target as HTMLInputElement).checked)
+                      onToggleVisibility(
+                        calendar.id,
+                        (event.target as HTMLInputElement).checked
+                      )
                     }
                   />
                   {showIcon && (
@@ -238,11 +268,13 @@ export const CalendarList = ({
                       ref={editInputRef}
                       type="text"
                       value={editingName}
-                      onChange={(e) => setEditingName((e.target as HTMLInputElement).value)}
+                      onChange={e =>
+                        setEditingName((e.target as HTMLInputElement).value)
+                      }
                       onBlur={handleRenameSave}
                       onKeyDown={handleRenameKeyDown}
                       className="ml-2 flex-1 min-w-0 h-5 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     />
                   ) : (
                     <span

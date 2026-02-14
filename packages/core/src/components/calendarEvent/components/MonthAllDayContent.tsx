@@ -1,11 +1,7 @@
 import { h } from 'preact';
 import { Event } from '@/types';
 import { CalendarDays } from '../../common/Icons';
-import {
-  monthAllDayContent,
-  mr1,
-  eventIcon,
-} from '@/styles/classNames';
+import { monthAllDayContent, mr1, eventIcon } from '@/styles/classNames';
 
 interface MonthAllDayContentProps {
   event: Event;
@@ -21,24 +17,21 @@ const MonthAllDayContent = ({
 
   return (
     <div className={monthAllDayContent}>
-      {showIcon && (
-        customIcon ? (
+      {showIcon &&
+        (customIcon ? (
           <div className={`${mr1} shrink-0`}>{customIcon}</div>
+        ) : event.title.toLowerCase().includes('easter') ||
+          event.title.toLowerCase().includes('holiday') ? (
+          <span
+            className={`inline-block ${mr1} shrink-0 ${isEventSelected ? 'text-yellow-200' : 'text-yellow-600'}`}
+          >
+            ⭐
+          </span>
         ) : (
-          event.title.toLowerCase().includes('easter') ||
-            event.title.toLowerCase().includes('holiday') ? (
-            <span
-              className={`inline-block ${mr1} shrink-0 ${isEventSelected ? 'text-yellow-200' : 'text-yellow-600'}`}
-            >
-              ⭐
-            </span>
-          ) : (
-            <CalendarDays
-              className={`${eventIcon} ${isEventSelected ? 'text-white' : ''}`}
-            />
-          )
-        )
-      )}
+          <CalendarDays
+            className={`${eventIcon} ${isEventSelected ? 'text-white' : ''}`}
+          />
+        ))}
       <span className={`truncate ${isEventSelected ? 'text-white' : ''}`}>
         {event.title}
       </span>

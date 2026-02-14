@@ -1,7 +1,11 @@
 import { h } from 'preact';
 import { PanelRightClose, PanelRightOpen, Plus } from '../../common/Icons';
 import { useLocale } from '@/locale';
-import { sidebarHeader, sidebarHeaderToggle, sidebarHeaderTitle } from '@/styles/classNames';
+import {
+  sidebarHeader,
+  sidebarHeaderToggle,
+  sidebarHeaderTitle,
+} from '@/styles/classNames';
 
 interface SidebarHeaderProps {
   isCollapsed: boolean;
@@ -28,10 +32,8 @@ export const SidebarHeader = ({
         )}
       </button>
       {!isCollapsed && (
-        <div className='flex flex-1 justify-between items-center ml-3'>
-          <span className={sidebarHeaderTitle}>
-            {t('calendars')}
-          </span>
+        <div className="flex flex-1 justify-between items-center ml-3">
+          <span className={sidebarHeaderTitle}>{t('calendars')}</span>
         </div>
       )}
     </div>

@@ -31,5 +31,12 @@ export default {
     }),
     terser(),
   ],
-  external: ['react', 'react-dom', '@dayflow/core', 'preact', 'preact/hooks', 'preact/compat'],
+  external: [
+    'react',
+    'react-dom',
+    '@dayflow/core',
+    'preact',
+    'preact/hooks',
+    'preact/compat',
+  ],
 };

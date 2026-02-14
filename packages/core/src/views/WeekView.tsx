@@ -1,15 +1,8 @@
-import { h } from "preact";
+import { h } from 'preact';
 import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
-import {
-  formatTime,
-  extractHourFromDate,
-} from '@/utils';
+import { formatTime, extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';
-import {
-  Event,
-  ViewType,
-  WeekViewProps,
-} from '@/types';
+import { Event, ViewType, WeekViewProps } from '@/types';
 import { useDragForView } from '@/plugins/dragPlugin';
 import { ViewType as DragViewType } from '@/types';
 import { defaultDragConfig } from '@/core/config';
@@ -18,9 +11,7 @@ import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { temporalToDate } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
-import {
-  calendarContainer,
-} from '@/styles/classNames';
+import { calendarContainer } from '@/styles/classNames';
 import { AllDayRow } from '@/components/weekView/AllDayRow';
 import { TimeGrid } from '@/components/weekView/TimeGrid';
 import {
@@ -29,7 +20,7 @@ import {
   organizeAllDaySegments,
   calculateEventLayouts,
   calculateNewEventLayout,
-  calculateDragLayout
+  calculateDragLayout,
 } from '@/components/weekView/util';
 
 const WeekView = ({
@@ -68,7 +59,8 @@ const WeekView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent = app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent =
+    app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
   // Calculate the week start time for the current date
   const currentWeekStart = useMemo(
@@ -77,11 +69,21 @@ const WeekView = ({
   );
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null
+  );
+  const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<
+    string | null
+  >(null);
 
-  const selectedEventId = propSelectedEventId !== undefined ? propSelectedEventId : internalSelectedId;
-  const detailPanelEventId = propDetailPanelEventId !== undefined ? propDetailPanelEventId : internalDetailPanelEventId;
+  const selectedEventId =
+    propSelectedEventId !== undefined
+      ? propSelectedEventId
+      : internalSelectedId;
+  const detailPanelEventId =
+    propDetailPanelEventId !== undefined
+      ? propDetailPanelEventId
+      : internalDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -132,7 +134,8 @@ const WeekView = ({
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
 
   useEffect(() => {
-    const hasChanged = app.state.highlightedEventId !== prevHighlightedEventId.current;
+    const hasChanged =
+      app.state.highlightedEventId !== prevHighlightedEventId.current;
 
     if (hasChanged) {
       if (app.state.highlightedEventId) {
@@ -222,21 +225,24 @@ const WeekView = ({
           (temporalToDate(oldEvent.start).getTime() !==
             temporalToDate(e.start).getTime() ||
             temporalToDate(oldEvent.end).getTime() !==
-            temporalToDate(e.end).getTime() ||
+              temporalToDate(e.end).getTime() ||
             oldEvent.day !== e.day ||
             extractHourFromDate(oldEvent.start) !==
-            extractHourFromDate(e.start) ||
+              extractHourFromDate(e.start) ||
             extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
             oldEvent.title !== e.title)
         );
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      app.applyEventsChanges({
-        delete: eventsToDelete.map(e => e.id),
-        add: eventsToAdd,
-        update: eventsToUpdate.map(e => ({ id: e.id, updates: e }))
-      }, isResizing);
+      app.applyEventsChanges(
+        {
+          delete: eventsToDelete.map(e => e.id),
+          add: eventsToAdd,
+          update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+        },
+        isResizing
+      );
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {
@@ -247,13 +253,24 @@ const WeekView = ({
         setNewlyCreatedEventId(event.id);
       }
     },
-    onEventEdit: () => { },
+    onEventEdit: () => {},
     currentWeekStart,
     events: currentWeekEvents,
     calculateNewEventLayout: (targetDay, startHour, endHour) =>
       calculateNewEventLayout(targetDay, startHour, endHour, currentWeekEvents),
-    calculateDragLayout: (draggedEvent, targetDay, targetStartHour, targetEndHour) =>
-      calculateDragLayout(draggedEvent, targetDay, targetStartHour, targetEndHour, currentWeekEvents),
+    calculateDragLayout: (
+      draggedEvent,
+      targetDay,
+      targetStartHour,
+      targetEndHour
+    ) =>
+      calculateDragLayout(
+        draggedEvent,
+        targetDay,
+        targetStartHour,
+        targetEndHour,
+        currentWeekEvents
+      ),
     TIME_COLUMN_WIDTH: sidebarWidth,
     isMobile,
   });
@@ -267,8 +284,8 @@ const WeekView = ({
 
     longPressTimerRef.current = setTimeout(() => {
       const mockEvent = {
-        preventDefault: () => { },
-        stopPropagation: () => { },
+        preventDefault: () => {},
+        stopPropagation: () => {},
         touches: [{ clientX, clientY }],
         changedTouches: [{ clientX, clientY }],
         target: target,

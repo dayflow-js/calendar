@@ -15,7 +15,7 @@ export {
   createWeekView,
   createMonthView,
   createYearView,
-  ViewType
+  ViewType,
 } from '@dayflow/core';
 
 export * from '@dayflow/core';

@@ -27,8 +27,14 @@ const frameworks = [
     color: '#41B883',
     icon: (
       <svg viewBox="0 0 256 221" className="w-5 h-5">
-        <path fill="#41B883" d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0h47.36Z" />
-        <path fill="#35495E" d="M0 0l128 220.8L256 0h-51.2L128 132.48L54.4 0H0Z" />
+        <path
+          fill="#41B883"
+          d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0h47.36Z"
+        />
+        <path
+          fill="#35495E"
+          d="M0 0l128 220.8L256 0h-51.2L128 132.48L54.4 0H0Z"
+        />
         <path fill="#41B883" d="M97.92 0L128 51.2L158.08 0h-60.16Z" />
       </svg>
     ),
@@ -40,9 +46,18 @@ const frameworks = [
     color: '#DD0031',
     icon: (
       <svg viewBox="0 0 250 250" className="w-5 h-5">
-        <path fill="#DD0031" d="M125 30L31.9 63.2l14.2 123.1L125 230l78.9-43.7 14.2-123.1z" />
-        <path fill="#C3002F" d="M125 30v22.2l76 2.7l-13.9 120.4L125 218.4v11.6l78.9-43.7 14.2-123.1z" />
-        <path fill="#FFF" d="M125 52.1L66.8 182.6h21.7l11.7-29.2h49.4l11.7 29.2h21.8L125 52.1zm24.6 101.2h-49.2L125 94.2l24.6 59.1z" />
+        <path
+          fill="#DD0031"
+          d="M125 30L31.9 63.2l14.2 123.1L125 230l78.9-43.7 14.2-123.1z"
+        />
+        <path
+          fill="#C3002F"
+          d="M125 30v22.2l76 2.7l-13.9 120.4L125 218.4v11.6l78.9-43.7 14.2-123.1z"
+        />
+        <path
+          fill="#FFF"
+          d="M125 52.1L66.8 182.6h21.7l11.7-29.2h49.4l11.7 29.2h21.8L125 52.1zm24.6 101.2h-49.2L125 94.2l24.6 59.1z"
+        />
       </svg>
     ),
   },
@@ -83,11 +98,23 @@ const InstallCommand = ({ cmd, pkg }: { cmd: string; pkg: string }) => {
         aria-label="Copy to clipboard"
       >
         {copied ? (
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-4 h-4 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <polyline points="20 6 9 17 4 12" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-4 h-4 text-muted-foreground"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
           </svg>
@@ -103,14 +130,15 @@ export function FrameworkInstall() {
   return (
     <div className="my-6 border border-border rounded-xl overflow-hidden bg-background">
       <div className="flex flex-wrap gap-2 p-4 border-b border-border bg-muted/20">
-        {frameworks.map((fw) => (
+        {frameworks.map(fw => (
           <button
             key={fw.id}
             onClick={() => setActiveFramework(fw)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${activeFramework.id === fw.id
-              ? 'bg-[#e5effe] text-blue-700 border-[#bfdbfe] shadow-sm font-medium'
-              : 'bg-transparent border-transparent hover:bg-muted text-muted-foreground'
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${
+              activeFramework.id === fw.id
+                ? 'bg-[#e5effe] text-blue-700 border-[#bfdbfe] shadow-sm font-medium'
+                : 'bg-transparent border-transparent hover:bg-muted text-muted-foreground'
+            }`}
           >
             {fw.icon}
             <span className="text-sm font-bold">{fw.name}</span>

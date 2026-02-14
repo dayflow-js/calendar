@@ -3,13 +3,9 @@ import {
   LayoutWeekEvent,
   LayoutNode,
   ParallelGroup,
-  LayoutCalculationParams
+  LayoutCalculationParams,
 } from './types';
-import {
-  toLayoutEvent,
-  getStartHour,
-  getEndHour
-} from './utils';
+import { toLayoutEvent, getStartHour, getEndHour } from './utils';
 import { LAYOUT_CONFIG } from './constants';
 
 export class EventLayoutCalculator {

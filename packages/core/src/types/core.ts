@@ -57,7 +57,10 @@ export interface CalendarCallbacks {
   onCalendarUpdate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarCreate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarDelete?: (calendarId: string) => void | Promise<void>;
-  onCalendarMerge?: (sourceId: string, targetId: string) => void | Promise<void>;
+  onCalendarMerge?: (
+    sourceId: string,
+    targetId: string
+  ) => void | Promise<void>;
   onEventClick?: (event: Event) => void | Promise<void>;
   onMoreEventsClick?: (date: Date) => void | Promise<void>;
 }
@@ -92,7 +95,10 @@ export interface CalendarSidebarRenderProps {
   toggleAll: (visible: boolean) => void;
   isCollapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  renderCalendarContextMenu?: (calendar: CalendarType, onClose: () => void) => TNode;
+  renderCalendarContextMenu?: (
+    calendar: CalendarType,
+    onClose: () => void
+  ) => TNode;
   createCalendarMode?: 'inline' | 'modal';
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
   editingCalendarId?: string | null;
@@ -109,7 +115,10 @@ export interface SidebarConfig {
   width?: number | string;
   initialCollapsed?: boolean;
   render?: (props: CalendarSidebarRenderProps) => TNode;
-  renderCalendarContextMenu?: (calendar: CalendarType, onClose: () => void) => TNode;
+  renderCalendarContextMenu?: (
+    calendar: CalendarType,
+    onClose: () => void
+  ) => TNode;
   createCalendarMode?: 'inline' | 'modal';
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
   /** Color picker mode: 'blossom' for BlossomColorPicker, 'default' for react-color */
@@ -174,7 +183,7 @@ export interface ICalendarApp {
   getReadOnlyConfig: () => ReadOnlyConfig;
 
   // Subscription management
-  subscribe: (listener: (app: ICalendarApp) => void) => (() => void);
+  subscribe: (listener: (app: ICalendarApp) => void) => () => void;
 
   // View management
   changeView: (view: ViewType) => void;
@@ -193,11 +202,14 @@ export interface ICalendarApp {
   undo: () => void;
 
   // Event management
-  applyEventsChanges: (changes: {
-    add?: Event[];
-    update?: Array<{ id: string; updates: Partial<Event> }>;
-    delete?: string[];
-  }, isPending?: boolean) => void;
+  applyEventsChanges: (
+    changes: {
+      add?: Event[];
+      update?: Array<{ id: string; updates: Partial<Event> }>;
+      delete?: string[];
+    },
+    isPending?: boolean
+  ) => void;
   addEvent: (event: Event) => void;
   updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
   deleteEvent: (id: string) => void;
@@ -225,7 +237,9 @@ export interface ICalendarApp {
   getSidebarConfig: () => SidebarConfig;
 
   // Calendar Header
-  getCalendarHeaderConfig: () => boolean | ((props: CalendarHeaderProps) => TNode);
+  getCalendarHeaderConfig: () =>
+    | boolean
+    | ((props: CalendarHeaderProps) => TNode);
 
   // Trigger render callback (internal use, notify subscribers)
   triggerRender: () => void;
@@ -245,7 +259,7 @@ export interface ICalendarApp {
   // Theme management
   setTheme: (mode: ThemeMode) => void;
   getTheme: () => ThemeMode;
-  subscribeThemeChange: (callback: (theme: ThemeMode) => void) => (() => void);
+  subscribeThemeChange: (callback: (theme: ThemeMode) => void) => () => void;
   unsubscribeThemeChange: (callback: (theme: ThemeMode) => void) => void;
 }
 
@@ -258,11 +272,14 @@ export interface UseCalendarAppReturn {
   currentView: ViewType;
   currentDate: Date;
   events: Event[];
-  applyEventsChanges: (changes: {
-    add?: Event[];
-    update?: Array<{ id: string; updates: Partial<Event> }>;
-    delete?: string[];
-  }, isPending?: boolean) => void;
+  applyEventsChanges: (
+    changes: {
+      add?: Event[];
+      update?: Array<{ id: string; updates: Partial<Event> }>;
+      delete?: string[];
+    },
+    isPending?: boolean
+  ) => void;
   changeView: (view: ViewType) => void;
   setCurrentDate: (date: Date) => void;
   addEvent: (event: Event) => void;

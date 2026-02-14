@@ -8,11 +8,7 @@
 import { Temporal } from 'temporal-polyfill';
 import { generateUniKey } from '../utilityFunctions';
 import { Event } from '../../types/event';
-import {
-  ICSVEvent,
-  ICSImportOptions,
-  ICSImportResult,
-} from './types';
+import { ICSVEvent, ICSImportOptions, ICSImportResult } from './types';
 import { parseICSDate } from './icsDateUtils';
 import { isPlainDate, isPlainDateTime } from '../temporalTypeGuards';
 
@@ -130,7 +126,7 @@ function parseVEventLines(lines: string[]): ICSVEvent {
 
     // Parse parameters
     const paramObj: Record<string, string> = {};
-    params.forEach((p) => {
+    params.forEach(p => {
       const [key, val] = p.split('=');
       if (key && val) {
         paramObj[key.trim().toUpperCase()] = val.trim();
@@ -165,7 +161,9 @@ function parseVEventLines(lines: string[]): ICSVEvent {
         };
         break;
       case 'CATEGORIES':
-        event.categories = value.split(',').map((c) => unescapeICSValue(c.trim()));
+        event.categories = value
+          .split(',')
+          .map(c => unescapeICSValue(c.trim()));
         break;
     }
   }
@@ -206,7 +204,10 @@ function convertToDayFlowEvent(
     defaultTimeZone
   );
 
-  let endTemporal: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime;
+  let endTemporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime;
 
   if (icsEvent.dtend) {
     endTemporal = parseICSDate(
@@ -244,22 +245,22 @@ function convertToDayFlowEvent(
   } else if (isPlainDateTime(startTemporal)) {
     // Manual conversion if toZonedDateTime is missing or fails
     try {
-        if (typeof (startTemporal as any).toZonedDateTime === 'function') {
-            finalStart = (startTemporal as any).toZonedDateTime(tz);
-        } else {
-            throw new Error('toZonedDateTime missing');
-        }
+      if (typeof (startTemporal as any).toZonedDateTime === 'function') {
+        finalStart = (startTemporal as any).toZonedDateTime(tz);
+      } else {
+        throw new Error('toZonedDateTime missing');
+      }
     } catch {
-        finalStart = Temporal.ZonedDateTime.from({
-            year: startTemporal.year,
-            month: startTemporal.month,
-            day: startTemporal.day,
-            hour: startTemporal.hour,
-            minute: startTemporal.minute,
-            second: startTemporal.second,
-            millisecond: startTemporal.millisecond,
-            timeZone: tz
-        });
+      finalStart = Temporal.ZonedDateTime.from({
+        year: startTemporal.year,
+        month: startTemporal.month,
+        day: startTemporal.day,
+        hour: startTemporal.hour,
+        minute: startTemporal.minute,
+        second: startTemporal.second,
+        millisecond: startTemporal.millisecond,
+        timeZone: tz,
+      });
     }
   } else {
     finalStart = startTemporal;
@@ -273,22 +274,22 @@ function convertToDayFlowEvent(
     });
   } else if (isPlainDateTime(endTemporal)) {
     try {
-        if (typeof (endTemporal as any).toZonedDateTime === 'function') {
-            finalEnd = (endTemporal as any).toZonedDateTime(tz);
-        } else {
-             throw new Error('toZonedDateTime missing');
-        }
+      if (typeof (endTemporal as any).toZonedDateTime === 'function') {
+        finalEnd = (endTemporal as any).toZonedDateTime(tz);
+      } else {
+        throw new Error('toZonedDateTime missing');
+      }
     } catch {
-        finalEnd = Temporal.ZonedDateTime.from({
-            year: endTemporal.year,
-            month: endTemporal.month,
-            day: endTemporal.day,
-            hour: endTemporal.hour,
-            minute: endTemporal.minute,
-            second: endTemporal.second,
-            millisecond: endTemporal.millisecond,
-            timeZone: tz
-        });
+      finalEnd = Temporal.ZonedDateTime.from({
+        year: endTemporal.year,
+        month: endTemporal.month,
+        day: endTemporal.day,
+        hour: endTemporal.hour,
+        minute: endTemporal.minute,
+        second: endTemporal.second,
+        millisecond: endTemporal.millisecond,
+        timeZone: tz,
+      });
     }
   } else {
     finalEnd = endTemporal as Temporal.ZonedDateTime;

@@ -25,12 +25,8 @@ describe('helpers', () => {
     });
 
     it('should handle ZonedDateTime', () => {
-      const start = Temporal.ZonedDateTime.from(
-        '2025-01-15T09:00:00[UTC]'
-      );
-      const end = Temporal.ZonedDateTime.from(
-        '2025-01-17T10:00:00[UTC]'
-      );
+      const start = Temporal.ZonedDateTime.from('2025-01-15T09:00:00[UTC]');
+      const end = Temporal.ZonedDateTime.from('2025-01-17T10:00:00[UTC]');
 
       expect(isMultiDayEvent(start, end)).toBe(true);
     });
@@ -45,9 +41,7 @@ describe('helpers', () => {
     });
 
     it('should extract hour from ZonedDateTime', () => {
-      const zdt = Temporal.ZonedDateTime.from(
-        '2025-01-15T09:15:00[UTC]'
-      );
+      const zdt = Temporal.ZonedDateTime.from('2025-01-15T09:15:00[UTC]');
       const hour = extractHourFromDate(zdt);
 
       expect(hour).toBe(9.25);

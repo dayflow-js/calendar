@@ -53,7 +53,8 @@ export const ThemeProvider = ({
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
 
   // Compute effective theme (resolve 'auto' to actual theme)
-  const effectiveTheme: 'light' | 'dark' = theme === 'auto' ? systemTheme : theme;
+  const effectiveTheme: 'light' | 'dark' =
+    theme === 'auto' ? systemTheme : theme;
 
   /**
    * Sync initialTheme prop changes to internal state
@@ -134,7 +135,6 @@ export const ThemeProvider = ({
 
     // Set data attribute for CSS selectors
     root.setAttribute('data-theme', targetTheme);
-
   }, [effectiveTheme, theme, systemTheme]);
 
   /**
@@ -153,9 +153,7 @@ export const ThemeProvider = ({
   };
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 

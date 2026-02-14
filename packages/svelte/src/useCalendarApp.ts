@@ -1,14 +1,16 @@
 import { writable, type Writable } from 'svelte/store';
-import { 
-  CalendarApp, 
-  type CalendarAppConfig, 
+import {
+  CalendarApp,
+  type CalendarAppConfig,
   type UseCalendarAppReturn,
-  type ICalendarApp
+  type ICalendarApp,
 } from '@dayflow/core';
 
-export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn {
+export function useCalendarApp(
+  config: CalendarAppConfig
+): UseCalendarAppReturn {
   const app = new CalendarApp(config);
-  
+
   // Create a store for the parts of state we want to be reactive in Svelte
   const stateStore = writable({
     currentView: app.state.currentView,
@@ -16,7 +18,7 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
     events: app.getEvents(),
   });
 
-  const unsubscribe = app.subscribe((updatedApp) => {
+  const unsubscribe = app.subscribe(updatedApp => {
     stateStore.set({
       currentView: updatedApp.state.currentView,
       currentDate: updatedApp.state.currentDate,
@@ -27,22 +29,22 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
   // Proxy the state properties
   const result = {
     app,
-    get currentView() { 
+    get currentView() {
       let val;
-      stateStore.subscribe(s => val = s.currentView)();
+      stateStore.subscribe(s => (val = s.currentView))();
       return val;
     },
     get currentDate() {
       let val;
-      stateStore.subscribe(s => val = s.currentDate)();
+      stateStore.subscribe(s => (val = s.currentDate))();
       return val;
     },
     get events() {
       let val;
-      stateStore.subscribe(s => val = s.events)();
+      stateStore.subscribe(s => (val = s.events))();
       return val;
     },
-    
+
     applyEventsChanges: app.applyEventsChanges.bind(app),
     changeView: app.changeView.bind(app),
     setCurrentDate: app.setCurrentDate.bind(app),
@@ -63,8 +65,12 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
     highlightEvent: app.highlightEvent.bind(app),
     setVisibleMonth: app.setVisibleMonth.bind(app),
     getVisibleMonth: app.getVisibleMonth.bind(app),
-    get sidebarConfig() { return app.getSidebarConfig() },
-    get readOnlyConfig() { return app.getReadOnlyConfig() },
+    get sidebarConfig() {
+      return app.getSidebarConfig();
+    },
+    get readOnlyConfig() {
+      return app.getReadOnlyConfig();
+    },
   } as unknown as UseCalendarAppReturn;
 
   return result;

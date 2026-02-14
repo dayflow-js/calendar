@@ -1,4 +1,3 @@
-
 import { Event } from './event';
 
 export type CalendarSearchEvent = Event & {

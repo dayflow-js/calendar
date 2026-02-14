@@ -31,11 +31,11 @@ export default async function BlogLayout({
       docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
       footer={footer}
       sidebar={{
-        toggleButton: false
+        toggleButton: false,
       }}
       nextThemes={{
-        defaultTheme: "system",
-        storageKey: "theme"
+        defaultTheme: 'system',
+        storageKey: 'theme',
       }}
     >
       {children}

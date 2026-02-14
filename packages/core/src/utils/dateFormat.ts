@@ -9,7 +9,11 @@ import { isPlainDate, isZonedDateTime } from './temporal';
  * Ensures consistent server and client rendering
  */
 export const formatDateConsistent = (
-  date?: Date | Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime
+  date?:
+    | Date
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
 ): string => {
   if (!date) return '';
 

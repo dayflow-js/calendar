@@ -42,11 +42,11 @@ const calendar = useCalendarApp({
 
 ```ts
 interface DragPluginConfig {
-  enableDrag?: boolean;         // イベントをドラッグで移動
-  enableResize?: boolean;       // 上下にドラッグして時間を変更
-  enableCreate?: boolean;       // ダブルクリックで新規作成
+  enableDrag?: boolean; // イベントをドラッグで移動
+  enableResize?: boolean; // 上下にドラッグして時間を変更
+  enableCreate?: boolean; // ダブルクリックで新規作成
   enableAllDayCreate?: boolean; // 終日行でのドラッグ作成
-  supportedViews?: ViewType[];  // 対応させたいビュー
+  supportedViews?: ViewType[]; // 対応させたいビュー
 }
 ```
 
@@ -87,9 +87,9 @@ const calendar = useCalendarApp({
 ```ts
 interface EventsPluginConfig {
   enableAutoRecalculate?: boolean; // 週ビューなどで日付範囲が変わった際に自動再計算
-  enableValidation?: boolean;      // 追加・更新前にイベントを検証
-  defaultEvents?: Event[];         // 初期イベント
-  maxEventsPerDay?: number;        // 1 日のイベント数上限
+  enableValidation?: boolean; // 追加・更新前にイベントを検証
+  defaultEvents?: Event[]; // 初期イベント
+  maxEventsPerDay?: number; // 1 日のイベント数上限
 }
 ```
 

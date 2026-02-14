@@ -15,17 +15,17 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
 ```
 
-| 属性          | 类型                                                                     | 描述                                                                       | 必需 |
-|---------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------|------|
-| `id`          | `string`                                                                 | 事件的唯一标识符                                                           | 必填    |
-| `title`       | `string`                                                                 | 在日历中显示的事件标题                                                     | 必填    |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件开始日期/时间。使用 `PlainDate` 表示全天，`PlainDateTime` 表示本地时间   | 必填    |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                          | 必填    |
-| `description` | `string`                                                                 | 可选的事件描述或备注                                                       | 可选    |
-| `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                               | 可选    |
-| `icon`        | `boolean \| ReactNode`                                                   | 事件的自定义图标。`true`（默认）：显示默认，`false`：隐藏，`ReactNode`：自定义图标 | 可选    |
-| `calendarId`  | `string`                                                                 | 日历类型引用，用于多日历支持                                                | 可选    |
-| `meta`        | `Record<string, any>`                                                    | 额外的自定义元数据（位置、参与者、自定义字段等）                               | 可选    |
+| 属性          | 类型                                                                     | 描述                                                                               | 必需 |
+| ------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ---- |
+| `id`          | `string`                                                                 | 事件的唯一标识符                                                                   | 必填 |
+| `title`       | `string`                                                                 | 在日历中显示的事件标题                                                             | 必填 |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件开始日期/时间。使用 `PlainDate` 表示全天，`PlainDateTime` 表示本地时间         | 必填 |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                                  | 必填 |
+| `description` | `string`                                                                 | 可选的事件描述或备注                                                               | 可选 |
+| `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                                    | 可选 |
+| `icon`        | `boolean \| ReactNode`                                                   | 事件的自定义图标。`true`（默认）：显示默认，`false`：隐藏，`ReactNode`：自定义图标 | 可选 |
+| `calendarId`  | `string`                                                                 | 日历类型引用，用于多日历支持                                                       | 可选 |
+| `meta`        | `Record<string, any>`                                                    | 额外的自定义元数据（位置、参与者、自定义字段等）                                   | 可选 |
 
 ## **创建事件**
 

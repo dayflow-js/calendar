@@ -2,7 +2,10 @@ import { h } from 'preact';
 import { useState, useRef, useEffect } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { ChevronsUpDown, Check } from './Icons';
-import { getDefaultCalendarRegistry, CalendarRegistry } from '../../core/calendarRegistry';
+import {
+  getDefaultCalendarRegistry,
+  CalendarRegistry,
+} from '../../core/calendarRegistry';
 import { calendarPickerDropdown } from '@/styles/classNames';
 
 export interface CalendarOption {
@@ -113,13 +116,17 @@ export const CalendarPicker = ({
             <div
               key={opt.value}
               className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${opt.value === value ? 'bg-gray-50 dark:bg-gray-700/50' : ''}`}
-              onClick={(e) => handleSelect(e, opt.value)}
+              onClick={e => handleSelect(e, opt.value)}
             >
               <div className="flex items-center flex-1 min-w-0 mr-3">
                 <div className="w-5 flex justify-center mr-2">
-                  {opt.value === value && <Check className="w-4 h-4 text-primary" />}
+                  {opt.value === value && (
+                    <Check className="w-4 h-4 text-primary" />
+                  )}
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-200 truncate">{opt.label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-200 truncate">
+                  {opt.label}
+                </span>
               </div>
               <span
                 className="w-3 h-3 rounded-full shrink-0"
@@ -141,18 +148,25 @@ export const CalendarPicker = ({
         {options.map(opt => (
           <li
             key={opt.value}
-            className={`flex items-center px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${value === opt.value ? 'font-semibold' : ''
-              }`}
-            onClick={(e) => handleSelect(e, opt.value)}
+            className={`flex items-center px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${
+              value === opt.value ? 'font-semibold' : ''
+            }`}
+            onClick={e => handleSelect(e, opt.value)}
           >
-            {value === opt.value ? <span className="mr-2 text-sm text-primary">
-              <Check width={12} height={12} />
-            </span> : <div className="mr-2 text-sm w-3 h-3">&nbsp;</div>}
+            {value === opt.value ? (
+              <span className="mr-2 text-sm text-primary">
+                <Check width={12} height={12} />
+              </span>
+            ) : (
+              <div className="mr-2 text-sm w-3 h-3">&nbsp;</div>
+            )}
             <span
               className="w-3 h-3 mr-2 rounded-sm shrink-0"
               style={{ backgroundColor: getColorForCalendarId(opt.value) }}
             />
-            <span className="text-sm whitespace-nowrap text-gray-700 dark:text-gray-200">{opt.label}</span>
+            <span className="text-sm whitespace-nowrap text-gray-700 dark:text-gray-200">
+              {opt.label}
+            </span>
           </li>
         ))}
       </ul>,
@@ -165,7 +179,7 @@ export const CalendarPicker = ({
       <div className="relative inline-block" ref={pickerRef}>
         <button
           ref={triggerRef}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
@@ -175,7 +189,9 @@ export const CalendarPicker = ({
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: getColorForCalendarId(value) }}
           />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{currentOption?.label || value}</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            {currentOption?.label || value}
+          </span>
           <ChevronsUpDown className="w-4 h-4 text-gray-400" />
         </button>
         {renderDropdown()}
@@ -188,7 +204,7 @@ export const CalendarPicker = ({
       <button
         ref={triggerRef}
         type="button"
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}

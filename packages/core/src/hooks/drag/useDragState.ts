@@ -56,22 +56,22 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
     () =>
       isMonthView
         ? ({
-          active: false,
-          mode: null,
-          eventId: null,
-          targetDate: null,
-          startDate: null,
-          endDate: null,
-        } as MonthDragState)
+            active: false,
+            mode: null,
+            eventId: null,
+            targetDate: null,
+            startDate: null,
+            endDate: null,
+          } as MonthDragState)
         : ({
-          active: false,
-          mode: null,
-          eventId: null,
-          dayIndex: 0,
-          startHour: 0,
-          endHour: 0,
-          allDay: false,
-        } as WeekDayDragState),
+            active: false,
+            mode: null,
+            eventId: null,
+            dayIndex: 0,
+            startHour: 0,
+            endHour: 0,
+            allDay: false,
+          } as WeekDayDragState),
     [isMonthView]
   );
 

@@ -25,15 +25,8 @@ export interface CalendarEventProps {
   newlyCreatedEventId?: string | null;
   selectedEventId?: string | null;
   detailPanelEventId?: string | null;
-  onMoveStart?: (
-    e: any | any,
-    event: Event
-  ) => void;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onMoveStart?: (e: any | any, event: Event) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
   onEventUpdate: (updatedEvent: Event) => void;
   onEventDelete: (eventId: string) => void;
   onDetailPanelOpen?: () => void;
@@ -45,7 +38,13 @@ export interface CalendarEventProps {
   /** Custom event detail dialog component (Dialog mode) */
   customEventDetailDialog?: EventDetailDialogRenderer;
   /** Multi-day regular event segment information */
-  multiDaySegmentInfo?: { startHour: number; endHour: number; isFirst: boolean; isLast: boolean; dayIndex?: number };
+  multiDaySegmentInfo?: {
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
   app?: ICalendarApp;
   /** Whether the current view is in mobile mode */
   isMobile?: boolean;

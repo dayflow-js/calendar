@@ -31,7 +31,7 @@ export default async function HomeLayout({
       docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
       footer={footer}
       sidebar={{
-        toggleButton: false
+        toggleButton: false,
       }}
     >
       {children}

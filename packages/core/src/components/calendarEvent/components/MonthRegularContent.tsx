@@ -34,7 +34,10 @@ const MonthRegularContent = ({
       <div className="flex items-center flex-1 min-w-0">
         <div
           style={{
-            backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()),
+            backgroundColor: getLineColor(
+              event.calendarId || 'blue',
+              app?.getCalendarRegistry()
+            ),
           }}
           className={monthEventColorBar}
         />

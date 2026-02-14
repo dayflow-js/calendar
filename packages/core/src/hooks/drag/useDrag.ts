@@ -26,7 +26,8 @@ export const useDrag = (options: useDragProps): useDragReturn => {
   );
 
   const { viewType } = config;
-  const isDateGridView = viewType === ViewType.MONTH || viewType === ViewType.YEAR;
+  const isDateGridView =
+    viewType === ViewType.MONTH || viewType === ViewType.YEAR;
 
   // Initialize common utility functions (shared utility methods)
   const common = useDragCommon(config);
@@ -81,16 +82,16 @@ export const useDrag = (options: useDragProps): useDragReturn => {
     // Week/Day view specific methods (optional)
     ...(isDateGridView
       ? {
-        // Month view specific methods
-        daysDifference: monthSpecific.daysDifference,
-        addDaysToDate: monthSpecific.addDaysToDate,
-        getTargetDateFromPosition: monthSpecific.getTargetDateFromPosition,
-      }
+          // Month view specific methods
+          daysDifference: monthSpecific.daysDifference,
+          addDaysToDate: monthSpecific.addDaysToDate,
+          getTargetDateFromPosition: monthSpecific.getTargetDateFromPosition,
+        }
       : {
-        // Week/Day view specific methods
-        handleCreateAllDayEvent: weekDaySpecific.handleCreateAllDayEvent,
-        pixelYToHour: weekDaySpecific.pixelYToHour,
-        getColumnDayIndex: weekDaySpecific.getColumnDayIndex,
-      }),
+          // Week/Day view specific methods
+          handleCreateAllDayEvent: weekDaySpecific.handleCreateAllDayEvent,
+          pixelYToHour: weekDaySpecific.pixelYToHour,
+          getColumnDayIndex: weekDaySpecific.getColumnDayIndex,
+        }),
   };
 };

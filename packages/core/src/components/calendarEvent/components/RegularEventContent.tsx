@@ -20,15 +20,17 @@ import {
 interface RegularEventContentProps {
   event: Event;
   app?: ICalendarApp;
-  multiDaySegmentInfo?: { startHour: number; endHour: number; isFirst: boolean; isLast: boolean; dayIndex?: number };
+  multiDaySegmentInfo?: {
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
   isEditable: boolean;
   isTouchEnabled: boolean;
   isEventSelected: boolean;
-  onResizeStart?: (
-    e: any | any,
-    event: Event,
-    direction: string
-  ) => void;
+  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
 }
 
 const RegularEventContent = ({
@@ -47,7 +49,9 @@ const RegularEventContent = ({
     ? multiDaySegmentInfo.endHour
     : getEventEndHour(event);
   const duration = endHour - startHour;
-  const isFirstSegment = multiDaySegmentInfo ? multiDaySegmentInfo.isFirst : true;
+  const isFirstSegment = multiDaySegmentInfo
+    ? multiDaySegmentInfo.isFirst
+    : true;
   const isLastSegment = multiDaySegmentInfo ? multiDaySegmentInfo.isLast : true;
   const calendarId = event.calendarId || 'blue';
 
@@ -60,7 +64,12 @@ const RegularEventContent = ({
     <>
       <div
         className={eventColorBar}
-        style={{ backgroundColor: getLineColor(event.calendarId || 'blue', app?.getCalendarRegistry()) }}
+        style={{
+          backgroundColor: getLineColor(
+            event.calendarId || 'blue',
+            app?.getCalendarRegistry()
+          ),
+        }}
       />
       <div
         className={`h-full flex flex-col overflow-hidden pl-3 ${getDynamicPadding()}`}
@@ -121,8 +130,10 @@ const RegularEventContent = ({
           {/* Top-Right Indicator (Start Time) */}
           <div
             className="absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
-            style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
-            onTouchStart={(e) => {
+            style={{
+              borderColor: getLineColor(calendarId, app?.getCalendarRegistry()),
+            }}
+            onTouchStart={e => {
               e.stopPropagation();
               onResizeStart(e, event, 'top');
             }}
@@ -130,8 +141,10 @@ const RegularEventContent = ({
           {/* Bottom-Left Indicator (End Time) */}
           <div
             className="absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
-            style={{ borderColor: getLineColor(calendarId, app?.getCalendarRegistry()) }}
-            onTouchStart={(e) => {
+            style={{
+              borderColor: getLineColor(calendarId, app?.getCalendarRegistry()),
+            }}
+            onTouchStart={e => {
               e.stopPropagation();
               onResizeStart(e, event, 'bottom');
             }}

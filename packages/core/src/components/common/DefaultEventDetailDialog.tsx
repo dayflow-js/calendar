@@ -39,7 +39,9 @@ const DefaultEventDetailDialog = ({
 
   // Get visible calendar type options
   const colorOptions: CalendarOption[] = useMemo(() => {
-    const registry = app ? app.getCalendarRegistry() : getDefaultCalendarRegistry();
+    const registry = app
+      ? app.getCalendarRegistry()
+      : getDefaultCalendarRegistry();
     return registry.getVisible().map(cal => ({
       label: cal.name,
       value: cal.id,
@@ -163,9 +165,7 @@ const DefaultEventDetailDialog = ({
       />
 
       {/* Dialog - relative positioning ensures it appears above backdrop */}
-      <div
-        className={dialogContainer}
-      >
+      <div className={dialogContainer}>
         {/* Close button */}
         <button
           onClick={onClose}
@@ -189,7 +189,9 @@ const DefaultEventDetailDialog = ({
 
         {/* Content */}
         <div>
-          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('eventTitle')}</span>
+          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+            {t('eventTitle')}
+          </span>
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex-1">
               <input
@@ -225,7 +227,9 @@ const DefaultEventDetailDialog = ({
 
           {!!editedEvent.allDay ? (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('dateRange')}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                {t('dateRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
                 format="YYYY-MM-DD"
@@ -240,12 +244,16 @@ const DefaultEventDetailDialog = ({
             </div>
           ) : (
             <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">{t('timeRange')}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                {t('timeRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
                 timeZone={eventTimeZone}
                 disabled={!isEditable}
-                onChange={(nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]) => {
+                onChange={(
+                  nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
+                ) => {
                   const [start, end] = nextRange;
                   setEditedEvent({
                     ...editedEvent,
@@ -253,7 +261,9 @@ const DefaultEventDetailDialog = ({
                     end,
                   });
                 }}
-                onOk={(nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]) => {
+                onOk={(
+                  nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
+                ) => {
                   const [start, end] = nextRange;
                   setEditedEvent({
                     ...editedEvent,
@@ -267,7 +277,9 @@ const DefaultEventDetailDialog = ({
           )}
 
           <div className="mb-4">
-            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">{t('note')}</span>
+            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+              {t('note')}
+            </span>
             <textarea
               id={`event-dialog-note-${editedEvent.id}`}
               name="note"
@@ -315,10 +327,11 @@ const DefaultEventDetailDialog = ({
               </button>
 
               <button
-                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition ml-auto ${hasChanges
-                  ? 'hover:bg-primary/90 shadow-lg shadow-primary/20'
-                  : 'opacity-50 cursor-not-allowed grayscale-[0.5]'
-                  }`}
+                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition ml-auto ${
+                  hasChanges
+                    ? 'hover:bg-primary/90 shadow-lg shadow-primary/20'
+                    : 'opacity-50 cursor-not-allowed grayscale-[0.5]'
+                }`}
                 onClick={handleSave}
                 disabled={!hasChanges}
               >
@@ -326,8 +339,6 @@ const DefaultEventDetailDialog = ({
               </button>
             </div>
           )}
-
-
         </div>
       </div>
     </div>

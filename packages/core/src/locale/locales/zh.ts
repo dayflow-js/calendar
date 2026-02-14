@@ -27,12 +27,14 @@ const zh: Locale = {
     newAllDayCalendarEvent: '新建 {calendarName} 全天日程',
     save: '保存',
     deleteCalendar: '删除日历 "{calendarName}"?',
-    deleteCalendarMessage: '您想删除日历 "{calendarName}" 还是将其事件合并到另一个现有日历中？',
+    deleteCalendarMessage:
+      '您想删除日历 "{calendarName}" 还是将其事件合并到另一个现有日历中？',
     merge: '合并',
     confirmDeleteTitle: '您确定要删除日历 "{calendarName}" 吗？',
     confirmDeleteMessage: '如果您删除此日历，与其关联的所有事件也将被删除。',
     mergeConfirmTitle: '将 "{sourceName}" 合并到 "{targetName}"?',
-    mergeConfirmMessage: '您确定要将 "{sourceName}" 合并到 "{targetName}" 吗？这样做会将 "{sourceName}" 中的所有事件移动到 "{targetName}"，并且 "{sourceName}" 将被删除。此操作无法撤销。',
+    mergeConfirmMessage:
+      '您确定要将 "{sourceName}" 合并到 "{targetName}" 吗？这样做会将 "{sourceName}" 中的所有事件移动到 "{targetName}"，并且 "{sourceName}" 将被删除。此操作无法撤销。',
     expandSidebar: '展开日历侧边栏',
     collapseSidebar: '收起日历侧边栏',
     calendars: '日历',
@@ -67,7 +69,7 @@ const zh: Locale = {
     copy: '复制',
     pasteHere: '粘贴在此处',
     eventSummary: '简介',
-  }
+  },
 };
 
 export default zh;

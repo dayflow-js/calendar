@@ -1,12 +1,12 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   'global-css': {
-    title: 'Global CSS Classes'
+    title: 'Global CSS Classes',
   },
   'theme-customization': {
-    title: 'Theme Customization'
+    title: 'Theme Customization',
   },
-}
+};
 
-export default meta
+export default meta;

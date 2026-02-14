@@ -67,7 +67,7 @@ export const getSearchHeaderInfo = (
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      weekday: 'long'
+      weekday: 'long',
     });
   }
 
@@ -84,7 +84,10 @@ export const groupSearchResults = (
   results: CalendarSearchEvent[],
   today: Date
 ): Array<{ date: Date; events: CalendarSearchEvent[] }> => {
-  const groupsMap = new Map<number, { date: Date; events: CalendarSearchEvent[] }>();
+  const groupsMap = new Map<
+    number,
+    { date: Date; events: CalendarSearchEvent[] }
+  >();
 
   results.forEach(event => {
     const dateObj = getDateObj(event.start);
@@ -104,7 +107,9 @@ export const groupSearchResults = (
   }
 
   // Sort groups by time
-  const sortedGroups = Array.from(groupsMap.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
+  const sortedGroups = Array.from(groupsMap.values()).sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
 
   return sortedGroups;
 };

@@ -1,6 +1,11 @@
 import { h } from 'preact';
 import { Temporal } from 'temporal-polyfill';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from '../../common/Icons';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from '../../common/Icons';
 
 interface CalendarHeaderProps {
   visibleMonth: Temporal.PlainDate;
