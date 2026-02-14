@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   CalendarApp,
   CalendarAppConfig,
@@ -11,6 +11,7 @@ export function useCalendarApp(
   // Use useMemo to ensure app is only created once
   const app = useMemo(() => new CalendarApp(config), []);
   const [, setTick] = useState(0);
+  const configRef = useRef(config);
 
   useEffect(() => {
     if (!app) return;
@@ -26,8 +27,9 @@ export function useCalendarApp(
 
   // Sync config changes to the app instance
   useEffect(() => {
-    if (app) {
+    if (app && JSON.stringify(configRef.current) !== JSON.stringify(config)) {
       app.updateConfig(config);
+      configRef.current = config;
     }
   }, [app, config]);
 

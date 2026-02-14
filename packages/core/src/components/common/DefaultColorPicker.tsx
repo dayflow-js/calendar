@@ -8,13 +8,15 @@ import {
 
 interface DefaultColorPickerProps {
   color: string;
-  onChange: (color: { hex: string }) => void;
+  onChange: (color: { hex: string }, isPending?: boolean) => void;
+  onClose?: () => void;
   [key: string]: any;
 }
 
 export const DefaultColorPicker = ({
   color,
   onChange,
+  onClose,
 }: DefaultColorPickerProps) => {
   const blossomValue = useMemo(() => {
     const { h, s, l } = hexToHsl(color);
@@ -36,7 +38,8 @@ export const DefaultColorPicker = ({
         coreSize={36}
         petalSize={32}
         openOnHover={false}
-        onChange={c => onChange({ hex: c.hex })}
+        onChange={c => onChange({ hex: c.hex }, true)}
+        onCollapse={onClose}
       />
     </div>
   );

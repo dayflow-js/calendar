@@ -522,8 +522,16 @@ export class CalendarApp implements ICalendarApp {
     this.notify();
   };
 
-  updateCalendar = (id: string, updates: Partial<CalendarType>): void => {
+  updateCalendar = (
+    id: string,
+    updates: Partial<CalendarType>,
+    isPending?: boolean
+  ): void => {
     this.calendarRegistry.updateCalendar(id, updates);
+    if (isPending) {
+      this.notify();
+      return;
+    }
     const updatedCalendar = this.calendarRegistry.get(id);
     if (updatedCalendar) {
       this.callbacks.onCalendarUpdate?.(updatedCalendar);

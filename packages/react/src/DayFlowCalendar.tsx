@@ -71,6 +71,7 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
 
   // Extract the underlying app instance
   const app = (calendar as any)?.app || calendar;
+  const renderPropsKeysRef = useRef<string[]>([]);
 
   useEffect(() => {
     if (!containerRef.current || !app) return;
@@ -99,7 +100,15 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
     const activeOverrides = Object.keys(renderProps).filter(
       key => (renderProps as any)[key] !== undefined
     );
-    store.setOverrides(activeOverrides);
+
+    // Only update if keys have changed
+    if (
+      JSON.stringify(renderPropsKeysRef.current) !==
+      JSON.stringify(activeOverrides)
+    ) {
+      store.setOverrides(activeOverrides);
+      renderPropsKeysRef.current = activeOverrides;
+    }
   }, [renderProps]);
 
   // Portals for custom content

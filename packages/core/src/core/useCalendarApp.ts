@@ -114,8 +114,12 @@ export function useCalendarApp(
     };
 
     const originalUpdateCalendar = app.updateCalendar;
-    app.updateCalendar = (id: string, updates: Partial<CalendarType>) => {
-      originalUpdateCalendar(id, updates);
+    app.updateCalendar = (
+      id: string,
+      updates: Partial<CalendarType>,
+      isPending?: boolean
+    ) => {
+      originalUpdateCalendar(id, updates, isPending);
     };
 
     const originalCreateCalendar = app.createCalendar;

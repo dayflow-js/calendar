@@ -222,7 +222,11 @@ export interface ICalendarApp {
   reorderCalendars: (fromIndex: number, toIndex: number) => void;
   setCalendarVisibility: (calendarId: string, visible: boolean) => void;
   setAllCalendarsVisibility: (visible: boolean) => void;
-  updateCalendar: (id: string, updates: Partial<CalendarType>) => void;
+  updateCalendar: (
+    id: string,
+    updates: Partial<CalendarType>,
+    isPending?: boolean
+  ) => void;
   createCalendar: (calendar: CalendarType) => void;
   deleteCalendar: (id: string) => void;
   mergeCalendars: (sourceId: string, targetId: string) => void;
