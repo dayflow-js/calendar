@@ -42,6 +42,7 @@ const DayView = ({
   switcherMode = 'buttons',
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
+  onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: DayViewProps) => {
@@ -254,9 +255,11 @@ const DayView = ({
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      eventsToDelete.forEach(event => app.deleteEvent(event.id));
-      eventsToAdd.forEach(event => app.addEvent(event));
-      eventsToUpdate.forEach(event => app.updateEvent(event.id, event));
+      app.applyEventsChanges({
+        delete: eventsToDelete.map(e => e.id),
+        add: eventsToAdd,
+        update: eventsToUpdate.map(e => ({ id: e.id, updates: e }))
+      });
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {
@@ -409,6 +412,7 @@ const DayView = ({
         handleDrop={handleDrop}
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
+        onDateChange={onDateChange}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
         calendarRef={calendarRef}

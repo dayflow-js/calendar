@@ -113,7 +113,7 @@ export const monthGrid6Rows = 'df-month-grid grid grid-rows-6 h-full overflow-hi
  * Month day cell
  */
 export const monthDayCell =
-  'df-month-day-cell relative flex flex-col border-r border-gray-200 dark:border-gray-700 last:border-r-0';
+  'df-month-day-cell relative flex flex-col border-r border-gray-200 dark:border-gray-700';
 
 /**
  * Month date number container

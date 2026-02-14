@@ -1,12 +1,11 @@
 @import 'tailwindcss/preflight' layer(base);
 @import 'tailwindcss/theme' layer(theme);
 @import 'tailwindcss/utilities';
+@import '@dayflow/blossom-color-picker/styles.css';
 
 /* Force scanning of all relevant source code files to extract utility classes */
 @source "../**/*.{ts,tsx}";
 @source "../../../packages/*/src/**/*.{ts,tsx}";
-
-@import '@dayflow/blossom-color-picker/styles.css';
 
 @variant dark (.dark &);
 
@@ -102,8 +101,16 @@ body {
 /* ==================== Component Layer ==================== */
 
 @layer components {
-  .calendar-container {
-    @apply relative flex flex-col bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700;
+  .df-calendar-container {
+    @apply relative flex flex-row bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700;
+    --df-calendar-height: 800px;
+    height: var(--df-calendar-height, 800px);
+  }
+
+  @media (max-width: 768px) {
+    .df-calendar-container {
+      --df-calendar-height: 550px;
+    }
   }
 
   .calendar-header {

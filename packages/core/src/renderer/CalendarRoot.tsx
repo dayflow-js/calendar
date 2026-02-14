@@ -52,8 +52,6 @@ const COLORS = [
 
 interface CalendarRootProps {
   app: ICalendarApp;
-  className?: string;
-  style?: any;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
   meta?: Record<string, any>;
@@ -86,8 +84,6 @@ const CalendarInternalLocaleProvider = ({ locale, messages, children }: {
 
 export const CalendarRoot = ({
   app,
-  className,
-  style,
   customDetailPanelContent,
   customEventDetailDialog,
   meta,
@@ -97,6 +93,14 @@ export const CalendarRoot = ({
   collapsedSafeAreaLeft,
 }: CalendarRootProps) => {
   const customRenderingStore = useContext(CustomRenderingContext);
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    return app.subscribe(() => {
+      setTick(t => t + 1);
+    });
+  }, [app]);
+
   const currentView = app.getCurrentView();
   const ViewComponent = currentView.component;
   const sidebarConfig = app.getSidebarConfig();
@@ -121,6 +125,11 @@ export const CalendarRoot = ({
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(null);
+
+  const handleDateSelect = useCallback((date: Date) => {
+    app.setCurrentDate(date);
+    setSelectedEventId(null);
+  }, [app]);
 
   useKeyboardShortcuts({
     app,
@@ -378,6 +387,7 @@ export const CalendarRoot = ({
     meta,
     selectedEventId,
     onEventSelect: setSelectedEventId,
+    onDateChange: handleDateSelect,
     detailPanelEventId,
     onDetailPanelToggle: setDetailPanelEventId,
   };
@@ -450,8 +460,7 @@ export const CalendarRoot = ({
         messages={customMessages}
       >
         <div
-          className={`calendar-container relative flex flex-row h-full overflow-hidden select-none ${className ?? ''}`}
-          style={{ height: 800, ...style }}
+          className="df-calendar-container relative flex flex-row overflow-hidden select-none"
         >
           <ContentSlot
             store={customRenderingStore}

@@ -30,6 +30,7 @@ import {
   flexCol,
   timeGridBoundary,
   midnightLabel,
+  cn,
 } from '@/styles/classNames';
 
 interface DayContentProps {
@@ -63,6 +64,7 @@ interface DayContentProps {
   handleDrop: any;
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
+  onDateChange?: (date: Date) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
   calendarRef: any;
@@ -111,6 +113,7 @@ export const DayContent = ({
   handleDrop,
   handleEventUpdate,
   handleEventDelete,
+  onDateChange,
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
@@ -177,7 +180,7 @@ export const DayContent = ({
     >
       <div className={`relative ${flexCol} h-full`}>
         {/* Fixed navigation bar */}
-        <div onContextMenu={e => e.preventDefault()}>
+        <div onContextMenu={e => e.preventDefault()} style={{ paddingRight: isMobile ? '0px' : '15px' }}>
           <ViewHeader
             calendar={app}
             viewType={ViewType.DAY}
@@ -190,15 +193,17 @@ export const DayContent = ({
         {/* All-day event area */}
         {showAllDay ? (
           <div
-            className={`${allDayRow} pt-px`}
+            className={cn(allDayRow, 'border-t border-gray-200 dark:border-gray-700 items-stretch')}
             ref={allDayRowRef}
+            style={{ paddingRight: isMobile ? '0px' : '0.6875rem' }}
             onContextMenu={(e) => handleContextMenu(e, true)}
           >
-            <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs`} onContextMenu={e => e.preventDefault()}>{t('allDay')}</div>
-            <div className="flex flex-1 relative">
+            <div className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs flex items-center`} onContextMenu={e => e.preventDefault()}>{t('allDay')}</div>
+            <div className={cn('flex flex-1 relative self-stretch', !isMobile ? 'border-r border-gray-200 dark:border-gray-700' : '')}>
               <div
                 className="w-full relative"
                 style={{ minHeight: `${allDayAreaHeight}px` }}
+                onClick={() => onDateChange?.(currentDate)}
                 onMouseDown={e => {
                   const currentDayIndex = Math.floor(
                     (currentDate.getTime() - currentWeekStart.getTime()) /
@@ -274,10 +279,10 @@ export const DayContent = ({
             </div>
           </div>
         ) :
-          <div className={`border-b border-gray-200 dark:border-gray-700`} />}
+          <div className={cn('border-b border-gray-200 dark:border-gray-700', !isMobile ? 'pr-2.75' : '')} />}
 
         {/* Time grid and event area */}
-        <div className={`${calendarContent} df-day-time-grid`} style={{ position: 'relative' }}>
+        <div className={`${calendarContent} df-day-time-grid`} style={{ position: 'relative', scrollbarGutter: 'stable' }}>
           <div className="relative flex">
             {/* Current time line */}
             {isToday && currentTime &&
@@ -331,7 +336,7 @@ export const DayContent = ({
             {/* Time grid */}
             <div className="grow select-none">
               {/* Top boundary */}
-              <div className={`${timeGridBoundary} border-t-0`}>
+              <div className={cn(timeGridBoundary, !isMobile ? 'border-r' : '', 'border-t-0')}>
                 <div className={`${midnightLabel} -left-9.5`} style={{ top: 'auto', bottom: '-0.625rem' }}>
                   {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
                 </div>
@@ -343,7 +348,8 @@ export const DayContent = ({
                 {timeSlots.map((_slot, slotIndex) => (
                   <div
                     key={slotIndex}
-                    className={timeGridRow}
+                    className={cn(timeGridRow, !isMobile ? 'border-r' : '')}
+                    onClick={() => onDateChange?.(currentDate)}
                     onDblClick={e => {
                       const currentDayIndex = Math.floor(
                         (currentDate.getTime() - currentWeekStart.getTime()) /
@@ -393,7 +399,7 @@ export const DayContent = ({
                 ))}
 
                 {/* Bottom boundary */}
-                <div className={timeGridBoundary}>
+                <div className={cn(timeGridBoundary, !isMobile ? 'border-r' : '')}>
                   <div className={`${midnightLabel} -left-9.5`}>
                     00:00
                   </div>
