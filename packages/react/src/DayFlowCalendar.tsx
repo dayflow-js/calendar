@@ -1,11 +1,9 @@
-import { useRef, useEffect, useState, useMemo, type CSSProperties, type ReactNode, type FC } from 'react';
+import { useRef, useEffect, useState, useMemo, type ReactNode, type FC } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarRenderer, type ICalendarApp, type CustomRendering, type UseCalendarAppReturn } from '@dayflow/core';
 
 export interface DayFlowCalendarProps {
   calendar: ICalendarApp | UseCalendarAppReturn;
-  className?: string;
-  style?: CSSProperties;
   /** Custom event content renderer (React) */
   eventContent?: (args: { event: any; isAllDay: boolean; isMobile: boolean }) => ReactNode;
   /** Custom event detail panel content (React) */
@@ -26,8 +24,6 @@ export interface DayFlowCalendarProps {
 
 export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   calendar,
-  className,
-  style,
   ...renderProps
 }: DayFlowCalendarProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,9 +73,9 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   }, [customRenderings, renderProps]);
 
   return (
-    <div className={className} style={style}>
-      <div ref={containerRef} className="df-core-container" style={{ height: '100%' }} />
+    <>
+      <div ref={containerRef} className="df-calendar-wrapper" />
       {portals}
-    </div>
+    </>
   );
 };

@@ -189,7 +189,15 @@ export interface ICalendarApp {
   goToNext: () => void;
   selectDate: (date: Date) => void;
 
+  // Undo management
+  undo: () => void;
+
   // Event management
+  applyEventsChanges: (changes: {
+    add?: Event[];
+    update?: Array<{ id: string; updates: Partial<Event> }>;
+    delete?: string[];
+  }, isPending?: boolean) => void;
   addEvent: (event: Event) => void;
   updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
   deleteEvent: (id: string) => void;
@@ -250,6 +258,11 @@ export interface UseCalendarAppReturn {
   currentView: ViewType;
   currentDate: Date;
   events: Event[];
+  applyEventsChanges: (changes: {
+    add?: Event[];
+    update?: Array<{ id: string; updates: Partial<Event> }>;
+    delete?: string[];
+  }, isPending?: boolean) => void;
   changeView: (view: ViewType) => void;
   setCurrentDate: (date: Date) => void;
   addEvent: (event: Event) => void;
@@ -259,6 +272,7 @@ export interface UseCalendarAppReturn {
   goToPrevious: () => void;
   goToNext: () => void;
   selectDate: (date: Date) => void;
+  undo: () => void;
   getCalendars: () => CalendarType[];
   createCalendar: (calendar: CalendarType) => void;
   mergeCalendars: (sourceId: string, targetId: string) => void;

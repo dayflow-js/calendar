@@ -53,6 +53,7 @@ interface TimeGridProps {
   handleResizeStart: any;
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
+  onDateChange?: (date: Date) => void;
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
   selectedEventId: string | null;
@@ -99,6 +100,7 @@ export const TimeGrid = ({
   handleResizeStart,
   handleEventUpdate,
   handleEventDelete,
+  onDateChange,
   newlyCreatedEventId,
   setNewlyCreatedEventId,
   selectedEventId,
@@ -269,6 +271,11 @@ export const TimeGrid = ({
                         key={`${slotIndex}-${dayIndex}`}
                         className={`${timeGridCell} snap-start ${isMobile && dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
                         style={columnStyle}
+                        onClick={() => {
+                          const clickedDate = new Date(currentWeekStart);
+                          clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
+                          onDateChange?.(clickedDate);
+                        }}
                         onDblClick={e => {
                           handleCreateStart?.(e, dayIndex, slot.hour);
                         }}

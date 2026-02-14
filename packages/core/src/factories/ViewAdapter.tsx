@@ -21,6 +21,7 @@ export const ViewAdapter = ({
   selectedEventId,
   detailPanelEventId,
   onEventSelect,
+  onDateChange,
   onDetailPanelToggle,
 }: ViewAdapterProps) => {
   // Get plugin services
@@ -70,9 +71,13 @@ export const ViewAdapter = ({
 
   const handleDateChange = useCallback(
     (date: Date) => {
-      app.setCurrentDate(date);
+      if (onDateChange) {
+        onDateChange(date);
+      } else {
+        app.setCurrentDate(date);
+      }
     },
-    [app]
+    [app, onDateChange]
   );
 
   const handleViewChange = useCallback(

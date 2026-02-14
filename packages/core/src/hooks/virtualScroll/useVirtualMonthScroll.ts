@@ -22,6 +22,7 @@ export const useResponsiveMonthConfig = () => {
     screenSize: 'mobile' | 'tablet' | 'desktop';
     weeksPerView: number;
   }>(() => {
+    // During initialization (SSR/Hydration), use cached value or default
     if (cachedConfig) return cachedConfig;
 
     return {
@@ -75,17 +76,22 @@ export const useResponsiveMonthConfig = () => {
         }
       })();
 
-      if (
-        cachedConfig &&
-        cachedConfig.screenSize === newConfig.screenSize &&
-        cachedConfig.weekHeight === newConfig.weekHeight &&
-        cachedConfig.weeksPerView === newConfig.weeksPerView
-      ) {
-        return;
-      }
-
+      // Update global cache
       cachedConfig = newConfig;
-      setConfig(newConfig);
+
+      // fix: In the mobile month view, when events are initially rendered, only the event start time is shown, 
+      // but it should show only the event title instead.
+      // always sync local state on mount/resize, but skip if effectively the same
+      setConfig(prev => {
+        if (
+          prev.screenSize === newConfig.screenSize &&
+          prev.weekHeight === newConfig.weekHeight &&
+          prev.weeksPerView === newConfig.weeksPerView
+        ) {
+          return prev;
+        }
+        return newConfig;
+      });
     };
 
     updateConfig();

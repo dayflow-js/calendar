@@ -157,7 +157,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             if (drag.allDay && isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
               indicator.style.top = `${sourceElement.offsetTop - 2}px`;
-              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - 2px)`;
+              const gutterOffset = !isMobile ? 11 : 0;
+              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
               indicator.style.height = `${sourceRect.height}px`;
             } else if (drag.allDay && !isDayView) {
               const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
@@ -193,7 +194,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
             if (isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - 2px)`;
+              const gutterOffset = !isMobile ? 11 : 0;
+              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
             } else {
               const totalWidth = isMobile ? '175%' : '100%';
               const dayColumnWidth = `calc(${totalWidth} / 7)`;
@@ -327,7 +329,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         if (isAllDay) {
           if (isDayView) {
             indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-            indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - 2px)`;
+            const gutterOffset = !isMobile ? 11 : 0;
+            indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
           } else {
             const totalWidth = (isMobile && !isDayView) ? '175%' : '100%';
             const dayColumnWidth = `calc(${totalWidth} / 7)`;

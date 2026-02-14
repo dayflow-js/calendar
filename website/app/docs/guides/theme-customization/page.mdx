@@ -158,7 +158,7 @@ Target specific calendar components:
 
 ```css
 /* Calendar container */
-.calendar-container {
+.df-calendar-container {
   --calendar-bg: var(--dayflow-bg-primary);
   --calendar-border: var(--dayflow-border);
 }
@@ -223,7 +223,7 @@ function CustomStyledCalendar({ calendar }) {
     <div className="custom-calendar-wrapper">
       <style jsx global>{`
         /* Override with Tailwind classes */
-        .custom-calendar-wrapper .calendar-container {
+        .custom-calendar-wrapper .df-calendar-container {
           @apply bg-gray-50 dark:bg-gray-950;
         }
 

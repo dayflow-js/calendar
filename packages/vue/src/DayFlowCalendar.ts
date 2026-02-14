@@ -8,14 +8,6 @@ export const DayFlowCalendar = defineComponent({
       type: Object as PropType<ICalendarApp | UseCalendarAppReturn>,
       required: true,
     },
-    className: {
-      type: String,
-      default: '',
-    },
-    style: {
-      type: Object as PropType<any>,
-      default: () => ({}),
-    },
   },
   setup(props, { slots }) {
     const container = ref<HTMLElement | null>(null);
@@ -45,14 +37,14 @@ export const DayFlowCalendar = defineComponent({
       });
     });
 
-    return () => h('div', { class: props.className, style: props.style }, [
-      h('div', { ref: container, class: 'df-core-container', style: { height: '100%' } }),
+    return () => [
+      h('div', { ref: container, class: 'df-calendar-wrapper' }),
       ...customRenderings.value.map(rendering => 
         h(Teleport, { to: rendering.containerEl }, {
           default: () => slots[rendering.generatorName]?.(rendering.generatorArgs)
         })
       )
-    ]);
+    ];
   },
 });
 

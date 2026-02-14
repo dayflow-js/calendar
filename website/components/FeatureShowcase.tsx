@@ -191,7 +191,6 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   useEventDetailDialog = false,
-  className = 'h-130',
 }) => {
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
 
@@ -199,7 +198,6 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
     <div className="rounded-xl dark:border-slate-700 bg-white dark:bg-slate-900 ">
       <DayFlowCalendar
         calendar={calendar}
-        className={`w-full ${className}`}
         eventDetailContent={customDetailPanelContent}
         eventDetailDialog={customEventDetailDialog}
       />

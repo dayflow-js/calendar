@@ -8,8 +8,6 @@
   } from '@dayflow/core';
 
   export let calendar: ICalendarApp | UseCalendarAppReturn;
-  export let className: string = '';
-  export let style: string = '';
   
   // Custom renderers passed as props (Svelte components)
   export let eventContent: any = null;
@@ -65,15 +63,13 @@
   }
 </script>
 
-<div class={className} {style}>
-  <div bind:this={container} class="df-core-container" style="height: 100%"></div>
-  
-  {#each customRenderings as rendering (rendering.id)}
-    {@const Component = renderProps[rendering.generatorName]}
-    {#if Component}
-      <div use:portal={rendering.containerEl}>
-        <svelte:component this={Component} {...rendering.generatorArgs} />
-      </div>
-    {/if}
-  {/each}
-</div>
+<div bind:this={container} class="df-calendar-wrapper"></div>
+
+{#each customRenderings as rendering (rendering.id)}
+  {@const Component = renderProps[rendering.generatorName]}
+  {#if Component}
+    <div use:portal={rendering.containerEl}>
+      <svelte:component this={Component} {...rendering.generatorArgs} />
+    </div>
+  {/if}
+{/each}

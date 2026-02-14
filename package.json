@@ -12,9 +12,13 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.10.3",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.21",
     "postcss-import": "^16.1.1",
     "preact": "^10.28.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^4.1.18",
     "turbo": "^2.3.3"
   },

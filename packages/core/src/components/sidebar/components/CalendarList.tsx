@@ -37,6 +37,7 @@ export const CalendarList = ({
 }: CalendarListProps) => {
   const [editingName, setEditingName] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
+  const isProcessedRef = useRef(false);
 
   // Drag state
   const [isDragging, setIsDragging] = useState(false);
@@ -124,6 +125,7 @@ export const CalendarList = ({
 
   const handleRenameStart = useCallback((calendar: CalendarType) => {
     if (!isEditable) return;
+    isProcessedRef.current = false;
     setEditingId(calendar.id);
     setEditingName(calendar.name);
   }, [setEditingId, isEditable]);
@@ -133,6 +135,9 @@ export const CalendarList = ({
   }, []);
 
   const handleRenameSave = useCallback(() => {
+    if (isProcessedRef.current) return;
+    isProcessedRef.current = true;
+
     if (editingId && editingName.trim()) {
       const calendar = calendars.find(c => c.id === editingId);
       if (calendar && calendar.name !== editingName.trim()) {
@@ -144,6 +149,9 @@ export const CalendarList = ({
   }, [editingId, editingName, calendars, onRename, setEditingId]);
 
   const handleRenameCancel = useCallback(() => {
+    if (isProcessedRef.current) return;
+    isProcessedRef.current = true;
+
     setEditingId(null);
     setEditingName('');
   }, [setEditingId]);

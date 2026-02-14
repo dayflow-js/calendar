@@ -40,6 +40,7 @@ const WeekView = ({
   calendarRef,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
+  onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: WeekViewProps) => {
@@ -231,11 +232,11 @@ const WeekView = ({
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      eventsToDelete.forEach(event => app.deleteEvent(event.id));
-      eventsToAdd.forEach(event => app.addEvent(event));
-      eventsToUpdate.forEach(event =>
-        app.updateEvent(event.id, event, isResizing)
-      );
+      app.applyEventsChanges({
+        delete: eventsToDelete.map(e => e.id),
+        add: eventsToAdd,
+        update: eventsToUpdate.map(e => ({ id: e.id, updates: e }))
+      }, isResizing);
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {
@@ -412,6 +413,7 @@ const WeekView = ({
         handleResizeStart={handleResizeStart}
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
+        onDateChange={onDateChange}
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         selectedEventId={selectedEventId}
@@ -455,6 +457,7 @@ const WeekView = ({
         handleResizeStart={handleResizeStart}
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
+        onDateChange={onDateChange}
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         selectedEventId={selectedEventId}

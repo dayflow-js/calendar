@@ -1193,6 +1193,9 @@ export const useDragHandlers = (
                   : event
               )
             );
+          } else if (drag.mode === 'resize') {
+            // Finalize resize to trigger undo snapshot and onEventUpdate callback
+            onEventsUpdate?.(prev => [...prev]);
           }
         }
       }

@@ -126,6 +126,12 @@ export function useCalendarApp(
       originalHighlightEvent(eventId);
     };
 
+    const originalUndo = app.undo;
+    app.undo = () => {
+      originalUndo();
+      setEvents([...app.getEvents()]);
+    };
+
     const originalTriggerRender = app.triggerRender;
     app.triggerRender = () => {
       originalTriggerRender();
@@ -178,6 +184,14 @@ export function useCalendarApp(
     [app, triggerUpdate]
   );
 
+  const applyEventsChanges = useCallback(
+    (changes: any, isPending?: boolean) => {
+      app.applyEventsChanges(changes, isPending);
+      triggerUpdate();
+    },
+    [app, triggerUpdate]
+  );
+
   const updateEvent = useCallback(
     (id: string, event: Partial<Event>, isPending?: boolean) => {
       app.updateEvent(id, event, isPending);
@@ -193,6 +207,11 @@ export function useCalendarApp(
     },
     [app, triggerUpdate]
   );
+
+  const undo = useCallback(() => {
+    app.undo();
+    triggerUpdate();
+  }, [app, triggerUpdate]);
 
   // Navigation methods
   const goToToday = useCallback(() => {
@@ -239,6 +258,7 @@ export function useCalendarApp(
     currentView,
     currentDate,
     events,
+    applyEventsChanges,
     changeView,
     setCurrentDate,
     addEvent,
@@ -248,6 +268,7 @@ export function useCalendarApp(
     goToPrevious,
     goToNext,
     selectDate,
+    undo,
     getCalendars: () => app.getCalendars(),
     createCalendar: (calendar: CalendarType) => app.createCalendar(calendar),
     mergeCalendars: (sourceId: string, targetId: string) => app.mergeCalendars(sourceId, targetId),

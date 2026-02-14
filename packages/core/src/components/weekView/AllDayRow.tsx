@@ -50,6 +50,7 @@ interface AllDayRowProps {
   handleResizeStart: any;
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
+  onDateChange?: (date: Date) => void;
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
   selectedEventId: string | null;
@@ -91,6 +92,7 @@ export const AllDayRow = ({
   handleResizeStart,
   handleEventUpdate,
   handleEventDelete,
+  onDateChange,
   newlyCreatedEventId,
   setNewlyCreatedEventId,
   selectedEventId,
@@ -191,6 +193,11 @@ export const AllDayRow = ({
                       key={`allday-${dayIndex}`}
                       className={`${allDayCell} ${isMobile && dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
                       style={{ minHeight: `${allDayAreaHeight}px`, ...columnStyle }}
+                      onClick={() => {
+                        const clickedDate = new Date(currentWeekStart);
+                        clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
+                        onDateChange?.(clickedDate);
+                      }}
                       onMouseDown={e => handleCreateAllDayEvent?.(e, dayIndex)}
                       onDblClick={e => handleCreateAllDayEvent?.(e, dayIndex)}
                       onDragOver={handleDragOver}

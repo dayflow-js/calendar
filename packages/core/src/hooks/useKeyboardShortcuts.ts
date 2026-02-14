@@ -88,9 +88,13 @@ export const useKeyboardShortcuts = ({
         return;
       }
 
-      // 6. Clipboard Operations (Cmd/Ctrl + C/X/V)
+      // 6. Clipboard & Undo Operations (Cmd/Ctrl + C/X/V/Z)
       if (e.metaKey || e.ctrlKey) {
         switch (e.key.toLowerCase()) {
+          case 'z': // Undo
+            e.preventDefault();
+            app.undo();
+            break;
           case 'c': // Copy
             if (selectedEventId) {
               const event = app.getEvents().find(e => e.id === selectedEventId);
@@ -160,17 +164,30 @@ export const useKeyboardShortcuts = ({
            const originalEnd = temporalToDate(eventData.end as any);
            const duration = originalEnd.getTime() - originalStart.getTime();
 
-           // For global paste, paste at current time or start of view
+           // 1. Determine target date
            let targetStart = new Date();
            
-           const currentViewDate = app.getCurrentDate();
-           targetStart = new Date(currentViewDate);
+           // If an event is currently selected, use its date as the base
+           // This covers the case: Copy -> (still selected) -> Paste
+           if (selectedEventId) {
+             const selectedEvent = app.getEvents().find(e => e.id === selectedEventId);
+             if (selectedEvent) {
+               targetStart = temporalToDate(selectedEvent.start);
+             } else {
+               targetStart = new Date(app.getCurrentDate());
+             }
+           } else {
+             // If no event is selected (e.g., clicked empty grid), use current app date
+             // Always fetch from app instance to get the freshest value
+             targetStart = new Date(app.getCurrentDate());
+           }
            
-           // Preserve original time
+           // 2. Preserve original time from copied event
            targetStart.setHours(
              originalStart.getHours(),
              originalStart.getMinutes(),
-             originalStart.getSeconds()
+             originalStart.getSeconds(),
+             0
            );
 
            const targetEnd = new Date(targetStart.getTime() + (duration > 0 ? duration : 3600000));

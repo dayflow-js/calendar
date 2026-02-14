@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/dayflow-js/dayflow#readme",
   "scripts": {
-    "dev": "vite --port 5529",
+    "dev": "vite --port 5529 --host",
     "build": "rollup -c --bundleConfigAsCjs",
     "typecheck": "tsc --noEmit",
     "test": "jest",

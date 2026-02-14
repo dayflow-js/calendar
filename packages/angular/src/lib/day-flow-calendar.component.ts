@@ -21,25 +21,21 @@ import {
 @Component({
   selector: 'dayflow-calendar',
   template: `
-    <div [class]="className" [ngStyle]="style">
-      <div #container class="df-core-container" style="height: 100%"></div>
-      
-      <!-- Hidden area to render Angular templates before they are portaled -->
-      <div style="display: none">
-        <ng-container *ngFor="let rendering of customRenderings; trackBy: trackById">
-          <div *ngIf="getTemplate(rendering.generatorName)" [dayflowPortal]="rendering.containerEl">
-            <ng-container *ngTemplateOutlet="getTemplate(rendering.generatorName)!; context: { $implicit: rendering.generatorArgs }"></ng-container>
-          </div>
-        </ng-container>
-      </div>
+    <div #container class="df-calendar-wrapper"></div>
+    
+    <!-- Hidden area to render Angular templates before they are portaled -->
+    <div style="display: none">
+      <ng-container *ngFor="let rendering of customRenderings; trackBy: trackById">
+        <div *ngIf="getTemplate(rendering.generatorName)" [dayflowPortal]="rendering.containerEl">
+          <ng-container *ngTemplateOutlet="getTemplate(rendering.generatorName)!; context: { $implicit: rendering.generatorArgs }"></ng-container>
+        </div>
+      </ng-container>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DayFlowCalendarComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() calendar!: ICalendarApp | UseCalendarAppReturn;
-  @Input() className: string = '';
-  @Input() style: Record<string, any> = {};
 
   // Templates for custom content injection
   @Input() eventContent?: TemplateRef<any>;

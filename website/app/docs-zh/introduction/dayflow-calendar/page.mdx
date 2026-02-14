@@ -34,15 +34,15 @@ export function CalendarDemo() {
 
 ## **属性说明**
 
-| **属性名**                 | **类型**                     | **说明**                                                              | **必填** |
-| -------------------------- | ---------------------------- | --------------------------------------------------------------------- | -------- |
-| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | ✅       |
-| `className`                | `string`                     | 根容器的附加类名（基础类名为 `calendar-container`）                   | ❌       |
-| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                    | ❌       |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                      | ❌       |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`          | ❌       |
-| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）          | ❌       |
-| `search`                   | `CalendarSearchProps`        | 内置搜索功能的配置项                                                  | ❌       |
+| **属性名**                 | **类型**                     | **说明**                                                           | **必填** |
+|----------------------------|------------------------------|--------------------------------------------------------------------|----------|
+| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | ✅        |
+| `className`                | `string`                     | 根容器的附加类名（基础类名为 `df-calendar-container`）               | ❌        |
+| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                   | ❌        |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                    | ❌        |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`        | ❌        |
+| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）         | ❌        |
+| `search`                   | `CalendarSearchProps`        | 内置搜索功能的配置项                                               | ❌        |
 
 ## 搜索配置
 
@@ -64,12 +64,12 @@ export function CalendarDemo() {
 
 ### 搜索属性说明
 
-| 选项 | 描述 |
-| :--- | :--- |
-| `debounceDelay` | 触发搜索前的延迟时间（毫秒）。 |
-| `onSearch` | 根据关键词获取结果的异步函数。 |
-| `customSearch` | 使用自定义逻辑在本地过滤事件的同步函数。 |
-| `emptyText` | 未找到结果时显示的文本。 |
+| 选项            | 描述                                    |
+|:----------------|:----------------------------------------|
+| `debounceDelay` | 触发搜索前的延迟时间（毫秒）。             |
+| `onSearch`      | 根据关键词获取结果的异步函数。           |
+| `customSearch`  | 使用自定义逻辑在本地过滤事件的同步函数。 |
+| `emptyText`     | 未找到结果时显示的文本。                 |
 
 ## **自定义容器样式**
 
@@ -93,7 +93,7 @@ export function CalendarDemo() {
 />
 ```
 
-也可以通过 `className` 添加自定义 CSS 类名，这些类名会附加在基础类 `calendar-container` 之后：
+也可以通过 `className` 添加自定义 CSS 类名，这些类名会附加在基础类 `df-calendar-container` 之后：
 
 ```tsx
 <DayFlowCalendarcalendar={calendar}className="my-custom-calendar shadow-lg"/>

@@ -19,6 +19,13 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
     };
   }, [app]);
 
+  // Sync config changes to the app instance
+  useEffect(() => {
+    if (app) {
+      app.updateConfig(config);
+    }
+  }, [app, config]);
+
   // Map app to the UseCalendarAppReturn interface
   // (In a real implementation, we might want a more comprehensive mapping)
   return {

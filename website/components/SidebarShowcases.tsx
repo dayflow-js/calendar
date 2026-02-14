@@ -316,7 +316,7 @@ export const SidebarBasicsShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar app={calendar.app} className="h-155 w-full" />
+      <DayFlowCalendar calendar={calendar} />
     </ShowcaseWrapper>
   );
 };
@@ -335,7 +335,7 @@ export const SidebarCustomShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar app={calendar.app} className="h-155 w-full" />
+      <DayFlowCalendar calendar={calendar} />
     </ShowcaseWrapper>
   );
 };

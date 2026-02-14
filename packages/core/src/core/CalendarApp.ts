@@ -78,6 +78,9 @@ export class CalendarApp implements ICalendarApp {
   private customMobileEventRenderer?: MobileEventRenderer;
   private themeChangeListeners: Set<(theme: ThemeMode) => void>;
   private listeners: Set<(app: ICalendarApp) => void>;
+  private undoStack: Array<{ type: string; data: any }> = [];
+  private pendingSnapshot: Event[] | null = null;
+  private readonly MAX_UNDO_STACK = 50;
 
   constructor(config: CalendarAppConfig) {
     // Initialize state
@@ -149,6 +152,29 @@ export class CalendarApp implements ICalendarApp {
 
   private notify = (): void => {
     this.listeners.forEach(listener => listener(this));
+  };
+
+  private pushToUndo = (eventsSnapshot?: Event[]): void => {
+    // Store a snapshot of events array (shallow copy)
+    this.undoStack.push({
+      type: 'events_snapshot',
+      data: eventsSnapshot || [...this.state.events],
+    });
+
+    if (this.undoStack.length > this.MAX_UNDO_STACK) {
+      this.undoStack.shift();
+    }
+  };
+
+  public undo = (): void => {
+    if (this.undoStack.length === 0) return;
+
+    const lastState = this.undoStack.pop();
+    if (lastState?.type === 'events_snapshot') {
+      this.state.events = lastState.data;
+      this.triggerRender();
+      this.notify();
+    }
   };
 
   getReadOnlyConfig = (): ReadOnlyConfig => {
@@ -276,11 +302,79 @@ export class CalendarApp implements ICalendarApp {
 
   // Event management
 
+  public applyEventsChanges = (changes: {
+    add?: Event[];
+    update?: Array<{ id: string; updates: Partial<Event> }>;
+    delete?: string[];
+  }, isPending?: boolean): void => {
+    if (!this.isInternalEditable() && !isPending) return;
+
+    if (isPending) {
+      // Starting or continuing a multi-step operation (drag/resize)
+      // Only capture the INITIAL state before the first change
+      if (!this.pendingSnapshot) {
+        this.pendingSnapshot = [...this.state.events];
+      }
+    } else {
+      // Finalizing an operation
+      if (this.pendingSnapshot) {
+        // We have a snapshot from the start of the interaction
+        this.pushToUndo(this.pendingSnapshot);
+        this.pendingSnapshot = null;
+      } else {
+        // Single step operation (like delete or paste)
+        this.pushToUndo();
+      }
+    }
+
+    let newEvents = [...this.state.events];
+
+    // 1. Delete
+    if (changes.delete) {
+      const deleteIds = new Set(changes.delete);
+      newEvents = newEvents.filter(e => !deleteIds.has(e.id));
+    }
+
+    // 2. Update
+    if (changes.update) {
+      changes.update.forEach(({ id, updates }) => {
+        const index = newEvents.findIndex(e => e.id === id);
+        if (index !== -1) {
+          newEvents[index] = { ...newEvents[index], ...updates };
+        }
+      });
+    }
+
+    // 3. Add
+    if (changes.add) {
+      newEvents = [...newEvents, ...changes.add];
+    }
+
+    this.state.events = newEvents;
+
+    if (!isPending) {
+      // Trigger individual callbacks if needed, though usually used for batch
+      if (changes.add) changes.add.forEach(e => this.callbacks.onEventCreate?.(e));
+      if (changes.delete) changes.delete.forEach(id => this.callbacks.onEventDelete?.(id));
+      if (changes.update && this.callbacks.onEventUpdate) {
+        changes.update.forEach(({ id }) => {
+          const updated = this.state.events.find(e => e.id === id);
+          if (updated) this.callbacks.onEventUpdate?.(updated);
+        });
+      }
+    }
+
+    this.notify();
+  };
+
   addEvent = (event: Event): void => {
     if (!this.isInternalEditable()) {
       logger.warn('Cannot add event in read-only mode');
       return;
     }
+
+    this.pendingSnapshot = null; // New operation, clear any pending
+    this.pushToUndo();
 
     this.state.events = [...this.state.events, event];
 
@@ -307,6 +401,20 @@ export class CalendarApp implements ICalendarApp {
       throw new Error(`Event with id ${id} not found`);
     }
 
+    // Save state before update
+    if (isPending) {
+      if (!this.pendingSnapshot) {
+        this.pendingSnapshot = [...this.state.events];
+      }
+    } else {
+      if (this.pendingSnapshot) {
+        this.pushToUndo(this.pendingSnapshot);
+        this.pendingSnapshot = null;
+      } else {
+        this.pushToUndo();
+      }
+    }
+
     const updatedEvent = { ...this.state.events[eventIndex], ...eventUpdate };
     this.state.events = [
       ...this.state.events.slice(0, eventIndex),
@@ -318,6 +426,8 @@ export class CalendarApp implements ICalendarApp {
       this.notify();
       return;
     }
+
+    this.callbacks.onEventUpdate?.(updatedEvent);
     this.notify();
   };
 
@@ -331,6 +441,9 @@ export class CalendarApp implements ICalendarApp {
     if (eventIndex === -1) {
       throw new Error(`Event with id ${id} not found`);
     }
+
+    this.pendingSnapshot = null;
+    this.pushToUndo();
 
     this.state.events = [
       ...this.state.events.slice(0, eventIndex),

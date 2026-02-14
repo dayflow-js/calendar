@@ -643,10 +643,11 @@ const WeekComponent = memo(
       return (
         <div
           key={`day-${day.date.getTime()}`}
-          className={`
-          ${monthDayCell}
-          ${!belongsToCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-100'}
-        `}
+          className={cn(
+            monthDayCell,
+            !belongsToCurrentMonth ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-100',
+            screenSize !== 'desktop' && dayIndex === 6 ? 'border-r-0' : 'last:border-r'
+          )}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
           onDblClick={e => onCreateStart?.(e, day.date)}
