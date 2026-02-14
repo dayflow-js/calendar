@@ -43,11 +43,13 @@ export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn 
       return val;
     },
     
+    applyEventsChanges: app.applyEventsChanges.bind(app),
     changeView: app.changeView.bind(app),
     setCurrentDate: app.setCurrentDate.bind(app),
     addEvent: app.addEvent.bind(app),
     updateEvent: app.updateEvent.bind(app),
     deleteEvent: app.deleteEvent.bind(app),
+    undo: app.undo.bind(app),
     goToToday: app.goToToday.bind(app),
     goToPrevious: app.goToPrevious.bind(app),
     goToNext: app.goToNext.bind(app),
