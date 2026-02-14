@@ -2,10 +2,7 @@ import { h } from 'preact';
 import { useState, useRef } from 'preact/hooks';
 import { ICalendarApp } from '@/types';
 import CalendarEventComponent from '@/components/calendarEvent';
-import {
-  formatTime,
-  getEventsForDay,
-} from '@/utils';
+import { formatTime, getEventsForDay, scrollbarTakesSpace } from '@/utils';
 import {
   EventLayout,
   Event,
@@ -121,7 +118,12 @@ export const TimeGrid = ({
 }: TimeGridProps) => {
   const columnStyle: any = { flexShrink: 0 };
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; date: Date } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    date: Date;
+  } | null>(null);
+  const hasScrollbarSpace = scrollbarTakesSpace();
 
   const handleContextMenu = (e: any, dayIndex: number, hour: number) => {
     e.preventDefault();
@@ -154,7 +156,10 @@ export const TimeGrid = ({
   return (
     <div className="flex flex-1 overflow-hidden relative">
       {/* Left Frozen Column */}
-      <div className="w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10" onContextMenu={e => e.preventDefault()}>
+      <div
+        className="w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10"
+        onContextMenu={e => e.preventDefault()}
+      >
         <div ref={leftFrozenContentRef}>
           {/* Top boundary spacer with start-of-day label */}
           <div className="h-3 relative">
@@ -165,15 +170,18 @@ export const TimeGrid = ({
           {timeSlots.map((slot, slotIndex) => (
             <div key={slotIndex} className={timeSlot}>
               <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                {(showStartOfDayLabel && slotIndex === 0) ? '' : slot.label}
+                {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
               </div>
             </div>
           ))}
           <div className="relative">
-            <div className={`${timeLabel} text-[10px] md:text-[12px]`}>00:00</div>
+            <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+              00:00
+            </div>
           </div>
           {/* Current Time Label */}
-          {isCurrentWeek && currentTime &&
+          {isCurrentWeek &&
+            currentTime &&
             (() => {
               const now = currentTime;
               const hours = now.getHours() + now.getMinutes() / 60;
@@ -184,7 +192,11 @@ export const TimeGrid = ({
               return (
                 <div
                   className="absolute left-0 w-full z-20 pointer-events-none flex items-center justify-end"
-                  style={{ top: `${topPx}px`, transform: 'translateY(-50%)', marginTop: '0.75rem' }}
+                  style={{
+                    top: `${topPx}px`,
+                    transform: 'translateY(-50%)',
+                    marginTop: '0.75rem',
+                  }}
                 >
                   <div className={currentTimeLabel}>{formatTime(hours)}</div>
                 </div>
@@ -194,7 +206,11 @@ export const TimeGrid = ({
       </div>
 
       {/* Scroller */}
-      <div ref={scrollerRef} className="flex-1 overflow-auto relative calendar-content snap-x snap-mandatory" onScroll={handleScroll}>
+      <div
+        ref={scrollerRef}
+        className="flex-1 overflow-auto relative calendar-content snap-x snap-mandatory"
+        onScroll={handleScroll}
+      >
         <div className="flex" style={{ width: gridWidth, minWidth: '100%' }}>
           {/* Time Grid */}
           <div className="grow">
@@ -203,14 +219,15 @@ export const TimeGrid = ({
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`top-${dayIndex}`}
-                  className={`flex-1 relative ${isMobile && dayIndex === weekDaysLabels.length - 1 ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
+                  className={`flex-1 relative ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
                   style={columnStyle}
                 />
               ))}
             </div>
             <div ref={timeGridRef} className="relative">
               {/* Current time line */}
-              {isCurrentWeek && currentTime &&
+              {isCurrentWeek &&
+                currentTime &&
                 (() => {
                   const now = currentTime;
                   const hours = now.getHours() + now.getMinutes() / 60;
@@ -230,22 +247,22 @@ export const TimeGrid = ({
                         zIndex: 20,
                       }}
                     >
-                      <div
-                        className="flex items-center w-0"
-                      >
+                      <div className="flex items-center w-0">
                         {/* Empty left part since it is in frozen column now */}
                       </div>
 
                       <div className="flex flex-1">
                         {weekDaysLabels.map((_, idx) => (
-                          <div key={idx} className="flex-1 flex items-center" >
+                          <div key={idx} className="flex-1 flex items-center">
                             <div
-                              className={`h-0.5 w-full relative ${idx === todayIndex
-                                ? 'bg-primary'
-                                : 'bg-primary/30'
-                                }`} style={{
-                                  zIndex: 9999,
-                                }}
+                              className={`h-0.5 w-full relative ${
+                                idx === todayIndex
+                                  ? 'bg-primary'
+                                  : 'bg-primary/30'
+                              }`}
+                              style={{
+                                zIndex: 9999,
+                              }}
                             >
                               {idx === todayIndex && todayIndex !== 0 && (
                                 <div
@@ -269,24 +286,30 @@ export const TimeGrid = ({
                     return (
                       <div
                         key={`${slotIndex}-${dayIndex}`}
-                        className={`${timeGridCell} snap-start ${isMobile && dayIndex === weekDaysLabels.length - 1 ? 'border-r-0' : ''}`}
+                        className={`${timeGridCell} snap-start ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? 'border-r-0' : ''}`}
                         style={columnStyle}
                         onClick={() => {
                           const clickedDate = new Date(currentWeekStart);
-                          clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
+                          clickedDate.setDate(
+                            currentWeekStart.getDate() + dayIndex
+                          );
                           onDateChange?.(clickedDate);
                         }}
                         onDblClick={e => {
                           handleCreateStart?.(e, dayIndex, slot.hour);
                         }}
-                        onTouchStart={e => handleTouchStart(e, dayIndex, slot.hour)}
+                        onTouchStart={e =>
+                          handleTouchStart(e, dayIndex, slot.hour)
+                        }
                         onTouchEnd={handleTouchEnd}
                         onTouchMove={handleTouchMove}
                         onDragOver={handleDragOver}
                         onDrop={e => {
                           handleDrop(e, dropDate, slot.hour);
                         }}
-                        onContextMenu={e => handleContextMenu(e, dayIndex, slot.hour)}
+                        onContextMenu={e =>
+                          handleContextMenu(e, dayIndex, slot.hour)
+                        }
                       />
                     );
                   })}
@@ -298,7 +321,7 @@ export const TimeGrid = ({
                 {weekDaysLabels.map((_, dayIndex) => (
                   <div
                     key={`24-${dayIndex}`}
-                    className={`flex-1 relative ${isMobile && dayIndex === weekDaysLabels.length - 1 ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
+                    className={`flex-1 relative ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
                     style={columnStyle}
                   />
                 ))}
@@ -310,15 +333,27 @@ export const TimeGrid = ({
                 const dayEvents = getEventsForDay(dayIndex, currentWeekEvents);
                 const allEventSegments: Array<{
                   event: Event;
-                  segmentInfo?: { startHour: number; endHour: number; isFirst: boolean; isLast: boolean; dayIndex?: number };
+                  segmentInfo?: {
+                    startHour: number;
+                    endHour: number;
+                    isFirst: boolean;
+                    isLast: boolean;
+                    dayIndex?: number;
+                  };
                 }> = [];
 
                 dayEvents.forEach(event => {
-                  const segments = analyzeMultiDayRegularEvent(event, currentWeekStart);
+                  const segments = analyzeMultiDayRegularEvent(
+                    event,
+                    currentWeekStart
+                  );
                   if (segments.length > 0) {
                     const segment = segments.find(s => s.dayIndex === dayIndex);
                     if (segment) {
-                      allEventSegments.push({ event, segmentInfo: { ...segment, dayIndex } });
+                      allEventSegments.push({
+                        event,
+                        segmentInfo: { ...segment, dayIndex },
+                      });
                     }
                   } else {
                     allEventSegments.push({ event });
@@ -327,10 +362,16 @@ export const TimeGrid = ({
 
                 currentWeekEvents.forEach(event => {
                   if (event.allDay || event.day === dayIndex) return;
-                  const segments = analyzeMultiDayRegularEvent(event, currentWeekStart);
+                  const segments = analyzeMultiDayRegularEvent(
+                    event,
+                    currentWeekStart
+                  );
                   const segment = segments.find(s => s.dayIndex === dayIndex);
                   if (segment) {
-                    allEventSegments.push({ event, segmentInfo: { ...segment, dayIndex } });
+                    allEventSegments.push({
+                      event,
+                      segmentInfo: { ...segment, dayIndex },
+                    });
                   }
                 });
 
@@ -350,13 +391,18 @@ export const TimeGrid = ({
 
                       return (
                         <CalendarEventComponent
-                          key={segmentInfo ? `${event.id}-seg-${dayIndex}` : event.id}
+                          key={
+                            segmentInfo
+                              ? `${event.id}-seg-${dayIndex}`
+                              : event.id
+                          }
                           event={event}
                           layout={eventLayout}
                           calendarRef={calendarRef}
                           isBeingDragged={
                             isDragging &&
-                            (dragState as WeekDayDragState)?.eventId === event.id &&
+                            (dragState as WeekDayDragState)?.eventId ===
+                              event.id &&
                             (dragState as WeekDayDragState)?.mode === 'move'
                           }
                           hourHeight={HOUR_HEIGHT}
@@ -370,9 +416,15 @@ export const TimeGrid = ({
                           selectedEventId={selectedEventId}
                           detailPanelEventId={detailPanelEventId}
                           onEventSelect={(eventId: string | null) => {
-                            const isViewable = app.getReadOnlyConfig().viewable !== false;
+                            const isViewable =
+                              app.getReadOnlyConfig().viewable !== false;
                             const isReadOnly = app.state.readOnly;
-                            if ((isMobile || isTouch) && eventId && isViewable && !isReadOnly) {
+                            if (
+                              (isMobile || isTouch) &&
+                              eventId &&
+                              isViewable &&
+                              !isReadOnly
+                            ) {
                               const evt = events.find(e => e.id === eventId);
                               if (evt) {
                                 setDraftEvent(evt);
@@ -387,7 +439,8 @@ export const TimeGrid = ({
                             }
                           }}
                           onEventLongPress={(eventId: string) => {
-                            if (isMobile || isTouch) setSelectedEventId(eventId);
+                            if (isMobile || isTouch)
+                              setSelectedEventId(eventId);
                           }}
                           onDetailPanelToggle={(eventId: string | null) =>
                             setDetailPanelEventId(eventId)
@@ -426,11 +479,13 @@ export const TimeGrid = ({
 
               const diffTime = targetDate.getTime() - startOfDay.getTime();
               const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-              const preciseHour = contextMenu.date.getHours() + contextMenu.date.getMinutes() / 60;
+              const preciseHour =
+                contextMenu.date.getHours() +
+                contextMenu.date.getMinutes() / 60;
 
               const syntheticEvent = {
-                preventDefault: () => { },
-                stopPropagation: () => { },
+                preventDefault: () => {},
+                stopPropagation: () => {},
                 clientX: contextMenu.x,
                 clientY: contextMenu.y,
               } as unknown as any;
