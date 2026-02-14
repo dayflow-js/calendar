@@ -13,6 +13,7 @@ DayFlow provides a set of CSS classes with the `df-` prefix that allow you to cu
 - [Sidebar Classes](#sidebar)
 - [Navigation Classes](#navigation)
 - [Event Detail Classes](#event-detail)
+- [Content Slot Classes](#content-slots)
 
 ---
 
@@ -22,8 +23,12 @@ Common CSS classes used across all calendar views.
 
 | Class Name | Description |
 |------------|-------------|
-| `df-calendar` | Main calendar container |
-| `df-header` | Calendar header section |
+| `df-calendar-container` | The outer root container that wraps both the Sidebar and the Calendar. Supports the `--df-calendar-height` CSS variable to set the component height. |
+| `df-calendar` | Main calendar container (includes header and view content) |
+| `df-header` | Calendar header section (includes title, today button, and view switcher) |
+| `df-header-left` | Left section of the header (title and navigation buttons) |
+| `df-header-mid` | Middle section of the header (current date range title) |
+| `df-header-right` | Right section of the header (view switcher and search) |
 | `df-navigation` | Navigation controls container |
 | `df-event` | Base class for all events |
 | `df-event-title` | Event title text |
@@ -158,6 +163,17 @@ CSS classes for event detail panels and dialogs.
 | `df-event-detail-panel` | Floating event detail panel |
 | `df-dialog-overlay` | Dialog background overlay |
 | `df-dialog-container` | Dialog content container |
+
+---
+
+## Content Slots
+
+CSS classes used for the Content Slot rendering system.
+
+| Class Name | Description |
+|------------|-------------|
+| `df-content-slot` | Container for a content slot |
+| `df-slot-[id]` | Dynamic class assigned to a specific slot instance where `[id]` is a unique identifier |
 
 ---
 

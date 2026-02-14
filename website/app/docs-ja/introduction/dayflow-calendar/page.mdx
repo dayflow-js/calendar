@@ -36,13 +36,13 @@ export function CalendarDemo() {
 
 | Prop                       | 型                           | 必須 | 説明                                                  |
 |----------------------------|------------------------------|------|-------------------------------------------------------|
-| `calendar`                 | `UseCalendarAppReturn`       | ✅    | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。          |
-| `className`                | `string`                     | ❌    | ルートコンテナに追加するクラス名。標準クラスは `df-calendar-container`。 |
-| `style`                    | `React.CSSProperties`        | ❌    | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。          |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | ❌    | 組み込み詳細パネルの中身だけを置き換える。                         |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | ❌    | モーダル UI 全体をカスタム実装に差し替える。                        |
-| `meta`                     | `Record<string, any>`        | ❌    | すべてのビューへ受け渡したい任意の追加データ。                         |
-| `search`                   | `CalendarSearchProps`        | ❌    | 組み込み検索機能の設定。                                  |
+| `calendar`                 | `UseCalendarAppReturn`       | 必須    | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。          |
+| `className`                | `string`                     | 任意    | ルートコンテナに追加するクラス名。標準クラスは `df-calendar-container`。 |
+| `style`                    | `React.CSSProperties`        | 任意    | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。          |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | 任意    | 組み込み詳細パネルの中身だけを置き換える。                         |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 任意    | モーダル UI 全体をカスタム実装に差し替える。                        |
+| `meta`                     | `Record<string, any>`        | 任意    | すべてのビューへ受け渡したい任意の追加データ。                         |
+| `search`                   | `CalendarSearchProps`        | 任意    | 組み込み検索機能の設定。                                  |
 
 ## 検索設定
 

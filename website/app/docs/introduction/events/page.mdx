@@ -7,7 +7,7 @@ Events are the core data structure in Day Flow. Learn how to create, update, del
 The library uses the Temporal API for all date/time handling. Events support three Temporal types:
 
 - **PlainDate**: For all-day events (no time)
-- **PlainDateTime**: For local events (date + time, no timezone) ✨ **Recommended for most use cases**
+- **PlainDateTime**: For local events (date + time, no timezone) Recommended for most use cases
 - **ZonedDateTime**: For timezone-aware events (international meetings, flights, etc.)
 
 ```tsx copy
@@ -17,15 +17,15 @@ import { Event } from '@dayflow/core';
 
 | Property      | Type                                                                     | Description                                                                                                       | Required |
 |---------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|----------|
-| `id`          | `string`                                                                 | Unique identifier for the event                                                                                   | ✅ Yes    |
-| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                             | ✅ Yes    |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | ✅ Yes    |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | ✅ Yes    |
-| `description` | `string`                                                                 | Optional event description or notes                                                                               | ❌ No     |
-| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | ❌ No     |
-| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | ❌ No     |
-| `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | ❌ No     |
-| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | ❌ No     |
+| `id`          | `string`                                                                 | Unique identifier for the event                                                                                   | Required |
+| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                             | Required |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | Required |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | Required |
+| `description` | `string`                                                                 | Optional event description or notes                                                                               | Optional |
+| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | Optional |
+| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | Optional |
+| `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | Optional |
+| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | Optional |
 
 ## Creating Events
 
@@ -408,7 +408,7 @@ const event: Event = {
 2. **Use helper functions** - Prefer `createEvent()` over manual Temporal construction (90% of use cases)
 3. **Choose the right type**:
    - Use `PlainDate` for all-day events (birthdays, holidays)
-   - Use `PlainDateTime` for local events (meetings, appointments) ✨ **Recommended default**
+   - Use `PlainDateTime` for local events (meetings, appointments) **Recommended default**
    - Use `ZonedDateTime` only for timezone-aware events (international calls, flights)
 4. **Validate time values** - The helper functions validate hour (0-23) and minute (0-59) automatically
 5. **Use calendar types for styling** - Assign `calendarId` to categorize and style events consistently

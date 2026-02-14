@@ -1,63 +1,12 @@
-import { Tabs } from 'nextra/components';
-
 # 快速上手
 
 DayFlow 是一套围绕“即插即用的日历体验”打造的 React 组件。
 
-### 安装核心包
+### 安装 DayFlow
 
-在开始之前，你可能需要安装 [yarn](https://github.com/yarnpkg/yarn/) 或者 [pnpm](https://pnpm.io/zh/) 或者 [bun](https://bun.sh/)。
+选择你的框架和首选包管理器以获取安装命令。
 
-{/* prettier-ignore */}
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-  <Tabs.Tab>
-    ```bash copy
-    npm install @dayflow/core lucide-react
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```bash copy
-    pnpm add @dayflow/core lucide-react
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```bash copy
-    yarn add @dayflow/core lucide-react
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```bash copy
-    bun add @dayflow/core lucide-react
-    ```
-  </Tabs.Tab>
-</Tabs>
-
-### 准备 Tailwind CSS
-
-DayFlow 的样式体系默认依赖 Tailwind。若项目里还没有，按照下面三步完成配置：
-
-1. 安装依赖
-
-```bash copy
-npm install -D tailwindcss @tailwindcss/postcss autoprefixer
-```
-
-2. 在项目根目录创建 `postcss.config.mjs`
-
-```js copy
-const config = {
-  plugins: ['@tailwindcss/postcss'],
-};
-
-export default config;
-```
-
-3. 在全局 CSS 中引入
-
-```css copy
-/* src/index.css 等 */
-@import 'tailwindcss';
-```
+<FrameworkInstall />
 
 ### 引入 DayFlow 样式
 
@@ -75,64 +24,163 @@ import '@dayflow/core/dist/styles.css';
 @import '@dayflow/core/dist/styles.css';
 ```
 
-### 创建第一个日历
+import { Tabs } from 'nextra/components'
 
-`useCalendarApp` 负责初始化状态，`DayFlowCalendar` 负责渲染。一个只包含月视图的最小示例如下：
+### 基础用法
 
-```tsx copy
-'use client';
+选择你的框架，查看如何将 DayFlow 集成到你的应用中。
 
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-} from '@dayflow/core';
-import '@dayflow/core/dist/styles.css';
+<FrameworkTabs>
+  <Tabs.Tab>
+    ```tsx copy
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createDayView,
+      createWeekView,
+      createMonthView,
+    } from '@dayflow/react';
+    import { createEvent, createAllDayEvent } from '@dayflow/core';
+    import '@dayflow/core/dist/styles.css';
 
-export default function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    events: [],
-    calendars: [],
-    defaultView: 'month',
-    initialDate: new Date(),
-  });
+    function App() {
+      const calendar = useCalendarApp({
+        views: [createDayView(), createWeekView(), createMonthView()],
+        events: [
+          createEvent({
+            id: '1',
+            title: '团队会议',
+            start: new Date(2025, 10, 15, 10, 0),
+            end: new Date(2025, 10, 15, 11, 0),
+          }),
+          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+        ],
+        initialDate: new Date(),
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
+      return (
+        <DayFlowCalendar calendar={calendar} />
+      );
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```vue copy
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { 
+      createDayView, 
+      createWeekView, 
+      createMonthView,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import '@dayflow/core/dist/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createDayView(), createWeekView(), createMonthView()],
+      events: [
+        createEvent({
+          id: '1',
+          title: '团队会议',
+          start: new Date(2025, 10, 15, 10, 0),
+          end: new Date(2025, 10, 15, 11, 0),
+        }),
+        createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+      ],
+      initialDate: new Date(),
+    });
+    </script>
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript copy
+    import { Component } from '@angular/core';
+    import { 
+      createDayView, 
+      createWeekView, 
+      createMonthView,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createDayView(), createWeekView(), createMonthView()],
+        events: [
+          createEvent({
+            id: '1',
+            title: '团队会议',
+            start: new Date(2025, 10, 15, 10, 0),
+            end: new Date(2025, 10, 15, 11, 0),
+          }),
+          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+        ],
+        initialDate: new Date(),
+      };
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```svelte copy
+    <script>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+    import { 
+      createDayView, 
+      createWeekView, 
+      createMonthView,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import '@dayflow/core/dist/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createDayView(), createWeekView(), createMonthView()],
+      events: [
+        createEvent({
+          id: '1',
+          title: '团队会议',
+          start: new Date(2025, 10, 15, 10, 0),
+          end: new Date(2025, 10, 15, 11, 0),
+        }),
+        createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+      ],
+      initialDate: new Date(),
+    });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+  </Tabs.Tab>
+</FrameworkTabs>
+
+### 自定义样式
+
+默认情况下，日历会自动撑满其容器的宽度。你可以通过 CSS 自定义日历的高度或其他样式。例如，设置响应式高度：
+
+```css copy
+.df-calendar-container {
+  --df-calendar-height: 760px !important;
+  height: var(--df-calendar-height, 760px) !important;
 }
-```
 
-### 带事件的示例
-
-通过内置的 helper（`createEvent`、`createAllDayEvent`…）可以快速生成不同类型的事件。
-
-```tsx copy
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  createEvent,
-  createAllDayEvent,
-} from '@dayflow/core';
-
-const events = [
-  createEvent({
-    id: '1',
-    title: '团队会议',
-    start: new Date(2024, 9, 10, 10, 0),
-    end: new Date(2024, 9, 10, 11, 0),
-  }),
-  createAllDayEvent('2', '项目截止', new Date(2024, 9, 15)),
-];
-
-function App() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    events,
-    initialDate: new Date(),
-  });
-
-  return <DayFlowCalendar calendar={calendar} />;
+@media (max-width: 768px) {
+  .df-calendar-container {
+    --df-calendar-height: 550px !important;
+  }
 }
 ```
 

@@ -22,10 +22,10 @@ export function LanguageSwitcher() {
   const triggerClasses = useMemo(
     () =>
       clsx(
-        'inline-flex items-center justify-center gap-1.5 rounded-md p-2 transition-colors',
+        'inline-flex items-center justify-center h-9 rounded-md transition-colors',
         isDarkMode
           ? 'text-gray-200 hover:bg-gray-800 focus-visible:outline-white'
-          : 'text-gray-700 hover:bg-gray-100 focus-visible:outline-black'
+          : 'text-gray-700 focus-visible:outline-black'
       ),
     [isDarkMode]
   );
@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
     () =>
       clsx(
         'flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors',
-        isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+        isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-700'
       ),
     [isDarkMode]
   );
@@ -58,7 +58,7 @@ export function LanguageSwitcher() {
     if (basePath && path.startsWith(basePath)) {
       path = path.substring(basePath.length);
     }
-    
+
     if (path.startsWith('/docs-zh')) {
       setCurrentLocale('zh');
     } else if (path.startsWith('/docs-ja')) {

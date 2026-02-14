@@ -24,10 +24,10 @@ export function ThemeToggle() {
       type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={clsx(
-        'rounded-md p-2 transition-colors',
+        'inline-flex items-center justify-center h-9 rounded-md transition-colors',
         isDark
-          ? 'text-gray-200 hover:bg-gray-800'
-          : 'text-gray-700 hover:bg-gray-100'
+          ? 'text-gray-200'
+          : 'text-gray-700'
       )}
       aria-label="Toggle theme"
     >

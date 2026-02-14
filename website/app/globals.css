@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@variant dark (&:where(.dark, .dark *));
 @import 'tw-animate-css';
 @import '@dayflow/core/dist/styles.css';
 
@@ -23,16 +24,20 @@
   @apply bg-[linear-gradient(1deg,#383838,#212121)];
 }
 
-/* Code block container
+/* Code block container */
 .nextra-code > div:first-child {
-  @apply bg-gray-200 dark:bg-zinc-900;
-  border: none;
+  @apply bg-[#f4f5f7]! dark:bg-[#141414]! dark:border! dark:border-gray-800;
+  border-radius: 0.5rem;
 }
 
 .nextra-code pre {
-  @apply bg-gray-100 dark:bg-zinc-800;
+  @apply bg-[#f4f5f7]! dark:bg-[#141414]! dark:border! dark:border-gray-800;
   box-shadow: none;
-} */
+}
+
+.nextra-sidebar-footer {
+  display: none;
+}
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {
@@ -43,4 +48,29 @@
 * {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+.nextra-sidebar-footer {
+  display: none !important;
+}
+
+.df-calendar-container {
+  --df-calendar-height: 760px !important;
+  height: var(--df-calendar-height, 760px) !important;
+}
+
+@media (max-width: 768px) {
+  .df-calendar-container {
+    --df-calendar-height: 550px !important;
+  }
+}
+
+.landingPage {
+  padding: 0 3.5rem !important;
+}
+
+@media (max-width: 768px) {
+  .landingPage {
+    padding: 0 !important;
+  }
 }

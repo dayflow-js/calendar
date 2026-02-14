@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BrandLogo } from '@/components/BrandLogo';
 
-const banner = <Banner storageKey="nextra-banner">DayFlowへようこそ 🎉</Banner>;
+const banner = <Banner storageKey="nextra-banner">DayFlowへようこそ</Banner>;
 const navbar = (
   <Navbar
     logo={<BrandLogo />}

@@ -36,13 +36,13 @@ export function CalendarDemo() {
 
 | **属性名**                 | **类型**                     | **说明**                                                           | **必填** |
 |----------------------------|------------------------------|--------------------------------------------------------------------|----------|
-| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | ✅        |
-| `className`                | `string`                     | 根容器的附加类名（基础类名为 `df-calendar-container`）               | ❌        |
-| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                   | ❌        |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                    | ❌        |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`        | ❌        |
-| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）         | ❌        |
-| `search`                   | `CalendarSearchProps`        | 内置搜索功能的配置项                                               | ❌        |
+| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | 必填        |
+| `className`                | `string`                     | 根容器的附加类名（基础类名为 `df-calendar-container`）               | 可选        |
+| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                   | 可选        |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                    | 可选        |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`        | 可选        |
+| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）         | 可选        |
+| `search`                   | `CalendarSearchProps`        | 内置搜索功能的配置项                                               | 可选        |
 
 ## 搜索配置
 

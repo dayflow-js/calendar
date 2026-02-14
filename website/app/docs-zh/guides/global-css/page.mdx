@@ -13,6 +13,7 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 - [侧边栏类](#侧边栏)
 - [导航类](#导航)
 - [事件详情类](#事件详情)
+- [内容插槽类](#内容插槽)
 
 ---
 
@@ -22,8 +23,12 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 | 类名 | 描述 |
 |------|------|
-| `df-calendar` | 日历主容器 |
-| `df-header` | 日历头部区域 |
+| `df-calendar-container` | 包裹侧边栏和日历的最外层根容器。支持通过 `--df-calendar-height` CSS 变量设置组件高度。 |
+| `df-calendar` | 日历主容器（包含头部和视图内容） |
+| `df-header` | 日历头部区域（包含标题、今天按钮和视图切换器） |
+| `df-header-left` | 头部左侧区域（标题和导航按钮） |
+| `df-header-mid` | 头部中间区域（当前日期范围标题） |
+| `df-header-right` | 头部右侧区域（视图切换器和搜索） |
 | `df-navigation` | 导航控件容器 |
 | `df-event` | 所有事件的基础类 |
 | `df-event-title` | 事件标题文本 |
@@ -158,6 +163,17 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 | `df-event-detail-panel` | 浮动事件详情面板 |
 | `df-dialog-overlay` | 对话框背景遮罩 |
 | `df-dialog-container` | 对话框内容容器 |
+
+---
+
+## 内容插槽
+
+用于内容插槽渲染系统的 CSS 类。
+
+| 类名 | 描述 |
+|------|------|
+| `df-content-slot` | 内容插槽的容器 |
+| `df-slot-[id]` | 分配给特定插槽实例的动态类，其中 `[id]` 是唯一标识符 |
 
 ---
 
