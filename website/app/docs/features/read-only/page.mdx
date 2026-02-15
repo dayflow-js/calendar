@@ -22,16 +22,16 @@ const calendar = useCalendarApp({
   views: [createMonthView()],
   readOnly: {
     draggable: false, // Disables drag-and-drop
-    viewable: true,   // Allows clicking to view event details (read-only mode)
+    viewable: true, // Allows clicking to view event details (read-only mode)
   },
 });
 ```
 
 ### Configuration Options
 
-| Option | Type | Description |
-| :--- | :--- | :--- |
-| `draggable` | `boolean` | Whether events can be moved or resized via drag-and-drop. |
-| `viewable` | `boolean` | Whether event details can be viewed (opens the detail panel/dialog). |
+| Option      | Type      | Description                                                          |
+| :---------- | :-------- | :------------------------------------------------------------------- |
+| `draggable` | `boolean` | Whether events can be moved or resized via drag-and-drop.            |
+| `viewable`  | `boolean` | Whether event details can be viewed (opens the detail panel/dialog). |
 
 When `readOnly` is active, the calendar will also hide "Create" buttons and other UI elements that would normally trigger changes.

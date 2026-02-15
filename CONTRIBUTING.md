@@ -32,4 +32,4 @@ If you have forked the repository and want to run the examples locally, follow t
 `style:` - for code style changes (formatting, missing semi-colons, etc.)  
 `refactor:` - for code refactoring without adding features or fixing bugs  
 `test:` - for adding or updating tests  
-`chore:` - for maintenance tasks (build process, dependencies, etc.)   
+`chore:` - for maintenance tasks (build process, dependencies, etc.)

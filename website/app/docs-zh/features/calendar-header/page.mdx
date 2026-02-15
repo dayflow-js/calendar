@@ -20,7 +20,7 @@ const calendar = useCalendarApp({
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: (props) => {
+  useCalendarHeader: props => {
     const { calendar, switcherMode } = props;
     return (
       <div className="custom-header">
@@ -36,13 +36,13 @@ const calendar = useCalendarApp({
 
 自定义渲染器接收以下 props：
 
-| Prop | 描述 |
-| :--- | :--- |
-| `calendar` | `CalendarApp` 实例。 |
-| `switcherMode` | 当前视图切换器模式（`buttons` 或 `select`）。 |
-| `onAddCalendar` | 添加新日历的处理函数。 |
-| `onSearchChange` | 更新搜索查询的处理函数。 |
-| `onSearchClick` | 点击搜索图标时的处理函数。 |
-| `searchValue` | 当前搜索字符串。 |
-| `isSearchOpen` | 搜索 UI 当前是否打开。 |
-| `isEditable` | 日历当前是否处于可编辑状态。 |
+| Prop             | 描述                                          |
+| :--------------- | :-------------------------------------------- |
+| `calendar`       | `CalendarApp` 实例。                          |
+| `switcherMode`   | 当前视图切换器模式（`buttons` 或 `select`）。 |
+| `onAddCalendar`  | 添加新日历的处理函数。                        |
+| `onSearchChange` | 更新搜索查询的处理函数。                      |
+| `onSearchClick`  | 点击搜索图标时的处理函数。                    |
+| `searchValue`    | 当前搜索字符串。                              |
+| `isSearchOpen`   | 搜索 UI 当前是否打开。                        |
+| `isEditable`     | 日历当前是否处于可编辑状态。                  |

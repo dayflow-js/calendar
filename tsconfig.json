@@ -1,23 +1,34 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "allowJs": true,
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
     "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
+
+    /* Bundler mode */
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noEmit": true,
     "jsx": "react-jsx",
-    "declaration": true,
-    "declarationMap": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@dayflow/core": ["packages/core/src/index.ts"],
+      "@dayflow/react": ["packages/react/src/index.ts"],
+      "@dayflow/vue": ["packages/vue/src/index.ts"],
+      "@dayflow/angular": ["packages/angular/src/public-api.ts"],
+      "@dayflow/svelte": ["packages/svelte/src/index.ts"],
+      "@/*": ["packages/core/src/*"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/app/**"]
+  "include": ["packages/*/src", "examples", "website"],
+  "exclude": ["node_modules", "dist"]
 }

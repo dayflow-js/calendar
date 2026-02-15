@@ -20,10 +20,14 @@ import {
   createDayView,
   createDragPlugin,
   ViewType,
+} from '@dayflow/react';
+import {
   Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   CalendarType,
+  EventDetailContentProps,
+  EventDetailDialogProps,
 } from '@dayflow/core';
 import { CALENDAR_SIDE_PANEL, getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
@@ -123,8 +127,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 }) => (
   <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
     <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{description}</p>
+      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+        {title}
+      </h3>
+      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+        {description}
+      </p>
     </div>
     <div className="p-6 bg-white dark:bg-slate-900">{children}</div>
   </div>
@@ -187,7 +195,6 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   customDetailPanelContent,
   customEventDetailDialog,
   useEventDetailDialog = false,
-  className = 'h-130',
 }) => {
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
 
@@ -195,9 +202,8 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
     <div className="rounded-xl dark:border-slate-700 bg-white dark:bg-slate-900 ">
       <DayFlowCalendar
         calendar={calendar}
-        className={`w-full ${className}`}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
+        eventDetailContent={customDetailPanelContent}
+        eventDetailDialog={customEventDetailDialog}
       />
     </div>
   );
@@ -216,7 +222,12 @@ export const SwitcherModeShowcase: React.FC = () => (
 
 export const CustomDetailPanelShowcase: React.FC = () => {
   const detailPanel: EventDetailContentRenderer = useCallback(
-    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+    ({
+      event,
+      onEventDelete,
+      onEventUpdate,
+      onClose,
+    }: EventDetailContentProps) => {
       const meta = event.meta ?? {};
       const isFavorite = Boolean(meta.favorite);
 
@@ -262,11 +273,15 @@ export const CustomDetailPanelShowcase: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3 text-xs text-slate-500 dark:text-slate-400">
             <div>
-              <span className="font-medium text-slate-700 dark:text-slate-200">Owner:</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">
+                Owner:
+              </span>
               <span>{meta.owner ?? 'Unassigned'}</span>
             </div>
             <div>
-              <span className="font-medium text-slate-700 dark:text-slate-200">Location:</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">
+                Location:
+              </span>
               <span>{meta.location ?? 'TBD'}</span>
             </div>
           </div>
@@ -295,36 +310,36 @@ export const CustomDetailPanelShowcase: React.FC = () => {
 
   return (
     <div>
-      <DemoCalendar
-        customDetailPanelContent={detailPanel}
-        className="h-130"
-      />
+      <DemoCalendar customDetailPanelContent={detailPanel} className="h-130" />
     </div>
   );
 };
 
 export const EventDialogShowcase: React.FC = () => {
-  return (
-    <DemoCalendar className="h-130" useEventDetailDialog={true} />
-  );
+  return <DemoCalendar className="h-130" useEventDetailDialog={true} />;
 };
 
 export const CustomDetailDialogShowcase: React.FC = () => {
   const customDialog: EventDetailDialogRenderer = useCallback(
-    ({ event, isOpen, onClose, onEventDelete, onEventUpdate }) => {
+    ({
+      event,
+      isOpen,
+      onClose,
+      onEventDelete,
+      onEventUpdate,
+    }: EventDetailDialogProps) => {
       if (!isOpen) return null;
 
       const meta = event.meta ?? {};
       const colorPresets = COLOR_PRESETS;
       const accentColor =
         colorPresets.find(preset => preset.id === event.calendarId)?.color ||
-        (typeof event.calendarId === 'string' && event.calendarId.startsWith('#')
+        (typeof event.calendarId === 'string' &&
+        event.calendarId.startsWith('#')
           ? event.calendarId
           : '#6366f1');
 
-      const toJsDate = (
-        value: Event['start'] | Event['end']
-      ): Date | null => {
+      const toJsDate = (value: Event['start'] | Event['end']): Date | null => {
         if (!value) return null;
 
         let result: Date | null = null;
@@ -335,12 +350,12 @@ export const CustomDetailDialogShowcase: React.FC = () => {
           result = new Date(Date.UTC(value.year, value.month - 1, value.day));
         } else if (value instanceof Date) {
           result = value;
-        } else if (
-          typeof value === 'string' ||
-          typeof value === 'number'
-        ) {
+        } else if (typeof value === 'string' || typeof value === 'number') {
           result = new Date(value);
-        } else if (typeof (value as unknown as { toString?: () => string })?.toString === 'function') {
+        } else if (
+          typeof (value as unknown as { toString?: () => string })?.toString ===
+          'function'
+        ) {
           result = new Date(String(value));
         }
 
@@ -394,19 +409,19 @@ export const CustomDetailDialogShowcase: React.FC = () => {
         : hasValidStart && hasValidEnd
           ? sameDay
             ? `${timeFormatter.format(startDate)} – ${timeFormatter.format(
-              endDate
-            )}`
+                endDate
+              )}`
             : `${startDayLabel} ${timeFormatter.format(
-              startDate
-            )} → ${endDayLabel} ${timeFormatter.format(endDate)}`
+                startDate
+              )} → ${endDayLabel} ${timeFormatter.format(endDate)}`
           : 'Time to be scheduled';
 
       const diffMinutes =
         hasValidStart && hasValidEnd
           ? Math.max(
-            0,
-            Math.round((endDate.getTime() - startDate.getTime()) / 60000)
-          )
+              0,
+              Math.round((endDate.getTime() - startDate.getTime()) / 60000)
+            )
           : 0;
       let durationLabel = '';
       if (isAllDayEvent) {
@@ -426,9 +441,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
 
       const timeZoneLabel =
         !isAllDayEvent &&
-          hasValidStart &&
-          event.start instanceof Temporal.ZonedDateTime &&
-          typeof event.start.timeZoneId === 'string'
+        hasValidStart &&
+        event.start instanceof Temporal.ZonedDateTime &&
+        typeof event.start.timeZoneId === 'string'
           ? event.start.timeZoneId
           : hasValidStart && !isAllDayEvent
             ? 'Local time'
@@ -460,9 +475,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
         },
         durationLabel
           ? {
-            icon: Clock3,
-            label: `Duration · ${durationLabel}`,
-          }
+              icon: Clock3,
+              label: `Duration · ${durationLabel}`,
+            }
           : null,
       ].filter(Boolean) as Array<{
         icon: React.ComponentType<{ className?: string; size?: number }>;
@@ -526,10 +541,15 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleToggleFavorite}
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${isFavorite ? 'bg-white text-slate-900 dark:bg-slate-900/20 dark:text-white backdrop-blur' : 'text-white hover:bg-white hover:text-slate-900 dark:hover:bg-slate-900/15 dark:hover:text-white'
-                        }`}
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${
+                        isFavorite
+                          ? 'bg-white text-slate-900 dark:bg-slate-900/20 dark:text-white backdrop-blur'
+                          : 'text-white hover:bg-white hover:text-slate-900 dark:hover:bg-slate-900/15 dark:hover:text-white'
+                      }`}
                       aria-label={
-                        isFavorite ? 'Remove from focus list' : 'Add to focus list'
+                        isFavorite
+                          ? 'Remove from focus list'
+                          : 'Add to focus list'
                       }
                     >
                       {isFavorite ? (
@@ -595,7 +615,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                             style={{ backgroundColor: accentColor }}
                           />
                           <div>
-                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{title}</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                              {title}
+                            </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
                               {date}
                               {time ? ` · ${time}` : ''}
@@ -646,7 +668,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                             Location
                           </p>
-                          <p className="text-sm text-slate-900 dark:text-slate-100">{location}</p>
+                          <p className="text-sm text-slate-900 dark:text-slate-100">
+                            {location}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -686,8 +710,9 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                             key={id}
                             type="button"
                             onClick={() => handleUpdateColor(id)}
-                            className={`h-9 w-9 rounded-full border-2 border-white shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${isActive ? 'ring-2 ring-offset-white' : ''
-                              }`}
+                            className={`h-9 w-9 rounded-full border-2 border-white shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+                              isActive ? 'ring-2 ring-offset-white' : ''
+                            }`}
                             style={{ backgroundColor: color }}
                             aria-label={`Change color to ${id}`}
                           />
@@ -704,13 +729,16 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleToggleFavorite}
-                        className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${isFavorite
-                          ? 'border-amber-200 bg-amber-50 dark:bg-amber-900/30 text-amber-700'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-slate-300'
-                          }`}
+                        className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                          isFavorite
+                            ? 'border-amber-200 bg-amber-50 dark:bg-amber-900/30 text-amber-700'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-slate-300'
+                        }`}
                       >
                         <span>
-                          {isFavorite ? 'Added to focus list' : 'Add to focus list'}
+                          {isFavorite
+                            ? 'Added to focus list'
+                            : 'Add to focus list'}
                         </span>
                         <Star className="h-4 w-4" />
                       </button>
@@ -738,11 +766,8 @@ export const CustomDetailDialogShowcase: React.FC = () => {
   );
 
   return (
-    <div className='mt-2'>
-      <DemoCalendar
-        customEventDetailDialog={customDialog}
-        className="h-130"
-      />
+    <div className="mt-2">
+      <DemoCalendar customEventDetailDialog={customDialog} className="h-130" />
     </div>
   );
 };

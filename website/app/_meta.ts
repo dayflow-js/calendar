@@ -1,39 +1,39 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   index: {
-    display: "hidden",
+    display: 'hidden',
     theme: {
       layout: 'full',
       sidebar: false,
       toc: false,
       timestamp: false,
       breadcrumb: false,
-      copyPage: false
-    }
+      copyPage: false,
+    },
   },
   docs: {
     type: 'page',
     href: 'docs',
-    title: 'Docs'
+    title: 'Documentation', // More standard for search engines
   },
   blog: {
     type: 'page',
     href: 'blog',
-    title: 'Blog'
+    title: 'Blog',
   },
   'docs-zh': {
-    display: "hidden",
+    display: 'hidden',
     type: 'page',
     href: 'docs-zh',
-    title: '中文文档'
+    title: '中文文档',
   },
   'docs-ja': {
-    display: "hidden",
+    display: 'hidden',
     type: 'page',
     href: 'docs-ja',
-    title: '日本語ドキュメント'
+    title: '日本語ドキュメント',
   },
-}
+};
 
-export default meta
+export default meta;

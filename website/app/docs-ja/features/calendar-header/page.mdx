@@ -20,7 +20,7 @@ const calendar = useCalendarApp({
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: (props) => {
+  useCalendarHeader: props => {
     const { calendar, switcherMode } = props;
     return (
       <div className="custom-header">
@@ -36,13 +36,13 @@ const calendar = useCalendarApp({
 
 カスタムレンダラーは以下の props を受け取ります：
 
-| Prop | 説明 |
-| :--- | :--- |
-| `calendar` | `CalendarApp` インスタンス。 |
-| `switcherMode` | 現在の表示切り替えモード（`buttons` または `select`）。 |
-| `onAddCalendar` | 新しいカレンダーを追加するためのハンドラー。 |
-| `onSearchChange` | 検索クエリを更新するためのハンドラー。 |
-| `onSearchClick` | 検索アイコンがクリックされた時のハンドラー。 |
-| `searchValue` | 現在の検索文字列。 |
-| `isSearchOpen` | 検索 UI が現在開いているかどうか。 |
-| `isEditable` | カレンダーが現在編集可能な状態かどうか。 |
+| Prop             | 説明                                                    |
+| :--------------- | :------------------------------------------------------ |
+| `calendar`       | `CalendarApp` インスタンス。                            |
+| `switcherMode`   | 現在の表示切り替えモード（`buttons` または `select`）。 |
+| `onAddCalendar`  | 新しいカレンダーを追加するためのハンドラー。            |
+| `onSearchChange` | 検索クエリを更新するためのハンドラー。                  |
+| `onSearchClick`  | 検索アイコンがクリックされた時のハンドラー。            |
+| `searchValue`    | 現在の検索文字列。                                      |
+| `isSearchOpen`   | 検索 UI が現在開いているかどうか。                      |
+| `isEditable`     | カレンダーが現在編集可能な状態かどうか。                |

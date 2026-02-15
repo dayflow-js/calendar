@@ -1,30 +1,30 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   index: {
     title: 'Getting started',
   },
   events: {
-    title: "Events"
+    title: 'Events',
   },
   plugins: {
-    title: "Plugins"
+    title: 'Plugins',
   },
   sidebar: {
-    title: "Sidebar"
+    title: 'Sidebar',
   },
   views: {
-    title: "Views"
+    title: 'Views',
   },
   'dayflow-calendar': {
-    title: 'DayFlowCalendar'
+    title: 'DayFlowCalendar',
   },
   'use-calendar-app': {
-    title: 'useCalendarApp'
+    title: 'useCalendarApp',
   },
   'keyboard-shortcuts': {
-    title: 'Keyboard Shortcuts'
+    title: 'Keyboard Shortcuts',
   },
-}
+};
 
-export default meta
+export default meta;

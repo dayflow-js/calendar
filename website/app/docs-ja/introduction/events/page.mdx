@@ -15,17 +15,17 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
 ```
 
-| プロパティ | 型 | 説明 | 必須 |
-| --- | --- | --- | --- |
-| `id` | `string` | イベントを一意に識別する ID | ✅ |
-| `title` | `string` | カレンダーに表示するタイトル | ✅ |
-| `start` | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 開始日時。イベント種別に合わせて型を選択 | ✅ |
-| `end` | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う | ✅ |
-| `description` | `string` | メモや詳細。表示方法は自由 | ❌ |
-| `allDay` | `boolean` | true なら終日イベントとして描画 | ❌ |
-| `icon` | `boolean \| ReactNode` | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`ReactNode`：カスタムアイコン | ❌ |
-| `calendarId` | `string` | 複数カレンダーを使う場合のカテゴリ ID | ❌ |
-| `meta` | `Record<string, any>` | 任意の追加データ（場所・参加者など） | ❌ |
+| プロパティ    | 型                                                                       | 説明                                                                                                             | 必須 |
+| ------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ---- |
+| `id`          | `string`                                                                 | イベントを一意に識別する ID                                                                                      | 必須 |
+| `title`       | `string`                                                                 | カレンダーに表示するタイトル                                                                                     | 必須 |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 開始日時。イベント種別に合わせて型を選択                                                                         | 必須 |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う                                                                                 | 必須 |
+| `description` | `string`                                                                 | メモや詳細。表示方法は自由                                                                                       | 任意 |
+| `allDay`      | `boolean`                                                                | true なら終日イベントとして描画                                                                                  | 任意 |
+| `icon`        | `boolean \| ReactNode`                                                   | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`ReactNode`：カスタムアイコン | 任意 |
+| `calendarId`  | `string`                                                                 | 複数カレンダーを使う場合のカテゴリ ID                                                                            | 任意 |
+| `meta`        | `Record<string, any>`                                                    | 任意の追加データ（場所・参加者など）                                                                             | 任意 |
 
 ## イベントの作り方
 
@@ -69,8 +69,18 @@ import { Event } from '@dayflow/core';
 const localEvent: Event = {
   id: '1',
   title: 'ローカル会議',
-  start: Temporal.PlainDateTime.from({ year: 2024, month: 10, day: 15, hour: 10 }),
-  end: Temporal.PlainDateTime.from({ year: 2024, month: 10, day: 15, hour: 11 }),
+  start: Temporal.PlainDateTime.from({
+    year: 2024,
+    month: 10,
+    day: 15,
+    hour: 10,
+  }),
+  end: Temporal.PlainDateTime.from({
+    year: 2024,
+    month: 10,
+    day: 15,
+    hour: 11,
+  }),
 };
 
 const allDayEvent: Event = {
@@ -184,8 +194,10 @@ function MyCalendar() {
     events,
     callbacks: {
       onEventCreate: event => setEvents(prev => [...prev, event]),
-      onEventUpdate: event => setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
-      onEventDelete: eventId => setEvents(prev => prev.filter(e => e.id !== eventId)),
+      onEventUpdate: event =>
+        setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
+      onEventDelete: eventId =>
+        setEvents(prev => prev.filter(e => e.id !== eventId)),
     },
   });
 

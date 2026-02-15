@@ -151,7 +151,7 @@ DayFlow 使用 CSS 变量实现一致的主题定制。您可以在全局 CSS �
 
 ```css
 /* 日历容器 */
-.calendar-container {
+.df-calendar-container {
   --calendar-bg: var(--dayflow-bg-primary);
   --calendar-border: var(--dayflow-border);
 }
@@ -216,7 +216,7 @@ function CustomStyledCalendar({ calendar }) {
     <div className="custom-calendar-wrapper">
       <style jsx global>{`
         /* 使用 Tailwind 类覆盖样式 */
-        .custom-calendar-wrapper .calendar-container {
+        .custom-calendar-wrapper .df-calendar-container {
           @apply bg-gray-50 dark:bg-gray-950;
         }
 

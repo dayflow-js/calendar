@@ -14,25 +14,25 @@ views, and plugin architecture.
 
 ### Monthly, Weekly, Daily and Various View Types
 
-| Monthly                                  | Weekly                                 |
-|------------------------------------------|----------------------------------------|
+| Monthly                                 | Weekly                                 |
+| --------------------------------------- | -------------------------------------- |
 | ![image](./assets/images/MonthView.png) | ![image](./assets/images/WeekView.png) |
 
 | Daily                                 | Event Stack Level                        |
-|---------------------------------------|------------------------------------------|
+| ------------------------------------- | ---------------------------------------- |
 | ![image](./assets/images/DayView.png) | ![image](./assets/images/stackLevel.png) |
 
 ### Default Panel (with multiple Event Detail Panel options available)
 
 | Detail Popup                        | Detail Dialog                        |
-|-------------------------------------|--------------------------------------|
+| ----------------------------------- | ------------------------------------ |
 | ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
 
 ### Easy to resize and drag
+
 https://github.com/user-attachments/assets/726a5232-35a8-4fe3-8e7b-4de07c455353
 
 https://github.com/user-attachments/assets/957317e5-02d8-4419-a74b-62b7d191e347
-
 
 ## Contributing
 

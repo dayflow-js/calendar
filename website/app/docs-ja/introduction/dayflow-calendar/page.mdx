@@ -10,7 +10,7 @@ import {
   useCalendarApp,
   createWeekView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react';
 import '@dayflow/core/dist/styles.css';
 
 export function CalendarDemo() {
@@ -34,15 +34,15 @@ export function CalendarDemo() {
 
 ## Props
 
-| Prop | 型 | 必須 | 説明 |
-| --- | --- | --- | --- |
-| `calendar` | `UseCalendarAppReturn` | ✅ | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。 |
-| `className` | `string` | ❌ | ルートコンテナに追加するクラス名。標準クラスは `calendar-container`。 |
-| `style` | `React.CSSProperties` | ❌ | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。 |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | ❌ | 組み込み詳細パネルの中身だけを置き換える。 |
-| `customEventDetailDialog` | `EventDetailDialogRenderer` | ❌ | モーダル UI 全体をカスタム実装に差し替える。 |
-| `meta` | `Record<string, any>` | ❌ | すべてのビューへ受け渡したい任意の追加データ。 |
-| `search` | `CalendarSearchProps` | ❌ | 組み込み検索機能の設定。 |
+| Prop                       | 型                           | 必須 | 説明                                                                     |
+| -------------------------- | ---------------------------- | ---- | ------------------------------------------------------------------------ |
+| `calendar`                 | `UseCalendarAppReturn`       | 必須 | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。              |
+| `className`                | `string`                     | 任意 | ルートコンテナに追加するクラス名。標準クラスは `df-calendar-container`。 |
+| `style`                    | `React.CSSProperties`        | 任意 | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。      |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | 任意 | 組み込み詳細パネルの中身だけを置き換える。                               |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 任意 | モーダル UI 全体をカスタム実装に差し替える。                             |
+| `meta`                     | `Record<string, any>`        | 任意 | すべてのビューへ受け渡したい任意の追加データ。                           |
+| `search`                   | `CalendarSearchProps`        | 任意 | 組み込み検索機能の設定。                                                 |
 
 ## 検索設定
 
@@ -53,23 +53,23 @@ export function CalendarDemo() {
   calendar={calendar}
   search={{
     debounceDelay: 500,
-    emptyText: "イベントが見つかりませんでした",
-    onSearch: async (keyword) => {
+    emptyText: 'イベントが見つかりませんでした',
+    onSearch: async keyword => {
       // カスタム非同期検索（例：APIから取得）
       return fetch(`/api/search?q=${keyword}`).then(res => res.json());
-    }
+    },
   }}
 />
 ```
 
 ### 検索プロパティ
 
-| オプション | 説明 |
-| :--- | :--- |
-| `debounceDelay` | 検索を実行するまでの待機時間（ミリ秒）。 |
-| `onSearch` | キーワードに基づいて結果を取得する非同期関数。 |
-| `customSearch` | カスタムロジックを使用してローカルでイベントをフィルタリングする同期関数。 |
-| `emptyText` | 結果が見つからない場合に表示されるテキスト。 |
+| オプション      | 説明                                                                       |
+| :-------------- | :------------------------------------------------------------------------- |
+| `debounceDelay` | 検索を実行するまでの待機時間（ミリ秒）。                                   |
+| `onSearch`      | キーワードに基づいて結果を取得する非同期関数。                             |
+| `customSearch`  | カスタムロジックを使用してローカルでイベントをフィルタリングする同期関数。 |
+| `emptyText`     | 結果が見つからない場合に表示されるテキスト。                               |
 
 ## コンテナスタイルを調整する
 
@@ -115,7 +115,7 @@ DayFlow には 2 つの表示モードがあります。
       <EventForm event={event} onSubmit={handleSave} />
     </MyDialog>
   )}
-/>;
+/>
 ```
 
 ## メタデータの共有

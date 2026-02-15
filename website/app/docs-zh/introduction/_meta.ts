@@ -1,30 +1,30 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   index: {
     title: '快速开始',
   },
   events: {
-    title: "事件"
+    title: '事件',
   },
   plugins: {
-    title: "插件"
+    title: '插件',
   },
   views: {
-    title: "视图"
+    title: '视图',
   },
   sidebar: {
-    title: "侧边栏"
+    title: '侧边栏',
   },
   'dayflow-calendar': {
-    title: 'DayFlowCalendar'
+    title: 'DayFlowCalendar',
   },
   'use-calendar-app': {
-    title: 'useCalendarApp'
+    title: 'useCalendarApp',
   },
   'keyboard-shortcuts': {
-    title: '键盘快捷键'
+    title: '键盘快捷键',
   },
-}
+};
 
-export default meta
+export default meta;

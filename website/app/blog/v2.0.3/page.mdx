@@ -7,33 +7,44 @@ date: 2026-02-04
 ## Year View Reimagined in DayFlow v2.0.3
 
 ### Year Canvas
+
 The year-canvas mode provides the ability to '**Year as one canvas**' and see the distribution of events for an entire year at once.
 
-<img width="1258" height="768" alt="image" src="https://github.com/user-attachments/assets/d5811c4e-b5b5-4a28-b42b-605137969ef7" />
-
+<img
+  width="1258"
+  height="768"
+  alt="image"
+  src="https://github.com/user-attachments/assets/d5811c4e-b5b5-4a28-b42b-605137969ef7"
+/>
 
 ### Fixed Week Year View
+
 We have completely reimagined the Year View (`FixedWeekYearView`) to provide a more powerful and continuous planning experience.
 
-<img width="1483" height="804" alt="image" src="https://github.com/user-attachments/assets/b1b160c2-52ac-4e76-9c55-8559a556f02e" />
+<img
+  width="1483"
+  height="804"
+  alt="image"
+  src="https://github.com/user-attachments/assets/b1b160c2-52ac-4e76-9c55-8559a556f02e"
+/>
 
-
-*   **Continuous Grid Layout**: Instead of 12 separate month grids, the year is now displayed as a continuous, scrollable grid of weeks. This "Fixed Week" layout aligns weeks vertically, making it perfect for long-term planning.
-*   **Multi-Day Event Support**: Events spanning multiple days, weeks, or even months are now rendered as continuous bars, providing a clear visual representation of duration and overlap.
-*   **Drag & Drop**: Full support for interactive event management.
-    *   **Move**: Drag events to reschedule them.
-    *   **Resize**: Drag the edges of an event to change its duration.
-    *   **Create**: Double-click any day to quickly create a new event.
-*   **Timed Events Display**: A new configuration option `showTimedEventsInYearView` allows you to choose whether to display dot indicators for timed events alongside all-day event bars.
+- **Continuous Grid Layout**: Instead of 12 separate month grids, the year is now displayed as a continuous, scrollable grid of weeks. This "Fixed Week" layout aligns weeks vertically, making it perfect for long-term planning.
+- **Multi-Day Event Support**: Events spanning multiple days, weeks, or even months are now rendered as continuous bars, providing a clear visual representation of duration and overlap.
+- **Drag & Drop**: Full support for interactive event management.
+  - **Move**: Drag events to reschedule them.
+  - **Resize**: Drag the edges of an event to change its duration.
+  - **Create**: Double-click any day to quickly create a new event.
+- **Timed Events Display**: A new configuration option `showTimedEventsInYearView` allows you to choose whether to display dot indicators for timed events alongside all-day event bars.
 
 ### Customization
-*   **Weekend Styling**: Added global CSS classes `df-year-view-weekend-header` and `df-year-view-weekend-cell` to easily customize the background color and appearance of weekends in the Year View.
+
+- **Weekend Styling**: Added global CSS classes `df-year-view-weekend-header` and `df-year-view-weekend-cell` to easily customize the background color and appearance of weekends in the Year View.
 
 ### Bug Fixes
 
-*   **Week View**: Fixed an issue where clicking on the Week View could incorrectly trigger the drag indicator display.
-*   **Event Rendering**: Resolved issues with all-day event rendering limits in Month View and Day View, ensuring events are correctly stacked and hidden/shown based on available space.
-*   **Scroll Synchronisation**: Improved the synchronisation between the week header, month sidebar, and content grid in the Year View.
+- **Week View**: Fixed an issue where clicking on the Week View could incorrectly trigger the drag indicator display.
+- **Event Rendering**: Resolved issues with all-day event rendering limits in Month View and Day View, ensuring events are correctly stacked and hidden/shown based on available space.
+- **Scroll Synchronisation**: Improved the synchronisation between the week header, month sidebar, and content grid in the Year View.
 
 ### Upgrading
 
@@ -52,7 +63,7 @@ import { createYearView } from '@dayflow/core';
 views: [
   createYearView({
     mode: 'fixed-week', // default is year-canvas
-    showTimedEventsInYearView: true // Enable dots for timed events
-  })
-]
+    showTimedEventsInYearView: true, // Enable dots for timed events
+  }),
+];
 ```

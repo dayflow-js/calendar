@@ -1,30 +1,30 @@
-import type { MetaRecord } from 'nextra'
+import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
   index: {
     title: 'はじめに',
   },
   events: {
-    title: "イベント"
+    title: 'イベント',
   },
   plugins: {
-    title: "プラグイン"
+    title: 'プラグイン',
   },
   sidebar: {
-    title: "サイドバー"
+    title: 'サイドバー',
   },
   views: {
-    title: "ビュー"
+    title: 'ビュー',
   },
   'dayflow-calendar': {
-    title: 'DayFlowCalendar'
+    title: 'DayFlowCalendar',
   },
   'use-calendar-app': {
-    title: 'useCalendarApp'
+    title: 'useCalendarApp',
   },
   'keyboard-shortcuts': {
-    title: 'キーボードショートカット'
+    title: 'キーボードショートカット',
   },
-}
+};
 
-export default meta
+export default meta;

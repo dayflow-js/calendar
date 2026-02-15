@@ -1,0 +1,97 @@
+{
+  "name": "@dayflow/core",
+  "version": "3.0.0",
+  "description": "A flexible and feature-rich calendar engine powered by Preact with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
+  "keywords": [
+    "calendar",
+    "preact",
+    "schedule",
+    "events",
+    "typescript",
+    "drag-drop",
+    "event-calendar",
+    "day-view",
+    "week-view",
+    "month-view",
+    "year-view",
+    "virtual-scroll",
+    "plugin-architecture"
+  ],
+  "author": "Jayce Li",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dayflow-js/dayflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dayflow-js/dayflow/issues"
+  },
+  "homepage": "https://github.com/dayflow-js/dayflow#readme",
+  "scripts": {
+    "dev": "vite --port 5529 --host",
+    "prebuild": "rimraf dist",
+    "build": "tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs",
+    "postbuild": "rimraf dist/types",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@dayflow/blossom-color-picker": "^2.0.1",
+    "preact": "^10.28.3",
+    "temporal-polyfill": "^0.3.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.3",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/preact": "^3.2.4",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.2",
+    "autoprefixer": "^10.4.21",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2",
+    "rollup": "^4.29.1",
+    "rollup-plugin-dts": "^6.3.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tailwindcss": "^4.1.14",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.20"
+  }
+}

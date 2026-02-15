@@ -28,24 +28,24 @@ export function TeamCalendar() {
 
 ## 主な設定項目
 
-| オプション             | 型                         | 必須 | デフォルト           | 説明                                                                                 |
-| ---------------------- | -------------------------- | ---- | -------------------- | ------------------------------------------------------------------------------------ |
-| `views`                | `CalendarView[]`           | ✅   | —                    | 表示するビューを登録。`createMonthView()` などのファクトリを使用。                   |
-| `plugins`              | `CalendarPlugin[]`         | ❌   | `[]`                 | ドラッグ操作やショートカットなどのプラグインをインストール。                         |
-| `events`               | `Event[]`                  | ❌   | `[]`                 | 初期イベント配列。以後は `calendar.addEvent` などで更新。                            |
-| `callbacks`            | `CalendarCallbacks`        | ❌   | `{}`                 | ビュー変更やイベント CRUD をフックするライフサイクルコールバック。                   |
-| `defaultView`          | `ViewType`                 | ❌   | `ViewType.WEEK`      | 最初に表示するビュー。`views` に含まれている必要あり。                               |
-| `initialDate`          | `Date`                     | ❌   | `new Date()`         | フォーカスする基準日。ルーティングの状態などから差し替え可能。                       |
-| `switcherMode`         | `'buttons' \| 'select'`    | ❌   | `'buttons'`          | ビルトインビュースイッチャーの表示方法。                                             |
-| `calendars`            | `CalendarType[]`           | ❌   | `[]`                 | カテゴリや色の定義。`calendarId` と連携。                                            |
-| `defaultCalendar`      | `string`                   | ❌   | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。                                              |
-| `theme`                | `ThemeConfig`              | ❌   | `{ mode: 'light' }`  | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                              |
-| `locale`               | `string \| Locale`         | ❌   | `'en-US'`            | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。 |
-| `useSidebar`           | `boolean \| SidebarConfig` | ❌   | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。                       |
-| `useEventDetailDialog` | `boolean`                  | ❌   | `false`              | 詳細表示をモーダルダイアログに切り替える。                                           |
-| `useCalendarHeader`    | `boolean \| Function`      | ❌   | `true`               | デフォルトヘッダーの有効化、非表示（`false`）、またはカスタムレンダラーの指定。      |
-| `readOnly`             | `boolean \| ReadOnlyConfig`| ❌   | `false`              | インタラクションを無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。|
-| `customMobileEventRenderer` | `MobileEventRenderer` | ❌   | —                    | デフォルトのモバイル用イベントドロワー/ダイアログを置き換えるカスタムコンポーネント。 |
+| オプション                  | 型                          | 必須 | デフォルト           | 説明                                                                                    |
+| --------------------------- | --------------------------- | ---- | -------------------- | --------------------------------------------------------------------------------------- |
+| `views`                     | `CalendarView[]`            | 必須 | —                    | 表示するビューを登録。`createMonthView()` などのファクトリを使用。                      |
+| `plugins`                   | `CalendarPlugin[]`          | 任意 | `[]`                 | ドラッグ操作やショートカットなどのプラグインをインストール。                            |
+| `events`                    | `Event[]`                   | 任意 | `[]`                 | 初期イベント配列。以後は `calendar.addEvent` などで更新。                               |
+| `callbacks`                 | `CalendarCallbacks`         | 任意 | `{}`                 | ビュー変更やイベント CRUD をフックするライフサイクルコールバック。                      |
+| `defaultView`               | `ViewType`                  | 任意 | `ViewType.WEEK`      | 最初に表示するビュー。`views` に含まれている必要あり。                                  |
+| `initialDate`               | `Date`                      | 任意 | `new Date()`         | フォーカスする基準日。ルーティングの状態などから差し替え可能。                          |
+| `switcherMode`              | `'buttons' \| 'select'`     | 任意 | `'buttons'`          | ビルトインビュースイッチャーの表示方法。                                                |
+| `calendars`                 | `CalendarType[]`            | 任意 | `[]`                 | カテゴリや色の定義。`calendarId` と連携。                                               |
+| `defaultCalendar`           | `string`                    | 任意 | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。                                                 |
+| `theme`                     | `ThemeConfig`               | 任意 | `{ mode: 'light' }`  | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                                 |
+| `locale`                    | `string \| Locale`          | 任意 | `'en-US'`            | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。    |
+| `useSidebar`                | `boolean \| SidebarConfig`  | 任意 | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。                          |
+| `useEventDetailDialog`      | `boolean`                   | 任意 | `false`              | 詳細表示をモーダルダイアログに切り替える。                                              |
+| `useCalendarHeader`         | `boolean \| Function`       | 任意 | `true`               | デフォルトヘッダーの有効化、非表示（`false`）、またはカスタムレンダラーの指定。         |
+| `readOnly`                  | `boolean \| ReadOnlyConfig` | 任意 | `false`              | インタラクションを無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。 |
+| `customMobileEventRenderer` | `MobileEventRenderer`       | 任意 | —                    | デフォルトのモバイル用イベントドロワー/ダイアログを置き換えるカスタムコンポーネント。   |
 
 ## それぞれのポイント
 

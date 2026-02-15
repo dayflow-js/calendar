@@ -1,0 +1,107 @@
+# Content Slots
+
+DayFlow uses a slot-based architecture that allows you to inject custom UI components from your preferred framework (React, Vue, etc.) directly into the core calendar engine.
+
+This is powered by the `ContentSlot` mechanism. While the core engine provides default implementations for most UI elements (using Preact), you can override them to match your application's design or to use specific libraries.
+
+## How it Works
+
+1. **Core Defines a Slot**: Inside `@dayflow/core`, certain UI areas are wrapped in a `ContentSlot`. Each slot has a `generatorName` and `generatorArgs`.
+2. **Adapter Bridges the Slot**: The framework adapter (`@dayflow/react`, `@dayflow/vue`) subscribes to these slots.
+3. **You Provide the Implementation**: You pass a component or a render function to the `DayFlowCalendar` component. The adapter then portals your component into the exact location defined by the core.
+
+## Available Slots
+
+| Generator Name       | Description                                                      | Arguments                                                       |
+| :------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------- |
+| `eventContent`       | The internal content of an event card.                           | `{ event, isAllDay, isMobile }`                                 |
+| `eventDetailContent` | The content shown in the popover/panel when an event is clicked. | `{ event, position, onClose }`                                  |
+| `colorPicker`        | A small color picker used in the sidebar.                        | `{ color, onChange, variant: 'sketch' }`                        |
+| `colorPickerWrapper` | A full-featured color picker used in dialogs.                    | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
+| `headerContent`      | Custom content for the calendar header.                          | `{ view, date, ... }`                                           |
+| `titleBarSlot`       | Extra content in the sidebar title bar.                          | `{ isCollapsed, toggleCollapsed }`                              |
+
+## Example: Injecting a Custom Color Picker
+
+By default, DayFlow uses a built-in `BlossomColorPicker`. If you prefer to use a library like `react-color` or `vue-color`, you can inject it using the `colorPicker` slots.
+
+### React Example
+
+Install `react-color`:
+
+```bash
+npm install react-color
+```
+
+Inject it into `DayFlowCalendar`:
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react';
+import { SketchPicker, PhotoshopPicker } from 'react-color';
+
+function MyCalendar() {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      colorPicker={args => (
+        <SketchPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+          width="220px"
+        />
+      )}
+      colorPickerWrapper={args => (
+        <PhotoshopPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+          onAccept={() => args.onAccept?.()}
+          onCancel={() => args.onCancel?.()}
+        />
+      )}
+    />
+  );
+}
+```
+
+### Vue Example
+
+Install `vue-color`:
+
+```bash
+npm install vue-color
+```
+
+Inject it using slots:
+
+```vue
+<template>
+  <DayFlowCalendar :calendar="calendar">
+    <template #colorPicker="args">
+      <Sketch
+        :value="args.color"
+        @input="val => args.onChange({ hex: val.hex })"
+      />
+    </template>
+
+    <template #colorPickerWrapper="args">
+      <Photoshop
+        :value="args.color"
+        @input="val => args.onChange({ hex: val.hex })"
+        @ok="args.onAccept"
+        @cancel="args.onCancel"
+      />
+    </template>
+  </DayFlowCalendar>
+</template>
+
+<script setup>
+import { DayFlowCalendar } from '@dayflow/vue';
+import { Sketch, Photoshop } from 'vue-color';
+</script>
+```
+
+## Benefits of this Approach
+
+- **Clean Dependencies**: The core packages remain small and don't force specific UI libraries on you.
+- **Full Control**: You have access to all internal data via `generatorArgs` but can render whatever you want.
+- **Framework Native**: You write your custom components in the same framework as the rest of your app.

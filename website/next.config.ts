@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 import nextra from 'nextra';
 import path from 'path';
 
@@ -12,11 +12,16 @@ const withNextra = nextra({
 const nextConfig: NextConfig = {
   output: 'export',
   basePath: process.env.BASE_PATH || '',
-  outputFileTracingRoot: path.join(process.cwd()),
+  outputFileTracingRoot: path.join(process.cwd(), '..'),
+  transpilePackages: ['@dayflow/core', '@dayflow/react'],
+  // @ts-expect-error: turbopack is not yet in NextConfig type
+  turbopack: {
+    root: path.join(process.cwd(), '..'),
+  },
   images: {
     unoptimized: true, // Required for static export
   },
-  webpack: (config) => {
+  webpack: config => {
     config.resolve.fallback = { fs: false, path: false };
     return config;
   },

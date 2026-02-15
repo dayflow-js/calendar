@@ -10,7 +10,7 @@ import {
   useCalendarApp,
   createWeekView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react';
 import '@dayflow/core/dist/styles.css';
 
 export function CalendarDemo() {
@@ -36,13 +36,13 @@ The component receives the `calendar` object from `useCalendarApp`, reads the ac
 
 | Prop                       | Type                         | Required | Description                                                                                         |
 | -------------------------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `calendar`                 | `UseCalendarAppReturn`       | ✅       | Result of `useCalendarApp`. Provides state, registered views, sidebar config, and calendar actions. |
-| `className`                | `string`                     | ❌       | Additional class names appended to the root container (base class: `calendar-container`).           |
-| `style`                    | `React.CSSProperties`        | ❌       | Inline styles for the root container. Default height is `800px`, which can be overridden.           |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | ❌       | Replaces the default detail panel body when the built-in panel is used.                             |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | ❌       | Full override for the event detail dialog UI. Takes precedence over `useEventDetailDialog`.         |
-| `meta`                     | `Record<string, any>`        | ❌       | Arbitrary metadata forwarded to every view component (helpful for feature flags or layout hints).   |
-| `search`                   | `CalendarSearchProps`        | ❌       | Configuration for the built-in search functionality.                                                |
+| `calendar`                 | `UseCalendarAppReturn`       | Required | Result of `useCalendarApp`. Provides state, registered views, sidebar config, and calendar actions. |
+| `className`                | `string`                     | Optional | Additional class names appended to the root container (base class: `df-calendar-container`).        |
+| `style`                    | `React.CSSProperties`        | Optional | Inline styles for the root container. Default height is `800px`, which can be overridden.           |
+| `customDetailPanelContent` | `EventDetailContentRenderer` | Optional | Replaces the default detail panel body when the built-in panel is used.                             |
+| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | Optional | Full override for the event detail dialog UI. Takes precedence over `useEventDetailDialog`.         |
+| `meta`                     | `Record<string, any>`        | Optional | Arbitrary metadata forwarded to every view component (helpful for feature flags or layout hints).   |
+| `search`                   | `CalendarSearchProps`        | Optional | Configuration for the built-in search functionality.                                                |
 
 ## Search Configuration
 
@@ -53,23 +53,23 @@ The `search` prop allows you to customize the built-in search behavior. By defau
   calendar={calendar}
   search={{
     debounceDelay: 500,
-    emptyText: "No events found",
-    onSearch: async (keyword) => {
+    emptyText: 'No events found',
+    onSearch: async keyword => {
       // Custom async search (e.g., from an API)
       return fetch(`/api/search?q=${keyword}`).then(res => res.json());
-    }
+    },
   }}
 />
 ```
 
 ### Search Props
 
-| Option | Description |
-| :--- | :--- |
-| `debounceDelay` | Time in milliseconds to wait before triggering a search. |
-| `onSearch` | Async function to fetch results based on a keyword. |
-| `customSearch` | Synchronous function to filter events locally with custom logic. |
-| `emptyText` | Text to display when no results are found. |
+| Option          | Description                                                      |
+| :-------------- | :--------------------------------------------------------------- |
+| `debounceDelay` | Time in milliseconds to wait before triggering a search.         |
+| `onSearch`      | Async function to fetch results based on a keyword.              |
+| `customSearch`  | Synchronous function to filter events locally with custom logic. |
+| `emptyText`     | Text to display when no results are found.                       |
 
 ## Customizing Container Styles
 
@@ -95,7 +95,7 @@ The root container has a default height of `800px` to ensure proper functioning 
 />
 ```
 
-You can also add custom CSS classes via `className`, which will be appended to the base `calendar-container` class:
+You can also add custom CSS classes via `className`, which will be appended to the base `df-calendar-container` class:
 
 ```tsx copy
 <DayFlowCalendar calendar={calendar} className="my-custom-calendar shadow-lg" />

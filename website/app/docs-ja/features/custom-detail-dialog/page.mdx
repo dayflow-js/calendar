@@ -26,7 +26,8 @@ const CustomDialog: EventDetailDialogRenderer = ({
   if (!isOpen) return null;
 
   const accent = event.color ?? '#6366f1';
-  const handleColor = (next: string) => onEventUpdate({ ...event, color: next });
+  const handleColor = (next: string) =>
+    onEventUpdate({ ...event, color: next });
 
   return (
     <div
@@ -43,9 +44,13 @@ const CustomDialog: EventDetailDialogRenderer = ({
           <p className="text-xs uppercase tracking-[0.25em] text-white/70">
             Hosted by {event.meta?.owner ?? 'Team'}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold leading-tight">{event.title}</h2>
+          <h2 className="mt-2 text-3xl font-semibold leading-tight">
+            {event.title}
+          </h2>
           {event.description && (
-            <p className="mt-3 max-w-xl text-sm text-white/80">{event.description}</p>
+            <p className="mt-3 max-w-xl text-sm text-white/80">
+              {event.description}
+            </p>
           )}
         </header>
 
@@ -56,7 +61,9 @@ const CustomDialog: EventDetailDialogRenderer = ({
               Schedule
             </h3>
             <p className="mt-3 text-sm text-gray-700">
-              {event.allDay ? 'All day' : `${event.start.toString()} → ${event.end?.toString()}`}
+              {event.allDay
+                ? 'All day'
+                : `${event.start.toString()} → ${event.end?.toString()}`}
             </p>
           </article>
 
@@ -64,7 +71,9 @@ const CustomDialog: EventDetailDialogRenderer = ({
             <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Personalize
             </h3>
-            <p className="mt-2 text-xs text-gray-500">ブランドカラーや優先度の色に合わせられます。</p>
+            <p className="mt-2 text-xs text-gray-500">
+              ブランドカラーや優先度の色に合わせられます。
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {['#6366f1', '#f97316', '#22c55e', '#0ea5e9'].map(color => (
                 <button

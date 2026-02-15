@@ -10,20 +10,22 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { useCalendarApp } from '@dayflow/core';
-import { DayFlowCalendar } from '@dayflow/core';
-import { createMonthView } from '@dayflow/core';
-import { createWeekView } from '@dayflow/core';
-import { createDayView } from '@dayflow/core';
-import { createDragPlugin } from '@dayflow/core';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  createDayView,
+  createDragPlugin,
+  ViewType,
+} from '@dayflow/react';
 import {
   CalendarType,
   CalendarSidebarRenderProps,
   Event,
   SidebarConfig,
-  ViewType,
+  temporalToDate,
 } from '@dayflow/core';
-import { temporalToDate } from '@dayflow/core';
 import { getWebsiteCalendars } from '@/utils/palette';
 
 const SIDEBAR_CALENDAR_IDS = new Set([
@@ -42,9 +44,7 @@ const cloneCalendars = (): CalendarType[] =>
   BASE_CALENDARS.map(calendar => ({
     ...calendar,
     colors: { ...calendar.colors },
-    darkColors: calendar.darkColors
-      ? { ...calendar.darkColors }
-      : undefined,
+    darkColors: calendar.darkColors ? { ...calendar.darkColors } : undefined,
   }));
 
 const createSidebarEvents = (): Event[] => {
@@ -133,7 +133,7 @@ const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
     initialDate: new Date(),
     switcherMode: 'buttons',
     useSidebar: sidebarConfig,
-    theme: { mode: themeMode }
+    theme: { mode: themeMode },
   });
 };
 
@@ -233,10 +233,11 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
               onClick={() =>
                 toggleCalendarVisibility(calendar.id, !calendar.isVisible)
               }
-              className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm shadow-sm transition ${calendar.isVisible
-                ? 'border-slate-700 bg-slate-900/70 hover:border-slate-600'
-                : 'border-slate-800 bg-slate-950 hover:border-slate-800/80 text-slate-500'
-                }`}
+              className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm shadow-sm transition ${
+                calendar.isVisible
+                  ? 'border-slate-700 bg-slate-900/70 hover:border-slate-600'
+                  : 'border-slate-800 bg-slate-950 hover:border-slate-800/80 text-slate-500'
+              }`}
             >
               <span className="inline-flex items-center gap-2">
                 <span className="text-lg leading-none">
@@ -248,7 +249,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
                 className="h-2.5 w-2.5 rounded-full"
                 style={{
                   backgroundColor: calendar.isVisible
-                    ? calendar.colors?.lineColor ?? '#22c55e'
+                    ? (calendar.colors?.lineColor ?? '#22c55e')
                     : 'rgba(148, 163, 184, 0.45)',
                 }}
               />
@@ -300,11 +301,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
 
 const ShowcaseWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => (
-  <div className="mt-6">
-    {children}
-  </div>
-);
+}) => <div className="mt-6">{children}</div>;
 
 export const SidebarBasicsShowcase: React.FC = () => {
   const calendar = useSidebarCalendar({
@@ -314,7 +311,7 @@ export const SidebarBasicsShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar calendar={calendar} className="h-155 w-full" />
+      <DayFlowCalendar calendar={calendar} />
     </ShowcaseWrapper>
   );
 };
@@ -333,7 +330,7 @@ export const SidebarCustomShowcase: React.FC = () => {
 
   return (
     <ShowcaseWrapper>
-      <DayFlowCalendar calendar={calendar} className="h-155 w-full" />
+      <DayFlowCalendar calendar={calendar} />
     </ShowcaseWrapper>
   );
 };

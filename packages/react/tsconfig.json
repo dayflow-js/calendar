@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": false,
+    "paths": {
+      "@dayflow/core": ["../core/dist/index.d.ts"]
+    }
+  },
+  "include": ["src"]
+}
