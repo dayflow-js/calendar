@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
   basePath: process.env.BASE_PATH || '',
   outputFileTracingRoot: path.join(process.cwd(), '..'),
   transpilePackages: ['@dayflow/core', '@dayflow/react'],
-  // @ts-expect-error: turbopack is not yet in NextConfig type
   turbopack: {
     root: path.join(process.cwd(), '..'),
   },
