@@ -14,6 +14,8 @@ import {
 import {
   CalendarRenderer,
   ICalendarApp,
+  CalendarApp,
+  CalendarAppConfig,
   UseCalendarAppReturn,
   CustomRendering,
 } from '@dayflow/core';
@@ -47,7 +49,7 @@ import {
 export class DayFlowCalendarComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  @Input() calendar!: ICalendarApp | UseCalendarAppReturn;
+  @Input() calendar!: ICalendarApp | UseCalendarAppReturn | CalendarAppConfig;
 
   // Templates for custom content injection
   @Input() eventContent?: TemplateRef<any>;
@@ -64,11 +66,28 @@ export class DayFlowCalendarComponent
   customRenderings: CustomRendering[] = [];
   private renderer?: CalendarRenderer;
   private unsubscribe?: () => void;
+  private internalApp?: ICalendarApp;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
   private get app(): ICalendarApp {
-    return (this.calendar as any).app || this.calendar;
+    if (this.internalApp) return this.internalApp;
+
+    if (this.calendar instanceof CalendarApp) {
+      return this.calendar;
+    }
+
+    if ((this.calendar as any).app) {
+      return (this.calendar as any).app;
+    }
+
+    // If it's a config object, we create an internal instance
+    if (typeof (this.calendar as any).views !== 'undefined') {
+      this.internalApp = new CalendarApp(this.calendar as CalendarAppConfig);
+      return this.internalApp;
+    }
+
+    return this.calendar as ICalendarApp;
   }
 
   ngAfterViewInit() {
@@ -77,6 +96,7 @@ export class DayFlowCalendarComponent
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['calendar'] && !changes['calendar'].firstChange) {
+      this.internalApp = undefined;
       this.destroyCalendar();
       this.initCalendar();
     }
@@ -121,7 +141,7 @@ export class DayFlowCalendarComponent
     return templates[name] || null;
   }
 
-  trackById(index: number, item: CustomRendering) {
+  trackById(_index: number, item: CustomRendering) {
     return item.id;
   }
 }

@@ -68,12 +68,14 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   const [customRenderings, setCustomRenderings] = useState<
     Map<string, CustomRendering>
   >(new Map());
+  const [isMounted, setIsMounted] = useState(false);
 
   // Extract the underlying app instance
   const app = (calendar as any)?.app || calendar;
   const renderPropsKeysRef = useRef<string[]>([]);
 
   useEffect(() => {
+    setIsMounted(true);
     if (!containerRef.current || !app) return;
 
     const renderer = new CalendarRenderer(app);
@@ -82,10 +84,17 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
 
     const unsubscribe = renderer
       .getCustomRenderingStore()
-      .subscribe(renderings => {
-        // Create a new map to trigger re-render
-        setCustomRenderings(new Map(renderings));
-      });
+      .subscribe(
+        (
+          renderings:
+            | Iterable<readonly [string, CustomRendering]>
+            | null
+            | undefined
+        ) => {
+          // Create a new map to trigger re-render
+          setCustomRenderings(new Map(renderings));
+        }
+      );
 
     return () => {
       unsubscribe();
@@ -113,6 +122,7 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
 
   // Portals for custom content
   const portals = useMemo(() => {
+    if (!isMounted) return [];
     return Array.from(customRenderings.values()).map(
       (rendering: CustomRendering) => {
         const { id, containerEl, generatorName, generatorArgs } = rendering;
@@ -132,12 +142,12 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
         return createPortal(content, containerEl, id);
       }
     );
-  }, [customRenderings, renderProps]);
+  }, [customRenderings, renderProps, isMounted]);
 
   return (
     <>
       <div ref={containerRef} className="df-calendar-wrapper" />
-      {portals}
+      {isMounted && portals}
     </>
   );
 };
