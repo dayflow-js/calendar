@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/vue",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0",
   "type": "module",
   "description": "Vue adapter for DayFlow calendar",
   "main": "dist/index.js",

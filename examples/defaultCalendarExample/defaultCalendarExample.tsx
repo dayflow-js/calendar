@@ -8,20 +8,18 @@ import {
   createDragPlugin,
   createYearView,
   ViewType,
+  UseCalendarAppReturn,
 } from '@dayflow/react';
-import { Event } from '@dayflow/core';
+import { Event, CalendarType } from '@dayflow/core';
 import { Sun, Moon } from 'lucide-react';
 import { generateSampleEvents } from '../utils/sampleData';
 import { getWebsiteCalendars } from '../utils/palette';
 
+interface DefaultCalendarExampleProps {}
 
-interface DefaultCalendarExampleProps {
-  useCustomMobileEditor: boolean;
-}
-
-const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCustomMobileEditor }) => {
+const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = () => {
   const [events] = useState<Event[]>(generateSampleEvents());
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<UseCalendarAppReturn | null>(null);
 
   const [isMobile, setIsMobile] = React.useState(true);
 
@@ -32,9 +30,7 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-
   const dragPlugin = useMemo(() => createDragPlugin(), []);
-
 
   const calendar = useCalendarApp({
     views: [
@@ -54,56 +50,63 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = ({ useCust
     theme: { mode: 'auto' as const },
     // switcherMode: 'select' as const,
     useSidebar: {
+      enabled: !isMobile,
       createCalendarMode: 'modal',
       colorPickerMode: 'blossom',
     },
     // readOnly: true,
     callbacks: {
-      onEventCreate: async (event: any) => {
+      onEventCreate: async (event: Event) => {
         await new Promise(resolve => setTimeout(resolve, 500));
         console.log('create event:', event);
       },
-      onEventClick: async (event: any) => {
+      onEventClick: async (event: Event) => {
         console.log('click event:', event);
       },
-      onEventUpdate: async (event: any) => {
+      onEventUpdate: async (event: Event) => {
         console.log('update event:', event);
       },
-      onMoreEventsClick: async (date: any) => {
+      onEventDelete: async (eventId: string) => {
+        console.log('delete event:', eventId);
+      },
+      onMoreEventsClick: async (date: Date) => {
         console.log('more events click date:', date);
         calendarRef.current?.selectDate(date);
         calendarRef.current?.changeView(ViewType.DAY);
       },
-      onCalendarUpdate: async (calendar: any) => {
+      onCalendarUpdate: async (calendar: CalendarType) => {
         console.log('update calendar:', calendar);
       },
-      onCalendarDelete: async (calendar: any) => {
-        console.log('delete calendar:', calendar);
+      onCalendarDelete: async (calendarId: string) => {
+        console.log('delete calendar:', calendarId);
       },
-      onCalendarCreate: async (calendar: any) => {
+      onCalendarCreate: async (calendar: CalendarType) => {
         console.log('create calendar:', calendar);
       },
-      onCalendarMerge: async (sourceId: any, targetId: any) => {
+      onCalendarMerge: async (sourceId: string, targetId: string) => {
         console.log('merge calendar:', sourceId, targetId);
       },
-    }
+    },
   });
 
   calendarRef.current = calendar;
 
   return (
     <div>
-      <DayFlowCalendar app={calendar.app} />
+      <DayFlowCalendar calendar={calendar} />
     </div>
   );
 };
 
-const ThemeToggle = ({ }: {}) => {
+const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    if (document.documentElement.classList.contains('dark') ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (
+      document.documentElement.classList.contains('dark') ||
+      (!('theme' in localStorage) &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     } else {
@@ -138,28 +141,26 @@ const ThemeToggle = ({ }: {}) => {
 };
 
 export function CalendarTypesExample() {
-  const [useCustomMobileEditor, setUseCustomMobileEditor] = useState(false);
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <div className="">
-
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex justify-between gap-4 mb-4 px-4 items-center">
           <div className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">Calendar Example</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Calendar Example
+            </h1>
           </div>
           <ThemeToggle />
         </div>
 
         {/* Calendar Instance */}
-        <div className='px-0.5 my-4 pb-4 mb-4'>
-          <DefaultCalendarExample useCustomMobileEditor={useCustomMobileEditor} />
+        <div className="px-4 my-4 pb-4 mb-4">
+          <DefaultCalendarExample />
         </div>
       </div>
     </div>
   );
 }
-
 
 export default CalendarTypesExample;

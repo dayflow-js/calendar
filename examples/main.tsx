@@ -1,6 +1,6 @@
 // import 'preact/debug';
-import React from 'react';
 import { createRoot } from 'react-dom/client';
+// import '@dayflow/core/dist/styles.css';
 import '../packages/core/src/styles/tailwind.css';
 import CalendarTypesExample from './defaultCalendarExample/defaultCalendarExample';
 
@@ -9,4 +9,3 @@ if (container) {
   const root = createRoot(container);
   root.render(<CalendarTypesExample />);
 }
-

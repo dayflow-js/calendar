@@ -1,5 +1,6 @@
 {
   "name": "dayflow-monorepo",
+  "version": "3.0.0",
   "private": true,
   "description": "Multi-framework calendar component library",
   "scripts": {
@@ -7,7 +8,10 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "publish:all": "./scripts/publish.sh all",
+    "publish:main": "./scripts/publish.sh main",
+    "publish:dry": "./scripts/publish.sh all --dry-run"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.3",
