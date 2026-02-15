@@ -98,7 +98,7 @@ publish_pkg() {
         return 0
     fi
 
-    if ! (cd "$dir" && npm publish --access public $DRY_RUN); then
+    if ! (cd "$dir" && pnpm publish --access public --no-git-checks $DRY_RUN); then
         err "Failed to publish @dayflow/$name"
     fi
     ok "@dayflow/$name published"

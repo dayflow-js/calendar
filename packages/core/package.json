@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/core",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A flexible and feature-rich calendar engine powered by Preact with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
