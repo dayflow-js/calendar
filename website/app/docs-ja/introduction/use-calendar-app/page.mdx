@@ -86,16 +86,17 @@ const calendar = useCalendarApp({
 
 ### Callbacks
 
-| コールバック                                             | 役割                                                           |
-| -------------------------------------------------------- | -------------------------------------------------------------- |
-| `onViewChange(view)`                                     | ビュー切り替え後に発火。アナリティクスや URL 同期に便利。      |
-| `onDateChange(date)`                                     | 選択日が変わったときに発火。日付連動のサイドバーなどに。       |
-| `onVisibleMonthChange(date)`                             | 表示月が変わったタイミングで呼ばれる。先読み API 呼び出しに。  |
-| `onEventCreate / onEventUpdate / onEventDelete`          | イベント CRUD を捕捉。バックエンドと同期。                     |
-| `onMoreEventsClick(date)`                                | 月ビューで「+ X 件」リンクがクリックされたときに発火。         |
-| `onCalendarCreate / onCalendarUpdate / onCalendarDelete` | カレンダーの追加・更新・削除を捕捉。                           |
-| `onCalendarMerge(sourceId, targetId)`                    | カレンダーのマージ操作を捕捉（例：「仕事」を「個人」に統合）。 |
-| `onRender()`                                             | レンダリング完了時に 1 度だけ発火。計測用。                    |
+| コールバック                                             | 役割                                                                               |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `onViewChange(view)`                                     | ビュー切り替え後に発火。アナリティクスや URL 同期に便利。                          |
+| `onDateChange(date)`                                     | 選択日が変わったときに発火。日付連動のサイドバーなどに。                           |
+| `onVisibleMonthChange(date)`                             | 表示月が変わったタイミングで呼ばれる。先読み API 呼び出しに。                      |
+| `onVisibleRangeChange(start, end, reason)`               | 可視日付範囲が変わるたびに発火。追加計算なしで、より正確なデータ取得に役立ちます。 |
+| `onEventCreate / onEventUpdate / onEventDelete`          | イベント CRUD を捕捉。バックエンドと同期。                                         |
+| `onMoreEventsClick(date)`                                | 月ビューで「+ X 件」リンクがクリックされたときに発火。                             |
+| `onCalendarCreate / onCalendarUpdate / onCalendarDelete` | カレンダーの追加・更新・削除を捕捉。                                               |
+| `onCalendarMerge(sourceId, targetId)`                    | カレンダーのマージ操作を捕捉（例：「仕事」を「個人」に統合）。                     |
+| `onRender()`                                             | レンダリング完了時に 1 度だけ発火。計測用。                                        |
 
 ### switcherMode
 
