@@ -27,19 +27,27 @@ In inline mode, clicking the create button immediately adds a new "Untitled" cal
 <img
   width="207"
   height="211"
-  alt="Image"
-  src="https://github.com/user-attachments/assets/05b2ee0d-03e6-4158-a6af-f0b3e56343b9"
+  alt="Inline Mode"
+  src="/images/docs/inline-mode.png"
 />
 
 ### Modal Mode
 
 In modal mode, clicking the create button opens a dialog where users can enter the calendar name and select a color from a preset palette.
 
+import { Callout } from 'nextra/components';
+
+<Callout type="warning">
+  The built-in color picker (previously `react-color`) is no longer included in the core package to maintain framework-agnosticism. You need to provide your own color picker component using [Content Slots](/docs/features/content-slots).
+</Callout>
+
+<div className="mt-8" />
+
 <img
   width="542"
   height="542"
-  alt="Image"
-  src="https://github.com/user-attachments/assets/da55cc17-eb49-42c6-b252-d100c6783867"
+  alt="Modal Mode"
+  src="/images/docs/modal-mode.png"
 />
 
 ```tsx

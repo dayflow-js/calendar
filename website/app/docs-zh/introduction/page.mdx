@@ -39,6 +39,8 @@ import { Tabs } from 'nextra/components';
       createDayView,
       createWeekView,
       createMonthView,
+      createDragPlugin,
+      createEventsPlugin,
     } from '@dayflow/react';
     import { createEvent, createAllDayEvent } from '@dayflow/core';
     import '@dayflow/core/dist/styles.css';
@@ -46,6 +48,7 @@ import { Tabs } from 'nextra/components';
     function App() {
       const calendar = useCalendarApp({
         views: [createDayView(), createWeekView(), createMonthView()],
+        plugins: [createDragPlugin(), createEventsPlugin()],
         events: [
           createEvent({
             id: '1',
@@ -77,6 +80,8 @@ import { Tabs } from 'nextra/components';
       createDayView,
       createWeekView,
       createMonthView,
+      createDragPlugin,
+      createEventsPlugin,
       createEvent,
       createAllDayEvent
     } from '@dayflow/core';
@@ -84,6 +89,7 @@ import { Tabs } from 'nextra/components';
 
     const calendar = useCalendarApp({
       views: [createDayView(), createWeekView(), createMonthView()],
+      plugins: [createDragPlugin(), createEventsPlugin()],
       events: [
         createEvent({
           id: '1',
@@ -106,10 +112,13 @@ import { Tabs } from 'nextra/components';
       createDayView, 
       createWeekView, 
       createMonthView,
+      createDragPlugin,
+      createEventsPlugin,
       createEvent,
       createAllDayEvent
     } from '@dayflow/core';
     import { DayFlowCalendarModule } from '@dayflow/angular';
+    import '@dayflow/core/dist/styles.css';
 
     @Component({
       selector: 'app-root',
@@ -122,6 +131,7 @@ import { Tabs } from 'nextra/components';
     export class AppComponent {
       calendar = {
         views: [createDayView(), createWeekView(), createMonthView()],
+        plugins: [createDragPlugin(), createEventsPlugin()],
         events: [
           createEvent({
             id: '1',
@@ -145,6 +155,8 @@ import { Tabs } from 'nextra/components';
       createDayView, 
       createWeekView, 
       createMonthView,
+      createDragPlugin,
+      createEventsPlugin,
       createEvent,
       createAllDayEvent
     } from '@dayflow/core';
@@ -152,6 +164,7 @@ import { Tabs } from 'nextra/components';
 
     const calendar = useCalendarApp({
       views: [createDayView(), createWeekView(), createMonthView()],
+      plugins: [createDragPlugin(), createEventsPlugin()],
       events: [
         createEvent({
           id: '1',

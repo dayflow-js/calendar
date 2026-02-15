@@ -24,9 +24,31 @@ const calendar = useCalendarApp({
 
 インラインモードでは、作成ボタンをクリックすると、即座に「無題」のカレンダーがリストに追加され、編集モードになります。ユーザーはサイドバーで直接名前を入力できます。カレンダーにはランダムな色が自動的に割り当てられます。
 
+<img
+  width="207"
+  height="211"
+  alt="インラインモード"
+  src="/images/docs/inline-mode.png"
+/>
+
 ### モーダルモード
 
 モーダルモードでは、作成ボタンをクリックするとダイアログが開き、ユーザーはカレンダー名を入力し、プリセットのパレットから色を選択できます。
+
+import { Callout } from 'nextra/components';
+
+<Callout type="warning">
+  マルチフレームワーク対応に伴い、コアパッケージにはカラーピッカー（以前の `react-color`）が含まれなくなりました。[Content Slots](/docs-ja/features/content-slots) を使用して、独自のカラーピッカーコンポーネントを提供する必要があります。
+</Callout>
+
+<div className="mt-8" />
+
+<img
+  width="542"
+  height="542"
+  alt="モーダルモード"
+  src="/images/docs/modal-mode.png"
+/>
 
 ```tsx
 const calendar = useCalendarApp({

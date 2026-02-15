@@ -7,6 +7,8 @@ const meta: MetaRecord = {
       pagination: false,
     },
   },
+  'v3.0': 'V3.0 (Multi-Framework)',
+  'v2.0.3': 'V2.0.3',
   'v1.8': 'V1.8',
   'v1.7': 'V1.7',
   'v1.4': 'V1.4',
