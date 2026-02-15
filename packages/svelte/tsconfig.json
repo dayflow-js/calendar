@@ -1,18 +1,22 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "bundler",
     "target": "ESNext",
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "lib": ["ESNext", "DOM"],
+    "strict": true,
     "declaration": true,
-    "declarationDir": "dist",
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "dist",
     "baseUrl": ".",
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": true,
+    "types": ["svelte"],
+    "skipLibCheck": true,
     "paths": {
-      "@dayflow/core": ["../core/src/index.ts"],
+      "@dayflow/core": ["../core/dist/index.d.ts"],
       "@/*": ["../core/src/*"]
     }
   },

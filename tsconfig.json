@@ -24,6 +24,8 @@
       "@dayflow/core": ["packages/core/src/index.ts"],
       "@dayflow/react": ["packages/react/src/index.ts"],
       "@dayflow/vue": ["packages/vue/src/index.ts"],
+      "@dayflow/angular": ["packages/angular/src/public-api.ts"],
+      "@dayflow/svelte": ["packages/svelte/src/index.ts"],
       "@/*": ["packages/core/src/*"]
     }
   },

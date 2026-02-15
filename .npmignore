@@ -45,6 +45,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+*.tgz
 
 # Source maps (not needed in published package)
 *.map

@@ -1,32 +1,46 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { 
-    CalendarRenderer, 
-    type ICalendarApp, 
-    type UseCalendarAppReturn, 
-    type CustomRendering 
+  import { onMount, onDestroy, tick } from 'svelte';
+  import {
+    CalendarRenderer,
+    type ICalendarApp,
+    type UseCalendarAppReturn,
+    type CustomRendering,
   } from '@dayflow/core';
 
-  export let calendar: ICalendarApp | UseCalendarAppReturn;
-  
-  // Custom renderers passed as props (Svelte components)
-  export let eventContent: any = null;
-  export let eventDetailContent: any = null;
-  export let eventDetailDialog: any = null;
-  export let headerContent: any = null;
-  export let createCalendarDialog: any = null;
-  export let titleBarSlot: any = null;
-  export let colorPicker: any = null;
-  export let colorPickerWrapper: any = null;
+  let {
+    calendar,
+    eventContent = null,
+    eventDetailContent = null,
+    eventDetailDialog = null,
+    headerContent = null,
+    createCalendarDialog = null,
+    titleBarSlot = null,
+    colorPicker = null,
+    colorPickerWrapper = null,
+  } = $props<{
+    calendar: ICalendarApp | UseCalendarAppReturn;
+    eventContent?: any;
+    eventDetailContent?: any;
+    eventDetailDialog?: any;
+    headerContent?: any;
+    createCalendarDialog?: any;
+    titleBarSlot?: any;
+    colorPicker?: any;
+    colorPickerWrapper?: any;
+  }>();
 
-  let container: HTMLElement;
-  let renderer: CalendarRenderer;
-  let customRenderings: CustomRendering[] = [];
-  let unsubscribe: () => void;
+  let container: HTMLElement | undefined = $state();
+  let renderer: CalendarRenderer | undefined;
+  let customRenderings: CustomRendering[] = $state([]);
+  let unsubscribe: (() => void) | undefined;
+  let mounted = $state(false);
 
-  $: app = (calendar as any).app || calendar;
-  
-  const renderProps: Record<string, any> = {
+  // Guard for browser environment
+  const isBrowser = typeof window !== 'undefined';
+
+  const app = $derived((calendar as any).app || calendar);
+
+  const renderProps = $derived({
     eventContent,
     eventDetailContent,
     eventDetailDialog,
@@ -34,20 +48,29 @@
     createCalendarDialog,
     titleBarSlot,
     colorPicker,
-    colorPickerWrapper
-  };
+    colorPickerWrapper,
+  } as Record<string, any>);
 
-  onMount(() => {
+  onMount(async () => {
+    if (!container) return;
+
+    await tick();
+
+    const { CalendarRenderer } = await import('@dayflow/core');
+
     renderer = new CalendarRenderer(app);
     renderer.mount(container);
 
-    unsubscribe = renderer.getCustomRenderingStore().subscribe((renderings) => {
+    unsubscribe = renderer.getCustomRenderingStore().subscribe(renderings => {
       customRenderings = Array.from(renderings.values());
     });
 
-    // Synchronize slot overrides
-    const activeOverrides = Object.keys(renderProps).filter(key => renderProps[key] !== null);
+    const activeOverrides = Object.keys(renderProps).filter(
+      key => renderProps[key] !== null
+    );
     renderer.getCustomRenderingStore().setOverrides(activeOverrides);
+
+    mounted = true;
   });
 
   onDestroy(() => {
@@ -56,24 +79,32 @@
   });
 
   function portal(node: HTMLElement, target: HTMLElement) {
+    if (!target || !node || !isBrowser) return;
     target.appendChild(node);
     return {
       destroy() {
         if (node.parentNode === target) {
           target.removeChild(node);
         }
-      }
+      },
     };
   }
 </script>
 
-<div bind:this={container} class="df-calendar-wrapper"></div>
+{#if isBrowser}
+  <div bind:this={container} class="df-calendar-wrapper"></div>
 
-{#each customRenderings as rendering (rendering.id)}
-  {@const Component = renderProps[rendering.generatorName]}
-  {#if Component}
-    <div use:portal={rendering.containerEl}>
-      <svelte:component this={Component} {...rendering.generatorArgs} />
-    </div>
+  {#if mounted}
+    {#each customRenderings as rendering (rendering.id)}
+      {@const Component = renderProps[rendering.generatorName]}
+      {#if Component && rendering.containerEl}
+        <div use:portal={rendering.containerEl}>
+          <Component {...rendering.generatorArgs} />
+        </div>
+      {/if}
+    {/each}
   {/if}
-{/each}
+{:else}
+  <!-- SSR Placeholder -->
+  <div class="df-calendar-wrapper df-calendar-ssr-placeholder"></div>
+{/if}

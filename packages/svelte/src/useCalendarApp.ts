@@ -1,9 +1,10 @@
-import { writable, type Writable } from 'svelte/store';
-import {
-  CalendarApp,
-  type CalendarAppConfig,
-  type UseCalendarAppReturn,
-  type ICalendarApp,
+import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
+import { CalendarApp } from '@dayflow/core';
+import type {
+  CalendarAppConfig,
+  UseCalendarAppReturn,
+  ICalendarApp,
 } from '@dayflow/core';
 
 export function useCalendarApp(

@@ -1,15 +1,14 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
+import esbuild from 'rollup-plugin-esbuild';
 import svelte from 'rollup-plugin-svelte';
 import sveltePreprocess from 'svelte-preprocess';
-import terser from '@rollup/plugin-terser';
 
-export default {
+const createConfig = (ssr) => ({
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.js',
+      file: ssr ? 'dist/index.ssr.js' : 'dist/index.js',
       format: 'es',
       sourcemap: true,
     },
@@ -18,21 +17,26 @@ export default {
     svelte({
       preprocess: sveltePreprocess(),
       emitCss: false,
+      compilerOptions: {
+        generate: ssr ? 'server' : 'client',
+      },
     }),
     resolve({
-      browser: true,
+      browser: !ssr,
       dedupe: ['svelte'],
       extensions: ['.mjs', '.js', '.ts', '.svelte'],
     }),
-    typescript({
-      tsconfig: './tsconfig.json',
-      declaration: true,
-      declarationDir: 'dist',
+    esbuild({
+      sourceMap: true,
+      minify: false,
+      target: 'esnext',
+      loaders: {
+        '.ts': 'ts',
+      },
     }),
     commonjs(),
-    terser(),
   ],
-  external: id =>
+  external: (id) =>
     id === 'svelte' || id.startsWith('svelte/') || id === '@dayflow/core',
   onwarn(warning, warn) {
     if (
@@ -44,4 +48,6 @@ export default {
     }
     warn(warning);
   },
-};
+});
+
+export default [createConfig(false), createConfig(true)];
