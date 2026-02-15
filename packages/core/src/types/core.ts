@@ -42,6 +42,8 @@ export interface CalendarView {
   config?: Record<string, unknown>;
 }
 
+export type RangeChangeReason = 'initial' | 'navigation' | 'viewChange';
+
 /**
  * Calendar callbacks interface
  * Defines calendar event callback functions
@@ -54,6 +56,11 @@ export interface CalendarCallbacks {
   onDateChange?: (date: Date) => void | Promise<void>;
   onRender?: () => void | Promise<void>;
   onVisibleMonthChange?: (date: Date) => void | Promise<void>;
+  onVisibleRangeChange?: (
+    start: Date,
+    end: Date,
+    reason: RangeChangeReason
+  ) => void | Promise<void>;
   onCalendarUpdate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarCreate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarDelete?: (calendarId: string) => void | Promise<void>;
@@ -232,6 +239,11 @@ export interface ICalendarApp {
   mergeCalendars: (sourceId: string, targetId: string) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
+  emitVisibleRange: (
+    start: Date,
+    end: Date,
+    reason?: RangeChangeReason
+  ) => void;
 
   // Plugin management
   getPlugin: <T = unknown>(name: string) => T | undefined;
@@ -303,6 +315,11 @@ export interface UseCalendarAppReturn {
   highlightEvent: (eventId: string | null) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
+  emitVisibleRange: (
+    start: Date,
+    end: Date,
+    reason?: RangeChangeReason
+  ) => void;
   sidebarConfig: SidebarConfig;
   readOnlyConfig: ReadOnlyConfig;
 }

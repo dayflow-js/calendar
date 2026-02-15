@@ -11,6 +11,7 @@ import {
   MobileEventRenderer,
   ReadOnlyConfig,
   TNode,
+  RangeChangeReason,
 } from '../types';
 import { Event } from '../types';
 import {
@@ -22,6 +23,7 @@ import { normalizeCssWidth } from '../utils/styleUtils';
 import { ThemeMode } from '../types/calendarTypes';
 import { isValidLocale } from '../locale/utils';
 import { isDeepEqual } from '../utils/helpers';
+import { getWeekRange } from '../utils/dateRangeUtils';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
 
@@ -126,6 +128,8 @@ export class CalendarApp implements ICalendarApp {
     config.plugins?.forEach(plugin => {
       this.installPlugin(plugin);
     });
+
+    this.handleVisibleRangeChange('initial');
   }
 
   private resolveLocale(locale?: string | any): string | any {
@@ -210,6 +214,7 @@ export class CalendarApp implements ICalendarApp {
     this.state.currentView = view;
     this.state.highlightedEventId = null;
     this.callbacks.onViewChange?.(view);
+    this.handleVisibleRangeChange('viewChange');
     this.notify();
   };
 
@@ -223,11 +228,79 @@ export class CalendarApp implements ICalendarApp {
     return view;
   };
 
+  emitVisibleRange = (
+    start: Date,
+    end: Date,
+    reason: RangeChangeReason = 'navigation'
+  ): void => {
+    this.callbacks.onVisibleRangeChange?.(
+      new Date(start),
+      new Date(end),
+      reason
+    );
+  };
+
+  handleVisibleRangeChange = (reason: RangeChangeReason): void => {
+    const view = this.state.views.get(this.state.currentView);
+    switch (view?.type) {
+      case ViewType.DAY: {
+        const start = new Date(this.state.currentDate);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(start);
+        end.setDate(end.getDate() + 1);
+
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
+      case ViewType.WEEK: {
+        const { monday } = getWeekRange(this.state.currentDate);
+        const start = new Date(monday);
+        const end = new Date(monday);
+        end.setDate(end.getDate() + 7);
+
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
+      case ViewType.MONTH: {
+        if (reason === 'navigation') {
+          // ignore, MonthView emits itself, based on vscroll position
+          break;
+        }
+
+        const firstDayOfMonth = new Date(
+          this.state.currentDate.getFullYear(),
+          this.state.currentDate.getMonth(),
+          1
+        );
+        const { monday } = getWeekRange(firstDayOfMonth);
+        const start = new Date(monday);
+
+        const end = new Date(monday);
+        end.setDate(end.getDate() + 42);
+
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
+      case ViewType.YEAR: {
+        const start = new Date(this.state.currentDate.getFullYear(), 0, 1);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(this.state.currentDate.getFullYear(), 11, 31);
+        end.setDate(end.getDate() + 1);
+
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
+    }
+  };
+
   // Date management
   setCurrentDate = (date: Date): void => {
     this.state.currentDate = new Date(date);
     this.callbacks.onDateChange?.(this.state.currentDate);
     this.setVisibleMonth(this.state.currentDate);
+    this.handleVisibleRangeChange('navigation');
     this.notify();
   };
 
