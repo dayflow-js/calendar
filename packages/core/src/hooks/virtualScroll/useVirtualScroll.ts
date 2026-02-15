@@ -236,7 +236,7 @@ export const useVirtualScroll = ({
 
   // References
   const scrollElementRef = useRef<HTMLDivElement | null>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastScrollTime = useRef(0);
   const lastScrollTop = useRef(0);
   const previousYearHeightRef = useRef(yearHeight);

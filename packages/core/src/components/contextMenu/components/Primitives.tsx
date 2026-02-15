@@ -1,4 +1,4 @@
-import { h, Fragment, cloneElement, isValidElement } from 'preact';
+import { h, cloneElement, isValidElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { createPortal, forwardRef } from 'preact/compat';
 import { ChevronRight } from '../../common/Icons';
@@ -161,7 +161,7 @@ interface ContextMenuSubProps {
 
 export const ContextMenuSub: any = ({ children }: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {

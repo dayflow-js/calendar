@@ -33,7 +33,7 @@ export const TimePickerWheel = ({
   // Refs for scrolling to initial position and handling scroll stop
   const hourRef = useRef<HTMLDivElement>(null);
   const minRef = useRef<HTMLDivElement>(null);
-  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (hourRef.current) {

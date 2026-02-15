@@ -60,9 +60,9 @@ interface WeekComponentProps {
   calendarRef: any;
   onEventUpdate: (updatedEvent: Event) => void;
   onEventDelete: (eventId: string) => void;
-  onMoveStart?: (e: any | any, event: Event) => void;
-  onCreateStart?: (e: any | any, targetDate: Date) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onMoveStart?: (e: any, event: Event) => void;
+  onCreateStart?: (e: any, targetDate: Date) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
   onDetailPanelOpen: () => void;
   onMoreEventsClick?: (date: Date) => void;
   onChangeView?: (view: ViewType) => void;
@@ -311,9 +311,13 @@ const WeekComponent = memo(
   }: WeekComponentProps) => {
     const { t, locale } = useLocale();
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
-    const hideTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const hideTitleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
 
-    const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
     const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
     const [contextMenu, setContextMenu] = useState<{
       x: number;

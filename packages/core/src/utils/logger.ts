@@ -9,7 +9,8 @@ class Logger {
   private isDevelopment: boolean;
 
   constructor() {
-    this.isDevelopment = process.env.NODE_ENV !== 'production';
+    this.isDevelopment =
+      (globalThis as any).process?.env?.NODE_ENV !== 'production';
   }
 
   private formatMessage(

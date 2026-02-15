@@ -168,7 +168,7 @@ export const useVirtualMonthScroll = ({
 
   // References and cache
   const scrollElementRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const weekDataCache = useRef(new WeekDataCache());
   const lastScrollTime = useRef(0);
   const lastScrollTop = useRef(0);

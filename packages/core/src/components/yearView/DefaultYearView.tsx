@@ -14,6 +14,7 @@ import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
+  YearViewConfig,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import ViewHeader from '@/components/common/ViewHeader';
@@ -31,8 +32,7 @@ export interface YearViewProps {
   calendarRef: any;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  //TOOD: eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config?: any;
+  config?: YearViewConfig;
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
   detailPanelEventId?: string | null;
@@ -182,7 +182,7 @@ export const DefaultYearView = ({
 
   // Handle double click on cell - create all-day or timed event based on config
   const handleCellDoubleClick = useCallback(
-    (e: any | any, date: Date) => {
+    (e: any, date: Date) => {
       if (showTimedEvents) {
         // Use default drag behavior for timed events
         handleCreateStart?.(e, date);

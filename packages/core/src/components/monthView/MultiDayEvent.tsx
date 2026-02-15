@@ -40,8 +40,8 @@ interface MultiDayEventProps {
   isDragging: boolean;
   isResizing?: boolean;
   isSelected?: boolean;
-  onMoveStart: (e: any | any, event: Event) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onMoveStart: (e: any, event: Event) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
   onEventLongPress?: (eventId: string) => void;
   isMobile?: boolean;
   isDraggable?: boolean;
@@ -117,7 +117,9 @@ export const MultiDayEvent = memo(
     };
 
     // Long press handling
-    const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
     const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
     const handleTouchStart = (e: any) => {

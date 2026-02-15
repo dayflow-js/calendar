@@ -6,8 +6,7 @@ import {
   useRef,
 } from 'preact/hooks';
 import { formatTime, extractHourFromDate } from '@/utils';
-import { useLocale } from '@/locale';
-import { Event, DayViewProps, ViewType } from '@/types';
+import { Event, DayViewProps } from '@/types';
 import { EventLayoutCalculator } from '@/components/eventLayout';
 import { useDragForView } from '@/plugins/dragPlugin';
 import { ViewType as DragViewType } from '@/types';
@@ -109,7 +108,7 @@ const DayView = ({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
-  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentDate = app.getCurrentDate();
   const visibleMonthDate = app.getVisibleMonth();

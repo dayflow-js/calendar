@@ -106,7 +106,7 @@ const WeekView = ({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
-  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // References
   const allDayRowRef = useRef<HTMLDivElement>(null);

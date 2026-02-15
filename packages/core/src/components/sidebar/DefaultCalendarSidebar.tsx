@@ -219,7 +219,6 @@ const DefaultCalendarSidebar = ({
     if (contextMenu) {
       const calendar = calendars.find(c => c.id === contextMenu.calendarId);
       if (calendar) {
-        // TODO s unused
         const { l, h } = hexToHsl(calendar.colors.lineColor);
         // Calculate slider position from lightness
         const sliderValue = lightnessToSliderValue(l);
