@@ -301,6 +301,7 @@ const MonthView = ({
     virtualData,
     weeksData,
     scrollElementRef,
+    isNavigating,
     handleScroll,
     handlePreviousMonth,
     handleNextMonth,
@@ -367,10 +368,18 @@ const MonthView = ({
   }, [effectiveStartIndex, weekHeight]);
 
   const initialLoadRef = useRef(true);
+  const pendingNavigation = useRef(false);
   const debouncedDisplayStartIndex = useDebouncedValue(
     virtualData.displayStartIndex,
     250
   );
+
+  useEffect(() => {
+    if (isNavigating) {
+      pendingNavigation.current = true;
+      return;
+    }
+  }, [isNavigating]);
 
   useEffect(() => {
     if (initialLoadRef.current) {
@@ -387,7 +396,13 @@ const MonthView = ({
     const end = new Date(start);
     end.setDate(end.getDate() + 42 + 7); // visible month + buffer for partial scroll
 
-    app.emitVisibleRange(start, end, 'navigation');
+    app.emitVisibleRange(
+      start,
+      end,
+      pendingNavigation.current ? 'navigation' : 'scroll'
+    );
+
+    pendingNavigation.current = false;
   }, [app, weeksData, debouncedDisplayStartIndex]);
 
   const bottomSpacerHeight = useMemo(() => {

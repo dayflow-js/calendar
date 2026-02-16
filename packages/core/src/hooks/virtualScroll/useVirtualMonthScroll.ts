@@ -700,6 +700,7 @@ export const useVirtualMonthScroll = ({
     currentMonth,
     currentYear,
     isScrolling,
+    isNavigating,
     virtualData,
     scrollElementRef,
     handleScroll,

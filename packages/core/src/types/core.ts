@@ -42,7 +42,11 @@ export interface CalendarView {
   config?: Record<string, unknown>;
 }
 
-export type RangeChangeReason = 'initial' | 'navigation' | 'viewChange';
+export type RangeChangeReason =
+  | 'initial'
+  | 'navigation'
+  | 'viewChange'
+  | 'scroll';
 
 /**
  * Calendar callbacks interface
@@ -55,6 +59,9 @@ export interface CalendarCallbacks {
   onEventDelete?: (eventId: string) => void | Promise<void>;
   onDateChange?: (date: Date) => void | Promise<void>;
   onRender?: () => void | Promise<void>;
+  /**
+   * @deprecated This method is retained for backward compatibility and will be removed in future releases. Use ``onVisibleRangeChange`` instead.
+   */
   onVisibleMonthChange?: (date: Date) => void | Promise<void>;
   onVisibleRangeChange?: (
     start: Date,
