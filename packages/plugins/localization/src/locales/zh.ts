@@ -1,4 +1,4 @@
-import type { Locale } from '../types';
+import type { Locale } from '@dayflow/core';
 
 const zh: Locale = {
   code: 'zh-CN',

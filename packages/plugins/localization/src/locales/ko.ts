@@ -1,4 +1,4 @@
-import type { Locale } from '../types';
+import type { Locale } from '@dayflow/core';
 
 const ko: Locale = {
   code: 'ko-KR',

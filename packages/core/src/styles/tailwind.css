@@ -235,14 +235,14 @@ body {
 }
 
 /* Hide scrollbar but allow scrolling */
-/*.scrollbar-hide::-webkit-scrollbar {*/
-/*  display: none;*/
-/*}*/
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
-/*.scrollbar-hide {*/
-/*  -ms-overflow-style: none; !* IE and Edge *!*/
-/*  scrollbar-width: none; !* Firefox *!*/
-/*}*/
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
 /* Custom 2px scrollbar */
 ::-webkit-scrollbar {
