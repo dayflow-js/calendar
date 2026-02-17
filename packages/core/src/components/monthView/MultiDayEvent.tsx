@@ -47,6 +47,7 @@ interface MultiDayEventProps {
   isDraggable?: boolean;
   isEditable?: boolean;
   viewable?: boolean;
+  isPopping?: boolean;
 }
 
 const ROW_HEIGHT = 16;
@@ -81,6 +82,7 @@ export const MultiDayEvent = memo(
     isDraggable = true,
     isEditable = true,
     viewable = true,
+    isPopping,
   }: MultiDayEventProps) => {
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
@@ -316,6 +318,9 @@ export const MultiDayEvent = memo(
           borderRadius: getBorderRadius(segment.segmentType),
           pointerEvents: 'auto',
           zIndex: 10,
+          transform: isPopping ? 'scale(1.02)' : 'scale(1)',
+          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          willChange: 'transform',
           ...(isSelected || isDragging || isPressed
             ? {
                 backgroundColor: getSelectedBgColor(calendarId),

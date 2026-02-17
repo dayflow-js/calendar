@@ -159,11 +159,24 @@ const CalendarEvent = ({
   // --- Style Calculation (Internal due to state dependencies) ---
   const calculateEventStyle = () => {
     if (isMonthView) {
+      if (isMultiDay && segment) {
+        // MultiDayEvent handles its own scaling and positioning.
+        // Applying transform here would create a containing block, breaking absolute positioning.
+        return {
+          opacity: 1,
+          zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
+          cursor: isDraggable
+            ? 'pointer'
+            : canOpenDetail
+              ? 'pointer'
+              : 'default',
+        };
+      }
       return {
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
-        transform: isPopping ? 'scale(1.15)' : undefined,
-        transition: 'transform 0.1s ease-in-out',
+        transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
     }
@@ -173,8 +186,8 @@ const CalendarEvent = ({
         height: `${allDayHeight - 4}px`,
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
-        transform: isPopping ? 'scale(1.12)' : undefined,
-        transition: 'transform 0.1s ease-in-out',
+        transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
 
@@ -234,8 +247,8 @@ const CalendarEvent = ({
       position: 'absolute' as const,
       opacity: 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
-      transform: isPopping ? 'scale(1.12)' : undefined,
-      transition: 'transform 0.1s ease-in-out',
+      transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+      transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
       cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
     };
 
@@ -593,6 +606,20 @@ const CalendarEvent = ({
     }
   }, [showDetailPanel, detailPanelPosition, updatePanelPosition, isMobile]);
 
+  // --- Highlight effect ---
+  useEffect(() => {
+    if (app?.state.highlightedEventId === event.id) {
+      setIsPopping(true);
+      const timer = setTimeout(() => {
+        setIsPopping(false);
+      }, 300);
+      return () => {
+        clearTimeout(timer);
+        setIsPopping(false);
+      };
+    }
+  }, [app?.state.highlightedEventId, event.id]);
+
   // --- Helpers ---
   const scrollEventToCenter = (): Promise<void> => {
     return new Promise(resolve => {
@@ -819,6 +846,7 @@ const CalendarEvent = ({
             isDraggable={isDraggable}
             isEditable={isEditable}
             viewable={canOpenDetail}
+            isPopping={isPopping}
           />
         );
       } else {

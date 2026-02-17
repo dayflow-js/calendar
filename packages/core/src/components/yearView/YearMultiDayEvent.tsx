@@ -71,6 +71,21 @@ export const YearMultiDayEvent = ({
     x: number;
     y: number;
   } | null>(null);
+  const [isPopping, setIsPopping] = useState(false);
+
+  // --- Highlight effect ---
+  useEffect(() => {
+    if (app?.state.highlightedEventId === event.id) {
+      setIsPopping(true);
+      const timer = setTimeout(() => {
+        setIsPopping(false);
+      }, 300);
+      return () => {
+        clearTimeout(timer);
+        setIsPopping(false);
+      };
+    }
+  }, [app?.state.highlightedEventId, event.id]);
 
   // Use segment.id to uniquely identify which segment's panel should be shown
   // This prevents multiple panels from showing for multi-month events
@@ -499,6 +514,8 @@ export const YearMultiDayEvent = ({
           width: `calc(${widthPercent}% - ${HORIZONTAL_MARGIN * 2}px)`,
           pointerEvents: isDragging ? 'none' : 'auto',
           borderRadius: getBorderRadius(),
+          transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+          transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
         data-segment-days={segmentDays}
         data-event-id={event.id}
