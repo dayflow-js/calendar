@@ -34,7 +34,6 @@ import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
 import { getCalendarColorsForHex } from '../core/calendarRegistry';
 import { generateUniKey } from '../utils/helpers';
 import { temporalToDate, dateToZonedDateTime } from '../utils/temporal';
-import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
 
@@ -134,29 +133,49 @@ export const CalendarRoot = ({
     null
   );
 
+  useEffect(() => {
+    // Sync local selectedEventId with app state
+    const unsubscribe = app.subscribe(appInstance => {
+      if (appInstance.state.selectedEventId !== selectedEventId) {
+        setSelectedEventId(appInstance.state.selectedEventId || null);
+      }
+    });
+    return unsubscribe;
+  }, [app, selectedEventId]);
+
+  // Handle Dismiss UI signal from app
+  useEffect(() => {
+    const originalCallbacks = (app as any).callbacks;
+    const prevDismiss = originalCallbacks.onDismissUI;
+    
+    originalCallbacks.onDismissUI = () => {
+      if (detailPanelEventId) {
+        setDetailPanelEventId(null);
+      }
+      if (isMobileDrawerOpen) {
+        setIsMobileDrawerOpen(false);
+      }
+      prevDismiss?.();
+    };
+
+    return () => {
+      originalCallbacks.onDismissUI = prevDismiss;
+    };
+  }, [app, detailPanelEventId, isMobileDrawerOpen]);
+
   const handleDateSelect = useCallback(
     (date: Date) => {
       app.setCurrentDate(date);
-      setSelectedEventId(null);
+      app.selectEvent(null);
     },
     [app]
   );
 
-  useKeyboardShortcuts({
-    app,
-    selectedEventId,
-    setSelectedEventId,
-    detailPanelEventId,
-    setDetailPanelEventId,
-    isDrawerOpen: isMobileDrawerOpen,
-    setIsDrawerOpen: setIsMobileDrawerOpen,
-  });
-
   useEffect(() => {
     if (app.state.highlightedEventId) {
-      setSelectedEventId(app.state.highlightedEventId);
+      app.selectEvent(app.state.highlightedEventId);
     }
-  }, [app.state.highlightedEventId]);
+  }, [app.state.highlightedEventId, app]);
 
   const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
 
@@ -402,7 +421,7 @@ export const CalendarRoot = ({
     calendarRef,
     meta,
     selectedEventId,
-    onEventSelect: setSelectedEventId,
+    onEventSelect: (id: string | null) => app.selectEvent(id),
     onDateChange: handleDateSelect,
     detailPanelEventId,
     onDetailPanelToggle: setDetailPanelEventId,

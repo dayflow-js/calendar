@@ -63,6 +63,7 @@ export interface CalendarCallbacks {
   ) => void | Promise<void>;
   onEventClick?: (event: Event) => void | Promise<void>;
   onMoreEventsClick?: (date: Date) => void | Promise<void>;
+  onDismissUI?: () => void | Promise<void>;
 }
 
 export interface CreateCalendarDialogProps {
@@ -170,6 +171,7 @@ export interface CalendarAppState {
   sidebar?: SidebarConfig;
   locale: string | Locale;
   highlightedEventId?: string | null;
+  selectedEventId?: string | null;
   readOnly: boolean | ReadOnlyConfig;
 }
 
@@ -218,6 +220,7 @@ export interface ICalendarApp {
   onEventClick: (event: Event) => void;
   onMoreEventsClick: (date: Date) => void;
   highlightEvent: (eventId: string | null) => void;
+  selectEvent: (eventId: string | null) => void;
   getCalendars: () => CalendarType[];
   reorderCalendars: (fromIndex: number, toIndex: number) => void;
   setCalendarVisibility: (calendarId: string, visible: boolean) => void;
@@ -232,6 +235,9 @@ export interface ICalendarApp {
   mergeCalendars: (sourceId: string, targetId: string) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
+
+  // UI Signals
+  dismissUI: () => void;
 
   // Plugin management
   getPlugin: <T = unknown>(name: string) => T | undefined;

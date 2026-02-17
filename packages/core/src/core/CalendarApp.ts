@@ -93,6 +93,7 @@ export class CalendarApp implements ICalendarApp {
       views: new Map(),
       locale: this.resolveLocale(config.locale),
       highlightedEventId: null,
+      selectedEventId: null,
       readOnly: config.readOnly || false,
     };
 
@@ -475,6 +476,19 @@ export class CalendarApp implements ICalendarApp {
     if (this.state.highlightedEventId === eventId) return;
     this.state.highlightedEventId = eventId;
     this.callbacks.onRender?.();
+    this.notify();
+  };
+
+  selectEvent = (eventId: string | null): void => {
+    if (this.state.selectedEventId === eventId) return;
+    this.state.selectedEventId = eventId;
+    this.callbacks.onRender?.();
+    this.notify();
+  };
+
+  dismissUI = (): void => {
+    this.callbacks.onDismissUI?.();
+    // Also notify listeners so components can react to UI dismiss signal if they prefer
     this.notify();
   };
 
