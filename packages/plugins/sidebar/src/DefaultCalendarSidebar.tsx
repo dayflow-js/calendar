@@ -1,7 +1,6 @@
 import { useCallback, useState, useRef } from 'preact/hooks';
 import {
   createPortal,
-  CalendarSidebarRenderProps,
   Event,
   ContextMenu,
   ContextMenuItem,
@@ -23,6 +22,7 @@ import {
   hexToHsl,
   lightnessToSliderValue,
 } from '@dayflow/blossom-color-picker';
+import type { CalendarSidebarRenderProps } from './plugin';
 import { SidebarHeader } from './components/SidebarHeader';
 import { CalendarList } from './components/CalendarList';
 import { MergeMenuItem } from './components/MergeMenuItem';
@@ -442,36 +442,45 @@ const DefaultCalendarSidebar = ({
           onClose={handleCloseContextMenu}
           className="w-64 p-2"
         >
-          {renderCalendarContextMenu ? (
-            renderCalendarContextMenu(
-              calendars.find(c => c.id === contextMenu.calendarId)!,
-              handleCloseContextMenu
-            )
-          ) : (
-            <>
-              <ContextMenuLabel>{t('calendarOptions')}</ContextMenuLabel>
-              <MergeMenuItem
-                calendars={calendars}
-                currentCalendarId={contextMenu.calendarId}
-                onMergeSelect={handleMergeSelect}
-              />
-              <ContextMenuItem onClick={handleDeleteCalendar}>
-                {t('delete')}
-              </ContextMenuItem>
-              <ContextMenuItem onClick={handleExportCalendar}>
-                {t('exportCalendar') || 'Export Calendar'}
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuColorPicker
-                selectedColor={
-                  calendars.find(c => c.id === contextMenu.calendarId)?.colors
-                    .lineColor
-                }
-                onSelect={handleColorSelect}
-                onCustomColor={handleCustomColor}
-              />
-            </>
-          )}
+          <ContentSlot
+            generatorName="calendarContextMenu"
+            generatorArgs={{
+              calendar: calendars.find(c => c.id === contextMenu.calendarId)!,
+              onClose: handleCloseContextMenu,
+            }}
+            defaultContent={
+              renderCalendarContextMenu ? (
+                renderCalendarContextMenu(
+                  calendars.find(c => c.id === contextMenu.calendarId)!,
+                  handleCloseContextMenu
+                )
+              ) : (
+                <>
+                  <ContextMenuLabel>{t('calendarOptions')}</ContextMenuLabel>
+                  <MergeMenuItem
+                    calendars={calendars}
+                    currentCalendarId={contextMenu.calendarId}
+                    onMergeSelect={handleMergeSelect}
+                  />
+                  <ContextMenuItem onClick={handleDeleteCalendar}>
+                    {t('delete')}
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={handleExportCalendar}>
+                    {t('exportCalendar') || 'Export Calendar'}
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuColorPicker
+                    selectedColor={
+                      calendars.find(c => c.id === contextMenu.calendarId)?.colors
+                        .lineColor
+                    }
+                    onSelect={handleColorSelect}
+                    onCustomColor={handleCustomColor}
+                  />
+                </>
+              )
+            }
+          />
         </ContextMenu>
       )}
 

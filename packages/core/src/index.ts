@@ -25,6 +25,8 @@ export * from './factories';
 // Plugins
 export { createEventsPlugin } from './plugins/eventsPlugin';
 export { registerDragImplementation, useDragForView } from './plugins/dragBridge';
+export { registerSidebarImplementation, useSidebarBridge } from './plugins/sidebarBridge';
+export type { SidebarBridgeReturn } from './plugins/sidebarBridge';
 
 // Context Menu Primitives
 export {
@@ -42,6 +44,7 @@ export { getCalendarColorsForHex } from './core/calendarRegistry';
 export { BlossomColorPicker } from './components/common/BlossomColorPicker';
 export { DefaultColorPicker } from './components/common/DefaultColorPicker';
 export { MiniCalendar } from './components/common/MiniCalendar';
+export { CreateCalendarDialog } from './components/common/CreateCalendarDialog';
 export { ContentSlot } from './renderer/ContentSlot';
 
 // Icons

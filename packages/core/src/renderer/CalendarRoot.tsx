@@ -2,7 +2,6 @@ import { h, Fragment } from 'preact';
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useContext,
@@ -12,41 +11,25 @@ import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
-  CalendarSidebarRenderProps,
-  CalendarType,
   TNode,
 } from '../types';
 import DefaultEventDetailDialog from '../components/common/DefaultEventDetailDialog';
 import CalendarHeader from '../components/common/CalendarHeader';
-import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
 import SearchDrawer from '../components/search/SearchDrawer';
 import MobileSearchDialog from '../components/search/MobileSearchDialog';
 import { QuickCreateEventPopup } from '../components/common/QuickCreateEventPopup';
 import { MobileEventDrawer } from '../components/mobileEventDrawer';
 import { CalendarSearchProps, CalendarSearchEvent } from '../types/search';
-import { normalizeCssWidth } from '../utils/styleUtils';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { ThemeMode } from '../types/calendarTypes';
 import { LocaleProvider } from '../locale/LocaleProvider';
 import { useLocale } from '../locale/useLocale';
 import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
-import { getCalendarColorsForHex } from '../core/calendarRegistry';
 import { generateUniKey } from '../utils/helpers';
 import { temporalToDate, dateToZonedDateTime } from '../utils/temporal';
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
-
-const DEFAULT_SIDEBAR_WIDTH = '240px';
-
-const COLORS = [
-  '#ea426b',
-  '#f19a38',
-  '#f7cf46',
-  '#83d754',
-  '#51aaf2',
-  '#b672d0',
-  '#957e5e',
-];
+import { useSidebarBridge } from '../plugins/sidebarBridge';
 
 interface CalendarRootProps {
   app: ICalendarApp;
@@ -107,18 +90,8 @@ export const CalendarRoot = ({
 
   const currentView = app.getCurrentView();
   const ViewComponent = currentView.component;
-  const sidebarConfig = app.getSidebarConfig();
-  const sidebarEnabled = sidebarConfig?.enabled ?? false;
-  const [sidebarVersion, setSidebarVersion] = useState(0);
-  const [isCollapsed, setIsCollapsed] = useState(
-    sidebarConfig?.initialCollapsed ?? false
-  );
-  const { t } = useLocale();
 
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingCalendarId, setEditingCalendarId] = useState<string | null>(
-    null
-  );
+  const sidebar = useSidebarBridge(app);
 
   const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
   const quickCreateAnchorRef = useRef<HTMLElement>(null);
@@ -146,7 +119,7 @@ export const CalendarRoot = ({
   useEffect(() => {
     const originalCallbacks = (app as any).callbacks;
     const prevDismiss = originalCallbacks.onDismissUI;
-    
+
     originalCallbacks.onDismissUI = () => {
       if (detailPanelEventId) {
         setDetailPanelEventId(null);
@@ -290,10 +263,6 @@ export const CalendarRoot = ({
   };
 
   useEffect(() => {
-    setIsCollapsed(sidebarConfig?.initialCollapsed ?? false);
-  }, [sidebarConfig?.initialCollapsed]);
-
-  useEffect(() => {
     const unsubscribe = app.subscribeThemeChange(newTheme => {
       setTheme(newTheme);
     });
@@ -310,64 +279,10 @@ export const CalendarRoot = ({
     [app]
   );
 
-  const refreshSidebar = useCallback(() => {
-    setSidebarVersion(prev => prev + 1);
-  }, []);
-
-  const calendars = useMemo(
-    () => app.getCalendars(),
-    [app, sidebarVersion, tick]
-  );
-
-  const handleToggleCalendarVisibility = useCallback(
-    (calendarId: string, visible: boolean) => {
-      app.setCalendarVisibility(calendarId, visible);
-      refreshSidebar();
-    },
-    [app, refreshSidebar]
-  );
-
-  const handleToggleAllCalendars = useCallback(
-    (visible: boolean) => {
-      app.setAllCalendarsVisibility(visible);
-      refreshSidebar();
-    },
-    [app, refreshSidebar]
-  );
-
-  const handleCreateCalendar = useCallback(() => {
-    const createMode = sidebarConfig.createCalendarMode || 'inline';
-
-    if (createMode === 'modal') {
-      setShowCreateDialog(true);
-      return;
-    }
-
-    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const { colors, darkColors } = getCalendarColorsForHex(randomColor);
-    const newId = generateUniKey();
-
-    const newCalendar: CalendarType = {
-      id: newId,
-      name: t('untitled'),
-      colors,
-      darkColors,
-      isVisible: true,
-      isDefault: false,
-    };
-
-    app.createCalendar(newCalendar);
-    setEditingCalendarId(newId);
-    refreshSidebar();
-  }, [app, sidebarConfig.createCalendarMode, t, refreshSidebar]);
-
   const handleAddButtonClick = useCallback(
     (e: any) => {
       const isEditable = !app.state.readOnly;
-      if (!isEditable) {
-        if (sidebarEnabled) return;
-        return;
-      }
+      if (!isEditable) return;
 
       if (isMobile) {
         const now = new Date();
@@ -391,18 +306,14 @@ export const CalendarRoot = ({
         return;
       }
 
-      if (sidebarEnabled) {
-        if (isQuickCreateOpen) {
-          setIsQuickCreateOpen(false);
-        } else {
-          (quickCreateAnchorRef as any).current = e.currentTarget;
-          setIsQuickCreateOpen(true);
-        }
+      if (isQuickCreateOpen) {
+        setIsQuickCreateOpen(false);
       } else {
-        handleCreateCalendar();
+        (quickCreateAnchorRef as any).current = e.currentTarget;
+        setIsQuickCreateOpen(true);
       }
     },
-    [sidebarEnabled, isMobile, isQuickCreateOpen, handleCreateCalendar, app]
+    [isMobile, isQuickCreateOpen, app]
   );
 
   const calendarRef = useRef<HTMLDivElement>(null!);
@@ -426,42 +337,17 @@ export const CalendarRoot = ({
     onDetailPanelToggle: setDetailPanelEventId,
   };
 
-  const sidebarProps: CalendarSidebarRenderProps = {
-    app: app,
-    calendars,
-    toggleCalendarVisibility: handleToggleCalendarVisibility,
-    toggleAll: handleToggleAllCalendars,
-    isCollapsed,
-    setCollapsed: setIsCollapsed,
-    renderCalendarContextMenu: sidebarConfig.renderCalendarContextMenu,
-    createCalendarMode: sidebarConfig.createCalendarMode,
-    renderCreateCalendarDialog: sidebarConfig.renderCreateCalendarDialog,
-    editingCalendarId,
-    setEditingCalendarId,
-    onCreateCalendar: handleCreateCalendar,
-    colorPickerMode: sidebarConfig.colorPickerMode,
-  };
+  const miniSidebarWidth =
+    collapsedSafeAreaLeft != null ? '0px' : sidebar.miniWidth;
 
-  const renderSidebarContent = () => {
-    if (!sidebarEnabled) return null;
-
-    if (sidebarConfig.render) {
-      return sidebarConfig.render(sidebarProps);
-    }
-
-    return null;
-  };
-
-  const sidebarWidth = normalizeCssWidth(
-    sidebarConfig?.width,
-    DEFAULT_SIDEBAR_WIDTH
-  );
-  const miniSidebarWidth = collapsedSafeAreaLeft != null ? '0px' : '50px';
+  console.log('miniSidebarWidth', miniSidebarWidth, sidebar.miniWidth);
 
   const headerConfig = app.getCalendarHeaderConfig();
 
   const safeAreaLeft =
-    collapsedSafeAreaLeft != null && isCollapsed ? collapsedSafeAreaLeft : 0;
+    collapsedSafeAreaLeft != null && sidebar.isCollapsed
+      ? collapsedSafeAreaLeft
+      : sidebar.safeAreaLeft;
 
   const headerProps = {
     calendar: app,
@@ -500,37 +386,37 @@ export const CalendarRoot = ({
             store={customRenderingStore}
             generatorName="titleBarSlot"
             generatorArgs={{
-              isCollapsed,
-              toggleCollapsed: () => setIsCollapsed(prev => !prev),
+              isCollapsed: sidebar.isCollapsed,
+              toggleCollapsed: sidebar.toggleCollapsed,
             }}
             defaultContent={
               titleBarSlot &&
               (typeof titleBarSlot === 'function'
                 ? titleBarSlot({
-                    isCollapsed,
-                    toggleCollapsed: () => setIsCollapsed(prev => !prev),
+                    isCollapsed: sidebar.isCollapsed,
+                    toggleCollapsed: sidebar.toggleCollapsed,
                   })
                 : titleBarSlot)
             }
           />
-          {sidebarEnabled && (
+          {sidebar.enabled && (
             <aside
               className={`absolute top-0 bottom-0 left-0 z-0 h-full`}
               style={{
-                width: sidebarWidth,
+                width: sidebar.width,
               }}
             >
-              {renderSidebarContent()}
+              {sidebar.content}
             </aside>
           )}
 
           <div
-            className={`flex flex-col flex-1 h-full overflow-hidden relative z-10 bg-white dark:bg-gray-900 transition-all duration-250 ease-in-out border-l ${isCollapsed ? 'border-gray-200 dark:border-gray-700 shadow-xl' : 'border-transparent'}`}
+            className={`flex flex-col flex-1 h-full overflow-hidden relative z-10 bg-white dark:bg-gray-900 transition-all duration-250 ease-in-out border-l ${sidebar.isCollapsed ? 'border-gray-200 dark:border-gray-700 shadow-xl' : 'border-transparent'}`}
             style={{
-              marginLeft: sidebarEnabled
-                ? isCollapsed
+              marginLeft: sidebar.enabled
+                ? sidebar.isCollapsed
                   ? miniSidebarWidth
-                  : sidebarWidth
+                  : sidebar.width
                 : 0,
             }}
           >
@@ -596,44 +482,7 @@ export const CalendarRoot = ({
             app={app}
           />
 
-          {showCreateDialog && (
-            <ContentSlot
-              store={customRenderingStore}
-              generatorName="createCalendarDialog"
-              generatorArgs={{
-                onClose: () => setShowCreateDialog(false),
-                onCreate: (newCalendar: any) => {
-                  app.createCalendar(newCalendar);
-                  setShowCreateDialog(false);
-                  refreshSidebar();
-                },
-                colorPickerMode: sidebarConfig.colorPickerMode,
-              }}
-              defaultContent={
-                sidebarConfig.renderCreateCalendarDialog ? (
-                  sidebarConfig.renderCreateCalendarDialog({
-                    onClose: () => setShowCreateDialog(false),
-                    onCreate: (newCalendar: any) => {
-                      app.createCalendar(newCalendar);
-                      setShowCreateDialog(false);
-                      refreshSidebar();
-                    },
-                    colorPickerMode: sidebarConfig.colorPickerMode,
-                  })
-                ) : (
-                  <CreateCalendarDialog
-                    onClose={() => setShowCreateDialog(false)}
-                    onCreate={newCalendar => {
-                      app.createCalendar(newCalendar);
-                      setShowCreateDialog(false);
-                      refreshSidebar();
-                    }}
-                    colorPickerMode={sidebarConfig.colorPickerMode}
-                  />
-                )
-              }
-            />
-          )}
+          {sidebar.extraContent}
         </div>
       </CalendarInternalLocaleProvider>
     </ThemeProvider>

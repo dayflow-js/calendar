@@ -6,7 +6,7 @@ import {
   CalendarView,
   ViewType,
   CalendarCallbacks,
-  SidebarConfig,
+
   CalendarType,
   MobileEventRenderer,
   ReadOnlyConfig,
@@ -18,60 +18,15 @@ import {
   setDefaultCalendarRegistry,
 } from './calendarRegistry';
 import { logger } from '../utils/logger';
-import { normalizeCssWidth } from '../utils/styleUtils';
+
 import { ThemeMode } from '../types/calendarTypes';
 import { isValidLocale } from '../locale/utils';
 import { isDeepEqual } from '../utils/helpers';
-
-const DEFAULT_SIDEBAR_WIDTH = '240px';
-
-const resolveSidebarConfig = (
-  input?: boolean | SidebarConfig
-): SidebarConfig => {
-  if (!input) {
-    return {
-      enabled: false,
-      width: DEFAULT_SIDEBAR_WIDTH,
-      initialCollapsed: false,
-    };
-  }
-
-  if (input === true) {
-    return {
-      enabled: true,
-      width: DEFAULT_SIDEBAR_WIDTH,
-      initialCollapsed: false,
-    };
-  }
-
-  const {
-    enabled = true,
-    width,
-    initialCollapsed = false,
-    render,
-    createCalendarMode,
-    renderCalendarContextMenu,
-    renderCreateCalendarDialog,
-    colorPickerMode,
-  } = input;
-
-  return {
-    enabled,
-    width: normalizeCssWidth(width, DEFAULT_SIDEBAR_WIDTH),
-    initialCollapsed,
-    render,
-    createCalendarMode,
-    renderCalendarContextMenu,
-    renderCreateCalendarDialog,
-    colorPickerMode,
-  };
-};
 
 export class CalendarApp implements ICalendarApp {
   public state: CalendarAppState;
   private callbacks: CalendarCallbacks;
   private calendarRegistry: CalendarRegistry;
-  private sidebarConfig: SidebarConfig;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
   private useCalendarHeader: boolean | ((props: any) => TNode);
@@ -110,8 +65,6 @@ export class CalendarApp implements ICalendarApp {
 
     setDefaultCalendarRegistry(this.calendarRegistry);
 
-    this.sidebarConfig = resolveSidebarConfig(config.useSidebar);
-    this.state.sidebar = this.sidebarConfig;
     const current = this.state.currentDate;
     this.visibleMonth = new Date(current.getFullYear(), current.getMonth(), 1);
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
@@ -590,10 +543,6 @@ export class CalendarApp implements ICalendarApp {
     this.notify();
   };
 
-  getSidebarConfig = (): SidebarConfig => {
-    return this.sidebarConfig;
-  };
-
   getCalendarHeaderConfig = (): boolean | ((props: any) => TNode) => {
     return this.useCalendarHeader;
   };
@@ -705,19 +654,6 @@ export class CalendarApp implements ICalendarApp {
     ) {
       this.setTheme(config.theme.mode);
       // setTheme already triggers re-render via onRender callback
-    }
-    if (config.useSidebar !== undefined) {
-      // Merge with existing config to preserve plugin-set fields (like render)
-      let mergedInput = config.useSidebar;
-      if (typeof mergedInput === 'object' && mergedInput !== null) {
-        mergedInput = { ...this.sidebarConfig, ...mergedInput };
-      }
-      const newSidebarConfig = resolveSidebarConfig(mergedInput);
-      if (!isDeepEqual(newSidebarConfig, this.sidebarConfig)) {
-        this.sidebarConfig = newSidebarConfig;
-        this.state.sidebar = this.sidebarConfig;
-        hasChanged = true;
-      }
     }
     if (
       config.switcherMode !== undefined &&

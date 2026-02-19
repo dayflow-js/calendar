@@ -11,7 +11,6 @@ import {
   UseCalendarAppReturn,
   ViewType,
   CalendarType,
-  SidebarConfig,
   ReadOnlyConfig,
 } from '../types';
 import { Event } from '../types';
@@ -31,10 +30,6 @@ export function useCalendarApp(
     app.state.currentDate
   );
   const [events, setEvents] = useState<Event[]>(app.getEvents());
-  const [sidebarConfig, setSidebarConfigState] = useState<SidebarConfig>(
-    app.getSidebarConfig()
-  );
-
   // Component re-render trigger
   const [, forceUpdate] = useState({});
   const updateTimerRef = useRef<number | null>(null);
@@ -147,12 +142,6 @@ export function useCalendarApp(
     app.undo = () => {
       originalUndo();
       setEvents([...app.getEvents()]);
-    };
-
-    const originalTriggerRender = app.triggerRender;
-    app.triggerRender = () => {
-      originalTriggerRender();
-      setSidebarConfigState(app.getSidebarConfig());
     };
 
     return () => {
@@ -296,7 +285,6 @@ export function useCalendarApp(
     highlightEvent: (eventId: string | null) => app.highlightEvent(eventId),
     setVisibleMonth: (date: Date) => app.setVisibleMonth(date),
     getVisibleMonth: () => app.getVisibleMonth(),
-    sidebarConfig,
     readOnlyConfig: app.getReadOnlyConfig(),
   };
 }
