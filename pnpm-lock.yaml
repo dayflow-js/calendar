@@ -8,9 +8,15 @@ importers:
 
   .:
     devDependencies:
+      '@dayflow/plugin-keyboard-shortcuts':
+        specifier: workspace:*
+        version: link:packages/plugins/keyboard-shortcuts
+      '@dayflow/plugin-sidebar':
+        specifier: workspace:*
+        version: link:packages/plugins/sidebar
       '@preact/preset-vite':
         specifier: ^2.10.3
-        version: 2.10.3(@babel/core@7.29.0)(preact@10.28.3)(rollup@4.57.1)(vite@5.4.21(@types/node@22.19.11)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))
+        version: 2.10.3(@babel/core@7.29.0)(preact@10.28.3)(rollup@4.57.1)(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))
       '@tailwindcss/postcss':
         specifier: ^4.1.18
         version: 4.1.18
@@ -63,8 +69,8 @@ importers:
         specifier: ^18.2.0
         version: 18.2.14(@angular/common@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/compiler@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10)))(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(@angular/platform-browser@18.2.14(@angular/common@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10))(rxjs@7.8.2))(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10)))
       '@dayflow/core':
-        specifier: workspace:*
-        version: link:../core
+        specifier: ^3.0.1
+        version: 3.0.1
       ng-packagr:
         specifier: ^18.2.1
         version: 18.2.1(@angular/compiler-cli@18.2.14(@angular/compiler@18.2.14(@angular/core@18.2.14(rxjs@7.8.2)(zone.js@0.14.10)))(typescript@5.5.4))(tailwindcss@4.1.18)(tslib@2.8.1)(typescript@5.5.4)
@@ -152,7 +158,7 @@ importers:
         version: 3.8.1
       rimraf:
         specifier: ^6.1.2
-        version: 6.1.2
+        version: 6.1.3
       rollup:
         specifier: ^4.29.1
         version: 4.57.1
@@ -181,11 +187,122 @@ importers:
         specifier: ^5.4.20
         version: 5.4.21(@types/node@22.19.11)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
 
-  packages/react:
+  packages/plugins/drag:
     devDependencies:
       '@dayflow/core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../../core
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.2
+        version: 28.0.9(rollup@4.57.1)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.0
+        version: 16.0.3(rollup@4.57.1)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.2
+        version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
+      rollup:
+        specifier: ^4.29.1
+        version: 4.57.1
+      rollup-plugin-dts:
+        specifier: ^6.3.0
+        version: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
+      temporal-polyfill:
+        specifier: ^0.3.0
+        version: 0.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  packages/plugins/keyboard-shortcuts:
+    devDependencies:
+      '@dayflow/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.2
+        version: 28.0.9(rollup@4.57.1)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.0
+        version: 16.0.3(rollup@4.57.1)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.2
+        version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
+      rollup:
+        specifier: ^4.29.1
+        version: 4.57.1
+      rollup-plugin-dts:
+        specifier: ^6.3.0
+        version: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
+      temporal-polyfill:
+        specifier: ^0.3.0
+        version: 0.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  packages/plugins/localization:
+    devDependencies:
+      '@dayflow/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.2
+        version: 28.0.9(rollup@4.57.1)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.0
+        version: 16.0.3(rollup@4.57.1)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.2
+        version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
+      rollup:
+        specifier: ^4.29.1
+        version: 4.57.1
+      rollup-plugin-dts:
+        specifier: ^6.3.0
+        version: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  packages/plugins/sidebar:
+    devDependencies:
+      '@dayflow/blossom-color-picker':
+        specifier: ^2.0.1
+        version: 2.0.1
+      '@dayflow/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.2
+        version: 28.0.9(rollup@4.57.1)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.0
+        version: 16.0.3(rollup@4.57.1)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.2
+        version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
+      preact:
+        specifier: ^10.25.4
+        version: 10.28.3
+      rollup:
+        specifier: ^4.29.1
+        version: 4.57.1
+      rollup-plugin-dts:
+        specifier: ^6.3.0
+        version: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
+      temporal-polyfill:
+        specifier: ^0.3.0
+        version: 0.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  packages/react:
+    devDependencies:
+      '@dayflow/core':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@rollup/plugin-commonjs':
         specifier: ^28.0.2
         version: 28.0.9(rollup@4.57.1)
@@ -223,8 +340,8 @@ importers:
   packages/svelte:
     devDependencies:
       '@dayflow/core':
-        specifier: workspace:*
-        version: link:../core
+        specifier: ^3.0.1
+        version: 3.0.1
       '@rollup/plugin-commonjs':
         specifier: ^28.0.2
         version: 28.0.9(rollup@4.57.1)
@@ -239,7 +356,7 @@ importers:
         version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
       '@tsconfig/svelte':
         specifier: ^5.0.4
-        version: 5.0.7
+        version: 5.0.8
       esbuild:
         specifier: ^0.27.3
         version: 0.27.3
@@ -251,16 +368,16 @@ importers:
         version: 6.2.1(esbuild@0.27.3)(rollup@4.57.1)
       rollup-plugin-svelte:
         specifier: ^7.2.2
-        version: 7.2.3(rollup@4.57.1)(svelte@5.51.1)
+        version: 7.2.3(rollup@4.57.1)(svelte@5.51.2)
       svelte:
         specifier: ^5.0.0
-        version: 5.51.1
+        version: 5.51.2
       svelte-check:
         specifier: ^4.1.1
-        version: 4.4.0(picomatch@4.0.3)(svelte@5.51.1)(typescript@5.9.3)
+        version: 4.4.0(picomatch@4.0.3)(svelte@5.51.2)(typescript@5.9.3)
       svelte-preprocess:
         specifier: ^6.0.3
-        version: 6.0.3(@babel/core@7.29.0)(less@4.5.1)(postcss-load-config@3.1.4(postcss@8.5.6))(postcss@8.5.6)(sass@1.97.3)(svelte@5.51.1)(typescript@5.9.3)
+        version: 6.0.3(@babel/core@7.29.0)(less@4.5.1)(postcss-load-config@3.1.4(postcss@8.5.6))(postcss@8.5.6)(sass@1.97.3)(svelte@5.51.2)(typescript@5.9.3)
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -268,8 +385,8 @@ importers:
   packages/vue:
     devDependencies:
       '@dayflow/core':
-        specifier: workspace:*
-        version: link:../core
+        specifier: ^3.0.1
+        version: 3.0.1
       '@rollup/plugin-commonjs':
         specifier: ^28.0.2
         version: 28.0.9(rollup@4.57.1)
@@ -556,6 +673,9 @@ packages:
 
   '@dayflow/blossom-color-picker@2.0.1':
     resolution: {integrity: sha512-Ez+8bwXI1aOj4QT8f35I5gDkzRZmVYSS+8GYAZSjWzNKnVq2WaM6Bhm9b//QhWdB/wzWltmqCkEuwTIaPXRqig==}
+
+  '@dayflow/core@3.0.1':
+    resolution: {integrity: sha512-YXfKNFMpOdwo1MQRhXh6/NdFNCyLmSN+ww8JmZH3j9H7K4q0McjtEhm5J9qqB3h5ESI1iv6Rz0/kfSolcX8GBw==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -1658,8 +1778,8 @@ packages:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
 
-  '@tsconfig/svelte@5.0.7':
-    resolution: {integrity: sha512-NOtJF9LQnV7k6bpzcXwL/rXdlFHvAT9e0imrftiMc6/+FUNBHRZ8UngDrM+jciA6ENzFYNoFs8rfwumuGF+Dhw==}
+  '@tsconfig/svelte@5.0.8':
+    resolution: {integrity: sha512-UkNnw1/oFEfecR8ypyHIQuWYdkPvHiwcQ78sh+ymIiYoF+uc5H1UBetbjyqT+vgGJ3qQN6nhucJviX6HesWtKQ==}
 
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
@@ -1702,6 +1822,9 @@ packages:
 
   '@types/node@22.19.11':
     resolution: {integrity: sha512-BH7YwL6rA93ReqeQS1c4bsPpcfOmJasG+Fkr6Y59q83f9M1WcBRHR2vM+P9eOisYRcN3ujQoiZY8uk5W+1WL8w==}
+
+  '@types/node@25.3.0':
+    resolution: {integrity: sha512-4K3bqJpXpqfg2XKGK9bpDTc6xO/xoUP/RBWS7AtRMug6zZFaRekiLzjVtAoZMquxoAbzBvy5nxQ7veS5eYzf8A==}
 
   '@types/prop-types@15.7.15':
     resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
@@ -1992,8 +2115,8 @@ packages:
   caniuse-api@3.0.0:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
 
-  caniuse-lite@1.0.30001769:
-    resolution: {integrity: sha512-BCfFL1sHijQlBGWBMuJyhZUhzo7wer5sVj9hqekB/7xn0Ypy+pER/edCYQm4exbXj4WiySGp40P8UuTh6w1srg==}
+  caniuse-lite@1.0.30001770:
+    resolution: {integrity: sha512-x/2CLQ1jHENRbHg5PSId2sXq1CIO1CISvwWAj027ltMVG2UNgW+w9oH2+HzgEIRFembL8bUlXtfbBHR1fCg2xw==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -2527,8 +2650,8 @@ packages:
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
-  glob@13.0.3:
-    resolution: {integrity: sha512-/g3B0mC+4x724v1TgtBlBtt2hPi/EWptsIAmXUx9Z2rvBYleQcsrmaOzd5LyL50jf/Soi83ZDJmw2+XqvH/EeA==}
+  glob@13.0.4:
+    resolution: {integrity: sha512-KACie1EOs9BIOMtenFaxwmYODWA3/fTfGSUnLhMJpXRntu1g+uL/Xvub5f8SCTppvo9q62Qy4LeOoUiaL54G5A==}
     engines: {node: 20 || >=22}
 
   glob@7.2.3:
@@ -3198,8 +3321,8 @@ packages:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
 
-  minimatch@10.2.0:
-    resolution: {integrity: sha512-ugkC31VaVg9cF0DFVoADH12k6061zNZkZON+aX8AWsR9GhPcErkcMBceb6znR8wLERM2AkkOxy2nWRLpT9Jq5w==}
+  minimatch@10.2.1:
+    resolution: {integrity: sha512-MClCe8IL5nRRmawL6ib/eT4oLyeKMGCghibcDWK+J0hh0Q8kqSdia6BvbRMVk6mPa6WqUa5uR2oxt6C5jd533A==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.2:
@@ -3807,8 +3930,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rimraf@6.1.2:
-    resolution: {integrity: sha512-cFCkPslJv7BAXJsYlK1dZsbP8/ZNLkCAQ0bi1hf5EKX2QHegmDFEFA6QhuYJlk7UDdc+02JjO80YSOrWPpw06g==}
+  rimraf@6.1.3:
+    resolution: {integrity: sha512-LKg+Cr2ZF61fkcaK1UdkH2yEBBKnYjTyWzTJT6KNPcSPaiT7HSdhtMXQuN5wkTX0Xu72KQ1l8S42rlmexS2hSA==}
     engines: {node: 20 || >=22}
     hasBin: true
 
@@ -4127,8 +4250,8 @@ packages:
       typescript:
         optional: true
 
-  svelte@5.51.1:
-    resolution: {integrity: sha512-r8r6p+NFC2ckAkxW4lqpGs1AZWBi5Y+TbJMmAglqSbokN5UWkDsKKkybfGBKXd8yYMri7KJ2L78fO9SO+NOelA==}
+  svelte@5.51.2:
+    resolution: {integrity: sha512-AqApqNOxVS97V4Ko9UHTHeSuDJrwauJhZpLDs1gYD8Jk48ntCSWD7NxKje+fnGn5Ja1O3u2FzQZHPdifQjXe3w==}
     engines: {node: '>=18'}
 
   svgo@2.8.0:
@@ -4274,6 +4397,9 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
   unique-filename@3.0.0:
     resolution: {integrity: sha512-afXhuC55wkAmZ0P18QsVE6kp8JaxrEokN2HGIoIVv2ijHQd419H0+6EigAFcIzXeMIkcIkNBpB3L/DXB3cTS/g==}
@@ -4774,6 +4900,13 @@ snapshots:
   '@bcoe/v8-coverage@0.2.3': {}
 
   '@dayflow/blossom-color-picker@2.0.1': {}
+
+  '@dayflow/core@3.0.1':
+    dependencies:
+      '@dayflow/blossom-color-picker': 2.0.1
+      preact: 10.28.3
+      temporal-polyfill: 0.3.0
+      tslib: 2.8.1
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
@@ -5370,6 +5503,23 @@ snapshots:
       - rollup
       - supports-color
 
+  '@preact/preset-vite@2.10.3(@babel/core@7.29.0)(preact@10.28.3)(rollup@4.57.1)(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))':
+    dependencies:
+      '@babel/core': 7.29.0
+      '@babel/plugin-transform-react-jsx': 7.28.6(@babel/core@7.29.0)
+      '@babel/plugin-transform-react-jsx-development': 7.27.1(@babel/core@7.29.0)
+      '@prefresh/vite': 2.4.11(preact@10.28.3)(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))
+      '@rollup/pluginutils': 5.3.0(rollup@4.57.1)
+      babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.29.0)
+      debug: 4.4.3
+      picocolors: 1.1.1
+      vite: 5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
+      vite-prerender-plugin: 0.5.12(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))
+    transitivePeerDependencies:
+      - preact
+      - rollup
+      - supports-color
+
   '@prefresh/babel-plugin@0.5.2': {}
 
   '@prefresh/core@1.5.9(preact@10.28.3)':
@@ -5387,6 +5537,18 @@ snapshots:
       '@rollup/pluginutils': 4.2.1
       preact: 10.28.3
       vite: 5.4.21(@types/node@22.19.11)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@prefresh/vite@2.4.11(preact@10.28.3)(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0))':
+    dependencies:
+      '@babel/core': 7.29.0
+      '@prefresh/babel-plugin': 0.5.2
+      '@prefresh/core': 1.5.9(preact@10.28.3)
+      '@prefresh/utils': 1.2.1
+      '@rollup/pluginutils': 4.2.1
+      preact: 10.28.3
+      vite: 5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -5655,7 +5817,7 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
-  '@tsconfig/svelte@5.0.7': {}
+  '@tsconfig/svelte@5.0.8': {}
 
   '@types/aria-query@5.0.4': {}
 
@@ -5712,6 +5874,11 @@ snapshots:
   '@types/node@22.19.11':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/node@25.3.0':
+    dependencies:
+      undici-types: 7.18.2
+    optional: true
 
   '@types/prop-types@15.7.15': {}
 
@@ -5898,7 +6065,7 @@ snapshots:
   autoprefixer@10.4.24(postcss@8.5.6):
     dependencies:
       browserslist: 4.28.1
-      caniuse-lite: 1.0.30001769
+      caniuse-lite: 1.0.30001770
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.6
@@ -6009,7 +6176,7 @@ snapshots:
   browserslist@4.28.1:
     dependencies:
       baseline-browser-mapping: 2.9.19
-      caniuse-lite: 1.0.30001769
+      caniuse-lite: 1.0.30001770
       electron-to-chromium: 1.5.286
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -6070,11 +6237,11 @@ snapshots:
   caniuse-api@3.0.0:
     dependencies:
       browserslist: 4.28.1
-      caniuse-lite: 1.0.30001769
+      caniuse-lite: 1.0.30001770
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
 
-  caniuse-lite@1.0.30001769: {}
+  caniuse-lite@1.0.30001770: {}
 
   chalk@4.1.2:
     dependencies:
@@ -6707,9 +6874,9 @@ snapshots:
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
 
-  glob@13.0.3:
+  glob@13.0.4:
     dependencies:
-      minimatch: 10.2.0
+      minimatch: 10.2.1
       minipass: 7.1.2
       path-scurry: 2.0.1
 
@@ -7536,7 +7703,7 @@ snapshots:
 
   min-indent@1.0.1: {}
 
-  minimatch@10.2.0:
+  minimatch@10.2.1:
     dependencies:
       brace-expansion: 5.0.2
 
@@ -8117,9 +8284,9 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rimraf@6.1.2:
+  rimraf@6.1.3:
     dependencies:
-      glob: 13.0.3
+      glob: 13.0.4
       package-json-from-dist: 1.0.1
 
   rollup-plugin-dts@6.3.0(rollup@4.57.1)(typescript@5.9.3):
@@ -8164,12 +8331,12 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  rollup-plugin-svelte@7.2.3(rollup@4.57.1)(svelte@5.51.1):
+  rollup-plugin-svelte@7.2.3(rollup@4.57.1)(svelte@5.51.2):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       resolve.exports: 2.0.3
       rollup: 4.57.1
-      svelte: 5.51.1
+      svelte: 5.51.2
 
   rollup-plugin-visualizer@6.0.5(rollup@4.57.1):
     dependencies:
@@ -8436,21 +8603,21 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@4.4.0(picomatch@4.0.3)(svelte@5.51.1)(typescript@5.9.3):
+  svelte-check@4.4.0(picomatch@4.0.3)(svelte@5.51.2)(typescript@5.9.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       chokidar: 4.0.3
       fdir: 6.5.0(picomatch@4.0.3)
       picocolors: 1.1.1
       sade: 1.8.1
-      svelte: 5.51.1
+      svelte: 5.51.2
       typescript: 5.9.3
     transitivePeerDependencies:
       - picomatch
 
-  svelte-preprocess@6.0.3(@babel/core@7.29.0)(less@4.5.1)(postcss-load-config@3.1.4(postcss@8.5.6))(postcss@8.5.6)(sass@1.97.3)(svelte@5.51.1)(typescript@5.9.3):
+  svelte-preprocess@6.0.3(@babel/core@7.29.0)(less@4.5.1)(postcss-load-config@3.1.4(postcss@8.5.6))(postcss@8.5.6)(sass@1.97.3)(svelte@5.51.2)(typescript@5.9.3):
     dependencies:
-      svelte: 5.51.1
+      svelte: 5.51.2
     optionalDependencies:
       '@babel/core': 7.29.0
       less: 4.5.1
@@ -8459,7 +8626,7 @@ snapshots:
       sass: 1.97.3
       typescript: 5.9.3
 
-  svelte@5.51.1:
+  svelte@5.51.2:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -8603,6 +8770,9 @@ snapshots:
 
   undici-types@6.21.0: {}
 
+  undici-types@7.18.2:
+    optional: true
+
   unique-filename@3.0.0:
     dependencies:
       unique-slug: 4.0.0
@@ -8647,6 +8817,16 @@ snapshots:
       stack-trace: 1.0.0-pre2
       vite: 5.4.21(@types/node@22.19.11)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
 
+  vite-prerender-plugin@0.5.12(vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)):
+    dependencies:
+      kolorist: 1.8.0
+      magic-string: 0.30.21
+      node-html-parser: 6.1.13
+      simple-code-frame: 1.3.0
+      source-map: 0.7.6
+      stack-trace: 1.0.0-pre2
+      vite: 5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0)
+
   vite@5.4.21(@types/node@22.19.11)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0):
     dependencies:
       esbuild: 0.21.5
@@ -8654,6 +8834,19 @@ snapshots:
       rollup: 4.57.1
     optionalDependencies:
       '@types/node': 22.19.11
+      fsevents: 2.3.3
+      less: 4.5.1
+      lightningcss: 1.30.2
+      sass: 1.97.3
+      terser: 5.46.0
+
+  vite@5.4.21(@types/node@25.3.0)(less@4.5.1)(lightningcss@1.30.2)(sass@1.97.3)(terser@5.46.0):
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.5.6
+      rollup: 4.57.1
+    optionalDependencies:
+      '@types/node': 25.3.0
       fsevents: 2.3.3
       less: 4.5.1
       lightningcss: 1.30.2

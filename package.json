@@ -24,7 +24,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.1.18",
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "@dayflow/plugin-keyboard-shortcuts": "workspace:*",
+    "@dayflow/plugin-sidebar": "workspace:*"
   },
   "packageManager": "pnpm@9.15.0"
 }

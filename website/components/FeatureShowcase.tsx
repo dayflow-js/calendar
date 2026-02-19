@@ -18,9 +18,9 @@ import {
   createMonthView,
   createWeekView,
   createDayView,
-  createDragPlugin,
   ViewType,
 } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import {
   Event,
   EventDetailContentRenderer,
