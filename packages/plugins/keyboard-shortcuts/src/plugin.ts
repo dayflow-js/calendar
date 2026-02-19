@@ -114,7 +114,7 @@ export function createKeyboardShortcutsPlugin(
         }
 
         // 6. Clipboard & Undo Operations (Cmd/Ctrl + C/X/V/Z)
-        if (e.metaKey || e.ctrlKey) {
+        if ((e.metaKey || e.ctrlKey) && !isTyping) {
           const undoKey = keyMap.undo || 'z';
           const copyKey = keyMap.copy || 'c';
           const cutKey = keyMap.cut || 'x';
@@ -260,30 +260,42 @@ function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
 
   let visibleEvents: Event[] = [];
 
-  if (currentView === ViewType.DAY) {
-    visibleEvents = events.filter(e => {
-      const s = temporalToDate(e.start);
-      return s.toDateString() === currentDate.toDateString();
-    });
-  } else if (currentView === ViewType.WEEK) {
-    const { monday: start, sunday: end } = getWeekRange(currentDate);
-    visibleEvents = events.filter(e => {
-      const s = temporalToDate(e.start);
-      return s >= start && s <= end;
-    });
-  } else if (currentView === ViewType.MONTH) {
-    const visibleMonth = app.getVisibleMonth();
-    const start = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
-    const end = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0);
-    visibleEvents = events.filter(e => {
-      const s = temporalToDate(e.start);
-      return s >= start && s <= end;
-    });
-  } else if (currentView === ViewType.YEAR) {
-    const year = currentDate.getFullYear();
-    visibleEvents = events.filter(e => {
-      return temporalToDate(e.start).getFullYear() === year;
-    });
+  switch (currentView) {
+    case ViewType.DAY: {
+      visibleEvents = events.filter(e => {
+        const s = temporalToDate(e.start);
+        return s.toDateString() === currentDate.toDateString();
+      });
+      break;
+    }
+    case ViewType.WEEK: {
+      const { monday: start, sunday: end } = getWeekRange(currentDate);
+      visibleEvents = events.filter(e => {
+        const s = temporalToDate(e.start);
+        return s >= start && s <= end;
+      });
+      break;
+    }
+    case ViewType.MONTH: {
+      const visibleMonth = app.getVisibleMonth();
+      const start = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+      const end = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0);
+      visibleEvents = events.filter(e => {
+        const s = temporalToDate(e.start);
+        return s >= start && s <= end;
+      });
+      break;
+    }
+    case ViewType.YEAR: {
+      const year = currentDate.getFullYear();
+      const yearConfig = app.getViewConfig(ViewType.YEAR);
+      const showTimedEvents = (yearConfig as any).showTimedEventsInYearView ?? false;
+      visibleEvents = events.filter(e => {
+        if (!showTimedEvents && !e.allDay) return false;
+        return temporalToDate(e.start).getFullYear() === year;
+      });
+      break;
+    }
   }
 
   visibleEvents.sort((a, b) => {

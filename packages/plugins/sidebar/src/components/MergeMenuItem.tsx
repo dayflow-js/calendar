@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
-import { ChevronRight } from '../../common/Icons';
-import { CalendarType } from '../../../types';
-import { useLocale } from '@/locale';
+import {
+  createPortal,
+  ChevronRight,
+  CalendarType,
+  useLocale,
+} from '@dayflow/core';
 
 interface MergeMenuItemProps {
   calendars: CalendarType[];
@@ -67,6 +69,7 @@ export const MergeMenuItem = ({
         createPortal(
           <div
             ref={submenuRef}
+            data-submenu-content="true"
             className="fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-slate-800 dark:bg-slate-950 animate-in fade-in-0 zoom-in-95 duration-100"
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}

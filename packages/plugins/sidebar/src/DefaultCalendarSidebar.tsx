@@ -1,25 +1,30 @@
-import { useCallback, useEffect, useState, useRef } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
-import { CalendarSidebarRenderProps, Event } from '../../types';
+import { useCallback, useState, useRef } from 'preact/hooks';
 import {
+  createPortal,
+  CalendarSidebarRenderProps,
+  Event,
   ContextMenu,
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuLabel,
   ContextMenuColorPicker,
-} from '@/components/contextMenu';
-import { getCalendarColorsForHex } from '../../core/calendarRegistry';
-import { BlossomColorPicker } from '../common/BlossomColorPicker';
+  getCalendarColorsForHex,
+  BlossomColorPicker,
+  ContentSlot,
+  DefaultColorPicker,
+  MiniCalendar,
+  useLocale,
+  sidebarContainer,
+  importICSFile,
+  downloadICS,
+  generateUniKey,
+} from '@dayflow/core';
 import {
   hexToHsl,
   lightnessToSliderValue,
 } from '@dayflow/blossom-color-picker';
-import { ContentSlot } from '../../renderer/ContentSlot';
-import { DefaultColorPicker } from '../common/DefaultColorPicker';
-// common component
 import { SidebarHeader } from './components/SidebarHeader';
 import { CalendarList } from './components/CalendarList';
-import { MiniCalendar } from '../common/MiniCalendar';
 import { MergeMenuItem } from './components/MergeMenuItem';
 import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
@@ -27,10 +32,6 @@ import {
   ImportCalendarDialog,
   NEW_CALENDAR_ID,
 } from './components/ImportCalendarDialog';
-import { useLocale } from '@/locale';
-import { sidebarContainer } from '@/styles/classNames';
-import { importICSFile, downloadICS } from '@/utils/ics';
-import { generateUniKey } from '@/utils/utilityFunctions';
 
 const DefaultCalendarSidebar = ({
   app,
@@ -45,9 +46,6 @@ const DefaultCalendarSidebar = ({
   colorPickerMode = 'default',
 }: CalendarSidebarRenderProps) => {
   const { t } = useLocale();
-  const visibleMonthDate = app.getVisibleMonth();
-  const visibleYear = visibleMonthDate.getFullYear();
-  const visibleMonthIndex = visibleMonthDate.getMonth();
 
   const [localEditingCalendarId, setLocalEditingCalendarId] = useState<
     string | null
@@ -62,30 +60,11 @@ const DefaultCalendarSidebar = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
-  // Visible Month State
-  const [visibleMonth, setVisibleMonth] = useState<Date>(() => {
-    return new Date(visibleYear, visibleMonthIndex, 1);
-  });
-
-  useEffect(() => {
-    setVisibleMonth(prev => {
-      if (
-        prev.getFullYear() === visibleYear &&
-        prev.getMonth() === visibleMonthIndex
-      ) {
-        return prev;
-      }
-      return new Date(visibleYear, visibleMonthIndex, 1);
-    });
-  }, [visibleYear, visibleMonthIndex]);
-
   const handleMonthChange = useCallback(
     (offset: number) => {
-      setVisibleMonth(prev => {
-        const next = new Date(prev.getFullYear(), prev.getMonth() + offset, 1);
-        app.setVisibleMonth(next);
-        return next;
-      });
+      const current = app.getVisibleMonth();
+      const next = new Date(current.getFullYear(), current.getMonth() + offset, 1);
+      app.setVisibleMonth(next);
     },
     [app]
   );

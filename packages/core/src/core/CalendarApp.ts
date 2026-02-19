@@ -198,8 +198,11 @@ export class CalendarApp implements ICalendarApp {
    */
   private isInternalEditable = (): boolean => {
     if (this.state.readOnly === true) return false;
-    if (typeof this.state.readOnly === 'object') return false;
-    return true;
+    if (typeof this.state.readOnly === 'object') {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   // View management
@@ -704,7 +707,12 @@ export class CalendarApp implements ICalendarApp {
       // setTheme already triggers re-render via onRender callback
     }
     if (config.useSidebar !== undefined) {
-      const newSidebarConfig = resolveSidebarConfig(config.useSidebar);
+      // Merge with existing config to preserve plugin-set fields (like render)
+      let mergedInput = config.useSidebar;
+      if (typeof mergedInput === 'object' && mergedInput !== null) {
+        mergedInput = { ...this.sidebarConfig, ...mergedInput };
+      }
+      const newSidebarConfig = resolveSidebarConfig(mergedInput);
       if (!isDeepEqual(newSidebarConfig, this.sidebarConfig)) {
         this.sidebarConfig = newSidebarConfig;
         this.state.sidebar = this.sidebarConfig;

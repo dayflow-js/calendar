@@ -16,7 +16,6 @@ import {
   CalendarType,
   TNode,
 } from '../types';
-import DefaultCalendarSidebar from '../components/sidebar/DefaultCalendarSidebar';
 import DefaultEventDetailDialog from '../components/common/DefaultEventDetailDialog';
 import CalendarHeader from '../components/common/CalendarHeader';
 import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
@@ -450,7 +449,7 @@ export const CalendarRoot = ({
       return sidebarConfig.render(sidebarProps);
     }
 
-    return h(DefaultCalendarSidebar, sidebarProps);
+    return null;
   };
 
   const sidebarWidth = normalizeCssWidth(

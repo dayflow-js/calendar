@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
-import { CalendarType } from '../../../types';
+import { CalendarType } from '@dayflow/core';
 
 interface CalendarListProps {
   calendars: CalendarType[];
@@ -41,7 +41,6 @@ export const CalendarList = ({
   const isProcessedRef = useRef(false);
 
   // Drag state
-  const [isDragging, setIsDragging] = useState(false);
   const [draggedCalendarId, setDraggedCalendarId] = useState<string | null>(
     null
   );
@@ -57,7 +56,6 @@ export const CalendarList = ({
         e.preventDefault();
         return;
       }
-      setIsDragging(true);
       setDraggedCalendarId(calendar.id);
 
       // Store calendar data for drop handling
@@ -77,7 +75,6 @@ export const CalendarList = ({
   );
 
   const handleDragEnd = useCallback(() => {
-    setIsDragging(false);
     setDraggedCalendarId(null);
     setDropTarget(null);
   }, []);
@@ -150,10 +147,6 @@ export const CalendarList = ({
     },
     [setEditingId, isEditable]
   );
-
-  const handleRenameChange = useCallback((e: any) => {
-    setEditingName(e.target.value);
-  }, []);
 
   const handleRenameSave = useCallback(() => {
     if (isProcessedRef.current) return;

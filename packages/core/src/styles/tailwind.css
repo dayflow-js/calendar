@@ -5,7 +5,8 @@
 
 /* Force scanning of all relevant source code files to extract utility classes */
 @source "../**/*.{ts,tsx}";
-@source "../../../packages/*/src/**/*.{ts,tsx}";
+@source "../../../core/*/src/**/*.{ts,tsx}";
+@source "../../../plugins/*/src/**/*.{ts,tsx}";
 
 @variant dark (.dark &);
 

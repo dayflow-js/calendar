@@ -1,7 +1,10 @@
 import { useState } from 'preact/hooks';
-import { CalendarType } from '../../../types';
-import { cancelButton } from '@/styles/classNames';
-import { useLocale } from '@/locale';
+import {
+  createPortal,
+  CalendarType,
+  cancelButton,
+  useLocale,
+} from '@dayflow/core';
 
 interface DeleteCalendarDialogProps {
   calendarId: string;
@@ -27,8 +30,8 @@ export const DeleteCalendarDialog = ({
   const [showMergeDropdown, setShowMergeDropdown] = useState(false);
   const { t } = useLocale();
 
-  return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg p-6 shadow-xl bg-background">
         {step === 'initial' ? (
           <>
@@ -43,7 +46,7 @@ export const DeleteCalendarDialog = ({
                 <button
                   type="button"
                   onClick={() => setShowMergeDropdown(!showMergeDropdown)}
-                  className="flex items-center gap-1 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-slate-700"
+                  className="flex items-center gap-1 rounded-md border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-slate-700"
                 >
                   {t('merge')}
                 </button>
@@ -85,7 +88,7 @@ export const DeleteCalendarDialog = ({
                 <button
                   type="button"
                   onClick={() => onStepChange('confirm_delete')}
-                  className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
+                  className="rounded-md bg-destructive px-4 py-2 text-xs font-medium text-destructive-foreground hover:bg-destructive/90"
                 >
                   {t('delete')}
                 </button>
@@ -104,14 +107,14 @@ export const DeleteCalendarDialog = ({
               <button
                 type="button"
                 onClick={onCancel}
-                className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+                className="rounded-md bg-background border border-border px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
               >
                 {t('cancel')}
               </button>
               <button
                 type="button"
                 onClick={onConfirmDelete}
-                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
+                className="rounded-md bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground hover:bg-destructive/90"
               >
                 {t('delete')}
               </button>
@@ -119,6 +122,7 @@ export const DeleteCalendarDialog = ({
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

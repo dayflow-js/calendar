@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
-import { CalendarType } from '../../../types';
-import { cancelButton, calendarPickerDropdown } from '@/styles/classNames';
-import { useLocale } from '@/locale';
-import { Check, ChevronsUpDown } from '../../common/Icons';
+import {
+  createPortal,
+  CalendarType,
+  cancelButton,
+  useLocale,
+  Check,
+  ChevronsUpDown,
+} from '@dayflow/core';
 
 interface ImportCalendarDialogProps {
   calendars: CalendarType[];

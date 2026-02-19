@@ -26,6 +26,47 @@ export * from './factories';
 export { createDragPlugin } from './plugins/dragPlugin';
 export { createEventsPlugin } from './plugins/eventsPlugin';
 
+// Context Menu Primitives
+export {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+  ContextMenuColorPicker,
+} from './components/contextMenu';
+
+// Calendar Registry helpers
+export { getCalendarColorsForHex } from './core/calendarRegistry';
+
+// Common Components
+export { BlossomColorPicker } from './components/common/BlossomColorPicker';
+export { DefaultColorPicker } from './components/common/DefaultColorPicker';
+export { MiniCalendar } from './components/common/MiniCalendar';
+export { ContentSlot } from './renderer/ContentSlot';
+
+// Icons
+export {
+  PanelRightClose,
+  PanelRightOpen,
+  ChevronRight,
+  Check,
+  ChevronsUpDown,
+  Plus,
+} from './components/common/Icons';
+
+// Sidebar classNames
+export {
+  sidebarContainer,
+  sidebarHeader,
+  sidebarHeaderToggle,
+  sidebarHeaderTitle,
+  cancelButton,
+  calendarPickerDropdown,
+} from './styles/classNames';
+
+// Preact interop (re-export so plugins use the same preact instance as core)
+export { createPortal } from 'preact/compat';
+
 // Styles
 import './styles/tailwind.css';
 // Note: consumers should import '@dayflow/core/dist/styles.css'

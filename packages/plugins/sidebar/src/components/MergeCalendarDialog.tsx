@@ -1,6 +1,4 @@
-import { cancelButton } from '@/styles/classNames';
-
-import { useLocale } from '@/locale';
+import { cancelButton, useLocale } from '@dayflow/core';
 
 interface MergeCalendarDialogProps {
   sourceName: string;
@@ -32,7 +30,7 @@ export const MergeCalendarDialog = ({
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
+            className="rounded-md bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground hover:bg-destructive/90"
           >
             {t('merge')}
           </button>
