@@ -7,9 +7,6 @@ const meta: MetaRecord = {
   events: {
     title: '事件',
   },
-  plugins: {
-    title: '插件',
-  },
   views: {
     title: '视图',
   },
@@ -21,9 +18,6 @@ const meta: MetaRecord = {
   },
   'use-calendar-app': {
     title: 'useCalendarApp',
-  },
-  'keyboard-shortcuts': {
-    title: '键盘快捷键',
   },
 };
 

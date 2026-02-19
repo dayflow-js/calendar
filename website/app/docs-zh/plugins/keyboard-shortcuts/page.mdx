@@ -1,0 +1,64 @@
+# 键盘快捷键插件
+
+键盘快捷键 (Keyboard Shortcuts) 插件为日历提供了全局键盘控制功能，支持导航、事件管理和剪贴板操作。
+
+## 安装
+
+安装插件包：
+
+```bash copy
+npm install @dayflow/plugin-keyboard-shortcuts
+```
+
+## 使用方法
+
+```tsx copy
+import { useCalendarApp } from '@dayflow/core';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    // ...
+    plugins: [
+      createKeyboardShortcutsPlugin({
+        // 可选配置
+      })
+    ]
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 默认快捷键
+
+| 操作 | 快捷键 (Mac) | 快捷键 (Windows/Linux) |
+| :--- | :--- | :--- |
+| **跳转到今天** | `Cmd + T` | `Ctrl + T` |
+| **搜索** | `Cmd + F` | `Ctrl + F` |
+| **新建事件** | `Cmd + N` | `Ctrl + N` |
+| **视图导航** | `左箭头` / `右箭头` | `左箭头` / `右箭头` |
+| **循环选择事件** | `Tab` / `Shift + Tab` | `Tab` / `Shift + Tab` |
+| **撤销** | `Cmd + Z` | `Ctrl + Z` |
+| **复制事件** | `Cmd + C` | `Ctrl + C` |
+| **剪切事件** | `Cmd + X` | `Ctrl + X` |
+| **粘贴事件** | `Cmd + V` | `Ctrl + V` |
+| **删除事件** | `Backspace` / `Delete` | `Backspace` / `Delete` |
+| **关闭弹窗/面板** | `Esc` | `Esc` |
+
+## 配置项
+
+您可以自定义按键映射：
+
+```tsx copy
+createKeyboardShortcutsPlugin({
+  keyMap: {
+    today: 't',
+    search: 'f',
+    prev: 'ArrowLeft',
+    next: 'ArrowRight',
+    delete: 'Delete',
+    newEvent: 'n'
+  }
+})
+```

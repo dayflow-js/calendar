@@ -1,0 +1,53 @@
+# 拖拽插件
+
+拖拽插件启用了交互式的事件管理，允许用户直接在日历网格上移动、调整大小和创建事件。
+
+## 安装
+
+拖拽插件目前是 `@dayflow/core` 包的一部分。
+
+```tsx copy
+import { createDragPlugin } from '@dayflow/core';
+```
+
+## 使用方法
+
+```tsx copy
+import { useCalendarApp, createDragPlugin, ViewType } from '@dayflow/core';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+  });
+
+  const calendar = useCalendarApp({
+    // ... 视图配置
+    plugins: [dragPlugin],
+  });
+
+  // ...
+}
+```
+
+## 配置项
+
+| 属性 | 类型 | 默认值 | 描述 |
+| :--- | :--- | :--- | :--- |
+| `enableDrag` | `boolean` | `true` | 是否允许通过拖拽移动事件。 |
+| `enableResize` | `boolean` | `true` | 是否允许通过拖拽调整事件持续时间。 |
+| `enableCreate` | `boolean` | `true` | 是否允许通过双击网格创建事件。 |
+| `enableAllDayCreate` | `boolean` | `true` | 是否允许在全天行通过拖拽创建全天事件。 |
+| `supportedViews` | `ViewType[]` | `[DAY, WEEK, MONTH]` | 启用拖拽功能的视图类型。 |
+
+## 插件 API
+
+您可以访问拖拽服务来动态更新配置：
+
+```tsx copy
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// 动态禁用调整大小功能
+dragService.updateConfig({ enableResize: false });
+```

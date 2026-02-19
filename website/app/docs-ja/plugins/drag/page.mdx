@@ -1,0 +1,53 @@
+# ドラッグ＆ドロップ (Drag & Drop) プラグイン
+
+ドラッグ＆ドロッププラグインは、カレンダーグリッド上で直接イベントを移動、リサイズ、作成できるインタラクティブなイベント管理機能を提供します。
+
+## インストール
+
+ドラッグ＆ドロッププラグインは現在、`@dayflow/core` パッケージに含まれています。
+
+```tsx copy
+import { createDragPlugin } from '@dayflow/core';
+```
+
+## 使い方
+
+```tsx copy
+import { useCalendarApp, createDragPlugin, ViewType } from '@dayflow/core';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+  });
+
+  const calendar = useCalendarApp({
+    // ... ビューの設定
+    plugins: [dragPlugin],
+  });
+
+  // ...
+}
+```
+
+## 設定項目
+
+| プロパティ | 型 | デフォルト値 | 説明 |
+| :--- | :--- | :--- | :--- |
+| `enableDrag` | `boolean` | `true` | ドラッグによるイベントの移動を許可するかどうか。 |
+| `enableResize` | `boolean` | `true` | ドラッグによるイベント期間の変更を許可するかどうか。 |
+| `enableCreate` | `boolean` | `true` | グリッドのダブルクリックによるイベント作成を許可するかどうか。 |
+| `enableAllDayCreate` | `boolean` | `true` | 終日行でのドラッグによる終日イベントの作成を許可するかどうか。 |
+| `supportedViews` | `ViewType[]` | `[DAY, WEEK, MONTH]` | ドラッグ機能が有効になるビューのリスト。 |
+
+## プラグイン API
+
+ドラッグサービスにアクセスして、設定を動的に更新できます：
+
+```tsx copy
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// 動的にリサイズ機能を無効にする
+dragService.updateConfig({ enableResize: false });
+```

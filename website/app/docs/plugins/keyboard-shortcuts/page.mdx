@@ -1,0 +1,72 @@
+# Keyboard Shortcuts Plugin
+
+The Keyboard Shortcuts plugin enables global keyboard controls for navigation, event management, and clipboard operations.
+
+## Installation
+
+Install the plugin package:
+
+```bash copy
+npm install @dayflow/plugin-keyboard-shortcuts
+```
+
+## Usage
+
+```tsx copy
+import { useCalendarApp } from '@dayflow/core';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    // ...
+    plugins: [
+      createKeyboardShortcutsPlugin({
+        // Optional configuration
+      })
+    ]
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Default Shortcuts
+
+| Action | Key (Mac) | Key (Windows/Linux) |
+| :--- | :--- | :--- |
+| **Go to Today** | `Cmd + T` | `Ctrl + T` |
+| **Search** | `Cmd + F` | `Ctrl + F` |
+| **New Event** | `Cmd + N` | `Ctrl + N` |
+| **Navigation** | `ArrowLeft` / `ArrowRight` | `ArrowLeft` / `ArrowRight` |
+| **Tab Through Events** | `Tab` / `Shift + Tab` | `Tab` / `Shift + Tab` |
+| **Undo** | `Cmd + Z` | `Ctrl + Z` |
+| **Copy Event** | `Cmd + C` | `Ctrl + C` |
+| **Cut Event** | `Cmd + X` | `Ctrl + X` |
+| **Paste Event** | `Cmd + V` | `Ctrl + V` |
+| **Delete Event** | `Backspace` / `Delete` | `Backspace` / `Delete` |
+| **Close Dialogs/Panels** | `Esc` | `Esc` |
+
+## Configuration
+
+You can customize the key mappings:
+
+```tsx copy
+createKeyboardShortcutsPlugin({
+  keyMap: {
+    today: 't',
+    search: 'f',
+    prev: 'ArrowLeft',
+    next: 'ArrowRight',
+    delete: 'Delete',
+    newEvent: 'n'
+  }
+})
+```
+
+## Plugin API
+
+You can programmatically trigger UI dismissal:
+
+```tsx copy
+calendar.app.dismissUI();
+```

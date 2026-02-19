@@ -1,0 +1,84 @@
+# サイドバープラグイン
+
+サイドバープラグインは、Day Flow カレンダーにカレンダー管理サイドバーを追加します。日付ナビゲーション用のミニカレンダー、表示切替付きカレンダーリスト、カレンダーの CRUD 操作（作成、名前変更、色変更、統合、削除、インポート/エクスポート）を含みます。
+
+## インストール
+
+プラグインパッケージをインストールします：
+
+```bash copy
+npm install @dayflow/plugin-sidebar
+# or
+pnpm add @dayflow/plugin-sidebar
+```
+
+## 使い方
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [/* ビュー */],
+    plugins: [
+      createSidebarPlugin({
+        // オプション設定
+      })
+    ]
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 設定
+
+| プロパティ | 型 | デフォルト | 説明 |
+| :--- | :--- | :--- | :--- |
+| `width` | `number \| string` | `undefined` | サイドバーの幅（例: `280` または `'20rem'`） |
+| `initialCollapsed` | `boolean` | `false` | サイドバーを折りたたんだ状態で開始するかどうか |
+| `createCalendarMode` | `'inline' \| 'modal'` | `'inline'` | カレンダー作成フォームの表示方法 |
+| `colorPickerMode` | `'blossom' \| 'default'` | `'default'` | 使用するカラーピッカーコンポーネント |
+| `renderCalendarContextMenu` | `(calendar, onClose) => TNode` | `undefined` | カレンダー項目のカスタムコンテキストメニューレンダラー |
+| `renderCreateCalendarDialog` | `(props) => TNode` | `undefined` | カスタムカレンダー作成ダイアログレンダラー |
+
+## 機能
+
+サイドバーには以下の機能が組み込まれています：
+
+- **ミニカレンダー** - 日付の素早いナビゲーション用のコンパクトな月表示
+- **カレンダーリスト** - 色分けされたチェックボックスで個々のカレンダーの表示を切替
+- **カレンダー作成** - カスタム名と色で新しいカレンダーを追加
+- **名前変更 / 色変更** - カレンダーを右クリックして名前や色を変更
+- **カレンダー統合** - あるカレンダーの全イベントを別のカレンダーに移動
+- **カレンダー削除** - 確認ステップ付きでカレンダーを削除（事前に統合も可能）
+- **インポート / エクスポート** - `.ics` ファイルのインポートまたはカレンダーを `.ics` にエクスポート
+
+## カスタムコンテキストメニュー
+
+カレンダー項目のデフォルトの右クリックメニューを置き換えることができます：
+
+```tsx copy
+createSidebarPlugin({
+  renderCalendarContextMenu: (calendar, onClose) => (
+    <div>
+      <button onClick={() => { /* カスタムアクション */ onClose(); }}>
+        {calendar.name} のカスタムアクション
+      </button>
+    </div>
+  )
+})
+```
+
+## カスタムカレンダー作成ダイアログ
+
+デフォルトのカレンダー作成ダイアログを置き換えることができます：
+
+```tsx copy
+createSidebarPlugin({
+  renderCreateCalendarDialog: ({ onSave, onCancel }) => (
+    <MyCustomDialog onSave={onSave} onCancel={onCancel} />
+  )
+})
+```

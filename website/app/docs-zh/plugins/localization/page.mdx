@@ -1,0 +1,86 @@
+# 多语言插件
+
+Localization 插件提供多语言和本地化支持。默认情况下，Day Flow 核心库仅包含英文 (`en-US`) 语言包，以保持最小的包体积。
+
+## 安装
+
+安装多语言插件包：
+
+```bash copy
+npm install @dayflow/plugin-localization
+# 或
+pnpm add @dayflow/plugin-localization
+```
+
+## 使用方法
+
+要启用其他语言支持，请注册插件并提供所需的语言对象。
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { createLocalizationPlugin, zh, ja, fr } from '@dayflow/plugin-localization';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [/* 视图配置 */],
+    plugins: [
+      createLocalizationPlugin({
+        locales: [zh, ja, fr] // 注册你需要的语言包
+      })
+    ],
+    locale: 'zh-CN' // 设置当前语言
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 配置项
+
+该插件接受一个 `Locale` 对象列表，用于注册到全局语言注册表中。
+
+```tsx copy
+interface LocalizationConfig {
+  locales: Locale[];
+}
+```
+
+## 可用的语言包
+
+`@dayflow/plugin-localization` 包含以下语言包：
+
+| 导出名称 | 语言 | 语言代码 |
+| :--- | :--- | :--- |
+| `zh` | 中文 | `zh-CN` |
+| `ja` | 日语 | `ja-JP` |
+| `ko` | 韩语 | `ko-KR` |
+| `fr` | 法语 | `fr-FR` |
+| `de` | 德语 | `de-DE` |
+| `es` | 西班牙语 | `es-ES` |
+| `en` | 英语 | `en-US` (核心库已内置) |
+
+## 自定义语言包
+
+你也可以不使用插件直接注册自定义语言包，或者通过插件传入它们：
+
+```tsx copy
+const myCustomLocale = {
+  code: 'pt-BR',
+  messages: {
+    today: 'Hoje',
+    day: 'Dia',
+    week: 'Semana',
+    month: 'Mês',
+    // ... 其他所有翻译键值
+  }
+};
+
+const calendar = useCalendarApp({
+  plugins: [
+    createLocalizationPlugin({
+      locales: [myCustomLocale]
+    })
+  ],
+  locale: 'pt-BR'
+});
+```

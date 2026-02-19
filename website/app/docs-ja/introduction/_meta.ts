@@ -7,9 +7,6 @@ const meta: MetaRecord = {
   events: {
     title: 'イベント',
   },
-  plugins: {
-    title: 'プラグイン',
-  },
   sidebar: {
     title: 'サイドバー',
   },
@@ -21,9 +18,6 @@ const meta: MetaRecord = {
   },
   'use-calendar-app': {
     title: 'useCalendarApp',
-  },
-  'keyboard-shortcuts': {
-    title: 'キーボードショートカット',
   },
 };
 

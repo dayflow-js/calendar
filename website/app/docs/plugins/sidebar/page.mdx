@@ -1,0 +1,84 @@
+# Sidebar Plugin
+
+The Sidebar plugin adds a calendar management sidebar to your Day Flow calendar. It includes a mini calendar for date navigation, a calendar list with visibility toggles, and full calendar CRUD operations (create, rename, recolor, merge, delete, import/export).
+
+## Installation
+
+Install the plugin package:
+
+```bash copy
+npm install @dayflow/plugin-sidebar
+# or
+pnpm add @dayflow/plugin-sidebar
+```
+
+## Usage
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [/* your views */],
+    plugins: [
+      createSidebarPlugin({
+        // Optional configuration
+      })
+    ]
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Configuration
+
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `width` | `number \| string` | `undefined` | Width of the sidebar (e.g. `280` or `'20rem'`) |
+| `initialCollapsed` | `boolean` | `false` | Whether the sidebar starts collapsed |
+| `createCalendarMode` | `'inline' \| 'modal'` | `'inline'` | How the "create calendar" form is displayed |
+| `colorPickerMode` | `'blossom' \| 'default'` | `'default'` | Which color picker component to use |
+| `renderCalendarContextMenu` | `(calendar, onClose) => TNode` | `undefined` | Custom context menu renderer for calendar items |
+| `renderCreateCalendarDialog` | `(props) => TNode` | `undefined` | Custom create-calendar dialog renderer |
+
+## Features
+
+The sidebar provides the following built-in features:
+
+- **Mini Calendar** - A compact month view for quick date navigation
+- **Calendar List** - Toggle visibility of individual calendars with color-coded checkboxes
+- **Create Calendar** - Add new calendars with custom name and color
+- **Rename / Recolor** - Right-click a calendar to rename or change its color
+- **Merge Calendars** - Move all events from one calendar into another
+- **Delete Calendar** - Remove a calendar with a confirmation step (or merge first)
+- **Import / Export** - Import `.ics` files or export calendars to `.ics`
+
+## Custom Context Menu
+
+You can replace the default right-click menu for calendar items:
+
+```tsx copy
+createSidebarPlugin({
+  renderCalendarContextMenu: (calendar, onClose) => (
+    <div>
+      <button onClick={() => { /* custom action */ onClose(); }}>
+        Custom Action for {calendar.name}
+      </button>
+    </div>
+  )
+})
+```
+
+## Custom Create Calendar Dialog
+
+You can replace the default create-calendar dialog:
+
+```tsx copy
+createSidebarPlugin({
+  renderCreateCalendarDialog: ({ onSave, onCancel }) => (
+    <MyCustomDialog onSave={onSave} onCancel={onCancel} />
+  )
+})
+```

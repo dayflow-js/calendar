@@ -1,0 +1,52 @@
+# Plugins Overview
+
+Day Flow uses a plugin architecture to extend functionality. Plugins provide modular features that can be enabled, disabled, or configured based on your needs.
+
+## Why Plugins?
+
+The plugin system allows you to:
+
+- **Enable/disable features** - Only load what you need (e.g., only English by default to save bundle size)
+- **Configure behavior** - Customize plugin settings for specific use cases
+- **Extend functionality** - Create custom plugins for your unique requirements
+- **Access plugin APIs** - Use plugin services directly in your business logic
+
+## Available Plugins
+
+Day Flow provides several built-in and official plugins:
+
+### [Localization](../localization)
+Support for multiple languages. Extracting non-English locales into a plugin allows for a smaller core bundle for English-only applications.
+
+### [Drag & Drop](../drag)
+Enables interactive event management including moving, resizing, and double-click to create events.
+
+### [Events Service](../events)
+Provides advanced event management capabilities including validation, filtering, and date-range querying.
+
+---
+
+## Plugin Lifecycle
+
+1. **Plugin Creation** - Call the factory function (e.g., `createDragPlugin()`) with your configuration.
+2. **Plugin Registration** - Add the plugin instance to the `plugins` array when initializing your calendar.
+3. **Installation** - The `install()` function is automatically called with the `CalendarApp` instance.
+4. **Usage** - Access plugin APIs via `app.getPlugin('plugin-name')`.
+
+## Creating Custom Plugins
+
+You can create your own plugins to extend calendar functionality by implementing the `CalendarPlugin` interface:
+
+```tsx copy
+import { CalendarPlugin, ICalendarApp } from '@dayflow/core';
+
+export const myPlugin: CalendarPlugin = {
+  name: 'my-custom-plugin',
+  install(app: ICalendarApp) {
+    console.log('Plugin installed!');
+    // Extend app functionality here
+  }
+};
+```
+
+Refer to [Creating Custom Plugins](#creating-custom-plugins) for more details on custom plugin development.

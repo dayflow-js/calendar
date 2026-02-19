@@ -1,0 +1,50 @@
+# 插件概览
+
+Day Flow 使用插件架构来扩展功能。插件提供模块化的功能特性，可以根据您的需要启用、禁用或配置。
+
+## 为什么使用插件？
+
+插件系统允许您：
+
+- **按需加载** - 仅加载您需要的功能（例如：默认仅包含英文以减小包体积）。
+- **配置行为** - 为特定用例定制插件设置。
+- **扩展功能** - 为您的独特需求创建自定义插件。
+- **访问插件 API** - 直接在业务逻辑中使用插件服务。
+
+## 可用插件
+
+Day Flow 提供以下官方插件：
+
+### [多语言](../localization)
+支持多种语言。将非英文语言包提取到插件中，可以让仅使用英文的应用拥有更小的核心包体积。
+
+### [拖拽 (Drag & Drop)](../drag)
+启用交互式事件管理，包括移动、调整大小以及双击创建事件。
+
+### [事件服务 (Events Service)](../events)
+提供高级事件管理功能，包括验证、过滤和日期范围查询。
+
+---
+
+## 插件生命周期
+
+1. **创建插件** - 调用工厂函数（如 `createDragPlugin()`）并传入配置。
+2. **注册插件** - 在初始化日历时，将插件实例添加到 `plugins` 数组中。
+3. **安装** - `install()` 函数会自动调用，并传入 `CalendarApp` 实例。
+4. **使用** - 通过 `app.getPlugin('plugin-name')` 访问插件 API。
+
+## 创建自定义插件
+
+您可以通过实现 `CalendarPlugin` 接口来创建自己的插件：
+
+```tsx copy
+import { CalendarPlugin, ICalendarApp } from '@dayflow/core';
+
+export const myPlugin: CalendarPlugin = {
+  name: 'my-custom-plugin',
+  install(app: ICalendarApp) {
+    console.log('插件已安装！');
+    // 在此处扩展应用功能
+  }
+};
+```

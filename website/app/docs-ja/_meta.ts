@@ -15,6 +15,9 @@ const meta: MetaRecord = {
       copyPage: false,
     },
   },
+  plugins: {
+    title: 'プラグイン',
+  },
   guides: {
     title: 'ガイド',
   },
