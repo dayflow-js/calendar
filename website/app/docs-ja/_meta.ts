@@ -4,6 +4,9 @@ const meta: MetaRecord = {
   introduction: {
     title: 'はじめに',
   },
+  plugins: {
+    title: 'プラグイン',
+  },
   features: {
     title: '機能',
     theme: {
@@ -14,9 +17,6 @@ const meta: MetaRecord = {
       breadcrumb: false,
       copyPage: false,
     },
-  },
-  plugins: {
-    title: 'プラグイン',
   },
   guides: {
     title: 'ガイド',

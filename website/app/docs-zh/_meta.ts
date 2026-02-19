@@ -4,6 +4,9 @@ const meta: MetaRecord = {
   introduction: {
     title: '介绍',
   },
+  plugins: {
+    title: '插件',
+  },
   features: {
     title: '功能特性',
     theme: {
@@ -14,9 +17,6 @@ const meta: MetaRecord = {
       breadcrumb: false,
       copyPage: false,
     },
-  },
-  plugins: {
-    title: '插件',
   },
   guides: {
     title: '指南',

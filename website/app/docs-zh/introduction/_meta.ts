@@ -10,9 +10,6 @@ const meta: MetaRecord = {
   views: {
     title: '视图',
   },
-  sidebar: {
-    title: '侧边栏',
-  },
   'dayflow-calendar': {
     title: 'DayFlowCalendar',
   },

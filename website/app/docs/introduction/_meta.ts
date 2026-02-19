@@ -7,9 +7,6 @@ const meta: MetaRecord = {
   events: {
     title: 'Events',
   },
-  sidebar: {
-    title: 'Sidebar',
-  },
   views: {
     title: 'Views',
   },

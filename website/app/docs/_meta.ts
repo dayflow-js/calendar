@@ -4,6 +4,9 @@ const meta: MetaRecord = {
   introduction: {
     title: 'Introduction',
   },
+  plugins: {
+    title: 'Plugins',
+  },
   features: {
     title: 'Features',
     theme: {
@@ -14,9 +17,6 @@ const meta: MetaRecord = {
       breadcrumb: false,
       copyPage: false,
     },
-  },
-  plugins: {
-    title: 'Plugins',
   },
 };
 

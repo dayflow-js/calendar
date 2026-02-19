@@ -8,15 +8,18 @@ DayFlow 提供内置能力，可以直接从侧边栏管理日历。这包括创
 
 ### 配置
 
-您可以通过 `useCalendarApp` 中的 `useSidebar` 选项配置创建模式。
+您可以通过 `createSidebarPlugin` 的配置项来设置创建模式。
 
 ```tsx
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+const sidebarPlugin = createSidebarPlugin({
+  createCalendarMode: 'inline', // 'inline' (默认) 或 'modal'
+});
+
 const calendar = useCalendarApp({
   // ...
-  useSidebar: {
-    enabled: true,
-    createCalendarMode: 'inline', // 'inline' (默认) 或 'modal'
-  },
+  plugins: [sidebarPlugin],
 });
 ```
 
@@ -51,11 +54,8 @@ import { Callout } from 'nextra/components';
 />
 
 ```tsx
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    createCalendarMode: 'modal',
-  },
+createSidebarPlugin({
+  createCalendarMode: 'modal',
 });
 ```
 
@@ -64,21 +64,18 @@ const calendar = useCalendarApp({
 如果您需要为创建对话框使用自定义 UI，可以提供 `renderCreateCalendarDialog` 函数。
 
 ```tsx
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    createCalendarMode: 'modal',
-    renderCreateCalendarDialog: ({ onClose, onCreate }) => (
-      <MyCustomDialog
-        onCancel={onClose}
-        onConfirm={(name, color) => {
-          onCreate({
-            /* ... 新日历对象 ... */
-          });
-        }}
-      />
-    ),
-  },
+createSidebarPlugin({
+  createCalendarMode: 'modal',
+  renderCreateCalendarDialog: ({ onClose, onCreate }) => (
+    <MyCustomDialog
+      onCancel={onClose}
+      onConfirm={(name, color) => {
+        onCreate({
+          /* ... 新日历对象 ... */
+        });
+      }}
+    />
+  ),
 });
 ```
 
@@ -95,30 +92,27 @@ const calendar = useCalendarApp({
 
 ### 自定义右键菜单
 
-您可以通过在 `useSidebar` 配置中提供 `renderCalendarContextMenu` 函数来自定义右键菜单。这让您可以完全控制菜单项及其行为。
+您可以通过在 `createSidebarPlugin` 配置中提供 `renderCalendarContextMenu` 函数来自定义右键菜单。这让您可以完全控制菜单项及其行为。
 
 ```tsx
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    renderCalendarContextMenu: (calendar, onClose) => (
-      <>
-        <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
-          {calendar.name}
-        </div>
-        <div className="my-1 h-px bg-gray-200" />
-        <div
-          className="flex cursor-pointer items-center px-3 py-2 text-sm hover:bg-gray-100"
-          onClick={() => {
-            console.log('自定义操作：', calendar.id);
-            onClose();
-          }}
-        >
-          自定义操作
-        </div>
-      </>
-    ),
-  },
+createSidebarPlugin({
+  renderCalendarContextMenu: (calendar, onClose) => (
+    <div className="bg-white shadow-lg border rounded p-2">
+      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+        {calendar.name}
+      </div>
+      <div className="my-1 h-px bg-gray-200" />
+      <button
+        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+        onClick={() => {
+          console.log('自定义操作：', calendar.id);
+          onClose();
+        }}
+      >
+        自定义操作
+      </button>
+    </div>
+  ),
 });
 ```
 

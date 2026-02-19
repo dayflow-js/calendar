@@ -1,6 +1,10 @@
+import {
+  SidebarCustomShowcase,
+} from '@/components/SidebarShowcases';
+
 # 侧边栏插件
 
-侧边栏插件为 Day Flow 日历添加日历管理侧边栏。包含用于日期导航的迷你日历、带可见性切换的日历列表，以及完整的日历 CRUD 操作（创建、重命名、更改颜色、合并、删除、导入/导出）。
+侧边栏插件为 DayFlow 日历添加日历管理侧边栏。包含用于日期导航的迷你日历、带可见性切换的日历列表，以及完整的日历 CRUD 操作（创建、重命名、更改颜色、合并、删除、导入/导出）。
 
 ## 安装
 
@@ -15,37 +19,41 @@ pnpm add @dayflow/plugin-sidebar
 ## 使用
 
 ```tsx copy
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/react'; // 或 @dayflow/vue 等
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 
 function MyCalendar() {
+  const sidebarPlugin = createSidebarPlugin({
+    width: 280,
+    createCalendarMode: 'modal'
+  });
+
   const calendar = useCalendarApp({
     views: [/* 视图 */],
-    plugins: [
-      createSidebarPlugin({
-        // 可选配置
-      })
-    ]
+    plugins: [sidebarPlugin]
   });
 
   return <DayFlowCalendar calendar={calendar} />;
 }
 ```
 
-## 配置
+## 属性参数
 
-| 属性 | 类型 | 默认值 | 说明 |
+| 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `width` | `number \| string` | `undefined` | 侧边栏宽度（如 `280` 或 `'20rem'`） |
+| `width` | `number \| string` | `'240px'` | 侧边栏宽度（如 `280` 或 `'20rem'`） |
 | `initialCollapsed` | `boolean` | `false` | 是否以折叠状态启动侧边栏 |
 | `createCalendarMode` | `'inline' \| 'modal'` | `'inline'` | 创建日历表单的显示方式 |
 | `colorPickerMode` | `'blossom' \| 'default'` | `'default'` | 使用的颜色选择器组件 |
+| `render` | `(props: CalendarSidebarRenderProps) => TNode` | `undefined` | 完全自定义侧边栏 UI |
 | `renderCalendarContextMenu` | `(calendar, onClose) => TNode` | `undefined` | 日历项的自定义右键菜单渲染器 |
 | `renderCreateCalendarDialog` | `(props) => TNode` | `undefined` | 自定义创建日历对话框渲染器 |
 
 ## 功能
 
-侧边栏提供以下内置功能：
+侧边栏插件提供包含颜色点、可见性开关和折叠按钮的侧栏布局。它会自动与日历状态同步，无需额外代码。同时内置了 [日历管理与右键菜单](/docs-zh/features/create-calendar) 功能。
+
+内置功能包括：
 
 - **迷你日历** - 用于快速日期导航的紧凑月视图
 - **日历列表** - 通过彩色复选框切换各个日历的可见性
@@ -55,6 +63,77 @@ function MyCalendar() {
 - **删除日历** - 带确认步骤的日历删除（也可先合并）
 - **导入 / 导出** - 导入 `.ics` 文件或将日历导出为 `.ics`
 
+### 在线示例
+
+这一页用两个示例展示侧边栏的不同形态：一个是开箱即用的默认布局，另一个是完全由 React 自绘的深度定制版本。
+
+<SidebarCustomShowcase />
+
+#### 可以尝试
+
+- **可见性切换**：在两个示例中切换日历可见性，观察 UI 如何瞬时同步
+- **拖拽同步**：拖拽或创建事件，侧栏的“即将到来”卡片会实时更新
+- **收起侧栏**：折叠侧栏，看看在周视图等高密度布局里如何回收更多空间
+
+## 完全自定义侧边栏
+
+你可以通过向 `createSidebarPlugin` 传入 `render` 函数来完全替换侧边栏。它会接收实时的日历状态和辅助操作。
+
+```tsx copy
+import { createSidebarPlugin, type CalendarSidebarRenderProps } from '@dayflow/plugin-sidebar';
+
+const CustomSidebar = ({
+  app,
+  calendars,
+  toggleCalendarVisibility,
+  toggleAll,
+  isCollapsed,
+  setCollapsed,
+}: CalendarSidebarRenderProps) => {
+  if (isCollapsed) {
+    return (
+      <div className="p-2">
+        <button onClick={() => setCollapsed(false)}>展开 →</button>
+      </div>
+    );
+  }
+
+  return (
+    <aside className="flex h-full flex-col gap-4 p-4 bg-slate-50 border-r">
+      <header className="flex items-center justify-between">
+        <h3 className="font-semibold">我的工作区</h3>
+        <button onClick={() => setCollapsed(true)}>收起 ←</button>
+      </header>
+
+      <nav className="space-y-1">
+        {calendars.map(calendar => (
+          <label key={calendar.id} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={calendar.isVisible}
+              onChange={(e) => toggleCalendarVisibility(calendar.id, e.target.checked)}
+            />
+            <span 
+              className="w-3 h-3 rounded-full" 
+              style={{ backgroundColor: calendar.colors.lineColor }} 
+            />
+            {calendar.name}
+          </label>
+        ))}
+      </nav>
+
+      <div className="mt-auto pt-4 border-t text-xs text-slate-500">
+        当前日期：{app.getCurrentDate().toLocaleDateString()}
+      </div>
+    </aside>
+  );
+};
+
+const sidebarPlugin = createSidebarPlugin({
+  render: (props) => <CustomSidebar {...props} />
+});
+```
+
 ## 自定义右键菜单
 
 可以替换日历项的默认右键菜单：
@@ -62,9 +141,9 @@ function MyCalendar() {
 ```tsx copy
 createSidebarPlugin({
   renderCalendarContextMenu: (calendar, onClose) => (
-    <div>
-      <button onClick={() => { /* 自定义操作 */ onClose(); }}>
-        {calendar.name} 的自定义操作
+    <div className="bg-white shadow-lg border rounded p-2">
+      <button onClick={() => { console.log('自定义操作'); onClose(); }}>
+        针对 {calendar.name} 的自定义操作
       </button>
     </div>
   )
@@ -77,8 +156,8 @@ createSidebarPlugin({
 
 ```tsx copy
 createSidebarPlugin({
-  renderCreateCalendarDialog: ({ onSave, onCancel }) => (
-    <MyCustomDialog onSave={onSave} onCancel={onCancel} />
+  renderCreateCalendarDialog: ({ onCreate, onClose }) => (
+    <MyCustomDialog onSave={onCreate} onCancel={onClose} />
   )
 })
 ```

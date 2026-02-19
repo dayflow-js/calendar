@@ -1,6 +1,10 @@
+import {
+  SidebarCustomShowcase,
+} from '@/components/SidebarShowcases';
+
 # サイドバープラグイン
 
-サイドバープラグインは、Day Flow カレンダーにカレンダー管理サイドバーを追加します。日付ナビゲーション用のミニカレンダー、表示切替付きカレンダーリスト、カレンダーの CRUD 操作（作成、名前変更、色変更、統合、削除、インポート/エクスポート）を含みます。
+サイドバープラグインは、DayFlow カレンダーにカレンダー管理サイドバーを追加します。日付ナビゲーション用のミニカレンダー、表示切替付きカレンダーリスト、カレンダーの CRUD 操作（作成、名前変更、色変更、統合、削除、インポート/エクスポート）を含みます。
 
 ## インストール
 
@@ -15,37 +19,41 @@ pnpm add @dayflow/plugin-sidebar
 ## 使い方
 
 ```tsx copy
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/react'; // または @dayflow/vue など
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 
 function MyCalendar() {
+  const sidebarPlugin = createSidebarPlugin({
+    width: 280,
+    createCalendarMode: 'modal'
+  });
+
   const calendar = useCalendarApp({
     views: [/* ビュー */],
-    plugins: [
-      createSidebarPlugin({
-        // オプション設定
-      })
-    ]
+    plugins: [sidebarPlugin]
   });
 
   return <DayFlowCalendar calendar={calendar} />;
 }
 ```
 
-## 設定
+## 設定リファレンス
 
 | プロパティ | 型 | デフォルト | 説明 |
 | :--- | :--- | :--- | :--- |
-| `width` | `number \| string` | `undefined` | サイドバーの幅（例: `280` または `'20rem'`） |
+| `width` | `number \| string` | `'240px'` | サイドバーの幅（例: `280` または `'20rem'`） |
 | `initialCollapsed` | `boolean` | `false` | サイドバーを折りたたんだ状態で開始するかどうか |
 | `createCalendarMode` | `'inline' \| 'modal'` | `'inline'` | カレンダー作成フォームの表示方法 |
 | `colorPickerMode` | `'blossom' \| 'default'` | `'default'` | 使用するカラーピッカーコンポーネント |
+| `render` | `(props: CalendarSidebarRenderProps) => TNode` | `undefined` | サイドバー UI を完全にオーバーライドします |
 | `renderCalendarContextMenu` | `(calendar, onClose) => TNode` | `undefined` | カレンダー項目のカスタムコンテキストメニューレンダラー |
 | `renderCreateCalendarDialog` | `(props) => TNode` | `undefined` | カスタムカレンダー作成ダイアログレンダラー |
 
 ## 機能
 
-サイドバーには以下の機能が組み込まれています：
+サイドバープラグインは、可視状態のトグル、カレンダーの配色表示、折りたたみボタンを備えた既製のレイアウトを提供します。また、[カレンダーの作成とコンテキストメニュー](/docs-ja/features/create-calendar) もサポートしており、ユーザーがカレンダーの追加、色の編集、削除を自由に行うことができます。
+
+組み込み機能：
 
 - **ミニカレンダー** - 日付の素早いナビゲーション用のコンパクトな月表示
 - **カレンダーリスト** - 色分けされたチェックボックスで個々のカレンダーの表示を切替
@@ -55,6 +63,77 @@ function MyCalendar() {
 - **カレンダー削除** - 確認ステップ付きでカレンダーを削除（事前に統合も可能）
 - **インポート / エクスポート** - `.ics` ファイルのインポートまたはカレンダーを `.ics` にエクスポート
 
+### デモ
+
+DayFlow のサイドバー体験を 2 つのデモで紹介します。標準 UI のまま使うパターンと、完全カスタムに置き換えるパターンを比較しながら確認してください。
+
+<SidebarCustomShowcase />
+
+#### 見どころ
+
+- **表示の同期**: 可視状態を切り替えるとカレンダー側もリアルタイムに反映
+- **ドラッグ & 同期**: ビューを切り替えてもカスタムサイドバーに表示する「次の予定」や KPI を同期可能
+- **折りたたみ**: 集中したいときは折りたたんで表示領域を広げられる
+
+## 完全なカスタマイズ
+
+独自のサイドバーコンポーネントを使用することも可能です。`createSidebarPlugin` の `render` にレンダリング関数を渡すだけで、リアルタイムのカレンダー状態とヘルパーアクションを受け取ることができます。
+
+```tsx copy
+import { createSidebarPlugin, type CalendarSidebarRenderProps } from '@dayflow/plugin-sidebar';
+
+const CustomSidebar = ({
+  app,
+  calendars,
+  toggleCalendarVisibility,
+  toggleAll,
+  isCollapsed,
+  setCollapsed,
+}: CalendarSidebarRenderProps) => {
+  if (isCollapsed) {
+    return (
+      <div className="p-2">
+        <button onClick={() => setCollapsed(false)}>→</button>
+      </div>
+    );
+  }
+
+  return (
+    <aside className="flex h-full flex-col gap-4 p-4 bg-slate-50 border-r">
+      <header className="flex items-center justify-between">
+        <h3 className="font-semibold">マイワークスペース</h3>
+        <button onClick={() => setCollapsed(true)}>←</button>
+      </header>
+
+      <nav className="space-y-1">
+        {calendars.map(calendar => (
+          <label key={calendar.id} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={calendar.isVisible}
+              onChange={(e) => toggleCalendarVisibility(calendar.id, e.target.checked)}
+            />
+            <span 
+              className="w-3 h-3 rounded-full" 
+              style={{ backgroundColor: calendar.colors.lineColor }} 
+            />
+            {calendar.name}
+          </label>
+        ))}
+      </nav>
+
+      <div className="mt-auto pt-4 border-t text-xs text-slate-500">
+        選択日: {app.getCurrentDate().toLocaleDateString()}
+      </div>
+    </aside>
+  );
+};
+
+const sidebarPlugin = createSidebarPlugin({
+  render: (props) => <CustomSidebar {...props} />
+});
+```
+
 ## カスタムコンテキストメニュー
 
 カレンダー項目のデフォルトの右クリックメニューを置き換えることができます：
@@ -62,8 +141,8 @@ function MyCalendar() {
 ```tsx copy
 createSidebarPlugin({
   renderCalendarContextMenu: (calendar, onClose) => (
-    <div>
-      <button onClick={() => { /* カスタムアクション */ onClose(); }}>
+    <div className="bg-white shadow-lg border rounded p-2">
+      <button onClick={() => { console.log('カスタムアクション'); onClose(); }}>
         {calendar.name} のカスタムアクション
       </button>
     </div>
@@ -77,8 +156,8 @@ createSidebarPlugin({
 
 ```tsx copy
 createSidebarPlugin({
-  renderCreateCalendarDialog: ({ onSave, onCancel }) => (
-    <MyCustomDialog onSave={onSave} onCancel={onCancel} />
+  renderCreateCalendarDialog: ({ onCreate, onClose }) => (
+    <MyCustomDialog onSave={onCreate} onCancel={onClose} />
   )
 })
 ```

@@ -41,7 +41,6 @@ export function TeamCalendar() {
 | `defaultCalendar`           | `string`                    | Optional | First visible calendar | ID used when new events are created.                                                                               |
 | `theme`                     | `ThemeConfig`               | Optional | `{ mode: 'light' }`    | Sets global theme mode and optional token overrides.                                                               |
 | `locale`                    | `string \| Locale`          | Optional | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
-| `useSidebar`                | `boolean \| SidebarConfig`  | Optional | `false`                | Enables the built-in sidebar or lets you customize width, collapse state, and renderer.                            |
 | `useEventDetailDialog`      | `boolean`                   | Optional | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
 | `useCalendarHeader`         | `boolean \| Function`       | Optional | `true`                 | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                             |
 | `readOnly`                  | `boolean \| ReadOnlyConfig` | Optional | `false`                | Disables interactions. Can be a boolean or a config for fine-grained control (drag/view).                          |
@@ -183,14 +182,6 @@ const calendar = useCalendarApp({
 });
 ```
 
-### useSidebar
-
-- `true` enables the stock sidebar (240 px wide) with calendar toggles.
-- Passing a `SidebarConfig` lets you control:
-  - `width`: number (auto-suffixed with `px`) or string.
-  - `initialCollapsed`: whether the sidebar starts collapsed.
-  - `render(props)`: replace the sidebar UI entirely while reusing DayFlow's helper props.
-
 ### useEventDetailDialog
 
 - `true` turns on the default modal dialog (`DefaultEventDetailDialog`).
@@ -213,7 +204,7 @@ const calendar = useCalendarApp({
 ### customMobileEventRenderer
 
 - Allows replacing the default bottom-drawer for mobile event editing with your own component.
-- See [Features Overview](/docs/features/sidebar) for more on specific features.
+- See [Sidebar Plugin](/docs/plugins/sidebar) for more on specific features.
 
 ## Advanced Configuration Example
 
@@ -224,7 +215,8 @@ import {
   createMonthView,
   createWeekView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import '@dayflow/core/dist/styles.css';
 
 const calendars = [
@@ -263,10 +255,12 @@ export function AdvancedCalendar() {
       onEventUpdate: event => api.events.update(event),
       onVisibleMonthChange: month => preloadMonthData(month),
     },
-    useSidebar: {
-      width: 280,
-      initialCollapsed: false,
-    },
+    plugins: [
+      createSidebarPlugin({
+        width: 280,
+        initialCollapsed: false,
+      })
+    ],
     useEventDetailDialog: true,
   });
 
