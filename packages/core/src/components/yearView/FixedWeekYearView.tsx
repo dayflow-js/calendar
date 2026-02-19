@@ -247,8 +247,19 @@ export const FixedWeekYearView = ({
       const target = e.target as HTMLElement;
       const clickedEvent = target.closest('[data-event-id]');
       const clickedPanel = target.closest('[data-event-detail-panel]');
+      const clickedDialog = target.closest('[data-event-detail-dialog]');
+      const clickedRangePicker = target.closest('[data-range-picker-popup]');
+      const clickedCalendarPicker = target.closest(
+        '[data-calendar-picker-dropdown]'
+      );
 
-      if (!clickedEvent && !clickedPanel) {
+      if (
+        !clickedEvent &&
+        !clickedPanel &&
+        !clickedDialog &&
+        !clickedRangePicker &&
+        !clickedCalendarPicker
+      ) {
         setSelectedEventId(null);
         setDetailPanelEventId(null);
       }
@@ -374,6 +385,8 @@ export const FixedWeekYearView = ({
       return s <= yearEnd && e >= yearStart;
     });
   }, [rawEvents, currentYear, showTimedEvents]);
+
+  console.log('yearEvents', yearEvents.length);
 
   // Generate data for all 12 months with event segments
   const monthsData = useMemo(() => {

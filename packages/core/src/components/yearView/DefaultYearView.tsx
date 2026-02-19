@@ -106,8 +106,19 @@ export const DefaultYearView = ({
 
       const clickedEvent = target.closest('[data-event-id]');
       const clickedPanel = target.closest('[data-event-detail-panel]');
+      const clickedDialog = target.closest('[data-event-detail-dialog]');
+      const clickedRangePicker = target.closest('[data-range-picker-popup]');
+      const clickedCalendarPicker = target.closest(
+        '[data-calendar-picker-dropdown]'
+      );
 
-      if (!clickedEvent && !clickedPanel) {
+      if (
+        !clickedEvent &&
+        !clickedPanel &&
+        !clickedDialog &&
+        !clickedRangePicker &&
+        !clickedCalendarPicker
+      ) {
         setSelectedEventId(null);
         setDetailPanelEventId(null);
       }
