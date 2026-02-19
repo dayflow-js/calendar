@@ -7,21 +7,19 @@ import {
   WeekDayDragState,
   UseDragHandlersReturn,
   UseDragHandlersParams,
-} from '../../types';
-import { roundToTimeStep, TIME_STEP, getDateByDayIndex } from '../../utils';
-import {
+  roundToTimeStep,
+  TIME_STEP,
+  getDateByDayIndex,
   extractHourFromDate,
   createDateWithHour,
   getEndOfDay,
   getEventEndHour,
-} from '../../utils/helpers';
-import { useLocale } from '@/locale';
-import { Temporal } from 'temporal-polyfill';
-import {
+  useLocale,
   temporalToDate,
   dateToZonedDateTime,
   dateToPlainDate,
-} from '../../utils/temporal';
+} from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
 
 // Helper function to get client coordinates from Mouse or Touch events
 const getClientCoordinates = (e: any) => {
@@ -204,8 +202,8 @@ export const useDragHandlers = (
         handleDirectScroll(clientY);
         const mouseHour = pixelYToHour(clientY);
 
-        const startDragDay = drag.startDragDayIndex ?? drag.originalDay;
-        const dayOffset = drag.dayIndex - startDragDay;
+        // const startDragDay = drag.startDragDayIndex ?? drag.originalDay;
+        // const dayOffset = drag.dayIndex - startDragDay;
 
         if (drag.allDay) {
           // Switch from all-day to regular event
@@ -334,11 +332,6 @@ export const useDragHandlers = (
     onEventsUpdate?.(prev =>
       prev.map(event => {
         if (event.id !== drag.eventId) return event;
-
-        // Calculate new event date
-        const newEventDate = currentWeekStart
-          ? getDateByDayIndex(currentWeekStart, drag.dayIndex)
-          : temporalToDate(event.start);
 
         // Calculate day offset during drag
         const startDragDay = drag.startDragDayIndex ?? drag.originalDay;
@@ -1245,7 +1238,7 @@ export const useDragHandlers = (
 
   // Create event start - complete version
   const handleCreateStart = useCallback(
-    (e: any | any, ...args: (Date | number)[]) => {
+    (e: any, ...args: (Date | number)[]) => {
       if (app?.state.readOnly) return; // Non-editable if readOnly exists
 
       // Prevent scrolling on touch devices
@@ -1291,8 +1284,8 @@ export const useDragHandlers = (
         const [dayIndex, startHour] = args as [number, number];
         const drag = dragRef.current;
         if (!drag) return;
-        const roundedStart = roundToTimeStep(startHour);
-        const isMobile = !!options.isMobile;
+        // const roundedStart = roundToTimeStep(startHour);
+        const isMobile = options.isMobile;
         const initialDuration = isMobile ? 1 : TIME_STEP * 4;
         const hourOffset = isMobile ? -initialDuration / 2 : 0;
         const adjustedStart = roundToTimeStep(startHour + hourOffset);
@@ -1357,7 +1350,7 @@ export const useDragHandlers = (
 
   // Move event start - complete version
   const handleMoveStart = useCallback(
-    (e: any | any, event: Event) => {
+    (e: any, event: Event) => {
       // Prevent scrolling on touch devices
       if (e.cancelable && ('touches' in e || 'changedTouches' in e)) {
         e.preventDefault();
@@ -1538,7 +1531,7 @@ export const useDragHandlers = (
 
   // Resize start - complete version
   const handleResizeStart = useCallback(
-    (e: any | any, event: Event, direction: string) => {
+    (e: any, event: Event, direction: string) => {
       if (app?.state.readOnly) return;
 
       // Prevent scrolling on touch devices

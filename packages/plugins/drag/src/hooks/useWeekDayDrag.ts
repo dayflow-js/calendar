@@ -5,20 +5,19 @@ import {
   UseWeekDayDragParams,
   UseWeekDayDragReturn,
   Event,
-} from '../../types';
-import { getDateByDayIndex } from '../../utils';
-import { useLocale } from '@/locale';
-import { dateToPlainDate } from '../../utils/temporal';
+  getDateByDayIndex,
+  useLocale,
+  dateToPlainDate,
+} from '@dayflow/core';
 
 export const useWeekDayDrag = (
   params: UseWeekDayDragParams
 ): UseWeekDayDragReturn => {
   const { t } = useLocale();
-  const { options, common, state, manager, handleDragMove, handleDragEnd } =
+  const { options, common, state, handleDragMove, handleDragEnd } =
     params;
   const { viewType, currentWeekStart, app } = options;
   const { dragRef, setDragState } = state;
-  const { createDragIndicator } = manager;
   const { pixelYToHour, getColumnDayIndex } = common;
 
   const isMonthView = viewType === ViewType.MONTH;

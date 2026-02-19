@@ -7,13 +7,15 @@ import {
   useDragProps,
   ViewType,
   UseDragManagerReturn,
-} from '../../types';
-import DragIndicatorComponent from '../../components/weekView/DragIndicator/DragIndicatorComponent';
-import MonthDragIndicatorComponent from '../../components/monthView/MonthDragIndicator';
-import { getSelectedBgColor, getEventTextColor, formatTime } from '../../utils';
-import { useLocale } from '@/locale';
-import { LocaleProvider } from '@/locale/LocaleProvider';
-import { dateToZonedDateTime } from '../../utils/temporal';
+  getSelectedBgColor,
+  getEventTextColor,
+  formatTime,
+  useLocale,
+  LocaleProvider,
+  dateToZonedDateTime,
+} from '@dayflow/core';
+import DragIndicatorComponent from '../components/DragIndicatorComponent';
+import MonthDragIndicatorComponent from '../components/MonthDragIndicator';
 
 export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
   const { t, locale } = useLocale();
@@ -130,7 +132,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         render(
           h(
-            LocaleProvider,
+            LocaleProvider as any,
             { locale },
             h(MonthDragIndicatorComponent, {
               event: eventForComponent,
@@ -254,7 +256,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         // Render Week/Day view content
         render(
           h(
-            LocaleProvider,
+            LocaleProvider as any,
             { locale },
             h(DragIndicatorComponent, {
               drag,
@@ -408,7 +410,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
           render(
             h(
-              LocaleProvider,
+              LocaleProvider as any,
               { locale },
               h(DragIndicatorComponent, {
                 drag: updatedDrag,

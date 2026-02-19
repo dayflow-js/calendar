@@ -1,7 +1,11 @@
 import { useMemo } from 'preact/hooks';
-import { useDragProps, useDragReturn, ViewType } from '../../types';
-import { defaultDragConfig } from '../../core/config';
-import { getLineColor } from '../../utils';
+import {
+  useDragProps,
+  useDragReturn,
+  ViewType,
+  getLineColor,
+} from '@dayflow/core';
+import { defaultDragConfig } from '../utils/defaultDragConfig';
 import { useDragCommon } from './useDragCommon';
 import { useDragState } from './useDragState';
 import { useDragManager } from './useDragManager';

@@ -1,5 +1,4 @@
 import { useRef, useCallback, useState, useMemo } from 'preact/hooks';
-import { throttle } from '../../utils/throttle';
 import {
   MonthDragState,
   UnifiedDragRef,
@@ -7,7 +6,8 @@ import {
   ViewType,
   WeekDayDragState,
   UseDragStateReturn,
-} from '../../types';
+} from '@dayflow/core';
+import { throttle } from '../utils/throttle';
 
 export const useDragState = (options: useDragProps): UseDragStateReturn => {
   const { viewType, onEventsUpdate } = options;

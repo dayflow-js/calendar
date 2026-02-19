@@ -23,8 +23,8 @@ export * from './locale';
 export * from './factories';
 
 // Plugins
-export { createDragPlugin } from './plugins/dragPlugin';
 export { createEventsPlugin } from './plugins/eventsPlugin';
+export { registerDragImplementation, useDragForView } from './plugins/dragBridge';
 
 // Context Menu Primitives
 export {

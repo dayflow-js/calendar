@@ -1,10 +1,12 @@
 // Shared utility hook providing common utility functions for drag operations
 import { useCallback, useMemo } from 'preact/hooks';
-import { useDragProps, ViewType, UseDragCommonReturn } from '../../types';
 import {
+  useDragProps,
+  ViewType,
+  UseDragCommonReturn,
   daysDifference as utilsDaysDifference,
   addDays as utilsAddDays,
-} from '../../utils';
+} from '@dayflow/core';
 
 export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
   const {

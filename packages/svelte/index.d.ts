@@ -1,11 +1,10 @@
 declare module "@dayflow/svelte" {
     import { SvelteComponent } from "svelte";
-    import { 
-        CalendarApp, 
-        CalendarAppConfig, 
+    import {
+        CalendarApp,
+        CalendarAppConfig,
         UseCalendarAppReturn,
         CalendarRegistry,
-        createDragPlugin,
         createEventsPlugin,
         createDayView,
         createWeekView,
@@ -27,7 +26,6 @@ declare module "@dayflow/svelte" {
     export {
         CalendarApp,
         CalendarRegistry,
-        createDragPlugin,
         createEventsPlugin,
         createDayView,
         createWeekView,

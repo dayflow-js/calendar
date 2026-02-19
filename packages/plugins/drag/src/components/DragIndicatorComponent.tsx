@@ -1,9 +1,9 @@
 import {
   DragIndicatorProps,
   DragIndicatorRenderer,
-} from '@/types/dragIndicator';
-import { DefaultDragIndicatorRenderer } from '@/components/weekView/DragIndicator/DefaultDragIndicator';
-import { useLocale } from '@/locale';
+  useLocale,
+} from '@dayflow/core';
+import { DefaultDragIndicatorRenderer } from './DefaultDragIndicator';
 
 interface DragIndicatorComponentProps extends DragIndicatorProps {
   renderer?: DragIndicatorRenderer;

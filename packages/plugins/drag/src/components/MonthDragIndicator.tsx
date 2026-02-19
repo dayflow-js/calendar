@@ -1,7 +1,24 @@
-import { Event } from '../../types';
-import { Calendar } from '../common/Icons';
-import { daysDifference } from '../../utils';
-import { useLocale } from '@/locale';
+import { Event, daysDifference, useLocale } from '@dayflow/core';
+
+const CalendarIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    className={className}
+  >
+    <path d="M8 2v4" />
+    <path d="M16 2v4" />
+    <rect width="18" height="18" x="3" y="4" rx="2" />
+    <path d="M3 10h18" />
+  </svg>
+);
 
 interface MonthDragIndicatorProps {
   event: Event;
@@ -24,7 +41,7 @@ const MonthDragIndicatorComponent = ({
     if (isCreating) {
       return {
         title: t('newEvent'),
-        icon: <Calendar className="h-3 w-3" />,
+        icon: <CalendarIcon className="h-3 w-3" />,
         showDateRange: false,
       };
     }
@@ -33,7 +50,6 @@ const MonthDragIndicatorComponent = ({
       const duration = daysDifference(startDate, endDate) + 1;
       return {
         title: event.title.replace(/ \(\d+天\)$/, ''),
-        // icon: getEventIcon(event),
         showDateRange: true,
         duration,
       };
@@ -41,7 +57,6 @@ const MonthDragIndicatorComponent = ({
 
     return {
       title: event.title,
-      // icon: getEventIcon(event),
       showDateRange: false,
     };
   };

@@ -4,7 +4,6 @@ export * from './hooks/useCalendarApp';
 export {
   CalendarApp,
   CalendarRegistry,
-  createDragPlugin,
   createEventsPlugin,
   createDayView,
   createWeekView,

@@ -6,7 +6,7 @@ import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
 } from '@/hooks/virtualScroll';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
@@ -544,7 +544,7 @@ const MonthView = ({
               onSelectDate={app.selectDate}
               selectedEventId={selectedEventId}
               onEventSelect={(eventId: string | null) => {
-                const isViewable = app.getReadOnlyConfig().viewable !== false;
+                const isViewable = app.getReadOnlyConfig().viewable;
                 if (
                   (screenSize !== 'desktop' || isTouch) &&
                   eventId &&

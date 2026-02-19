@@ -15,7 +15,7 @@ import {
   ICalendarApp,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import ViewHeader from '@/components/common/ViewHeader';
 import { YearMultiDayEvent } from './YearMultiDayEvent';
 import { YearMultiDaySegment } from './utils';
@@ -571,7 +571,7 @@ export const FixedWeekYearView = ({
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 flex-grow shrink-0"
+              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 grow shrink-0"
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {month.monthName}
@@ -600,7 +600,7 @@ export const FixedWeekYearView = ({
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="relative flex-grow shrink-0"
+              className="relative grow shrink-0"
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {/* Background grid cells */}

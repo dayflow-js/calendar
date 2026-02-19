@@ -18,7 +18,7 @@ import {
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
 import ViewHeader from '@/components/common/ViewHeader';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import {
   monthViewContainer,
   scrollContainer,

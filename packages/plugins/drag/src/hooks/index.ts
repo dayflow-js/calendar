@@ -1,4 +1,3 @@
-// Main entry for drag hooks, exporting all sub-modules
 export * from './useDrag';
 export * from './useDragCommon';
 export * from './useDragState';
