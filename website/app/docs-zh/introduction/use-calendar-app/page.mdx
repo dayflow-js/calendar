@@ -66,6 +66,9 @@ export function TeamCalendar() {
 - 可以同时安装多个插件，它们彼此独立
 
 ```tsx copy
+import { createDragPlugin } from '@dayflow/plugin-drag';
+import { createEventsPlugin } from '@dayflow/core';
+
 const dragPlugin = createDragPlugin({
   enableDrag: true,
   enableResize: true,

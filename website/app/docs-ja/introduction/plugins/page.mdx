@@ -19,10 +19,10 @@ DayFlow はプラグイン方式で機能を拡張します。必要な機能だ
 import {
   useCalendarApp,
   DayFlowCalendar,
-  createDragPlugin,
   createMonthView,
   ViewType,
 } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 
 const dragPlugin = createDragPlugin({
   enableDrag: true,

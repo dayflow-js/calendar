@@ -66,6 +66,9 @@ export function TeamCalendar() {
 - 複数のプラグインを同時に登録でき、それぞれ独立して動作します。
 
 ```tsx copy
+import { createDragPlugin } from '@dayflow/plugin-drag';
+import { createEventsPlugin } from '@dayflow/core';
+
 const dragPlugin = createDragPlugin({
   enableDrag: true,
   enableResize: true,

@@ -33,10 +33,10 @@ Day Flow 提供两个核心插件：
 import {
   useCalendarApp,
   DayFlowCalendar,
-  createDragPlugin,
   createMonthView,
   ViewType,
 } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import '@dayflow/core/dist/styles.css';
 
 function MyCalendar() {
@@ -202,11 +202,11 @@ const recalculatedEvents = eventsService?.recalculateEventDays(
 import {
   useCalendarApp,
   DayFlowCalendar,
-  createDragPlugin,
   createEventsPlugin,
   createMonthView,
   createWeekView,
 } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import '@dayflow/core/dist/styles.css';
 
 function MyCalendar() {
@@ -239,10 +239,10 @@ function MyCalendar() {
 import {
   useCalendarApp,
   DayFlowCalendar,
-  createDragPlugin,
   createEventsPlugin,
   createMonthView,
 } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import '@dayflow/core/dist/styles.css';
 
 function MyCalendar() {
