@@ -4,16 +4,21 @@
 
 ## 安装
 
-拖拽插件目前是 `@dayflow/core` 包的一部分。
+使用您喜欢的包管理器安装插件：
+
+```bash copy
+npm install @dayflow/plugin-drag
+```
 
 ```tsx copy
-import { createDragPlugin } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 ```
 
 ## 使用方法
 
 ```tsx copy
-import { useCalendarApp, createDragPlugin, ViewType } from '@dayflow/core';
+import { useCalendarApp, ViewType } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 
 function MyCalendar() {
   const dragPlugin = createDragPlugin({

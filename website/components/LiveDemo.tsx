@@ -38,15 +38,6 @@ export function LiveDemo() {
       </section>
 
       <section className="space-y-6 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-semibold">Try it in your browser</h2>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              Switch views, drag events, and explore the plugin architecture
-              live.
-            </p>
-          </div>
-        </div>
         <div className="overflow-hidden ">
           <InteractiveCalendar />
         </div>

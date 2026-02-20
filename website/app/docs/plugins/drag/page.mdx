@@ -4,16 +4,21 @@ The Drag & Drop plugin enables interactive event management, allowing users to m
 
 ## Installation
 
-The Drag & Drop plugin is currently part of the `@dayflow/core` package.
+Install the plugin using your preferred package manager:
+
+```bash copy
+npm install @dayflow/plugin-drag
+```
 
 ```tsx copy
-import { createDragPlugin } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 ```
 
 ## Usage
 
 ```tsx copy
-import { useCalendarApp, createDragPlugin, ViewType } from '@dayflow/core';
+import { useCalendarApp, ViewType } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 
 function MyCalendar() {
   const dragPlugin = createDragPlugin({

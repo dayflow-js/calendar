@@ -89,8 +89,8 @@ const InstallCommand = ({ cmd, pkg }: { cmd: string; pkg: string }) => {
 
   return (
     <div className="relative group mt-4">
-      <div className="p-4 rounded-lg bg-[#f4f5f7] dark:bg-zinc-800 font-mono text-sm overflow-x-auto whitespace-pre">
-        <span className="text-blue-700 dark:text-blue-300">$</span> {command}
+      <div className="p-4 rounded-lg bg-[#f4f5f7] dark:bg-zinc-800 font-medium text-sm overflow-x-auto whitespace-pre">
+        {command}
       </div>
       <button
         onClick={copy}
