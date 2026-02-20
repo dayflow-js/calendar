@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
 } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
 import {
   getSelectedBgColor,
   getEventBgColor,
@@ -94,6 +93,9 @@ const CalendarEvent = ({
         : event.id;
 
   const showDetailPanel = detailPanelEventId === detailPanelKey;
+  // When a custom dialog is provided, CalendarRoot handles it — disable click-outside
+  // in CalendarEvent so clicks inside the dialog don't accidentally close it.
+  const showDetailPanelForClickOutside = showDetailPanel && !customEventDetailDialog;
 
   const readOnlyConfig = app?.getReadOnlyConfig();
   const isEditable = !app?.state.readOnly;
@@ -579,13 +581,18 @@ const CalendarEvent = ({
     setEventVisibility,
   });
 
+  // When a custom dialog is open, disable ALL click-outside handling so that
+  // clicks inside the dialog don't accidentally close it. The dialog closes
+  // itself via its own onClose callback.
+  const isDialogOpen = showDetailPanel && !!customEventDetailDialog;
+
   // --- Click Outside Hook ---
   useClickOutside({
     eventRef,
     detailPanelRef,
     eventId: event.id,
-    isEventSelected,
-    showDetailPanel,
+    isEventSelected: isDialogOpen ? false : isEventSelected,
+    showDetailPanel: showDetailPanelForClickOutside,
     onEventSelect,
     onDetailPanelToggle,
     setIsSelected,
@@ -764,31 +771,9 @@ const CalendarEvent = ({
     };
 
     if (customEventDetailDialog) {
-      const DialogComponent = customEventDetailDialog;
-      const dialogProps = {
-        event,
-        isOpen: showDetailPanel,
-        isAllDay,
-        onEventUpdate,
-        onEventDelete,
-        onClose: handleClose,
-        app,
-      };
-      const portalTarget =
-        typeof document !== 'undefined' ? document.body : null;
-      if (!portalTarget) return null;
-
-      return (
-        <ContentSlot
-          store={customRenderingStore}
-          generatorName="eventDetailDialog"
-          generatorArgs={dialogProps}
-          defaultContent={createPortal(
-            <DialogComponent {...dialogProps} />,
-            portalTarget
-          )}
-        />
-      );
+      // Dialog rendering is handled at CalendarRoot level to avoid stacking context issues.
+      // CalendarRoot uses detailPanelEventId to know which event's dialog to show.
+      return null;
     }
 
     if (!detailPanelPosition) return null;
@@ -806,27 +791,40 @@ const CalendarEvent = ({
       onClose: handleClose,
     };
 
-    return (
-      <ContentSlot
-        store={customRenderingStore}
-        generatorName="eventDetailContent"
-        generatorArgs={{
-          event,
-          position: detailPanelPosition,
-          onClose: handleClose,
-        }}
-        defaultContent={
-          customDetailPanelContent ? (
-            <EventDetailPanelWithContent
-              {...panelProps}
-              contentRenderer={customDetailPanelContent}
+    // If framework(React/Vue/...) has overridden the eventDetailContent slot, render the panel chrome
+    // with ContentSlot inside it. This ensures the React content is portaled into
+    // the positioned floating panel (at document.body), not inline in the calendar grid.
+    if (customRenderingStore?.isOverridden('eventDetailContent')) {
+      return (
+        <EventDetailPanelWithContent
+          {...panelProps}
+          contentRenderer={() => (
+            <ContentSlot
+              store={customRenderingStore}
+              generatorName="eventDetailContent"
+              generatorArgs={{
+                event,
+                isAllDay,
+                onEventUpdate,
+                onEventDelete,
+                onClose: handleClose,
+              }}
             />
-          ) : (
-            <DefaultEventDetailPanel {...panelProps} app={app} />
-          )
-        }
-      />
-    );
+          )}
+        />
+      );
+    }
+
+    if (customDetailPanelContent) {
+      return (
+        <EventDetailPanelWithContent
+          {...panelProps}
+          contentRenderer={customDetailPanelContent}
+        />
+      );
+    }
+
+    return <DefaultEventDetailPanel {...panelProps} app={app} />;
   };
 
   const renderEventContent = () => {
@@ -960,7 +958,7 @@ const CalendarEvent = ({
         {renderEventContent()}
       </div>
 
-      {showDetailPanel && (
+      {showDetailPanel && !customEventDetailDialog && (
         <div
           style={{
             position: 'fixed',

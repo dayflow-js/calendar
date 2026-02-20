@@ -69,6 +69,7 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
     Map<string, CustomRendering>
   >(new Map());
   const [isMounted, setIsMounted] = useState(false);
+  const [, setTick] = useState(0);
 
   // Extract the underlying app instance
   const app = (calendar as any)?.app || calendar;
@@ -82,7 +83,7 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
     rendererRef.current = renderer;
     renderer.mount(containerRef.current);
 
-    const unsubscribe = renderer
+    const unsubscribeStore = renderer
       .getCustomRenderingStore()
       .subscribe(
         (
@@ -96,8 +97,14 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
         }
       );
 
+    // Subscribe to app changes to refresh portals if needed
+    const unsubscribeApp = app.subscribe(() => {
+      setTick(t => t + 1);
+    });
+
     return () => {
-      unsubscribe();
+      unsubscribeStore();
+      unsubscribeApp();
       renderer.unmount();
       rendererRef.current = null;
     };
@@ -106,19 +113,40 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
   useEffect(() => {
     if (!rendererRef.current) return;
     const store = rendererRef.current.getCustomRenderingStore();
+
+    // Regular overrides from props
     const activeOverrides = Object.keys(renderProps).filter(
       key => (renderProps as any)[key] !== undefined
+    );
+
+    // Also check for overrides from plugins (like sidebar)
+    const pluginOverrides: string[] = [];
+    if (app && app.state && app.state.plugins) {
+      app.state.plugins.forEach((plugin: any) => {
+        if (plugin.name === 'sidebar' && plugin.config) {
+          if (plugin.config.render) pluginOverrides.push('sidebar');
+          if (plugin.config.renderCreateCalendarDialog)
+            pluginOverrides.push('createCalendarDialog');
+          if (plugin.config.renderCalendarContextMenu)
+            pluginOverrides.push('calendarContextMenu');
+        }
+        // Add other plugins as needed
+      });
+    }
+
+    const allOverrides = Array.from(
+      new Set([...activeOverrides, ...pluginOverrides])
     );
 
     // Only update if keys have changed
     if (
       JSON.stringify(renderPropsKeysRef.current) !==
-      JSON.stringify(activeOverrides)
+      JSON.stringify(allOverrides)
     ) {
-      store.setOverrides(activeOverrides);
-      renderPropsKeysRef.current = activeOverrides;
+      store.setOverrides(allOverrides);
+      renderPropsKeysRef.current = allOverrides;
     }
-  }, [renderProps]);
+  }, [renderProps, app]);
 
   // Portals for custom content
   const portals = useMemo(() => {
@@ -127,8 +155,21 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
       (rendering: CustomRendering) => {
         const { id, containerEl, generatorName, generatorArgs } = rendering;
 
-        // Look up the generator in renderProps
-        const generator = (renderProps as any)[generatorName];
+        // 1. Look up the generator in renderProps
+        let generator = (renderProps as any)[generatorName];
+
+        // 2. If not in props, look up in plugins
+        if (!generator && app && app.state && app.state.plugins) {
+          app.state.plugins.forEach((plugin: any) => {
+            if (plugin.name === 'sidebar' && plugin.config) {
+              if (generatorName === 'sidebar') generator = plugin.config.render;
+              if (generatorName === 'createCalendarDialog')
+                generator = plugin.config.renderCreateCalendarDialog;
+              if (generatorName === 'calendarContextMenu')
+                generator = plugin.config.renderCalendarContextMenu;
+            }
+          });
+        }
 
         if (!generator) {
           return null;
@@ -142,7 +183,7 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
         return createPortal(content, containerEl, id);
       }
     );
-  }, [customRenderings, renderProps, isMounted]);
+  }, [customRenderings, renderProps, isMounted, app]);
 
   return (
     <>

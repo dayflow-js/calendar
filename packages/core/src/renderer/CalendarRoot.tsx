@@ -26,7 +26,8 @@ import { LocaleProvider } from '../locale/LocaleProvider';
 import { useLocale } from '../locale/useLocale';
 import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
 import { generateUniKey } from '../utils/helpers';
-import { temporalToDate, dateToZonedDateTime } from '../utils/temporal';
+import { temporalToDate, dateToZonedDateTime, isPlainDate } from '../utils/temporal';
+import { createPortal } from 'preact/compat';
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
 import { useSidebarBridge } from '../plugins/sidebarBridge';
@@ -337,10 +338,53 @@ export const CalendarRoot = ({
     onDetailPanelToggle: setDetailPanelEventId,
   };
 
+  const renderEventDetailDialog = () => {
+    if (!effectiveEventDetailDialog || !detailPanelEventId) return null;
+
+    const rawEventId = detailPanelEventId.split('::')[0];
+    const selectedEvent = app.getEvents().find((e: Event) => e.id === rawEventId);
+    if (!selectedEvent) return null;
+
+    const DialogComponent = effectiveEventDetailDialog;
+    const portalTarget = typeof document !== 'undefined' ? document.body : null;
+    if (!portalTarget) return null;
+
+    const isAllDay = isPlainDate(selectedEvent.start);
+
+    const handleDialogClose = () => {
+      setDetailPanelEventId(null);
+      app.selectEvent(null);
+    };
+
+    const dialogProps = {
+      event: selectedEvent,
+      isOpen: true,
+      isAllDay,
+      onEventUpdate: (evt: Event) => app.updateEvent(evt.id, evt),
+      onEventDelete: (id: string) => {
+        app.deleteEvent(id);
+        setDetailPanelEventId(null);
+        app.selectEvent(null);
+      },
+      onClose: handleDialogClose,
+      app,
+    };
+
+    return (
+      <ContentSlot
+        store={customRenderingStore}
+        generatorName="eventDetailDialog"
+        generatorArgs={dialogProps}
+        defaultContent={createPortal(
+          h(DialogComponent, dialogProps),
+          portalTarget
+        )}
+      />
+    );
+  };
+
   const miniSidebarWidth =
     collapsedSafeAreaLeft != null ? '0px' : sidebar.miniWidth;
-
-  console.log('miniSidebarWidth', miniSidebarWidth, sidebar.miniWidth);
 
   const headerConfig = app.getCalendarHeaderConfig();
 
@@ -483,6 +527,7 @@ export const CalendarRoot = ({
           />
 
           {sidebar.extraContent}
+          {renderEventDetailDialog()}
         </div>
       </CalendarInternalLocaleProvider>
     </ThemeProvider>

@@ -60,7 +60,6 @@ export function useCalendarApp(
     highlightEvent: app.highlightEvent,
     setVisibleMonth: app.setVisibleMonth,
     getVisibleMonth: app.getVisibleMonth,
-    sidebarConfig: app.getSidebarConfig(),
     readOnlyConfig: app.getReadOnlyConfig(),
   };
 }

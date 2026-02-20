@@ -66,9 +66,6 @@ export function useCalendarApp(
     highlightEvent: app.highlightEvent.bind(app),
     setVisibleMonth: app.setVisibleMonth.bind(app),
     getVisibleMonth: app.getVisibleMonth.bind(app),
-    get sidebarConfig() {
-      return app.getSidebarConfig();
-    },
     get readOnlyConfig() {
       return app.getReadOnlyConfig();
     },
