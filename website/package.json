@@ -14,6 +14,7 @@
     "@dayflow/core": "^3.1.0",
     "@dayflow/plugin-drag": "^1.0.0",
     "@dayflow/plugin-keyboard-shortcuts": "^1.0.0",
+    "@dayflow/plugin-localization": "^1.0.0",
     "@dayflow/plugin-sidebar": "^1.0.0",
     "@dayflow/react": "^3.1.0",
     "class-variance-authority": "^0.7.1",

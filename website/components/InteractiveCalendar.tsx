@@ -15,6 +15,12 @@ import { createDragPlugin } from '@dayflow/plugin-drag';
 import { CalendarType } from '@dayflow/core';
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+import {
+  createLocalizationPlugin,
+  zh,
+  ja,
+  fr,
+} from '@dayflow/plugin-localization';
 
 import { getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
