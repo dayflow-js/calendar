@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/vue",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "type": "module",
   "description": "Vue adapter for DayFlow calendar",
   "main": "dist/index.js",
@@ -8,18 +8,19 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "typecheck": "vue-tsc --noEmit",
     "build": "rollup -c"
   },
   "peerDependencies": {
-    "@dayflow/core": "^3.0.1",
+    "@dayflow/core": "workspace:*",
     "vue": ">=3.0.0"
   },
   "devDependencies": {
-    "@dayflow/core": "^3.0.1",
+    "@dayflow/core": "workspace:*",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",

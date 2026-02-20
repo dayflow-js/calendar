@@ -6,7 +6,7 @@
     "jsx": "react-jsx",
     "allowImportingTsExtensions": false,
     "paths": {
-      "@dayflow/core": ["../core/dist/index.d.ts"]
+      "@dayflow/core": ["packages/core/dist/index.d.ts"]
     }
   },
   "include": ["src"]

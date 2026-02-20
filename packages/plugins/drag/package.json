@@ -32,7 +32,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@dayflow/core": "^3.0.0"
+    "@dayflow/core": "workspace:*"
   },
   "devDependencies": {
     "@dayflow/core": "workspace:*",

@@ -14,6 +14,7 @@ import {
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import { CalendarType } from '@dayflow/core';
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
 
 import { getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
@@ -60,7 +61,7 @@ export function InteractiveCalendar() {
 
   const calendar = useCalendarApp({
     views,
-    plugins: [dragPlugin, sidebarPlugin],
+    plugins: [dragPlugin, sidebarPlugin, createKeyboardShortcutsPlugin()],
     initialDate: new Date(),
     defaultView: currentView,
     events,

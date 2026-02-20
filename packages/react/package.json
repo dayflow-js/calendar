@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/react",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "type": "module",
   "description": "React adapter for DayFlow calendar",
   "main": "dist/index.js",
@@ -8,7 +8,8 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -17,12 +18,12 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "@dayflow/core": "^3.0.1"
+    "@dayflow/core": "workspace:*"
   },
   "devDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@dayflow/core": "^3.0.1",
+    "@dayflow/core": "workspace:*",
     "typescript": "^5.7.2",
     "rollup": "^4.29.1",
     "@rollup/plugin-commonjs": "^28.0.2",

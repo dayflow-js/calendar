@@ -1,4 +1,4 @@
-# コンテンツスロット (Content Slots)
+# ⚠️WIP: コンテンツスロット (Content Slots)
 
 DayFlow はスロットベースのアーキテクチャを採用しており、使用しているフレームワーク（React、Vue など）からカスタム UI コンポーネントをコア日暦エンジンに直接注入できます。
 
@@ -12,14 +12,14 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 
 ## 利用可能なスロット
 
-| ジェネレーター名     | 説明                                                  | 引数                                                            |
-| :------------------- | :---------------------------------------------------- | :-------------------------------------------------------------- |
-| `eventContent`       | イベントカードの内部コンテンツ。                      | `{ event, isAllDay, isMobile }`                                 |
+| ジェネレーター名            | 説明                             | 引数                                                            |
+|:---------------------|:---------------------------------|:----------------------------------------------------------------|
+| `eventContent`       | イベントカードの内部コンテンツ。               | `{ event, isAllDay, isMobile }`                                 |
 | `eventDetailContent` | イベントクリック時に表示されるパネル/詳細コンテンツ。 | `{ event, position, onClose }`                                  |
-| `colorPicker`        | サイドバーで使用される小型のカラーピッカー。          | `{ color, onChange, variant: 'sketch' }`                        |
-| `colorPickerWrapper` | ダイアログで使用されるフル機能のカラーピッカー。      | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `headerContent`      | カレンダーヘッダーのカスタムコンテンツ。              | `{ view, date, ... }`                                           |
-| `titleBarSlot`       | サイドバーのタイトルバー内の追加コンテンツ。          | `{ isCollapsed, toggleCollapsed }`                              |
+| `colorPicker`        | サイドバーで使用される小型のカラーピッカー。       | `{ color, onChange, variant: 'sketch' }`                        |
+| `colorPickerWrapper` | ダイアログで使用されるフル機能のカラーピッカー。     | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
+| `headerContent`      | カレンダーヘッダーのカスタムコンテンツ。             | `{ view, date, ... }`                                           |
+| `titleBarSlot`       | サイドバーのタイトルバー内の追加コンテンツ。        | `{ isCollapsed, toggleCollapsed }`                              |
 
 ## 例: カスタムカラーピッカーの注入
 

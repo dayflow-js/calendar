@@ -3,5 +3,9 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
+  "assets": [
+    "README.md",
+    "LICENSE"
+  ],
   "dest": "dist"
 }

@@ -1,4 +1,9 @@
-import { CalendarPlugin, ICalendarApp, Locale, registerLocale } from '@dayflow/core';
+import {
+  CalendarPlugin,
+  ICalendarApp,
+  Locale,
+  registerLocale,
+} from '@dayflow/core';
 
 export interface LocalizationConfig {
   locales: Locale[];
@@ -6,11 +11,13 @@ export interface LocalizationConfig {
 
 /**
  * Creates a localization plugin to register additional locales.
- * 
+ *
  * @param config Plugin configuration containing locales to register
  * @returns A CalendarPlugin instance
  */
-export function createLocalizationPlugin(config: LocalizationConfig): CalendarPlugin {
+export function createLocalizationPlugin(
+  config: LocalizationConfig
+): CalendarPlugin {
   return {
     name: 'localization',
     install(app: ICalendarApp) {
@@ -19,9 +26,9 @@ export function createLocalizationPlugin(config: LocalizationConfig): CalendarPl
           registerLocale(locale);
         });
       }
-      
+
       // Trigger a re-render to apply new locales
       app.triggerRender();
-    }
+    },
   };
 }

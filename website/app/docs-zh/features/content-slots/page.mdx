@@ -1,4 +1,4 @@
-# 内容插槽 (Content Slots)
+# ⚠️WIP: 内容插槽 (Content Slots)
 
 DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（React、Vue 等）中注入自定义 UI 组件到核心日历引擎中。
 
@@ -12,13 +12,13 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 
 ## 可用插槽
 
-| 生成器名称           | 描述                               | 参数                                                            |
-| :------------------- | :--------------------------------- | :-------------------------------------------------------------- |
+| 生成器名称           | 描述                              | 参数                                                            |
+|:---------------------|:----------------------------------|:----------------------------------------------------------------|
 | `eventContent`       | 日历事件卡片的内部内容。           | `{ event, isAllDay, isMobile }`                                 |
 | `eventDetailContent` | 点击事件时弹出的面板/详情内容。    | `{ event, position, onClose }`                                  |
 | `colorPicker`        | 侧边栏中使用的小型颜色选择器。     | `{ color, onChange, variant: 'sketch' }`                        |
 | `colorPickerWrapper` | 对话框中使用功能完整的颜色选择器。 | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `headerContent`      | 日历头部（Header）的自定义内容。   | `{ view, date, ... }`                                           |
+| `headerContent`      | 日历头部（Header）的自定义内容。     | `{ view, date, ... }`                                           |
 | `titleBarSlot`       | 侧边栏标题栏中的额外内容。         | `{ isCollapsed, toggleCollapsed }`                              |
 
 ## 示例：注入自定义颜色选择器

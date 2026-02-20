@@ -93,7 +93,7 @@ export function createKeyboardShortcutsPlugin(
         if (!isTyping) {
           const prevKey = keyMap.prev || 'ArrowLeft';
           const nextKey = keyMap.next || 'ArrowRight';
-          
+
           if (e.key === prevKey) {
             e.preventDefault();
             app.goToPrevious();
@@ -177,12 +177,13 @@ export function createKeyboardShortcutsPlugin(
           }
         }
       };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('keydown', handleKeyDown);
+      }
 
-      window.addEventListener('keydown', handleKeyDown);
-      
       // Cleanup is tricky for plugins as there's no uninstall yet in DayFlow core,
       // but we can store it or just let it live with the app instance.
-    }
+    },
   };
 }
 
@@ -198,7 +199,11 @@ async function handlePaste(app: ICalendarApp) {
       }
     }
 
-    if (eventData && typeof eventData === 'object' && (eventData as any).title) {
+    if (
+      eventData &&
+      typeof eventData === 'object' &&
+      (eventData as any).title
+    ) {
       const originalStart = temporalToDate(eventData.start as any);
       const originalEnd = temporalToDate(eventData.end as any);
       const duration = originalEnd.getTime() - originalStart.getTime();
@@ -239,7 +244,8 @@ async function handlePaste(app: ICalendarApp) {
           ? dateToPlainDate(targetEnd)
           : dateToZonedDateTime(targetEnd, Temporal.Now.timeZoneId()),
         calendarId:
-          eventData.calendarId && app.getCalendarRegistry().has(eventData.calendarId)
+          eventData.calendarId &&
+          app.getCalendarRegistry().has(eventData.calendarId)
             ? eventData.calendarId
             : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
       };
@@ -278,8 +284,16 @@ function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
     }
     case ViewType.MONTH: {
       const visibleMonth = app.getVisibleMonth();
-      const start = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
-      const end = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0);
+      const start = new Date(
+        visibleMonth.getFullYear(),
+        visibleMonth.getMonth(),
+        1
+      );
+      const end = new Date(
+        visibleMonth.getFullYear(),
+        visibleMonth.getMonth() + 1,
+        0
+      );
       visibleEvents = events.filter(e => {
         const s = temporalToDate(e.start);
         return s >= start && s <= end;
@@ -289,7 +303,8 @@ function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
     case ViewType.YEAR: {
       const year = currentDate.getFullYear();
       const yearConfig = app.getViewConfig(ViewType.YEAR);
-      const showTimedEvents = (yearConfig as any).showTimedEventsInYearView ?? false;
+      const showTimedEvents =
+        (yearConfig as any).showTimedEventsInYearView ?? false;
       visibleEvents = events.filter(e => {
         if (!showTimedEvents && !e.allDay) return false;
         return temporalToDate(e.start).getFullYear() === year;
