@@ -4,6 +4,9 @@ const meta: MetaRecord = {
   introduction: {
     title: 'Introduction',
   },
+  plugins: {
+    title: 'Plugins',
+  },
   features: {
     title: 'Features',
     theme: {

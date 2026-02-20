@@ -5,3 +5,4 @@ export * from './locales';
 export * from './utils';
 export * from './LocaleContext';
 export * from './useLocale';
+export * from './LocaleProvider';

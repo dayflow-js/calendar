@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
 } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
 import {
   getSelectedBgColor,
   getEventBgColor,
@@ -94,6 +93,9 @@ const CalendarEvent = ({
         : event.id;
 
   const showDetailPanel = detailPanelEventId === detailPanelKey;
+  // When a custom dialog is provided, CalendarRoot handles it — disable click-outside
+  // in CalendarEvent so clicks inside the dialog don't accidentally close it.
+  const showDetailPanelForClickOutside = showDetailPanel && !customEventDetailDialog;
 
   const readOnlyConfig = app?.getReadOnlyConfig();
   const isEditable = !app?.state.readOnly;
@@ -159,11 +161,24 @@ const CalendarEvent = ({
   // --- Style Calculation (Internal due to state dependencies) ---
   const calculateEventStyle = () => {
     if (isMonthView) {
+      if (isMultiDay && segment) {
+        // MultiDayEvent handles its own scaling and positioning.
+        // Applying transform here would create a containing block, breaking absolute positioning.
+        return {
+          opacity: 1,
+          zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
+          cursor: isDraggable
+            ? 'pointer'
+            : canOpenDetail
+              ? 'pointer'
+              : 'default',
+        };
+      }
       return {
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
-        transform: isPopping ? 'scale(1.15)' : undefined,
-        transition: 'transform 0.1s ease-in-out',
+        transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
     }
@@ -173,8 +188,8 @@ const CalendarEvent = ({
         height: `${allDayHeight - 4}px`,
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
-        transform: isPopping ? 'scale(1.12)' : undefined,
-        transition: 'transform 0.1s ease-in-out',
+        transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
 
@@ -234,8 +249,8 @@ const CalendarEvent = ({
       position: 'absolute' as const,
       opacity: 1,
       zIndex: isEventSelected || showDetailPanel ? 1000 : (layout?.zIndex ?? 1),
-      transform: isPopping ? 'scale(1.12)' : undefined,
-      transition: 'transform 0.1s ease-in-out',
+      transform: isPopping ? 'scale(1.05)' : 'scale(1)',
+      transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
       cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
     };
 
@@ -566,13 +581,18 @@ const CalendarEvent = ({
     setEventVisibility,
   });
 
+  // When a custom dialog is open, disable ALL click-outside handling so that
+  // clicks inside the dialog don't accidentally close it. The dialog closes
+  // itself via its own onClose callback.
+  const isDialogOpen = showDetailPanel && !!customEventDetailDialog;
+
   // --- Click Outside Hook ---
   useClickOutside({
     eventRef,
     detailPanelRef,
     eventId: event.id,
-    isEventSelected,
-    showDetailPanel,
+    isEventSelected: isDialogOpen ? false : isEventSelected,
+    showDetailPanel: showDetailPanelForClickOutside,
     onEventSelect,
     onDetailPanelToggle,
     setIsSelected,
@@ -592,6 +612,20 @@ const CalendarEvent = ({
       requestAnimationFrame(() => updatePanelPosition());
     }
   }, [showDetailPanel, detailPanelPosition, updatePanelPosition, isMobile]);
+
+  // --- Highlight effect ---
+  useEffect(() => {
+    if (app?.state.highlightedEventId === event.id) {
+      setIsPopping(true);
+      const timer = setTimeout(() => {
+        setIsPopping(false);
+      }, 300);
+      return () => {
+        clearTimeout(timer);
+        setIsPopping(false);
+      };
+    }
+  }, [app?.state.highlightedEventId, event.id]);
 
   // --- Helpers ---
   const scrollEventToCenter = (): Promise<void> => {
@@ -737,31 +771,9 @@ const CalendarEvent = ({
     };
 
     if (customEventDetailDialog) {
-      const DialogComponent = customEventDetailDialog;
-      const dialogProps = {
-        event,
-        isOpen: showDetailPanel,
-        isAllDay,
-        onEventUpdate,
-        onEventDelete,
-        onClose: handleClose,
-        app,
-      };
-      const portalTarget =
-        typeof document !== 'undefined' ? document.body : null;
-      if (!portalTarget) return null;
-
-      return (
-        <ContentSlot
-          store={customRenderingStore}
-          generatorName="eventDetailDialog"
-          generatorArgs={dialogProps}
-          defaultContent={createPortal(
-            <DialogComponent {...dialogProps} />,
-            portalTarget
-          )}
-        />
-      );
+      // Dialog rendering is handled at CalendarRoot level to avoid stacking context issues.
+      // CalendarRoot uses detailPanelEventId to know which event's dialog to show.
+      return null;
     }
 
     if (!detailPanelPosition) return null;
@@ -779,27 +791,40 @@ const CalendarEvent = ({
       onClose: handleClose,
     };
 
-    return (
-      <ContentSlot
-        store={customRenderingStore}
-        generatorName="eventDetailContent"
-        generatorArgs={{
-          event,
-          position: detailPanelPosition,
-          onClose: handleClose,
-        }}
-        defaultContent={
-          customDetailPanelContent ? (
-            <EventDetailPanelWithContent
-              {...panelProps}
-              contentRenderer={customDetailPanelContent}
+    // If framework(React/Vue/...) has overridden the eventDetailContent slot, render the panel chrome
+    // with ContentSlot inside it. This ensures the React content is portaled into
+    // the positioned floating panel (at document.body), not inline in the calendar grid.
+    if (customRenderingStore?.isOverridden('eventDetailContent')) {
+      return (
+        <EventDetailPanelWithContent
+          {...panelProps}
+          contentRenderer={() => (
+            <ContentSlot
+              store={customRenderingStore}
+              generatorName="eventDetailContent"
+              generatorArgs={{
+                event,
+                isAllDay,
+                onEventUpdate,
+                onEventDelete,
+                onClose: handleClose,
+              }}
             />
-          ) : (
-            <DefaultEventDetailPanel {...panelProps} app={app} />
-          )
-        }
-      />
-    );
+          )}
+        />
+      );
+    }
+
+    if (customDetailPanelContent) {
+      return (
+        <EventDetailPanelWithContent
+          {...panelProps}
+          contentRenderer={customDetailPanelContent}
+        />
+      );
+    }
+
+    return <DefaultEventDetailPanel {...panelProps} app={app} />;
   };
 
   const renderEventContent = () => {
@@ -819,6 +844,7 @@ const CalendarEvent = ({
             isDraggable={isDraggable}
             isEditable={isEditable}
             viewable={canOpenDetail}
+            isPopping={isPopping}
           />
         );
       } else {
@@ -932,7 +958,7 @@ const CalendarEvent = ({
         {renderEventContent()}
       </div>
 
-      {showDetailPanel && (
+      {showDetailPanel && !customEventDetailDialog && (
         <div
           style={{
             position: 'fixed',

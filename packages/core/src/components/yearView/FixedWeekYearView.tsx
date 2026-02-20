@@ -15,7 +15,7 @@ import {
   ICalendarApp,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import ViewHeader from '@/components/common/ViewHeader';
 import { YearMultiDayEvent } from './YearMultiDayEvent';
 import { YearMultiDaySegment } from './utils';
@@ -247,8 +247,19 @@ export const FixedWeekYearView = ({
       const target = e.target as HTMLElement;
       const clickedEvent = target.closest('[data-event-id]');
       const clickedPanel = target.closest('[data-event-detail-panel]');
+      const clickedDialog = target.closest('[data-event-detail-dialog]');
+      const clickedRangePicker = target.closest('[data-range-picker-popup]');
+      const clickedCalendarPicker = target.closest(
+        '[data-calendar-picker-dropdown]'
+      );
 
-      if (!clickedEvent && !clickedPanel) {
+      if (
+        !clickedEvent &&
+        !clickedPanel &&
+        !clickedDialog &&
+        !clickedRangePicker &&
+        !clickedCalendarPicker
+      ) {
         setSelectedEventId(null);
         setDetailPanelEventId(null);
       }
@@ -374,6 +385,8 @@ export const FixedWeekYearView = ({
       return s <= yearEnd && e >= yearStart;
     });
   }, [rawEvents, currentYear, showTimedEvents]);
+
+  console.log('yearEvents', yearEvents.length);
 
   // Generate data for all 12 months with event segments
   const monthsData = useMemo(() => {
@@ -558,7 +571,7 @@ export const FixedWeekYearView = ({
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 flex-grow shrink-0"
+              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 grow shrink-0"
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {month.monthName}
@@ -587,7 +600,7 @@ export const FixedWeekYearView = ({
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="relative flex-grow shrink-0"
+              className="relative grow shrink-0"
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {/* Background grid cells */}

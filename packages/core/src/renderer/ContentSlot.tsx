@@ -1,4 +1,4 @@
-import { useRef, useEffect, useContext } from 'preact/hooks';
+import { useRef, useEffect, useContext, useState } from 'preact/hooks';
 import { CustomRenderingContext } from './CustomRenderingContext';
 
 interface ContentSlotProps {
@@ -28,11 +28,13 @@ export function ContentSlot({
   const contextStore = useContext(CustomRenderingContext);
   const store = propStore || contextStore;
   const idRef = useRef<string | null>(null);
+  const [, setTick] = useState(0);
 
   if (!idRef.current) {
     idRef.current = generateId();
   }
 
+  // Register/Unregister the container once
   useEffect(() => {
     if (!containerRef.current || !store) return;
 
@@ -41,19 +43,42 @@ export function ContentSlot({
       id,
       containerEl: containerRef.current,
       generatorName,
-      generatorArgs,
+      generatorArgs, // Initial args
     });
 
-    return () => store.unregister(id);
-  }, [store, generatorName, JSON.stringify(generatorArgs)]); // Use JSON.stringify for deep comparison of args if needed
+    // Subscribe to store updates to re-render when overrides change
+    const unsubscribe = store.subscribe(() => {
+      setTick(t => t + 1);
+    });
+
+    return () => {
+      store.unregister(id);
+      unsubscribe();
+    };
+  }, [store]); // Only re-run if store changes
+
+  // Update args when they change, without unregistering
+  useEffect(() => {
+    if (!store || !idRef.current) return;
+    
+    // Check if actually different to avoid redundant notifications
+    const id = idRef.current;
+    store.register({
+      id,
+      containerEl: containerRef.current!,
+      generatorName,
+      generatorArgs,
+    });
+  }, [generatorName, generatorArgs]);
 
   const isEventSlot = generatorName === 'eventContent';
+  const isSidebarSlot = generatorName === 'sidebar';
   const isOverridden = store?.isOverridden(generatorName);
 
   return (
     <div
       ref={containerRef}
-      className={`df-content-slot ${isEventSlot ? 'flex-1 flex flex-col h-full' : ''}`}
+      className={`df-content-slot ${isEventSlot || isSidebarSlot ? 'flex-1 flex flex-col h-full' : ''}`}
     >
       {!isOverridden && defaultContent}
     </div>

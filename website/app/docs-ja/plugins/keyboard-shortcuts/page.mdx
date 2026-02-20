@@ -1,0 +1,64 @@
+# キーボードショートカットプラグイン
+
+キーボードショートカット (Keyboard Shortcuts) プラグインは、ナビゲーション、イベント管理、およびクリップボード操作のためのグローバルなキーボードコントロールを可能にします。
+
+## インストール
+
+プラグインパッケージをインストールします：
+
+```bash copy
+npm install @dayflow/plugin-keyboard-shortcuts
+```
+
+## 使い方
+
+```tsx copy
+import { useCalendarApp } from '@dayflow/core';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    // ...
+    plugins: [
+      createKeyboardShortcutsPlugin({
+        // オプション設定
+      })
+    ]
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## デフォルトのショートカット
+
+| 操作 | キー (Mac) | キー (Windows/Linux) |
+| :--- | :--- | :--- |
+| **今日に移動** | `Cmd + T` | `Ctrl + T` |
+| **検索** | `Cmd + F` | `Ctrl + F` |
+| **新規イベント** | `Cmd + N` | `Ctrl + N` |
+| **ナビゲーション** | `ArrowLeft` / `ArrowRight` | `ArrowLeft` / `ArrowRight` |
+| **イベントのタブ移動** | `Tab` / `Shift + Tab` | `Tab` / `Shift + Tab` |
+| **元に戻す** | `Cmd + Z` | `Ctrl + Z` |
+| **イベントをコピー** | `Cmd + C` | `Ctrl + C` |
+| **イベントを切り取り** | `Cmd + X` | `Ctrl + X` |
+| **イベントを貼り付け** | `Cmd + V` | `Ctrl + V` |
+| **イベントを削除** | `Backspace` / `Delete` | `Backspace` / `Delete` |
+| **ダイアログ/パネルを閉じる** | `Esc` | `Esc` |
+
+## 設定
+
+キーマッピングをカスタマイズできます：
+
+```tsx copy
+createKeyboardShortcutsPlugin({
+  keyMap: {
+    today: 't',
+    search: 'f',
+    prev: 'ArrowLeft',
+    next: 'ArrowRight',
+    delete: 'Delete',
+    newEvent: 'n'
+  }
+})
+```

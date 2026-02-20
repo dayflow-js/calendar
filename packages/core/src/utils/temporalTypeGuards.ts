@@ -156,7 +156,7 @@ export function dateToPlainDateTime(date: Date): Temporal.PlainDateTime {
  */
 export function dateToZonedDateTime(
   date: Date,
-  timeZone: string
+  timeZone: string = Temporal.Now.timeZoneId()
 ): Temporal.ZonedDateTime {
   return Temporal.ZonedDateTime.from({
     year: date.getFullYear(),

@@ -8,7 +8,7 @@ import {
 import { formatTime, extractHourFromDate } from '@/utils';
 import { Event, DayViewProps } from '@/types';
 import { EventLayoutCalculator } from '@/components/eventLayout';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import { ViewType as DragViewType } from '@/types';
 import { defaultDragConfig } from '@/core/config';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
@@ -111,7 +111,7 @@ const DayView = ({
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentDate = app.getCurrentDate();
-  const visibleMonthDate = app.getVisibleMonth();
+  // const visibleMonthDate = app.getVisibleMonth();
   // Visible Month State
   const [visibleMonth, setVisibleMonth] = useState(currentDate);
   const prevDateRef = useRef(currentDate.getTime());

@@ -123,6 +123,7 @@ const RangePicker = ({
     end: { hour: null, minute: null },
   });
   const committedRef = useRef(false);
+  const isEditingRef = useRef(false);
 
   useEffect(() => {
     inputValuesRef.current = inputValues;
@@ -211,6 +212,9 @@ const RangePicker = ({
   const draftEndOffset = draftRange[1].offsetNanoseconds;
 
   useEffect(() => {
+    // Don't overwrite the input while the user is actively typing
+    if (isEditingRef.current) return;
+
     const [currentStart, currentEnd] = draftRangeRef.current;
     const nextStart = formatTemporal(currentStart, format, effectiveTimeFormat);
     const nextEnd = formatTemporal(currentEnd, format, effectiveTimeFormat);
@@ -555,17 +559,49 @@ const RangePicker = ({
 
   const handleInputChange = useCallback(
     (field: 'start' | 'end') => (event: any) => {
-      updateInputValue(field, event.target.value);
+      const newValue = event.target.value;
+      isEditingRef.current = true;
+      updateInputValue(field, newValue);
+
+      // Try to parse and sync to popup in real-time
+      const index = field === 'start' ? 0 : 1;
+      const reference = draftRangeRef.current[index];
+      const zoneId = getZoneId(reference);
+      const parsed = parseTemporalString(
+        newValue,
+        parseRegExp,
+        reference,
+        zoneId
+      );
+      if (parsed) {
+        updateRange(field, parsed);
+        const month = parsed.toPlainDate().with({ day: 1 });
+        setVisibleMonth(month);
+        scrollToActiveTime(field);
+      }
     },
-    [updateInputValue]
+    [updateInputValue, parseRegExp, updateRange, scrollToActiveTime]
   );
 
   const handleInputBlur = useCallback(
     (field: 'start' | 'end') => (event: any) => {
       if (disabled) return;
-      // If popup is open, don't do anything on blur
-      // The popup will handle its own interactions
+      isEditingRef.current = false;
+
       if (isOpen) {
+        // Reset input text to canonical format of current draftRange
+        // (draftRange was already synced in real-time for valid inputs)
+        const index = field === 'start' ? 0 : 1;
+        const formatted = formatTemporal(
+          draftRangeRef.current[index],
+          format,
+          effectiveTimeFormat
+        );
+        setInputValues(prev => {
+          const next: [string, string] = [...prev] as [string, string];
+          next[index] = formatted;
+          return next;
+        });
         return;
       }
 
@@ -575,13 +611,14 @@ const RangePicker = ({
         commitInputValue(field, event.target.value);
       }
     },
-    [commitInputValue, disabled, isOpen]
+    [commitInputValue, disabled, isOpen, format, effectiveTimeFormat]
   );
 
   const handleInputKeyDown = useCallback(
     (field: 'start' | 'end') => (event: any) => {
       if (event.key === 'Enter') {
         event.preventDefault();
+        isEditingRef.current = false;
         commitInputValue(field, event.currentTarget.value);
       }
       if (event.key === 'Escape') {

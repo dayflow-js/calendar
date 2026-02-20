@@ -1,9 +1,6 @@
 import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
-  sidebar: {
-    title: '侧边栏',
-  },
   'calendar-header': {
     title: '日历页眉',
   },
@@ -21,9 +18,11 @@ const meta: MetaRecord = {
   },
   'custom-detail-dialog': {
     title: '自定义详情对话框',
+    display: 'hidden',
   },
   'custom-detail-panel': {
     title: '自定义详情面板',
+    display: 'hidden',
   },
   'content-slots': {
     title: '内容插槽 (Content Slots)',

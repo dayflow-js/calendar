@@ -1,0 +1,46 @@
+{
+  "name": "@dayflow/plugin-keyboard-shortcuts",
+  "version": "1.0.0",
+  "description": "Keyboard shortcuts plugin for DayFlow calendar",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "calendar",
+    "keyboard",
+    "shortcuts",
+    "dayflow",
+    "plugin"
+  ],
+  "author": "Jayce Li",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@dayflow/core": "workspace:*",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "rollup": "^4.29.1",
+    "rollup-plugin-dts": "^6.3.0",
+    "temporal-polyfill": "^0.3.0",
+    "typescript": "^5.7.2"
+  }
+}

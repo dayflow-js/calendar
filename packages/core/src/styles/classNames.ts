@@ -64,7 +64,7 @@ export const iconSize = 'h-5 w-5';
  * Cancel button
  */
 export const cancelButton =
-  'rounded-md bg-background border border-border px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-(--hover)';
+  'rounded-md bg-background border border-border px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-(--hover)';
 
 // ==================== Grid Styles ====================
 

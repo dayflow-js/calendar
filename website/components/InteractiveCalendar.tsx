@@ -8,11 +8,13 @@ import {
   createDayView,
   createWeekView,
   createMonthView,
-  createDragPlugin,
   ViewType,
   createYearView,
 } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import { CalendarType } from '@dayflow/core';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
 
 import { getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
@@ -36,6 +38,11 @@ export function InteractiveCalendar() {
 
   const dragPlugin = createDragPlugin();
 
+  const sidebarPlugin = createSidebarPlugin({
+    createCalendarMode: 'modal',
+    colorPickerMode: 'blossom',
+  });
+
   const views = useMemo(
     () => [
       createDayView(),
@@ -54,20 +61,19 @@ export function InteractiveCalendar() {
 
   const calendar = useCalendarApp({
     views,
-    plugins: [dragPlugin],
+    plugins: [dragPlugin, sidebarPlugin, createKeyboardShortcutsPlugin()],
     initialDate: new Date(),
     defaultView: currentView,
     events,
     calendars: calendarTypes,
     switcherMode: 'buttons',
-    useSidebar: {
-      enabled: !isMobile,
-      colorPickerMode: 'blossom',
-    },
     callbacks: {
       onMoreEventsClick: (date: Date) => {
         calendar.selectDate(date);
         calendar.changeView(ViewType.DAY);
+      },
+      onEventUpdate(event) {
+        console.log('Event updated:', event);
       },
     },
     theme: { mode: themeMode },

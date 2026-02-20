@@ -41,7 +41,6 @@ export function TeamCalendar() {
 | `defaultCalendar`           | `string`                    | 任意 | 最初の可視カレンダー | 新規イベント作成時の既定カレンダー ID。                                                 |
 | `theme`                     | `ThemeConfig`               | 任意 | `{ mode: 'light' }`  | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                                 |
 | `locale`                    | `string \| Locale`          | 任意 | `'en-US'`            | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。    |
-| `useSidebar`                | `boolean \| SidebarConfig`  | 任意 | `false`              | サイドバーを有効化し、幅や折りたたみ・カスタムレンダーを制御。                          |
 | `useEventDetailDialog`      | `boolean`                   | 任意 | `false`              | 詳細表示をモーダルダイアログに切り替える。                                              |
 | `useCalendarHeader`         | `boolean \| Function`       | 任意 | `true`               | デフォルトヘッダーの有効化、非表示（`false`）、またはカスタムレンダラーの指定。         |
 | `readOnly`                  | `boolean \| ReadOnlyConfig` | 任意 | `false`              | インタラクションを無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。 |
@@ -154,34 +153,10 @@ const calendar = useCalendarApp({
 });
 ```
 
-### useSidebar
-
-- `true` で標準サイドバー（幅 240px）が表示されます。
-- オブジェクト形式で `width`, `initialCollapsed`, `render` を指定すると、折りたたみ状態やカスタムレンダーを制御可能です。
-
-### useEventDetailDialog
-
-- `true` にするとモーダルダイアログが有効になります。
-- `DayFlowCalendar` の `customEventDetailDialog` と組み合わせれば UI を完全に差し替えつつ、開閉ロジックはそのまま利用できます。
-
-### useCalendarHeader
-
-- `true` (デフォルト): 標準のカレンダーヘッダーをレンダリングします。
-- `false`: ヘッダーを完全に非表示にします。
-- `(props) => ReactNode`: カスタムヘッダーをレンダリングします。詳細は [カレンダーヘッダー](/docs-ja/features/calendar-header) を参照してください。
-
-### readOnly
-
-- `true`: すべての変更（ドラッグ、作成、編集）を無効にします。
-- `ReadOnlyConfig`: きめ細かな制御。
-  - `draggable`: ドラッグが可能かどうか。
-  - `viewable`: イベント詳細を開くことが可能かどうか。
-- 詳細は [読み取り専用モード](/docs-ja/features/read-only) を参照してください。
-
 ### customMobileEventRenderer
 
 - モバイル用のデフォルトのイベント編集ドロワーを独自のコンポーネントで置き換えることができます。
-- 詳細は[機能の概要](/docs-ja/features/sidebar)を参照してください。
+- 詳細は[サイドバープラグイン](/docs-ja/plugins/sidebar)を参照してください。
 
 ## 応用的な設定例
 
@@ -192,7 +167,9 @@ import {
   createMonthView,
   createWeekView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+import '@dayflow/core/dist/styles.css';
 
 const calendars = [
   {
@@ -230,10 +207,12 @@ export function AdvancedCalendar() {
       onEventUpdate: event => api.events.update(event),
       onVisibleMonthChange: month => preloadMonthData(month),
     },
-    useSidebar: {
-      width: 280,
-      initialCollapsed: false,
-    },
+    plugins: [
+      createSidebarPlugin({
+        width: 280,
+        initialCollapsed: false,
+      })
+    ],
     useEventDetailDialog: true,
   });
 

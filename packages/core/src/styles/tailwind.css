@@ -5,7 +5,8 @@
 
 /* Force scanning of all relevant source code files to extract utility classes */
 @source "../**/*.{ts,tsx}";
-@source "../../../packages/*/src/**/*.{ts,tsx}";
+@source "../../../core/*/src/**/*.{ts,tsx}";
+@source "../../../plugins/*/src/**/*.{ts,tsx}";
 
 @variant dark (.dark &);
 
@@ -235,14 +236,14 @@ body {
 }
 
 /* Hide scrollbar but allow scrolling */
-/*.scrollbar-hide::-webkit-scrollbar {*/
-/*  display: none;*/
-/*}*/
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
-/*.scrollbar-hide {*/
-/*  -ms-overflow-style: none; !* IE and Edge *!*/
-/*  scrollbar-width: none; !* Firefox *!*/
-/*}*/
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 
 /* Custom 2px scrollbar */
 ::-webkit-scrollbar {

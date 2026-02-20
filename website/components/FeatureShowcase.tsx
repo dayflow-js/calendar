@@ -18,9 +18,9 @@ import {
   createMonthView,
   createWeekView,
   createDayView,
-  createDragPlugin,
   ViewType,
 } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import {
   Event,
   EventDetailContentRenderer,
@@ -767,7 +767,11 @@ export const CustomDetailDialogShowcase: React.FC = () => {
 
   return (
     <div className="mt-2">
-      <DemoCalendar customEventDetailDialog={customDialog} className="h-130" />
+      <DemoCalendar
+        customEventDetailDialog={customDialog}
+        useEventDetailDialog={true}
+        className="h-130"
+      />
     </div>
   );
 };

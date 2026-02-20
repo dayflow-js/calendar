@@ -77,6 +77,7 @@ export interface CalendarCallbacks {
   ) => void | Promise<void>;
   onEventClick?: (event: Event) => void | Promise<void>;
   onMoreEventsClick?: (date: Date) => void | Promise<void>;
+  onDismissUI?: () => void | Promise<void>;
 }
 
 export interface CreateCalendarDialogProps {
@@ -100,46 +101,6 @@ export interface CalendarHeaderProps {
 }
 
 /**
- * Sidebar render props
- */
-export interface CalendarSidebarRenderProps {
-  app: ICalendarApp;
-  calendars: CalendarType[];
-  toggleCalendarVisibility: (calendarId: string, visible: boolean) => void;
-  toggleAll: (visible: boolean) => void;
-  isCollapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  renderCalendarContextMenu?: (
-    calendar: CalendarType,
-    onClose: () => void
-  ) => TNode;
-  createCalendarMode?: 'inline' | 'modal';
-  renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
-  editingCalendarId?: string | null;
-  setEditingCalendarId?: (id: string | null) => void;
-  onCreateCalendar?: () => void;
-  colorPickerMode?: 'blossom' | 'default';
-}
-
-/**
- * Sidebar config
- */
-export interface SidebarConfig {
-  enabled?: boolean;
-  width?: number | string;
-  initialCollapsed?: boolean;
-  render?: (props: CalendarSidebarRenderProps) => TNode;
-  renderCalendarContextMenu?: (
-    calendar: CalendarType,
-    onClose: () => void
-  ) => TNode;
-  createCalendarMode?: 'inline' | 'modal';
-  renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
-  /** Color picker mode: 'blossom' for BlossomColorPicker, 'default' for react-color */
-  colorPickerMode?: 'blossom' | 'default';
-}
-
-/**
  * Calendar application configuration
  * Used to initialize CalendarApp
  */
@@ -154,7 +115,6 @@ export interface CalendarAppConfig {
   calendars?: CalendarType[];
   defaultCalendar?: string;
   theme?: ThemeConfig;
-  useSidebar?: boolean | SidebarConfig;
   useEventDetailDialog?: boolean;
   useCalendarHeader?: boolean | ((props: CalendarHeaderProps) => TNode);
   customMobileEventRenderer?: MobileEventRenderer;
@@ -181,9 +141,10 @@ export interface CalendarAppState {
   plugins: Map<string, CalendarPlugin>;
   views: Map<ViewType, CalendarView>;
   switcherMode?: ViewSwitcherMode;
-  sidebar?: SidebarConfig;
+
   locale: string | Locale;
   highlightedEventId?: string | null;
+  selectedEventId?: string | null;
   readOnly: boolean | ReadOnlyConfig;
 }
 
@@ -232,6 +193,7 @@ export interface ICalendarApp {
   onEventClick: (event: Event) => void;
   onMoreEventsClick: (date: Date) => void;
   highlightEvent: (eventId: string | null) => void;
+  selectEvent: (eventId: string | null) => void;
   getCalendars: () => CalendarType[];
   reorderCalendars: (fromIndex: number, toIndex: number) => void;
   setCalendarVisibility: (calendarId: string, visible: boolean) => void;
@@ -252,12 +214,12 @@ export interface ICalendarApp {
     reason?: RangeChangeReason
   ) => void;
 
+  // UI Signals
+  dismissUI: () => void;
+
   // Plugin management
   getPlugin: <T = unknown>(name: string) => T | undefined;
   hasPlugin: (name: string) => boolean;
-
-  // Sidebar
-  getSidebarConfig: () => SidebarConfig;
 
   // Calendar Header
   getCalendarHeaderConfig: () =>
@@ -327,7 +289,6 @@ export interface UseCalendarAppReturn {
     end: Date,
     reason?: RangeChangeReason
   ) => void;
-  sidebarConfig: SidebarConfig;
   readOnlyConfig: ReadOnlyConfig;
 }
 

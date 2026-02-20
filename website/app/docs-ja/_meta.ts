@@ -4,6 +4,9 @@ const meta: MetaRecord = {
   introduction: {
     title: 'はじめに',
   },
+  plugins: {
+    title: 'プラグイン',
+  },
   features: {
     title: '機能',
     theme: {

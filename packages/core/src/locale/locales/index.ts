@@ -1,21 +1,25 @@
 import en from './en';
-import zh from './zh';
-import ja from './ja';
-import ko from './ko';
-import fr from './fr';
-import de from './de';
-import es from './es';
+import { Locale } from '../types';
 
-export { en, zh, ja, ko, fr, de, es };
+export { en };
 
-export const LOCALES = {
+/**
+ * Global locale registry for the core library.
+ * Default includes English.
+ */
+export const LOCALES: Record<string, Locale> = {
   en,
-  zh,
-  ja,
-  ko,
-  fr,
-  de,
-  es,
 };
 
-export type SupportedLang = keyof typeof LOCALES;
+export type SupportedLang = string;
+
+/**
+ * Registers a new locale in the global registry.
+ * This allows plugins to provide additional translations.
+ * 
+ * @param locale The locale object to register
+ */
+export function registerLocale(locale: Locale) {
+  const lang = locale.code.split('-')[0].toLowerCase();
+  LOCALES[lang] = locale;
+}

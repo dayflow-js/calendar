@@ -1,0 +1,61 @@
+# イベントサービス (Events Service) プラグイン
+
+イベントサービスプラグインは、バリデーション、フィルタリング、複雑なクエリなど、高度なイベント管理機能を提供します。
+
+## インストール
+
+イベントサービスプラグインは現在、`@dayflow/core` パッケージに含まれています。
+
+```tsx copy
+import { createEventsPlugin } from '@dayflow/core';
+```
+
+## 使い方
+
+```tsx copy
+import { useCalendarApp, createEventsPlugin } from '@dayflow/core';
+
+function MyCalendar() {
+  const eventsPlugin = createEventsPlugin({
+    enableValidation: true,
+    maxEventsPerDay: 50,
+  });
+
+  const calendar = useCalendarApp({
+    // ... ビューの設定
+    plugins: [eventsPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 設定項目
+
+| プロパティ | 型 | デフォルト値 | 説明 |
+| :--- | :--- | :--- | :--- |
+| `enableAutoRecalculate` | `boolean` | `true` | 日付が変更されたときにイベントのセグメントを自動的に再計算します。 |
+| `enableValidation` | `boolean` | `true` | 追加または更新前にイベントオブジェクトをバリデーションします。 |
+| `maxEventsPerDay` | `number` | `50` | 1日あたりの最大イベント数。 |
+
+## プラグイン API
+
+`EventsService` にアクセスして、高度なクエリを実行します：
+
+```tsx copy
+const eventsService = calendar.app.getPlugin<EventsService>('events');
+
+// 特定の日付のイベントを取得
+const events = eventsService.getByDate(new Date());
+
+// イベントをフィルタリング
+const workEvents = eventsService.filterEvents(allEvents, e => e.calendarId === 'work');
+```
+
+### 利用可能なメソッド
+
+- `getAll()`: すべてのイベントを取得します。
+- `getById(id)`: 特定のイベントを検索します。
+- `getByDate(date)`: 特定の日に発生するイベントを取得します。
+- `getByDateRange(start, end)`: 指定した範囲内のイベントを取得します。
+- `validateEvent(event)`: バリデーションエラーの配列を返します。

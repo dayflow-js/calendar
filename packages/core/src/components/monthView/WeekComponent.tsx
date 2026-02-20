@@ -720,6 +720,7 @@ const WeekComponent = memo(
           )}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
+          onClick={() => onSelectDate?.(day.date)}
           onDblClick={e => onCreateStart?.(e, day.date)}
           onTouchStart={e => {
             if (screenSize !== 'mobile' && !enableTouch) return;

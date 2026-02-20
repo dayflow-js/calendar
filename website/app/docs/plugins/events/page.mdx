@@ -1,0 +1,61 @@
+# Events Service Plugin
+
+The Events Service plugin provides advanced event management capabilities, including validation, filtering, and complex querying.
+
+## Installation
+
+The Events Service plugin is currently part of the `@dayflow/core` package.
+
+```tsx copy
+import { createEventsPlugin } from '@dayflow/core';
+```
+
+## Usage
+
+```tsx copy
+import { useCalendarApp, createEventsPlugin } from '@dayflow/core';
+
+function MyCalendar() {
+  const eventsPlugin = createEventsPlugin({
+    enableValidation: true,
+    maxEventsPerDay: 50,
+  });
+
+  const calendar = useCalendarApp({
+    // ... views
+    plugins: [eventsPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Configuration
+
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `enableAutoRecalculate` | `boolean` | `true` | Automatically recalculate event segments when dates change. |
+| `enableValidation` | `boolean` | `true` | Validate event objects before adding or updating. |
+| `maxEventsPerDay` | `number` | `50` | Maximum number of events allowed per day. |
+
+## Plugin API
+
+Access the `EventsService` to perform advanced queries:
+
+```tsx copy
+const eventsService = calendar.app.getPlugin<EventsService>('events');
+
+// Get events for a specific day
+const events = eventsService.getByDate(new Date());
+
+// Filter events
+const workEvents = eventsService.filterEvents(allEvents, e => e.calendarId === 'work');
+```
+
+### Available Methods
+
+- `getAll()`: Get all events.
+- `getById(id)`: Find a specific event.
+- `getByDate(date)`: Get events occurring on a specific date.
+- `getByDateRange(start, end)`: Get events within a range.
+- `validateEvent(event)`: Returns an array of validation errors.

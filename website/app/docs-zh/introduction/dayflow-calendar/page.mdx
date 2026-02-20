@@ -11,6 +11,7 @@ import {
   createWeekView,
   ViewType,
 } from '@dayflow/react';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import '@dayflow/core/dist/styles.css';
 
 export function CalendarDemo() {
@@ -19,7 +20,7 @@ export function CalendarDemo() {
     defaultView: ViewType.WEEK,
     initialDate: new Date(),
     events: [],
-    useSidebar: true,
+    plugins: [createSidebarPlugin()],
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -28,7 +29,7 @@ export function CalendarDemo() {
 
 该组件接收来自 `useCalendarApp` 的 `calendar` 对象，读取当前激活的视图，并渲染对应的视图组件。可以在 `DayFlowCalendar` 外部放置工具栏或其他自定义 UI，该组件本身已内置：
 
-- 可选日历侧边栏（通过 `useSidebar` 控制）
+- 可选日历侧边栏（通过 `createSidebarPlugin` 插件添加）
 - 事件详情弹窗支持（可通过 `useEventDetailDialog` 或自定义渲染器驱动）
 - 日历切换或视图变更时的自动布局更新
 
@@ -101,22 +102,27 @@ export function CalendarDemo() {
 
 ## **侧边栏配置**
 
-侧边栏通过 `useCalendarApp` 的 `useSidebar` 选项控制：
+侧边栏通过安装并添加 `@dayflow/plugin-sidebar` 插件来启用：
 
 ```tsx
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
 const calendar = useCalendarApp({
   views: [createWeekView()],
-  useSidebar: {
-    width: 280,
-    initialCollapsed: false,
-  },
+  plugins: [
+    createSidebarPlugin({
+      width: 280,
+      initialCollapsed: false,
+      createCalendarMode: 'modal', // 'inline' 或 'modal'
+    })
+  ],
 });
 
 return <DayFlowCalendar calendar={calendar} />;
 ```
 
-- 当 `useSidebar` 设为 `true` 时，会渲染默认侧边栏（`DefaultCalendarSidebar`），包含日历筛选器和全选控制功能
-- 当 `useSidebar` 为 `SidebarConfig` 配置对象时，可自定义宽度、默认折叠状态，或通过 `render(props)` 提供完全自定义的渲染器。自定义渲染器会接收到与 DayFlow 内部相同的 `CalendarSidebarRenderProps`，便于复用其辅助回调和数据
+- 当添加 `createSidebarPlugin()` 插件后，会渲染默认侧边栏，包含日历筛选器和全选控制功能
+- 可以自定义宽度、默认折叠状态，或通过 `render` 提供完全自定义的渲染器。自定义渲染器会接收到 `CalendarSidebarRenderProps`，便于复用其辅助回调和数据
 
 ## **事件详情展示**
 

@@ -1,9 +1,6 @@
 import type { MetaRecord } from 'nextra';
 
 const meta: MetaRecord = {
-  sidebar: {
-    title: 'Sidebar',
-  },
   'calendar-header': {
     title: 'Calendar Header',
   },
@@ -21,9 +18,11 @@ const meta: MetaRecord = {
   },
   'custom-detail-dialog': {
     title: 'Custom Detail Dialog',
+    display: 'hidden',
   },
   'custom-detail-panel': {
     title: 'Custom Detail Panel',
+    display: 'hidden',
   },
   'content-slots': {
     title: 'Content Slots',

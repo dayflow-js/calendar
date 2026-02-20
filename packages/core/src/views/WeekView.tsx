@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
 import { formatTime, extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';
 import { Event, ViewType, WeekViewProps } from '@/types';
-import { useDragForView } from '@/plugins/dragPlugin';
+import { useDragForView } from '@/plugins/dragBridge';
 import { ViewType as DragViewType } from '@/types';
 import { defaultDragConfig } from '@/core/config';
 import ViewHeader from '@/components/common/ViewHeader';

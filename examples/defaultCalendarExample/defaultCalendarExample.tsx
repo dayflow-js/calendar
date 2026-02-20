@@ -5,11 +5,13 @@ import {
   createMonthView,
   createWeekView,
   createDayView,
-  createDragPlugin,
   createYearView,
   ViewType,
   UseCalendarAppReturn,
 } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import { Event, CalendarType } from '@dayflow/core';
 import { Sun, Moon } from 'lucide-react';
 import { generateSampleEvents } from '../utils/sampleData';
@@ -31,6 +33,11 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = () => {
   }, []);
 
   const dragPlugin = useMemo(() => createDragPlugin(), []);
+  const keyboardPlugin = useMemo(() => createKeyboardShortcutsPlugin(), []);
+  const sidebarPlugin = createSidebarPlugin({
+    createCalendarMode: 'modal',
+    colorPickerMode: 'blossom',
+  });
 
   const calendar = useCalendarApp({
     views: [
@@ -44,16 +51,11 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = () => {
     events: events,
     calendars: getWebsiteCalendars(),
     defaultCalendar: 'work',
-    plugins: [dragPlugin],
+    plugins: [keyboardPlugin, sidebarPlugin, dragPlugin],
     defaultView: ViewType.MONTH,
-
+    useEventDetailDialog: true,
     theme: { mode: 'auto' as const },
     // switcherMode: 'select' as const,
-    useSidebar: {
-      enabled: !isMobile,
-      createCalendarMode: 'modal',
-      colorPickerMode: 'blossom',
-    },
     // readOnly: true,
     callbacks: {
       onEventCreate: async (event: Event) => {

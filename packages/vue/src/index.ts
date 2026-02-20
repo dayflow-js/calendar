@@ -7,7 +7,6 @@ export default DayFlowCalendar;
 export {
   CalendarApp,
   CalendarRegistry,
-  createDragPlugin,
   createEventsPlugin,
   createDayView,
   createWeekView,

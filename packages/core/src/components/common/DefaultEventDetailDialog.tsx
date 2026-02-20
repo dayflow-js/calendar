@@ -301,14 +301,14 @@ const DefaultEventDetailDialog = ({
             <div className="flex space-x-2">
               {!editedEvent.allDay ? (
                 <button
-                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
+                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition"
                   onClick={convertToAllDay}
                 >
                   {t('setAsAllDay')}
                 </button>
               ) : (
                 <button
-                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-sm font-medium transition"
+                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition"
                   onClick={convertToRegular}
                 >
                   {t('setAsTimed')}
@@ -316,7 +316,7 @@ const DefaultEventDetailDialog = ({
               )}
 
               <button
-                className="px-3 py-2 bg-destructive border border-border text-destructive-foreground rounded-lg hover:bg-destructive/90 text-sm font-medium transition"
+                className="px-3 py-2 bg-destructive border border-border text-destructive-foreground rounded-lg hover:bg-destructive/90 text-xs font-medium transition"
                 onClick={() => {
                   onEventDelete(event.id);
                   onClose();
@@ -326,7 +326,7 @@ const DefaultEventDetailDialog = ({
               </button>
 
               <button
-                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition ml-auto ${
+                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-medium transition ml-auto ${
                   hasChanges
                     ? 'hover:bg-primary/90 shadow-lg shadow-primary/20'
                     : 'opacity-50 cursor-not-allowed grayscale-[0.5]'

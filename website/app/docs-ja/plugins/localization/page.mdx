@@ -1,0 +1,86 @@
+# ローカライズプラグイン
+
+Localization プラグインは、多言語およびローカライズのサポートを提供します。デフォルトでは、Day Flow のコアライブラリはバンドルサイズを最小限に抑えるため、英語 (`en-US`) ののみが含まれています。
+
+## インストール
+
+ローカライズプラグインパッケージをインストールします：
+
+```bash copy
+npm install @dayflow/plugin-localization
+# または
+pnpm add @dayflow/plugin-localization
+```
+
+## 使い方
+
+他の言語のサポートを有効にするには、プラグインを登録し、必要なロケールオブジェクトを提供します。
+
+```tsx copy
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { createLocalizationPlugin, zh, ja, fr } from '@dayflow/plugin-localization';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [/* ビューの設定 */],
+    plugins: [
+      createLocalizationPlugin({
+        locales: [zh, ja, fr] // 必要な言語を登録
+      })
+    ],
+    locale: 'ja-JP' // 現在のロケールを設定
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 設定
+
+プラグインは、グローバルロケールレジストリに登録する `Locale` オブジェクトのリストを受け取ります。
+
+```tsx copy
+interface LocalizationConfig {
+  locales: Locale[];
+}
+```
+
+## 利用可能なロケール
+
+現在、`@dayflow/plugin-localization` パッケージでは以下のロケールが利用可能です：
+
+| エクスポート | 言語 | ロケールコード |
+| :--- | :--- | :--- |
+| `zh` | 中国語 | `zh-CN` |
+| `ja` | 日本語 | `ja-JP` |
+| `ko` | 韓国語 | `ko-KR` |
+| `fr` | フランス語 | `fr-FR` |
+| `de` | ドイツ語 | `de-DE` |
+| `es` | スペイン語 | `es-ES` |
+| `en` | 英語 | `en-US` (コアに内蔵済み) |
+
+## カスタムロケール
+
+プラグインを使用せずに、またはプラグインに渡すことで、独自のカスタムロケールを登録することもできます：
+
+```tsx copy
+const myCustomLocale = {
+  code: 'pt-BR',
+  messages: {
+    today: 'Hoje',
+    day: 'Dia',
+    week: 'Semana',
+    month: 'Mês',
+    // ... 他のすべての翻訳キー
+  }
+};
+
+const calendar = useCalendarApp({
+  plugins: [
+    createLocalizationPlugin({
+      locales: [myCustomLocale]
+    })
+  ],
+  locale: 'pt-BR'
+});
+```

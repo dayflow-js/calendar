@@ -1,0 +1,61 @@
+# 事件服务插件
+
+事件服务插件提供高级的事件管理功能，包括验证、过滤和复杂的查询。
+
+## 安装
+
+事件服务插件目前是 `@dayflow/core` 包的一部分。
+
+```tsx copy
+import { createEventsPlugin } from '@dayflow/core';
+```
+
+## 使用方法
+
+```tsx copy
+import { useCalendarApp, createEventsPlugin } from '@dayflow/core';
+
+function MyCalendar() {
+  const eventsPlugin = createEventsPlugin({
+    enableValidation: true,
+    maxEventsPerDay: 50,
+  });
+
+  const calendar = useCalendarApp({
+    // ... 视图配置
+    plugins: [eventsPlugin],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## 配置项
+
+| 属性 | 类型 | 默认值 | 描述 |
+| :--- | :--- | :--- | :--- |
+| `enableAutoRecalculate` | `boolean` | `true` | 当日期变化时自动重新计算事件片段。 |
+| `enableValidation` | `boolean` | `true` | 在添加或更新事件前验证事件对象。 |
+| `maxEventsPerDay` | `number` | `50` | 每天允许的最大事件数量。 |
+
+## 插件 API
+
+访问 `EventsService` 以执行高级查询：
+
+```tsx copy
+const eventsService = calendar.app.getPlugin<EventsService>('events');
+
+// 获取特定日期的事件
+const events = eventsService.getByDate(new Date());
+
+// 过滤事件
+const workEvents = eventsService.filterEvents(allEvents, e => e.calendarId === 'work');
+```
+
+### 可用方法
+
+- `getAll()`: 获取所有事件。
+- `getById(id)`: 查找特定事件。
+- `getByDate(date)`: 获取发生在特定日期的事件。
+- `getByDateRange(start, end)`: 获取日期范围内的事件。
+- `validateEvent(event)`: 返回验证错误数组。

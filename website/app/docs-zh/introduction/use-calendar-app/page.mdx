@@ -41,7 +41,6 @@ export function TeamCalendar() {
 | `defaultCalendar`           | `string`                    | 可选 | 第一个可见日历      | 创建新事件时使用的 ID                                                 |
 | `theme`                     | `ThemeConfig`               | 可选 | `{ mode: 'light' }` | 设置全局主题模式和可选的令牌覆盖                                      |
 | `locale`                    | `string \| Locale`          | 可选 | `'en-US'`           | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。 |
-| `useSidebar`                | `boolean \| SidebarConfig`  | 可选 | `false`             | 启用内置侧边栏或让您自定义宽度、折叠状态和渲染器                      |
 | `useEventDetailDialog`      | `boolean`                   | 可选 | `false`             | 启用默认模态详情对话框而不是内联面板                                  |
 | `useCalendarHeader`         | `boolean \| Function`       | 可选 | `true`              | 启用默认页眉、隐藏页眉（`false`）或提供自定义渲染函数                 |
 | `readOnly`                  | `boolean \| ReadOnlyConfig` | 可选 | `false`             | 禁用交互。可以是布尔值，也可以是用于细粒度控制（拖拽/查看）的配置对象 |
@@ -202,34 +201,10 @@ const calendar = useCalendarApp({
 });
 ```
 
-### useSidebar
-
-- `true`：启用默认侧边栏
-- 传递对象即可自定义宽度、初始折叠状态或提供 `render` 函数来自绘
-
-### useEventDetailDialog
-
-- `true`：切换到模态详情对话框
-- 可与 `DayFlowCalendar` 的 `customEventDetailDialog` / `customDetailPanelContent` 协作，实现完全自定义的详情体验
-
-### useCalendarHeader
-
-- `true` (默认)：渲染内置的日历页眉。
-- `false`：完全隐藏页眉。
-- `(props) => ReactNode`：渲染自定义页眉。详见 [日历页眉](/docs-zh/features/calendar-header)。
-
-### readOnly
-
-- `true`：禁用所有修改（拖拽、创建、编辑）。
-- `ReadOnlyConfig`：细粒度控制。
-  - `draggable`：是否允许拖拽。
-  - `viewable`：是否允许打开事件详情。
-- 详见 [只读模式](/docs-zh/features/read-only)。
-
 ### customMobileEventRenderer
 
 - 允许使用您自己的组件替换移动端的默认事件编辑抽屉。
-- 详见[功能概览](/docs-zh/features/sidebar)。
+- 详见[侧边栏插件](/docs-zh/plugins/sidebar)。
 
 ## 高级配置示例
 
@@ -240,7 +215,8 @@ import {
   createMonthView,
   createWeekView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import '@dayflow/core/dist/styles.css';
 
 const calendars = [
@@ -279,10 +255,12 @@ export function AdvancedCalendar() {
       onEventUpdate: event => api.events.update(event),
       onVisibleMonthChange: month => preloadMonthData(month),
     },
-    useSidebar: {
-      width: 280,
-      initialCollapsed: false,
-    },
+    plugins: [
+      createSidebarPlugin({
+        width: 280,
+        initialCollapsed: false,
+      })
+    ],
     useEventDetailDialog: true,
   });
 

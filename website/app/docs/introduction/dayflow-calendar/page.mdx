@@ -11,6 +11,7 @@ import {
   createWeekView,
   ViewType,
 } from '@dayflow/react';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import '@dayflow/core/dist/styles.css';
 
 export function CalendarDemo() {
@@ -19,7 +20,7 @@ export function CalendarDemo() {
     defaultView: ViewType.WEEK,
     initialDate: new Date(),
     events: [],
-    useSidebar: true,
+    plugins: [createSidebarPlugin()],
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -28,7 +29,7 @@ export function CalendarDemo() {
 
 The component receives the `calendar` object from `useCalendarApp`, reads the active view, and renders the corresponding view component. Any toolbar or custom UI can live beside `DayFlowCalendar`, but it already includes:
 
-- An optional calendar sidebar (controlled through `useSidebar`).
+- An optional calendar sidebar (added through `createSidebarPlugin`).
 - Event detail dialog support (driven by `useEventDetailDialog` or a custom renderer).
 - Automatic layout updates when calendars are toggled or views change.
 
@@ -103,23 +104,27 @@ You can also add custom CSS classes via `className`, which will be appended to t
 
 ## Sidebar Behavior
 
-The sidebar is controlled by the `useSidebar` option passed to `useCalendarApp`:
+The sidebar is added by installing the `@dayflow/plugin-sidebar` plugin:
 
 ```tsx copy
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
 const calendar = useCalendarApp({
   views: [createWeekView()],
-  useSidebar: {
-    width: 280,
-    initialCollapsed: false,
-    createCalendarMode: 'modal', // 'inline' or 'modal'
-  },
+  plugins: [
+    createSidebarPlugin({
+      width: 280,
+      initialCollapsed: false,
+      createCalendarMode: 'modal', // 'inline' or 'modal'
+    })
+  ],
 });
 
 return <DayFlowCalendar calendar={calendar} />;
 ```
 
-- When `useSidebar` is `true`, the default sidebar (`DefaultCalendarSidebar`) is rendered with calendar filters and toggle-all controls.
-- When `useSidebar` is a `SidebarConfig`, you can customize width, default collapsed state, creation mode (`createCalendarMode`), or supply your own renderer via `render(props)`. Your renderer receives the same `CalendarSidebarRenderProps` DayFlow uses internally, so you can reuse its helper callbacks and data.
+- When `createSidebarPlugin()` is added to plugins, the default sidebar (`DefaultCalendarSidebar`) is rendered with calendar filters and toggle-all controls.
+- You can customize width, default collapsed state, creation mode (`createCalendarMode`), or supply your own renderer via `render`. Your renderer receives `CalendarSidebarRenderProps`, so you can reuse its helper callbacks and data.
 
 ## Event Detail Experiences
 

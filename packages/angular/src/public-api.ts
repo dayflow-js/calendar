@@ -9,7 +9,6 @@ export * from './lib/day-flow-portal.directive';
 export {
   CalendarApp,
   CalendarRegistry,
-  createDragPlugin,
   createEventsPlugin,
   createDayView,
   createWeekView,

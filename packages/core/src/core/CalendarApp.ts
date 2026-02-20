@@ -6,7 +6,7 @@ import {
   CalendarView,
   ViewType,
   CalendarCallbacks,
-  SidebarConfig,
+
   CalendarType,
   MobileEventRenderer,
   ReadOnlyConfig,
@@ -19,61 +19,16 @@ import {
   setDefaultCalendarRegistry,
 } from './calendarRegistry';
 import { logger } from '../utils/logger';
-import { normalizeCssWidth } from '../utils/styleUtils';
+
 import { ThemeMode } from '../types/calendarTypes';
 import { isValidLocale } from '../locale/utils';
 import { isDeepEqual } from '../utils/helpers';
 import { getWeekRange } from '../utils/dateRangeUtils';
 
-const DEFAULT_SIDEBAR_WIDTH = '240px';
-
-const resolveSidebarConfig = (
-  input?: boolean | SidebarConfig
-): SidebarConfig => {
-  if (!input) {
-    return {
-      enabled: false,
-      width: DEFAULT_SIDEBAR_WIDTH,
-      initialCollapsed: false,
-    };
-  }
-
-  if (input === true) {
-    return {
-      enabled: true,
-      width: DEFAULT_SIDEBAR_WIDTH,
-      initialCollapsed: false,
-    };
-  }
-
-  const {
-    enabled = true,
-    width,
-    initialCollapsed = false,
-    render,
-    createCalendarMode,
-    renderCalendarContextMenu,
-    renderCreateCalendarDialog,
-    colorPickerMode,
-  } = input;
-
-  return {
-    enabled,
-    width: normalizeCssWidth(width, DEFAULT_SIDEBAR_WIDTH),
-    initialCollapsed,
-    render,
-    createCalendarMode,
-    renderCalendarContextMenu,
-    renderCreateCalendarDialog,
-    colorPickerMode,
-  };
-};
-
 export class CalendarApp implements ICalendarApp {
   public state: CalendarAppState;
   private callbacks: CalendarCallbacks;
   private calendarRegistry: CalendarRegistry;
-  private sidebarConfig: SidebarConfig;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
   private useCalendarHeader: boolean | ((props: any) => TNode);
@@ -95,6 +50,7 @@ export class CalendarApp implements ICalendarApp {
       views: new Map(),
       locale: this.resolveLocale(config.locale),
       highlightedEventId: null,
+      selectedEventId: null,
       readOnly: config.readOnly || false,
     };
 
@@ -111,8 +67,6 @@ export class CalendarApp implements ICalendarApp {
 
     setDefaultCalendarRegistry(this.calendarRegistry);
 
-    this.sidebarConfig = resolveSidebarConfig(config.useSidebar);
-    this.state.sidebar = this.sidebarConfig;
     const current = this.state.currentDate;
     this.visibleMonth = new Date(current.getFullYear(), current.getMonth(), 1);
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
@@ -201,8 +155,11 @@ export class CalendarApp implements ICalendarApp {
    */
   private isInternalEditable = (): boolean => {
     if (this.state.readOnly === true) return false;
-    if (typeof this.state.readOnly === 'object') return false;
-    return true;
+    if (typeof this.state.readOnly === 'object') {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   // View management
@@ -551,6 +508,19 @@ export class CalendarApp implements ICalendarApp {
     this.notify();
   };
 
+  selectEvent = (eventId: string | null): void => {
+    if (this.state.selectedEventId === eventId) return;
+    this.state.selectedEventId = eventId;
+    this.callbacks.onRender?.();
+    this.notify();
+  };
+
+  dismissUI = (): void => {
+    this.callbacks.onDismissUI?.();
+    // Also notify listeners so components can react to UI dismiss signal if they prefer
+    this.notify();
+  };
+
   getEvents = (): Event[] => {
     const allEvents = this.getAllEvents();
     const visibleCalendars = new Set(
@@ -644,10 +614,6 @@ export class CalendarApp implements ICalendarApp {
     this.callbacks.onCalendarMerge?.(sourceId, targetId);
     this.callbacks.onRender?.();
     this.notify();
-  };
-
-  getSidebarConfig = (): SidebarConfig => {
-    return this.sidebarConfig;
   };
 
   getCalendarHeaderConfig = (): boolean | ((props: any) => TNode) => {
@@ -761,14 +727,6 @@ export class CalendarApp implements ICalendarApp {
     ) {
       this.setTheme(config.theme.mode);
       // setTheme already triggers re-render via onRender callback
-    }
-    if (config.useSidebar !== undefined) {
-      const newSidebarConfig = resolveSidebarConfig(config.useSidebar);
-      if (!isDeepEqual(newSidebarConfig, this.sidebarConfig)) {
-        this.sidebarConfig = newSidebarConfig;
-        this.state.sidebar = this.sidebarConfig;
-        hasChanged = true;
-      }
     }
     if (
       config.switcherMode !== undefined &&

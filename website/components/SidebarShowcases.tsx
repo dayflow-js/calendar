@@ -16,16 +16,14 @@ import {
   createMonthView,
   createWeekView,
   createDayView,
-  createDragPlugin,
   ViewType,
 } from '@dayflow/react';
+import { createDragPlugin } from '@dayflow/plugin-drag';
 import {
-  CalendarType,
+  createSidebarPlugin,
   CalendarSidebarRenderProps,
-  Event,
-  SidebarConfig,
-  temporalToDate,
-} from '@dayflow/core';
+} from '@dayflow/plugin-sidebar';
+import { CalendarType, Event, temporalToDate } from '@dayflow/core';
 import { getWebsiteCalendars } from '@/utils/palette';
 
 const SIDEBAR_CALENDAR_IDS = new Set([
@@ -99,13 +97,11 @@ const createSidebarEvents = (): Event[] => {
   ];
 };
 
-const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
+const useSidebarCalendar = (
+  sidebarPlugin: ReturnType<typeof createSidebarPlugin>
+) => {
   const { resolvedTheme } = useTheme();
-
-  const views = useMemo(
-    () => [createMonthView(), createWeekView(), createDayView()],
-    []
-  );
+  const views = useMemo(() => [createMonthView()], []);
   const dragPlugin = useMemo(
     () =>
       createDragPlugin({
@@ -126,13 +122,12 @@ const useSidebarCalendar = (sidebarConfig: boolean | SidebarConfig) => {
 
   return useCalendarApp({
     views,
-    plugins: [dragPlugin],
+    plugins: [dragPlugin, sidebarPlugin],
     events,
     calendars,
-    defaultView: ViewType.WEEK,
+    defaultView: ViewType.MONTH,
     initialDate: new Date(),
     switcherMode: 'buttons',
-    useSidebar: sidebarConfig,
     theme: { mode: themeMode },
   });
 };
@@ -169,7 +164,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
 
   if (isCollapsed) {
     return (
-      <div className="flex h-full flex-col items-center gap-4 bg-slate-900 py-4 text-slate-100">
+      <div className="h-full pl-2 bg-slate-900 py-4 text-slate-100">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
@@ -178,7 +173,6 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
         >
           <ChevronRight className="h-5 w-5" />
         </button>
-        <CalendarRange className="h-6 w-6 text-slate-500" />
       </div>
     );
   }
@@ -241,7 +235,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
             >
               <span className="inline-flex items-center gap-2">
                 <span className="text-lg leading-none">
-                  {calendar.icon ?? '📅'}
+                  {calendar.icon ?? ''}
                 </span>
                 <span>{calendar.name}</span>
               </span>
@@ -303,30 +297,23 @@ const ShowcaseWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => <div className="mt-6">{children}</div>;
 
-export const SidebarBasicsShowcase: React.FC = () => {
-  const calendar = useSidebarCalendar({
-    enabled: true,
-    width: 280,
-  });
-
-  return (
-    <ShowcaseWrapper>
-      <DayFlowCalendar calendar={calendar} />
-    </ShowcaseWrapper>
-  );
-};
-
 export const SidebarCustomShowcase: React.FC = () => {
   const renderSidebar = useCallback(
     (props: CalendarSidebarRenderProps) => <CustomSidebarPanel {...props} />,
     []
   );
 
-  const calendar = useSidebarCalendar({
-    enabled: true,
-    width: 320,
-    render: renderSidebar,
-  });
+  const sidebarPlugin = useMemo(
+    () =>
+      createSidebarPlugin({
+        createCalendarMode: 'modal',
+        colorPickerMode: 'blossom',
+        width: 260,
+        render: renderSidebar,
+      }),
+    [renderSidebar]
+  );
+  const calendar = useSidebarCalendar(sidebarPlugin);
 
   return (
     <ShowcaseWrapper>

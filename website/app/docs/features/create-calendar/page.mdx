@@ -8,15 +8,18 @@ The default sidebar includes a "plus" button that allows users to create new cal
 
 ### Configuration
 
-You can configure the creation mode via the `useSidebar` option in `useCalendarApp`.
+You can configure the creation mode via the `createSidebarPlugin` configuration.
 
 ```tsx
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+const sidebarPlugin = createSidebarPlugin({
+  createCalendarMode: 'inline', // 'inline' (default) or 'modal'
+});
+
 const calendar = useCalendarApp({
   // ...
-  useSidebar: {
-    enabled: true,
-    createCalendarMode: 'inline', // 'inline' (default) or 'modal'
-  },
+  plugins: [sidebarPlugin],
 });
 ```
 
@@ -51,11 +54,8 @@ import { Callout } from 'nextra/components';
 />
 
 ```tsx
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    createCalendarMode: 'modal',
-  },
+createSidebarPlugin({
+  createCalendarMode: 'modal',
 });
 ```
 
@@ -64,21 +64,18 @@ const calendar = useCalendarApp({
 If you need a custom UI for the creation dialog, you can provide a `renderCreateCalendarDialog` function.
 
 ```tsx
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    createCalendarMode: 'modal',
-    renderCreateCalendarDialog: ({ onClose, onCreate }) => (
-      <MyCustomDialog
-        onCancel={onClose}
-        onConfirm={(name, color) => {
-          onCreate({
-            /* ... new calendar object ... */
-          });
-        }}
-      />
-    ),
-  },
+createSidebarPlugin({
+  createCalendarMode: 'modal',
+  renderCreateCalendarDialog: ({ onClose, onCreate }) => (
+    <MyCustomDialog
+      onCancel={onClose}
+      onConfirm={(name, color) => {
+        onCreate({
+          /* ... new calendar object ... */
+        });
+      }}
+    />
+  ),
 });
 ```
 
@@ -95,33 +92,27 @@ The default context menu provides the following options:
 
 ### Custom Context Menu
 
-You can customize the context menu by providing a `renderCalendarContextMenu` function in the `useSidebar` configuration. This gives you full control over the menu items and their behavior.
+You can customize the context menu by providing a `renderCalendarContextMenu` function in the `createSidebarPlugin` configuration. This gives you full control over the menu items and their behavior.
 
 ```tsx
-import { ContextMenuItem, ContextMenuSeparator } from '@dayflow/core'; // Assuming these are exported or you use your own
-
-const calendar = useCalendarApp({
-  // ...
-  useSidebar: {
-    renderCalendarContextMenu: (calendar, onClose) => (
-      <>
-        <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
-          {calendar.name}
-        </div>
-        <div className="my-1 h-px bg-gray-200" />
-        <div
-          className="flex cursor-pointer items-center px-3 py-2 text-sm hover:bg-gray-100"
-          onClick={() => {
-            console.log('Custom action for', calendar.id);
-            onClose();
-          }}
-        >
-          Custom Action
-        </div>
-        {/* You can still use the default actions if you implement them yourself using the app instance */}
-      </>
-    ),
-  },
+createSidebarPlugin({
+  renderCalendarContextMenu: (calendar, onClose) => (
+    <div className="bg-white shadow-lg border rounded p-2">
+      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+        {calendar.name}
+      </div>
+      <div className="my-1 h-px bg-gray-200" />
+      <button
+        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+        onClick={() => {
+          console.log('Custom action for', calendar.id);
+          onClose();
+        }}
+      >
+        Custom Action
+      </button>
+    </div>
+  ),
 });
 ```
 
