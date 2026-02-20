@@ -42,6 +42,12 @@ export interface CalendarView {
   config?: Record<string, unknown>;
 }
 
+export type RangeChangeReason =
+  | 'initial'
+  | 'navigation'
+  | 'viewChange'
+  | 'scroll';
+
 /**
  * Calendar callbacks interface
  * Defines calendar event callback functions
@@ -53,7 +59,15 @@ export interface CalendarCallbacks {
   onEventDelete?: (eventId: string) => void | Promise<void>;
   onDateChange?: (date: Date) => void | Promise<void>;
   onRender?: () => void | Promise<void>;
+  /**
+   * @deprecated This method is retained for backward compatibility and will be removed in future releases. Use ``onVisibleRangeChange`` instead.
+   */
   onVisibleMonthChange?: (date: Date) => void | Promise<void>;
+  onVisibleRangeChange?: (
+    start: Date,
+    end: Date,
+    reason: RangeChangeReason
+  ) => void | Promise<void>;
   onCalendarUpdate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarCreate?: (calendar: CalendarType) => void | Promise<void>;
   onCalendarDelete?: (calendarId: string) => void | Promise<void>;
@@ -194,6 +208,11 @@ export interface ICalendarApp {
   mergeCalendars: (sourceId: string, targetId: string) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
+  emitVisibleRange: (
+    start: Date,
+    end: Date,
+    reason?: RangeChangeReason
+  ) => void;
 
   // UI Signals
   dismissUI: () => void;
@@ -265,6 +284,11 @@ export interface UseCalendarAppReturn {
   highlightEvent: (eventId: string | null) => void;
   setVisibleMonth: (date: Date) => void;
   getVisibleMonth: () => Date;
+  emitVisibleRange: (
+    start: Date,
+    end: Date,
+    reason?: RangeChangeReason
+  ) => void;
   readOnlyConfig: ReadOnlyConfig;
 }
 

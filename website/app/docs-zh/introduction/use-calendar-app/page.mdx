@@ -90,6 +90,7 @@ const calendar = useCalendarApp({
 - `onViewChange(view)`：视图切换后触发，可用于埋点或同步 URL
 - `onDateChange(date)`：当前聚焦日期变化
 - `onVisibleMonthChange(date)`：月份视窗滚动，用于预加载数据
+- `onVisibleRangeChange(start, end, reason)`：可见日期范围每次变化时触发，无需额外计算即可进行更精准的数据拉取
 - `onEventCreate/Update/Delete`：与服务端 CRUD 对接
 - `onMoreEventsClick(date)`：当月视图中的“+ X 更多”链接被点击时触发
 - `onCalendarCreate/onCalendarUpdate/onCalendarDelete`：日历增删改的回调，用于同步日历列表

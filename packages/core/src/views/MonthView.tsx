@@ -12,6 +12,7 @@ import WeekComponent from '@/components/monthView/WeekComponent';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { temporalToDate } from '@/utils/temporal';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   monthViewContainer,
   weekHeaderRow,
@@ -298,7 +299,9 @@ const MonthView = ({
     currentYear,
     isScrolling,
     virtualData,
+    weeksData,
     scrollElementRef,
+    isNavigating,
     handleScroll,
     handlePreviousMonth,
     handleNextMonth,
@@ -363,6 +366,44 @@ const MonthView = ({
   const topSpacerHeight = useMemo(() => {
     return effectiveStartIndex * weekHeight;
   }, [effectiveStartIndex, weekHeight]);
+
+  const initialLoadRef = useRef(true);
+  const pendingNavigation = useRef(false);
+  const debouncedDisplayStartIndex = useDebouncedValue(
+    virtualData.displayStartIndex,
+    250
+  );
+
+  useEffect(() => {
+    if (isNavigating) {
+      pendingNavigation.current = true;
+      return;
+    }
+  }, [isNavigating]);
+
+  useEffect(() => {
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      return;
+    }
+
+    const startWeek = weeksData[debouncedDisplayStartIndex];
+    if (!startWeek) return;
+
+    const start = new Date(startWeek.startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 42 + 7); // visible month + buffer for partial scroll
+
+    app.emitVisibleRange(
+      start,
+      end,
+      pendingNavigation.current ? 'navigation' : 'scroll'
+    );
+
+    pendingNavigation.current = false;
+  }, [app, weeksData, debouncedDisplayStartIndex]);
 
   const bottomSpacerHeight = useMemo(() => {
     const total = virtualData.totalHeight;

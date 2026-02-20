@@ -16,6 +16,7 @@ export interface UseVirtualMonthScrollReturn {
   currentMonth: string;
   currentYear: number;
   isScrolling: boolean;
+  isNavigating: boolean;
   virtualData: {
     totalHeight: number;
     visibleItems: VirtualWeekItem[];
