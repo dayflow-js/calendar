@@ -19,6 +19,10 @@ export const BlossomColorPicker = (props: BlossomColorPickerProps) => {
         containerRef.current,
         options
       );
+
+      if (options.initialExpanded) {
+        pickerRef.current.expand();
+      }
     }
 
     return () => {

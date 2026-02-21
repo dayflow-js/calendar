@@ -35,7 +35,7 @@ export const CreateCalendarDialog = ({
   const [name, setName] = useState('');
 
   // State for default mode (react-color)
-  const [defaultSelectedColor, setDefaultSelectedColor] = useState(
+  const [customSelectedColor, setCustomSelectedColor] = useState(
     PICKER_DEFAULT_COLORS[
       Math.floor(Math.random() * PICKER_DEFAULT_COLORS.length)
     ]
@@ -78,7 +78,7 @@ export const CreateCalendarDialog = ({
     if (!name.trim()) return;
 
     let hex: string;
-    if (colorPickerMode === 'blossom') {
+    if (colorPickerMode === 'default') {
       hex =
         blossomSelectedColor?.hex ??
         hslToHex(
@@ -87,7 +87,7 @@ export const CreateCalendarDialog = ({
           initialColorData.lightness
         );
     } else {
-      hex = defaultSelectedColor;
+      hex = customSelectedColor;
     }
 
     const { colors, darkColors } = getCalendarColorsForHex(hex);
@@ -106,11 +106,11 @@ export const CreateCalendarDialog = ({
   };
 
   const handleColorChange = (color: { hex: string }) => {
-    setDefaultSelectedColor(color.hex);
+    setCustomSelectedColor(color.hex);
   };
 
   const handleOpenPicker = () => {
-    setPreviousColor(defaultSelectedColor);
+    setPreviousColor(customSelectedColor);
     setShowPicker(true);
   };
 
@@ -119,7 +119,7 @@ export const CreateCalendarDialog = ({
   };
 
   const handleCancel = () => {
-    setDefaultSelectedColor(previousColor);
+    setCustomSelectedColor(previousColor);
     setShowPicker(false);
   };
 
@@ -168,13 +168,13 @@ export const CreateCalendarDialog = ({
         onClick={e => e.stopPropagation()}
       >
         <h2
-          className={`text-lg font-semibold text-gray-900 dark:text-white ${colorPickerMode === 'blossom' ? 'mb-6' : 'mb-4'}`}
+          className={`text-lg font-semibold text-gray-900 dark:text-white ${colorPickerMode === 'default' ? 'mb-6' : 'mb-4'}`}
         >
           {t('createCalendar')}
         </h2>
 
         <form onSubmit={handleSubmit}>
-          {colorPickerMode === 'blossom' ? (
+          {colorPickerMode === 'default' ? (
             // Blossom mode UI
             <div className="mb-8 flex items-center gap-4">
               <div className="flex-1">
@@ -205,16 +205,16 @@ export const CreateCalendarDialog = ({
               </div>
             </div>
           ) : (
-            // Default mode UI (react-color)
+            // Custom mode UI (react-color)
             <>
               <div className="mb-4">
                 <div className="flex items-center gap-3">
                   <div
                     className="h-9 w-9 rounded-md border border-gray-200 shadow-sm dark:border-gray-600"
-                    style={{ backgroundColor: defaultSelectedColor }}
+                    style={{ backgroundColor: customSelectedColor }}
                   />
                   <input
-                    id="default-calendar-name"
+                    id="custom-calendar-name"
                     name="calendar-name"
                     type="text"
                     value={name}
@@ -235,12 +235,12 @@ export const CreateCalendarDialog = ({
                       key={color}
                       type="button"
                       className={`h-6 w-6 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
-                        defaultSelectedColor === color
+                        customSelectedColor === color
                           ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-800'
                           : ''
                       }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => setDefaultSelectedColor(color)}
+                      onClick={() => setCustomSelectedColor(color)}
                     />
                   ))}
                 </div>
@@ -260,7 +260,7 @@ export const CreateCalendarDialog = ({
                         generatorName="colorPickerWrapper"
                         generatorArgs={{
                           variant: 'photoshop',
-                          color: defaultSelectedColor,
+                          color: customSelectedColor,
                           onChange: handleColorChange,
                           onAccept: handleAccept,
                           onCancel: handleCancel,
@@ -269,10 +269,10 @@ export const CreateCalendarDialog = ({
                         defaultContent={
                           <div>
                             <DefaultColorPicker
-                              color={defaultSelectedColor}
+                              color={customSelectedColor}
                               onChange={handleColorChange}
                             />
-                            <div className="mt-2 flex justify-end gap-2">
+                            {/* <div className="mt-2 flex justify-end gap-2">
                               <button
                                 type="button"
                                 onClick={handleCancel}
@@ -287,7 +287,7 @@ export const CreateCalendarDialog = ({
                               >
                                 OK
                               </button>
-                            </div>
+                            </div> */}
                           </div>
                         }
                       />

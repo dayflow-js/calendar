@@ -83,7 +83,7 @@ export interface CalendarCallbacks {
 export interface CreateCalendarDialogProps {
   onClose: () => void;
   onCreate: (calendar: CalendarType) => void;
-  colorPickerMode?: 'blossom' | 'default';
+  colorPickerMode?: 'default' | 'custom';
 }
 
 export interface CalendarHeaderProps {
