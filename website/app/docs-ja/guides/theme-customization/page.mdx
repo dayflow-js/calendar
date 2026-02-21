@@ -24,12 +24,14 @@ const calendar = useCalendarApp({
       name: '個人',
       colors: {
         lineColor: '#0891b2',
-        backgroundColor: '#cffafe',
+        eventColor: '#cffafe',
+        eventSelectedColor: '#a5f3fc',
         textColor: '#164e63',
       },
       darkColors: {
         lineColor: '#22d3ee',
-        backgroundColor: '#164e63',
+        eventColor: '#164e63',
+        eventSelectedColor: '#083344',
         textColor: '#cffafe',
       },
     },
@@ -40,7 +42,8 @@ const calendar = useCalendarApp({
 ### 各色の役割
 
 - `lineColor`：イベントカード左側のアクセントやボーダー
-- `backgroundColor`：イベント本体の背景
+- `eventColor`：イベント本体の背景
+- `eventSelectedColor`：選択されたイベントの背景
 - `textColor`：タイトルや時刻テキスト
 
 ### ブランドカラーを当てはめる
@@ -48,13 +51,15 @@ const calendar = useCalendarApp({
 ```tsx copy
 const brandPalette = {
   lineColor: '#6366f1',
-  backgroundColor: '#e0e7ff',
+  eventColor: '#e0e7ff',
+  eventSelectedColor: '#c7d2fe',
   textColor: '#312e81',
 };
 
 const brandDarkPalette = {
   lineColor: '#a5b4fc',
-  backgroundColor: '#312e81',
+  eventColor: '#312e81',
+  eventSelectedColor: '#1e1b4b',
   textColor: '#e0e7ff',
 };
 ```
@@ -64,19 +69,22 @@ const brandDarkPalette = {
 ```ts copy
 interface ColorSet {
   lineColor: string;
-  backgroundColor: string;
+  eventColor: string;
+  eventSelectedColor: string;
   textColor: string;
 }
 
 export const buildLightColors = (base: string): ColorSet => ({
   lineColor: base,
-  backgroundColor: lighten(base, 0.88),
+  eventColor: lighten(base, 0.88),
+  eventSelectedColor: lighten(base, 0.8),
   textColor: darken(base, 0.45),
 });
 
 export const buildDarkColors = (base: string): ColorSet => ({
   lineColor: lighten(base, 0.25),
-  backgroundColor: darken(base, 0.55),
+  eventColor: darken(base, 0.55),
+  eventSelectedColor: darken(base, 0.65),
   textColor: lighten(base, 0.8),
 });
 ```
@@ -217,12 +225,14 @@ export const oceanTheme = {
       name: 'Deep Ocean',
       colors: {
         lineColor: '#0284c7',
-        backgroundColor: '#e0f2fe',
+        eventColor: '#e0f2fe',
+        eventSelectedColor: '#bae6fd',
         textColor: '#0f172a',
       },
       darkColors: {
         lineColor: '#38bdf8',
-        backgroundColor: '#0f172a',
+        eventColor: '#0f172a',
+        eventSelectedColor: '#020617',
         textColor: '#e0f2fe',
       },
     },

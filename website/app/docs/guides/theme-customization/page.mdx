@@ -24,12 +24,14 @@ const calendar = useCalendarApp({
       name: 'Personal',
       colors: {
         lineColor: '#0891b2', // cyan-600
-        backgroundColor: '#cffafe', // cyan-100
+        eventColor: '#cffafe', // cyan-100
+        eventSelectedColor: '#a5f3fc', // cyan-200
         textColor: '#164e63', // cyan-900
       },
       darkColors: {
         lineColor: '#22d3ee', // cyan-400
-        backgroundColor: '#164e63', // cyan-900
+        eventColor: '#164e63', // cyan-900
+        eventSelectedColor: '#083344', // cyan-950
         textColor: '#cffafe', // cyan-100
       },
     },
@@ -40,7 +42,8 @@ const calendar = useCalendarApp({
 ### Color Properties Explained
 
 - **lineColor**: Border and accent color (left bar on events)
-- **backgroundColor**: Event background fill
+- **eventColor**: Event background fill
+- **eventSelectedColor**: Background fill when an event is selected
 - **textColor**: Text color for event title and time
 
 ### Brand Color Integration
@@ -51,12 +54,14 @@ const calendar = useCalendarApp({
   name: 'Brand Events',
   colors: {
     lineColor: '#6366f1',       // Brand indigo
-    backgroundColor: '#e0e7ff', // Indigo-100
+    eventColor: '#e0e7ff', // Indigo-100
+    eventSelectedColor: '#c7d2fe', // Indigo-200
     textColor: '#312e81',       // Indigo-900
   },
   darkColors: {
     lineColor: '#a5b4fc',       // Indigo-300
-    backgroundColor: '#312e81', // Indigo-900
+    eventColor: '#312e81', // Indigo-900
+    eventSelectedColor: '#1e1b4b', // Indigo-950
     textColor: '#e0e7ff',       // Indigo-100
   },
 }
@@ -68,14 +73,16 @@ const calendar = useCalendarApp({
 // utils/colorGenerator.ts
 interface ColorSet {
   lineColor: string;
-  backgroundColor: string;
+  eventColor: string;
+  eventSelectedColor: string;
   textColor: string;
 }
 
 export function generateLightColors(baseColor: string): ColorSet {
   return {
     lineColor: baseColor,
-    backgroundColor: lighten(baseColor, 0.9),
+    eventColor: lighten(baseColor, 0.9),
+    eventSelectedColor: lighten(baseColor, 0.8),
     textColor: darken(baseColor, 0.4),
   };
 }
@@ -83,7 +90,8 @@ export function generateLightColors(baseColor: string): ColorSet {
 export function generateDarkColors(baseColor: string): ColorSet {
   return {
     lineColor: lighten(baseColor, 0.3),
-    backgroundColor: darken(baseColor, 0.6),
+    eventColor: darken(baseColor, 0.6),
+    eventSelectedColor: darken(baseColor, 0.7),
     textColor: lighten(baseColor, 0.8),
   };
 }
@@ -240,12 +248,14 @@ export const oceanTheme = {
       name: 'Deep Ocean',
       colors: {
         lineColor: '#0369a1',
-        backgroundColor: '#e0f2fe',
+        eventColor: '#e0f2fe',
+        eventSelectedColor: '#bae6fd',
         textColor: '#0c4a6e',
       },
       darkColors: {
         lineColor: '#7dd3fc',
-        backgroundColor: '#0c4a6e',
+        eventColor: '#0c4a6e',
+        eventSelectedColor: '#083344',
         textColor: '#e0f2fe',
       },
     },
@@ -254,12 +264,14 @@ export const oceanTheme = {
       name: 'Coral Reef',
       colors: {
         lineColor: '#ea580c',
-        backgroundColor: '#ffedd5',
+        eventColor: '#ffedd5',
+        eventSelectedColor: '#fed7aa',
         textColor: '#7c2d12',
       },
       darkColors: {
         lineColor: '#fb923c',
-        backgroundColor: '#7c2d12',
+        eventColor: '#7c2d12',
+        eventSelectedColor: '#431407',
         textColor: '#ffedd5',
       },
     },
