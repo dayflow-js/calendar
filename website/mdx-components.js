@@ -5,10 +5,10 @@ import { withBasePath } from './utils/basePath';
 
 const docsComponents = getDocsMDXComponents();
 
-export function useMDXComponents(components: any): any {
+export function useMDXComponents(components) {
   return {
     ...docsComponents,
-    img: (props: any) => (
+    img: (props) => (
       <img {...props} src={withBasePath(props.src)} />
     ),
     FrameworkInstall,

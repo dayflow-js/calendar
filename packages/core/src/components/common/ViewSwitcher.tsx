@@ -46,7 +46,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
       <div className="relative inline-block" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 mb-1 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between"
+          className="flex items-center gap-2 px-3 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
@@ -64,7 +64,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
           <div
             className={`absolute top-full mt-1 left-0 z-50 w-full min-w-30 ${dropdownPanel} animate-in`}
           >
-            <div className="py-1" role="listbox">
+            <div className="p-1" role="listbox">
               {registeredViews.map(viewType => (
                 <button
                   key={viewType}
@@ -75,7 +75,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
                     if ((calendar as any).triggerRender)
                       (calendar as any).triggerRender();
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm transition-colors duration-150 focus:outline-none ${
+                  className={`w-full text-left px-3 py-0.5 rounded text-sm transition-colors duration-150 focus:outline-none ${
                     currentView === viewType
                       ? 'bg-primary/10 text-primary font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'

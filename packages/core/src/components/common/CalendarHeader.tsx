@@ -111,12 +111,13 @@ const CalendarHeader = ({
           </div>
 
           {/* Right Section: Search, ViewSwitcher (if select) */}
-          {!isSwitcherCentered && (
-            <ViewSwitcher mode={switcherMode} calendar={calendar} />
-          )}
           <div
-            className={`df-header-right flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}
+            className={`df-header-right flex items-center justify-end gap-3 mb-1 pb-1`}
           >
+            {!isSwitcherCentered && (
+              <ViewSwitcher mode={switcherMode} calendar={calendar} />
+            )}
+
             {/* Mobile Search Icon */}
             <button
               onClick={onSearchClick}
@@ -127,7 +128,7 @@ const CalendarHeader = ({
             </button>
 
             {/* Desktop Search Bar */}
-            <div className="relative hidden md:block group mt-1">
+            <div className="relative hidden md:block group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="text-gray-400 group-focus-within:text-primary transition-colors">
                   <Search width={16} height={16} />
