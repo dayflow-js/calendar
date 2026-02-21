@@ -12,6 +12,8 @@ export interface QuickCreateController {
   mobileDraftEvent: Event | null;
   setMobileDraftEvent: (event: Event | null) => void;
   handleAddButtonClick: (e: any) => void;
+  isCreateCalendarOpen: boolean;
+  setIsCreateCalendarOpen: (open: boolean) => void;
 }
 
 /**
@@ -20,12 +22,18 @@ export interface QuickCreateController {
  */
 export function useQuickCreateController(
   app: ICalendarApp,
-  isMobile: boolean
+  isMobile: boolean,
+  sidebarEnabled: boolean
 ): QuickCreateController {
   const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
   const quickCreateAnchorRef = useRef<HTMLElement>(null!);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [mobileDraftEvent, setMobileDraftEvent] = useState<Event | null>(null);
+  const [isCreateCalendarOpen, setIsCreateCalendarOpen] = useState(false);
+
+  const handleCreateCalendar = useCallback(() => {
+    setIsCreateCalendarOpen(true);
+  }, []);
 
   const handleAddButtonClick = useCallback(
     (e: any) => {
@@ -54,14 +62,20 @@ export function useQuickCreateController(
         return;
       }
 
-      if (isQuickCreateOpen) {
-        setIsQuickCreateOpen(false);
+      if (sidebarEnabled) {
+        // Desktop: Toggle popup
+        if (isQuickCreateOpen) {
+          setIsQuickCreateOpen(false);
+        } else {
+          (quickCreateAnchorRef as any).current = e.currentTarget;
+          setIsQuickCreateOpen(true);
+        }
       } else {
-        (quickCreateAnchorRef as any).current = e.currentTarget;
-        setIsQuickCreateOpen(true);
+        // Sidebar disabled -> Add Button creates calendar
+        handleCreateCalendar();
       }
     },
-    [isMobile, isQuickCreateOpen, app]
+    [isMobile, isQuickCreateOpen, app, sidebarEnabled, handleCreateCalendar]
   );
 
   return {
@@ -73,5 +87,7 @@ export function useQuickCreateController(
     mobileDraftEvent,
     setMobileDraftEvent,
     handleAddButtonClick,
+    isCreateCalendarOpen,
+    setIsCreateCalendarOpen,
   };
 }

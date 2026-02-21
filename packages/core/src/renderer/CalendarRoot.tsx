@@ -22,6 +22,7 @@ import CalendarHeader from '../components/common/CalendarHeader';
 import SearchDrawer from '../components/search/SearchDrawer';
 import MobileSearchDialog from '../components/search/MobileSearchDialog';
 import { QuickCreateEventPopup } from '../components/common/QuickCreateEventPopup';
+import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
 import { MobileEventDrawer } from '../components/mobileEventDrawer';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { LocaleProvider } from '../locale/LocaleProvider';
@@ -104,10 +105,10 @@ export const CalendarRoot = ({
     effectiveEventDetailDialog,
     tick
   );
-  // Quick-create (desktop popup + mobile drawer)
-  const quickCreate = useQuickCreateController(app, isMobile);
   // Sidebar
   const sidebar = useSidebarBridge(app);
+  // Quick-create (desktop popup + mobile drawer)
+  const quickCreate = useQuickCreateController(app, isMobile, sidebar.enabled);
   // Theme
   const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
 
@@ -364,6 +365,15 @@ export const CalendarRoot = ({
           />
 
           {sidebar.extraContent}
+          {quickCreate.isCreateCalendarOpen && (
+            <CreateCalendarDialog
+              onClose={() => quickCreate.setIsCreateCalendarOpen(false)}
+              onCreate={calendar => {
+                app.createCalendar(calendar);
+                quickCreate.setIsCreateCalendarOpen(false);
+              }}
+            />
+          )}
           {renderEventDetailDialog()}
         </div>
       </CalendarInternalLocaleProvider>
