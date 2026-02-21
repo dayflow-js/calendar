@@ -12,6 +12,7 @@ import {
   EventDetailDialogRenderer,
   ICalendarApp,
   TNode,
+  Event as CalendarEvent,
 } from '../types';
 import { ThemeMode } from '../types/calendarTypes';
 import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
@@ -139,6 +140,21 @@ export const CalendarRoot = ({
       callbacks.onDismissUI = prevDismiss;
     };
   }, [app, eventDialog, quickCreate]);
+
+  // On mobile, route event-tap detail requests to the MobileEventDrawer instead
+  // of the floating desktop panel. detailPanelEventId is set by handleTouchEnd
+  // (via onDetailPanelToggle) when canOpenDetail is true.
+  useEffect(() => {
+    if (!isMobile || !eventDialog.detailPanelEventId) return;
+
+    const rawEventId = eventDialog.detailPanelEventId.split('::')[0];
+    const event = app.getEvents().find((e: CalendarEvent) => e.id === rawEventId);
+    if (event) {
+      quickCreate.setMobileDraftEvent(event);
+      quickCreate.setIsMobileDrawerOpen(true);
+    }
+    eventDialog.setDetailPanelEventId(null);
+  }, [eventDialog.detailPanelEventId, isMobile]);
 
   const handleDateSelect = useCallback(
     (date: Date) => {
@@ -326,8 +342,20 @@ export const CalendarRoot = ({
               quickCreate.setIsMobileDrawerOpen(false);
               quickCreate.setMobileDraftEvent(null);
             }}
-            onSave={(event: any) => {
-              app.addEvent(event);
+            onSave={(event: CalendarEvent) => {
+              const exists = app
+                .getEvents()
+                .some((e: CalendarEvent) => e.id === event.id);
+              if (exists) {
+                app.updateEvent(event.id, event);
+              } else {
+                app.addEvent(event);
+              }
+              quickCreate.setIsMobileDrawerOpen(false);
+              quickCreate.setMobileDraftEvent(null);
+            }}
+            onEventDelete={(id: string) => {
+              app.deleteEvent(id);
               quickCreate.setIsMobileDrawerOpen(false);
               quickCreate.setMobileDraftEvent(null);
             }}

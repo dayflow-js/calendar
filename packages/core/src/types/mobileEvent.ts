@@ -11,6 +11,8 @@ export interface MobileEventProps {
   onClose: () => void;
   /** Callback to save the event (creates or updates) */
   onSave: (event: Event) => void;
+  /** Callback to delete an existing event by id */
+  onEventDelete?: (id: string) => void;
   /** Current event data (newly created template or existing event) */
   draftEvent: Event | null;
   /** The ICalendarApp instance providing built-in services */

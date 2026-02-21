@@ -121,6 +121,7 @@ const CalendarHeader = ({
             <button
               onClick={onSearchClick}
               className={`md:hidden ${iconButton}`}
+              title={t('search') || 'Search'}
             >
               <Search width={16} height={16} />
             </button>
@@ -135,7 +136,7 @@ const CalendarHeader = ({
               <input
                 id="dayflow-search-input"
                 type="text"
-                placeholder="Search"
+                placeholder={t('search') || 'Search'}
                 value={searchValue}
                 onChange={handleSearchChange}
                 className={`${searchInput} w-48`}

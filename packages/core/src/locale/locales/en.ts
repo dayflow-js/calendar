@@ -55,6 +55,7 @@ const en: Locale = {
     titlePlaceholder: 'Title',
     notesPlaceholder: 'Notes',
     editEvent: 'Edit Event',
+    viewEvent: 'View Event',
     done: 'Done',
     quickCreateEvent: 'Quick Create Event',
     quickCreatePlaceholder: 'Movie at 7pm on Friday',

@@ -11,7 +11,6 @@ import {
   UseCalendarAppReturn,
   ViewType,
   CalendarType,
-  ReadOnlyConfig,
   RangeChangeReason,
 } from '../types';
 import { Event } from '../types';

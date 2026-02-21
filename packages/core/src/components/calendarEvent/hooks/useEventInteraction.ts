@@ -126,7 +126,11 @@ export const useEventInteraction = ({
         app.onEventClick(event);
       }
 
-      onDetailPanelToggle?.(null);
+      if (canOpenDetail) {
+        onDetailPanelToggle?.(detailPanelKey);
+      } else {
+        onDetailPanelToggle?.(null);
+      }
     }
 
     touchStartPosRef.current = null;
