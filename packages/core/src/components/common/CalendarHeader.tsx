@@ -1,4 +1,4 @@
-import { useContext, useCallback } from 'preact/hooks';
+import { useContext, useCallback, useMemo } from 'preact/hooks';
 import { ViewType, CalendarHeaderProps } from '../../types';
 import ViewSwitcher from './ViewSwitcher';
 import { Plus, Search } from './Icons';
@@ -40,17 +40,32 @@ const CalendarHeader = ({
     onSearchChange?.('');
   };
 
-  const headerProps = {
-    calendar,
-    switcherMode,
-    onAddCalendar,
-    onSearchChange,
-    onSearchClick,
-    searchValue,
-    isSearchOpen,
-    isEditable,
-    safeAreaLeft,
-  };
+  // Stable object so ContentSlot's update effect does not fire on every
+  // CalendarRoot re-render (app ticks, non-search state changes, etc.).
+  const headerProps = useMemo(
+    () => ({
+      calendar,
+      switcherMode,
+      onAddCalendar,
+      onSearchChange,
+      onSearchClick,
+      searchValue,
+      isSearchOpen,
+      isEditable,
+      safeAreaLeft,
+    }),
+    [
+      calendar,
+      switcherMode,
+      onAddCalendar,
+      onSearchChange,
+      onSearchClick,
+      searchValue,
+      isSearchOpen,
+      isEditable,
+      safeAreaLeft,
+    ]
+  );
 
   return (
     <ContentSlot

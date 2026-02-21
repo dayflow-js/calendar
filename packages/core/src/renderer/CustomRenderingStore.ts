@@ -14,6 +14,12 @@ export class CustomRenderingStore {
   private overrides = new Set<string>();
   private listeners = new Set<CustomRenderingListener>();
 
+  constructor(initialOverrides?: string[]) {
+    if (initialOverrides && initialOverrides.length > 0) {
+      this.overrides = new Set(initialOverrides);
+    }
+  }
+
   /**
    * Register a new custom rendering placeholder.
    * Called by the ContentSlot Preact component.

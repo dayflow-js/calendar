@@ -464,7 +464,7 @@ export const sidebarContainer =
 /**
  * Sidebar header
  */
-export const sidebarHeader = 'df-sidebar-header flex items-center px-2 py-2';
+export const sidebarHeader = 'df-sidebar-header flex items-center px-2 py-1';
 
 /**
  * Sidebar header toggle button

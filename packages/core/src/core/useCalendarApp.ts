@@ -12,6 +12,7 @@ import {
   ViewType,
   CalendarType,
   ReadOnlyConfig,
+  RangeChangeReason,
 } from '../types';
 import { Event } from '../types';
 import { isDeepEqual } from '../utils/helpers';
@@ -259,6 +260,13 @@ export function useCalendarApp(
     [app, triggerUpdate]
   );
 
+  const emitVisibleRange = useCallback(
+    (start: Date, end: Date, reason?: RangeChangeReason) => {
+      app.emitVisibleRange(start, end, reason);
+    },
+    [app]
+  );
+
   return {
     app,
     currentView,
@@ -285,6 +293,7 @@ export function useCalendarApp(
     highlightEvent: (eventId: string | null) => app.highlightEvent(eventId),
     setVisibleMonth: (date: Date) => app.setVisibleMonth(date),
     getVisibleMonth: () => app.getVisibleMonth(),
+    emitVisibleRange,
     readOnlyConfig: app.getReadOnlyConfig(),
   };
 }

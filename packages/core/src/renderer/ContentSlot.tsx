@@ -60,7 +60,7 @@ export function ContentSlot({
   // Update args when they change, without unregistering
   useEffect(() => {
     if (!store || !idRef.current) return;
-    
+
     // Check if actually different to avoid redundant notifications
     const id = idRef.current;
     store.register({

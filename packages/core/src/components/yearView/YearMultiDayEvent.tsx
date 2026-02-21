@@ -1,4 +1,11 @@
-import { useRef, useState, useEffect, useCallback } from 'preact/hooks';
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+} from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import {
   Event,
@@ -18,14 +25,16 @@ import { YearMultiDaySegment } from './utils';
 import DefaultEventDetailPanel from '../common/DefaultEventDetailPanel';
 import EventDetailPanelWithContent from '../common/EventDetailPanelWithContent';
 import { EventContextMenu } from '@/components/contextMenu';
+import { ContentSlot } from '../../renderer/ContentSlot';
+import { CustomRenderingContext } from '../../renderer/CustomRenderingContext';
 
 interface YearMultiDayEventProps {
   segment: YearMultiDaySegment;
   columnsPerRow: number;
   isDragging: boolean;
   isSelected: boolean;
-  onMoveStart?: (e: any | any, event: Event) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onMoveStart?: (e: any, event: Event) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
   onEventSelect?: (eventId: string | null) => void;
   detailPanelEventId?: string | null;
   onDetailPanelToggle?: (eventId: string | null) => void;
@@ -63,6 +72,8 @@ export const YearMultiDayEvent = ({
     isLastSegment,
   } = segment;
 
+  const customRenderingStore = useContext(CustomRenderingContext);
+
   const eventRef = useRef<HTMLDivElement>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [detailPanelPosition, setDetailPanelPosition] =
@@ -91,6 +102,68 @@ export const YearMultiDayEvent = ({
   // This prevents multiple panels from showing for multi-month events
   const showDetailPanel = detailPanelEventId === segment.id;
   const isEditable = !app?.state.readOnly;
+
+  // Stable callbacks and memos for ContentSlot integration
+  const handleClose = useCallback(() => {
+    onDetailPanelToggle?.(null);
+    if (onEventSelect) onEventSelect(null);
+  }, [onDetailPanelToggle, onEventSelect]);
+
+  const handleEventUpdate = useCallback(
+    (updated: Event) => app?.updateEvent(updated.id, updated),
+    [app]
+  );
+
+  const handleEventDelete = useCallback(
+    (id: string) => app?.deleteEvent(id),
+    [app]
+  );
+
+  // Memoized args for the eventDetailContent ContentSlot. Stable identity
+  // prevents unnecessary ContentSlot re-registrations on re-renders.
+  const panelSlotArgs = useMemo(
+    () => ({
+      event,
+      isAllDay: !!event.allDay,
+      onEventUpdate: handleEventUpdate,
+      onEventDelete: handleEventDelete,
+      onClose: handleClose,
+    }),
+    [event, handleEventUpdate, handleEventDelete, handleClose]
+  );
+
+  // Stable renderer so Preact does not see a new component type each render.
+  const contentSlotRenderer = useCallback(
+    () => (
+      <ContentSlot
+        store={customRenderingStore}
+        generatorName="eventDetailContent"
+        generatorArgs={panelSlotArgs}
+      />
+    ),
+    [customRenderingStore, panelSlotArgs]
+  );
+
+  // Memoized args for the eventDetailDialog ContentSlot.
+  const dialogSlotArgs = useMemo(
+    () => ({
+      event,
+      isOpen: showDetailPanel,
+      isAllDay: !!event.allDay,
+      onClose: handleClose,
+      app: app!,
+      onEventUpdate: handleEventUpdate,
+      onEventDelete: handleEventDelete,
+    }),
+    [
+      event,
+      showDetailPanel,
+      handleClose,
+      app,
+      handleEventUpdate,
+      handleEventDelete,
+    ]
+  );
 
   const startPercent = (startCellIndex / columnsPerRow) * 100;
   const widthPercent =
@@ -345,67 +418,66 @@ export const YearMultiDayEvent = ({
   const renderDetailPanel = () => {
     if (!showDetailPanel || !calendarRef) return null;
 
-    const handleClose = () => {
-      onDetailPanelToggle?.(null);
-      if (onEventSelect) onEventSelect(null);
-    };
-
-    if (customEventDetailDialog) {
-      const DialogComponent = customEventDetailDialog;
-      const dialogProps = {
-        event,
-        isOpen: showDetailPanel,
-        isAllDay,
-        onClose: handleClose,
-        app: app!,
-        onEventUpdate: (updated: Event) =>
-          app?.updateEvent(updated.id, updated),
-        onEventDelete: (id: string) => app?.deleteEvent(id),
-      };
-
-      if (typeof window === 'undefined' || typeof document === 'undefined')
-        return null;
-      const portalTarget = document.body;
-      if (!portalTarget) return null;
-
-      return createPortal(<DialogComponent {...dialogProps} />, portalTarget);
-    }
-
-    if (!detailPanelPosition) return null;
-
-    if (customDetailPanelContent) {
+    // ContentSlot path: React/Vue adapter has overridden the dialog slot.
+    if (customRenderingStore?.isOverridden('eventDetailDialog')) {
       return (
-        <EventDetailPanelWithContent
-          event={event}
-          position={detailPanelPosition}
-          panelRef={detailPanelRef}
-          isAllDay={isAllDay}
-          onClose={handleClose}
-          contentRenderer={customDetailPanelContent}
-          onEventUpdate={updated => app?.updateEvent(updated.id, updated)}
-          onEventDelete={id => app?.deleteEvent(id)}
-          eventVisibility="visible"
-          calendarRef={calendarRef}
-          selectedEventElementRef={eventRef}
+        <ContentSlot
+          store={customRenderingStore}
+          generatorName="eventDetailDialog"
+          generatorArgs={dialogSlotArgs}
         />
       );
     }
 
-    return (
-      <DefaultEventDetailPanel
-        event={event}
-        position={detailPanelPosition}
-        panelRef={detailPanelRef}
-        isAllDay={isAllDay}
-        onClose={handleClose}
-        app={app}
-        onEventUpdate={updated => app?.updateEvent(updated.id, updated)}
-        onEventDelete={id => app?.deleteEvent(id)}
-        eventVisibility="visible"
-        calendarRef={calendarRef}
-        selectedEventElementRef={eventRef}
-      />
-    );
+    // Direct prop path: caller passed a dialog renderer directly.
+    if (customEventDetailDialog) {
+      const DialogComponent = customEventDetailDialog;
+      if (typeof window === 'undefined' || typeof document === 'undefined')
+        return null;
+      const portalTarget = document.body;
+      if (!portalTarget) return null;
+      return createPortal(
+        <DialogComponent {...dialogSlotArgs} />,
+        portalTarget
+      );
+    }
+
+    if (!detailPanelPosition) return null;
+
+    const commonPanelProps = {
+      event,
+      position: detailPanelPosition,
+      panelRef: detailPanelRef,
+      isAllDay: !!event.allDay,
+      onClose: handleClose,
+      onEventUpdate: handleEventUpdate,
+      onEventDelete: handleEventDelete,
+      eventVisibility: 'visible' as const,
+      calendarRef,
+      selectedEventElementRef: eventRef,
+    };
+
+    // ContentSlot path: React/Vue adapter has overridden the panel content slot.
+    if (customRenderingStore?.isOverridden('eventDetailContent')) {
+      return (
+        <EventDetailPanelWithContent
+          {...commonPanelProps}
+          contentRenderer={contentSlotRenderer}
+        />
+      );
+    }
+
+    // Direct prop path: caller passed a panel content renderer directly.
+    if (customDetailPanelContent) {
+      return (
+        <EventDetailPanelWithContent
+          {...commonPanelProps}
+          contentRenderer={customDetailPanelContent}
+        />
+      );
+    }
+
+    return <DefaultEventDetailPanel {...commonPanelProps} app={app} />;
   };
 
   // Calculate border radius based on segment position

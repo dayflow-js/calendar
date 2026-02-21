@@ -7,7 +7,7 @@ import {
   ContextMenuSubTrigger,
   ContextMenuSubContent,
 } from './Primitives';
-import { Event, ICalendarApp } from '@/types';
+import { Event, ICalendarApp } from '../../../types';
 import { useLocale } from '@/locale';
 import { clipboardStore } from '@/utils/clipboardStore';
 

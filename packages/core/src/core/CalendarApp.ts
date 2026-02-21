@@ -6,7 +6,6 @@ import {
   CalendarView,
   ViewType,
   CalendarCallbacks,
-
   CalendarType,
   MobileEventRenderer,
   ReadOnlyConfig,

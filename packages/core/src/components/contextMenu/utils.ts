@@ -1,5 +1,5 @@
 import { Temporal } from 'temporal-polyfill';
-import { Event, ViewType, ICalendarApp } from '@/types';
+import { Event, ViewType, ICalendarApp } from '../../types';
 import {
   generateUniKey,
   temporalToDate,

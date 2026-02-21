@@ -8,6 +8,7 @@ import {
   PropType,
   Teleport,
   computed,
+  watch,
 } from 'vue';
 import {
   CalendarRenderer,
@@ -23,34 +24,63 @@ export const DayFlowCalendar = defineComponent({
       type: Object as PropType<ICalendarApp | UseCalendarAppReturn>,
       required: true,
     },
+    collapsedSafeAreaLeft: {
+      type: Number as PropType<number>,
+      default: undefined,
+    },
   },
   setup(props, { slots }) {
     const container = ref<HTMLElement | null>(null);
     const renderer = shallowRef<CalendarRenderer | null>(null);
     const customRenderings = ref<CustomRendering[]>([]);
 
+    // Store subscription cleanup so it can be replaced when the app changes.
+    let storeUnsubscribe: (() => void) | null = null;
+
     // Extract underlying app instance
     const app = computed(() => {
       return (props.calendar as any).app || props.calendar;
     });
 
-    onMounted(() => {
+    function initRenderer(appInstance: ICalendarApp) {
       if (!container.value) return;
 
-      const r = new CalendarRenderer(app.value);
+      // Tear down the previous renderer if the app instance was replaced.
+      storeUnsubscribe?.();
+      renderer.value?.unmount();
+
+      const r = new CalendarRenderer(appInstance);
       renderer.value = r;
+      r.setProps({ collapsedSafeAreaLeft: props.collapsedSafeAreaLeft });
       r.mount(container.value);
 
-      const unsubscribe = r.getCustomRenderingStore().subscribe(renderings => {
+      storeUnsubscribe = r.getCustomRenderingStore().subscribe(renderings => {
         customRenderings.value = Array.from(renderings.values());
       });
 
       // Synchronize slot overrides
       r.getCustomRenderingStore().setOverrides(Object.keys(slots));
+    }
+
+    watch(
+      () => props.collapsedSafeAreaLeft,
+      val => {
+        renderer.value?.setProps({ collapsedSafeAreaLeft: val });
+      }
+    );
+
+    // Recreate the renderer when the calendar prop is replaced (e.g. after
+    // client-side navigation to a different calendar instance).
+    watch(app, newApp => {
+      if (container.value) initRenderer(newApp);
+    });
+
+    onMounted(() => {
+      initRenderer(app.value);
 
       onUnmounted(() => {
-        unsubscribe();
-        r.unmount();
+        storeUnsubscribe?.();
+        renderer.value?.unmount();
         renderer.value = null;
       });
     });

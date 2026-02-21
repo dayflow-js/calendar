@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'preact/hooks';
 import { extractHourFromDate } from '@/utils';
 import { useLocale } from '@/locale';
 import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
@@ -172,21 +172,21 @@ const MonthView = ({
       ? propDetailPanelEventId
       : internalDetailPanelEventId;
 
-  const setSelectedEventId = (id: string | null) => {
+  const setSelectedEventId = useCallback((id: string | null) => {
     if (propOnEventSelect) {
       propOnEventSelect(id);
     } else {
       setInternalSelectedId(id);
     }
-  };
+  }, [propOnEventSelect]);
 
-  const setDetailPanelEventId = (id: string | null) => {
+  const setDetailPanelEventId = useCallback((id: string | null) => {
     if (propOnDetailPanelToggle) {
       propOnDetailPanelToggle(id);
     } else {
       setInternalDetailPanelEventId(id);
     }
-  };
+  }, [propOnDetailPanelToggle]);
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -481,17 +481,46 @@ const MonthView = ({
     setWeekHeight(height);
   }, []);
 
-  const handleEventUpdate = (updatedEvent: Event) => {
+  const handleEventUpdate = useCallback((updatedEvent: Event) => {
     app.updateEvent(updatedEvent.id, updatedEvent);
-  };
+  }, [app]);
 
-  const handleEventDelete = (eventId: string) => {
+  const handleEventDelete = useCallback((eventId: string) => {
     app.deleteEvent(eventId);
-  };
+  }, [app]);
 
   const handleChangeView = (view: ViewType) => {
     app.changeView(view);
   };
+
+  // Stable callbacks for WeekComponent props so memo() can bail out during scroll
+  const handleDetailPanelOpen = useCallback(
+    () => setNewlyCreatedEventId(null),
+    []
+  );
+
+  const handleWeekEventSelect = useCallback(
+    (eventId: string | null) => {
+      const isViewable = app.getReadOnlyConfig().viewable;
+      if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
+        const evt = events.find(e => e.id === eventId);
+        if (evt) {
+          setDraftEvent(evt);
+          setIsDrawerOpen(true);
+          return;
+        }
+      }
+      setSelectedEventId(eventId);
+    },
+    [screenSize, isTouch, events, setSelectedEventId, app]
+  );
+
+  const handleWeekEventLongPress = useCallback(
+    (eventId: string) => {
+      if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
+    },
+    [screenSize, isTouch, setSelectedEventId]
+  );
 
   // TODO: remove getCustomTitle and using app.currentDate to fixed
   const getCustomTitle = () => {
@@ -579,31 +608,13 @@ const MonthView = ({
               isDragging={isDragging}
               dragState={dragState as MonthEventDragState}
               newlyCreatedEventId={newlyCreatedEventId}
-              onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
+              onDetailPanelOpen={handleDetailPanelOpen}
               onMoreEventsClick={app.onMoreEventsClick}
               onChangeView={handleChangeView}
               onSelectDate={app.selectDate}
               selectedEventId={selectedEventId}
-              onEventSelect={(eventId: string | null) => {
-                const isViewable = app.getReadOnlyConfig().viewable;
-                if (
-                  (screenSize !== 'desktop' || isTouch) &&
-                  eventId &&
-                  isViewable
-                ) {
-                  const evt = events.find(e => e.id === eventId);
-                  if (evt) {
-                    setDraftEvent(evt);
-                    setIsDrawerOpen(true);
-                    return;
-                  }
-                }
-                setSelectedEventId(eventId);
-              }}
-              onEventLongPress={(eventId: string) => {
-                if (screenSize !== 'desktop' || isTouch)
-                  setSelectedEventId(eventId);
-              }}
+              onEventSelect={handleWeekEventSelect}
+              onEventLongPress={handleWeekEventLongPress}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}
               customDetailPanelContent={customDetailPanelContent}

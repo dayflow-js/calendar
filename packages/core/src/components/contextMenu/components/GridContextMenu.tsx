@@ -1,6 +1,6 @@
 import { ContextMenu, ContextMenuItem } from './Primitives';
 import { useLocale } from '@/locale';
-import { ICalendarApp, ViewType } from '@/types';
+import { ICalendarApp, ViewType } from '../../../types';
 import { clipboardStore } from '@/utils/clipboardStore';
 import { handlePasteEvent } from '../utils';
 

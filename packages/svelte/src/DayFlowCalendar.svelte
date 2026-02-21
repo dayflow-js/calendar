@@ -17,6 +17,7 @@
     titleBarSlot = null,
     colorPicker = null,
     colorPickerWrapper = null,
+    collapsedSafeAreaLeft = null,
   } = $props<{
     calendar: ICalendarApp | UseCalendarAppReturn;
     eventContent?: any;
@@ -27,6 +28,7 @@
     titleBarSlot?: any;
     colorPicker?: any;
     colorPickerWrapper?: any;
+    collapsedSafeAreaLeft?: number | null;
   }>();
 
   let container: HTMLElement | undefined = $state();
@@ -49,6 +51,7 @@
     titleBarSlot,
     colorPicker,
     colorPickerWrapper,
+    collapsedSafeAreaLeft,
   } as Record<string, any>);
 
   onMount(async () => {
@@ -56,9 +59,8 @@
 
     await tick();
 
-    const { CalendarRenderer } = await import('@dayflow/core');
-
     renderer = new CalendarRenderer(app);
+    renderer.setProps(renderProps);
     renderer.mount(container);
 
     unsubscribe = renderer.getCustomRenderingStore().subscribe(renderings => {
@@ -76,6 +78,18 @@
   onDestroy(() => {
     if (unsubscribe) unsubscribe();
     if (renderer) renderer.unmount();
+  });
+
+  // Reactively forward prop changes to the renderer after mount.
+  // `mounted` is $state so this effect re-runs when it becomes true, and
+  // again whenever any renderProp value changes.
+  $effect(() => {
+    if (!mounted || !renderer) return;
+    renderer.setProps(renderProps);
+    const activeOverrides = Object.keys(renderProps).filter(
+      key => renderProps[key] !== null
+    );
+    renderer.getCustomRenderingStore().setOverrides(activeOverrides);
   });
 
   function portal(node: HTMLElement, target: HTMLElement) {
