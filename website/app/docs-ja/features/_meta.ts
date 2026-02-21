@@ -25,7 +25,7 @@ const meta: MetaRecord = {
     display: 'hidden',
   },
   'content-slots': {
-    title: 'コンテンツスロット (Content Slots)',
+    title: 'コンテンツスロット',
   },
 };
 

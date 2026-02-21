@@ -1,6 +1,6 @@
 # useCalendarApp Reference
 
-`useCalendarApp(config: CalendarAppConfig)` is the hook that connects the DayFlow core to your React components. Pass a single configuration object to register views, feed initial events, toggle optional UI, and connect lifecycle callbacks. This guide breaks down every available option.
+`useCalendarApp(config: CalendarAppConfig)` is the hook that connects the DayFlow core to your application. Pass a single configuration object to register views, feed initial events, toggle optional UI, and connect lifecycle callbacks. This guide breaks down every available option.
 
 ## Quick Start
 
@@ -57,7 +57,7 @@ export function TeamCalendar() {
 ### Events
 
 - The provided array becomes the in-memory `CalendarApp.state.events` list.
-- `useCalendarApp` watches app mutations, so calling `calendar.addEvent()` or `calendar.updateEvent()` automatically syncs React state.
+- `useCalendarApp` watches app mutations, so calling `calendar.addEvent()` or `calendar.updateEvent()` automatically syncs application state.
 - Make sure events adhere to the `Event` interface (`start`/`end` accept `PlainDate`, `PlainDateTime`, or `ZonedDateTime`).
 
 ### Plugins
@@ -67,7 +67,7 @@ export function TeamCalendar() {
 
 ### Callbacks
 
-`callbacks` keep React state in sync with your backend or analytics layer:
+`callbacks` keep state in sync with your backend or analytics layer:
 
 - `onViewChange(view)` fires after a successful view switch.
 - `onDateChange(date)` fires whenever the focused date changes (navigation or selection).

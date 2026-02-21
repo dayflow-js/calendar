@@ -1,19 +1,20 @@
 # テーマカスタマイズガイド
 
-DayFlow カレンダーの見た目は、カレンダータイプの色・CSS 変数・Tailwind のダークモードなどを組み合わせて細かく調整できます。このガイドでは実務でよく使うテクニックをまとめました。
+DayFlow カレンダーの見た目は、`--df-color-*` という名前空間付き CSS カスタムプロパティで管理されています。すべてのトークンは `@layer df-theme` の内側で定義されているため、ホストアプリケーションは `!important` を使わずに上書きできます。Tailwind を使っていない環境でも同様です。
 
 ## 目次
 
-- [カスタムカレンダータイプカラー](#カスタムカレンダータイプカラー)
-- [CSS 変数のオーバーライド](#css-変数のオーバーライド)
-- [Tailwind との連携](#tailwind-との連携)
+- [カレンダータイプのカスタムカラー](#カレンダータイプのカスタムカラー)
+- [CSS 変数リファレンス](#css-変数リファレンス)
+- [上書き方法](#上書き方法)
+- [Tailwind v4 との連携](#tailwind-v4-との連携)
 - [カスタムテーマの組み立て](#カスタムテーマの組み立て)
 
-## カスタムカレンダータイプカラー
+## カレンダータイプのカスタムカラー
 
 ### 基本設定
 
-1 つの `calendarId` ごとにライト/ダークの配色を定義できます。ブランドカラーをベースに、背景は薄く、ラインは高彩度、テキストはコントラスト高めにするのがコツです。
+1 つの `calendarId` ごとにライト／ダークの配色を定義できます。
 
 ```tsx copy
 const calendar = useCalendarApp({
@@ -38,7 +39,7 @@ const calendar = useCalendarApp({
 
 ### 各色の役割
 
-- `lineColor`：イベントカード左側のアクセントやボーダーに使用
+- `lineColor`：イベントカード左側のアクセントやボーダー
 - `backgroundColor`：イベント本体の背景
 - `textColor`：タイトルや時刻テキスト
 
@@ -69,7 +70,7 @@ interface ColorSet {
 
 export const buildLightColors = (base: string): ColorSet => ({
   lineColor: base,
-  backgroundColor: lighten(base, 0.88), // chroma-js や tinycolor の lighten を想定
+  backgroundColor: lighten(base, 0.88),
   textColor: darken(base, 0.45),
 });
 
@@ -80,69 +81,125 @@ export const buildDarkColors = (base: string): ColorSet => ({
 });
 ```
 
-## CSS 変数のオーバーライド
+## CSS 変数リファレンス
 
-DayFlow のコンポーネントは CSS カスタムプロパティで配色を管理しています。グローバル CSS で上書きすると、細かなトークンまで統一できます。
+DayFlow のすべてのテーマトークンは `--df-color-` プレフィックスを持ち、ホストアプリの変数との衝突を防ぎます。
+
+| 変数 | 用途 |
+|---|---|
+| `--df-color-background` | カレンダーの背景 |
+| `--df-color-foreground` | 主テキスト色 |
+| `--df-color-hover` | ホバー時の背景 |
+| `--df-color-border` | ボーダーと区切り線 |
+| `--df-color-card` | カード・パネルの背景 |
+| `--df-color-card-foreground` | カード内テキスト色 |
+| `--df-color-muted` | 控えめな背景エリア |
+| `--df-color-muted-foreground` | 補助テキスト色 |
+| `--df-color-primary` | 主アクセント（ボタン、選択状態など） |
+| `--df-color-primary-foreground` | プライマリ背景上のテキスト |
+| `--df-color-secondary` | セカンダリアクセント |
+| `--df-color-secondary-foreground` | セカンダリ背景上のテキスト |
+| `--df-color-destructive` | 削除など破壊的アクション |
+| `--df-color-destructive-foreground` | デストラクティブ背景上のテキスト |
+
+## 上書き方法
+
+### 方法 1 — コンテナへの直接指定（全環境対応）
+
+`.df-calendar-container` に変数を直接設定します。この規則はどの `@layer` にも属さないため、ライブラリのデフォルト値に対して常に優先されます。
 
 ```css copy
-:root {
-  --dayflow-bg-primary: #ffffff;
-  --dayflow-bg-secondary: #f9fafb;
-  --dayflow-text-primary: #111827;
-  --dayflow-border: #e5e7eb;
-}
-
-.dark {
-  --dayflow-bg-primary: #111827;
-  --dayflow-bg-secondary: #1f2937;
-  --dayflow-text-primary: #f9fafb;
-  --dayflow-border: #374151;
-}
-
+/* styles/globals.css */
 .df-calendar-container {
-  --calendar-border: var(--dayflow-border);
+  --df-color-primary:    #6366f1;
+  --df-color-background: #f9fafb;
+  --df-color-border:     #e0e7ff;
 }
-.calendar-event {
-  --event-hover-opacity: 0.9;
-  --event-shadow: rgba(0, 0, 0, 0.1);
-}
-.dark .calendar-event {
-  --event-shadow: rgba(0, 0, 0, 0.3);
+
+/* ダークモード — 祖先要素に .dark クラスがあるとき */
+.dark .df-calendar-container {
+  --df-color-primary:    #a5b4fc;
+  --df-color-background: #1e1e2e;
+  --df-color-border:     #312e81;
 }
 ```
 
-## Tailwind との連携
+ほとんどのプロジェクトにはこの方法を推奨します。変数はカレンダー内部にのみ影響し、外部には漏れません。
 
-Tailwind を使っている場合は `darkMode: 'class'` を設定し、DayFlow のパッケージを `content` に含めるとツリーシェイクの対象になります。
+### 方法 2 — 名前付きレイヤーの順序指定（Tailwind v4）
 
-```js copy
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class',
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@dayflow/**/*.{js,ts,jsx,tsx}',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        brand: {
-          100: '#e0f2fe',
-          500: '#0ea5e9',
-          900: '#0c4a6e',
-        },
-      },
-    },
-  },
-};
+DayFlow のデフォルト値は `@layer df-theme` の中にあります。ライブラリをインポートする前に優先度の高いレイヤーを宣言し、そこに上書きを記述します。
+
+```css copy
+/* app.css */
+
+/* df-theme を先に宣言することで自分のレイヤーを優先させる */
+@layer df-theme, dayflow-overrides;
+
+@import '@dayflow/core/dist/styles.css';
+@import 'tailwindcss';
+
+@layer dayflow-overrides {
+  :where(:root) {
+    --df-color-primary:    #6366f1;
+    --df-color-background: #f9fafb;
+  }
+
+  :where(.dark) {
+    --df-color-primary:    #a5b4fc;
+    --df-color-background: #1e1e2e;
+  }
+}
 ```
 
-Tailwind クラスで DayFlow のルートを包むと、簡単に独自スタイルを付けられます。
+### 方法 3 — ライブラリをレイヤー内に隔離（Tailwind v4 上級）
+
+ライブラリのインポートを名前付きレイヤーでラップすると、Tailwind の `@layer theme` が自動的に優先度を上回ります。その後 `@theme` で上書きを注入できます。
+
+```css copy
+/* app.css */
+
+/* 先に宣言したレイヤーが最低優先度になる */
+@import '@dayflow/core/dist/styles.css' layer(dayflow);
+@import 'tailwindcss';
+
+/* @theme は @layer theme の中に変数を生成し、@layer dayflow より優先される */
+@theme {
+  --df-color-primary:    #6366f1;
+  --df-color-background: #f9fafb;
+}
+```
+
+> **注意：** ここでは `@theme inline` ではなく `@theme` を使ってください。`@theme inline` はビルド時にユーティリティクラスへ値を直接展開するものであり、ランタイムの CSS カスタムプロパティは生成されません。そのため、カレンダー内の `var(--df-color-*)` 参照には影響しません。
+
+## Tailwind v4 との連携
+
+Tailwind v4 はすべて CSS で設定します。`tailwind.config.js` は不要です。ライブラリの CSS には自身のコンポーネントをスキャンする `@source` ディレクティブが含まれています。
+
+### 最小構成
+
+```css copy
+/* app.css */
+@import '@dayflow/core/dist/styles.css';
+@import 'tailwindcss';
+```
+
+### ダークモード
+
+DayFlow は祖先要素（`<html>` を含む）の `.dark` クラスを参照します。JavaScript で切り替えてください。
+
+```ts copy
+document.documentElement.classList.toggle('dark', isDark);
+```
+
+クラスなしでもシステム設定のダークモードが自動的に適用されます。
+
+### Tailwind ユーティリティでラップする
 
 ```tsx copy
-function ThemedCalendar() {
+function ThemedCalendar({ calendar }) {
   return (
-    <div className="rounded-3xl bg-gray-50 p-6 dark:bg-gray-950">
+    <div className="rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700">
       <DayFlowCalendar calendar={calendar} />
     </div>
   );
@@ -150,8 +207,6 @@ function ThemedCalendar() {
 ```
 
 ## カスタムテーマの組み立て
-
-`theme` オブジェクトにモードやトークンをまとめて渡すと、アプリ全体で再利用しやすくなります。
 
 ```tsx copy
 export const oceanTheme = {
@@ -177,4 +232,44 @@ export const oceanTheme = {
 const calendar = useCalendarApp({ theme: oceanTheme });
 ```
 
-以上を踏まえてテーマを整えると、DayFlow を自社ブランドに自然に溶け込ませることができます。
+CSS 変数の上書きと組み合わせると、見た目を完全に統一できます。
+
+```css copy
+/* Ocean テーマ CSS トークン */
+.df-calendar-container {
+  --df-color-primary:    #0369a1;
+  --df-color-background: #f0f9ff;
+  --df-color-border:     #bae6fd;
+}
+
+.dark .df-calendar-container {
+  --df-color-primary:    #7dd3fc;
+  --df-color-background: #0c1220;
+  --df-color-border:     #0c4a6e;
+}
+```
+
+## リソース
+
+### ツール
+
+- [WebAIM コントラストチェッカー](https://webaim.org/resources/contrastchecker/) - 色のコントラストを確認
+- [Coolors](https://coolors.co/) - カラーパレット生成
+- [カラーコントラストアナライザー](https://www.tpgi.com/color-contrast-checker/) - デスクトップツール
+
+### ライブラリ
+
+- [chroma-js](https://gka.github.io/chroma.js/) - 色操作
+- [tinycolor2](https://github.com/bgrins/TinyColor) - 色ユーティリティ
+- [color](https://github.com/Qix-/color) - 色変換
+
+### Tailwind リソース
+
+- [Tailwind v4 アップグレードガイド](https://tailwindcss.com/docs/upgrade-guide) - v3 → v4 移行
+- [Tailwind CSS レイヤー](https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer) - レイヤードキュメント
+
+## 関連ドキュメント
+
+- [ダークモード](/docs-ja/features/dark-mode) - ダークモードの概要と API
+- [カレンダータイプ](/docs-ja/introduction/events#calendar-types) - イベントの分類
+- [カレンダーアプリの使用](/docs-ja/introduction/use-calendar-app) - コア設定

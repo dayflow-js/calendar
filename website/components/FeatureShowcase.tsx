@@ -28,6 +28,7 @@ import {
   CalendarType,
   EventDetailContentProps,
   EventDetailDialogProps,
+  createYearView,
 } from '@dayflow/core';
 import { CALENDAR_SIDE_PANEL, getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
@@ -157,7 +158,12 @@ const useDemoCalendar = ({
   }, [events]);
 
   const views = useMemo(
-    () => [createMonthView(), createWeekView(), createDayView()],
+    () => [
+      createDayView(),
+      createWeekView(),
+      createMonthView(),
+      createYearView({ mode: 'fixed-week' }),
+    ],
     []
   );
   const dragPlugin = useMemo(
