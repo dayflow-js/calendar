@@ -307,7 +307,6 @@ export const SidebarCustomShowcase: React.FC = () => {
     () =>
       createSidebarPlugin({
         createCalendarMode: 'modal',
-        colorPickerMode: 'blossom',
         width: 260,
         render: renderSidebar,
       }),

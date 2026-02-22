@@ -120,7 +120,6 @@ export function InteractiveCalendar() {
       p.push(
         createSidebarPlugin({
           createCalendarMode: 'modal',
-          colorPickerMode: 'blossom',
         })
       );
     }
