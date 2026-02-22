@@ -73,7 +73,7 @@ export class CalendarStore {
   public updateEvent(id: string, updates: Partial<Event>): void {
     const existingEvent = this.events.get(id);
     if (!existingEvent) {
-      throw new Error(`Event with ID ${id} not found.`);
+      throw new Error(`Event with id ${id} not found`);
     }
 
     const updatedEvent = { ...existingEvent, ...updates };

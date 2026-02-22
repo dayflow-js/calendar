@@ -25,7 +25,6 @@ export default [
       commonjs(),
       typescript({
         tsconfig: './tsconfig.build.json',
-        declaration: false,
       }),
     ],
     external: ['@dayflow/core', 'temporal-polyfill'],

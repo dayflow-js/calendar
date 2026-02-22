@@ -119,7 +119,7 @@ publish_pkg() {
     echo -e "  version: ${BOLD}$version${NC}"
 
     # Check if already published
-    if [ -z "$DRY_RUN" ] && npm view "@dayflow/$name@$version" version &>/dev/null; then
+    if npm view "@dayflow/$name@$version" version &>/dev/null; then
         warn "@dayflow/$name@$version already exists on npm — skipping"
         return 0
     fi

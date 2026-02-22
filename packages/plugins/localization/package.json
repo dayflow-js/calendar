@@ -1,6 +1,7 @@
 {
   "name": "@dayflow/plugin-localization",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "type": "module",
   "description": "Localization plugin for DayFlow calendar, providing support for multiple languages",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

@@ -1,6 +1,7 @@
 {
   "name": "@dayflow/plugin-drag",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "type": "module",
   "description": "Drag plugin for DayFlow calendar - event move, resize, and create via mouse/touch",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
