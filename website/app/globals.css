@@ -1,7 +1,8 @@
+/* The layer declared first has the lowest priority */
+@import '@dayflow/core/dist/styles.css';
 @import 'tailwindcss';
 @variant dark (&:where(.dark, .dark *));
 @import 'tw-animate-css';
-@import '@dayflow/core/dist/styles.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,6 +50,7 @@
 }
 
 :root {
+  font-family: Arial;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -124,17 +126,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Map Tailwind's semantic colors to DayFlow's variables to prevent theme conflicts */
-@theme inline {
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
-  --color-border: var(--color-border);
-  --color-primary: var(--color-primary);
-  --color-primary-foreground: var(--color-primary-foreground);
-  --color-muted: var(--color-muted);
-  --color-muted-foreground: var(--color-muted-foreground);
 }
 
 @layer l-base {

@@ -185,16 +185,6 @@ if [[ "$MODE" == "all" || "$MODE" == "angular" ]]; then
     publish_pkg "angular" "$ROOT/packages/angular/dist"
 fi
 
-# ---------- Git Tagging ----------
-if [ -z "$DRY_RUN" ] && [ "$MODE" == "all" ]; then
-    VERSION=$(node -e "console.log(require('$ROOT/packages/core/package.json').version)")
-    if ! git rev-parse "v$VERSION" >/dev/null 2>&1; then
-        echo -e "\n${YELLOW}🏷️  Creating git tag v$VERSION...${NC}"
-        git tag "v$VERSION"
-        ok "Tag v$VERSION created"
-    fi
-fi
-
 echo -e "\n${GREEN}${BOLD}Done!${NC}"
 if [ -n "$DRY_RUN" ]; then
     warn "This was a dry run. No actual publish occurred."

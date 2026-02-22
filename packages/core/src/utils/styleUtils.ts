@@ -38,29 +38,41 @@ export function normalizeCssWidth(
 }
 
 /**
- * Check if the browser's scrollbar takes up space in the layout.
+ * Check if the calendar's scrollbar takes up space in the layout.
  *
- * Some browsers (like Safari on macOS with "Show scroll bars: When scrolling" setting)
- * use overlay scrollbars that don't take up space, while others (like Chrome on Windows)
- * use scrollbars that reduce the available width of the container.
+ * Tests inside a .df-calendar-container element so the library's scoped
+ * scrollbar CSS applies (scrollbar-width: thin; ::-webkit-scrollbar { width: 2px }).
+ * Also overrides any host-app CSS that hides scrollbars (e.g. display: none),
+ * since we need to measure the actual rendered scrollbar width.
  *
- * @returns true if scrollbar takes space, false otherwise
+ * @returns true if the calendar scrollbar takes space, false otherwise
  */
 export function scrollbarTakesSpace(): boolean {
   if (typeof document === 'undefined') return false;
 
-  const div = document.createElement('div');
-  div.style.width = '100px';
-  div.style.height = '100px';
-  div.style.overflow = 'scroll';
-  div.style.position = 'absolute';
-  div.style.top = '-9999px';
+  // Override host-app ::-webkit-scrollbar { display: none } so measurement is accurate
+  const styleEl = document.createElement('style');
+  styleEl.textContent =
+    '.df-calendar-container .__df_measure__::-webkit-scrollbar { display: block !important; }';
+  document.head.appendChild(styleEl);
 
-  document.body.appendChild(div);
+  // Test inside .df-calendar-container so scoped scrollbar CSS applies
+  const container = document.createElement('div');
+  container.className = 'df-calendar-container';
+  container.style.cssText =
+    'position:absolute;top:-9999px;width:100px;height:100px;overflow:hidden';
+
+  const div = document.createElement('div');
+  div.className = '__df_measure__';
+  div.style.cssText = 'width:100px;height:100px;overflow:scroll';
+
+  container.appendChild(div);
+  document.body.appendChild(container);
 
   const takesSpace = div.offsetWidth - div.clientWidth > 0;
 
-  document.body.removeChild(div);
+  document.body.removeChild(container);
+  document.head.removeChild(styleEl);
 
   return takesSpace;
 }

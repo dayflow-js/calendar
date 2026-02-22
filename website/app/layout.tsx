@@ -3,6 +3,7 @@ import { Head } from 'nextra/components';
 import 'nextra-theme-docs/style.css';
 import './globals.css';
 import { withBasePath } from '@/utils/basePath';
+import '@dayflow/core/dist/styles.css';
 
 export const metadata: Metadata = {
   title: {

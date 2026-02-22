@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/angular",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Angular adapter for DayFlow calendar",
   "main": "dist/fesm2022/dayflow-angular.mjs",
   "module": "dist/fesm2022/dayflow-angular.mjs",

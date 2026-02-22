@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import {
   useCalendarApp,
@@ -345,7 +345,7 @@ export function InteractiveCalendar() {
             </div>
 
             {/* Localization Column */}
-            <div className="space-y-3">
+            <div className="space-y-1">
               <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-tight">
                 Language
               </h3>
