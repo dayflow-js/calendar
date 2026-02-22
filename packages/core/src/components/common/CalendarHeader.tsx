@@ -1,4 +1,4 @@
-import { useContext, useCallback } from 'preact/hooks';
+import { useContext, useCallback, useMemo } from 'preact/hooks';
 import { ViewType, CalendarHeaderProps } from '../../types';
 import ViewSwitcher from './ViewSwitcher';
 import { Plus, Search } from './Icons';
@@ -40,17 +40,32 @@ const CalendarHeader = ({
     onSearchChange?.('');
   };
 
-  const headerProps = {
-    calendar,
-    switcherMode,
-    onAddCalendar,
-    onSearchChange,
-    onSearchClick,
-    searchValue,
-    isSearchOpen,
-    isEditable,
-    safeAreaLeft,
-  };
+  // Stable object so ContentSlot's update effect does not fire on every
+  // CalendarRoot re-render (app ticks, non-search state changes, etc.).
+  const headerProps = useMemo(
+    () => ({
+      calendar,
+      switcherMode,
+      onAddCalendar,
+      onSearchChange,
+      onSearchClick,
+      searchValue,
+      isSearchOpen,
+      isEditable,
+      safeAreaLeft,
+    }),
+    [
+      calendar,
+      switcherMode,
+      onAddCalendar,
+      onSearchChange,
+      onSearchClick,
+      searchValue,
+      isSearchOpen,
+      isEditable,
+      safeAreaLeft,
+    ]
+  );
 
   return (
     <ContentSlot
@@ -96,22 +111,24 @@ const CalendarHeader = ({
           </div>
 
           {/* Right Section: Search, ViewSwitcher (if select) */}
-          {!isSwitcherCentered && (
-            <ViewSwitcher mode={switcherMode} calendar={calendar} />
-          )}
           <div
-            className={`df-header-right flex ${switcherMode === 'select' ? 'ml-2' : ''} items-center justify-end gap-3 mb-1 pb-1 h-6`}
+            className={`df-header-right flex items-center justify-end gap-3 mb-1 pb-1`}
           >
+            {!isSwitcherCentered && (
+              <ViewSwitcher mode={switcherMode} calendar={calendar} />
+            )}
+
             {/* Mobile Search Icon */}
             <button
               onClick={onSearchClick}
               className={`md:hidden ${iconButton}`}
+              title={t('search') || 'Search'}
             >
               <Search width={16} height={16} />
             </button>
 
             {/* Desktop Search Bar */}
-            <div className="relative hidden md:block group mt-1">
+            <div className="relative hidden md:block group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="text-gray-400 group-focus-within:text-primary transition-colors">
                   <Search width={16} height={16} />
@@ -120,7 +137,7 @@ const CalendarHeader = ({
               <input
                 id="dayflow-search-input"
                 type="text"
-                placeholder="Search"
+                placeholder={t('search') || 'Search'}
                 value={searchValue}
                 onChange={handleSearchChange}
                 className={`${searchInput} w-48`}

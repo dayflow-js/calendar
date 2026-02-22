@@ -1,4 +1,4 @@
-import { Event } from '@/types';
+import { Event } from '../types';
 
 class ClipboardStore {
   private lastCopiedEvent: Event | null = null;

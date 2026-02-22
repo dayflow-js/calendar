@@ -1,3 +1,4 @@
+// TODO: refactor to split into multiple files if it grows too large
 import {
   ICalendarApp,
   CalendarAppConfig,
@@ -6,18 +7,19 @@ import {
   CalendarView,
   ViewType,
   CalendarCallbacks,
-
   CalendarType,
   MobileEventRenderer,
   ReadOnlyConfig,
   TNode,
   RangeChangeReason,
+  EventChange,
 } from '../types';
 import { Event } from '../types';
 import {
   CalendarRegistry,
   setDefaultCalendarRegistry,
 } from './calendarRegistry';
+import { CalendarStore } from './CalendarStore';
 import { logger } from '../utils/logger';
 
 import { ThemeMode } from '../types/calendarTypes';
@@ -29,6 +31,7 @@ export class CalendarApp implements ICalendarApp {
   public state: CalendarAppState;
   private callbacks: CalendarCallbacks;
   private calendarRegistry: CalendarRegistry;
+  private store: CalendarStore;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
   private useCalendarHeader: boolean | ((props: any) => TNode);
@@ -58,6 +61,10 @@ export class CalendarApp implements ICalendarApp {
     this.themeChangeListeners = new Set();
     this.listeners = new Set();
 
+    // Initialize CalendarStore
+    this.store = new CalendarStore(this.state.events);
+    this.setupStoreListeners();
+
     // Initialize CalendarRegistry
     this.calendarRegistry = new CalendarRegistry(
       config.calendars,
@@ -84,6 +91,35 @@ export class CalendarApp implements ICalendarApp {
     });
 
     this.handleVisibleRangeChange('initial');
+  }
+
+  private setupStoreListeners(): void {
+    this.store.onEventChange = (change: EventChange) => {
+      // Sync local state
+      this.state.events = this.store.getAllEvents();
+
+      if (change.type === 'create') {
+        this.callbacks.onEventCreate?.(change.event);
+      } else if (change.type === 'update') {
+        this.callbacks.onEventUpdate?.(change.after);
+      } else if (change.type === 'delete') {
+        this.callbacks.onEventDelete?.(change.event.id);
+      }
+
+      this.triggerRender();
+      this.notify();
+    };
+
+    this.store.onEventBatchChange = (changes: EventChange[]) => {
+      // Sync local state
+      this.state.events = this.store.getAllEvents();
+
+      // Trigger generic batch callback
+      this.callbacks.onEventBatchChange?.(changes);
+
+      this.triggerRender();
+      this.notify();
+    };
   }
 
   private resolveLocale(locale?: string | any): string | any {
@@ -130,6 +166,9 @@ export class CalendarApp implements ICalendarApp {
     const lastState = this.undoStack.pop();
     if (lastState?.type === 'events_snapshot') {
       this.state.events = lastState.data;
+      this.store = new CalendarStore(this.state.events);
+      this.setupStoreListeners();
+
       this.triggerRender();
       this.notify();
     }
@@ -360,46 +399,61 @@ export class CalendarApp implements ICalendarApp {
       }
     }
 
-    let newEvents = [...this.state.events];
+    // Handle Pending State (Direct Mutation)
+    if (isPending) {
+      let newEvents = [...this.state.events];
 
-    // 1. Delete
-    if (changes.delete) {
-      const deleteIds = new Set(changes.delete);
-      newEvents = newEvents.filter(e => !deleteIds.has(e.id));
+      if (changes.delete) {
+        const deleteIds = new Set(changes.delete);
+        newEvents = newEvents.filter(e => !deleteIds.has(e.id));
+      }
+
+      if (changes.update) {
+        changes.update.forEach(({ id, updates }) => {
+          const index = newEvents.findIndex(e => e.id === id);
+          if (index !== -1) {
+            newEvents[index] = { ...newEvents[index], ...updates };
+          }
+        });
+      }
+
+      if (changes.add) {
+        newEvents = [...newEvents, ...changes.add];
+      }
+
+      this.state.events = newEvents;
+      this.notify();
+      return;
     }
 
-    // 2. Update
+    // Handle Committed State (Through Store)
+    this.store.beginTransaction();
+
+    if (changes.delete) {
+      changes.delete.forEach(id => this.store.deleteEvent(id));
+    }
+
     if (changes.update) {
       changes.update.forEach(({ id, updates }) => {
-        const index = newEvents.findIndex(e => e.id === id);
-        if (index !== -1) {
-          newEvents[index] = { ...newEvents[index], ...updates };
+        try {
+          this.store.updateEvent(id, updates);
+        } catch (e) {
+          console.warn(`Failed to update event ${id}:`, e);
         }
       });
     }
 
-    // 3. Add
     if (changes.add) {
-      newEvents = [...newEvents, ...changes.add];
+      changes.add.forEach(event => {
+        try {
+          this.store.createEvent(event);
+        } catch (e) {
+          console.warn(`Failed to create event ${event.id}:`, e);
+        }
+      });
     }
 
-    this.state.events = newEvents;
-
-    if (!isPending) {
-      // Trigger individual callbacks if needed, though usually used for batch
-      if (changes.add)
-        changes.add.forEach(e => this.callbacks.onEventCreate?.(e));
-      if (changes.delete)
-        changes.delete.forEach(id => this.callbacks.onEventDelete?.(id));
-      if (changes.update && this.callbacks.onEventUpdate) {
-        changes.update.forEach(({ id }) => {
-          const updated = this.state.events.find(e => e.id === id);
-          if (updated) this.callbacks.onEventUpdate?.(updated);
-        });
-      }
-    }
-
-    this.notify();
+    this.store.endTransaction();
   };
 
   addEvent = (event: Event): void => {
@@ -411,10 +465,8 @@ export class CalendarApp implements ICalendarApp {
     this.pendingSnapshot = null; // New operation, clear any pending
     this.pushToUndo();
 
-    this.state.events = [...this.state.events, event];
-
-    this.callbacks.onEventCreate?.(event);
-    this.notify();
+    // Delegate to store
+    this.store.createEvent(event);
   };
 
   updateEvent = (
@@ -431,12 +483,7 @@ export class CalendarApp implements ICalendarApp {
       return;
     }
 
-    const eventIndex = this.state.events.findIndex(e => e.id === id);
-    if (eventIndex === -1) {
-      throw new Error(`Event with id ${id} not found`);
-    }
-
-    // Save state before update
+    // Save state before update (Snapshotting)
     if (isPending) {
       if (!this.pendingSnapshot) {
         this.pendingSnapshot = [...this.state.events];
@@ -450,20 +497,25 @@ export class CalendarApp implements ICalendarApp {
       }
     }
 
-    const updatedEvent = { ...this.state.events[eventIndex], ...eventUpdate };
-    this.state.events = [
-      ...this.state.events.slice(0, eventIndex),
-      updatedEvent,
-      ...this.state.events.slice(eventIndex + 1),
-    ];
-    // When resizing the events do not callbacks
     if (isPending) {
+      // Direct local mutation for pending state
+      const eventIndex = this.state.events.findIndex(e => e.id === id);
+      if (eventIndex === -1) {
+        throw new Error(`Event with id ${id} not found`);
+      }
+
+      const updatedEvent = { ...this.state.events[eventIndex], ...eventUpdate };
+      this.state.events = [
+        ...this.state.events.slice(0, eventIndex),
+        updatedEvent,
+        ...this.state.events.slice(eventIndex + 1),
+      ];
       this.notify();
       return;
     }
 
-    this.callbacks.onEventUpdate?.(updatedEvent);
-    this.notify();
+    // Committed update -> Store
+    this.store.updateEvent(id, eventUpdate);
   };
 
   deleteEvent = (id: string): void => {
@@ -472,21 +524,10 @@ export class CalendarApp implements ICalendarApp {
       return;
     }
 
-    const eventIndex = this.state.events.findIndex(e => e.id === id);
-    if (eventIndex === -1) {
-      throw new Error(`Event with id ${id} not found`);
-    }
-
     this.pendingSnapshot = null;
     this.pushToUndo();
 
-    this.state.events = [
-      ...this.state.events.slice(0, eventIndex),
-      ...this.state.events.slice(eventIndex + 1),
-    ];
-
-    this.callbacks.onEventDelete?.(id);
-    this.notify();
+    this.store.deleteEvent(id);
   };
 
   getAllEvents = (): Event[] => {
@@ -598,22 +639,28 @@ export class CalendarApp implements ICalendarApp {
   };
 
   mergeCalendars = (sourceId: string, targetId: string): void => {
-    const sourceEvents = this.state.events.filter(
-      e => e.calendarId === sourceId
-    );
+    const sourceEvents = this.store
+      .getAllEvents()
+      .filter(e => e.calendarId === sourceId);
+
+    this.pushToUndo();
+
+    // Use Transaction for batch update
+    this.store.beginTransaction();
 
     // Update all events from source calendar to target calendar
     sourceEvents.forEach(event => {
-      this.updateEvent(event.id, { calendarId: targetId });
+      this.store.updateEvent(event.id, { calendarId: targetId });
     });
+
+    this.store.endTransaction();
 
     // Delete source calendar
     this.deleteCalendar(sourceId);
 
     // Call callback
     this.callbacks.onCalendarMerge?.(sourceId, targetId);
-    this.callbacks.onRender?.();
-    this.notify();
+    // onRender and notify will be triggered by store callbacks
   };
 
   getCalendarHeaderConfig = (): boolean | ((props: any) => TNode) => {

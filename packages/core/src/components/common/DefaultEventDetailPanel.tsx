@@ -1,4 +1,4 @@
-import { useMemo } from 'preact/hooks';
+import { useMemo, useState, useEffect } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
 import { Temporal } from 'temporal-polyfill';
 import { EventDetailPanelProps, CalendarType } from '../../types';
@@ -34,6 +34,48 @@ const DefaultEventDetailPanel = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
+
+  // Local state for debounced inputs
+  const [title, setTitle] = useState(event.title);
+  const [description, setDescription] = useState(event.description ?? '');
+
+  // Sync local state when event prop changes (external updates or navigation)
+  useEffect(() => {
+    setTitle(event.title);
+  }, [event.title]);
+
+  useEffect(() => {
+    setDescription(event.description ?? '');
+  }, [event.description]);
+
+  // Debounce logic for Title
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (title !== event.title) {
+        onEventUpdate({
+          ...event,
+          title,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [title, event]);
+
+  // Debounce logic for Description
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentDesc = event.description ?? '';
+      if (description !== currentDesc) {
+        onEventUpdate({
+          ...event,
+          description,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [description, event]);
 
   // Check if dark mode is active (either via theme context or DOM class)
   const isDark =
@@ -276,15 +318,11 @@ const DefaultEventDetailPanel = ({
             id={`event-title-${event.id}`}
             name="title"
             type="text"
-            value={event.title}
+            value={title}
             readOnly={!isEditable}
             disabled={!isEditable}
-            onChange={(e: any) => {
-              onEventUpdate({
-                ...event,
-                title: (e.target as HTMLInputElement).value,
-              });
-            }}
+            onChange={(e: any) => setTitle((e.target as HTMLInputElement).value)}
+            onInput={(e: any) => setTitle((e.target as HTMLInputElement).value)}
             className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
           />
         </div>
@@ -316,7 +354,6 @@ const DefaultEventDetailPanel = ({
             matchTriggerWidth
             disabled={!isEditable}
             onChange={handleAllDayRangeChange}
-            onOk={handleAllDayRangeChange}
             locale={app?.state.locale}
           />
         </div>
@@ -339,16 +376,6 @@ const DefaultEventDetailPanel = ({
                 end,
               });
             }}
-            onOk={(
-              nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
-            ) => {
-              const [start, end] = nextRange;
-              onEventUpdate({
-                ...event,
-                start,
-                end,
-              });
-            }}
             locale={app?.state.locale}
           />
         </div>
@@ -361,15 +388,11 @@ const DefaultEventDetailPanel = ({
         <textarea
           id={`event-note-${event.id}`}
           name="note"
-          value={event.description ?? ''}
+          value={description}
           readOnly={!isEditable}
           disabled={!isEditable}
-          onChange={e =>
-            onEventUpdate({
-              ...event,
-              description: (e.target as HTMLTextAreaElement).value,
-            })
-          }
+          onChange={e => setDescription((e.target as HTMLTextAreaElement).value)}
+          onInput={e => setDescription((e.target as HTMLTextAreaElement).value)}
           rows={3}
           className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
           placeholder={t('addNotePlaceholder')}

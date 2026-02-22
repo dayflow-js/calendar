@@ -7,7 +7,6 @@ interface CalendarListProps {
   onReorder: (fromIndex: number, toIndex: number) => void;
   onRename: (id: string, newName: string) => void;
   onContextMenu: (e: any, id: string) => void;
-  onColorClick?: (e: any, id: string) => void;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   activeContextMenuCalendarId?: string | null;
@@ -29,7 +28,6 @@ export const CalendarList = ({
   onReorder,
   onRename,
   onContextMenu,
-  onColorClick,
   editingId,
   setEditingId,
   activeContextMenuCalendarId,
@@ -248,12 +246,6 @@ export const CalendarList = ({
                         (event.target as HTMLInputElement).checked
                       )
                     }
-                    onClick={e => {
-                      if (onColorClick && isVisible) {
-                        e.preventDefault();
-                        onColorClick(e, calendar.id);
-                      }
-                    }}
                   />
                   {showIcon && (
                     <span

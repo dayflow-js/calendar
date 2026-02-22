@@ -139,13 +139,15 @@ const calendar = useCalendarApp({
       colors: {
         // Light mode colors
         lineColor: '#0066cc',
-        backgroundColor: '#e6f2ff',
+        eventColor: '#e6f2ff',
+        eventSelectedColor: '#cce4ff',
         textColor: '#003d7a',
       },
       darkColors: {
         // Dark mode colors
         lineColor: '#4da6ff',
-        backgroundColor: '#1a3d5c',
+        eventColor: '#1a3d5c',
+        eventSelectedColor: '#2a5a8a',
         textColor: '#b3d9ff',
       },
     },
@@ -160,13 +162,13 @@ For optimal readability and accessibility:
 **Light Mode:**
 
 - Line colors: Vibrant, saturated colors (#0066cc, #16a34a)
-- Background colors: Light tints (#e6f2ff, #dcfce7)
+- Event colors: Light tints (#e6f2ff, #dcfce7)
 - Text colors: Dark shades for contrast (#003d7a, #14532d)
 
 **Dark Mode:**
 
 - Line colors: Lighter, more luminous variants (#4da6ff, #4ade80)
-- Background colors: Dark, desaturated backgrounds (#1a3d5c, #1e4d2b)
+- Event colors: Dark, desaturated backgrounds (#1a3d5c, #1e4d2b)
 - Text colors: Light shades for readability (#b3d9ff, #bbf7d0)
 
 ## Default Calendar Type Colors
@@ -206,7 +208,8 @@ app.unsubscribeThemeChange(callback: (theme: ThemeMode) => void): void
 ```typescript
 interface CalendarTypeColors {
   lineColor: string; // Border and accent color
-  backgroundColor: string; // Background color
+  eventColor: string; // Event background color
+  eventSelectedColor: string; // Selected event background color
   textColor: string; // Text color
 }
 

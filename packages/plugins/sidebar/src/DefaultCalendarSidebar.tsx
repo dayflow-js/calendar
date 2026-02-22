@@ -63,7 +63,11 @@ const DefaultCalendarSidebar = ({
   const handleMonthChange = useCallback(
     (offset: number) => {
       const current = app.getVisibleMonth();
-      const next = new Date(current.getFullYear(), current.getMonth() + offset, 1);
+      const next = new Date(
+        current.getFullYear(),
+        current.getMonth() + offset,
+        1
+      );
       app.setVisibleMonth(next);
     },
     [app]
@@ -143,35 +147,6 @@ const DefaultCalendarSidebar = ({
   const handleCloseSidebarContextMenu = useCallback(() => {
     setSidebarContextMenu(null);
   }, []);
-
-  const handleColorClick = useCallback(
-    (e: any, calendarId: string) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const calendar = calendars.find(c => c.id === calendarId);
-      if (calendar) {
-        const { l, h } = hexToHsl(calendar.colors.lineColor);
-        const sliderValue = lightnessToSliderValue(l);
-        const rect = e.currentTarget.getBoundingClientRect();
-
-        setCustomColorPicker({
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2,
-          calendarId: calendarId,
-          initialColor: {
-            hue: h,
-            saturation: sliderValue,
-            lightness: l,
-            alpha: 100,
-            layer: 'outer',
-          },
-          currentColor: calendar.colors.lineColor,
-        });
-      }
-    },
-    [calendars]
-  );
 
   const handleDeleteCalendar = useCallback(() => {
     if (contextMenu) {
@@ -396,7 +371,6 @@ const DefaultCalendarSidebar = ({
                 : () => {}
             }
             onContextMenu={isEditable ? handleContextMenu : () => {}}
-            onColorClick={isEditable ? handleColorClick : undefined}
             editingId={editingCalendarId}
             setEditingId={setEditingCalendarId}
             activeContextMenuCalendarId={contextMenu?.calendarId}
@@ -425,7 +399,6 @@ const DefaultCalendarSidebar = ({
               : () => {}
           }
           onContextMenu={isEditable ? handleContextMenu : () => {}}
-          onColorClick={isEditable ? handleColorClick : undefined}
           editingId={editingCalendarId}
           setEditingId={setEditingCalendarId}
           activeContextMenuCalendarId={contextMenu?.calendarId}
@@ -471,8 +444,8 @@ const DefaultCalendarSidebar = ({
                   <ContextMenuSeparator />
                   <ContextMenuColorPicker
                     selectedColor={
-                      calendars.find(c => c.id === contextMenu.calendarId)?.colors
-                        .lineColor
+                      calendars.find(c => c.id === contextMenu.calendarId)
+                        ?.colors.lineColor
                     }
                     onSelect={handleColorSelect}
                     onCustomColor={handleCustomColor}
@@ -581,7 +554,7 @@ const DefaultCalendarSidebar = ({
               }}
               onMouseDown={e => e.stopPropagation()}
             >
-              {colorPickerMode === 'blossom' ? (
+              {colorPickerMode === 'custom' ? (
                 <BlossomColorPicker
                   defaultValue={customColorPicker.initialColor}
                   coreSize={28}
@@ -611,7 +584,7 @@ const DefaultCalendarSidebar = ({
                 <ContentSlot
                   generatorName="colorPicker"
                   generatorArgs={{
-                    variant: 'sketch',
+                    variant: 'sketch', // TODO: change name
                     color: customColorPicker.currentColor,
                     onChange: (color: { hex: string }) => {
                       setCustomColorPicker(prev =>

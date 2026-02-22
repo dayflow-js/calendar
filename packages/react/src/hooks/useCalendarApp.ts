@@ -27,7 +27,7 @@ export function useCalendarApp(
 
   // Sync config changes to the app instance
   useEffect(() => {
-    if (app && JSON.stringify(configRef.current) !== JSON.stringify(config)) {
+    if (app && config !== configRef.current) {
       app.updateConfig(config);
       configRef.current = config;
     }
@@ -60,6 +60,7 @@ export function useCalendarApp(
     highlightEvent: app.highlightEvent,
     setVisibleMonth: app.setVisibleMonth,
     getVisibleMonth: app.getVisibleMonth,
+    emitVisibleRange: app.emitVisibleRange,
     readOnlyConfig: app.getReadOnlyConfig(),
   };
 }

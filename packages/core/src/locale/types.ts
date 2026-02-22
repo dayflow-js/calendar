@@ -49,6 +49,7 @@ export type TranslationKey =
   | 'titlePlaceholder'
   | 'notesPlaceholder'
   | 'editEvent'
+  | 'viewEvent'
   | 'done'
   | 'quickCreateEvent'
   | 'quickCreatePlaceholder'

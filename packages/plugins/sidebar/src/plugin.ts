@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useCallback, useMemo } from 'preact/hooks';
+import { useState, useCallback, useMemo, useEffect } from 'preact/hooks';
 import {
   CalendarPlugin,
   ICalendarApp,
@@ -45,7 +45,7 @@ export interface CalendarSidebarRenderProps {
   editingCalendarId?: string | null;
   setEditingCalendarId?: (id: string | null) => void;
   onCreateCalendar?: () => void;
-  colorPickerMode?: 'blossom' | 'default';
+  colorPickerMode?: 'default' | 'custom';
 }
 
 export interface SidebarPluginConfig {
@@ -53,7 +53,7 @@ export interface SidebarPluginConfig {
   miniWidth?: string;
   initialCollapsed?: boolean;
   createCalendarMode?: 'inline' | 'modal';
-  colorPickerMode?: 'blossom' | 'default';
+  colorPickerMode?: 'default' | 'custom';
   render?: (props: CalendarSidebarRenderProps) => TNode;
   renderCalendarContextMenu?: (
     calendar: CalendarType,
@@ -91,6 +91,12 @@ export function createSidebarPlugin(
           const refreshSidebar = useCallback(() => {
             setSidebarVersion(prev => prev + 1);
           }, []);
+
+          useEffect(() => {
+            return app.subscribe(() => {
+              refreshSidebar();
+            });
+          }, [app, refreshSidebar]);
 
           const calendars = useMemo(
             () => app.getCalendars(),

@@ -25,7 +25,7 @@ const meta: MetaRecord = {
     display: 'hidden',
   },
   'content-slots': {
-    title: '内容插槽 (Content Slots)',
+    title: '内容插槽',
   },
 };
 

@@ -1,6 +1,7 @@
 {
   "name": "@dayflow/plugin-keyboard-shortcuts",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "type": "module",
   "description": "Keyboard shortcuts plugin for DayFlow calendar",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

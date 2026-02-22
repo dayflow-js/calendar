@@ -36,6 +36,7 @@ export const DefaultColorPicker = ({
         defaultValue={blossomValue}
         coreSize={36}
         petalSize={32}
+        initialExpanded={true}
         openOnHover={false}
         onChange={c => onChange({ hex: c.hex }, true)}
         onCollapse={onClose}

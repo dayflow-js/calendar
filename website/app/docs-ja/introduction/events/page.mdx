@@ -23,7 +23,7 @@ import { Event } from '@dayflow/core';
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う                                                                                 | 必須 |
 | `description` | `string`                                                                 | メモや詳細。表示方法は自由                                                                                       | 任意 |
 | `allDay`      | `boolean`                                                                | true なら終日イベントとして描画                                                                                  | 任意 |
-| `icon`        | `boolean \| ReactNode`                                                   | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`ReactNode`：カスタムアイコン | 任意 |
+| `icon`        | `boolean \| Node`                                                        | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`Node`：カスタムアイコン      | 任意 |
 | `calendarId`  | `string`                                                                 | 複数カレンダーを使う場合のカテゴリ ID                                                                            | 任意 |
 | `meta`        | `Record<string, any>`                                                    | 任意の追加データ（場所・参加者など）                                                                             | 任意 |
 
@@ -159,23 +159,7 @@ const { events } = calendar; // 現在の状態をそのまま参照
 
 ## コールバックと状態管理
 
-`callbacks` オプションを利用すると、UI 操作とアプリの状態更新をきれいに分離できます。
-
-```tsx copy
-import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
-
-const calendar = useCalendarApp({
-  views: [createMonthView()],
-  events: initialEvents,
-  callbacks: {
-    onEventCreate: (event: Event) => api.createEvent(event),
-    onEventUpdate: (event: Event) => api.updateEvent(event),
-    onEventDelete: (eventId: string) => api.deleteEvent(eventId),
-  },
-});
-```
-
-React ステートと組み合わせると次のようになります。
+使用しているフレームワーク（React, Vue, Svelte, Angular）の状態管理と組み合わせると次のようになります。
 
 ```tsx copy
 import { useState } from 'react';
@@ -318,4 +302,4 @@ const nightShift: Event = {
 ## 参考リンク
 
 - 型定義：`src/types/event.ts`
-- 関連ドキュメント：[ビュー](/docs-ja/introduction/views) / [プラグイン](/docs-ja/introduction/plugins) / [はじめに](/docs-ja/introduction)
+- 関連ドキュメント：[ビュー](/docs-ja/introduction/views) / [はじめに](/docs-ja/introduction)

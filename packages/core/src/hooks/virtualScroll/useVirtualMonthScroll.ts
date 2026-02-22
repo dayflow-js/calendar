@@ -646,18 +646,51 @@ export const useVirtualMonthScroll = ({
     const nextYear = currentDate.getFullYear();
 
     if (prevMonth !== nextMonth || prevYear !== nextYear) {
-      const firstDayOfMonth = new Date(nextYear, nextMonth, 1);
-      const monthName = getMonthName(nextMonth, nextYear);
+      // Check if the new date is already visible in the current viewport
+      const FIXED_WEEKS_TO_SHOW = 6;
+      const startIndex = virtualData.displayStartIndex;
+      const endIndex = Math.min(
+        weeksData.length - 1,
+        startIndex + FIXED_WEEKS_TO_SHOW - 1
+      );
 
-      targetNavigationRef.current = { month: monthName, year: nextYear };
-      setCurrentMonth(monthName);
-      setCurrentYear(nextYear);
-      onCurrentMonthChange?.(monthName, nextYear);
-      scrollToDate(firstDayOfMonth, true);
+      let isVisible = false;
+
+      // Iterate through the visible weeks to see if the date is there
+      for (let i = startIndex; i <= endIndex; i++) {
+        const week = weeksData[i];
+        if (
+          week &&
+          week.days.some(
+            day => day.date.toDateString() === currentDate.toDateString()
+          )
+        ) {
+          isVisible = true;
+          break;
+        }
+      }
+
+      if (!isVisible) {
+        const firstDayOfMonth = new Date(nextYear, nextMonth, 1);
+        const monthName = getMonthName(nextMonth, nextYear);
+
+        targetNavigationRef.current = { month: monthName, year: nextYear };
+        setCurrentMonth(monthName);
+        setCurrentYear(nextYear);
+        onCurrentMonthChange?.(monthName, nextYear);
+        scrollToDate(firstDayOfMonth, true);
+      }
     }
 
     previousDateRef.current = currentDate;
-  }, [currentDate, onCurrentMonthChange, scrollToDate]);
+  }, [
+    currentDate,
+    onCurrentMonthChange,
+    scrollToDate,
+    virtualData,
+    weeksData,
+    getMonthName,
+  ]);
 
   // Container size listener
   useEffect(() => {

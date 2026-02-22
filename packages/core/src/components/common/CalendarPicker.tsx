@@ -18,6 +18,7 @@ export interface CalendarPickerProps {
   onChange: (value: string) => void;
   registry?: CalendarRegistry;
   variant?: 'desktop' | 'mobile';
+  disabled?: boolean;
 }
 
 /**
@@ -30,6 +31,7 @@ export const CalendarPicker = ({
   onChange,
   registry,
   variant = 'desktop',
+  disabled = false,
 }: CalendarPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<any>({});
@@ -178,11 +180,12 @@ export const CalendarPicker = ({
       <div className="relative inline-block" ref={pickerRef}>
         <button
           ref={triggerRef}
+          disabled={disabled}
           onClick={e => {
             e.stopPropagation();
-            setIsOpen(!isOpen);
+            if (!disabled) setIsOpen(!isOpen);
           }}
-          className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-1.5 transition-colors"
+          className={`flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-1.5 transition-colors ${disabled ? 'opacity-50 cursor-default' : ''}`}
         >
           <span
             className="w-3 h-3 rounded-full"

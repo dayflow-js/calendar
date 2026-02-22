@@ -3,6 +3,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   useContext,
 } from 'preact/hooks';
 import {
@@ -102,7 +103,7 @@ const CalendarEvent = ({
   const canOpenDetail = readOnlyConfig?.viewable !== false;
   const isDraggable = readOnlyConfig?.draggable !== false;
 
-  // --- Interaction Hook ---
+  // Interaction Hook
   const {
     isSelected,
     setIsSelected,
@@ -137,7 +138,7 @@ const CalendarEvent = ({
     'visible' | 'sticky-top' | 'sticky-bottom'
   >('visible');
 
-  // --- Utility Wrappers ---
+  // Utility Wrappers
   const setActiveDayIndex = (dayIndex: number | null) => {
     selectedDayIndexRef.current = dayIndex;
   };
@@ -158,7 +159,7 @@ const CalendarEvent = ({
   const getDayMetricsWrapper = (dayIndex: number) =>
     getDayMetrics(dayIndex, calendarRef, isMonthView, isDayView, isMobile);
 
-  // --- Style Calculation (Internal due to state dependencies) ---
+  // Style Calculation (Internal due to state dependencies)
   const calculateEventStyle = () => {
     if (isMonthView) {
       if (isMultiDay && segment) {
@@ -381,7 +382,7 @@ const CalendarEvent = ({
     };
   };
 
-  // --- Panel Position logic (internal due to refs/state) ---
+  // Panel Position logic (internal due to refs/state)
   const updatePanelPosition = useCallback(() => {
     if (
       !selectedEventElementRef.current ||
@@ -565,7 +566,7 @@ const CalendarEvent = ({
     isDayView,
   ]);
 
-  // --- Visibility Hook ---
+  // Visibility Hook
   useEventVisibility({
     event,
     isEventSelected,
@@ -586,7 +587,7 @@ const CalendarEvent = ({
   // itself via its own onClose callback.
   const isDialogOpen = showDetailPanel && !!customEventDetailDialog;
 
-  // --- Click Outside Hook ---
+  // Click Outside Hook
   useClickOutside({
     eventRef,
     detailPanelRef,
@@ -599,7 +600,53 @@ const CalendarEvent = ({
     setActiveDayIndex,
   });
 
-  // --- Visibility Sync ---
+  // Stable panel close handler
+  // Extracted to component scope so it can be used as a stable dep for
+  // panelSlotArgs and contentSlotRenderer (avoids inline arrow churn).
+  const handlePanelClose = useCallback(() => {
+    if (onEventSelect) onEventSelect(null);
+    selectedDayIndexRef.current = null;
+    setIsSelected(false);
+    onDetailPanelToggle?.(null);
+  }, [onEventSelect, onDetailPanelToggle]);
+
+  // Memoized args for the eventDetailContent ContentSlot
+  // Object identity must be stable across scroll-triggered re-renders so
+  // ContentSlot's update effect does not fire on every scroll tick.
+  const panelSlotArgs = useMemo(
+    () => ({
+      event,
+      isAllDay,
+      onEventUpdate,
+      onEventDelete,
+      onClose: handlePanelClose,
+    }),
+    [event, isAllDay, onEventUpdate, onEventDelete, handlePanelClose]
+  );
+
+  // Memoized args for the eventContent ContentSlot
+  // One ContentSlot per visible event; during scroll dozens fire every frame.
+  // Keeping the object identity stable prevents store.notify() on every tick.
+  const eventContentSlotArgs = useMemo(
+    () => ({ event, isAllDay, isMobile, isMonthView, segment, layout }),
+    [event, isAllDay, isMobile, isMonthView, segment, layout]
+  );
+
+  // Stable contentRenderer for EventDetailPanelWithContent
+  // Must be a stable function reference so Preact does not see a new
+  // component type each render and unmount/remount the ContentSlot tree.
+  const contentSlotRenderer = useCallback(
+    () => (
+      <ContentSlot
+        store={customRenderingStore}
+        generatorName="eventDetailContent"
+        generatorArgs={panelSlotArgs}
+      />
+    ),
+    [customRenderingStore, panelSlotArgs]
+  );
+
+  // Visibility Sync
   useEffect(() => {
     if (showDetailPanel && !detailPanelPosition && !isMobile) {
       setDetailPanelPosition({
@@ -613,7 +660,7 @@ const CalendarEvent = ({
     }
   }, [showDetailPanel, detailPanelPosition, updatePanelPosition, isMobile]);
 
-  // --- Highlight effect ---
+  // Highlight effect
   useEffect(() => {
     if (app?.state.highlightedEventId === event.id) {
       setIsPopping(true);
@@ -627,7 +674,7 @@ const CalendarEvent = ({
     }
   }, [app?.state.highlightedEventId, event.id]);
 
-  // --- Helpers ---
+  // Helpers
   const scrollEventToCenter = (): Promise<void> => {
     return new Promise(resolve => {
       if (!calendarRef.current || isAllDay || isMonthView) {
@@ -760,15 +807,9 @@ const CalendarEvent = ({
     setDetailPanelPosition(null);
   };
 
-  // --- Rendering Functions ---
+  // Rendering Functions
   const renderDetailPanel = () => {
     if (!showDetailPanel) return null;
-    const handleClose = () => {
-      if (onEventSelect) onEventSelect(null);
-      setActiveDayIndex(null);
-      setIsSelected(false);
-      onDetailPanelToggle?.(null);
-    };
 
     if (customEventDetailDialog) {
       // Dialog rendering is handled at CalendarRoot level to avoid stacking context issues.
@@ -788,29 +829,19 @@ const CalendarEvent = ({
       selectedEventElementRef,
       onEventUpdate,
       onEventDelete,
-      onClose: handleClose,
+      onClose: handlePanelClose,
     };
 
     // If framework(React/Vue/...) has overridden the eventDetailContent slot, render the panel chrome
     // with ContentSlot inside it. This ensures the React content is portaled into
     // the positioned floating panel (at document.body), not inline in the calendar grid.
+    // contentSlotRenderer is a stable useCallback so Preact does not see a new
+    // component type on every render, preventing unmount/remount flicker.
     if (customRenderingStore?.isOverridden('eventDetailContent')) {
       return (
         <EventDetailPanelWithContent
           {...panelProps}
-          contentRenderer={() => (
-            <ContentSlot
-              store={customRenderingStore}
-              generatorName="eventDetailContent"
-              generatorArgs={{
-                event,
-                isAllDay,
-                onEventUpdate,
-                onEventDelete,
-                onClose: handleClose,
-              }}
-            />
-          )}
+          contentRenderer={contentSlotRenderer}
         />
       );
     }
@@ -884,20 +915,13 @@ const CalendarEvent = ({
       <ContentSlot
         store={customRenderingStore}
         generatorName="eventContent"
-        generatorArgs={{
-          event,
-          isAllDay,
-          isMobile,
-          isMonthView,
-          segment,
-          layout,
-        }}
+        generatorArgs={eventContentSlotArgs}
         defaultContent={defaultContent}
       />
     );
   };
 
-  // --- Final Render ---
+  // Final Render
   const calendarId = event.calendarId || 'blue';
   const calendarRegistry = app?.getCalendarRegistry();
 

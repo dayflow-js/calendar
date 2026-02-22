@@ -48,11 +48,17 @@ export type RangeChangeReason =
   | 'viewChange'
   | 'scroll';
 
+export type EventChange =
+  | { type: 'create'; event: Event }
+  | { type: 'update'; before: Event; after: Event }
+  | { type: 'delete'; event: Event };
+
 /**
  * Calendar callbacks interface
  * Defines calendar event callback functions
  */
 export interface CalendarCallbacks {
+  onEventBatchChange?: (changes: EventChange[]) => void | Promise<void>;
   onViewChange?: (view: ViewType) => void | Promise<void>;
   onEventCreate?: (event: Event) => void | Promise<void>;
   onEventUpdate?: (event: Event) => void | Promise<void>;
@@ -83,7 +89,7 @@ export interface CalendarCallbacks {
 export interface CreateCalendarDialogProps {
   onClose: () => void;
   onCreate: (calendar: CalendarType) => void;
-  colorPickerMode?: 'blossom' | 'default';
+  colorPickerMode?: 'default' | 'custom';
 }
 
 export interface CalendarHeaderProps {

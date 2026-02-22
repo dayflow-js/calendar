@@ -61,6 +61,7 @@ export function useCalendarApp(
     highlightEvent: app.highlightEvent.bind(app),
     setVisibleMonth: app.setVisibleMonth.bind(app),
     getVisibleMonth: app.getVisibleMonth.bind(app),
+    emitVisibleRange: app.emitVisibleRange.bind(app),
     get readOnlyConfig() {
       return app.getReadOnlyConfig();
     },

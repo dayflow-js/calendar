@@ -23,7 +23,7 @@ import { Event } from '@dayflow/core';
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | Required |
 | `description` | `string`                                                                 | Optional event description or notes                                                                               | Optional |
 | `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | Optional |
-| `icon`        | `boolean \| ReactNode`                                                   | Custom icon for the event. `true` (default): show default, `false`: hide, `ReactNode`: custom icon                | Optional |
+| `icon`        | `boolean \| Node`                                                        | Custom icon for the event. `true` (default): show default, `false`: hide, `Node`: custom icon                     | Optional |
 | `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | Optional |
 | `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | Optional |
 
@@ -204,7 +204,9 @@ const calendar = useCalendarApp({
 
 ## Event State Management
 
-### Using React State
+### Basic Usage
+
+You can use the native state management of your framework (React, Vue, Svelte, Angular) to manage events.
 
 ```tsx copy
 import { useState } from 'react';

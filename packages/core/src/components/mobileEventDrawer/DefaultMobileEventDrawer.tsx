@@ -13,10 +13,15 @@ export const MobileEventDrawer = ({
   isOpen,
   onClose,
   onSave,
+  onEventDelete,
   draftEvent,
   app,
 }: MobileEventProps) => {
   const { locale, t } = useLocale();
+  const readOnlyConfig = app.getReadOnlyConfig();
+  const isEditable = !app.state.readOnly;
+  const isViewable = readOnlyConfig.viewable !== false;
+
   const [title, setTitle] = useState('');
   const [calendarId, setCalendarId] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
@@ -180,7 +185,7 @@ export const MobileEventDrawer = ({
     notes,
   ]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !isViewable) return null;
 
   const handleSave = () => {
     if (!draftEvent) return;
@@ -292,19 +297,26 @@ export const MobileEventDrawer = ({
             {t('cancel')}
           </button>
           <span className="font-semibold text-lg">
-            {isEditing ? t('editEvent') : t('newEvent')}
+            {!isEditable && isEditing
+              ? t('viewEvent')
+              : isEditing
+                ? t('editEvent')
+                : t('newEvent')}
           </span>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanges}
-            className={`font-bold px-2 py-1 transition-colors ${
-              hasChanges
-                ? 'text-primary'
-                : 'text-gray-400 cursor-not-allowed opacity-50'
-            }`}
-          >
-            {isEditing ? t('done') : t('create')}
-          </button>
+          {isEditable && (
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges}
+              className={`font-bold px-2 py-1 transition-colors ${
+                hasChanges
+                  ? 'text-primary'
+                  : 'text-gray-400 cursor-not-allowed opacity-50'
+              }`}
+            >
+              {isEditing ? t('done') : t('create')}
+            </button>
+          )}
+          {!isEditable && <span className="w-12" />}
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -314,9 +326,10 @@ export const MobileEventDrawer = ({
               type="text"
               placeholder={t('titlePlaceholder')}
               value={title}
-              onChange={(e: any) => setTitle(e.target.value)}
+              onChange={(e: any) => isEditable && setTitle(e.target.value)}
+              readOnly={!isEditable}
               className="w-full bg-transparent text-xl font-medium placeholder-gray-400 focus:outline-none"
-              autoFocus
+              autoFocus={isEditable}
             />
           </div>
 
@@ -329,9 +342,10 @@ export const MobileEventDrawer = ({
               <CalendarPicker
                 options={calendarOptions}
                 value={calendarId}
-                onChange={setCalendarId}
+                onChange={isEditable ? setCalendarId : () => {}}
                 registry={app.getCalendarRegistry()}
                 variant="mobile"
+                disabled={!isEditable}
               />
             </div>
           )}
@@ -341,7 +355,11 @@ export const MobileEventDrawer = ({
             <span className="text-gray-700 dark:text-gray-300">
               {t('allDay')}
             </span>
-            <Switch checked={isAllDay} onChange={setIsAllDay} />
+            <Switch
+              checked={isAllDay}
+              onChange={isEditable ? setIsAllDay : () => {}}
+              disabled={!isEditable}
+            />
           </div>
 
           {/* Starts */}
@@ -353,14 +371,16 @@ export const MobileEventDrawer = ({
               <div className="flex space-x-2">
                 <button
                   className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
-                  onClick={() => toggleExpand('start-date')}
+                  onClick={() => isEditable && toggleExpand('start-date')}
+                  disabled={!isEditable}
                 >
                   {formatDate(startDate)}
                 </button>
                 {!isAllDay && (
                   <button
                     className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
-                    onClick={() => toggleExpand('start-time')}
+                    onClick={() => isEditable && toggleExpand('start-time')}
+                    disabled={!isEditable}
                   >
                     {formatTime(
                       startDate.getHours() + startDate.getMinutes() / 60
@@ -404,14 +424,16 @@ export const MobileEventDrawer = ({
               <div className="flex space-x-2">
                 <button
                   className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
-                  onClick={() => toggleExpand('end-date')}
+                  onClick={() => isEditable && toggleExpand('end-date')}
+                  disabled={!isEditable}
                 >
                   {formatDate(endDate)}
                 </button>
                 {!isAllDay && (
                   <button
                     className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
-                    onClick={() => toggleExpand('end-time')}
+                    onClick={() => isEditable && toggleExpand('end-time')}
+                    disabled={!isEditable}
                   >
                     {formatTime(endDate.getHours() + endDate.getMinutes() / 60)}
                   </button>
@@ -448,10 +470,21 @@ export const MobileEventDrawer = ({
             <textarea
               placeholder={t('notesPlaceholder')}
               value={notes}
-              onChange={(e: any) => setNotes(e.target.value)}
+              onChange={(e: any) => isEditable && setNotes(e.target.value)}
+              readOnly={!isEditable}
               className="w-full bg-transparent text-base placeholder-gray-400 focus:outline-none min-h-20"
             />
           </div>
+
+          {/* Delete button — only for existing events that can be edited */}
+          {isEditable && isEditing && onEventDelete && draftEvent && (
+            <button
+              onClick={() => onEventDelete(draftEvent.id)}
+              className="w-full bg-white dark:bg-gray-900 rounded-lg px-4 py-3 text-red-500 font-medium text-left"
+            >
+              {t('delete')}
+            </button>
+          )}
         </div>
       </div>
     </div>,

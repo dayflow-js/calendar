@@ -60,6 +60,7 @@ export class DayFlowCalendarComponent
   @Input() titleBarSlot?: TemplateRef<any>;
   @Input() colorPicker?: TemplateRef<any>;
   @Input() colorPickerWrapper?: TemplateRef<any>;
+  @Input() collapsedSafeAreaLeft?: number;
 
   @ViewChild('container') container!: ElementRef<HTMLElement>;
 
@@ -99,6 +100,10 @@ export class DayFlowCalendarComponent
       this.internalApp = undefined;
       this.destroyCalendar();
       this.initCalendar();
+    } else if (changes['collapsedSafeAreaLeft'] && this.renderer) {
+      this.renderer.setProps({
+        collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
+      });
     }
   }
 
@@ -110,6 +115,9 @@ export class DayFlowCalendarComponent
     if (!this.container || !this.calendar) return;
 
     this.renderer = new CalendarRenderer(this.app);
+    this.renderer.setProps({
+      collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
+    });
     this.renderer.mount(this.container.nativeElement);
 
     this.unsubscribe = this.renderer
@@ -128,17 +136,18 @@ export class DayFlowCalendarComponent
   }
 
   getTemplate(name: string): TemplateRef<any> | null {
-    const templates: Record<string, TemplateRef<any> | undefined> = {
-      eventContent: this.eventContent,
-      eventDetailContent: this.eventDetailContent,
-      eventDetailDialog: this.eventDetailDialog,
-      headerContent: this.headerContent,
-      createCalendarDialog: this.createCalendarDialog,
-      titleBarSlot: this.titleBarSlot,
-      colorPicker: this.colorPicker,
-      colorPickerWrapper: this.colorPickerWrapper,
-    };
-    return templates[name] || null;
+    // Switch avoids allocating a new Record on every change-detection cycle.
+    switch (name) {
+      case 'eventContent': return this.eventContent ?? null;
+      case 'eventDetailContent': return this.eventDetailContent ?? null;
+      case 'eventDetailDialog': return this.eventDetailDialog ?? null;
+      case 'headerContent': return this.headerContent ?? null;
+      case 'createCalendarDialog': return this.createCalendarDialog ?? null;
+      case 'titleBarSlot': return this.titleBarSlot ?? null;
+      case 'colorPicker': return this.colorPicker ?? null;
+      case 'colorPickerWrapper': return this.colorPickerWrapper ?? null;
+      default: return null;
+    }
   }
 
   trackById(_index: number, item: CustomRendering) {

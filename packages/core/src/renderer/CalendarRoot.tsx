@@ -2,35 +2,40 @@ import { h, Fragment } from 'preact';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
-  useState,
   useContext,
+  useState,
 } from 'preact/hooks';
 import {
-  Event,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
   TNode,
+  Event as CalendarEvent,
 } from '../types';
+import { ThemeMode } from '../types/calendarTypes';
+import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
+import { CalendarSearchProps } from '../types/search';
 import DefaultEventDetailDialog from '../components/common/DefaultEventDetailDialog';
 import CalendarHeader from '../components/common/CalendarHeader';
 import SearchDrawer from '../components/search/SearchDrawer';
 import MobileSearchDialog from '../components/search/MobileSearchDialog';
 import { QuickCreateEventPopup } from '../components/common/QuickCreateEventPopup';
+import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
 import { MobileEventDrawer } from '../components/mobileEventDrawer';
-import { CalendarSearchProps, CalendarSearchEvent } from '../types/search';
 import { ThemeProvider } from '../contexts/ThemeContext';
-import { ThemeMode } from '../types/calendarTypes';
 import { LocaleProvider } from '../locale/LocaleProvider';
 import { useLocale } from '../locale/useLocale';
-import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
-import { generateUniKey } from '../utils/helpers';
-import { temporalToDate, dateToZonedDateTime, isPlainDate } from '../utils/temporal';
 import { createPortal } from 'preact/compat';
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
 import { useSidebarBridge } from '../plugins/sidebarBridge';
+import { useAppSubscription } from './hooks/useAppSubscription';
+import { useResponsive } from './hooks/useResponsive';
+import { useSearchController } from './hooks/useSearchController';
+import { useEventDialogController } from './hooks/useEventDialogController';
+import { useQuickCreateController } from './hooks/useQuickCreateController';
 
 interface CalendarRootProps {
   app: ICalendarApp;
@@ -48,6 +53,9 @@ interface CalendarRootProps {
   collapsedSafeAreaLeft?: number;
 }
 
+// Internal locale gate — only wraps with LocaleProvider when no parent
+// provider is already present (e.g. when used inside a Vue/Angular adapter
+// that sets up its own locale context).
 const CalendarInternalLocaleProvider = ({
   locale,
   messages,
@@ -81,60 +89,73 @@ export const CalendarRoot = ({
   collapsedSafeAreaLeft,
 }: CalendarRootProps) => {
   const customRenderingStore = useContext(CustomRenderingContext);
-  const [tick, setTick] = useState(0);
+  // App subscription & sync
+  const { tick, selectedEventId } = useAppSubscription(app);
+  // Responsive breakpoint
+  const { isMobile } = useResponsive();
+  // Search
+  const search = useSearchController(app, searchConfig);
+  // Event detail dialog / panel
+  const effectiveEventDetailDialog: EventDetailDialogRenderer | undefined =
+    customEventDetailDialog ||
+    (app.getUseEventDetailDialog() ? DefaultEventDetailDialog : undefined);
+
+  const eventDialog = useEventDialogController(
+    app,
+    effectiveEventDetailDialog,
+    tick
+  );
+  // Sidebar
+  const sidebar = useSidebarBridge(app);
+  // Quick-create (desktop popup + mobile drawer)
+  const quickCreate = useQuickCreateController(app, isMobile, sidebar.enabled);
+  // Theme
+  const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
 
   useEffect(() => {
-    return app.subscribe(() => {
-      setTick(t => t + 1);
-    });
+    return app.subscribeThemeChange(newTheme => setTheme(newTheme));
   }, [app]);
 
-  const currentView = app.getCurrentView();
-  const ViewComponent = currentView.component;
-
-  const sidebar = useSidebarBridge(app);
-
-  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
-  const quickCreateAnchorRef = useRef<HTMLElement>(null);
-
-  const [isMobile, setIsMobile] = useState(false);
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [mobileDraftEvent, setMobileDraftEvent] = useState<Event | null>(null);
-
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [detailPanelEventId, setDetailPanelEventId] = useState<string | null>(
-    null
+  const handleThemeChange = useCallback(
+    (newTheme: ThemeMode) => app.setTheme(newTheme),
+    [app]
   );
-
+  // Cross-cutting: dismiss UI
+  // Patches the app callback so that app.dismissUI() collapses any open
+  // UI layer (detail panel or mobile drawer) and chains the previous handler.
   useEffect(() => {
-    // Sync local selectedEventId with app state
-    const unsubscribe = app.subscribe(appInstance => {
-      if (appInstance.state.selectedEventId !== selectedEventId) {
-        setSelectedEventId(appInstance.state.selectedEventId || null);
-      }
-    });
-    return unsubscribe;
-  }, [app, selectedEventId]);
+    const callbacks = (app as any).callbacks;
+    const prevDismiss = callbacks.onDismissUI;
 
-  // Handle Dismiss UI signal from app
-  useEffect(() => {
-    const originalCallbacks = (app as any).callbacks;
-    const prevDismiss = originalCallbacks.onDismissUI;
-
-    originalCallbacks.onDismissUI = () => {
-      if (detailPanelEventId) {
-        setDetailPanelEventId(null);
+    callbacks.onDismissUI = () => {
+      if (eventDialog.detailPanelEventId) {
+        eventDialog.setDetailPanelEventId(null);
       }
-      if (isMobileDrawerOpen) {
-        setIsMobileDrawerOpen(false);
+      if (quickCreate.isMobileDrawerOpen) {
+        quickCreate.setIsMobileDrawerOpen(false);
       }
       prevDismiss?.();
     };
 
     return () => {
-      originalCallbacks.onDismissUI = prevDismiss;
+      callbacks.onDismissUI = prevDismiss;
     };
-  }, [app, detailPanelEventId, isMobileDrawerOpen]);
+  }, [app, eventDialog, quickCreate]);
+
+  // On mobile, route event-tap detail requests to the MobileEventDrawer instead
+  // of the floating desktop panel. detailPanelEventId is set by handleTouchEnd
+  // (via onDetailPanelToggle) when canOpenDetail is true.
+  useEffect(() => {
+    if (!isMobile || !eventDialog.detailPanelEventId) return;
+
+    const rawEventId = eventDialog.detailPanelEventId.split('::')[0];
+    const event = app.getEvents().find((e: CalendarEvent) => e.id === rawEventId);
+    if (event) {
+      quickCreate.setMobileDraftEvent(event);
+      quickCreate.setIsMobileDrawerOpen(true);
+    }
+    eventDialog.setDetailPanelEventId(null);
+  }, [eventDialog.detailPanelEventId, isMobile]);
 
   const handleDateSelect = useCallback(
     (date: Date) => {
@@ -144,278 +165,98 @@ export const CalendarRoot = ({
     [app]
   );
 
-  useEffect(() => {
-    if (app.state.highlightedEventId) {
-      app.selectEvent(app.state.highlightedEventId);
-    }
-  }, [app.state.highlightedEventId, app]);
-
-  const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
-
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<CalendarSearchEvent[]>([]);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    if (!searchKeyword.trim()) {
-      setIsSearchOpen(false);
-      setSearchResults([]);
-      if (app.state.highlightedEventId !== null) {
-        app.highlightEvent(null);
-      }
-      return;
-    }
-
-    const debounceDelay = searchConfig?.debounceDelay ?? 300;
-
-    const performSearch = async () => {
-      setSearchLoading(true);
-      setIsSearchOpen(true);
-
-      try {
-        let results: CalendarSearchEvent[] = [];
-
-        if (searchConfig?.customSearch) {
-          const currentEvents = app.getEvents().map(e => ({
-            ...e,
-            color:
-              app.getCalendarRegistry().get(e.calendarId || '')?.colors
-                .lineColor ||
-              app.getCalendarRegistry().resolveColors().lineColor,
-          }));
-          results = searchConfig.customSearch({
-            keyword: searchKeyword,
-            events: currentEvents,
-          });
-        } else if (searchConfig?.onSearch) {
-          results = await searchConfig.onSearch(searchKeyword);
-        } else {
-          const keywordLower = searchKeyword.toLowerCase();
-          results = app
-            .getEvents()
-            .filter(e => {
-              return (
-                e.title.toLowerCase().includes(keywordLower) ||
-                (e.description &&
-                  e.description.toLowerCase().includes(keywordLower))
-              );
-            })
-            .map(e => ({
-              ...e,
-              color:
-                app.getCalendarRegistry().get(e.calendarId || '')?.colors
-                  .lineColor ||
-                app.getCalendarRegistry().resolveColors().lineColor,
-            }));
-        }
-
-        setSearchResults(results);
-        searchConfig?.onSearchStateChange?.({
-          keyword: searchKeyword,
-          loading: false,
-          results,
-        });
-      } catch (error) {
-        console.error('Search failed', error);
-        setSearchResults([]);
-      } finally {
-        setSearchLoading(false);
-      }
-    };
-
-    const timer = setTimeout(performSearch, debounceDelay);
-    return () => clearTimeout(timer);
-  }, [searchKeyword, searchConfig, app]);
-
-  useEffect(() => {
-    if (!isSearchOpen) {
-      if (app.state.highlightedEventId !== null) {
-        app.highlightEvent(null);
-      }
-    }
-  }, [isSearchOpen, app]);
-
-  const handleSearchResultClick = (event: CalendarSearchEvent) => {
-    let date: Date;
-    if (event.start instanceof Date) {
-      date = event.start;
-    } else if (typeof event.start === 'string') {
-      date = new Date(event.start);
-    } else {
-      date = temporalToDate(event.start as any);
-    }
-    app.setCurrentDate(date);
-    app.highlightEvent(event.id);
-
-    if (isMobileSearchOpen) {
-      setIsMobileSearchOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = app.subscribeThemeChange(newTheme => {
-      setTheme(newTheme);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [app]);
-
-  const handleThemeChange = useCallback(
-    (newTheme: ThemeMode) => {
-      app.setTheme(newTheme);
-    },
+  const handleEventSelect = useCallback(
+    (id: string | null) => app.selectEvent(id),
     [app]
   );
 
-  const handleAddButtonClick = useCallback(
-    (e: any) => {
-      const isEditable = !app.state.readOnly;
-      if (!isEditable) return;
-
-      if (isMobile) {
-        const now = new Date();
-        now.setMinutes(0, 0, 0);
-        now.setHours(now.getHours() + 1);
-
-        const end = new Date(now);
-        end.setHours(end.getHours() + 1);
-
-        const draft: Event = {
-          id: generateUniKey(),
-          title: '',
-          start: dateToZonedDateTime(now),
-          end: dateToZonedDateTime(end),
-          calendarId:
-            app.getCalendars().find(c => c.isVisible !== false)?.id ||
-            app.getCalendars()[0]?.id,
-        };
-        setMobileDraftEvent(draft);
-        setIsMobileDrawerOpen(true);
-        return;
-      }
-
-      if (isQuickCreateOpen) {
-        setIsQuickCreateOpen(false);
-      } else {
-        (quickCreateAnchorRef as any).current = e.currentTarget;
-        setIsQuickCreateOpen(true);
-      }
-    },
-    [isMobile, isQuickCreateOpen, app]
-  );
-
+  // Layout helpers
   const calendarRef = useRef<HTMLDivElement>(null!);
 
-  const effectiveEventDetailDialog: EventDetailDialogRenderer | undefined =
-    customEventDetailDialog ||
-    (app.getUseEventDetailDialog() ? DefaultEventDetailDialog : undefined);
-
   const viewProps = {
-    app: app,
-    config: currentView.config || {},
+    app,
+    config: app.getCurrentView().config || {},
     customDetailPanelContent,
     customEventDetailDialog: effectiveEventDetailDialog,
     switcherMode: app.state.switcherMode,
     calendarRef,
     meta,
     selectedEventId,
-    onEventSelect: (id: string | null) => app.selectEvent(id),
+    onEventSelect: handleEventSelect,
     onDateChange: handleDateSelect,
-    detailPanelEventId,
-    onDetailPanelToggle: setDetailPanelEventId,
+    detailPanelEventId: eventDialog.detailPanelEventId,
+    onDetailPanelToggle: eventDialog.setDetailPanelEventId,
   };
 
-  const renderEventDetailDialog = () => {
-    if (!effectiveEventDetailDialog || !detailPanelEventId) return null;
-
-    const rawEventId = detailPanelEventId.split('::')[0];
-    const selectedEvent = app.getEvents().find((e: Event) => e.id === rawEventId);
-    if (!selectedEvent) return null;
-
-    const DialogComponent = effectiveEventDetailDialog;
-    const portalTarget = typeof document !== 'undefined' ? document.body : null;
-    if (!portalTarget) return null;
-
-    const isAllDay = isPlainDate(selectedEvent.start);
-
-    const handleDialogClose = () => {
-      setDetailPanelEventId(null);
-      app.selectEvent(null);
-    };
-
-    const dialogProps = {
-      event: selectedEvent,
-      isOpen: true,
-      isAllDay,
-      onEventUpdate: (evt: Event) => app.updateEvent(evt.id, evt),
-      onEventDelete: (id: string) => {
-        app.deleteEvent(id);
-        setDetailPanelEventId(null);
-        app.selectEvent(null);
-      },
-      onClose: handleDialogClose,
-      app,
-    };
-
-    return (
-      <ContentSlot
-        store={customRenderingStore}
-        generatorName="eventDetailDialog"
-        generatorArgs={dialogProps}
-        defaultContent={createPortal(
-          h(DialogComponent, dialogProps),
-          portalTarget
-        )}
-      />
-    );
-  };
+  // Stable args object so the titleBarSlot ContentSlot does not re-register
+  // on every CalendarRoot render.
+  const titleBarSlotArgs = useMemo(
+    () => ({
+      isCollapsed: sidebar.isCollapsed,
+      toggleCollapsed: sidebar.toggleCollapsed,
+    }),
+    [sidebar.isCollapsed, sidebar.toggleCollapsed]
+  );
 
   const miniSidebarWidth =
     collapsedSafeAreaLeft != null ? '0px' : sidebar.miniWidth;
-
-  const headerConfig = app.getCalendarHeaderConfig();
 
   const safeAreaLeft =
     collapsedSafeAreaLeft != null && sidebar.isCollapsed
       ? collapsedSafeAreaLeft
       : sidebar.safeAreaLeft;
 
+  const headerConfig = app.getCalendarHeaderConfig();
+
   const headerProps = {
     calendar: app,
     switcherMode: app.state.switcherMode,
-    onAddCalendar: handleAddButtonClick,
-    onSearchChange: setSearchKeyword,
-    onSearchClick: () => {
-      setSearchKeyword('');
-      setIsMobileSearchOpen(true);
-    },
-    searchValue: searchKeyword,
-    isSearchOpen: isSearchOpen,
+    onAddCalendar: quickCreate.handleAddButtonClick,
+    onSearchChange: search.setSearchKeyword,
+    onSearchClick: search.handleSearchClick,
+    searchValue: search.searchKeyword,
+    isSearchOpen: search.isSearchOpen,
     isEditable: !app.state.readOnly,
     ...(safeAreaLeft > 0 ? { safeAreaLeft } : {}),
   };
 
   const renderHeader = () => {
     if (headerConfig === false) return null;
-    if (typeof headerConfig === 'function') {
-      return headerConfig(headerProps);
-    }
+    if (typeof headerConfig === 'function') return headerConfig(headerProps);
     return h(CalendarHeader, headerProps);
   };
 
+  // Only create the Preact fallback portal when the slot is NOT yet overridden
+  // by a framework adapter, to prevent a brief flash of the default dialog
+  // while React/Vue sets up its override via setOverrides().
+  const renderEventDetailDialog = () => {
+    if (!eventDialog.dialogProps) return null;
+
+    const DialogComponent = effectiveEventDetailDialog!;
+    const portalTarget = typeof document !== 'undefined' ? document.body : null;
+    if (!portalTarget) return null;
+
+    const isOverridden =
+      customRenderingStore?.isOverridden('eventDetailDialog');
+
+    return (
+      <ContentSlot
+        store={customRenderingStore}
+        generatorName="eventDetailDialog"
+        generatorArgs={eventDialog.dialogProps}
+        defaultContent={
+          !isOverridden
+            ? createPortal(
+                h(DialogComponent, eventDialog.dialogProps),
+                portalTarget
+              )
+            : null
+        }
+      />
+    );
+  };
+
+  const ViewComponent = app.getCurrentView().component;
   const MobileEventDrawerComponent =
     app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
@@ -429,26 +270,19 @@ export const CalendarRoot = ({
           <ContentSlot
             store={customRenderingStore}
             generatorName="titleBarSlot"
-            generatorArgs={{
-              isCollapsed: sidebar.isCollapsed,
-              toggleCollapsed: sidebar.toggleCollapsed,
-            }}
+            generatorArgs={titleBarSlotArgs}
             defaultContent={
               titleBarSlot &&
               (typeof titleBarSlot === 'function'
-                ? titleBarSlot({
-                    isCollapsed: sidebar.isCollapsed,
-                    toggleCollapsed: sidebar.toggleCollapsed,
-                  })
+                ? titleBarSlot(titleBarSlotArgs)
                 : titleBarSlot)
             }
           />
+
           {sidebar.enabled && (
             <aside
-              className={`absolute top-0 bottom-0 left-0 z-0 h-full`}
-              style={{
-                width: sidebar.width,
-              }}
+              className="absolute top-0 bottom-0 left-0 z-0 h-full"
+              style={{ width: sidebar.width }}
             >
               {sidebar.content}
             </aside>
@@ -473,32 +307,24 @@ export const CalendarRoot = ({
                 </div>
 
                 <SearchDrawer
-                  isOpen={isSearchOpen}
-                  onClose={() => {
-                    setIsSearchOpen(false);
-                    setSearchKeyword('');
-                    app.highlightEvent(null);
-                  }}
-                  loading={searchLoading}
-                  results={searchResults}
-                  keyword={searchKeyword}
-                  onResultClick={handleSearchResultClick}
+                  isOpen={search.isSearchOpen}
+                  onClose={search.handleSearchClose}
+                  loading={search.searchLoading}
+                  results={search.searchResults}
+                  keyword={search.searchKeyword}
+                  onResultClick={search.handleSearchResultClick}
                   emptyText={searchConfig?.emptyText}
                 />
               </div>
 
               <MobileSearchDialog
-                isOpen={isMobileSearchOpen}
-                onClose={() => {
-                  setIsMobileSearchOpen(false);
-                  setSearchKeyword('');
-                  app.highlightEvent(null);
-                }}
-                keyword={searchKeyword}
-                onSearchChange={setSearchKeyword}
-                results={searchResults}
-                loading={searchLoading}
-                onResultClick={handleSearchResultClick}
+                isOpen={search.isMobileSearchOpen}
+                onClose={search.handleMobileSearchClose}
+                keyword={search.searchKeyword}
+                onSearchChange={search.setSearchKeyword}
+                results={search.searchResults}
+                loading={search.searchLoading}
+                onResultClick={search.handleSearchResultClick}
                 emptyText={searchConfig?.emptyText}
               />
             </div>
@@ -506,27 +332,48 @@ export const CalendarRoot = ({
 
           <QuickCreateEventPopup
             app={app}
-            anchorRef={quickCreateAnchorRef}
-            isOpen={isQuickCreateOpen}
-            onClose={() => setIsQuickCreateOpen(false)}
+            anchorRef={quickCreate.quickCreateAnchorRef}
+            isOpen={quickCreate.isQuickCreateOpen}
+            onClose={() => quickCreate.setIsQuickCreateOpen(false)}
           />
 
           <MobileEventDrawerComponent
-            isOpen={isMobileDrawerOpen}
+            isOpen={quickCreate.isMobileDrawerOpen}
             onClose={() => {
-              setIsMobileDrawerOpen(false);
-              setMobileDraftEvent(null);
+              quickCreate.setIsMobileDrawerOpen(false);
+              quickCreate.setMobileDraftEvent(null);
             }}
-            onSave={(event: any) => {
-              app.addEvent(event);
-              setIsMobileDrawerOpen(false);
-              setMobileDraftEvent(null);
+            onSave={(event: CalendarEvent) => {
+              const exists = app
+                .getEvents()
+                .some((e: CalendarEvent) => e.id === event.id);
+              if (exists) {
+                app.updateEvent(event.id, event);
+              } else {
+                app.addEvent(event);
+              }
+              quickCreate.setIsMobileDrawerOpen(false);
+              quickCreate.setMobileDraftEvent(null);
             }}
-            draftEvent={mobileDraftEvent}
+            onEventDelete={(id: string) => {
+              app.deleteEvent(id);
+              quickCreate.setIsMobileDrawerOpen(false);
+              quickCreate.setMobileDraftEvent(null);
+            }}
+            draftEvent={quickCreate.mobileDraftEvent}
             app={app}
           />
 
           {sidebar.extraContent}
+          {quickCreate.isCreateCalendarOpen && (
+            <CreateCalendarDialog
+              onClose={() => quickCreate.setIsCreateCalendarOpen(false)}
+              onCreate={calendar => {
+                app.createCalendar(calendar);
+                quickCreate.setIsCreateCalendarOpen(false);
+              }}
+            />
+          )}
           {renderEventDetailDialog()}
         </div>
       </CalendarInternalLocaleProvider>
