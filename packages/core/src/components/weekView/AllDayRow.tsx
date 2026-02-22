@@ -258,6 +258,7 @@ export const AllDayRow = ({
                         isMultiDay={true}
                         allDayHeight={ALL_DAY_HEIGHT}
                         calendarRef={calendarRef}
+                        viewType={ViewType.WEEK}
                         isBeingDragged={
                           isDragging &&
                           (dragState as WeekDayDragState)?.eventId ===

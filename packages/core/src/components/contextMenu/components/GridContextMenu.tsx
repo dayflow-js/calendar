@@ -32,7 +32,7 @@ const GridContextMenu = ({
   };
 
   return (
-    <ContextMenu x={x} y={y} onClose={onClose}>
+    <ContextMenu x={x} y={y} onClose={onClose} className="df-context-menu">
       <ContextMenuItem
         onClick={() => {
           onCreateEvent();

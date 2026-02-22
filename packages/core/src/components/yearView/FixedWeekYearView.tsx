@@ -17,7 +17,7 @@ import {
 import { temporalToDate } from '@/utils/temporal';
 import { useDragForView } from '@/plugins/dragBridge';
 import ViewHeader from '@/components/common/ViewHeader';
-import { YearMultiDayEvent } from './YearMultiDayEvent';
+import { CalendarEvent } from '../calendarEvent';
 import { YearMultiDaySegment } from './utils';
 import { GridContextMenu } from '@/components/contextMenu';
 import { scrollbarHide } from '@/styles/classNames';
@@ -386,8 +386,6 @@ export const FixedWeekYearView = ({
     });
   }, [rawEvents, currentYear, showTimedEvents]);
 
-  console.log('yearEvents', yearEvents.length);
-
   // Generate data for all 12 months with event segments
   const monthsData = useMemo(() => {
     const data = [];
@@ -667,13 +665,15 @@ export const FixedWeekYearView = ({
                   <div className="relative w-full h-full">
                     {month.eventSegments.map(segment => (
                       <div key={segment.id} className="pointer-events-auto">
-                        <YearMultiDayEvent
-                          segment={segment}
+                        <CalendarEvent
+                          event={segment.event}
+                          viewType={ViewType.YEAR}
+                          yearSegment={segment}
                           columnsPerRow={totalColumns}
-                          isDragging={
+                          isBeingDragged={
                             isDragging && dragState.eventId === segment.event.id
                           }
-                          isSelected={selectedEventId === segment.event.id}
+                          selectedEventId={selectedEventId}
                           onMoveStart={handleMoveStart}
                           onResizeStart={handleResizeStart}
                           onEventSelect={setSelectedEventId}
@@ -685,6 +685,12 @@ export const FixedWeekYearView = ({
                           detailPanelEventId={detailPanelEventId}
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
+                          firstHour={0}
+                          hourHeight={0}
+                          onEventUpdate={updated =>
+                            app.updateEvent(updated.id, updated)
+                          }
+                          onEventDelete={id => app.deleteEvent(id)}
                         />
                       </div>
                     ))}

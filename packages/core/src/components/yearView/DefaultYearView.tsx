@@ -26,6 +26,7 @@ import {
 } from '@/styles/classNames';
 import { groupDaysIntoRows } from '@/components/yearView/utils';
 import { YearRowComponent } from '@/components/yearView/YearRowComponent';
+import { GridContextMenu } from '@/components/contextMenu';
 
 export interface YearViewProps {
   app: ICalendarApp;
@@ -100,8 +101,16 @@ export const DefaultYearView = ({
     null
   );
 
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    date: Date;
+  } | null>(null);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (e.button === 2) return; // Ignore right clicks
+
       const target = e.target as HTMLElement;
 
       const clickedEvent = target.closest('[data-event-id]');
@@ -111,16 +120,19 @@ export const DefaultYearView = ({
       const clickedCalendarPicker = target.closest(
         '[data-calendar-picker-dropdown]'
       );
+      const clickedContextMenu = target.closest('.df-context-menu');
 
       if (
         !clickedEvent &&
         !clickedPanel &&
         !clickedDialog &&
         !clickedRangePicker &&
-        !clickedCalendarPicker
+        !clickedCalendarPicker &&
+        !clickedContextMenu
       ) {
         setSelectedEventId(null);
         setDetailPanelEventId(null);
+        setContextMenu(null);
       }
     };
 
@@ -128,20 +140,29 @@ export const DefaultYearView = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const resizeTimeoutRef = useRef<any>(null);
+
   useEffect(() => {
     const container = scrollElementRef.current;
     if (!container) return;
 
     const observer = new ResizeObserver(entries => {
-      const width = entries[0].contentRect.width;
-      const minCellWidth = 80; // Consistent with previous minmax
-      const cols = Math.floor(width / minCellWidth);
-      setColumnsPerRow(Math.max(1, cols));
-      setIsLayoutReady(true);
+      if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current);
+
+      resizeTimeoutRef.current = setTimeout(() => {
+        const width = entries[0].contentRect.width;
+        const minCellWidth = 80; // Consistent with previous minmax
+        const cols = Math.floor(width / minCellWidth);
+        setColumnsPerRow(Math.max(1, cols));
+        setIsLayoutReady(true);
+      }, 60);
     });
 
     observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current);
+    };
   }, []);
 
   // Sync highlighted event from app state
@@ -210,12 +231,14 @@ export const DefaultYearView = ({
           start: plainDate,
           end: plainDate,
           allDay: true,
+          calendarId:
+            app.getCalendarRegistry().getDefaultCalendarId() || 'default',
         };
         app.addEvent(newEvent);
         setNewlyCreatedEventId(newEvent.id);
       }
     },
-    [showTimedEvents, handleCreateStart, app]
+    [showTimedEvents, handleCreateStart, app, t]
   );
 
   // Generate all days for the current year
@@ -317,10 +340,32 @@ export const DefaultYearView = ({
               onDetailPanelToggle={setDetailPanelEventId}
               customDetailPanelContent={customDetailPanelContent}
               customEventDetailDialog={customEventDetailDialog}
+              onContextMenu={setContextMenu}
             />
           ))}
         </div>
       </div>
+      {contextMenu && (
+        <GridContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          date={contextMenu.date}
+          viewType={ViewType.YEAR}
+          onClose={() => setContextMenu(null)}
+          app={app}
+          onCreateEvent={() => {
+            if (contextMenu && contextMenu.date) {
+              const syntheticEvent = {
+                preventDefault: () => {},
+                stopPropagation: () => {},
+                clientX: contextMenu.x,
+                clientY: contextMenu.y,
+              } as unknown as any;
+              handleCellDoubleClick(syntheticEvent, contextMenu.date);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

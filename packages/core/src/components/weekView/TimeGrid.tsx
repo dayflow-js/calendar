@@ -397,6 +397,7 @@ export const TimeGrid = ({
                           }
                           event={event}
                           layout={eventLayout}
+                          viewType={ViewType.WEEK}
                           calendarRef={calendarRef}
                           isBeingDragged={
                             isDragging &&

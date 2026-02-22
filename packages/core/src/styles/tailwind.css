@@ -13,60 +13,50 @@
 /* Ensure that the base variables can be correctly parsed even without Tailwind */
 :root {
   color-scheme: light dark;
+  font-family: Arial;
 }
 
-/*
- * Library theme variables are:
- *   1. Namespaced with --df-color-* to avoid colliding with any host --color-* tokens.
- *   2. Wrapped in @layer df-theme so host apps can place their own layer above
- *      this one to override values without !important:
- *
- *        @layer df-theme, my-overrides;   ← declare before importing the library CSS
- *
- * Non-Tailwind users get sensible defaults; Tailwind users retain full control
- * of their own --color-* tokens.
- */
 @layer df-theme {
   :where(:root) {
     /* Light mode colors */
-    --df-color-background:           rgb(255 255 255);
-    --df-color-foreground:           rgb(46 46 46);
-    --df-color-hover:                rgb(245 245 245);
-    --df-color-border:               rgb(229 229 229);
-    --df-color-card:                 rgb(255 255 255);
-    --df-color-card-foreground:      rgb(46 46 46);
-    --df-color-muted:                rgb(243 244 246);
-    --df-color-muted-foreground:     rgb(107 114 128);
+    --df-color-background: rgb(255 255 255);
+    --df-color-foreground: rgb(46 46 46);
+    --df-color-hover: rgb(245 245 245);
+    --df-color-border: rgb(229 229 229);
+    --df-color-card: rgb(255 255 255);
+    --df-color-card-foreground: rgb(46 46 46);
+    --df-color-muted: rgb(243 244 246);
+    --df-color-muted-foreground: rgb(107 114 128);
 
     /* Theme colors */
-    --df-color-primary:              rgb(46 46 46);
-    --df-color-primary-foreground:   rgb(255 255 255);
-    --df-color-secondary:            rgb(100 116 139);
+    --df-color-primary: rgb(46 46 46);
+    --df-color-primary-foreground: rgb(255 255 255);
+    --df-color-secondary: rgb(100 116 139);
     --df-color-secondary-foreground: rgb(255 255 255);
 
     /* Destructive */
-    --df-color-destructive:            rgb(212 36 34);
+    --df-color-destructive: rgb(212 36 34);
     --df-color-destructive-foreground: rgb(255 255 255);
   }
 
   :where(.dark) {
     /* Dark mode colors */
-    --df-color-background:           rgb(21 21 21);
-    --df-color-hover:                rgb(28 28 28);
-    --df-color-foreground:           rgb(229 229 229);
-    --df-color-card:                 rgb(31 41 55);
-    --df-color-card-foreground:      rgb(229 229 229);
-    --df-color-border:               rgb(56 56 56);
-    --df-color-muted:                rgb(55 65 81);
-    --df-color-muted-foreground:     rgb(156 163 175);
+    --df-color-background: rgb(21 21 21);
+    --df-color-hover: rgb(28 28 28);
+    --df-color-foreground: rgb(229 229 229);
+    --df-color-card: rgb(31 41 55);
+    --df-color-card-foreground: rgb(229 229 229);
+    --df-color-border: rgb(56 56 56);
+    --df-color-muted: rgb(55 65 81);
+    --df-color-muted-foreground: rgb(156 163 175);
 
-    --df-color-primary:              rgb(229 229 229);
-    --df-color-primary-foreground:   rgb(23 23 23);
-    --df-color-secondary:            rgb(156 163 175);
+    --df-color-primary: rgb(229 229 229);
+    --df-color-primary-foreground: rgb(23 23 23);
+    --df-color-secondary: rgb(156 163 175);
     --df-color-secondary-foreground: rgb(23 23 23);
 
     /* Destructive */
-    --df-color-destructive:            rgb(147 70 69);
+    --df-color-destructive: rgb(147 70 69);
     --df-color-destructive-foreground: rgb(254 242 242);
   }
 
@@ -75,19 +65,19 @@
    * tokens fall back to their light-mode values from :where(:root). */
   @media (prefers-color-scheme: dark) {
     :root:not(.light):not(.dark) {
-      --df-color-background:           rgb(21 21 21);
-      --df-color-hover:                rgb(28 28 28);
-      --df-color-foreground:           rgb(229 229 229);
-      --df-color-border:               rgb(56 56 56);
-      --df-color-card:                 rgb(31 41 55);
-      --df-color-card-foreground:      rgb(229 229 229);
-      --df-color-muted:                rgb(55 65 81);
-      --df-color-muted-foreground:     rgb(156 163 175);
-      --df-color-primary:              rgb(229 229 229);
-      --df-color-primary-foreground:   rgb(23 23 23);
-      --df-color-secondary:            rgb(156 163 175);
+      --df-color-background: rgb(21 21 21);
+      --df-color-hover: rgb(28 28 28);
+      --df-color-foreground: rgb(229 229 229);
+      --df-color-border: rgb(56 56 56);
+      --df-color-card: rgb(31 41 55);
+      --df-color-card-foreground: rgb(229 229 229);
+      --df-color-muted: rgb(55 65 81);
+      --df-color-muted-foreground: rgb(156 163 175);
+      --df-color-primary: rgb(229 229 229);
+      --df-color-primary-foreground: rgb(23 23 23);
+      --df-color-secondary: rgb(156 163 175);
       --df-color-secondary-foreground: rgb(23 23 23);
-      --df-color-destructive:          rgb(147 70 69);
+      --df-color-destructive: rgb(147 70 69);
       --df-color-destructive-foreground: rgb(254 242 242);
     }
   }
@@ -103,21 +93,21 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-background:           var(--df-color-background);
-  --color-foreground:           var(--df-color-foreground);
-  --color-hover:                var(--df-color-hover);
-  --color-border:               var(--df-color-border);
-  --color-card:                 var(--df-color-card);
-  --color-card-foreground:      var(--df-color-card-foreground);
-  --color-muted:                var(--df-color-muted);
-  --color-muted-foreground:     var(--df-color-muted-foreground);
+  --color-background: var(--df-color-background);
+  --color-foreground: var(--df-color-foreground);
+  --color-hover: var(--df-color-hover);
+  --color-border: var(--df-color-border);
+  --color-card: var(--df-color-card);
+  --color-card-foreground: var(--df-color-card-foreground);
+  --color-muted: var(--df-color-muted);
+  --color-muted-foreground: var(--df-color-muted-foreground);
 
-  --color-primary:              var(--df-color-primary);
-  --color-primary-foreground:   var(--df-color-primary-foreground);
-  --color-secondary:            var(--df-color-secondary);
+  --color-primary: var(--df-color-primary);
+  --color-primary-foreground: var(--df-color-primary-foreground);
+  --color-secondary: var(--df-color-secondary);
   --color-secondary-foreground: var(--df-color-secondary-foreground);
 
-  --color-destructive:            var(--df-color-destructive);
+  --color-destructive: var(--df-color-destructive);
   --color-destructive-foreground: var(--df-color-destructive-foreground);
 }
 

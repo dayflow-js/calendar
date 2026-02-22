@@ -4,8 +4,10 @@ import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
+  ViewType,
 } from '@/types';
 import { MultiDayEventSegment } from '../monthView/WeekComponent';
+import { YearMultiDaySegment } from '../yearView/utils';
 
 export interface CalendarEventProps {
   event: Event;
@@ -15,10 +17,11 @@ export interface CalendarEventProps {
   calendarRef: any;
   isBeingDragged?: boolean;
   isBeingResized?: boolean;
-  isDayView?: boolean;
-  isMonthView?: boolean;
+  viewType: ViewType;
   isMultiDay?: boolean;
   segment?: MultiDayEventSegment;
+  yearSegment?: YearMultiDaySegment;
+  columnsPerRow?: number;
   segmentIndex?: number;
   hourHeight: number;
   firstHour: number;

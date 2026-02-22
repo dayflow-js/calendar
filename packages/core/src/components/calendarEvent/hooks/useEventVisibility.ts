@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'preact/hooks';
-import { Event } from '@/types';
+import { Event, ViewType } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 
 interface UseEventVisibilityProps {
@@ -9,7 +9,7 @@ interface UseEventVisibilityProps {
   eventRef: { current: HTMLElement | null };
   calendarRef: { current: HTMLElement | null };
   isAllDay: boolean;
-  isMonthView: boolean;
+  viewType: ViewType;
   multiDaySegmentInfo?: any;
   firstHour: number;
   hourHeight: number;
@@ -26,13 +26,16 @@ export const useEventVisibility = ({
   eventRef,
   calendarRef,
   isAllDay,
-  isMonthView,
+  viewType,
   multiDaySegmentInfo,
   firstHour,
   hourHeight,
   updatePanelPosition,
   setEventVisibility,
 }: UseEventVisibilityProps) => {
+  const isMonthView = viewType === ViewType.MONTH;
+  const isYearView = viewType === ViewType.YEAR;
+
   const checkEventVisibility = useCallback(() => {
     if (
       !isEventSelected ||
@@ -40,7 +43,8 @@ export const useEventVisibility = ({
       !eventRef.current ||
       !calendarRef.current ||
       isAllDay ||
-      isMonthView
+      isMonthView ||
+      isYearView
     )
       return;
 

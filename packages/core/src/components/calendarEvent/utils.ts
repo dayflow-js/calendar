@@ -1,4 +1,4 @@
-import { Event, EventDetailPosition } from '@/types';
+import { Event, ViewType } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 import {
   baseEvent,
@@ -14,15 +14,14 @@ import { CalendarEventProps } from './types';
 export const getDayMetrics = (
   dayIndex: number,
   calendarRef: { current: HTMLElement | null },
-  isMonthView: boolean,
-  isDayView: boolean,
+  viewType: ViewType,
   isMobile: boolean
 ): { left: number; width: number } | null => {
   if (!calendarRef.current) return null;
 
   const calendarRect = calendarRef.current.getBoundingClientRect();
 
-  if (isMonthView) {
+  if (viewType === ViewType.MONTH) {
     const dayColumnWidth = calendarRect.width / 7;
     return {
       left: calendarRect.left + dayIndex * dayColumnWidth,
@@ -31,7 +30,7 @@ export const getDayMetrics = (
   }
 
   const timeColumnWidth = isMobile ? 48 : 80;
-  if (isDayView) {
+  if (viewType === ViewType.DAY) {
     const dayColumnWidth = calendarRect.width - timeColumnWidth;
     return {
       left: calendarRect.left + timeColumnWidth,
@@ -87,14 +86,13 @@ export const getActiveDayIndex = (
 export const getClickedDayIndex = (
   clientX: number,
   calendarRef: { current: HTMLElement | null },
-  isMonthView: boolean,
-  isDayView: boolean,
+  viewType: ViewType,
   isMobile: boolean
 ): number | null => {
   if (!calendarRef.current) return null;
 
   const calendarRect = calendarRef.current.getBoundingClientRect();
-  if (isMonthView) {
+  if (viewType === ViewType.MONTH) {
     const dayColumnWidth = calendarRect.width / 7;
     const relativeX = clientX - calendarRect.left;
     const index = Math.floor(relativeX / dayColumnWidth);
@@ -102,7 +100,7 @@ export const getClickedDayIndex = (
   }
 
   const timeColumnWidth = isMobile ? 48 : 80;
-  const columnCount = isDayView ? 1 : 7;
+  const columnCount = viewType === ViewType.DAY ? 1 : 7;
   const dayColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
   const relativeX = clientX - calendarRect.left - timeColumnWidth;
   const index = Math.floor(relativeX / dayColumnWidth);
@@ -115,17 +113,23 @@ export const getClickedDayIndex = (
  * Gets the CSS classes for the event container
  */
 export const getEventClasses = (
-  isMonthView: boolean,
-  isDayView: boolean,
+  viewType: ViewType,
   isAllDay: boolean,
   isMultiDay: boolean,
-  segment?: { segmentType: string }
+  segment?: { segmentType: string },
+  yearSegment?: { isFirstSegment: boolean; isLastSegment: boolean }
 ): string => {
   let classes = baseEvent;
+  const isDayView = viewType === ViewType.DAY;
+  const isMonthView = viewType === ViewType.MONTH;
+  const isYearView = viewType === ViewType.YEAR;
+
   if (isDayView) {
     classes += ' df-day-event flex flex-col';
-  } else if (!isMonthView) {
+  } else if (!isMonthView && !isYearView) {
     classes += ' df-week-event flex flex-col';
+  } else if (isYearView) {
+    classes += ' df-year-event transition-colors group px-1 overflow-hidden whitespace-nowrap cursor-pointer';
   }
 
   const getAllDayClass = () => {
@@ -143,6 +147,21 @@ export const getEventClasses = (
     }
     return allDayRounded;
   };
+
+  const getYearViewClass = () => {
+    if (yearSegment) {
+      const { isFirstSegment, isLastSegment } = yearSegment;
+      if (isFirstSegment && isLastSegment) return 'rounded';
+      if (isFirstSegment) return 'rounded-l rounded-r-none';
+      if (isLastSegment) return 'rounded-r rounded-l-none';
+      return 'rounded-none';
+    }
+    return 'rounded';
+  };
+
+  if (isYearView) {
+    return `${classes} ${getYearViewClass()}`;
+  }
 
   if (isMonthView) {
     let monthClasses = `
