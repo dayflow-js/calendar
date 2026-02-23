@@ -2,7 +2,6 @@
 import { h } from 'preact';
 import {
   WeekViewConfig,
-  ViewAdapterProps,
   ViewFactory,
   ViewType,
 } from '../types';
@@ -21,6 +20,7 @@ const defaultWeekViewConfig: WeekViewConfig = {
   showAllDay: true,
   startOfWeek: 1, // Monday
   scrollToCurrentTime: true,
+  mobileColumns: 2,
 
   // Layout configuration
   hourHeight: 72,

@@ -50,6 +50,7 @@ const WeekView = ({
     LAST_HOUR = defaultDragConfig.LAST_HOUR,
     ALL_DAY_HEIGHT = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
+    mobileColumns = 2,
   } = config;
 
   const showStartOfDayLabel = !showAllDay;
@@ -61,11 +62,56 @@ const WeekView = ({
   const MobileEventDrawerComponent =
     app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
-  // Calculate the week start time for the current date
-  const currentWeekStart = useMemo(
+  // Mobile 2-Column Logic
+  const isMobileTwoColumn = isMobile && mobileColumns === 2;
+
+  const standardWeekStart = useMemo(
     () => getWeekStart(currentDate),
     [currentDate]
   );
+
+  // Mobile Page Start (Synced with currentDate)
+  const [mobilePageStart, setMobilePageStart] = useState<Date>(
+    () => new Date(currentDate)
+  );
+
+  // Sync mobilePageStart with currentDate when it goes out of view
+  useEffect(() => {
+    if (!isMobileTwoColumn) return;
+
+    const start = mobilePageStart;
+    // Check if currentDate is in range [start, start + 1]
+    const curr = new Date(currentDate);
+    curr.setHours(0, 0, 0, 0);
+    const s = new Date(start);
+    s.setHours(0, 0, 0, 0);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 2); // strictly less than this
+
+    if (curr >= s && curr < e) {
+      // In view, do nothing
+    } else {
+      // Out of view, snap to currentDate
+      setMobilePageStart(new Date(currentDate));
+    }
+  }, [currentDate, isMobileTwoColumn, mobilePageStart]);
+
+  const currentWeekStart = isMobileTwoColumn
+    ? mobilePageStart
+    : standardWeekStart;
+
+  // For mobile 2-column mode, we render 3 pages (6 days) to allow for smooth swipe transitions
+  // Page 1: Previous 2 days
+  // Page 2: Current 2 days (mobilePageStart)
+  // Page 3: Next 2 days
+  const displayDays = isMobileTwoColumn ? 6 : 7;
+  const displayStart = useMemo(() => {
+    if (!isMobileTwoColumn) return currentWeekStart;
+    const d = new Date(currentWeekStart);
+    d.setDate(d.getDate() - 2);
+    return d;
+  }, [currentWeekStart, isMobileTwoColumn]);
+
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
@@ -117,17 +163,121 @@ const WeekView = ({
   const handleScroll = (e: any) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
     if (topFrozenContentRef.current) {
-      topFrozenContentRef.current.style.transform = `translateX(${-scrollLeft}px)`;
+      const baseTranslateX = isMobileTwoColumn ? '-33.333%' : '0px';
+      const horizontalOffset = isMobileTwoColumn
+        ? `${swipeOffset}px`
+        : `-${scrollLeft}px`;
+      topFrozenContentRef.current.style.transform = `translateX(calc(${baseTranslateX} + ${horizontalOffset}))`;
+      topFrozenContentRef.current.style.transition =
+        isMobileTwoColumn && isTransitioning ? 'transform 0.3s ease-out' : 'none';
     }
     if (leftFrozenContentRef.current) {
       leftFrozenContentRef.current.style.transform = `translateY(${-scrollTop}px)`;
     }
   };
 
-  // Events for the current week
+  // Mobile Swipe Navigation Logic
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const touchStartPos = useRef({ x: 0, y: 0 });
+  const isHorizontalSwipe = useRef(false);
+
+  useEffect(() => {
+    if (!isMobileTwoColumn) return;
+
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const handleScrollerTouchStart = (e: TouchEvent) => {
+      touchStartPos.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+      isHorizontalSwipe.current = false;
+      setIsTransitioning(false);
+    };
+
+    const handleScrollerTouchMove = (e: TouchEvent) => {
+      if (isTransitioning) return;
+
+      const deltaX = e.touches[0].clientX - touchStartPos.current.x;
+      const deltaY = e.touches[0].clientY - touchStartPos.current.y;
+
+      // Detect horizontal swipe on first move
+      if (!isHorizontalSwipe.current && Math.abs(deltaX) > 10) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          isHorizontalSwipe.current = true;
+        }
+      }
+
+      if (isHorizontalSwipe.current) {
+        if (e.cancelable) e.preventDefault();
+        setSwipeOffset(deltaX);
+      }
+    };
+
+    const handleScrollerTouchEnd = () => {
+      if (!isHorizontalSwipe.current) {
+        setSwipeOffset(0);
+        return;
+      }
+
+      const threshold = 100; // Snap threshold
+      const containerWidth = scroller.clientWidth;
+
+      if (swipeOffset > threshold) {
+        // Snap to Previous Page
+        setIsTransitioning(true);
+        setSwipeOffset(containerWidth);
+        setTimeout(() => {
+          const nextDate = new Date(currentWeekStart);
+          nextDate.setDate(nextDate.getDate() - 2);
+          app.setCurrentDate(nextDate);
+          setSwipeOffset(0);
+          setIsTransitioning(false);
+        }, 300);
+      } else if (swipeOffset < -threshold) {
+        // Snap to Next Page
+        setIsTransitioning(true);
+        setSwipeOffset(-containerWidth);
+        setTimeout(() => {
+          const nextDate = new Date(currentWeekStart);
+          nextDate.setDate(nextDate.getDate() + 2);
+          app.setCurrentDate(nextDate);
+          setSwipeOffset(0);
+          setIsTransitioning(false);
+        }, 300);
+      } else {
+        // Bounce back
+        setIsTransitioning(true);
+        setSwipeOffset(0);
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 300);
+      }
+    };
+
+    scroller.addEventListener('touchstart', handleScrollerTouchStart, {
+      passive: true,
+    });
+    scroller.addEventListener('touchmove', handleScrollerTouchMove, {
+      passive: false,
+    });
+    scroller.addEventListener('touchend', handleScrollerTouchEnd, {
+      passive: true,
+    });
+
+    return () => {
+      scroller.removeEventListener('touchstart', handleScrollerTouchStart);
+      scroller.removeEventListener('touchmove', handleScrollerTouchMove);
+      scroller.removeEventListener('touchend', handleScrollerTouchEnd);
+    };
+  }, [isMobileTwoColumn, app, currentWeekStart, isTransitioning, swipeOffset]);
+
+  // Events for the current week (or custom 2-day range)
   const currentWeekEvents = useMemo(() => {
-    return filterWeekEvents(events, currentWeekStart);
-  }, [events, currentWeekStart]);
+    return filterWeekEvents(events, displayStart, displayDays);
+  }, [events, displayStart, displayDays]);
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -172,20 +322,34 @@ const WeekView = ({
 
   // Organize the hierarchy of all-day events to avoid overlap
   const organizedAllDaySegments = useMemo(() => {
-    return organizeAllDaySegments(currentWeekEvents, currentWeekStart);
-  }, [currentWeekEvents, currentWeekStart]);
+    return organizeAllDaySegments(
+      currentWeekEvents,
+      displayStart,
+      displayDays
+    );
+  }, [currentWeekEvents, displayStart, displayDays]);
 
   // Calculate the required height for the all-day event area
   const allDayAreaHeight = useMemo(() => {
-    if (organizedAllDaySegments.length === 0) return ALL_DAY_HEIGHT;
-    const maxRow = Math.max(...organizedAllDaySegments.map(s => s.row));
+    const relevantSegments = isMobileTwoColumn
+      ? organizedAllDaySegments.filter(
+          s => s.endDayIndex >= 2 && s.startDayIndex <= 3
+        )
+      : organizedAllDaySegments;
+
+    if (relevantSegments.length === 0) return ALL_DAY_HEIGHT;
+    const maxRow = Math.max(...relevantSegments.map(s => s.row));
     return ALL_DAY_HEIGHT + maxRow * ALL_DAY_HEIGHT;
-  }, [organizedAllDaySegments, ALL_DAY_HEIGHT]);
+  }, [organizedAllDaySegments, ALL_DAY_HEIGHT, isMobileTwoColumn]);
 
   // Calculate event layouts
   const eventLayouts = useMemo(() => {
-    return calculateEventLayouts(currentWeekEvents, currentWeekStart);
-  }, [currentWeekEvents, currentWeekStart]);
+    return calculateEventLayouts(
+      currentWeekEvents,
+      displayStart,
+      displayDays
+    );
+  }, [currentWeekEvents, displayStart, displayDays]);
 
   // Use drag functionality provided by the plugin
   const {
@@ -253,7 +417,7 @@ const WeekView = ({
       }
     },
     onEventEdit: () => {},
-    currentWeekStart,
+    currentWeekStart: displayStart,
     events: currentWeekEvents,
     calculateNewEventLayout: (targetDay, startHour, endHour) =>
       calculateNewEventLayout(targetDay, startHour, endHour, currentWeekEvents),
@@ -319,8 +483,21 @@ const WeekView = ({
   });
 
   const weekDaysLabels = useMemo(() => {
+    if (isMobileTwoColumn) {
+      return Array.from({ length: displayDays }, (_, i) => {
+        const d = new Date(displayStart);
+        d.setDate(d.getDate() + i);
+        return d.toLocaleDateString(locale, { weekday: 'short' });
+      });
+    }
     return getWeekDaysLabels(locale, 'short');
-  }, [locale, getWeekDaysLabels]);
+  }, [
+    locale,
+    getWeekDaysLabels,
+    isMobileTwoColumn,
+    displayStart,
+    displayDays,
+  ]);
 
   const mobileWeekDaysLabels = useMemo(() => {
     if (!isMobile) return [];
@@ -354,8 +531,8 @@ const WeekView = ({
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Compare date part only
     return weekDaysLabels.map((_, index) => {
-      const date = new Date(currentWeekStart);
-      date.setDate(currentWeekStart.getDate() + index);
+      const date = new Date(displayStart);
+      date.setDate(displayStart.getDate() + index);
       const dateOnly = new Date(date);
       dateOnly.setHours(0, 0, 0, 0);
       return {
@@ -365,7 +542,38 @@ const WeekView = ({
         isToday: dateOnly.getTime() === today.getTime(),
       };
     });
-  }, [currentWeekStart, weekDaysLabels, locale]);
+  }, [displayStart, weekDaysLabels, locale]);
+
+  // Sync horizontal transform for swipe
+  useEffect(() => {
+    if (!isMobileTwoColumn) {
+      if (topFrozenContentRef.current) {
+        topFrozenContentRef.current.style.transform = '';
+        topFrozenContentRef.current.style.transition = '';
+      }
+      if (scrollerRef.current && scrollerRef.current.firstChild) {
+        const target = scrollerRef.current.firstChild as HTMLElement;
+        target.style.transform = '';
+        target.style.transition = '';
+      }
+      return;
+    }
+
+    const baseTranslateX = '-33.333%';
+    const transition = isTransitioning ? 'transform 0.3s ease-out' : 'none';
+    const transform = `translateX(calc(${baseTranslateX} + ${swipeOffset}px))`;
+
+    if (topFrozenContentRef.current) {
+      topFrozenContentRef.current.style.transition = transition;
+      topFrozenContentRef.current.style.transform = transform;
+    }
+
+    if (scrollerRef.current && scrollerRef.current.firstChild) {
+      const target = scrollerRef.current.firstChild as HTMLElement;
+      target.style.transition = transition;
+      target.style.transform = transform;
+    }
+  }, [swipeOffset, isTransitioning, isMobileTwoColumn]);
 
   // Event handling functions
   const handleEventUpdate = (updatedEvent: Event) => {
@@ -390,7 +598,14 @@ const WeekView = ({
     return () => clearInterval(timer);
   }, []);
 
-  const gridWidth = isMobile ? '175%' : '100%';
+  const gridWidth =
+    isMobile && !isMobileTwoColumn
+      ? mobileColumns === 4
+        ? '175%'
+        : '100%'
+      : isMobileTwoColumn
+        ? '300%'
+        : '100%';
 
   return (
     <div className={`${calendarContainer} df-week-view`}>
@@ -409,7 +624,7 @@ const WeekView = ({
         weekDaysLabels={weekDaysLabels}
         mobileWeekDaysLabels={mobileWeekDaysLabels}
         weekDates={weekDates}
-        currentWeekStart={currentWeekStart}
+        currentWeekStart={displayStart}
         gridWidth={gridWidth}
         allDayAreaHeight={allDayAreaHeight}
         organizedAllDaySegments={organizedAllDaySegments}
@@ -450,7 +665,7 @@ const WeekView = ({
         app={app}
         timeSlots={timeSlots}
         weekDaysLabels={weekDaysLabels}
-        currentWeekStart={currentWeekStart}
+        currentWeekStart={displayStart}
         currentWeekEvents={currentWeekEvents}
         eventLayouts={eventLayouts}
         gridWidth={gridWidth}

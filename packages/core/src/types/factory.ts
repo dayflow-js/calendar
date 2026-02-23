@@ -126,6 +126,7 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   FIRST_HOUR?: number;
   LAST_HOUR?: number;
   ALL_DAY_HEIGHT?: number;
+  mobileColumns?: 2 | 4;
 }
 
 /**

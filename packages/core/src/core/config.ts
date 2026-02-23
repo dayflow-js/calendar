@@ -29,6 +29,7 @@ export const defaultViewConfigs = {
     showAllDay: true,
     startOfWeek: 1, // Monday
     scrollToCurrentTime: true,
+    mobileColumns: 2,
   },
   month: {
     showWeekends: true,
