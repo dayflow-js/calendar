@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'preact/hooks';
 import { Event, ViewType, EventDetailPosition } from '@/types';
-import { extractHourFromDate, getEventEndHour } from '@/utils';
 import { MultiDayEventSegment } from '../../monthView/WeekComponent';
 import { YearMultiDaySegment } from '../../yearView/utils';
+import { getTimeColumnWidth } from '../utils';
 
 interface UseDetailPanelPositionProps {
   event: Event;
@@ -78,7 +78,7 @@ export const useDetailPanelPosition = ({
       dayColumnWidth = calendarRect.width / 7;
       dayStartX = calendarRect.left + positionDayIndex * dayColumnWidth;
     } else {
-      const timeColumnWidth = isMobile ? 48 : 80;
+      const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
       dayColumnWidth = (calendarRect.width - timeColumnWidth) / 7;
       dayStartX =
         calendarRect.left + timeColumnWidth + positionDayIndex * dayColumnWidth;
@@ -103,40 +103,10 @@ export const useDetailPanelPosition = ({
         eventVisibility === 'sticky-top' ||
         eventVisibility === 'sticky-bottom'
       ) {
-        const calendarContent =
-          calendarRef.current?.querySelector('.calendar-content');
-        if (!calendarContent) return;
-
-        const segmentStartHour = multiDaySegmentInfo
-          ? multiDaySegmentInfo.startHour
-          : extractHourFromDate(event.start);
-        const segmentEndHour = multiDaySegmentInfo
-          ? multiDaySegmentInfo.endHour
-          : getEventEndHour(event);
-        const eventLogicalTop = (segmentStartHour - firstHour) * hourHeight;
-        const eventLogicalHeight = Math.max(
-          (segmentEndHour - segmentStartHour) * hourHeight,
-          hourHeight / 4
-        );
-
-        const contentRect = calendarContent.getBoundingClientRect();
-        const scrollTop = calendarContent.scrollTop;
-        const virtualTop = contentRect.top + eventLogicalTop - scrollTop;
-
         const actualEventRect = eventRef.current?.getBoundingClientRect();
         if (!actualEventRect) return;
 
-        eventRect = {
-          top: virtualTop,
-          bottom: virtualTop + eventLogicalHeight,
-          left: actualEventRect.left,
-          right: actualEventRect.right,
-          width: actualEventRect.width,
-          height: eventLogicalHeight,
-          x: actualEventRect.x,
-          y: virtualTop,
-          toJSON: () => ({}),
-        } as DOMRect;
+        eventRect = actualEventRect;
       } else {
         eventRect = selectedEventElementRef!.current!.getBoundingClientRect();
       }
@@ -158,37 +128,6 @@ export const useDetailPanelPosition = ({
           x: selectedDayLeft,
           y: eventRect.top,
           toJSON: () => ({}),
-        } as DOMRect;
-      }
-
-      if (
-        (eventVisibility === 'sticky-top' ||
-          eventVisibility === 'sticky-bottom') &&
-        !isMonthView
-      ) {
-        const activeDayIndex = getActiveDayIdx();
-        const metrics = getDayMetricsWrapper(activeDayIndex);
-        const timeColumnWidth = isMobile ? 48 : 80;
-        const baseLeft = metrics
-          ? metrics.left
-          : calendarRect.left +
-            timeColumnWidth +
-            (activeDayIndex * (calendarRect.width - timeColumnWidth)) /
-              (isDayView ? 1 : 7);
-        const baseWidth = metrics
-          ? metrics.width
-          : (calendarRect.width - timeColumnWidth) / (isDayView ? 1 : 7);
-        const segmentWidth = Math.max(
-          0,
-          isDayView ? eventRect.width : baseWidth - 3
-        );
-        const segmentLeft = isDayView ? eventRect.left : baseLeft;
-
-        eventRect = {
-          ...eventRect,
-          left: segmentLeft,
-          right: segmentLeft + segmentWidth,
-          width: segmentWidth,
         } as DOMRect;
       }
 

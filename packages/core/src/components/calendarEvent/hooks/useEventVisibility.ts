@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'preact/hooks';
+import { useEffect, useCallback } from 'preact/hooks';
 import { Event, ViewType } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 
@@ -14,6 +14,7 @@ interface UseEventVisibilityProps {
   firstHour: number;
   hourHeight: number;
   updatePanelPosition: () => void;
+  eventVisibility: 'visible' | 'sticky-top' | 'sticky-bottom';
   setEventVisibility: (
     visibility: 'visible' | 'sticky-top' | 'sticky-bottom'
   ) => void;
@@ -31,6 +32,7 @@ export const useEventVisibility = ({
   firstHour,
   hourHeight,
   updatePanelPosition,
+  eventVisibility,
   setEventVisibility,
 }: UseEventVisibilityProps) => {
   const isMonthView = viewType === ViewType.MONTH;
@@ -71,24 +73,37 @@ export const useEventVisibility = ({
     const viewportHeight = contentRect.height;
     const scrollBottom = scrollTop + viewportHeight;
 
-    let isTopInvisible = originalBottom < scrollTop + 6;
-    let isBottomInvisible = originalTop > scrollBottom - 6;
-
     const isContentAboveViewport = contentRect.bottom < 0;
     const isContentBelowViewport = contentRect.top > window.innerHeight;
 
+    const STICKY_THRESHOLD = 20;
+
+    let nextVisibility = eventVisibility;
+
     if (isContentAboveViewport) {
-      isTopInvisible = true;
+      nextVisibility = 'sticky-top';
     } else if (isContentBelowViewport) {
-      isBottomInvisible = true;
+      nextVisibility = 'sticky-bottom';
+    } else {
+      if (eventVisibility === 'visible') {
+        if (originalBottom < scrollTop) {
+          nextVisibility = 'sticky-top';
+        } else if (originalTop > scrollBottom - STICKY_THRESHOLD) {
+          nextVisibility = 'sticky-bottom';
+        }
+      } else if (eventVisibility === 'sticky-top') {
+        if (originalBottom >= scrollTop) {
+          nextVisibility = 'visible';
+        }
+      } else if (eventVisibility === 'sticky-bottom') {
+        if (originalTop <= scrollBottom - STICKY_THRESHOLD) {
+          nextVisibility = 'visible';
+        }
+      }
     }
 
-    if (isTopInvisible) {
-      setEventVisibility('sticky-top');
-    } else if (isBottomInvisible) {
-      setEventVisibility('sticky-bottom');
-    } else {
-      setEventVisibility('visible');
+    if (nextVisibility !== eventVisibility) {
+      setEventVisibility(nextVisibility);
     }
 
     updatePanelPosition();
@@ -104,6 +119,8 @@ export const useEventVisibility = ({
     hourHeight,
     updatePanelPosition,
     multiDaySegmentInfo,
+    eventVisibility,
+    setEventVisibility,
   ]);
 
   useEffect(() => {

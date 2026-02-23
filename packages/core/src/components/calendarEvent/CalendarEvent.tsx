@@ -246,6 +246,7 @@ const CalendarEvent = ({
     firstHour,
     hourHeight,
     updatePanelPosition,
+    eventVisibility,
     setEventVisibility,
   });
 

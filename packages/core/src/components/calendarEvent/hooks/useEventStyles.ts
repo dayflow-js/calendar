@@ -2,6 +2,7 @@ import { ViewType, Event, EventLayout } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 import { MultiDayEventSegment } from '../../monthView/WeekComponent';
 import { YearMultiDaySegment } from '../../yearView/utils';
+import { getTimeColumnWidth } from '../utils';
 
 interface UseEventStylesProps {
   event: Event;
@@ -131,9 +132,10 @@ export const useEventStyles = ({
           position: 'absolute',
         });
       } else if (isMultiDay && segment) {
+        const cols = columnsPerRow || 7;
         const spanDays = segment.endDayIndex - segment.startDayIndex + 1;
-        const widthPercent = (spanDays / 7) * 100;
-        const leftPercent = (segment.startDayIndex / 7) * 100;
+        const widthPercent = (spanDays / cols) * 100;
+        const leftPercent = (segment.startDayIndex / cols) * 100;
         const HORIZONTAL_MARGIN = 2;
         const marginLeft = segment.isFirstSegment ? HORIZONTAL_MARGIN : 0;
         const marginRight = segment.isLastSegment ? HORIZONTAL_MARGIN : 0;
@@ -190,8 +192,8 @@ export const useEventStyles = ({
         const calendarRect = calendarRef.current?.getBoundingClientRect();
         if (calendarRect) {
           const activeDayIndex = getActiveDayIdx();
-          const timeColumnWidth = isMobile ? 48 : 80;
-          const columnCount = isDayView ? 1 : 7;
+          const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
+          const columnCount = isDayView ? 1 : (columnsPerRow || 7);
           let dayColumnWidth =
             (calendarRect.width - timeColumnWidth) / columnCount;
           let dayStartX =

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 import { memo } from 'preact/compat';
 import {
   Event,
@@ -21,9 +21,9 @@ interface YearRowComponentProps {
   locale: string;
   isDragging: boolean;
   dragState: MonthEventDragState;
-  onMoveStart?: (e: any | any, event: Event) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
-  onCreateStart?: (e: any | any, targetDate: Date) => void;
+  onMoveStart?: (e: any, event: Event) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onCreateStart?: (e: any, targetDate: Date) => void;
   selectedEventId: string | null;
   onEventSelect: (eventId: string | null) => void;
   onMoreEventsClick?: (date: Date) => void;

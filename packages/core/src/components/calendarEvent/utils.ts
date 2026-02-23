@@ -1,12 +1,23 @@
 import { Event, ViewType } from '@/types';
-import { extractHourFromDate, getEventEndHour } from '@/utils';
 import {
   baseEvent,
   eventShadow,
   allDayRounded,
   regularEventRounded,
 } from '@/styles/classNames';
-import { CalendarEventProps } from './types';
+/**
+ * Gets the actual width of the time column from the DOM
+ */
+export const getTimeColumnWidth = (
+  calendarRef: { current: HTMLElement | null },
+  isMobile: boolean
+): number => {
+  if (!calendarRef.current) return isMobile ? 48 : 80;
+  const timeColumn = calendarRef.current.querySelector('.df-time-column');
+  return timeColumn 
+    ? timeColumn.getBoundingClientRect().width 
+    : (isMobile ? 48 : 80);
+};
 
 /**
  * Calculates the horizontal metrics (left and width) for a day column
@@ -29,7 +40,7 @@ export const getDayMetrics = (
     };
   }
 
-  const timeColumnWidth = isMobile ? 48 : 80;
+  const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
   if (viewType === ViewType.DAY) {
     const dayColumnWidth = calendarRect.width - timeColumnWidth;
     return {
@@ -99,7 +110,7 @@ export const getClickedDayIndex = (
     return Number.isFinite(index) ? Math.max(0, Math.min(6, index)) : null;
   }
 
-  const timeColumnWidth = isMobile ? 48 : 80;
+  const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
   const columnCount = viewType === ViewType.DAY ? 1 : 7;
   const dayColumnWidth = (calendarRect.width - timeColumnWidth) / columnCount;
   const relativeX = clientX - calendarRect.left - timeColumnWidth;

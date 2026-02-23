@@ -152,7 +152,7 @@ export const AllDayRow = ({
 
       {/* Top Frozen Content - overflow hidden, content positioned via transform */}
       <div
-        className="flex-1 overflow-x-hidden overflow-y-auto relative"
+        className="flex-1 overflow-hidden relative"
         style={{ scrollbarGutter: 'stable' }}
       >
         <div
@@ -259,6 +259,7 @@ export const AllDayRow = ({
                         allDayHeight={ALL_DAY_HEIGHT}
                         calendarRef={calendarRef}
                         viewType={ViewType.WEEK}
+                        columnsPerRow={weekDaysLabels.length}
                         isBeingDragged={
                           isDragging &&
                           (dragState as WeekDayDragState)?.eventId ===
@@ -277,7 +278,7 @@ export const AllDayRow = ({
                         detailPanelEventId={detailPanelEventId}
                         onEventSelect={(eventId: string | null) => {
                           const isViewable =
-                            app.getReadOnlyConfig().viewable !== false;
+                            app.getReadOnlyConfig().viewable;
                           const isReadOnly = app.state.readOnly;
                           if (
                             (isMobile || isTouch) &&

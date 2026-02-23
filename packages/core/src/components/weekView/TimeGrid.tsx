@@ -37,7 +37,7 @@ interface TimeGridProps {
   leftFrozenContentRef: any;
   calendarRef: any;
   handleScroll: (e: any) => void;
-  handleCreateStart?: (e: any | any, dayIndex: number, hour: number) => void;
+  handleCreateStart?: (e: any, dayIndex: number, hour: number) => void;
   handleTouchStart: (e: any, dayIndex: number, hour: number) => void;
   handleTouchEnd: () => void;
   handleTouchMove: () => void;
@@ -207,7 +207,7 @@ export const TimeGrid = ({
       {/* Scroller */}
       <div
         ref={scrollerRef}
-        className="flex-1 overflow-auto relative calendar-content snap-x snap-mandatory"
+        className={`flex-1 overflow-auto relative calendar-content ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
         onScroll={handleScroll}
       >
         <div className="flex" style={{ width: gridWidth, minWidth: '100%' }}>
@@ -232,8 +232,14 @@ export const TimeGrid = ({
                   const hours = now.getHours() + now.getMinutes() / 60;
                   if (hours < FIRST_HOUR || hours > LAST_HOUR) return null;
 
-                  const jsDay = now.getDay();
-                  const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+                  const today = new Date(now);
+                  today.setHours(0, 0, 0, 0);
+                  const start = new Date(currentWeekStart);
+                  start.setHours(0, 0, 0, 0);
+                  const diffTime = today.getTime() - start.getTime();
+                  const todayIndex = Math.round(
+                    diffTime / (1000 * 60 * 60 * 24)
+                  );
                   const topPx = (hours - FIRST_HOUR) * HOUR_HEIGHT;
 
                   return (
@@ -328,6 +334,7 @@ export const TimeGrid = ({
 
               {/* Event layer */}
               {weekDaysLabels.map((_, dayIndex) => {
+                const daysToShow = weekDaysLabels.length;
                 // Collect all event segments for this day
                 const dayEvents = getEventsForDay(dayIndex, currentWeekEvents);
                 const allEventSegments: Array<{
@@ -379,8 +386,8 @@ export const TimeGrid = ({
                     key={`events-day-${dayIndex}`}
                     className="absolute top-0 pointer-events-none"
                     style={{
-                      left: `calc(${(100 / 7) * dayIndex}%)`,
-                      width: `${100 / 7}%`,
+                      left: `calc(${(100 / daysToShow) * dayIndex}%)`,
+                      width: `${100 / daysToShow}%`,
                       height: '100%',
                     }}
                   >
@@ -399,6 +406,7 @@ export const TimeGrid = ({
                           layout={eventLayout}
                           viewType={ViewType.WEEK}
                           calendarRef={calendarRef}
+                          columnsPerRow={daysToShow}
                           isBeingDragged={
                             isDragging &&
                             (dragState as WeekDayDragState)?.eventId ===
@@ -417,7 +425,7 @@ export const TimeGrid = ({
                           detailPanelEventId={detailPanelEventId}
                           onEventSelect={(eventId: string | null) => {
                             const isViewable =
-                              app.getReadOnlyConfig().viewable !== false;
+                              app.getReadOnlyConfig().viewable;
                             const isReadOnly = app.state.readOnly;
                             if (
                               (isMobile || isTouch) &&
