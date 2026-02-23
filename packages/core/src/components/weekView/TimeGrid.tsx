@@ -424,22 +424,6 @@ export const TimeGrid = ({
                           selectedEventId={selectedEventId}
                           detailPanelEventId={detailPanelEventId}
                           onEventSelect={(eventId: string | null) => {
-                            const isViewable =
-                              app.getReadOnlyConfig().viewable;
-                            const isReadOnly = app.state.readOnly;
-                            if (
-                              (isMobile || isTouch) &&
-                              eventId &&
-                              isViewable &&
-                              !isReadOnly
-                            ) {
-                              const evt = events.find(e => e.id === eventId);
-                              if (evt) {
-                                setDraftEvent(evt);
-                                setIsDrawerOpen(true);
-                                return;
-                              }
-                            }
                             setSelectedEventId(eventId);
                             if (app.state.highlightedEventId) {
                               app.highlightEvent(null);
