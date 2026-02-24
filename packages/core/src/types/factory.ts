@@ -79,35 +79,19 @@ export interface YearViewProps extends BaseViewProps<YearViewConfig> {
  * Base configuration for creating views
  */
 export interface ViewFactoryConfig {
-  // Base configuration
-  enableDrag?: boolean;
-  enableResize?: boolean;
-  enableCreate?: boolean;
-
-  // Plugin configuration
-  dragConfig?: Record<string, any>;
-  eventsConfig?: Record<string, any>;
-  virtualScrollConfig?: Record<string, any>;
-
-  // View-specific configuration
-  viewConfig?: Record<string, any>;
+  // Shared layout properties
+  hourHeight?: number;
+  firstHour?: number;
+  lastHour?: number;
+  allDayHeight?: number;
 }
 
 /**
  * Day view factory configuration
  */
 export interface DayViewConfig extends ViewFactoryConfig {
-  showMiniCalendar?: boolean;
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
-  hourHeight?: number;
-  firstHour?: number;
-  lastHour?: number;
-  // Flattened layout properties
-  HOUR_HEIGHT?: number;
-  FIRST_HOUR?: number;
-  LAST_HOUR?: number;
-  ALL_DAY_HEIGHT?: number;
 }
 
 /**
@@ -118,14 +102,6 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   startOfWeek?: number;
   scrollToCurrentTime?: boolean;
-  hourHeight?: number;
-  firstHour?: number;
-  lastHour?: number;
-  // Flattened layout properties
-  HOUR_HEIGHT?: number;
-  FIRST_HOUR?: number;
-  LAST_HOUR?: number;
-  ALL_DAY_HEIGHT?: number;
   mode?: ViewMode;
 }
 
@@ -134,18 +110,13 @@ export interface WeekViewConfig extends ViewFactoryConfig {
  */
 export interface MonthViewConfig extends ViewFactoryConfig {
   showOtherMonth?: boolean;
-  weekHeight?: number;
   showWeekNumbers?: boolean;
-  enableVirtualScroll?: boolean;
-  initialWeeksToLoad?: number;
 }
 
 /**
  * Year view factory configuration
  */
 export interface YearViewConfig extends ViewFactoryConfig {
-  enableVirtualScroll?: boolean;
-  showDebugInfo?: boolean;
   mode?: 'year-canvas' | 'fixed-week';
   showTimedEventsInYearView?: boolean;
 }

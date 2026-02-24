@@ -50,13 +50,19 @@ const WeekView = ({
 
   // Configuration from the typed config object
   const {
-    HOUR_HEIGHT = defaultDragConfig.HOUR_HEIGHT,
-    FIRST_HOUR = defaultDragConfig.FIRST_HOUR,
-    LAST_HOUR = defaultDragConfig.LAST_HOUR,
-    ALL_DAY_HEIGHT = defaultDragConfig.ALL_DAY_HEIGHT,
+    hourHeight: configHourHeight = defaultDragConfig.HOUR_HEIGHT,
+    firstHour: configFirstHour = defaultDragConfig.FIRST_HOUR,
+    lastHour: configLastHour = defaultDragConfig.LAST_HOUR,
+    allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
     mode: configMode,
   } = config;
+
+  // Use standardized names internally (matching previous uppercase names for compatibility with minimal changes)
+  const HOUR_HEIGHT = configHourHeight;
+  const FIRST_HOUR = configFirstHour;
+  const LAST_HOUR = configLastHour;
+  const ALL_DAY_HEIGHT = configAllDayHeight;
 
   const showStartOfDayLabel = !showAllDay;
 

@@ -10,11 +10,6 @@ import WeekView from '../views/WeekView';
 
 // Default Week view configuration
 const defaultWeekViewConfig: WeekViewConfig = {
-  // Feature toggles
-  enableDrag: true,
-  enableResize: true,
-  enableCreate: true,
-
   // Week view specific configuration
   showWeekends: true,
   showAllDay: true,
@@ -25,17 +20,7 @@ const defaultWeekViewConfig: WeekViewConfig = {
   hourHeight: 72,
   firstHour: 0,
   lastHour: 24,
-
-  // Plugin configuration
-  dragConfig: {
-    supportedViews: [ViewType.WEEK],
-    enableAllDayCreate: true,
-  },
-
-  eventsConfig: {
-    enableAutoRecalculate: true,
-    enableValidation: true,
-  },
+  allDayHeight: 28,
 };
 
 // Week view factory function
