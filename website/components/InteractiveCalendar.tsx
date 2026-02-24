@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import {
   useCalendarApp,
@@ -11,6 +11,7 @@ import {
   createMonthView,
   ViewType,
   createYearView,
+  UseCalendarAppReturn,
 } from '@dayflow/react';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
@@ -65,16 +66,6 @@ const VIEW_OPTIONS = [
   { label: 'Year', value: ViewType.YEAR },
 ];
 
-/**
- * Sub-component to handle the calendar instance.
- * Using a key on this component forces useCalendarApp to create a fresh instance
- * when critical config (like locale) changes.
- */
-function CalendarViewer({ config }: { config: any }) {
-  const calendar = useCalendarApp(config);
-  return <DayFlowCalendar calendar={calendar} />;
-}
-
 export function InteractiveCalendar() {
   const { resolvedTheme } = useTheme();
 
@@ -84,6 +75,19 @@ export function InteractiveCalendar() {
   const [showHeader, setShowHeader] = useState(true);
   const [enableDrag, setEnableDrag] = useState(true);
   const [enableShortcuts, setEnableShortcuts] = useState(true);
+  const calendarRef = useRef<UseCalendarAppReturn | null>(null);
+
+  /**
+   * Sub-component to handle the calendar instance.
+   * Using a key on this component forces useCalendarApp to create a fresh instance
+   * when critical config (like locale) changes.
+   */
+  function CalendarViewer({ config }: { config: any }) {
+    const calendar = useCalendarApp(config);
+    calendarRef.current = calendar;
+
+    return <DayFlowCalendar calendar={calendar} />;
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
@@ -154,6 +158,10 @@ export function InteractiveCalendar() {
       defaultView: currentView,
       callbacks: {
         onViewChange: (view: ViewType) => setActiveView(view),
+        onMoreEventsClick: (date: Date) => {
+          calendarRef.current?.selectDate(date);
+          calendarRef.current?.changeView(ViewType.DAY);
+        },
       },
       events,
       locale: locale,
