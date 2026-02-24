@@ -13,10 +13,22 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
       '@dayflow/core': resolve(__dirname, 'src/index.ts'),
       '@dayflow/react': resolve(__dirname, '../react/src/index.ts'),
-      '@dayflow/plugin-sidebar': resolve(__dirname, '../plugins/sidebar/src/index.ts'),
-      '@dayflow/plugin-keyboard-shortcuts': resolve(__dirname, '../plugins/keyboard-shortcuts/src/index.ts'),
-      '@dayflow/plugin-drag': resolve(__dirname, '../plugins/drag/src/index.ts'),
-      '@dayflow/plugin-localization': resolve(__dirname, '../plugins/localization/src/index.ts'),
+      '@dayflow/plugin-sidebar': resolve(
+        __dirname,
+        '../plugins/sidebar/src/index.ts'
+      ),
+      '@dayflow/plugin-keyboard-shortcuts': resolve(
+        __dirname,
+        '../plugins/keyboard-shortcuts/src/index.ts'
+      ),
+      '@dayflow/plugin-drag': resolve(
+        __dirname,
+        '../plugins/drag/src/index.ts'
+      ),
+      '@dayflow/plugin-localization': resolve(
+        __dirname,
+        '../plugins/localization/src/index.ts'
+      ),
       'preact/hooks': resolve(workspaceRoot, 'node_modules/preact/hooks'),
       'preact/compat': resolve(workspaceRoot, 'node_modules/preact/compat'),
       'preact/jsx-runtime': resolve(
@@ -39,7 +51,7 @@ export default defineConfig({
   },
   server: {
     port: 5529,
-    open: '/packages/core/index.html',
+    open: true,
     fs: {
       allow: [workspaceRoot],
     },

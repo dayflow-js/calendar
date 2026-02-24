@@ -23,24 +23,18 @@
 ![月次](./assets/images/MonthView.png)
 
 #### 年次 (固定週)
-![年次](./assets/images/YearView.png)
+![年次](./assets/images/Year-Fixed-Week.png)
 
 #### 年次 (キャンバス)
 ![年次 (キャンバス)](./assets/images/Year-Canvas.png)
 
 ### モバイルビューのサポート
 
-#### モバイル日次
-![モバイル日次](./assets/images/Mobile-Day.png)
+#### モバイル日次 & 年次
+![モバイル日次と年次](./assets/images/Mobile-Day-Year.png)
 
-#### モバイル週次
-![モバイル週次](./assets/images/Mobile-Week.png)
-
-#### モバイル月次
-![モバイル月次](./assets/images/Mobile-Month.png)
-
-#### モバイル年次
-![モバイル年次](./assets/images/Mobile-Year.png)
+#### モバイル週次 & 月次
+![モバイル週次と月次](./assets/images/Mobile-Week-Month.png)
 
 ### デフォルトパネル（複数のイベント詳細パネルオプションが利用可能）
 

@@ -23,24 +23,18 @@
 ![月视图](./assets/images/MonthView.png)
 
 #### 年视图 (固定周)
-![年视图](./assets/images/YearView.png)
+![年视图](./assets/images/Year-Fixed-Week.png)
 
 #### 年视图 (画布)
 ![年视图 (画布)](./assets/images/Year-Canvas.png)
 
 ### 移动端视图支持
 
-#### 移动端日视图
-![移动端日视图](./assets/images/Mobile-Day.png)
+#### 移动端日视图 & 年视图
+![移动端日视图与年视图](./assets/images/Mobile-Day-Year.png)
 
-#### 移动端周视图
-![移动端周视图](./assets/images/Mobile-Week.png)
-
-#### 移动端月视图
-![移动端月视图](./assets/images/Mobile-Month.png)
-
-#### 移动端年视图
-![移动端年视图](./assets/images/Mobile-Year.png)
+#### 移动端周视图 & 月视图
+![移动端周视图与月视图](./assets/images/Mobile-Week-Month.png)
 
 ### 默认面板（提供多种事件详情面板选项）
 

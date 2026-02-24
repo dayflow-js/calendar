@@ -24,24 +24,18 @@ views, and plugin architecture.
 ![Month View](./assets/images/MonthView.png)
 
 #### Year View(Fixed-Week)
-![Year View](./assets/images/YearView.png)
+![Year View](./assets/images/Year-Fixed-Week.png)
 
 #### Year View(Year-Canvas)
 ![Year Canvas View](./assets/images/Year-Canvas.png)
 
 ### Mobile View Support
 
-#### Mobile Day View
-![Mobile Day View](./assets/images/Mobile-Day.png)
+#### Mobile Day & Year View
+![Mobile Day and Year View](./assets/images/Mobile-Day-Year.png)
 
-#### Mobile Week View
-![Mobile Week View](./assets/images/Mobile-Week.png)
-
-#### Mobile Month View
-![Mobile Month View](./assets/images/Mobile-Month.png)
-
-#### Mobile Year View
-![Mobile Year View](./assets/images/Mobile-Year.png)
+#### Mobile Week & Month View
+![Mobile Week and Month View](./assets/images/Mobile-Week-Month.png)
 
 ### Multiple Event Detail Panel options
 
