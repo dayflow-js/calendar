@@ -77,9 +77,9 @@ export interface DragHookOptions extends Partial<DragConfig> {
  * Drag Hook return value
  */
 export interface DragHookReturn {
-  handleMoveStart?: (e: any | any, event: Event) => void;
-  handleCreateStart?: (e: any | any, ...args: (Date | number)[]) => void;
-  handleResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  handleMoveStart?: (e: any, event: Event) => void;
+  handleCreateStart?: (e: any, ...args: (Date | number)[]) => void;
+  handleResizeStart?: (e: any, event: Event, direction: string) => void;
   handleCreateAllDayEvent?: (e: any, dayIndex: number) => void;
   dragState: MonthDragState | WeekDayDragState;
   isDragging: boolean;

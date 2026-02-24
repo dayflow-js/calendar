@@ -264,7 +264,7 @@ export const DayContent = ({
                     key={event.id}
                     event={event}
                     isAllDay={true}
-                    isDayView={true}
+                    viewType={ViewType.DAY}
                     segmentIndex={event.row}
                     allDayHeight={ALL_DAY_HEIGHT}
                     calendarRef={calendarRef}
@@ -488,7 +488,7 @@ export const DayContent = ({
                           key={event.id}
                           event={event}
                           layout={eventLayout}
-                          isDayView={true}
+                          viewType={ViewType.DAY}
                           calendarRef={calendarRef}
                           isBeingDragged={
                             isDragging &&

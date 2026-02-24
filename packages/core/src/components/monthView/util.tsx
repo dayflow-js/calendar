@@ -48,13 +48,14 @@ export const getEventIcon = (event: Event) => {
 // Analyze multi-day events and generate segments for the current week (supports all-day events and multi-day regular events)
 export const analyzeMultiDayEventsForWeek = (
   events: Event[],
-  weekStart: Date
+  weekStart: Date,
+  daysInWeek: number = 7
 ): MultiDayEventSegment[] => {
   const segments: MultiDayEventSegment[] = [];
 
   // Get the date range of the current week
   const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setDate(weekStart.getDate() + (daysInWeek - 1));
   weekEnd.setHours(23, 59, 59, 999);
 
   events.forEach(event => {
@@ -103,7 +104,7 @@ export const analyzeMultiDayEventsForWeek = (
         (eventStartDate.getTime() - weekStart.getTime()) / (24 * 60 * 60 * 1000)
       );
 
-      if (dayIndex >= 0 && dayIndex <= 6) {
+      if (dayIndex >= 0 && dayIndex <= daysInWeek - 1) {
         segments.push({
           id: `${event.id}-week-${weekStart.getTime()}`,
           originalEventId: event.id,
@@ -167,7 +168,7 @@ export const analyzeMultiDayEventsForWeek = (
       )
     );
     const endDayIndex = Math.min(
-      6,
+      daysInWeek - 1,
       Math.floor(
         (weekEventEnd.getTime() - weekStart.getTime()) / (24 * 60 * 60 * 1000)
       )
@@ -176,7 +177,7 @@ export const analyzeMultiDayEventsForWeek = (
     // Determine segment type
     const isFirstSegment = eventStart >= weekStart;
     const isLastSegment = eventEnd <= weekEnd;
-    const isWeekBoundary = startDayIndex === 0 || endDayIndex === 6;
+    const isWeekBoundary = startDayIndex === 0 || endDayIndex === daysInWeek - 1;
 
     let segmentType: MultiDayEventSegment['segmentType'];
 
@@ -184,7 +185,7 @@ export const analyzeMultiDayEventsForWeek = (
       segmentType = 'single';
     } else if (isFirstSegment) {
       segmentType =
-        isWeekBoundary && endDayIndex === 6 ? 'start-week-end' : 'start';
+        isWeekBoundary && endDayIndex === daysInWeek - 1 ? 'start-week-end' : 'start';
     } else if (isLastSegment) {
       segmentType =
         isWeekBoundary && startDayIndex === 0 ? 'end-week-start' : 'end';
@@ -214,7 +215,8 @@ export const analyzeMultiDayEventsForWeek = (
 // Check if a regular event spans multiple days and return time segment information for each day
 export const analyzeMultiDayRegularEvent = (
   event: Event,
-  weekStart: Date
+  weekStart: Date,
+  daysInWeek: number = 7
 ): {
   dayIndex: number;
   startHour: number;
@@ -276,7 +278,7 @@ export const analyzeMultiDayRegularEvent = (
     );
 
     // Skip dates not in the current week
-    if (dayIndex < 0 || dayIndex > 6) continue;
+    if (dayIndex < 0 || dayIndex > daysInWeek - 1) continue;
 
     const isFirst = i === 0;
     const isLast = i === lastDayOffset;

@@ -12,17 +12,22 @@ import {
 // Calculate event layouts for the entire week
 export const calculateEventLayouts = (
   currentWeekEvents: Event[],
-  currentWeekStart: Date
+  currentWeekStart: Date,
+  daysToShow: number = 7
 ): Map<number, Map<string, EventLayout>> => {
   const allLayouts = new Map<number, Map<string, EventLayout>>();
 
-  for (let day = 0; day < 7; day++) {
+  for (let day = 0; day < daysToShow; day++) {
     const dayEventsForLayout: Event[] = [];
 
     currentWeekEvents.forEach(event => {
       if (event.allDay) return;
 
-      const segments = analyzeMultiDayRegularEvent(event, currentWeekStart);
+      const segments = analyzeMultiDayRegularEvent(
+        event,
+        currentWeekStart,
+        daysToShow
+      );
 
       if (segments.length > 0) {
         const segment = segments.find(s => s.dayIndex === day);
@@ -77,10 +82,11 @@ export const getWeekStart = (date: Date): Date => {
 // Filter events for the current week
 export const filterWeekEvents = (
   events: Event[],
-  currentWeekStart: Date
+  currentWeekStart: Date,
+  daysToShow: number = 7
 ): Event[] => {
   const weekEnd = new Date(currentWeekStart);
-  weekEnd.setDate(currentWeekStart.getDate() + 6);
+  weekEnd.setDate(currentWeekStart.getDate() + (daysToShow - 1));
   weekEnd.setHours(23, 59, 59, 999);
 
   const filtered = events.filter(event => {
@@ -97,7 +103,7 @@ export const filterWeekEvents = (
     const dayDiff = Math.floor(
       (eventDate.getTime() - currentWeekStart.getTime()) / (24 * 60 * 60 * 1000)
     );
-    const correctDay = Math.max(0, Math.min(6, dayDiff));
+    const correctDay = Math.max(0, Math.min(daysToShow - 1, dayDiff));
 
     return {
       ...event,
@@ -109,20 +115,26 @@ export const filterWeekEvents = (
 // Organize all-day segments
 export const organizeAllDaySegments = (
   currentWeekEvents: Event[],
-  currentWeekStart: Date
+  currentWeekStart: Date,
+  daysToShow: number = 7
 ) => {
   const multiDaySegments = analyzeMultiDayEventsForWeek(
     currentWeekEvents,
-    currentWeekStart
+    currentWeekStart,
+    daysToShow
   );
   const segments = multiDaySegments.filter((seg: any) => seg.event.allDay);
 
   segments.sort((a: any, b: any) => {
-    if (a.startDayIndex !== b.startDayIndex) {
-      return a.startDayIndex - b.startDayIndex;
+    // Use absolute start time for stable sorting across window shifts
+    const aStart = temporalToDate(a.event.start).getTime();
+    const bStart = temporalToDate(b.event.start).getTime();
+    
+    if (aStart !== bStart) {
+      return aStart - bStart;
     }
-    const aDays = a.endDayIndex - a.startDayIndex;
-    const bDays = b.endDayIndex - b.startDayIndex;
+    const aDays = a.totalDays;
+    const bDays = b.totalDays;
     return bDays - aDays;
   });
 

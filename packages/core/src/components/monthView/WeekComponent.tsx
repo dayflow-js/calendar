@@ -675,7 +675,7 @@ const WeekComponent = memo(
               key={`${event.id}-${event.day}-${extractHourFromDate(event.start)}-${timedEventIndex}`}
               event={event}
               isAllDay={!!event.allDay}
-              isMonthView={true}
+              viewType={ViewType.MONTH}
               isBeingDragged={
                 isDragging &&
                 dragState.eventId === event.id &&
@@ -880,7 +880,7 @@ const WeekComponent = memo(
                           isAllDay={!!segment.event.allDay}
                           segment={segment}
                           segmentIndex={layerIndex}
-                          isMonthView={true}
+                          viewType={ViewType.MONTH}
                           isMultiDay={true}
                           calendarRef={calendarRef}
                           hourHeight={72}

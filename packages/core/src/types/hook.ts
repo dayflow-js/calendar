@@ -123,9 +123,9 @@ export interface UseDragManagerReturn {
 export interface UseDragHandlersReturn {
   handleDragMove: (e: MouseEvent | TouchEvent) => void;
   handleDragEnd: (e: MouseEvent | TouchEvent) => void;
-  handleCreateStart: (e: any | any, ...args: (Date | number)[]) => void;
-  handleMoveStart: (e: any | any, event: Event) => void;
-  handleResizeStart: (e: any | any, event: Event, direction: string) => void;
+  handleCreateStart: (e: any, ...args: (Date | number)[]) => void;
+  handleMoveStart: (e: any, event: Event) => void;
+  handleResizeStart: (e: any, event: Event, direction: string) => void;
   handleUniversalDragMove: (e: MouseEvent | TouchEvent) => void;
   handleUniversalDragEnd: (e?: MouseEvent | TouchEvent) => void;
 }

@@ -25,9 +25,7 @@ export const ViewAdapter = ({
 }: ViewAdapterProps) => {
   // Get plugin services
   const eventsService = app.getPlugin<EventsService>('events');
-  const dragService = config.enableDrag
-    ? app.getPlugin<DragService>('drag')
-    : undefined;
+  const dragService = app.getPlugin<DragService>('drag');
 
   // Basic state
   const currentDate = app.getCurrentDate();
@@ -88,23 +86,8 @@ export const ViewAdapter = ({
 
   // Merge configuration
   const mergedConfig = useMemo(() => {
-    const { dragConfig, eventsConfig, virtualScrollConfig, ...rest } = config;
-
-    const baseConfig = {
-      ...rest,
-    };
-
-    // Add plugin configuration
-    if (dragService) {
-      Object.assign(baseConfig, dragConfig || {});
-    }
-
-    if (eventsService) {
-      Object.assign(baseConfig, eventsConfig || {});
-    }
-
-    return baseConfig;
-  }, [config, dragService, eventsService]);
+    return { ...config };
+  }, [config]);
 
   // Prepare props to pass to original component
   const viewProps: BaseViewProps = useMemo(

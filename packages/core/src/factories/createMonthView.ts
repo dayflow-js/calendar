@@ -1,48 +1,14 @@
 // Factory function for creating Month view
 import { h } from 'preact';
-import {
-  MonthViewConfig,
-  ViewAdapterProps,
-  ViewFactory,
-  ViewType,
-} from '../types';
+import { MonthViewConfig, ViewFactory, ViewType } from '../types';
 import { ViewAdapter } from './ViewAdapter';
 import MonthView from '../views/MonthView';
 
 // Default Month view configuration
 const defaultMonthViewConfig: MonthViewConfig = {
-  // Feature toggles
-  enableDrag: true,
-  enableResize: false, // Month view usually doesn't need resizing
-  enableCreate: true,
-
   // Month view specific configuration
   showOtherMonth: true,
-  weekHeight: 120,
   showWeekNumbers: false,
-  enableVirtualScroll: true,
-
-  // Virtual scroll configuration
-  initialWeeksToLoad: 156, // 3 years of week data (52*3)
-
-  // Plugin configuration
-  dragConfig: {
-    supportedViews: [ViewType.MONTH],
-    enableAllDayCreate: false, // Month view usually only supports all-day events
-  },
-
-  eventsConfig: {
-    enableAutoRecalculate: true,
-    enableValidation: true,
-  },
-
-  virtualScrollConfig: {
-    weekHeight: 120,
-    initialWeeksToLoad: 156,
-    enableVirtualScroll: true,
-    enableKeyboardNavigation: true,
-    supportedViews: [ViewType.MONTH],
-  },
 };
 
 // Month view factory function

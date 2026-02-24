@@ -1,17 +1,16 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 import { memo } from 'preact/compat';
 import {
   Event,
-  ViewType,
   MonthEventDragState,
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
+  ViewType,
 } from '@/types';
 import { YearDayCell } from './YearDayCell';
-import { YearMultiDayEvent } from './YearMultiDayEvent';
+import { CalendarEvent } from '../calendarEvent';
 import { analyzeMultiDayEventsForRow } from './utils';
-import { GridContextMenu } from '@/components/contextMenu';
 
 interface YearRowComponentProps {
   rowDays: Date[];
@@ -22,9 +21,9 @@ interface YearRowComponentProps {
   locale: string;
   isDragging: boolean;
   dragState: MonthEventDragState;
-  onMoveStart?: (e: any | any, event: Event) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
-  onCreateStart?: (e: any | any, targetDate: Date) => void;
+  onMoveStart?: (e: any, event: Event) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onCreateStart?: (e: any, targetDate: Date) => void;
   selectedEventId: string | null;
   onEventSelect: (eventId: string | null) => void;
   onMoreEventsClick?: (date: Date) => void;
@@ -34,6 +33,7 @@ interface YearRowComponentProps {
   onDetailPanelToggle: (eventId: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  onContextMenu: (menu: { x: number; y: number; date: Date } | null) => void;
 }
 
 export const YearRowComponent = memo(
@@ -58,22 +58,17 @@ export const YearRowComponent = memo(
     onDetailPanelToggle,
     customDetailPanelContent,
     customEventDetailDialog,
+    onContextMenu,
   }: YearRowComponentProps) => {
     const MAX_VISIBLE_ROWS = 3;
     const HEADER_HEIGHT = 26;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [contextMenu, setContextMenu] = useState<{
-      x: number;
-      y: number;
-      date: Date;
-    } | null>(null);
-
     const handleContextMenu = (e: any, date: Date) => {
       e.preventDefault();
       e.stopPropagation();
-      setContextMenu({ x: e.clientX, y: e.clientY, date });
+      onContextMenu({ x: e.clientX, y: e.clientY, date });
     };
 
     const segments = useMemo(() => {
@@ -173,13 +168,15 @@ export const YearRowComponent = memo(
           <div className="relative w-full h-full">
             {visibleSegments.map(segment => (
               <div key={segment.id} className="pointer-events-auto">
-                <YearMultiDayEvent
-                  segment={segment}
+                <CalendarEvent
+                  event={segment.event}
+                  viewType={ViewType.YEAR}
+                  yearSegment={segment}
                   columnsPerRow={columnsPerRow}
-                  isDragging={
+                  isBeingDragged={
                     isDragging && dragState.eventId === segment.event.id
                   }
-                  isSelected={selectedEventId === segment.event.id}
+                  selectedEventId={selectedEventId}
                   onMoveStart={onMoveStart}
                   onResizeStart={onResizeStart}
                   onEventSelect={onEventSelect}
@@ -191,32 +188,18 @@ export const YearRowComponent = memo(
                   detailPanelEventId={detailPanelEventId}
                   customDetailPanelContent={customDetailPanelContent}
                   customEventDetailDialog={customEventDetailDialog}
+                  // Required props for CalendarEvent
+                  firstHour={0}
+                  hourHeight={0}
+                  onEventUpdate={updated =>
+                    app.updateEvent(updated.id, updated)
+                  }
+                  onEventDelete={id => app.deleteEvent(id)}
                 />
               </div>
             ))}
           </div>
         </div>
-        {contextMenu && (
-          <GridContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            date={contextMenu.date}
-            viewType={ViewType.YEAR}
-            onClose={() => setContextMenu(null)}
-            app={app}
-            onCreateEvent={() => {
-              if (onCreateStart) {
-                const syntheticEvent = {
-                  preventDefault: () => {},
-                  stopPropagation: () => {},
-                  clientX: contextMenu.x,
-                  clientY: contextMenu.y,
-                } as unknown as any;
-                onCreateStart(syntheticEvent, contextMenu.date);
-              }
-            }}
-          />
-        )}
       </div>
     );
   }

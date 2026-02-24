@@ -2,22 +2,11 @@
 import { h } from 'preact';
 import { ViewAdapter } from './ViewAdapter';
 import DayView from '../views/DayView';
-import {
-  DayViewConfig,
-  ViewAdapterProps,
-  ViewFactory,
-  ViewType,
-} from '../types';
+import { DayViewConfig, ViewFactory, ViewType } from '../types';
 
 // Default Day view configuration
 const defaultDayViewConfig: DayViewConfig = {
-  // Feature toggles
-  enableDrag: true,
-  enableResize: true,
-  enableCreate: true,
-
   // Day view specific configuration
-  showMiniCalendar: true,
   showAllDay: true,
   scrollToCurrentTime: true,
 
@@ -25,17 +14,7 @@ const defaultDayViewConfig: DayViewConfig = {
   hourHeight: 72,
   firstHour: 0,
   lastHour: 24,
-
-  // Plugin configuration
-  dragConfig: {
-    supportedViews: [ViewType.DAY],
-    enableAllDayCreate: true,
-  },
-
-  eventsConfig: {
-    enableAutoRecalculate: true,
-    enableValidation: true,
-  },
+  allDayHeight: 28,
 };
 
 // Day view factory function
