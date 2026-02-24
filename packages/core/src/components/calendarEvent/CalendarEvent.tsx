@@ -65,6 +65,9 @@ const CalendarEvent = ({
   multiDaySegmentInfo,
   app,
   isMobile = false,
+  mode = 'standard',
+  isCompact = false,
+  mobilePageStart,
   enableTouch,
   hideTime,
 }: CalendarEventProps) => {
@@ -353,13 +356,13 @@ const CalendarEvent = ({
       <div
         ref={eventRef}
         data-event-id={event.id}
-        className={getEventClasses(
+        className={`${getEventClasses(
           viewType,
           isAllDay,
           isMultiDay,
           segment,
           yearSegment
-        )}
+        )} ${isAllDay && newlyCreatedEventId === event.id ? 'df-all-day-event-animate' : ''}`}
         style={{
           ...calculateEventStyle(),
           backgroundColor: isEventSelected
@@ -420,6 +423,9 @@ const CalendarEvent = ({
           isTouchEnabled={isTouchEnabled}
           hideTime={hideTime}
           isMobile={isMobile}
+          mode={mode}
+          isCompact={isCompact}
+          mobilePageStart={mobilePageStart}
           app={app}
           onResizeStart={onResizeStart}
           multiDaySegmentInfo={multiDaySegmentInfo}

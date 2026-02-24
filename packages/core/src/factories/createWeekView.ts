@@ -20,7 +20,6 @@ const defaultWeekViewConfig: WeekViewConfig = {
   showAllDay: true,
   startOfWeek: 1, // Monday
   scrollToCurrentTime: true,
-  mobileColumns: 2,
 
   // Layout configuration
   hourHeight: 72,

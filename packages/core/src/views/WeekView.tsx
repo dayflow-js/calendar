@@ -35,12 +35,12 @@ const WeekView = ({
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: WeekViewProps) => {
   const { t, getWeekDaysLabels, locale } = useLocale();
-  
+
   // Stabilize currentDate reference to avoid unnecessary re-renders
   // app.getCurrentDate() returns a new Date object every time
   const rawCurrentDate = app.getCurrentDate();
   const currentDate = useMemo(() => rawCurrentDate, [rawCurrentDate.getTime()]);
-  
+
   const events = app.getEvents();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
@@ -55,7 +55,7 @@ const WeekView = ({
     LAST_HOUR = defaultDragConfig.LAST_HOUR,
     ALL_DAY_HEIGHT = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
-    mobileColumns = 2,
+    mode: configMode,
   } = config;
 
   const showStartOfDayLabel = !showAllDay;
@@ -67,57 +67,45 @@ const WeekView = ({
   const MobileEventDrawerComponent =
     app.getCustomMobileEventRenderer() || MobileEventDrawer;
 
-  // Mobile 2-Column Logic
-  const isMobileTwoColumn = isMobile && mobileColumns === 2;
+  const mode = configMode || (isMobile ? 'compact' : 'standard');
+  const isCompact = mode === 'compact';
 
   const standardWeekStart = useMemo(
     () => getWeekStart(currentDate),
     [currentDate]
   );
 
-  // Fixed Paging Logic for Mobile 2-Column
-  const getMobilePageStart = (date: Date) => {
-    const startOfWeek = getWeekStart(date);
-    const d = new Date(date);
+  // Mobile Page Start (Synced with currentDate)
+  // Sliding window: always start exactly at currentDate
+  const [mobilePageStart, setMobilePageStart] = useState<Date>(() => {
+    const d = new Date(currentDate);
     d.setHours(0, 0, 0, 0);
-    const diff = Math.floor(
-      (d.getTime() - startOfWeek.getTime()) / (24 * 60 * 60 * 1000)
-    );
-    const pageIndex = Math.min(3, Math.floor(diff / 2)); // 0: M-T, 1: W-T, 2: F-S, 3: Sun
-    const pageStart = new Date(startOfWeek);
-    pageStart.setDate(startOfWeek.getDate() + pageIndex * 2);
-    return pageStart;
-  };
-
-  // Mobile Page Start (Synced with currentDate group)
-  const [mobilePageStart, setMobilePageStart] = useState<Date>(() =>
-    getMobilePageStart(currentDate)
-  );
+    return d;
+  });
 
   // Sync mobilePageStart with currentDate
   useEffect(() => {
-    if (!isMobileTwoColumn) return;
-    const newPageStart = getMobilePageStart(currentDate);
-    setMobilePageStart(prev =>
-      prev.getTime() === newPageStart.getTime() ? prev : newPageStart
-    );
-  }, [currentDate, isMobileTwoColumn]);
+    if (!isCompact) return;
+    setMobilePageStart(prev => {
+      const target = new Date(currentDate);
+      target.setHours(0, 0, 0, 0);
+      return prev.getTime() === target.getTime() ? prev : target;
+    });
+  }, [currentDate, isCompact]);
 
-  const currentWeekStart = isMobileTwoColumn
-    ? mobilePageStart
-    : standardWeekStart;
+  const currentWeekStart = isCompact ? mobilePageStart : standardWeekStart;
 
   // For mobile 2-column mode, we render 3 pages (6 days) to allow for smooth swipe transitions
   // Page 1: Previous 2 days
   // Page 2: Current 2 days (mobilePageStart)
   // Page 3: Next 2 days
-  const displayDays = isMobileTwoColumn ? 6 : 7;
+  const displayDays = isCompact ? 6 : 7;
   const displayStart = useMemo(() => {
-    if (!isMobileTwoColumn) return currentWeekStart;
+    if (!isCompact) return currentWeekStart;
     const d = new Date(currentWeekStart);
     d.setDate(d.getDate() - 2);
     return d;
-  }, [currentWeekStart, isMobileTwoColumn]);
+  }, [currentWeekStart, isCompact]);
 
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
@@ -170,15 +158,13 @@ const WeekView = ({
   const handleScroll = (e: any) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
     if (topFrozenContentRef.current) {
-      const baseTranslateX = isMobileTwoColumn ? '-33.333%' : '0px';
-      const horizontalOffset = isMobileTwoColumn
+      const baseTranslateX = isCompact ? '-33.333%' : '0px';
+      const horizontalOffset = isCompact
         ? `${swipeOffset}px`
         : `-${scrollLeft}px`;
       topFrozenContentRef.current.style.transform = `translateX(calc(${baseTranslateX} + ${horizontalOffset}))`;
       topFrozenContentRef.current.style.transition =
-        isMobileTwoColumn && isTransitioning
-          ? 'transform 0.3s ease-out'
-          : 'none';
+        isCompact && isTransitioning ? 'transform 0.3s ease-out' : 'none';
     }
     if (leftFrozenContentRef.current) {
       leftFrozenContentRef.current.style.transform = `translateY(${-scrollTop}px)`;
@@ -192,7 +178,7 @@ const WeekView = ({
   const isHorizontalSwipe = useRef(false);
 
   useEffect(() => {
-    if (!isMobileTwoColumn) return;
+    if (!isCompact) return;
 
     const scroller = scrollerRef.current;
     if (!scroller) return;
@@ -221,7 +207,10 @@ const WeekView = ({
 
       if (isHorizontalSwipe.current) {
         if (e.cancelable) e.preventDefault();
-        setSwipeOffset(deltaX);
+        // Lock sliding to ±1 day
+        const containerWidth = scroller.clientWidth;
+        const maxOffset = containerWidth / 2;
+        setSwipeOffset(Math.max(-maxOffset, Math.min(maxOffset, deltaX)));
       }
     };
 
@@ -233,25 +222,26 @@ const WeekView = ({
 
       const threshold = 100; // Snap threshold
       const containerWidth = scroller.clientWidth;
+      const dayWidth = containerWidth / 2;
 
       if (swipeOffset > threshold) {
-        // Snap to Previous Page
+        // Snap to Previous Day
         setIsTransitioning(true);
-        setSwipeOffset(containerWidth);
+        setSwipeOffset(dayWidth);
         setTimeout(() => {
           const nextDate = new Date(mobilePageStart);
-          nextDate.setDate(nextDate.getDate() - 2);
+          nextDate.setDate(nextDate.getDate() - 1);
           app.setCurrentDate(nextDate);
           setSwipeOffset(0);
           setIsTransitioning(false);
         }, 300);
       } else if (swipeOffset < -threshold) {
-        // Snap to Next Page
+        // Snap to Next Day
         setIsTransitioning(true);
-        setSwipeOffset(-containerWidth);
+        setSwipeOffset(-dayWidth);
         setTimeout(() => {
           const nextDate = new Date(mobilePageStart);
-          nextDate.setDate(nextDate.getDate() + 2);
+          nextDate.setDate(nextDate.getDate() + 1);
           app.setCurrentDate(nextDate);
           setSwipeOffset(0);
           setIsTransitioning(false);
@@ -281,7 +271,7 @@ const WeekView = ({
       scroller.removeEventListener('touchmove', handleScrollerTouchMove);
       scroller.removeEventListener('touchend', handleScrollerTouchEnd);
     };
-  }, [isMobileTwoColumn, app, currentWeekStart, isTransitioning, swipeOffset]);
+  }, [isCompact, app, currentWeekStart, isTransitioning, swipeOffset]);
 
   // Events for the current week (or custom 2-day range)
   const currentWeekEvents = useMemo(() => {
@@ -336,7 +326,7 @@ const WeekView = ({
 
   // Calculate the required height for the all-day event area
   const allDayAreaHeight = useMemo(() => {
-    const relevantSegments = isMobileTwoColumn
+    const relevantSegments = isCompact
       ? organizedAllDaySegments.filter(
           s => s.endDayIndex >= 2 && s.startDayIndex <= 3
         )
@@ -345,7 +335,7 @@ const WeekView = ({
     if (relevantSegments.length === 0) return ALL_DAY_HEIGHT;
     const maxRow = Math.max(...relevantSegments.map(s => s.row));
     return ALL_DAY_HEIGHT + maxRow * ALL_DAY_HEIGHT;
-  }, [organizedAllDaySegments, ALL_DAY_HEIGHT, isMobileTwoColumn]);
+  }, [organizedAllDaySegments, ALL_DAY_HEIGHT, isCompact]);
 
   // Calculate event layouts
   const eventLayouts = useMemo(() => {
@@ -484,7 +474,7 @@ const WeekView = ({
   });
 
   const weekDaysLabels = useMemo(() => {
-    if (isMobileTwoColumn) {
+    if (isCompact) {
       return Array.from({ length: displayDays }, (_, i) => {
         const d = new Date(displayStart);
         d.setDate(d.getDate() + i);
@@ -492,7 +482,7 @@ const WeekView = ({
       });
     }
     return getWeekDaysLabels(locale, 'short');
-  }, [locale, getWeekDaysLabels, isMobileTwoColumn, displayStart, displayDays]);
+  }, [locale, getWeekDaysLabels, isCompact, displayStart, displayDays]);
 
   const mobileWeekDaysLabels = useMemo(() => {
     if (!isMobile) return [];
@@ -563,7 +553,7 @@ const WeekView = ({
 
   // Sync horizontal transform for swipe
   useEffect(() => {
-    if (!isMobileTwoColumn) {
+    if (!isCompact) {
       if (topFrozenContentRef.current) {
         topFrozenContentRef.current.style.transform = '';
         topFrozenContentRef.current.style.transition = '';
@@ -590,7 +580,7 @@ const WeekView = ({
       target.style.transition = transition;
       target.style.transform = transform;
     }
-  }, [swipeOffset, isTransitioning, isMobileTwoColumn]);
+  }, [swipeOffset, isTransitioning, isCompact]);
 
   // Event handling functions
   const handleEventUpdate = (updatedEvent: Event) => {
@@ -604,9 +594,14 @@ const WeekView = ({
   // Check if it is the current week
   const isCurrentWeek = useMemo(() => {
     const today = new Date();
-    const todayWeekStart = getWeekStart(today);
-    return currentWeekStart.getTime() === todayWeekStart.getTime();
-  }, [currentWeekStart]);
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(displayStart);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(start.getDate() + displayDays);
+
+    return today >= start && today < end;
+  }, [displayStart, displayDays]);
 
   // Timer
   useEffect(() => {
@@ -615,14 +610,7 @@ const WeekView = ({
     return () => clearInterval(timer);
   }, []);
 
-  const gridWidth =
-    isMobile && !isMobileTwoColumn
-      ? mobileColumns === 4
-        ? '175%'
-        : '100%'
-      : isMobileTwoColumn
-        ? '300%'
-        : '100%';
+  const gridWidth = isCompact ? '300%' : '100%';
 
   return (
     <div className={`${calendarContainer} df-week-view`}>
@@ -642,7 +630,8 @@ const WeekView = ({
         mobileWeekDaysLabels={mobileWeekDaysLabels}
         weekDates={weekDates}
         fullWeekDates={fullWeekDates}
-        isMobileTwoColumn={isMobileTwoColumn}
+        mode={mode}
+        isCompact={isCompact}
         mobilePageStart={mobilePageStart}
         currentWeekStart={displayStart}
         gridWidth={gridWidth}
@@ -676,9 +665,6 @@ const WeekView = ({
         handleDrop={handleDrop}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
-        events={events}
-        setDraftEvent={setDraftEvent}
-        setIsDrawerOpen={setIsDrawerOpen}
       />
 
       <TimeGrid
@@ -690,6 +676,8 @@ const WeekView = ({
         eventLayouts={eventLayouts}
         gridWidth={gridWidth}
         isMobile={isMobile}
+        mode={mode}
+        isCompact={isCompact}
         isTouch={isTouch}
         scrollerRef={scrollerRef}
         timeGridRef={timeGridRef}
@@ -717,9 +705,6 @@ const WeekView = ({
         setDetailPanelEventId={setDetailPanelEventId}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
-        events={events}
-        setDraftEvent={setDraftEvent}
-        setIsDrawerOpen={setIsDrawerOpen}
         isCurrentWeek={isCurrentWeek}
         currentTime={currentTime}
         HOUR_HEIGHT={HOUR_HEIGHT}

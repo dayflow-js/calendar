@@ -9,6 +9,7 @@ import {
   EventDetailDialogRenderer,
   WeekDayDragState,
   ViewType,
+  ViewMode,
 } from '@/types';
 import {
   timeSlot,
@@ -58,9 +59,8 @@ interface TimeGridProps {
   setDetailPanelEventId: (id: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  events: Event[];
-  setDraftEvent: (event: Event | null) => void;
-  setIsDrawerOpen: (isOpen: boolean) => void;
+  mode?: ViewMode;
+  isCompact?: boolean;
   isCurrentWeek: boolean;
   currentTime: Date | null;
   HOUR_HEIGHT: number;
@@ -105,9 +105,8 @@ export const TimeGrid = ({
   setDetailPanelEventId,
   customDetailPanelContent,
   customEventDetailDialog,
-  events,
-  setDraftEvent,
-  setIsDrawerOpen,
+  mode = 'standard',
+  isCompact,
   isCurrentWeek,
   currentTime,
   HOUR_HEIGHT,
@@ -442,6 +441,8 @@ export const TimeGrid = ({
                           multiDaySegmentInfo={segmentInfo}
                           app={app}
                           isMobile={isMobile}
+                          mode={mode}
+                          isCompact={isCompact}
                           enableTouch={isTouch}
                         />
                       );

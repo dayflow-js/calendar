@@ -1,4 +1,4 @@
-import { ViewType, Event, ICalendarApp } from '@/types';
+import { ViewType, Event, ICalendarApp, ViewMode } from '@/types';
 import MultiDayEvent from '../../monthView/MultiDayEvent';
 import MonthRegularContent from './MonthRegularContent';
 import MonthAllDayContent from './MonthAllDayContent';
@@ -27,6 +27,9 @@ interface EventContentProps {
   isTouchEnabled: boolean;
   hideTime?: boolean;
   isMobile: boolean;
+  mode?: ViewMode;
+  isCompact?: boolean;
+  mobilePageStart?: Date;
   app?: ICalendarApp;
   onResizeStart?: (e: any, event: Event, direction: string) => void;
   multiDaySegmentInfo?: any;
@@ -53,6 +56,9 @@ export const EventContent = ({
   isTouchEnabled,
   hideTime,
   isMobile,
+  mode = 'standard',
+  isCompact,
+  mobilePageStart,
   app,
   onResizeStart,
   multiDaySegmentInfo,
@@ -110,6 +116,12 @@ export const EventContent = ({
         event={event}
         isEditable={isEditable}
         onResizeStart={onResizeStart}
+        isMultiDay={isMultiDay}
+        segment={segment}
+        mode={mode}
+        isCompact={isCompact}
+        mobilePageStart={mobilePageStart}
+        app={app}
       />
     ) : (
       <RegularEventContent

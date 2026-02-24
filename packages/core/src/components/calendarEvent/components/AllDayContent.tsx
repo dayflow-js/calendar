@@ -1,4 +1,4 @@
-import { Event } from '@/types';
+import { Event, ICalendarApp, ViewMode } from '@/types';
 import { CalendarDays } from '../../common/Icons';
 import {
   eventIcon,
@@ -7,24 +7,60 @@ import {
   resizeHandleLeft,
   resizeHandleRight,
 } from '@/styles/classNames';
+import { MultiDayEventSegment } from '../../monthView/WeekComponent';
 
 interface AllDayContentProps {
   event: Event;
   isEditable: boolean;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  isMultiDay?: boolean;
+  segment?: MultiDayEventSegment;
+  mode?: ViewMode;
+  isCompact?: boolean;
 }
 
 const AllDayContent = ({
   event,
   isEditable,
   onResizeStart,
+  isMultiDay,
+  segment,
+  mode = 'standard',
+  isCompact,
 }: AllDayContentProps) => {
   const showIcon = event.icon !== false;
   const customIcon = typeof event.icon !== 'boolean' ? event.icon : null;
 
+  // Calculate title offset for mobile 2-column mode
+  const titleOffsetStyle = (() => {
+    if ((mode !== 'compact' && !isCompact) || !isMultiDay || !segment)
+      return {};
+    // The current visible window starts at index 2 of the 6-day range
+    const visibleStartIndex = 2;
+    // If the event starts before the visible window but ends within or after it
+    if (
+      segment.startDayIndex < visibleStartIndex &&
+      segment.endDayIndex >= visibleStartIndex
+    ) {
+      const offsetDays = visibleStartIndex - segment.startDayIndex;
+      const spanDays = segment.endDayIndex - segment.startDayIndex + 1;
+
+      // Calculate offset as a percentage of the event bar's width
+      const offsetPercent = (offsetDays / spanDays) * 100;
+
+      return {
+        paddingLeft: `calc(${offsetPercent}% + 0.75rem)`,
+        // Ensure the transition matches the swipe transition for a smooth effect
+        // transition: 'padding-left 0.3s ease-out',
+      };
+    }
+    return {};
+  })();
+
   return (
     <div
       className={`h-full flex items-center overflow-hidden pl-3 ${px1} py-0 relative group`}
+      style={titleOffsetStyle}
     >
       {/* Left resize handle - only shown for single-day all-day events with onResizeStart */}
       {onResizeStart && isEditable && (

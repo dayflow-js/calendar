@@ -7,6 +7,7 @@ import {
   EventDetailDialogRenderer,
   WeekDayDragState,
   ViewType,
+  ViewMode,
 } from '@/types';
 import {
   allDayRow,
@@ -18,6 +19,7 @@ import {
   miniCalendarToday,
 } from '@/styles/classNames';
 import { GridContextMenu } from '@/components/contextMenu';
+import { CompactHeader } from './CompactHeader';
 import { scrollbarTakesSpace } from '@/utils';
 
 interface AllDayRowProps {
@@ -38,7 +40,8 @@ interface AllDayRowProps {
     isCurrent: boolean;
     dayName: string;
   }>;
-  isMobileTwoColumn?: boolean;
+  mode?: ViewMode;
+  isCompact?: boolean;
   mobilePageStart?: Date;
   currentWeekStart: Date;
   gridWidth: string;
@@ -72,9 +75,6 @@ interface AllDayRowProps {
   handleDrop: (e: any, date: Date, hour?: number, allDay?: boolean) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  events: Event[];
-  setDraftEvent: (event: Event | null) => void;
-  setIsDrawerOpen: (isOpen: boolean) => void;
 }
 
 export const AllDayRow = ({
@@ -83,7 +83,8 @@ export const AllDayRow = ({
   mobileWeekDaysLabels,
   weekDates,
   fullWeekDates,
-  isMobileTwoColumn,
+  mode = 'standard',
+  isCompact,
   mobilePageStart,
   currentWeekStart,
   gridWidth,
@@ -117,9 +118,6 @@ export const AllDayRow = ({
   handleDrop,
   customDetailPanelContent,
   customEventDetailDialog,
-  events,
-  setDraftEvent,
-  setIsDrawerOpen,
 }: AllDayRowProps) => {
   const columnStyle: any = { flexShrink: 0 };
   const [contextMenu, setContextMenu] = useState<{
@@ -143,98 +141,16 @@ export const AllDayRow = ({
   return (
     <div className="flex flex-col w-full">
       {/* Mobile 7-day Header with Segmented Control */}
-      {isMobileTwoColumn && fullWeekDates && mobilePageStart && (
-        <div className="flex justify-between items-center px-2 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-          {fullWeekDates.map((day, index) => {
-            const dayTime = day.fullDate.getTime();
-            const startRangeTime = mobilePageStart.getTime();
-            const endRangeTime = new Date(mobilePageStart).setDate(
-              mobilePageStart.getDate() + 1
-            ); // 2 days range
-
-            // Check if this day is part of the current 2-day view
-            // Using time comparison for accuracy
-            // The range is [mobilePageStart, mobilePageStart + 1 day]
-            const isStart = dayTime === startRangeTime;
-            // The "end" of our 2-day visual group is the second day
-            // But we need to handle cross-week boundary.
-            // If the day matches mobilePageStart + 1 day, it is the second day.
-            const isSecondDay =
-              dayTime ===
-              new Date(startRangeTime + 24 * 60 * 60 * 1000).getTime();
-
-            const isSelected = isStart || isSecondDay;
-
-            // Determine border radius classes
-            let roundedClasses = 'rounded-md'; // Default for isolated selected day (shouldn't happen with 2-day logic but safe fallback)
-
-            if (isSelected) {
-              if (isStart) {
-                // It is the first day of the selection.
-                // If the next day is ALSO in the header (index + 1 < 7), then it connects to the right -> rounded-l-full
-                // If the next day is NOT in the header (e.g. Sunday is start, Monday is next week), then it is "Left Half Pill" -> rounded-l-full rounded-r-none
-                // Actually, if next day is in header, we assume it IS selected (because we are showing continuous 2 days).
-                // Wait, if mobilePageStart is Sun, next day is Mon (next week).
-                // fullWeekDates is Mon-Sun of CURRENT week.
-                // So next day (Mon next week) is NOT in fullWeekDates.
-                // So check if (index + 1 < fullWeekDates.length) AND (fullWeekDates[index+1] is the second day)
-                const nextDayIsSecond =
-                  index + 1 < fullWeekDates.length &&
-                  fullWeekDates[index + 1].fullDate.getTime() ===
-                    startRangeTime + 24 * 60 * 60 * 1000;
-
-                if (nextDayIsSecond) {
-                  roundedClasses = 'rounded-l-full rounded-r-none mr-0';
-                } else {
-                  // Next day is not visible/not in header -> Left Half Pill
-                  roundedClasses = 'rounded-l-full rounded-r-none';
-                }
-              } else if (isSecondDay) {
-                // It is the second day of the selection.
-                // Check if previous day was the start day and was in header.
-                const prevDayIsStart =
-                  index - 1 >= 0 &&
-                  fullWeekDates[index - 1].fullDate.getTime() ===
-                    startRangeTime;
-
-                if (prevDayIsStart) {
-                  roundedClasses = 'rounded-r-full rounded-l-none ml-0';
-                } else {
-                  // Previous day not in header -> Right Half Pill
-                  roundedClasses = 'rounded-r-full rounded-l-none';
-                }
-              }
-            }
-
-            return (
-              <div
-                key={dayTime}
-                className="flex flex-col items-center flex-1"
-                onClick={() => {
-                  app.setCurrentDate(day.fullDate);
-                  onDateChange?.(day.fullDate);
-                }}
-              >
-                <span className="text-[10px] text-gray-500 font-medium mb-1">
-                  {day.dayName}
-                </span>
-                <div
-                  className={`
-                    flex items-center justify-center w-8 h-8 text-sm font-bold transition-all duration-200
-                    ${
-                      isSelected
-                        ? `bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 ${roundedClasses}`
-                        : 'text-gray-900 dark:text-gray-100 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }
-                  `}
-                >
-                  {day.date}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {(mode === 'compact' || isCompact) &&
+        fullWeekDates &&
+        mobilePageStart && (
+          <CompactHeader
+            app={app}
+            fullWeekDates={fullWeekDates}
+            mobilePageStart={mobilePageStart}
+            onDateChange={onDateChange}
+          />
+        )}
 
       <div
         className={`flex flex-none ${showAllDay ? 'border-b border-gray-200 dark:border-gray-700' : ''} relative z-10`}
@@ -248,7 +164,7 @@ export const AllDayRow = ({
           >
             {/* Header spacer - flexes to match weekday header height */}
             <div
-              className={`flex-1 border-b border-gray-200 dark:border-gray-700 ${isMobileTwoColumn ? 'hidden' : ''}`}
+              className={`flex-1 border-b border-gray-200 dark:border-gray-700 ${mode === 'compact' || isCompact ? 'hidden' : ''}`}
             ></div>
             {/* All Day Label */}
             <div
@@ -262,8 +178,13 @@ export const AllDayRow = ({
 
         {/* Top Frozen Content - overflow hidden, content positioned via transform */}
         <div
-          className="flex-1 overflow-hidden relative"
-          style={{ scrollbarGutter: 'stable' }}
+          className="flex-1 overflow-hidden relative transition-[min-height] duration-300 ease-in-out"
+          style={{
+            scrollbarGutter: 'stable',
+            minHeight: showAllDay
+              ? `${allDayAreaHeight + (mode === 'compact' || isCompact ? 0 : 36)}px`
+              : 'auto',
+          }}
         >
           <div
             ref={topFrozenContentRef}
@@ -271,7 +192,7 @@ export const AllDayRow = ({
             style={{ width: gridWidth, minWidth: '100%' }}
           >
             {/* Weekday titles row */}
-            {!isMobileTwoColumn && (
+            {mode !== 'compact' && !isCompact && (
               <div
                 className={weekDayHeader}
                 style={{
@@ -316,12 +237,12 @@ export const AllDayRow = ({
             {/* All-day event area */}
             {showAllDay && (
               <div
-                className={`${allDayRow} border-none`}
+                className={`${allDayRow} border-none transition-[min-height] duration-300 ease-in-out`}
                 ref={allDayRowRef}
                 style={{ minHeight: `${allDayAreaHeight}px` }}
               >
                 <div
-                  className={allDayContent}
+                  className={`${allDayContent} transition-[min-height] duration-300 ease-in-out`}
                   style={{ minHeight: `${allDayAreaHeight}px` }}
                 >
                   {weekDaysLabels.map((_, dayIndex) => {
@@ -330,7 +251,7 @@ export const AllDayRow = ({
                     return (
                       <div
                         key={`allday-${dayIndex}`}
-                        className={`${allDayCell} ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? 'border-r-0' : ''}`}
+                        className={`${allDayCell} transition-[min-height] duration-300 ease-in-out ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? 'border-r-0' : ''}`}
                         style={{
                           minHeight: `${allDayAreaHeight}px`,
                           ...columnStyle,
@@ -359,7 +280,7 @@ export const AllDayRow = ({
                     {organizedAllDaySegments.map(segment => {
                       return (
                         <CalendarEventComponent
-                          key={segment.id}
+                          key={segment.event.id}
                           event={segment.event}
                           segment={segment}
                           segmentIndex={segment.row}
@@ -385,10 +306,9 @@ export const AllDayRow = ({
                           onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
                           selectedEventId={selectedEventId}
                           detailPanelEventId={detailPanelEventId}
-                                                  onEventSelect={(eventId: string | null) => {
-                                                    setSelectedEventId(eventId);
-                                                  }}
-                          
+                          onEventSelect={(eventId: string | null) => {
+                            setSelectedEventId(eventId);
+                          }}
                           onEventLongPress={(eventId: string) => {
                             if (isMobile || isTouch)
                               setSelectedEventId(eventId);
@@ -400,6 +320,9 @@ export const AllDayRow = ({
                           customEventDetailDialog={customEventDetailDialog}
                           app={app}
                           isMobile={isMobile}
+                          mode={mode}
+                          isCompact={isCompact}
+                          mobilePageStart={mobilePageStart}
                           enableTouch={isTouch}
                         />
                       );

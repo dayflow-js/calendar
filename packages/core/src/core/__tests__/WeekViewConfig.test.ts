@@ -1,13 +1,18 @@
 import { createWeekView } from '../../factories/createWeekView';
 
 describe('WeekView Configuration', () => {
-  it('should have default mobileColumns set to 2', () => {
+  it('should have undefined mode by default', () => {
     const view = createWeekView();
-    expect(view.config.mobileColumns).toBe(2);
+    expect(view.config.mode).toBeUndefined();
   });
 
-  it('should allow overriding mobileColumns to 4', () => {
-    const view = createWeekView({ mobileColumns: 4 });
-    expect(view.config.mobileColumns).toBe(4);
+  it('should allow overriding mode to standard', () => {
+    const view = createWeekView({ mode: 'standard' });
+    expect(view.config.mode).toBe('standard');
+  });
+
+  it('should allow overriding mode to compact', () => {
+    const view = createWeekView({ mode: 'compact' });
+    expect(view.config.mode).toBe('compact');
   });
 });

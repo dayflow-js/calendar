@@ -126,11 +126,15 @@ export const organizeAllDaySegments = (
   const segments = multiDaySegments.filter((seg: any) => seg.event.allDay);
 
   segments.sort((a: any, b: any) => {
-    if (a.startDayIndex !== b.startDayIndex) {
-      return a.startDayIndex - b.startDayIndex;
+    // Use absolute start time for stable sorting across window shifts
+    const aStart = temporalToDate(a.event.start).getTime();
+    const bStart = temporalToDate(b.event.start).getTime();
+    
+    if (aStart !== bStart) {
+      return aStart - bStart;
     }
-    const aDays = a.endDayIndex - a.startDayIndex;
-    const bDays = b.endDayIndex - b.startDayIndex;
+    const aDays = a.totalDays;
+    const bDays = b.totalDays;
     return bDays - aDays;
   });
 

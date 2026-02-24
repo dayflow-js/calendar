@@ -1,5 +1,5 @@
 // View factory type definitions
-import { CalendarView, ViewType, ICalendarApp } from './core';
+import { CalendarView, ViewType, ICalendarApp, ViewMode } from './core';
 import { Event } from './event';
 import { EventLayout } from './layout';
 import {
@@ -126,7 +126,7 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   FIRST_HOUR?: number;
   LAST_HOUR?: number;
   ALL_DAY_HEIGHT?: number;
-  mobileColumns?: 2 | 4;
+  mode?: ViewMode;
 }
 
 /**

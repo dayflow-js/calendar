@@ -187,6 +187,21 @@
   }
 }
 
+@keyframes df-event-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.df-all-day-event-animate {
+  animation: df-event-pop-in 0.3s ease-out forwards;
+}
+
 @keyframes zoomIn {
   from {
     transform: scale(0.95);

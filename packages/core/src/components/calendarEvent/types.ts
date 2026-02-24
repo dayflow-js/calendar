@@ -5,6 +5,7 @@ import {
   EventDetailDialogRenderer,
   ICalendarApp,
   ViewType,
+  ViewMode,
 } from '@/types';
 import { MultiDayEventSegment } from '../monthView/WeekComponent';
 import { YearMultiDaySegment } from '../yearView/utils';
@@ -28,8 +29,8 @@ export interface CalendarEventProps {
   newlyCreatedEventId?: string | null;
   selectedEventId?: string | null;
   detailPanelEventId?: string | null;
-  onMoveStart?: (e: any | any, event: Event) => void;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onMoveStart?: (e: any, event: Event) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
   onEventUpdate: (updatedEvent: Event) => void;
   onEventDelete: (eventId: string) => void;
   onDetailPanelOpen?: () => void;
@@ -51,6 +52,12 @@ export interface CalendarEventProps {
   app?: ICalendarApp;
   /** Whether the current view is in mobile mode */
   isMobile?: boolean;
+  /** View display mode */
+  mode?: ViewMode;
+  /** Whether the current view is in mobile 2-column mode */
+  isCompact?: boolean;
+  /** The start date of the mobile page (for 2-column mode) */
+  mobilePageStart?: Date;
   /** Force enable touch interactions regardless of isMobile */
   enableTouch?: boolean;
   /** Whether to hide the time in the event display (Month view regular events only) */
