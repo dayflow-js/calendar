@@ -39,10 +39,10 @@
 ### 默认面板（提供多种事件详情面板选项）
 
 #### 详情弹窗
-![详情弹窗](./assets/images/Popup.png)
+![详情弹窗](./assets/images/popup.png)
 
 #### 详情对话框
-![详情对话框](./assets/images/Dialog.png)
+![详情对话框](./assets/images/dialog.png)
 
 ### 暗色模式支持
 ![暗色模式](./assets/images/DarkMode.png)

@@ -39,10 +39,10 @@
 ### デフォルトパネル（複数のイベント詳細パネルオプションが利用可能）
 
 #### 詳細ポップアップ
-![詳細ポップアップ](./assets/images/Popup.png)
+![詳細ポップアップ](./assets/images/popup.png)
 
 #### 詳細ダイアログ
-![詳細ダイアログ](./assets/images/Dialog.png)
+![詳細ダイアログ](./assets/images/dialog.png)
 
 ### ダークモードのサポート
 ![ダークモード](./assets/images/DarkMode.png)

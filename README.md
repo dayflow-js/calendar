@@ -40,10 +40,10 @@ views, and plugin architecture.
 ### Multiple Event Detail Panel options
 
 #### Detail Popup
-![Popup](./assets/images/Popup.png)
+![Popup](./assets/images/popup.png)
 
 #### Detail Dialog
-![Dialog](./assets/images/Dialog.png)
+![Dialog](./assets/images/dialog.png)
 
 ### Dark Mode Support
 ![Dark Mode](./assets/images/DarkMode.png)
