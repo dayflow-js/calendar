@@ -157,9 +157,9 @@ export interface useDragReturn {
   ) => void;
   removeDragIndicator: () => void;
   handleCreateAllDayEvent?: (e: any, dayIndex: number) => void; // Week/Day views
-  handleCreateStart: (e: any | any, ...args: (Date | number)[]) => void;
-  handleMoveStart: (e: any | any, event: Event) => void;
-  handleResizeStart: (e: any | any, event: Event, direction: string) => void;
+  handleCreateStart: (e: any, ...args: (Date | number)[]) => void;
+  handleMoveStart: (e: any, event: Event) => void;
+  handleResizeStart: (e: any, event: Event, direction: string) => void;
   dragState: MonthDragState | WeekDayDragState;
   isDragging: boolean;
   // Week/Day view specific

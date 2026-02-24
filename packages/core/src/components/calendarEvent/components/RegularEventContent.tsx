@@ -29,7 +29,7 @@ interface RegularEventContentProps {
   isEditable: boolean;
   isTouchEnabled: boolean;
   isEventSelected: boolean;
-  onResizeStart?: (e: any | any, event: Event, direction: string) => void;
+  onResizeStart?: (e: any, event: Event, direction: string) => void;
 }
 
 const RegularEventContent = ({

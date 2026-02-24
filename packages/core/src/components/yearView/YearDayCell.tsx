@@ -6,7 +6,7 @@ interface YearDayCellProps {
   isToday: boolean;
   locale: string;
   onSelectDate: (date: Date) => void;
-  onCreateStart?: (e: any | any, targetDate: Date) => void;
+  onCreateStart?: (e: any, targetDate: Date) => void;
   onMoreEventsClick?: (date: Date) => void;
   moreCount?: number;
   onContextMenu?: (e: any, date: Date) => void;
