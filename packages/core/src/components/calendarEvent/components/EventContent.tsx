@@ -120,8 +120,6 @@ export const EventContent = ({
         segment={segment}
         mode={mode}
         isCompact={isCompact}
-        mobilePageStart={mobilePageStart}
-        app={app}
       />
     ) : (
       <RegularEventContent

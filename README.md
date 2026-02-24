@@ -12,21 +12,47 @@ views, and plugin architecture.
 
 ## Features
 
-### Monthly, Weekly, Daily and Various View Types
+### Daily, Weekly, Monthly and Yearly View Types
 
-| Monthly                                 | Weekly                                 |
-| --------------------------------------- | -------------------------------------- |
-| ![image](./assets/images/MonthView.png) | ![image](./assets/images/WeekView.png) |
+#### Day View
+![Day View](./assets/images/DayView.png)
 
-| Daily                                 | Event Stack Level                        |
-| ------------------------------------- | ---------------------------------------- |
-| ![image](./assets/images/DayView.png) | ![image](./assets/images/stackLevel.png) |
+#### Week View
+![Week View](./assets/images/WeekView.png)
 
-### Default Panel (with multiple Event Detail Panel options available)
+#### Month View
+![Month View](./assets/images/MonthView.png)
 
-| Detail Popup                        | Detail Dialog                        |
-| ----------------------------------- | ------------------------------------ |
-| ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
+#### Year View(Fixed-Week)
+![Year View](./assets/images/YearView.png)
+
+#### Year View(Year-Canvas)
+![Year Canvas View](./assets/images/Year-Canvas.png)
+
+### Mobile View Support
+
+#### Mobile Day View
+![Mobile Day View](./assets/images/Mobile-Day.png)
+
+#### Mobile Week View
+![Mobile Week View](./assets/images/Mobile-Week.png)
+
+#### Mobile Month View
+![Mobile Month View](./assets/images/Mobile-Month.png)
+
+#### Mobile Year View
+![Mobile Year View](./assets/images/Mobile-Year.png)
+
+### Multiple Event Detail Panel options
+
+#### Detail Popup
+![Popup](./assets/images/Popup.png)
+
+#### Detail Dialog
+![Dialog](./assets/images/Dialog.png)
+
+### Dark Mode Support
+![Dark Mode](./assets/images/DarkMode.png)
 
 ### Easy to resize and drag
 

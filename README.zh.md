@@ -11,21 +11,47 @@
 
 ## 功能特性
 
-### 月视图、周视图、日视图及多种视图类型
+### 日视图、周视图、月视图、年视图及多种视图类型
 
-| 月视图                                  | 周视图                                 |
-| --------------------------------------- | -------------------------------------- |
-| ![image](./assets/images/MonthView.png) | ![image](./assets/images/WeekView.png) |
+#### 日视图
+![日视图](./assets/images/DayView.png)
 
-| 日视图                                | 事件堆叠层级                             |
-| ------------------------------------- | ---------------------------------------- |
-| ![image](./assets/images/DayView.png) | ![image](./assets/images/stackLevel.png) |
+#### 周视图
+![周视图](./assets/images/WeekView.png)
+
+#### 月视图
+![月视图](./assets/images/MonthView.png)
+
+#### 年视图 (固定周)
+![年视图](./assets/images/YearView.png)
+
+#### 年视图 (画布)
+![年视图 (画布)](./assets/images/Year-Canvas.png)
+
+### 移动端视图支持
+
+#### 移动端日视图
+![移动端日视图](./assets/images/Mobile-Day.png)
+
+#### 移动端周视图
+![移动端周视图](./assets/images/Mobile-Week.png)
+
+#### 移动端月视图
+![移动端月视图](./assets/images/Mobile-Month.png)
+
+#### 移动端年视图
+![移动端年视图](./assets/images/Mobile-Year.png)
 
 ### 默认面板（提供多种事件详情面板选项）
 
-| 详情弹窗                            | 详情对话框                           |
-| ----------------------------------- | ------------------------------------ |
-| ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
+#### 详情弹窗
+![详情弹窗](./assets/images/Popup.png)
+
+#### 详情对话框
+![详情对话框](./assets/images/Dialog.png)
+
+### 暗色模式支持
+![暗色模式](./assets/images/DarkMode.png)
 
 ### 轻松拖拽与缩放
 

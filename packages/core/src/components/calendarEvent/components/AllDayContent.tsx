@@ -1,4 +1,4 @@
-import { Event, ICalendarApp, ViewMode } from '@/types';
+import { Event, ViewMode } from '@/types';
 import { CalendarDays } from '../../common/Icons';
 import {
   eventIcon,

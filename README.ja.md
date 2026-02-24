@@ -11,21 +11,47 @@
 
 ## 機能
 
-### 月次、週次、日次、その他のビュータイプ
+### 日次、週次、月次、年次、その他のビュータイプ
 
-| 月次                                    | 週次                                   |
-| --------------------------------------- | -------------------------------------- |
-| ![image](./assets/images/MonthView.png) | ![image](./assets/images/WeekView.png) |
+#### 日次
+![日次](./assets/images/DayView.png)
 
-| 日次                                  | イベントスタックレベル                   |
-| ------------------------------------- | ---------------------------------------- |
-| ![image](./assets/images/DayView.png) | ![image](./assets/images/stackLevel.png) |
+#### 週次
+![週次](./assets/images/WeekView.png)
+
+#### 月次
+![月次](./assets/images/MonthView.png)
+
+#### 年次 (固定週)
+![年次](./assets/images/YearView.png)
+
+#### 年次 (キャンバス)
+![年次 (キャンバス)](./assets/images/Year-Canvas.png)
+
+### モバイルビューのサポート
+
+#### モバイル日次
+![モバイル日次](./assets/images/Mobile-Day.png)
+
+#### モバイル週次
+![モバイル週次](./assets/images/Mobile-Week.png)
+
+#### モバイル月次
+![モバイル月次](./assets/images/Mobile-Month.png)
+
+#### モバイル年次
+![モバイル年次](./assets/images/Mobile-Year.png)
 
 ### デフォルトパネル（複数のイベント詳細パネルオプションが利用可能）
 
-| 詳細ポップアップ                    | 詳細ダイアログ                       |
-| ----------------------------------- | ------------------------------------ |
-| ![image](./assets/images/popup.png) | ![image](./assets/images/dialog.png) |
+#### 詳細ポップアップ
+![詳細ポップアップ](./assets/images/Popup.png)
+
+#### 詳細ダイアログ
+![詳細ダイアログ](./assets/images/Dialog.png)
+
+### ダークモードのサポート
+![ダークモード](./assets/images/DarkMode.png)
 
 ### ドラッグ＆ドロップとリサイズも簡単
 
