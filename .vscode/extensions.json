@@ -3,8 +3,8 @@
     "oxc.oxc-vscode",
     "bradlc.vscode-tailwindcss",
     "fill-labs.dependi",
-    "svelte.svelte-vscode"
-  "antfu.pnpm-catalog-lens",
+    "svelte.svelte-vscode",
+    "antfu.pnpm-catalog-lens",
     "vue.volar"
   ]
 }
