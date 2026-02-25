@@ -781,10 +781,9 @@ const WeekComponent = memo(
           {/* Date number area */}
           <div className={monthDateNumberContainer}>
             {
-              <span className={`
-                    ${monthDateNumber}
-                    ${day.isToday ? 'bg-primary text-primary-foreground' : belongsToCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'}
-                  `}>
+              <span
+                className={` ${monthDateNumber} ${day.isToday ? 'bg-primary text-primary-foreground' : belongsToCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'} `}
+              >
                 {day.day === 1 && screenSize === 'desktop'
                   ? day.date.toLocaleDateString(locale, {
                       month: 'short',
@@ -837,16 +836,13 @@ const WeekComponent = memo(
 
     return (
       <div
-        className='relative select-none border-b border-gray-200 dark:border-gray-700'
+        className='relative border-b border-gray-200 select-none dark:border-gray-700'
         style={{ height: weekHeightPx }}
       >
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
         {firstDayOfMonth && (
           <div
-            className={`
-            ${monthTitle}
-            ${shouldShowMonthTitle ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-          `}
+            className={` ${monthTitle} ${shouldShowMonthTitle ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} `}
             style={{
               transition: 'opacity 0.5s ease',
               maxWidth: 'fit-content',
@@ -859,17 +855,17 @@ const WeekComponent = memo(
           </div>
         )}
 
-        <div className='h-full flex flex-col'>
+        <div className='flex h-full flex-col'>
           <div className='calendar-week relative h-full'>
             {/* Date grid */}
-            <div className='grid grid-cols-7 h-full'>
+            <div className='grid h-full grid-cols-7'>
               {weekData.days.map((day, index) => renderDayCell(day, index))}
             </div>
 
             {/* Multi-day event overlay layer */}
             {organizedMultiDaySegments.length > 0 && (
               <div
-                className='absolute left-0 right-0 pointer-events-none'
+                className='pointer-events-none absolute right-0 left-0'
                 style={{
                   top: `${MULTI_DAY_TOP_OFFSET}px`,
                   height: `${multiDayAreaHeight}px`,

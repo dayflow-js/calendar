@@ -199,7 +199,7 @@ export const MultiDayEvent = memo(
 
       return (
         <div
-          className={`resize-handle absolute ${isLeft ? 'left-0' : 'right-0'} top-0 bottom-0 w-1 cursor-ew-resize opacity-0 group-hover:opacity-100 transition-opacity z-20`}
+          className={`resize-handle absolute ${isLeft ? 'left-0' : 'right-0'} top-0 bottom-0 z-20 w-1 cursor-ew-resize opacity-0 transition-opacity group-hover:opacity-100`}
           onMouseDown={e => {
             e.preventDefault();
             e.stopPropagation();
@@ -230,11 +230,11 @@ export const MultiDayEvent = memo(
         };
 
         return (
-          <div className='flex items-center min-w-0 w-full pointer-events-auto'>
+          <div className='pointer-events-auto flex w-full min-w-0 items-center'>
             {segment.isFirstSegment && getEventIcon(segment.event) && (
-              <div className='shrink-0 mr-1'>
+              <div className='mr-1 shrink-0'>
                 <div
-                  className='rounded-full p-0.5 text-white flex items-center justify-center'
+                  className='flex items-center justify-center rounded-full p-0.5 text-white'
                   style={{
                     backgroundColor: getLineColor(calendarId),
                     width: '12px',
@@ -246,13 +246,13 @@ export const MultiDayEvent = memo(
               </div>
             )}
 
-            <div className='flex-1 min-w-0'>
+            <div className='min-w-0 flex-1'>
               <div className='truncate text-xs'>{getDisplayText()}</div>
             </div>
 
             {segment.isLastSegment && segment.segmentType !== 'single' && (
-              <div className='shrink-0 ml-1 text-white/80 dark:text-white/90'>
-                <div className='w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80'></div>
+              <div className='ml-1 shrink-0 text-white/80 dark:text-white/90'>
+                <div className='h-1.5 w-1.5 rounded-full bg-white/60 dark:bg-white/80'></div>
               </div>
             )}
           </div>
@@ -279,14 +279,14 @@ export const MultiDayEvent = memo(
           : undefined;
 
       return (
-        <div className='relative flex items-center min-w-0 w-full pointer-events-auto'>
+        <div className='pointer-events-auto relative flex w-full min-w-0 items-center'>
           <div
             className={monthEventColorBar}
             style={{ backgroundColor: getLineColor(calendarId) }}
           />
-          <div className='flex items-center min-w-0 flex-1'>
+          <div className='flex min-w-0 flex-1 items-center'>
             <span
-              className={`whitespace-nowrap overflow-hidden block ${isMobile ? 'mobile-mask-fade' : 'truncate'} font-medium text-xs`}
+              className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'mobile-mask-fade' : 'truncate'} text-xs font-medium`}
             >
               {titleText}
             </span>
@@ -303,7 +303,7 @@ export const MultiDayEvent = memo(
             !segment.event.allDay &&
             endHour !== 24 &&
             !isMobile && (
-              <span className='text-xs font-medium whitespace-nowrap ml-auto'>
+              <span className='ml-auto text-xs font-medium whitespace-nowrap'>
                 {`ends ${endTimeText}`}
               </span>
             )}
@@ -318,7 +318,7 @@ export const MultiDayEvent = memo(
 
     return (
       <div
-        className='absolute px-1 text-xs select-none flex items-center transition-all duration-200 hover:shadow-sm dark:hover:shadow-lg dark:hover:shadow-black/20 group'
+        className='group absolute flex items-center px-1 text-xs transition-all duration-200 select-none hover:shadow-sm dark:hover:shadow-lg dark:hover:shadow-black/20'
         style={{
           left: adjustedLeft,
           width: adjustedWidth,
@@ -354,13 +354,13 @@ export const MultiDayEvent = memo(
           <>
             {segment.isFirstSegment && (
               <div
-                className='absolute left-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none'
+                className='pointer-events-none absolute top-1/2 left-5 z-50 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 bg-white'
                 style={{ borderColor: getLineColor(calendarId) }}
               />
             )}
             {segment.isLastSegment && (
               <div
-                className='absolute right-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none'
+                className='pointer-events-none absolute top-1/2 right-5 z-50 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 bg-white'
                 style={{ borderColor: getLineColor(calendarId) }}
               />
             )}
@@ -368,7 +368,7 @@ export const MultiDayEvent = memo(
         )}
         {renderResizeHandle('left')}
         <div
-          className='flex-1 min-w-0'
+          className='min-w-0 flex-1'
           style={{
             cursor: isResizing ? 'ew-resize' : 'pointer',
           }}

@@ -29,7 +29,7 @@ const MonthRegularContent = ({
 
   return (
     <div className={monthRegularContent}>
-      <div className='flex items-center flex-1 min-w-0'>
+      <div className='flex min-w-0 flex-1 items-center'>
         <div
           style={{
             backgroundColor: getLineColor(
@@ -40,7 +40,7 @@ const MonthRegularContent = ({
           className={monthEventColorBar}
         />
         <span
-          className={`whitespace-nowrap overflow-hidden block ${isMobile ? 'mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
+          className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
         >
           {event.title}
         </span>

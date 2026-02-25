@@ -797,10 +797,10 @@ const RangePicker = ({
       <div
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${
           disabled
-            ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'
+            ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500'
             : isOpen
-              ? 'border-primary bg-white dark:bg-gray-700 shadow-md'
-              : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700'
+              ? 'border-primary bg-white shadow-md dark:bg-gray-700'
+              : 'border-slate-200 bg-white dark:border-gray-600 dark:bg-gray-700'
         }`}
       >
         <div className='flex min-w-0 flex-1 flex-col gap-1'>
@@ -813,11 +813,11 @@ const RangePicker = ({
             onClick={() => openPanelForField('start')}
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
               disabled
                 ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
                 : focusedField === 'start' && isOpen
-                  ? ' bg-white dark:bg-gray-700 text-primary'
+                  ? 'bg-white text-primary dark:bg-gray-700'
                   : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
             }`}
             placeholder={formatTemplate}
@@ -838,11 +838,11 @@ const RangePicker = ({
             onClick={() => openPanelForField('end')}
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
               disabled
                 ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
                 : focusedField === 'end' && isOpen
-                  ? 'bg-white dark:bg-gray-700 text-primary'
+                  ? 'bg-white text-primary dark:bg-gray-700'
                   : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
             }`}
             placeholder={formatTemplate}

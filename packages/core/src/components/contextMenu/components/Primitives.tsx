@@ -92,7 +92,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     return createPortal(
       <div
         ref={setRefs}
-        className={`fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
+        className={`animate-in fade-in-0 zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
         style={style}
         onContextMenu={e => e.preventDefault()}
         data-context-menu-root='true'
@@ -120,17 +120,15 @@ export const ContextMenuItem = ({
   disabled?: boolean;
 }) => (
   <div
-    className={`relative flex cursor-default select-none items-center rounded-sm px-3 py-0.5 text-[12px] outline-none transition-colors group
-        ${
-          disabled
-            ? 'pointer-events-none opacity-50'
-            : 'focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white'
-        }
-        ${
-          danger
-            ? 'text-destructive focus:text-destructive-foreground focus:bg-destructive hover:bg-destructive hover:text-destructive-foreground'
-            : 'text-slate-900 dark:text-slate-50'
-        }`}
+    className={`group relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none ${
+      disabled
+        ? 'pointer-events-none opacity-50'
+        : 'hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white'
+    } ${
+      danger
+        ? 'text-destructive hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground'
+        : 'text-slate-900 dark:text-slate-50'
+    }`}
     onClick={e => {
       e.stopPropagation();
       if (!disabled) onClick();
@@ -214,7 +212,7 @@ export const ContextMenuSubTrigger = ({
   isOpen?: boolean;
 }) => (
   <div
-    className={`relative flex cursor-default select-none items-center rounded-sm px-3 py-0.5 text-[12px] outline-none transition-colors focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white ${isOpen ? 'bg-primary text-white' : ''}`}
+    className={`relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white ${isOpen ? 'bg-primary text-white' : ''}`}
   >
     {icon && <span className='mr-2 h-4 w-4'>{icon}</span>}
     <span className='grow text-left'>{children}</span>
@@ -255,7 +253,7 @@ export const ContextMenuSubContent = ({
   return (
     <div
       ref={ref}
-      className={`absolute top-0 z-50 min-w-32 whitespace-nowrap overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out`}
+      className={`animate-in fade-in-0 zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
       style={{
         left: position === 'right' ? '100%' : 'auto',
         right: position === 'left' ? '100%' : 'auto',
@@ -296,9 +294,9 @@ export const ContextMenuColorPicker = ({
           <button
             key={color}
             type='button'
-            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary dark:focus:ring-offset-slate-800 ${
+            className={`h-5 w-5 rounded-full border border-gray-200 transition-transform hover:scale-110 focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:outline-none dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
               selectedColor?.toLowerCase() === color.toLowerCase()
-                ? 'ring-2 ring-offset-1 ring-primary dark:ring-offset-slate-800'
+                ? 'ring-2 ring-primary ring-offset-1 dark:ring-offset-slate-800'
                 : ''
             }`}
             style={{ backgroundColor: color }}
@@ -312,7 +310,7 @@ export const ContextMenuColorPicker = ({
       </div>
       {onCustomColor && (
         <div
-          className='mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white transition-colors'
+          className='mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 transition-colors hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white'
           onClick={e => {
             e.stopPropagation();
             onCustomColor();

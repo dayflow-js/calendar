@@ -316,7 +316,7 @@ export const DefaultYearView = ({
         }}
       >
         <div
-          className='w-full flex flex-col border-t border-l border-gray-100 dark:border-gray-800'
+          className='flex w-full flex-col border-t border-l border-gray-100 dark:border-gray-800'
           style={{
             opacity: isLayoutReady ? 1 : 0,
             transition: 'opacity 0.2s ease',

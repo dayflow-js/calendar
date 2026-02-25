@@ -311,10 +311,10 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      <span className='block text-xs text-gray-600 dark:text-gray-300 mb-1'>
+      <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
         {t('eventTitle')}
       </span>
-      <div className='flex items-center justify-between gap-3 mb-3'>
+      <div className='mb-3 flex items-center justify-between gap-3'>
         <div className='flex-1'>
           <input
             id={`event-title-${event.id}`}
@@ -329,7 +329,7 @@ const DefaultEventDetailPanel = ({
             onInput={(e: React.FormEvent<HTMLInputElement>) =>
               setTitle((e.target as HTMLInputElement).value)
             }
-            className='w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition'
+            className='w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
           />
         </div>
         {isEditable && (
@@ -349,7 +349,7 @@ const DefaultEventDetailPanel = ({
 
       {isAllDay ? (
         <div className='mb-3'>
-          <div className='text-xs text-gray-600 dark:text-gray-300 mb-1'>
+          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
             {t('dateRange')}
           </div>
           <RangePicker
@@ -365,7 +365,7 @@ const DefaultEventDetailPanel = ({
         </div>
       ) : (
         <div className='mb-3'>
-          <div className='text-xs text-gray-600 dark:text-gray-300 mb-1'>
+          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
             {t('timeRange')}
           </div>
           <RangePicker
@@ -388,7 +388,7 @@ const DefaultEventDetailPanel = ({
       )}
 
       <div className='mb-3'>
-        <span className='block text-xs text-gray-600 dark:text-gray-300 mb-1'>
+        <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
           {t('note')}
         </span>
         <textarea
@@ -402,7 +402,7 @@ const DefaultEventDetailPanel = ({
           }
           onInput={e => setDescription((e.target as HTMLTextAreaElement).value)}
           rows={3}
-          className='w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none'
+          className='w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
           placeholder={t('addNotePlaceholder')}
         />
       </div>
@@ -412,7 +412,7 @@ const DefaultEventDetailPanel = ({
           {isAllDay ? (
             <button
               type='button'
-              className='px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition'
+              className='rounded bg-primary px-2 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary'
               onClick={convertToRegular}
             >
               {t('setAsTimed')}
@@ -420,7 +420,7 @@ const DefaultEventDetailPanel = ({
           ) : (
             <button
               type='button'
-              className='px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition'
+              className='rounded bg-primary px-2 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary'
               onClick={convertToAllDay}
             >
               {t('setAsAllDay')}
@@ -429,7 +429,7 @@ const DefaultEventDetailPanel = ({
 
           <button
             type='button'
-            className='px-2 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 text-xs font-medium transition'
+            className='rounded bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground transition hover:bg-destructive/90'
             onClick={() => onEventDelete(event.id)}
           >
             {t('delete')}

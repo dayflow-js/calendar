@@ -81,7 +81,7 @@ export function ContentSlot({
   return (
     <div
       ref={containerRef}
-      className={`df-content-slot ${isEventSlot || isSidebarSlot ? 'flex-1 flex flex-col h-full' : ''}`}
+      className={`df-content-slot ${isEventSlot || isSidebarSlot ? 'flex h-full flex-1 flex-col' : ''}`}
     >
       {!isOverridden && defaultContent}
     </div>

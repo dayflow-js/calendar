@@ -14,7 +14,7 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className='p-2 h-9 w-9' />;
+    return <div className='h-9 w-9 p-2' />;
   }
 
   const isDark = resolvedTheme === 'dark';
@@ -24,7 +24,7 @@ export function ThemeToggle() {
       type='button'
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={cn(
-        'inline-flex items-center justify-center h-9 rounded-md transition-colors',
+        'inline-flex h-9 items-center justify-center rounded-md transition-colors',
         isDark ? 'text-gray-200' : 'text-gray-700'
       )}
       aria-label='Toggle theme'

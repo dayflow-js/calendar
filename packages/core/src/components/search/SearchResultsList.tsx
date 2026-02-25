@@ -20,7 +20,7 @@ interface SearchResultsListProps {
 
 const SearchIconPlaceholder = () => (
   <svg
-    className='w-12 h-12 text-gray-300 dark:text-gray-600'
+    className='h-12 w-12 text-gray-300 dark:text-gray-600'
     fill='none'
     viewBox='0 0 24 24'
     stroke='currentColor'
@@ -64,8 +64,8 @@ const SearchResultsList = ({
 
   if (loading) {
     return (
-      <div className='flex flex-col items-center justify-center h-40 text-gray-500'>
-        <Loader2 className='w-8 h-8 animate-spin mb-2' />
+      <div className='flex h-40 flex-col items-center justify-center text-gray-500'>
+        <Loader2 className='mb-2 h-8 w-8 animate-spin' />
         <span>Loading...</span>
       </div>
     );
@@ -73,7 +73,7 @@ const SearchResultsList = ({
 
   if (results.length === 0) {
     return keyword ? (
-      <div className='flex flex-col items-center justify-center h-40 text-gray-500'>
+      <div className='flex h-40 flex-col items-center justify-center text-gray-500'>
         <SearchIconPlaceholder />
         <span className='mt-2 text-sm'>{getEmptyText()}</span>
       </div>
@@ -93,7 +93,7 @@ const SearchResultsList = ({
         return (
           <div key={group.date.getTime()}>
             <h3
-              className={`px-2 text-sm font-medium mb-4 sticky top-0 bg-white dark:bg-gray-900 py-1 z-10 ${colorClass} border-b border-gray-200 dark:border-gray-700`}
+              className={`sticky top-0 z-10 mb-4 bg-white px-2 py-1 text-sm font-medium dark:bg-gray-900 ${colorClass} border-b border-gray-200 dark:border-gray-700`}
             >
               {title}
             </h3>
@@ -116,19 +116,19 @@ const SearchResultsList = ({
                 return (
                   <div key={event.id}>
                     <div
-                      className='p-2 mx-2 mb-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group'
+                      className='group mx-2 mb-1 cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800'
                       onClick={() => onResultClick?.(event)}
                     >
                       <div className='flex items-stretch gap-3'>
                         <div
-                          className='w-1 rounded-full shrink-0'
+                          className='w-1 shrink-0 rounded-full'
                           style={{ backgroundColor: event.color || '#3b82f6' }}
                         />
-                        <div className='flex-1 min-w-0 flex justify-between items-start'>
-                          <div className='font-medium text-black dark:text-white truncate pr-2 text-sm'>
+                        <div className='flex min-w-0 flex-1 items-start justify-between'>
+                          <div className='truncate pr-2 text-sm font-medium text-black dark:text-white'>
                             {event.title}
                           </div>
-                          <div className='text-xs flex flex-col items-end shrink-0 leading-tight'>
+                          <div className='flex shrink-0 flex-col items-end text-xs leading-tight'>
                             <div className='text-black dark:text-white'>
                               {startTimeStr}
                             </div>

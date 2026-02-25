@@ -32,7 +32,7 @@ export const SidebarHeader = ({
         )}
       </button>
       {!isCollapsed && (
-        <div className='flex flex-1 justify-between items-center ml-3'>
+        <div className='ml-3 flex flex-1 items-center justify-between'>
           <span className={sidebarHeaderTitle}>{t('calendars')}</span>
         </div>
       )}

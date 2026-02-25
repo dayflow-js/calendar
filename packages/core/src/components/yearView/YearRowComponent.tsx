@@ -166,7 +166,7 @@ export const YearRowComponent = memo(
           );
         })}
         <div
-          className='absolute inset-0 pointer-events-none'
+          className='pointer-events-none absolute inset-0'
           style={{
             top: HEADER_HEIGHT,
             bottom: 0,
@@ -175,7 +175,7 @@ export const YearRowComponent = memo(
           }}
           onContextMenu={e => e.preventDefault()}
         >
-          <div className='relative w-full h-full'>
+          <div className='relative h-full w-full'>
             {visibleSegments.map(segment => (
               <div key={segment.id} className='pointer-events-auto'>
                 <CalendarEvent

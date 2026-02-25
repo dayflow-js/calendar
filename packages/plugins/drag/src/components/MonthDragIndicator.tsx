@@ -64,9 +64,9 @@ const MonthDragIndicatorComponent = ({
   const content = getDisplayContent();
 
   return (
-    <div className='flex items-center space-x-2 text-white text-xs font-medium rounded-sm'>
+    <div className='flex items-center space-x-2 rounded-sm text-xs font-medium text-white'>
       <div className='shrink-0'>{content.icon}</div>
-      <div className='flex-1 min-w-0'>
+      <div className='min-w-0 flex-1'>
         <div className='truncate font-medium'>{content.title}</div>
       </div>
     </div>

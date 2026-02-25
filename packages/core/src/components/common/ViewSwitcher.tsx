@@ -50,7 +50,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
         <button
           type='button'
           onClick={() => setIsOpen(!isOpen)}
-          className='flex items-center gap-2 px-3 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between'
+          className='flex h-7 min-w-30 items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium shadow-sm transition-all duration-200 hover:bg-gray-50 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700'
           aria-expanded={isOpen}
           aria-haspopup='listbox'
         >
@@ -66,7 +66,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
 
         {isOpen && (
           <div
-            className={`absolute top-full mt-1 left-0 z-50 w-full min-w-30 ${dropdownPanel} animate-in`}
+            className={`absolute top-full left-0 z-50 mt-1 w-full min-w-30 ${dropdownPanel} animate-in`}
           >
             <div className='p-1' role='listbox'>
               {registeredViews.map(viewType => (
@@ -79,10 +79,10 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
                     // Force update might be needed if not handled by app subscribe
                     calendar.triggerRender();
                   }}
-                  className={`w-full text-left px-3 py-0.5 rounded text-sm transition-colors duration-150 focus:outline-none ${
+                  className={`w-full rounded px-3 py-0.5 text-left text-sm transition-colors duration-150 focus:outline-none ${
                     currentView === viewType
-                      ? 'bg-primary/10 text-primary font-medium'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-primary/10 font-medium text-primary'
+                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
                   }`}
                   role='option'
                   aria-selected={currentView === viewType}
@@ -114,15 +114,15 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
   }
 
   return (
-    <div className='inline-flex items-center gap-1 p-0.5 mb-1 bg-gray-100 dark:bg-gray-800 rounded-lg'>
+    <div className='mb-1 inline-flex items-center gap-1 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-800'>
       {registeredViews.map(viewType => (
         <button
           type='button'
           key={viewType}
-          className={`px-4 h-6 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none ${
+          className={`h-6 rounded-md px-4 text-sm font-medium transition-all duration-200 focus:outline-none ${
             currentView === viewType
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-100'
           }`}
           onClick={() => {
             calendar.changeView(viewType);

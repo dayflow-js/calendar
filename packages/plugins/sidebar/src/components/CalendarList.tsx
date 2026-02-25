@@ -200,7 +200,7 @@ export const CalendarList = ({
 
   return (
     <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
-      <ul className='space-y-1 relative'>
+      <ul className='relative space-y-1'>
         {calendars.map(calendar => {
           const isVisible = calendar.isVisible !== false;
           const calendarColor = calendar.colors?.lineColor || '#3b82f6';
@@ -220,7 +220,7 @@ export const CalendarList = ({
               onContextMenu={e => onContextMenu(e, calendar.id)}
             >
               {isDropTarget && dropTarget.position === 'top' && (
-                <div className='absolute top-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none' />
+                <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-primary' />
               )}
               <div
                 draggable={isDraggable && !editingId}
@@ -236,7 +236,7 @@ export const CalendarList = ({
                 >
                   <input
                     type='checkbox'
-                    className='calendar-checkbox cursor-pointer shrink-0'
+                    className='calendar-checkbox shrink-0 cursor-pointer'
                     style={
                       {
                         '--checkbox-color': calendarColor,
@@ -268,12 +268,12 @@ export const CalendarList = ({
                       }
                       onBlur={handleRenameSave}
                       onKeyDown={handleRenameKeyDown}
-                      className='ml-2 flex-1 min-w-0 h-5 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
+                      className='ml-2 h-5 min-w-0 flex-1 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
                       onClick={e => e.stopPropagation()}
                     />
                   ) : (
                     <span
-                      className='flex-1 pl-1 truncate text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white ml-2'
+                      className='ml-2 flex-1 truncate pl-1 text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white'
                       onDblClick={() => handleRenameStart(calendar)}
                     >
                       {calendar.name || calendar.id}
@@ -282,7 +282,7 @@ export const CalendarList = ({
                 </div>
               </div>
               {isDropTarget && dropTarget.position === 'bottom' && (
-                <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none' />
+                <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-primary' />
               )}
             </li>
           );

@@ -491,7 +491,7 @@ export const FixedWeekYearView = ({
 
   return (
     <div
-      className='h-full bg-white dark:bg-gray-900 overflow-hidden select-none'
+      className='h-full overflow-hidden bg-white select-none dark:bg-gray-900'
       style={{
         display: 'grid',
         gridTemplateColumns: '3rem 1fr',
@@ -523,12 +523,12 @@ export const FixedWeekYearView = ({
       </div>
 
       {/* Corner - Fixed */}
-      <div className='bg-gray-50 dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-800 z-30' />
+      <div className='z-30 border-r border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900' />
 
       {/* Week Labels Header */}
       <div
         ref={weekLabelsRef}
-        className='overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'
+        className='overflow-hidden border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900'
       >
         <div
           className='flex'
@@ -547,7 +547,7 @@ export const FixedWeekYearView = ({
               return (
                 <div
                   key={`label-${i}`}
-                  className={`text-center py-2 text-[10px] font-bold tracking-wider border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 ${isWeekend ? 'df-year-view-weekend-header' : ''}`}
+                  className={`border-r border-gray-200 py-2 text-center text-[10px] font-bold tracking-wider text-gray-500 dark:border-gray-700 dark:text-gray-400 ${isWeekend ? 'df-year-view-weekend-header' : ''}`}
                 >
                   {label}
                 </div>
@@ -567,13 +567,13 @@ export const FixedWeekYearView = ({
       {/* Month Labels Sidebar */}
       <div
         ref={monthLabelsRef}
-        className='overflow-hidden bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
+        className='overflow-hidden border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900'
       >
-        <div className='flex flex-col min-h-full'>
+        <div className='flex min-h-full flex-col'>
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className='flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 grow shrink-0'
+              className='flex shrink-0 grow items-center justify-center border-b border-gray-200 text-[10px] font-bold text-gray-500 dark:border-gray-700 dark:text-gray-400'
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {month.monthName}
@@ -596,18 +596,18 @@ export const FixedWeekYearView = ({
         onScroll={handleContentScroll}
       >
         <div
-          className='flex flex-col min-h-full'
+          className='flex min-h-full flex-col'
           style={{ minWidth: '1352px' }}
         >
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className='relative grow shrink-0'
+              className='relative shrink-0 grow'
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {/* Background grid cells */}
               <div
-                className='grid absolute inset-0 z-0'
+                className='absolute inset-0 z-0 grid'
                 style={{
                   gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
                 }}
@@ -620,7 +620,7 @@ export const FixedWeekYearView = ({
                     return (
                       <div
                         key={`empty-${month.monthIndex}-${dayIndex}`}
-                        className={`bg-gray-50/80 dark:bg-gray-800/40 border-r border-b border-gray-200 dark:border-gray-700 ${isWeekend ? 'df-year-view-weekend-cell' : ''}`}
+                        className={`border-r border-b border-gray-200 bg-gray-50/80 dark:border-gray-700 dark:bg-gray-800/40 ${isWeekend ? 'df-year-view-weekend-cell' : ''}`}
                       />
                     );
                   }
@@ -634,19 +634,16 @@ export const FixedWeekYearView = ({
                     <div
                       key={date.getTime()}
                       data-date={dateString}
-                      className={`
-                        relative flex items-start justify-end p-0.5 border-r border-b border-gray-200 dark:border-gray-700
-                        cursor-pointer hover:bg-blue-100 dark:hover:bg-primary/20 transition-colors
-                        ${isWeekend ? 'bg-blue-50 dark:bg-blue-900/30 df-year-view-weekend-cell' : ''}
-                      `}
+                      className={`relative flex cursor-pointer items-start justify-end border-r border-b border-gray-200 p-0.5 transition-colors hover:bg-blue-100 dark:border-gray-700 dark:hover:bg-primary/20 ${isWeekend ? 'df-year-view-weekend-cell bg-blue-50 dark:bg-blue-900/30' : ''} `}
                       onClick={() => app.selectDate(date)}
                       onDblClick={e => handleCellDoubleClick(e, date)}
                       onContextMenu={e => handleContextMenu(e, date)}
                     >
-                      <span className={`
-                          text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full
-                          ${isToday ? 'bg-primary text-primary-foreground font-bold shadow-sm' : 'text-gray-700 dark:text-gray-300'}
-                        `}>{date.getDate()}</span>
+                      <span
+                        className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-medium ${isToday ? 'bg-primary font-bold text-primary-foreground shadow-sm' : 'text-gray-700 dark:text-gray-300'} `}
+                      >
+                        {date.getDate()}
+                      </span>
                     </div>
                   );
                 })}
@@ -655,10 +652,10 @@ export const FixedWeekYearView = ({
               {/* Event segments overlay */}
               {month.eventSegments.length > 0 && (
                 <div
-                  className='absolute inset-0 pointer-events-none z-20'
+                  className='pointer-events-none absolute inset-0 z-20'
                   style={{ top: 20 }}
                 >
-                  <div className='relative w-full h-full'>
+                  <div className='relative h-full w-full'>
                     {month.eventSegments.map(segment => (
                       <div key={segment.id} className='pointer-events-auto'>
                         <CalendarEvent

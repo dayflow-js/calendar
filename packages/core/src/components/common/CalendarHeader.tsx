@@ -77,7 +77,7 @@ const CalendarHeader = ({
       generatorArgs={headerProps}
       defaultContent={
         <div
-          className={`df-header flex items-center justify-between pr-2 pt-1 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0 border-b ${
+          className={`df-header flex shrink-0 items-center justify-between border-b bg-white pt-1 pr-2 transition-colors duration-200 dark:bg-gray-900 ${
             isDayView || isSearchOpen
               ? 'border-gray-200 dark:border-gray-700'
               : 'border-transparent'
@@ -89,7 +89,7 @@ const CalendarHeader = ({
           onContextMenu={e => e.preventDefault()}
         >
           {/* Left Section: Add Calendar Button Only */}
-          <div className='df-header-left flex items-center mb-1'>
+          <div className='df-header-left mb-1 flex items-center'>
             {onAddCalendar && isEditable && (
               <button
                 type='button'
@@ -108,7 +108,7 @@ const CalendarHeader = ({
           </div>
 
           {/* Middle Section: ViewSwitcher (if mode is buttons) */}
-          <div className='df-header-mid flex-1 flex justify-center'>
+          <div className='df-header-mid flex flex-1 justify-center'>
             {isSwitcherCentered && (
               <ViewSwitcher mode={switcherMode} calendar={calendar} />
             )}
@@ -116,7 +116,7 @@ const CalendarHeader = ({
 
           {/* Right Section: Search, ViewSwitcher (if select) */}
           <div
-            className={`df-header-right flex items-center justify-end gap-3 mb-1 pb-1`}
+            className={`df-header-right mb-1 flex items-center justify-end gap-3 pb-1`}
           >
             {!isSwitcherCentered && (
               <ViewSwitcher mode={switcherMode} calendar={calendar} />
@@ -133,9 +133,9 @@ const CalendarHeader = ({
             </button>
 
             {/* Desktop Search Bar */}
-            <div className='relative hidden md:block group'>
-              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                <span className='text-gray-400 group-focus-within:text-primary transition-colors'>
+            <div className='group relative hidden md:block'>
+              <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+                <span className='text-gray-400 transition-colors group-focus-within:text-primary'>
                   <Search width={16} height={16} />
                 </span>
               </div>
@@ -151,7 +151,7 @@ const CalendarHeader = ({
                 <button
                   type='button'
                   onClick={handleClearSearch}
-                  className='absolute inset-y-0 right-0 pr-2 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                  className='absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
                 >
                   <svg
                     width='14'

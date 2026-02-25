@@ -59,7 +59,7 @@ export const MergeMenuItem = ({
     <>
       <div
         ref={itemRef}
-        className='relative flex cursor-default select-none items-center justify-between rounded-sm px-3 py-0.5 text-[12px] outline-none hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white transition-colors'
+        className='relative flex cursor-default items-center justify-between rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -71,7 +71,7 @@ export const MergeMenuItem = ({
           <div
             ref={submenuRef}
             data-submenu-content='true'
-            className='fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md dark:border-slate-800 dark:bg-slate-950 animate-in fade-in-0 zoom-in-95 duration-100'
+            className='animate-in fade-in-0 zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -80,14 +80,14 @@ export const MergeMenuItem = ({
             {availableCalendars.map(calendar => (
               <div
                 key={calendar.id}
-                className='flex items-center cursor-pointer rounded-sm px-3 py-1 text-[12px] text-slate-900 hover:bg-primary hover:text-white dark:text-slate-50 dark:hover:bg-primary dark:hover:text-white transition-colors'
+                className='flex cursor-pointer items-center rounded-sm px-3 py-1 text-[12px] text-slate-900 transition-colors hover:bg-primary hover:text-white dark:text-slate-50 dark:hover:bg-primary dark:hover:text-white'
                 onClick={e => {
                   e.stopPropagation();
                   onMergeSelect(calendar.id);
                 }}
               >
                 <div
-                  className='mr-2 h-3 w-3 rounded-sm shrink-0'
+                  className='mr-2 h-3 w-3 shrink-0 rounded-sm'
                   style={{ backgroundColor: calendar.colors.lineColor }}
                 />
                 <span className='truncate'>{calendar.name || calendar.id}</span>

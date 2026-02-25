@@ -170,16 +170,16 @@ export const TimeGrid = ({
   };
 
   return (
-    <div className='flex flex-1 overflow-hidden relative'>
+    <div className='relative flex flex-1 overflow-hidden'>
       {/* Left Frozen Column */}
       <div
-        className='w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10'
+        className='relative z-10 w-12 shrink-0 overflow-hidden bg-white md:w-20 dark:bg-gray-900'
         onContextMenu={e => e.preventDefault()}
       >
         <div ref={leftFrozenContentRef}>
           {/* Top boundary spacer with start-of-day label */}
-          <div className='h-3 relative'>
-            <div className='absolute -bottom-1 right-2 text-[10px] md:text-[12px] text-gray-500 dark:text-gray-400 select-none'>
+          <div className='relative h-3'>
+            <div className='absolute right-2 -bottom-1 text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'>
               {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
             </div>
           </div>
@@ -207,7 +207,7 @@ export const TimeGrid = ({
 
               return (
                 <div
-                  className='absolute left-0 w-full z-20 pointer-events-none flex items-center justify-end'
+                  className='pointer-events-none absolute left-0 z-20 flex w-full items-center justify-end'
                   style={{
                     top: `${topPx}px`,
                     transform: 'translateY(-50%)',
@@ -224,18 +224,18 @@ export const TimeGrid = ({
       {/* Scroller */}
       <div
         ref={scrollerRef}
-        className={`flex-1 overflow-auto relative calendar-content ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
+        className={`calendar-content relative flex-1 overflow-auto ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
         onScroll={handleScroll}
       >
         <div className='flex' style={{ width: gridWidth, minWidth: '100%' }}>
           {/* Time Grid */}
           <div className='grow'>
             {/* Top boundary */}
-            <div className={`${timeGridBoundary} border-t-0 flex`}>
+            <div className={`${timeGridBoundary} flex border-t-0`}>
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`top-${dayIndex}`}
-                  className={`flex-1 relative ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
+                  className={`relative flex-1 ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
                   style={columnStyle}
                 />
               ))}
@@ -269,15 +269,15 @@ export const TimeGrid = ({
                         zIndex: 20,
                       }}
                     >
-                      <div className='flex items-center w-0'>
+                      <div className='flex w-0 items-center'>
                         {/* Empty left part since it is in frozen column now */}
                       </div>
 
                       <div className='flex flex-1'>
                         {weekDaysLabels.map((_, idx) => (
-                          <div key={idx} className='flex-1 flex items-center'>
+                          <div key={idx} className='flex flex-1 items-center'>
                             <div
-                              className={`h-0.5 w-full relative ${
+                              className={`relative h-0.5 w-full ${
                                 idx === todayIndex
                                   ? 'bg-primary'
                                   : 'bg-primary/30'
@@ -288,7 +288,7 @@ export const TimeGrid = ({
                             >
                               {idx === todayIndex && todayIndex !== 0 && (
                                 <div
-                                  className='absolute w-2 h-2 bg-primary rounded-full'
+                                  className='absolute h-2 w-2 rounded-full bg-primary'
                                   style={{ top: '-3px', left: '-4px' }}
                                 />
                               )}
@@ -343,7 +343,7 @@ export const TimeGrid = ({
                 {weekDaysLabels.map((_, dayIndex) => (
                   <div
                     key={`24-${dayIndex}`}
-                    className={`flex-1 relative ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
+                    className={`relative flex-1 ${dayIndex === weekDaysLabels.length - 1 && (isMobile || !hasScrollbarSpace) ? '' : 'border-r'} border-gray-200 dark:border-gray-700`}
                     style={columnStyle}
                   />
                 ))}
@@ -401,7 +401,7 @@ export const TimeGrid = ({
                 return (
                   <div
                     key={`events-day-${dayIndex}`}
-                    className='absolute top-0 pointer-events-none'
+                    className='pointer-events-none absolute top-0'
                     style={{
                       left: `calc(${(100 / daysToShow) * dayIndex}%)`,
                       width: `${100 / daysToShow}%`,

@@ -16,7 +16,7 @@ export const MergeCalendarDialog = ({
   const { t } = useLocale();
   return (
     <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/50'>
-      <div className='w-full max-w-md rounded-lg p-6 shadow-xl bg-background'>
+      <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-xl'>
         <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
           {t('mergeConfirmTitle', { sourceName, targetName })}
         </h2>

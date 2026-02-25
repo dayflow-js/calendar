@@ -32,7 +32,7 @@ export const DeleteCalendarDialog = ({
 
   return createPortal(
     <div className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
-      <div className='w-full max-w-md rounded-lg p-6 shadow-xl bg-background'>
+      <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-xl'>
         {step === 'initial' ? (
           <>
             <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
@@ -41,7 +41,7 @@ export const DeleteCalendarDialog = ({
             <p className='mt-3 text-sm text-gray-600 dark:text-gray-300'>
               {t('deleteCalendarMessage', { calendarName })}
             </p>
-            <div className='mt-6 flex justify-between items-center'>
+            <div className='mt-6 flex items-center justify-between'>
               <div className='relative'>
                 <button
                   type='button'
@@ -51,20 +51,20 @@ export const DeleteCalendarDialog = ({
                   {t('merge')}
                 </button>
                 {showMergeDropdown && (
-                  <div className='absolute left-0 top-full mt-1 min-w-full w-max rounded-md border border-gray-200 bg-background shadow-lg dark:border-slate-700 z-10 max-h-60 overflow-y-auto'>
+                  <div className='absolute top-full left-0 z-10 mt-1 max-h-60 w-max min-w-full overflow-y-auto rounded-md border border-gray-200 bg-background shadow-lg dark:border-slate-700'>
                     {calendars
                       .filter(c => c.id !== calendarId)
                       .map(calendar => (
                         <div
                           key={calendar.id}
-                          className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-700 cursor-pointer'
+                          className='flex cursor-pointer items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-700'
                           onClick={() => {
                             onMergeSelect(calendar.id);
                             setShowMergeDropdown(false);
                           }}
                         >
                           <div
-                            className='mr-2 h-3 w-3 rounded-sm shrink-0'
+                            className='mr-2 h-3 w-3 shrink-0 rounded-sm'
                             style={{
                               backgroundColor: calendar.colors.lineColor,
                             }}
@@ -107,7 +107,7 @@ export const DeleteCalendarDialog = ({
               <button
                 type='button'
                 onClick={onCancel}
-                className='rounded-md bg-background border border-border px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700'
+                className='rounded-md border border-border bg-background px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700'
               >
                 {t('cancel')}
               </button>

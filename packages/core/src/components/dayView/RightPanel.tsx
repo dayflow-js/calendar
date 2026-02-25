@@ -56,7 +56,7 @@ export const RightPanel = ({
 
   return (
     <div
-      className={`df-right-panel hidden md:block flex-none ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
+      className={`df-right-panel hidden flex-none md:block ${switcherMode === 'buttons' ? '' : ''} w-[30%] bg-white dark:bg-gray-900`}
       onContextMenu={e => e.preventDefault()}
     >
       <div className={`${flexCol} h-full`}>
@@ -89,7 +89,7 @@ export const RightPanel = ({
         <div className={`flex-1 overflow-y-auto`}>
           <div className={`${p4}`}>
             <h3
-              className={`${textLg} font-semibold ${mb3} sticky top-0 bg-white dark:bg-gray-900 z-10 py-2`}
+              className={`${textLg} font-semibold ${mb3} sticky top-0 z-10 bg-white py-2 dark:bg-gray-900`}
             >
               {currentDate.toLocaleDateString(locale, {
                 weekday: 'long',
@@ -105,11 +105,7 @@ export const RightPanel = ({
                 {sortedEvents.map((event: Event) => (
                   <div
                     key={event.id}
-                    className={`
-                      ${p2} rounded border-l-4 cursor-pointer transition-colors
-                      ${selectedEvent?.id === event.id ? 'bg-primary/10 border-primary' : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'}
-                      hover:bg-gray-100 dark:hover:bg-gray-700
-                    `}
+                    className={` ${p2} cursor-pointer rounded border-l-4 transition-colors ${selectedEvent?.id === event.id ? 'border-primary bg-primary/10' : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800'} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     style={{
                       borderLeftColor: getLineColor(event.calendarId || 'blue'),
                     }}

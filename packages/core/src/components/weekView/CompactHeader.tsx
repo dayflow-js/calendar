@@ -33,9 +33,9 @@ export const CompactHeader = ({
   mobilePageStart,
   onDateChange,
 }: CompactHeaderProps) => (
-  <div className='flex flex-col w-full py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'>
+  <div className='flex w-full flex-col border-b border-gray-200 bg-white py-3 dark:border-gray-700 dark:bg-gray-900'>
     {/* Weekday labels row */}
-    <div className='grid grid-cols-7 mb-1'>
+    <div className='mb-1 grid grid-cols-7'>
       {fullWeekDates.map((day, index) => (
         <div key={`label-${index}`} className='flex justify-center'>
           <span
@@ -66,7 +66,7 @@ export const CompactHeader = ({
         return (
           <>
             <div
-              className='absolute bg-gray-100 dark:bg-gray-800 rounded-full transition-all duration-300'
+              className='absolute rounded-full bg-gray-100 transition-all duration-300 dark:bg-gray-800'
               style={{
                 left: capsuleLeft,
                 top: 0,
@@ -83,21 +83,19 @@ export const CompactHeader = ({
               return (
                 <div
                   key={`date-${index}`}
-                  className='flex justify-center items-center cursor-pointer relative z-10'
+                  className='relative z-10 flex cursor-pointer items-center justify-center'
                   style={{ height: '32px' }}
                   onClick={() => {
                     app.setCurrentDate(day.fullDate);
                     onDateChange?.(day.fullDate);
                   }}
                 >
-                  <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-                        transition-all duration-300 relative
-                        ${isSelected ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 shadow-sm' : day.isToday ? 'text-primary font-bold' : isInsidePill ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}
-                      `}>
+                  <div
+                    className={`relative flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all duration-300 ${isSelected ? 'bg-gray-900 text-white shadow-sm dark:bg-gray-100 dark:text-gray-900' : day.isToday ? 'font-bold text-primary' : isInsidePill ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'} `}
+                  >
                     {day.date}
                     {day.isToday && !isSelected && (
-                      <div className='absolute bottom-1 w-1 h-1 bg-primary rounded-full'></div>
+                      <div className='absolute bottom-1 h-1 w-1 rounded-full bg-primary'></div>
                     )}
                   </div>
                 </div>

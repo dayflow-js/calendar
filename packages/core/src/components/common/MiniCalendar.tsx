@@ -113,11 +113,12 @@ export const MiniCalendar = ({
           </div>
         ))}
         {miniCalendarDays.map(day => (
-          <button type='button' key={day.fullDate.getTime()} className={`
-              ${miniCalendarDay}
-              ${day.isToday ? miniCalendarToday : day.isCurrentMonth ? miniCalendarCurrentMonth : miniCalendarOtherMonth}
-              ${day.isSelected && !day.isToday ? miniCalendarSelected : ''}
-            `} onClick={() => onDateSelect(day.fullDate)}>
+          <button
+            type='button'
+            key={day.fullDate.getTime()}
+            className={` ${miniCalendarDay} ${day.isToday ? miniCalendarToday : day.isCurrentMonth ? miniCalendarCurrentMonth : miniCalendarOtherMonth} ${day.isSelected && !day.isToday ? miniCalendarSelected : ''} `}
+            onClick={() => onDateSelect(day.fullDate)}
+          >
             {day.date}
           </button>
         ))}

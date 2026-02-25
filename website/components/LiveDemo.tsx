@@ -10,13 +10,13 @@ export function LiveDemo() {
     <div className='landingPage mx-auto px-0 sm:px-12'>
       <section className='space-y-12 py-8'>
         <div className='mx-auto text-center'>
-          <span className='inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-blue-600 dark:bg-blue-500/10 dark:text-blue-300'>
+          <span className='inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium tracking-wide text-blue-600 uppercase dark:bg-blue-500/10 dark:text-blue-300'>
             Calendar toolkit for product teams
           </span>
-          <h1 className='mt-6 text-3xl font-semibold leading-tight sm:text-5xl px-6'>
+          <h1 className='mt-6 px-6 text-3xl leading-tight font-semibold sm:text-5xl'>
             A lightweight and elegant full calendar component for the web
           </h1>
-          <p className='mt-4 text-base text-slate-600 dark:text-slate-400 sm:text-lg'>
+          <p className='mt-4 text-base text-slate-600 sm:text-lg dark:text-slate-400'>
             DayFlow provides production-ready calendar views, drag-and-drop, and
             a modular architecture so you can focus on your product, not date
             math.
@@ -39,7 +39,7 @@ export function LiveDemo() {
       </section>
 
       <section className='space-y-6 py-4'>
-        <div className='overflow-hidden '>
+        <div className='overflow-hidden'>
           <InteractiveCalendarComponent />
         </div>
       </section>

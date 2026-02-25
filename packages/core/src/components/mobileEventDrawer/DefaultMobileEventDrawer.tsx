@@ -284,29 +284,29 @@ export const MobileEventDrawer = ({
   };
 
   return createPortal(
-    <div className='fixed inset-0 z-10000 flex items-end pointer-events-none'>
+    <div className='pointer-events-none fixed inset-0 z-10000 flex items-end'>
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/30 pointer-events-auto transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+        className={`pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         style={{ touchAction: 'none' }}
         onClick={onClose}
       />
 
       {/* Drawer */}
       <div
-        className={`relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-2xl shadow-xl h-[85vh] flex flex-col pointer-events-auto overflow-hidden ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}
+        className={`pointer-events-auto relative flex h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-gray-100 shadow-xl dark:bg-gray-800 ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
         {/* Header Actions */}
-        <div className='flex justify-between items-center p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900'>
           <button
             type='button'
             onClick={onClose}
-            className='text-gray-500 hover:text-gray-700 px-2 py-1'
+            className='px-2 py-1 text-gray-500 hover:text-gray-700'
           >
             {t('cancel')}
           </button>
-          <span className='font-semibold text-lg'>
+          <span className='text-lg font-semibold'>
             {!isEditable && isEditing
               ? t('viewEvent')
               : isEditing
@@ -318,10 +318,10 @@ export const MobileEventDrawer = ({
               type='button'
               onClick={handleSave}
               disabled={!hasChanges}
-              className={`font-bold px-2 py-1 transition-colors ${
+              className={`px-2 py-1 font-bold transition-colors ${
                 hasChanges
                   ? 'text-primary'
-                  : 'text-gray-400 cursor-not-allowed opacity-50'
+                  : 'cursor-not-allowed text-gray-400 opacity-50'
               }`}
             >
               {isEditing ? t('done') : t('create')}
@@ -330,9 +330,9 @@ export const MobileEventDrawer = ({
           {!isEditable && <span className='w-12' />}
         </div>
 
-        <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+        <div className='flex-1 space-y-4 overflow-y-auto p-4'>
           {/* Title */}
-          <div className='bg-white dark:bg-gray-900 rounded-lg px-4 py-3'>
+          <div className='rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
             <input
               type='text'
               placeholder={t('titlePlaceholder')}
@@ -348,7 +348,7 @@ export const MobileEventDrawer = ({
 
           {/* Calendar */}
           {calendars.length > 0 && (
-            <div className='bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center relative'>
+            <div className='relative flex items-center justify-between rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
               <span className='text-gray-700 dark:text-gray-300'>
                 {t('calendar')}
               </span>
@@ -370,7 +370,7 @@ export const MobileEventDrawer = ({
           )}
 
           {/* All-day */}
-          <div className='bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center'>
+          <div className='flex items-center justify-between rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
             <span className='text-gray-700 dark:text-gray-300'>
               {t('allDay')}
             </span>
@@ -388,15 +388,15 @@ export const MobileEventDrawer = ({
           </div>
 
           {/* Starts */}
-          <div className='bg-white dark:bg-gray-900 rounded-lg overflow-hidden'>
-            <div className='flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0'>
+          <div className='overflow-hidden rounded-lg bg-white dark:bg-gray-900'>
+            <div className='flex items-center justify-between border-b border-gray-100 px-4 py-3 last:border-0 dark:border-gray-800'>
               <span className='text-gray-700 dark:text-gray-300'>
                 {t('starts')}
               </span>
               <div className='flex space-x-2'>
                 <button
                   type='button'
-                  className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                  className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'start-date' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                   onClick={() => isEditable && toggleExpand('start-date')}
                   disabled={!isEditable}
                 >
@@ -405,7 +405,7 @@ export const MobileEventDrawer = ({
                 {!isAllDay && (
                   <button
                     type='button'
-                    className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                    className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'start-time' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                     onClick={() => isEditable && toggleExpand('start-time')}
                     disabled={!isEditable}
                   >
@@ -443,15 +443,15 @@ export const MobileEventDrawer = ({
           </div>
 
           {/* Ends */}
-          <div className='bg-white dark:bg-gray-900 rounded-lg overflow-hidden'>
-            <div className='flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0'>
+          <div className='overflow-hidden rounded-lg bg-white dark:bg-gray-900'>
+            <div className='flex items-center justify-between border-b border-gray-100 px-4 py-3 last:border-0 dark:border-gray-800'>
               <span className='text-gray-700 dark:text-gray-300'>
                 {t('ends')}
               </span>
               <div className='flex space-x-2'>
                 <button
                   type='button'
-                  className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                  className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'end-date' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                   onClick={() => isEditable && toggleExpand('end-date')}
                   disabled={!isEditable}
                 >
@@ -460,7 +460,7 @@ export const MobileEventDrawer = ({
                 {!isAllDay && (
                   <button
                     type='button'
-                    className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                    className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'end-time' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                     onClick={() => isEditable && toggleExpand('end-time')}
                     disabled={!isEditable}
                   >
@@ -495,7 +495,7 @@ export const MobileEventDrawer = ({
           </div>
 
           {/* Notes */}
-          <div className='bg-white dark:bg-gray-900 rounded-lg px-4 py-3'>
+          <div className='rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
             <textarea
               placeholder={t('notesPlaceholder')}
               value={notes}
@@ -503,7 +503,7 @@ export const MobileEventDrawer = ({
                 e: JSX.TargetedEvent<HTMLTextAreaElement, globalThis.Event>
               ) => isEditable && setNotes(e.currentTarget.value)}
               readOnly={!isEditable}
-              className='w-full bg-transparent text-base placeholder-gray-400 focus:outline-none min-h-20'
+              className='min-h-20 w-full bg-transparent text-base placeholder-gray-400 focus:outline-none'
             />
           </div>
 
@@ -512,7 +512,7 @@ export const MobileEventDrawer = ({
             <button
               type='button'
               onClick={() => onEventDelete(draftEvent.id)}
-              className='w-full bg-white dark:bg-gray-900 rounded-lg px-4 py-3 text-red-500 font-medium text-left'
+              className='w-full rounded-lg bg-white px-4 py-3 text-left font-medium text-red-500 dark:bg-gray-900'
             >
               {t('delete')}
             </button>

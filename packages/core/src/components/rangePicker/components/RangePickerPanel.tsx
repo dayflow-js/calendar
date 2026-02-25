@@ -58,14 +58,14 @@ const RangePickerPanel = ({
   return (
     <div ref={popupRef} style={getPopupStyle()} data-range-picker-popup='true'>
       <div
-        className='space-y-3 rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-3'
+        className='space-y-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-800'
         style={{
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           width: matchTriggerWidth ? '100%' : undefined,
         }}
       >
         <div className='flex gap-1'>
-          <div className='flex-3 rounded-xl border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm w-full'>
+          <div className='w-full flex-3 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800'>
             <CalendarHeader
               visibleMonth={visibleMonth}
               monthLabels={monthLabels}

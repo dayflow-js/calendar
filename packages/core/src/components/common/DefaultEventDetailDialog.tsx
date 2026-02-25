@@ -169,11 +169,11 @@ const DefaultEventDetailDialog = ({
         <button
           type='button'
           onClick={onClose}
-          className='absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-200 transition'
+          className='absolute top-4 right-4 text-gray-400 transition hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-200'
           aria-label='Close'
         >
           <svg
-            className='w-5 h-5'
+            className='h-5 w-5'
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
@@ -189,10 +189,10 @@ const DefaultEventDetailDialog = ({
 
         {/* Content */}
         <div>
-          <span className='block text-xs text-gray-600 dark:text-gray-300 mb-1'>
+          <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
             {t('eventTitle')}
           </span>
-          <div className='flex items-center justify-between gap-3 mb-4'>
+          <div className='mb-4 flex items-center justify-between gap-3'>
             <div className='flex-1'>
               <input
                 id={`event-dialog-title-${editedEvent.id}`}
@@ -207,7 +207,7 @@ const DefaultEventDetailDialog = ({
                     title: (e.target as HTMLInputElement).value,
                   });
                 }}
-                className='w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition'
+                className='w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
               />
             </div>
             {isEditable && (
@@ -227,7 +227,7 @@ const DefaultEventDetailDialog = ({
 
           {editedEvent.allDay ? (
             <div className='mb-4'>
-              <div className='text-xs text-gray-600 dark:text-gray-300 mb-1'>
+              <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
                 {t('dateRange')}
               </div>
               <RangePicker
@@ -244,7 +244,7 @@ const DefaultEventDetailDialog = ({
             </div>
           ) : (
             <div className='mb-4'>
-              <div className='text-xs text-gray-600 dark:text-gray-300 mb-1'>
+              <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
                 {t('timeRange')}
               </div>
               <RangePicker
@@ -277,7 +277,7 @@ const DefaultEventDetailDialog = ({
           )}
 
           <div className='mb-4'>
-            <span className='block text-xs text-gray-600 dark:text-gray-300 mb-1'>
+            <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
               {t('note')}
             </span>
             <textarea
@@ -293,7 +293,7 @@ const DefaultEventDetailDialog = ({
                 })
               }
               rows={4}
-              className='w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none'
+              className='w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
               placeholder={t('addNotePlaceholder')}
             />
           </div>
@@ -303,7 +303,7 @@ const DefaultEventDetailDialog = ({
               {editedEvent.allDay ? (
                 <button
                   type='button'
-                  className='px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition'
+                  className='rounded-lg bg-secondary/10 px-3 py-2 text-xs font-medium text-secondary transition hover:bg-secondary/20'
                   onClick={convertToRegular}
                 >
                   {t('setAsTimed')}
@@ -311,7 +311,7 @@ const DefaultEventDetailDialog = ({
               ) : (
                 <button
                   type='button'
-                  className='px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition'
+                  className='rounded-lg bg-secondary/10 px-3 py-2 text-xs font-medium text-secondary transition hover:bg-secondary/20'
                   onClick={convertToAllDay}
                 >
                   {t('setAsAllDay')}
@@ -320,7 +320,7 @@ const DefaultEventDetailDialog = ({
 
               <button
                 type='button'
-                className='px-3 py-2 bg-destructive border border-border text-destructive-foreground rounded-lg hover:bg-destructive/90 text-xs font-medium transition'
+                className='rounded-lg border border-border bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground transition hover:bg-destructive/90'
                 onClick={() => {
                   onEventDelete(event.id);
                   onClose();
@@ -331,10 +331,10 @@ const DefaultEventDetailDialog = ({
 
               <button
                 type='button'
-                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-medium transition ml-auto ${
+                className={`ml-auto rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition ${
                   hasChanges
-                    ? 'hover:bg-primary/90 shadow-lg shadow-primary/20'
-                    : 'opacity-50 cursor-not-allowed grayscale-[0.5]'
+                    ? 'shadow-lg shadow-primary/20 hover:bg-primary/90'
+                    : 'cursor-not-allowed opacity-50 grayscale-[0.5]'
                 }`}
                 onClick={handleSave}
                 disabled={!hasChanges}

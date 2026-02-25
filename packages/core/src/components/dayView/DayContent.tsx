@@ -206,7 +206,7 @@ export const DayContent = ({
 
   return (
     <div
-      className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full md:w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
+      className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full border-r border-gray-200 bg-white md:w-[70%] dark:border-gray-700 dark:bg-gray-900`}
       onContextMenu={e => e.preventDefault()}
     >
       <div className={`relative ${flexCol} h-full`}>
@@ -231,7 +231,7 @@ export const DayContent = ({
           <div
             className={cn(
               allDayRow,
-              'border-t border-gray-200 dark:border-gray-700 items-stretch'
+              'items-stretch border-t border-gray-200 dark:border-gray-700'
             )}
             ref={allDayRowRef}
             style={{
@@ -241,21 +241,21 @@ export const DayContent = ({
             onContextMenu={e => handleContextMenu(e, true)}
           >
             <div
-              className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs flex items-center`}
+              className={`${allDayLabel} flex w-12 items-center text-[10px] md:w-20 md:text-xs`}
               onContextMenu={e => e.preventDefault()}
             >
               {t('allDay')}
             </div>
             <div
               className={cn(
-                'flex flex-1 relative self-stretch',
+                'relative flex flex-1 self-stretch',
                 !isMobile && hasScrollbarSpace
                   ? 'border-r border-gray-200 dark:border-gray-700'
                   : ''
               )}
             >
               <div
-                className='w-full relative'
+                className='relative w-full'
                 style={{ minHeight: `${allDayAreaHeight}px` }}
                 onClick={() => onDateChange?.(currentDate)}
                 onMouseDown={e => {
@@ -375,14 +375,14 @@ export const DayContent = ({
                       marginTop: '0.75rem',
                     }}
                   >
-                    <div className='flex items-center w-12 md:w-20'>
-                      <div className='relative w-full flex items-center'></div>
+                    <div className='flex w-12 items-center md:w-20'>
+                      <div className='relative flex w-full items-center'></div>
                       <div className={currentTimeLabel}>
                         {formatTime(hours)}
                       </div>
                     </div>
 
-                    <div className='flex-1 flex items-center'>
+                    <div className='flex flex-1 items-center'>
                       <div className={currentTimeLineBar} />
                     </div>
                   </div>
@@ -496,7 +496,7 @@ export const DayContent = ({
                 </div>
 
                 {/* Event layer */}
-                <div className='absolute top-0 left-0 right-0 bottom-0 pointer-events-none'>
+                <div className='pointer-events-none absolute top-0 right-0 bottom-0 left-0'>
                   {currentDayEvents
                     .filter(event => !event.allDay)
                     .map(event => {

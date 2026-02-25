@@ -157,7 +157,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
 
   if (isCollapsed) {
     return (
-      <div className='h-full pl-2 bg-slate-900 py-4 text-slate-100'>
+      <div className='h-full bg-slate-900 py-4 pl-2 text-slate-100'>
         <button
           type='button'
           onClick={() => setCollapsed(false)}
@@ -174,7 +174,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
     <div className='flex h-full flex-col bg-slate-950 text-slate-100'>
       <div className='flex items-center justify-between border-b border-white/10 px-4 py-3'>
         <div>
-          <p className='text-xs font-semibold uppercase tracking-wide text-slate-500'>
+          <p className='text-xs font-semibold tracking-wide text-slate-500 uppercase'>
             Workspace
           </p>
           <p className='text-base font-semibold text-white'>DayFlow Team</p>
@@ -190,7 +190,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
       </div>
 
       <div className='flex-1 overflow-y-auto px-4 py-4'>
-        <div className='flex items-center justify-between text-xs uppercase tracking-wide text-slate-500'>
+        <div className='flex items-center justify-between text-xs tracking-wide text-slate-500 uppercase'>
           <span>Calendars</span>
           <div className='flex items-center gap-2'>
             <button
@@ -223,7 +223,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
               className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm shadow-sm transition ${
                 calendar.isVisible
                   ? 'border-slate-700 bg-slate-900/70 hover:border-slate-600'
-                  : 'border-slate-800 bg-slate-950 hover:border-slate-800/80 text-slate-500'
+                  : 'border-slate-800 bg-slate-950 text-slate-500 hover:border-slate-800/80'
               }`}
             >
               <span className='inline-flex items-center gap-2'>
@@ -245,7 +245,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
         </div>
 
         <div className='mt-6 rounded-xl border border-slate-800 bg-slate-900/70 p-4'>
-          <p className='text-xs font-semibold uppercase tracking-wide text-slate-400'>
+          <p className='text-xs font-semibold tracking-wide text-slate-400 uppercase'>
             Upcoming
           </p>
           <ul className='mt-3 space-y-3 text-sm'>

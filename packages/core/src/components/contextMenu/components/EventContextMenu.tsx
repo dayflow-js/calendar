@@ -88,13 +88,13 @@ const EventContextMenu = ({
                 key={cal.id}
                 onClick={() => handleMoveToCalendar(cal.id)}
               >
-                <div className='flex items-center w-full'>
+                <div className='flex w-full items-center'>
                   <div className='w-4 shrink-0'>
-                    {isSelected && <Check className='w-3 h-3 text-primary' />}
+                    {isSelected && <Check className='h-3 w-3 text-primary' />}
                   </div>
-                  <div className='flex items-center gap-1.5 min-w-0'>
+                  <div className='flex min-w-0 items-center gap-1.5'>
                     <div
-                      className='w-3 h-3 rounded-sm shrink-0'
+                      className='h-3 w-3 shrink-0 rounded-sm'
                       style={{ backgroundColor: cal.colors.lineColor }}
                     />
                     <span

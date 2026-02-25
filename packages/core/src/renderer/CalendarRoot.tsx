@@ -297,7 +297,7 @@ export const CalendarRoot = ({
           )}
 
           <div
-            className={`flex flex-col flex-1 h-full overflow-hidden relative z-10 bg-white dark:bg-gray-900 transition-all duration-250 ease-in-out border-l ${sidebar.isCollapsed ? 'border-gray-200 dark:border-gray-700 shadow-xl' : 'border-transparent'}`}
+            className={`relative z-10 flex h-full flex-1 flex-col overflow-hidden border-l bg-white transition-all duration-250 ease-in-out dark:bg-gray-900 ${sidebar.isCollapsed ? 'border-gray-200 shadow-xl dark:border-gray-700' : 'border-transparent'}`}
             style={{
               marginLeft: sidebar.enabled
                 ? sidebar.isCollapsed
@@ -308,9 +308,9 @@ export const CalendarRoot = ({
           >
             {renderHeader()}
 
-            <div className='flex-1 overflow-hidden relative' ref={calendarRef}>
-              <div className='calendar-renderer h-full relative flex flex-row'>
-                <div className='flex-1 h-full overflow-hidden'>
+            <div className='relative flex-1 overflow-hidden' ref={calendarRef}>
+              <div className='calendar-renderer relative flex h-full flex-row'>
+                <div className='h-full flex-1 overflow-hidden'>
                   <ViewComponent {...viewProps} />
                 </div>
 

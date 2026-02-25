@@ -155,7 +155,7 @@ export const AllDayRow = ({
   };
 
   return (
-    <div className='flex flex-col w-full'>
+    <div className='flex w-full flex-col'>
       {/* Mobile 7-day Header with Segmented Control */}
       {(mode === 'compact' || isCompact) &&
         fullWeekDates &&
@@ -175,7 +175,7 @@ export const AllDayRow = ({
         {/* Left Frozen Column - outside scroll area, matching TimeGrid sidebar */}
         {showAllDay && (
           <div
-            className='w-12 md:w-20 shrink-0 bg-white dark:bg-gray-900 z-20 flex flex-col'
+            className='z-20 flex w-12 shrink-0 flex-col bg-white md:w-20 dark:bg-gray-900'
             onContextMenu={e => e.preventDefault()}
           >
             {/* Header spacer - flexes to match weekday header height */}
@@ -184,7 +184,7 @@ export const AllDayRow = ({
             ></div>
             {/* All Day Label */}
             <div
-              className='flex items-center justify-end p-1 text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 select-none'
+              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 select-none md:text-xs dark:text-gray-400'
               style={{ minHeight: `${allDayAreaHeight}px` }}
             >
               {allDayLabelText}
@@ -194,7 +194,7 @@ export const AllDayRow = ({
 
         {/* Top Frozen Content - overflow hidden, content positioned via transform */}
         <div
-          className='flex-1 overflow-hidden relative transition-[min-height] duration-300 ease-in-out'
+          className='relative flex-1 overflow-hidden transition-[min-height] duration-300 ease-in-out'
           style={{
             scrollbarGutter: 'stable',
             minHeight: showAllDay
@@ -224,18 +224,18 @@ export const AllDayRow = ({
                   >
                     {isMobile ? (
                       <>
-                        <div className='text-[12px] leading-tight text-gray-500 font-medium'>
+                        <div className='text-[12px] leading-tight font-medium text-gray-500'>
                           {mobileWeekDaysLabels[i]}
                         </div>
                         <div
-                          className={`${dateNumber} w-7 h-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}
+                          className={`${dateNumber} h-7 w-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}
                         >
                           {weekDates[i].date}
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className='inline-flex items-center justify-center text-sm mt-1 mr-1'>
+                        <div className='mt-1 mr-1 inline-flex items-center justify-center text-sm'>
                           {day}
                         </div>
                         <div
@@ -292,7 +292,7 @@ export const AllDayRow = ({
                     );
                   })}
                   {/* Multi-day event overlay */}
-                  <div className='absolute inset-0 pointer-events-none'>
+                  <div className='pointer-events-none absolute inset-0'>
                     {organizedAllDaySegments.map(segment => (
                       <CalendarEventComponent
                         key={segment.event.id}

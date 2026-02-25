@@ -123,14 +123,14 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
   };
 
   return (
-    <div className='flex h-56 overflow-hidden rounded-lg mt-2 relative '>
+    <div className='relative mt-2 flex h-56 overflow-hidden rounded-lg'>
       <style>{`
             .no-scrollbar::-webkit-scrollbar { display: none; }
             .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
       <div
         ref={hourRef}
-        className='flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar'
+        className='no-scrollbar flex-1 snap-y snap-mandatory overflow-y-auto'
         style={{ touchAction: 'pan-y' }}
         onScroll={e => onScroll(e, 'hour')}
       >
@@ -138,7 +138,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
         {hours.map((h, i) => (
           <div
             key={`h-${i}-${h}`}
-            className='h-8 flex items-center justify-end pr-5 snap-center cursor-pointer'
+            className='flex h-8 cursor-pointer snap-center items-center justify-end pr-5'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setHours(h);
@@ -161,7 +161,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
       </div>
       <div
         ref={minRef}
-        className='flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar'
+        className='no-scrollbar flex-1 snap-y snap-mandatory overflow-y-auto'
         style={{ touchAction: 'pan-y' }}
         onScroll={e => onScroll(e, 'minute')}
       >
@@ -169,7 +169,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
         {minutes.map((m, i) => (
           <div
             key={`m-${i}-${m}`}
-            className='h-8 flex items-center justify-start pl-5 snap-center cursor-pointer'
+            className='flex h-8 cursor-pointer snap-center items-center justify-start pl-5'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setMinutes(m);
@@ -191,7 +191,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
         <div style={{ height: spacerHeight }}></div>
       </div>
       {/* Selection Highlight */}
-      <div className='absolute top-24 left-2 right-2 h-8 bg-gray-300/20 dark:bg-gray-500/20 pointer-events-none border border-gray-300 dark:border-gray-600 rounded-lg'></div>
+      <div className='pointer-events-none absolute top-24 right-2 left-2 h-8 rounded-lg border border-gray-300 bg-gray-300/20 dark:border-gray-600 dark:bg-gray-500/20'></div>
     </div>
   );
 };

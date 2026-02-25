@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
   const triggerClasses = useMemo(
     () =>
       cn(
-        'inline-flex items-center justify-center h-9 rounded-md transition-colors',
+        'inline-flex h-9 items-center justify-center rounded-md transition-colors',
         isDarkMode
           ? 'text-gray-200 hover:bg-gray-800 focus-visible:outline-white'
           : 'text-gray-700 focus-visible:outline-black'

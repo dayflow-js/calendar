@@ -31,9 +31,9 @@ const CalendarDaysIcon = ({ className }: { className?: string }) => (
 
 export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
   renderAllDayContent: ({ title, color: _color }) => (
-    <div className='h-full flex items-center overflow-hidden pl-3 pt-1'>
-      <CalendarDaysIcon className='h-3 w-3 mr-1 text-white' />
-      <div className='font-medium text-xs truncate pr-1 text-white'>
+    <div className='flex h-full items-center overflow-hidden pt-1 pl-3'>
+      <CalendarDaysIcon className='mr-1 h-3 w-3 text-white' />
+      <div className='truncate pr-1 text-xs font-medium text-white'>
         {title}
       </div>
     </div>
@@ -55,10 +55,10 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
         style={{ backgroundColor: getLineColor(color || 'blue') }}
       />
       <div
-        className={`h-full flex flex-col overflow-hidden pl-3 text-white ${getDynamicPadding(drag)}`}
+        className={`flex h-full flex-col overflow-hidden pl-3 text-white ${getDynamicPadding(drag)}`}
       >
         <div
-          className='font-medium text-xs truncate pr-1 text-white'
+          className='truncate pr-1 text-xs font-medium text-white'
           style={{
             lineHeight:
               drag.endHour - drag.startHour <= 0.25 ? '1.2' : 'normal',
@@ -67,7 +67,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
           {title}
         </div>
         {!drag.allDay && drag.endHour - drag.startHour > 0.5 && (
-          <div className='text-xs truncate time-display text-white opacity-90'>
+          <div className='time-display truncate text-xs text-white opacity-90'>
             {formatTime(drag.startHour)} - {formatTime(drag.endHour)}
           </div>
         )}
@@ -75,11 +75,11 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
       {isMobile && (
         <>
           <div
-            className='absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50'
+            className='absolute -top-1.5 right-5 z-50 h-2.5 w-2.5 rounded-full border-2 bg-white'
             style={{ borderColor: getLineColor(color || 'blue') }}
           />
           <div
-            className='absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50'
+            className='absolute -bottom-1.5 left-5 z-50 h-2.5 w-2.5 rounded-full border-2 bg-white'
             style={{ borderColor: getLineColor(color || 'blue') }}
           />
         </>
@@ -90,9 +90,9 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
   renderDefaultContent: ({ drag: _drag, title, allDay }) => {
     if (allDay) {
       return (
-        <div className='h-full flex items-center overflow-hidden pl-3 px-1 py-0'>
+        <div className='flex h-full items-center overflow-hidden px-1 py-0 pl-3'>
           <svg
-            className='h-3 w-3 mr-1'
+            className='mr-1 h-3 w-3'
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
@@ -105,7 +105,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
             />
           </svg>
           <div
-            className='font-medium text-xs truncate pr-1'
+            className='truncate pr-1 text-xs font-medium'
             style={{ lineHeight: 1.2 }}
           >
             {title}
@@ -116,9 +116,9 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
 
     return (
       <>
-        <div className='absolute left-0.5 top-1 bottom-1 w-0.5 rounded-full bg-primary' />
-        <div className='h-full flex flex-col overflow-hidden pl-3 p-1'>
-          <div className='font-medium text-xs truncate pr-1 text-primary'>
+        <div className='absolute top-1 bottom-1 left-0.5 w-0.5 rounded-full bg-primary' />
+        <div className='flex h-full flex-col overflow-hidden p-1 pl-3'>
+          <div className='truncate pr-1 text-xs font-medium text-primary'>
             {title}
           </div>
         </div>
