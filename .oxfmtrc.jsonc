@@ -14,13 +14,15 @@
   "bracketSameLine": false,
   "arrowParens": "avoid",
   "endOfLine": "lf",
-  "experimentalSortPackageJson": true,
-  "experimentalSortImports": {
+  "sortPackageJson": {
+    "sortScripts": true,
+  },
+  "sortImports": {
     "ignoreCase": true,
     "newlinesBetween": true,
     "order": "asc",
   },
-  "experimentalTailwindcss": {
+  "sortTailwindcss": {
     "stylesheet": "./packages/core/src/styles/tailwind.css",
     "attributes": ["class", "className"],
     "functions": ["clsx", "cn", "cva", "tw"],
