@@ -1,37 +1,39 @@
 {
   "name": "@dayflow/react",
   "version": "3.1.2",
-  "type": "module",
   "description": "React adapter for DayFlow calendar",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "README.md",
     "LICENSE"
   ],
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "build": "rollup -c"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "@dayflow/core": "workspace:*"
+    "build": "rollup -c",
+    "clean": "rimraf dist node_modules",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "@dayflow/core": "workspace:*",
-    "typescript": "^5.7.2",
-    "rollup": "^4.29.1",
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.2",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "rimraf": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-peer-deps-external": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:*",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
   }
 }

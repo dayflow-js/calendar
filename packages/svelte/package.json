@@ -1,12 +1,19 @@
 {
   "name": "@dayflow/svelte",
   "version": "3.1.2",
-  "type": "module",
   "description": "Svelte adapter for DayFlow calendar",
+  "files": [
+    "dist",
+    "src",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "svelte": "src/index.ts",
   "types": "index.d.ts",
+  "svelte": "src/index.ts",
   "exports": {
     ".": {
       "types": "./index.d.ts",
@@ -20,35 +27,30 @@
       "default": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "index.d.ts",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
     "build": "rollup -c",
+    "clean": "rimraf dist node_modules",
     "typecheck": "svelte-check"
   },
-  "peerDependencies": {
-    "svelte": "^4.0.0 || ^5.0.0",
-    "@dayflow/core": "workspace:*"
-  },
   "devDependencies": {
-    "svelte": "^5.0.0",
     "@dayflow/core": "workspace:*",
-    "typescript": "^5.7.2",
-    "rollup": "^4.29.1",
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.2",
-    "rollup-plugin-svelte": "^7.2.2",
-    "svelte-preprocess": "^6.0.3",
-    "svelte-check": "^4.1.1",
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@tsconfig/svelte": "^5.0.4",
-    "rollup-plugin-esbuild": "^6.2.1",
-    "esbuild": "^0.27.3"
+    "esbuild": "catalog:",
+    "rimraf": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-esbuild": "catalog:",
+    "rollup-plugin-svelte": "catalog:",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.4.3",
+    "svelte-preprocess": "^6.0.3",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:*",
+    "svelte": "^4.0.0 || ^5.0.0"
   }
 }

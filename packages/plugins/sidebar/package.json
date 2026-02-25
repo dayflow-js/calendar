@@ -1,8 +1,21 @@
 {
   "name": "@dayflow/plugin-sidebar",
   "version": "1.0.2",
-  "type": "module",
   "description": "Sidebar plugin for DayFlow calendar",
+  "keywords": [
+    "calendar",
+    "dayflow",
+    "plugin",
+    "sidebar"
+  ],
+  "license": "MIT",
+  "author": "Jayce Li",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -13,36 +26,25 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "keywords": [
-    "calendar",
-    "sidebar",
-    "dayflow",
-    "plugin"
-  ],
-  "author": "Jayce Li",
-  "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && rollup -c",
+    "clean": "rimraf dist node_modules",
     "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@dayflow/blossom-color-picker": "catalog:",
+    "@dayflow/core": "workspace:*",
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
+    "preact": "catalog:",
+    "rimraf": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-dts": "catalog:",
+    "temporal-polyfill": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "@dayflow/core": "workspace:*"
-  },
-  "devDependencies": {
-    "@dayflow/core": "workspace:*",
-    "@dayflow/blossom-color-picker": "^2.0.1",
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "@rollup/plugin-typescript": "^12.1.2",
-    "rollup": "^4.29.1",
-    "rollup-plugin-dts": "^6.3.0",
-    "preact": "^10.25.4",
-    "temporal-polyfill": "^0.3.0",
-    "typescript": "^5.7.2"
   }
 }
