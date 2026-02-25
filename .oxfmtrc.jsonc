@@ -21,9 +21,9 @@
     "order": "asc",
   },
   "experimentalTailwindcss": {
-    "stylesheet": "./packages/ui/src/styles/globals.css",
+    "stylesheet": "./packages/core/src/styles/tailwind.css",
     "attributes": ["class", "className"],
-    "functions": ["clsx", "cn"],
+    "functions": ["clsx", "cn", "cva", "tw"],
     "preserveWhitespace": true,
   },
 }
