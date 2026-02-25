@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React from 'react';
-
-import InteractiveCalendarComponent from './InteractiveCalendarComponent';
+import InteractiveCalendarComponent from './InteractiveCalendar';
 
 export function LiveDemo() {
   return (

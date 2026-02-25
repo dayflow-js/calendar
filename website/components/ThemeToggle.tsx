@@ -1,9 +1,9 @@
 'use client';
 
-import cn from 'cn';
+import { cn } from '@/lib/utils';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

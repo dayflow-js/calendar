@@ -1,4 +1,4 @@
-import cn from 'cn';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
 import { withBasePath } from '@/utils/basePath';
