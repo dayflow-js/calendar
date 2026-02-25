@@ -45,8 +45,5 @@
   },
   "peerDependencies": {
     "@dayflow/core": "workspace:*"
-  },
-  "peerDependencies": {
-    "@dayflow/core": "workspace:*"
   }
 }
