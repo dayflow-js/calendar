@@ -1,0 +1,16 @@
+pre-commit:
+  jobs:
+    - run: pnpm format
+      stage_fixed: true
+
+    - run: pnpm lint:fix
+      glob:
+        - '*.js'
+        - '*.jsx'
+        - '*.ts'
+        - '*.tsx'
+        - '*.json'
+        - '*.jsonc'
+        - '*.css'
+        - '*.md'
+      stage_fixed: true
