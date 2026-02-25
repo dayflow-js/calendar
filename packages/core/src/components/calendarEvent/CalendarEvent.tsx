@@ -70,6 +70,7 @@ const CalendarEvent = ({
   mobilePageStart,
   enableTouch,
   hideTime,
+  timeFormat = '24h',
 }: CalendarEventProps) => {
   const customRenderingStore = useContext(CustomRenderingContext);
   const isTouchEnabled = enableTouch ?? isMobile;
@@ -432,6 +433,7 @@ const CalendarEvent = ({
           customRenderingStore={customRenderingStore}
           eventContentSlotArgs={eventContentSlotArgs}
           layout={layout}
+          timeFormat={timeFormat}
         />
       </div>
 

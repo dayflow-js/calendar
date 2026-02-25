@@ -67,6 +67,7 @@ interface TimeGridProps {
   FIRST_HOUR: number;
   LAST_HOUR: number;
   showStartOfDayLabel: boolean;
+  timeFormat?: '12h' | '24h';
 }
 
 export const TimeGrid = ({
@@ -113,6 +114,7 @@ export const TimeGrid = ({
   FIRST_HOUR,
   LAST_HOUR,
   showStartOfDayLabel,
+  timeFormat = '24h',
 }: TimeGridProps) => {
   const columnStyle: any = { flexShrink: 0 };
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -162,7 +164,7 @@ export const TimeGrid = ({
           {/* Top boundary spacer with start-of-day label */}
           <div className="h-3 relative">
             <div className="absolute -bottom-1 right-2 text-[10px] md:text-[12px] text-gray-500 dark:text-gray-400 select-none">
-              {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
+              {showStartOfDayLabel ? formatTime(FIRST_HOUR, 0, timeFormat) : ''}
             </div>
           </div>
           {timeSlots.map((slot, slotIndex) => (
@@ -174,7 +176,7 @@ export const TimeGrid = ({
           ))}
           <div className="relative">
             <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-              00:00
+              {formatTime(0, 0, timeFormat)}
             </div>
           </div>
           {/* Current Time Label */}
@@ -196,7 +198,9 @@ export const TimeGrid = ({
                     marginTop: '0.75rem',
                   }}
                 >
-                  <div className={currentTimeLabel}>{formatTime(hours)}</div>
+                  <div className={currentTimeLabel}>
+                    {formatTime(hours, 0, timeFormat)}
+                  </div>
                 </div>
               );
             })()}

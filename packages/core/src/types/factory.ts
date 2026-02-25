@@ -84,6 +84,7 @@ export interface ViewFactoryConfig {
   firstHour?: number;
   lastHour?: number;
   allDayHeight?: number;
+  timeFormat?: '12h' | '24h';
 }
 
 /**

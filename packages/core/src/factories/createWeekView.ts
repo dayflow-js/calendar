@@ -21,6 +21,7 @@ const defaultWeekViewConfig: WeekViewConfig = {
   firstHour: 0,
   lastHour: 24,
   allDayHeight: 28,
+  timeFormat: '24h',
 };
 
 // Week view factory function

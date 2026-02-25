@@ -15,6 +15,7 @@ const defaultDayViewConfig: DayViewConfig = {
   firstHour: 0,
   lastHour: 24,
   allDayHeight: 28,
+  timeFormat: '24h',
 };
 
 // Day view factory function

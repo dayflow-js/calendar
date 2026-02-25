@@ -19,26 +19,45 @@ import { extractHourFromDate } from './dateTimeUtils';
 export const TIME_STEP = 0.25;
 
 /**
- * Format hours and minutes to HH:MM format
+ * Format hours and minutes to HH:MM format or 12h format (e.g. 1AM)
  * @param hours Hour number (supports decimals, e.g., 14.5 = 14:30)
  * @param minutes Optional minutes (if not provided, extracted from decimal hours)
- * @returns Formatted time string (e.g., "14:30")
+ * @param format Time format ('12h' or '24h', defaults to '24h')
+ * @returns Formatted time string (e.g., "14:30" or "2PM")
  */
-export const formatTime = (hours: number, minutes = 0) => {
+export const formatTime = (
+  hours: number,
+  minutes = 0,
+  format: '12h' | '24h' = '24h'
+) => {
   const h = Math.floor(hours);
   const m = minutes || Math.round((hours - h) * 60);
+
+  if (format === '12h') {
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHour = h % 12 || 12;
+    if (m === 0) {
+      return `${displayHour} ${period}`;
+    }
+    return `${displayHour}:${m.toString().padStart(2, '0')} ${period}`;
+  }
+
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 };
 
 /**
  * Format event time range as a string
  * @param event Event object
+ * @param format Time format ('12h' or '24h', defaults to '24h')
  * @returns Formatted time range (e.g., "14:00 - 16:00" or "All day")
  */
-export const formatEventTimeRange = (event: Event) => {
+export const formatEventTimeRange = (
+  event: Event,
+  format: '12h' | '24h' = '24h'
+) => {
   const startHour = extractHourFromDate(event.start);
   const endHour = getEventEndHour(event);
-  return `${formatTime(startHour)} - ${formatTime(endHour)}`;
+  return `${formatTime(startHour, 0, format)} - ${formatTime(endHour, 0, format)}`;
 };
 
 /**

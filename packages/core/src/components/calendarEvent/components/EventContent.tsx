@@ -36,6 +36,7 @@ interface EventContentProps {
   customRenderingStore: any;
   eventContentSlotArgs: any;
   layout?: any;
+  timeFormat?: '12h' | '24h';
 }
 
 export const EventContent = ({
@@ -65,6 +66,7 @@ export const EventContent = ({
   customRenderingStore,
   eventContentSlotArgs,
   layout,
+  timeFormat = '24h',
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
@@ -132,6 +134,7 @@ export const EventContent = ({
         isTouchEnabled={isTouchEnabled}
         isEventSelected={isEventSelected}
         onResizeStart={onResizeStart}
+        timeFormat={timeFormat}
       />
     );
   }

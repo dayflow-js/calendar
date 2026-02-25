@@ -56,6 +56,7 @@ const WeekView = ({
     allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
     mode: configMode,
+    timeFormat = '24h',
   } = config;
 
   // Use standardized names internally (matching previous uppercase names for compatibility with minimal changes)
@@ -514,7 +515,7 @@ const WeekView = ({
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
-    label: formatTime(i + FIRST_HOUR),
+    label: formatTime(i + FIRST_HOUR, 0, timeFormat),
   }));
 
   // Generate week date data
@@ -717,6 +718,7 @@ const WeekView = ({
         FIRST_HOUR={FIRST_HOUR}
         LAST_HOUR={LAST_HOUR}
         showStartOfDayLabel={showStartOfDayLabel}
+        timeFormat={timeFormat}
       />
 
       <MobileEventDrawerComponent
@@ -736,6 +738,7 @@ const WeekView = ({
         }}
         draftEvent={draftEvent}
         app={app}
+        timeFormat={timeFormat}
       />
     </div>
   );

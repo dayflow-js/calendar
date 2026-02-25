@@ -52,6 +52,7 @@ const DayView = ({
     lastHour: configLastHour = defaultDragConfig.LAST_HOUR,
     allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
+    timeFormat = '24h',
   } = config;
 
   const HOUR_HEIGHT = configHourHeight;
@@ -371,7 +372,7 @@ const DayView = ({
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
-    label: formatTime(i + FIRST_HOUR),
+    label: formatTime(i + FIRST_HOUR, 0, timeFormat),
   }));
 
   // Date selection handling
@@ -452,6 +453,7 @@ const DayView = ({
         LAST_HOUR={LAST_HOUR}
         showAllDay={showAllDay}
         showStartOfDayLabel={showStartOfDayLabel}
+        timeFormat={timeFormat}
       />
       <RightPanel
         app={app}
@@ -463,6 +465,7 @@ const DayView = ({
         handleMonthChange={handleMonthChange}
         handleDateSelect={handleDateSelect}
         switcherMode={switcherMode}
+        timeFormat={timeFormat}
       />
       <MobileEventDrawerComponent
         isOpen={isDrawerOpen}
@@ -481,6 +484,7 @@ const DayView = ({
         }}
         draftEvent={draftEvent}
         app={app}
+        timeFormat={timeFormat}
       />
     </div>
   );

@@ -77,6 +77,7 @@ interface DayContentProps {
   LAST_HOUR: number;
   showAllDay: boolean;
   showStartOfDayLabel: boolean;
+  timeFormat?: '12h' | '24h';
 }
 
 export const DayContent = ({
@@ -126,6 +127,7 @@ export const DayContent = ({
   LAST_HOUR,
   showAllDay,
   showStartOfDayLabel,
+  timeFormat = '24h',
 }: DayContentProps) => {
   const { t, locale } = useLocale();
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -360,7 +362,7 @@ export const DayContent = ({
                     <div className="flex items-center w-12 md:w-20">
                       <div className="relative w-full flex items-center"></div>
                       <div className={currentTimeLabel}>
-                        {formatTime(hours)}
+                        {formatTime(hours, 0, timeFormat)}
                       </div>
                     </div>
 
@@ -401,7 +403,9 @@ export const DayContent = ({
                   className={`${midnightLabel} -left-9.5`}
                   style={{ top: 'auto', bottom: '-0.625rem' }}
                 >
-                  {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
+                  {showStartOfDayLabel
+                    ? formatTime(FIRST_HOUR, 0, timeFormat)
+                    : ''}
                 </div>
               </div>
               <div className="relative" style={{ WebkitTouchCallout: 'none' }}>
@@ -474,7 +478,9 @@ export const DayContent = ({
                     !isMobile && hasScrollbarSpace ? 'border-r' : ''
                   )}
                 >
-                  <div className={`${midnightLabel} -left-9.5`}>00:00</div>
+                  <div className={`${midnightLabel} -left-9.5`}>
+                    {formatTime(0, 0, timeFormat)}
+                  </div>
                 </div>
 
                 {/* Event layer */}

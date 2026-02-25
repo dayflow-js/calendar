@@ -62,4 +62,6 @@ export interface CalendarEventProps {
   enableTouch?: boolean;
   /** Whether to hide the time in the event display (Month view regular events only) */
   hideTime?: boolean;
+  /** Time format for event display */
+  timeFormat?: '12h' | '24h';
 }
