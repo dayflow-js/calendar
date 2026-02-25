@@ -6,7 +6,6 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import { dts } from 'rollup-plugin-dts';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import postcss from 'rollup-plugin-postcss';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 export default [
@@ -46,20 +45,6 @@ export default [
           '**/*.spec.ts',
           '**/*.spec.tsx',
         ],
-      }),
-      postcss({
-        extensions: ['.css'],
-        minimize: false,
-        inject: false,
-        extract: 'styles.css',
-        config: {
-          path: './postcss.build.mjs',
-        },
-        use: {
-          sass: false,
-          stylus: false,
-          less: false,
-        },
       }),
       terser(),
       visualizer({

@@ -48,7 +48,8 @@
     "./dist/styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs",
+    "build": "tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs && pnpm run build:css",
+    "build:css": "node ./scripts/build-css.mjs",
     "clean": "rimraf dist node_modules",
     "dev": "vite --port 5529 --host",
     "postbuild": "rimraf dist/types",
