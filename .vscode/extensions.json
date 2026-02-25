@@ -1,7 +1,10 @@
 {
-    "recommendations": [
-        "oxc.oxc-vscode",
-        "bradlc.vscode-tailwindcss",
-        "svelte.svelte-vscode",
-    ]
+  "recommendations": [
+    "oxc.oxc-vscode",
+    "bradlc.vscode-tailwindcss",
+    "fill-labs.dependi",
+    "svelte.svelte-vscode",
+    "antfu.pnpm-catalog-lens",
+    "vue.volar"
+  ]
 }
