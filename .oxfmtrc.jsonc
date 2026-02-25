@@ -26,6 +26,16 @@
     "stylesheet": "./packages/core/src/styles/tailwind.css",
     "attributes": ["class", "className"],
     "functions": ["clsx", "cn", "cva", "tw"],
-    "preserveWhitespace": true,
   },
+  "ignorePatterns": [
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lock",
+    "pnpm-workspace.yaml",
+    ".turbo",
+    ".cache",
+    ".output",
+    "dist",
+  ],
 }
