@@ -1,0 +1,130 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "jsdoc",
+    "node",
+    "promise",
+    "jest",
+    "vitest",
+    "react",
+    "react-perf",
+    "jsx-a11y",
+    "nextjs",
+    "vue"
+  ],
+  "env": {
+    "browser": true
+  },
+  "categories": {
+    "correctness": "error",
+    "perf": "error",
+    "restriction": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "style": "error"
+  },
+  "rules": {
+    "no-await-in-loop": "off",
+    "max-lines-per-function": "off",
+    "no-inline-comments": "off",
+    "no-implicit-coercion": "off",
+    "no-magic-numbers": "off",
+    "no-console": "off",
+    "no-ternary": "off",
+    "no-undefined": "off",
+    "max-lines": "off",
+    "id-length": "off",
+    "func-style": [
+      "error",
+      "expression",
+      {
+        "allowArrowFunctions": true
+      }
+    ],
+    "arrow-body-style": ["error", "as-needed"],
+    "max-depth": "off",
+    "max-params": "off",
+    "capitalized-comments": "off",
+    "new-cap": "off",
+    "no-continue": "off",
+    "no-barrel-file": "off",
+    "init-declarations": "off",
+    // Rely on oxfmt `experimentalSortImports` instead
+    "sort-imports": "off",
+    "sort-keys": "off",
+    "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
+
+    "import/no-default-export": "off",
+    "import/exports-last": "off",
+    "import/no-named-export": "off",
+    "import/max-dependencies": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "import/no-namespace": "off",
+    "import/no-anonymous-default-export": "off",
+    "import/prefer-default-export": "off",
+    "import/group-exports": "off",
+    "import/no-commonjs": "off",
+    "import/unambiguous": "off",
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+    "import/no-dynamic-require": "off",
+    "import/no-unassigned-import": "off",
+
+    "jsdoc/require-param": "off",
+    "jsdoc/require-returns": "off",
+
+    "unicorn/explicit-length-check": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "unicorn/no-process-exit": "off",
+    "unicorn/prefer-global-this": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/prefer-string-raw": "off",
+
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/no-require-imports": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/no-var-requires": "off",
+    "typescript/require-await": "off",
+
+    "node/no-process-env": "off",
+
+    "oxc/no-map-spread": "off",
+    "oxc/no-async-await": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "oxc/no-optional-chaining": "off",
+
+    "promise/catch-or-return": "off",
+    "promise/always-return": "off",
+
+    "vitest/prefer-called-times": "off",
+
+    "react/jsx-max-depth": "off",
+    "react/jsx-boolean-value": "off",
+    "react/jsx-filename-extension": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/no-multi-comp": "off",
+    "react/no-unknown-property": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/only-export-components": "off",
+
+    "react_perf/jsx-no-jsx-as-prop": "off",
+    "react_perf/jsx-no-new-object-as-prop": "off",
+    "react_perf/jsx-no-new-array-as-prop": "off",
+
+    "jsx-a11y/no-autofocus": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/next-env.d.ts"],
+      "rules": {
+        "import/no-unassigned-import": "off"
+      }
+    }
+  ]
+}
