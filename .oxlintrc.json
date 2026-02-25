@@ -39,6 +39,7 @@
     "no-console": "off",
     "no-ternary": "off",
     "no-undefined": "off",
+    "no-unused-vars": "warn",
     "max-lines": "off",
     "id-length": "off",
     "func-style": "off",
@@ -52,7 +53,7 @@
     "no-continue": "off",
     "no-barrel-file": "off",
     "init-declarations": "off",
-    // Rely on oxfmt `experimentalSortImports` instead
+    // Rely on oxfmt `sortImports` instead
     "sort-imports": "off",
     "sort-keys": "off",
     "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
@@ -68,6 +69,7 @@
     "import/prefer-default-export": "off",
     "import/group-exports": "off",
     "import/no-commonjs": "off",
+    "import/no-duplicates": "error",
     "import/unambiguous": "off",
     "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
     "import/no-dynamic-require": "off",
@@ -90,11 +92,12 @@
     "unicorn/no-array-for-each": "off",
 
     "typescript/explicit-module-boundary-types": "off",
-    "typescript/no-require-imports": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/no-var-requires": "off",
-    "typescript/require-await": "off",
+    "typescript/no-unused-vars": "warn",
     "typescript/no-non-null-assertion": "off",
+    "typescript/no-require-imports": "off",
+    "typescript/require-await": "off",
 
     "node/no-process-env": "off",
 
@@ -112,6 +115,8 @@
     "react/jsx-boolean-value": "off",
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/jsx-no-constructed-context-values": "warn",
+    "react/no-array-index-key": "off",
     "react/no-multi-comp": "off",
     "react/no-unknown-property": "off",
     "react/react-in-jsx-scope": "off",
@@ -122,18 +127,15 @@
     "react_perf/jsx-no-new-array-as-prop": "off",
     "react_perf/jsx-no-new-function-as-prop": "off",
 
+    "react-hooks/exhaustive-deps": "off",
+
+    "jsx-a11y/alt-text": "warn",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/heading-has-content": "warn",
     "jsx-a11y/no-autofocus": "off",
     "jsx-a11y/no-static-element-interactions": "off",
-    "jsx-a11y/click-events-have-key-events": "off",
-    "react/no-array-index-key": "off",
-    "no-unused-vars": "warn",
-    "typescript/no-unused-vars": "warn",
-    "react-hooks/exhaustive-deps": "off",
-    "react/jsx-no-constructed-context-values": "warn",
-    "jsx-a11y/heading-has-content": "warn",
-    "jsx-a11y/alt-text": "warn",
-    "nextjs/no-img-element": "warn",
-    "import/no-duplicates": "error"
+
+    "nextjs/no-img-element": "warn"
   },
   "overrides": [
     {
