@@ -1,23 +1,32 @@
-import { Event, ICalendarApp, EventDetailPosition } from '@/types';
-import DefaultEventDetailPanel from '../../common/DefaultEventDetailPanel';
-import { EventDetailPanelWithContent } from '../../common/EventDetailPanelWithContent';
+import { RefObject } from 'preact';
+
+import DefaultEventDetailPanel from '@/components/common/DefaultEventDetailPanel';
+import { EventDetailPanelWithContent } from '@/components/common/EventDetailPanelWithContent';
+import { CustomRenderingStore } from '@/renderer/CustomRenderingStore';
+import {
+  Event,
+  ICalendarApp,
+  EventDetailPosition,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+} from '@/types';
 
 interface EventDetailPanelProps {
   showDetailPanel: boolean;
-  customEventDetailDialog: any;
+  customEventDetailDialog?: EventDetailDialogRenderer;
   detailPanelPosition: EventDetailPosition | null;
   event: Event;
-  detailPanelRef: { current: HTMLElement | null };
+  detailPanelRef: RefObject<HTMLDivElement>;
   isAllDay: boolean;
   eventVisibility: 'visible' | 'sticky-top' | 'sticky-bottom';
-  calendarRef: any;
-  selectedEventElementRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
+  selectedEventElementRef: RefObject<HTMLElement | null>;
   onEventUpdate: (event: Event) => void;
   onEventDelete: (id: string) => void;
   handlePanelClose: () => void;
-  customRenderingStore: any;
-  contentSlotRenderer: any;
-  customDetailPanelContent: any;
+  customRenderingStore: CustomRenderingStore | null;
+  contentSlotRenderer: EventDetailContentRenderer;
+  customDetailPanelContent?: EventDetailContentRenderer;
   app?: ICalendarApp;
 }
 

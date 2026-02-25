@@ -8,7 +8,7 @@
 import {
   getDefaultCalendarRegistry,
   CalendarRegistry,
-} from '../core/calendarRegistry';
+} from '@/core/calendarRegistry';
 
 // ============================================================================
 // Color Tools

@@ -1,11 +1,13 @@
+import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
+
+import { useTheme } from '@/contexts/ThemeContext';
+import { eventDetailPanel } from '@/styles/classNames';
 import {
   EventDetailPanelProps,
   EventDetailContentRenderer,
-} from '../../types/eventDetail';
-import { useTheme } from '../../contexts/ThemeContext';
-import { resolveAppliedTheme } from '../../utils/themeUtils';
-import { eventDetailPanel } from '@/styles/classNames';
+} from '@/types/eventDetail';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
 
 /**
  * Event detail panel wrapper for rendering custom content in the default panel
@@ -35,8 +37,8 @@ export const EventDetailPanelWithContent = ({
     appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 
   // Calculate arrow style (same logic as DefaultEventDetailPanel)
-  const calculateArrowStyle = (): any => {
-    let arrowStyle: any = {};
+  const calculateArrowStyle = (): JSX.CSSProperties => {
+    let arrowStyle: JSX.CSSProperties = {};
 
     if (eventVisibility === 'sticky-top') {
       const calendarContent =
@@ -68,8 +70,10 @@ export const EventDetailPanelWithContent = ({
       if (panelElement) {
         const panelRect = panelElement.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(panelElement);
-        const paddingBottom = parseInt(computedStyle.paddingBottom, 10) || 0;
-        const borderBottom = parseInt(computedStyle.borderBottomWidth, 10) || 0;
+        const paddingBottom =
+          Number.parseInt(computedStyle.paddingBottom, 10) || 0;
+        const borderBottom =
+          Number.parseInt(computedStyle.borderBottomWidth, 10) || 0;
 
         arrowTop = panelRect.height - paddingBottom - borderBottom - 6 + 11;
       }
@@ -121,9 +125,9 @@ export const EventDetailPanelWithContent = ({
             const panelRect = panelElement.getBoundingClientRect();
             const computedStyle = window.getComputedStyle(panelElement);
             const paddingBottom =
-              parseInt(computedStyle.paddingBottom, 10) || 0;
+              Number.parseInt(computedStyle.paddingBottom, 10) || 0;
             const borderBottom =
-              parseInt(computedStyle.borderBottomWidth, 10) || 0;
+              Number.parseInt(computedStyle.borderBottomWidth, 10) || 0;
 
             maxArrowY = panelRect.height - paddingBottom - borderBottom + 11;
           }
@@ -161,7 +165,7 @@ export const EventDetailPanelWithContent = ({
     <div
       ref={panelRef}
       className={`${eventDetailPanel} p-3`}
-      data-event-detail-panel="true"
+      data-event-detail-panel='true'
       data-event-id={event.id}
       style={{
         top: `${position.top}px`,

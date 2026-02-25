@@ -1,14 +1,6 @@
-import { ICalendarApp } from '@/types';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import TodayBox from '@/components/common/TodayBox';
 import { useLocale } from '@/locale';
-import { Event } from '@/types';
-import {
-  formatTime,
-  extractHourFromDate,
-  getLineColor,
-  getEventEndHour,
-} from '@/utils';
 import {
   miniCalendarContainer,
   headerContainer,
@@ -23,6 +15,13 @@ import {
   textGray500,
   textGray600,
 } from '@/styles/classNames';
+import { ICalendarApp, Event } from '@/types';
+import {
+  formatTime,
+  extractHourFromDate,
+  getLineColor,
+  getEventEndHour,
+} from '@/utils';
 
 interface RightPanelProps {
   app: ICalendarApp;
@@ -46,10 +45,10 @@ export const RightPanel = ({
   handleMonthChange,
   handleDateSelect,
   switcherMode,
-}: RightPanelProps & any) => {
+}: RightPanelProps) => {
   const { t, locale } = useLocale();
 
-  const sortedEvents = [...currentDayEvents].sort((a, b) => {
+  const sortedEvents = [...currentDayEvents].toSorted((a, b) => {
     if (a.allDay && !b.allDay) return -1;
     if (!a.allDay && b.allDay) return 1;
     return 0;
@@ -64,7 +63,7 @@ export const RightPanel = ({
         {/* Mini calendar */}
         <div className={miniCalendarContainer}>
           <div>
-            <div className="flex items-center justify-end gap-2">
+            <div className='flex items-center justify-end gap-2'>
               <div className={headerContainer} style={{ position: 'relative' }}>
                 <div>
                   <h1 className={headerTitle}>&nbsp;</h1>
@@ -102,8 +101,8 @@ export const RightPanel = ({
             {sortedEvents.length === 0 ? (
               <p className={`${textGray500} ${textSm}`}>{t('noEvents')}</p>
             ) : (
-              <div className="space-y-2">
-                {sortedEvents.map((event: any) => (
+              <div className='space-y-2'>
+                {sortedEvents.map((event: Event) => (
                   <div
                     key={event.id}
                     className={`

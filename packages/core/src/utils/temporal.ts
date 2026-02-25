@@ -12,7 +12,7 @@ import { Temporal } from 'temporal-polyfill';
  * Check if value is Temporal.PlainDate
  * Uses multiple methods to check, handling polyfill and serialization issues
  */
-export function isPlainDate(date: any): date is Temporal.PlainDate {
+export function isPlainDate(date: unknown): date is Temporal.PlainDate {
   if (!date || typeof date !== 'object') return false;
   if (date instanceof Date) return false;
 
@@ -21,38 +21,40 @@ export function isPlainDate(date: any): date is Temporal.PlainDate {
     return true;
   }
 
+  const d = date as Record<string, unknown>;
+
   // Method 2: check constructor.name
-  if (date?.constructor?.name === 'PlainDate') {
+  if (d.constructor?.name === 'PlainDate') {
     return true;
   }
 
   // Method 3: check if no time properties (PlainDate characteristic)
   // PlainDate has no hour/minute properties, but ZonedDateTime does
   return (
-    !('hour' in date) &&
-    !('timeZone' in date) &&
-    'year' in date &&
-    'month' in date &&
-    'day' in date
+    !('hour' in d) &&
+    !('timeZone' in d) &&
+    'year' in d &&
+    'month' in d &&
+    'day' in d
   );
 }
 
 /**
  * Check if value is Temporal.ZonedDateTime
  */
-export function isZonedDateTime(date: any): date is Temporal.ZonedDateTime {
+export function isZonedDateTime(date: unknown): date is Temporal.ZonedDateTime {
   if (!date || typeof date !== 'object') return false;
   if (date instanceof Date) return false;
+  const d = date as Record<string, unknown>;
   return (
-    date instanceof Temporal.ZonedDateTime ||
-    ('timeZone' in date && 'year' in date)
+    date instanceof Temporal.ZonedDateTime || ('timeZone' in d && 'year' in d)
   );
 }
 
 /**
  * Check if value is Date object
  */
-export function isDate(value: any): value is Date {
+export function isDate(value: unknown): value is Date {
   return value instanceof Date;
 }
 
@@ -98,13 +100,8 @@ export function zonedDateTimeToDate(zdt: Temporal.ZonedDateTime): Date {
     return new Date(zdt.epochMilliseconds);
   }
   // Fallback for plain objects
-  return new Date(
-    (zdt as any).year,
-    (zdt as any).month - 1,
-    (zdt as any).day,
-    (zdt as any).hour,
-    (zdt as any).minute
-  );
+  const d = zdt as unknown as Record<string, number>;
+  return new Date(d.year, d.month - 1, d.day, d.hour, d.minute);
 }
 
 /**
@@ -124,7 +121,7 @@ export function plainDateToDate(
         plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0 }),
       });
       return zonedDateTimeToDate(zdt);
-    } catch (e) {
+    } catch {
       // Fallback
     }
   }
@@ -180,7 +177,7 @@ export function temporalToDate(
   }
 
   // Last resort
-  return new Date(temporal as any);
+  return new Date(temporal as string | number);
 }
 
 // ============================================================================
@@ -212,13 +209,14 @@ export function extractHourFromTemporal(
     temporal === null ||
     typeof temporal !== 'object' ||
     !('hour' in temporal) ||
-    (temporal as any).hour === undefined
+    (temporal as unknown as Record<string, unknown>).hour === undefined
   ) {
     return 0;
   }
 
-  const hours = (temporal as any).hour;
-  const minutes = (temporal as any).minute ?? 0;
+  const t = temporal as unknown as Record<string, number>;
+  const hours = t.hour;
+  const minutes = t.minute ?? 0;
   return hours + minutes / 60;
 }
 
@@ -250,8 +248,8 @@ export function createTemporalWithHour(
   }
 
   // Real Temporal instance check
-  if (typeof (temporal as any).with === 'function') {
-    return (temporal as any).with({
+  if (typeof (temporal as { with?: unknown }).with === 'function') {
+    return (temporal as Temporal.PlainDateTime).with({
       hour: hours,
       minute: minutes,
       second: 0,
@@ -260,10 +258,11 @@ export function createTemporalWithHour(
   }
 
   // Fallback for plain objects
+  const t = temporal as unknown as Record<string, number>;
   return Temporal.PlainDateTime.from({
-    year: (temporal as any).year,
-    month: (temporal as any).month,
-    day: (temporal as any).day,
+    year: t.year,
+    month: t.month,
+    day: t.day,
     hour: hours,
     minute: minutes,
   });
@@ -288,15 +287,17 @@ export function isSamePlainDate(
     return date1.toDateString() === date2.toDateString();
   }
 
-  const getPD = (d: any) => {
+  const getPD = (d: unknown) => {
     if (d instanceof Date) return dateToPlainDate(d);
     if (isPlainDate(d)) return d;
-    if (typeof d.toPlainDate === 'function') return d.toPlainDate();
+    if (typeof (d as { toPlainDate?: unknown }).toPlainDate === 'function')
+      return (d as Temporal.PlainDateTime).toPlainDate();
     // Fallback for plain objects
+    const t = d as Record<string, number>;
     return Temporal.PlainDate.from({
-      year: d.year,
-      month: d.month,
-      day: d.day,
+      year: t.year,
+      month: t.month,
+      day: t.day,
     });
   };
 
@@ -333,22 +334,26 @@ export function getStartOfTemporal(
     | Temporal.ZonedDateTime,
   timeZone: string = Temporal.Now.timeZoneId()
 ): Temporal.ZonedDateTime {
-  if (typeof (temporal as any).toZonedDateTime === 'function') {
+  if (
+    typeof (temporal as { toZonedDateTime?: unknown }).toZonedDateTime ===
+    'function'
+  ) {
     const plainDate = isPlainDate(temporal)
       ? temporal
-      : (temporal as any).toPlainDate();
+      : (temporal as Temporal.PlainDateTime).toPlainDate();
     return plainDate.toZonedDateTime({
       timeZone,
       plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0 }),
     });
   }
   // Fallback
+  const t = temporal as unknown as Record<string, number>;
   const pd = isPlainDate(temporal)
     ? temporal
     : Temporal.PlainDate.from({
-        year: (temporal as any).year,
-        month: (temporal as any).month,
-        day: (temporal as any).day,
+        year: t.year,
+        month: t.month,
+        day: t.day,
       });
   return pd.toZonedDateTime({
     timeZone,
@@ -366,10 +371,13 @@ export function getEndOfTemporal(
     | Temporal.ZonedDateTime,
   timeZone: string = Temporal.Now.timeZoneId()
 ): Temporal.ZonedDateTime {
-  if (typeof (temporal as any).toZonedDateTime === 'function') {
+  if (
+    typeof (temporal as { toZonedDateTime?: unknown }).toZonedDateTime ===
+    'function'
+  ) {
     const plainDate = isPlainDate(temporal)
       ? temporal
-      : (temporal as any).toPlainDate();
+      : (temporal as Temporal.PlainDateTime).toPlainDate();
     return plainDate.toZonedDateTime({
       timeZone,
       plainTime: Temporal.PlainTime.from({
@@ -381,12 +389,13 @@ export function getEndOfTemporal(
     });
   }
   // Fallback
+  const t = temporal as unknown as Record<string, number>;
   const pd = isPlainDate(temporal)
     ? temporal
     : Temporal.PlainDate.from({
-        year: (temporal as any).year,
-        month: (temporal as any).month,
-        day: (temporal as any).day,
+        year: t.year,
+        month: t.month,
+        day: t.day,
       });
   return pd.toZonedDateTime({
     timeZone,
@@ -406,13 +415,15 @@ export function daysBetween(
   start: Temporal.PlainDate | Temporal.ZonedDateTime,
   end: Temporal.PlainDate | Temporal.ZonedDateTime
 ): number {
-  const getPD = (d: any) => {
+  const getPD = (d: unknown) => {
     if (isPlainDate(d)) return d;
-    if (typeof d.toPlainDate === 'function') return d.toPlainDate();
+    if (typeof (d as { toPlainDate?: unknown }).toPlainDate === 'function')
+      return (d as Temporal.PlainDateTime).toPlainDate();
+    const t = d as Record<string, number>;
     return Temporal.PlainDate.from({
-      year: d.year,
-      month: d.month,
-      day: d.day,
+      year: t.year,
+      month: t.month,
+      day: t.day,
     });
   };
   const plainStart = getPD(start);

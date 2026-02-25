@@ -1,6 +1,6 @@
+import { EventLayoutCalculator } from '@/components/eventLayout';
 import { Event, EventLayout } from '@/types';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
-import { EventLayoutCalculator } from '@/components/eventLayout';
 
 // Filter events for the current day
 export const filterDayEvents = (
@@ -104,11 +104,7 @@ export const organizeAllDayEvents = (currentDayEvents: Event[]) => {
     let placed = false;
 
     while (!placed) {
-      if (!rows[rowIndex]) {
-        rows[rowIndex] = [event];
-        eventsWithRow.push({ ...event, row: rowIndex });
-        placed = true;
-      } else {
+      if (rows[rowIndex]) {
         const hasCollision = rows[rowIndex].some(existing => {
           const aStart = temporalToDate(event.start);
           const aEnd = temporalToDate(event.end);
@@ -117,13 +113,17 @@ export const organizeAllDayEvents = (currentDayEvents: Event[]) => {
           return aStart <= bEnd && bStart <= aEnd;
         });
 
-        if (!hasCollision) {
+        if (hasCollision) {
+          rowIndex++;
+        } else {
           rows[rowIndex].push(event);
           eventsWithRow.push({ ...event, row: rowIndex });
           placed = true;
-        } else {
-          rowIndex++;
         }
+      } else {
+        rows[rowIndex] = [event];
+        eventsWithRow.push({ ...event, row: rowIndex });
+        placed = true;
       }
     }
   });

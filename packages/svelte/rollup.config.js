@@ -1,10 +1,10 @@
-import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import svelte from 'rollup-plugin-svelte';
 import sveltePreprocess from 'svelte-preprocess';
 
-const createConfig = (ssr) => ({
+const createConfig = ssr => ({
   input: 'src/index.ts',
   output: [
     {
@@ -36,7 +36,7 @@ const createConfig = (ssr) => ({
     }),
     commonjs(),
   ],
-  external: (id) =>
+  external: id =>
     id === 'svelte' || id.startsWith('svelte/') || id === '@dayflow/core',
   onwarn(warning, warn) {
     if (

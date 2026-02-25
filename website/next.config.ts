@@ -1,6 +1,7 @@
+import path from 'node:path';
+
 import type { NextConfig } from 'next';
 import nextra from 'nextra';
-import path from 'path';
 
 const withNextra = nextra({
   // Enable search with pagefind for static export

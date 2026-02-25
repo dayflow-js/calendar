@@ -32,11 +32,11 @@ function MyCalendar() {
 
 ## Configuration
 
-| Property | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `enableAutoRecalculate` | `boolean` | `true` | Automatically recalculate event segments when dates change. |
-| `enableValidation` | `boolean` | `true` | Validate event objects before adding or updating. |
-| `maxEventsPerDay` | `number` | `50` | Maximum number of events allowed per day. |
+| Property                | Type      | Default | Description                                                 |
+| :---------------------- | :-------- | :------ | :---------------------------------------------------------- |
+| `enableAutoRecalculate` | `boolean` | `true`  | Automatically recalculate event segments when dates change. |
+| `enableValidation`      | `boolean` | `true`  | Validate event objects before adding or updating.           |
+| `maxEventsPerDay`       | `number`  | `50`    | Maximum number of events allowed per day.                   |
 
 ## Plugin API
 
@@ -49,7 +49,10 @@ const eventsService = calendar.app.getPlugin<EventsService>('events');
 const events = eventsService.getByDate(new Date());
 
 // Filter events
-const workEvents = eventsService.filterEvents(allEvents, e => e.calendarId === 'work');
+const workEvents = eventsService.filterEvents(
+  allEvents,
+  e => e.calendarId === 'work'
+);
 ```
 
 ### Available Methods

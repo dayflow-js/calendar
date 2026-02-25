@@ -5,10 +5,9 @@ import {
   Event,
   EventsService,
   EventsPluginConfig,
-} from '../types';
-import { recalculateEventDays } from '../utils';
-import { temporalToDate } from '../utils/temporal';
-import { logger } from '../utils/logger';
+} from '@/types';
+import { recalculateEventDays } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 
 export const defaultEventsConfig: EventsPluginConfig = {
   enableAutoRecalculate: true,
@@ -17,6 +16,16 @@ export const defaultEventsConfig: EventsPluginConfig = {
   maxEventsPerDay: 50,
 };
 
+// Utility function to get current week start time
+function getCurrentWeekStart(date: Date): Date {
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(date);
+  monday.setDate(diff);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
 export function createEventsPlugin(
   config: EventsPluginConfig = {}
 ): CalendarPlugin {
@@ -24,13 +33,9 @@ export function createEventsPlugin(
   let app: ICalendarApp;
 
   const eventsService: EventsService = {
-    getAll: () => {
-      return app.getAllEvents();
-    },
+    getAll: () => app.getAllEvents(),
 
-    getById: (id: string) => {
-      return app.getAllEvents().find(event => event.id === id);
-    },
+    getById: (id: string) => app.getAllEvents().find(event => event.id === id),
 
     add: (event: Event) => {
       // Validate event
@@ -103,18 +108,17 @@ export function createEventsPlugin(
       app.deleteEvent(id);
     },
 
-    getByDate: (date: Date) => {
-      return app.getAllEvents().filter(event => {
+    getByDate: (date: Date) =>
+      app.getAllEvents().filter(event => {
         const eventDate = temporalToDate(event.start);
         eventDate.setHours(0, 0, 0, 0);
         const targetDate = new Date(date);
         targetDate.setHours(0, 0, 0, 0);
         return eventDate.getTime() === targetDate.getTime();
-      });
-    },
+      }),
 
-    getByDateRange: (startDate: Date, endDate: Date) => {
-      return app.getAllEvents().filter(event => {
+    getByDateRange: (startDate: Date, endDate: Date) =>
+      app.getAllEvents().filter(event => {
         // Check if event start or end time is within range
         const eventStart = temporalToDate(event.start);
         const eventEnd = temporalToDate(event.end);
@@ -123,21 +127,17 @@ export function createEventsPlugin(
           (eventEnd >= startDate && eventEnd <= endDate) ||
           (eventStart <= startDate && eventEnd >= endDate)
         );
-      });
-    },
+      }),
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getByDay: (dayIndex: number, _weekStart: Date) => {
-      return app.getAllEvents().filter(event => event.day === dayIndex);
-    },
+    getByDay: (dayIndex: number, _weekStart: Date) =>
+      app.getAllEvents().filter(event => event.day === dayIndex),
 
-    getAllDayEvents: (dayIndex: number, events: Event[]) => {
-      return events.filter(event => event.day === dayIndex && event.allDay);
-    },
+    getAllDayEvents: (dayIndex: number, events: Event[]) =>
+      events.filter(event => event.day === dayIndex && event.allDay),
 
-    recalculateEventDays: (events: Event[], weekStart: Date) => {
-      return recalculateEventDays(events, weekStart);
-    },
+    recalculateEventDays: (events: Event[], weekStart: Date) =>
+      recalculateEventDays(events, weekStart),
 
     validateEvent: (event: Partial<Event>) => {
       const errors: string[] = [];
@@ -154,11 +154,13 @@ export function createEventsPlugin(
         errors.push('Event end time is required');
       }
 
-      if (event.start && event.end) {
-        // For all-day events, allow start and end to be on the same day
-        if (!event.allDay && event.start >= event.end) {
-          errors.push('Start time must be before end time');
-        }
+      if (
+        event.start &&
+        event.end &&
+        !event.allDay &&
+        event.start >= event.end
+      ) {
+        errors.push('Start time must be before end time');
       }
 
       // ID must be a string
@@ -175,32 +177,15 @@ export function createEventsPlugin(
       return errors;
     },
 
-    filterEvents: (events: Event[], filter: (event: Event) => boolean) => {
-      return events.filter(filter);
-    },
+    filterEvents: (events: Event[], filter: (event: Event) => boolean) =>
+      events.filter(filter),
   };
-
-  // Utility function to get current week start time
-  function getCurrentWeekStart(date: Date): Date {
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(date);
-    monday.setDate(diff);
-    monday.setHours(0, 0, 0, 0);
-    return monday;
-  }
 
   return {
     name: 'events',
     config: finalConfig,
     install: (calendarApp: ICalendarApp) => {
       app = calendarApp;
-      // TODO: remove
-      // Plugin only provides event operation services, does not initialize data
-      // Initial events should be passed through CalendarApp configuration
-      logger.log(
-        'Events plugin installed - providing event management services'
-      );
     },
     api: eventsService,
   };

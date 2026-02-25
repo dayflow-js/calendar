@@ -28,10 +28,10 @@ const calendar = useCalendarApp({
 インラインモードでは、作成ボタンをクリックすると、即座に「無題」のカレンダーがリストに追加され、編集モードになります。ユーザーはサイドバーで直接名前を入力できます。カレンダーにはランダムな色が自動的に割り当てられます。
 
 <DocImg
-  width="207"
-  height="211"
-  alt="インラインモード"
-  src="/images/docs/inline-mode.png"
+  width='207'
+  height='211'
+  alt='インラインモード'
+  src='/images/docs/inline-mode.png'
 />
 
 ### モーダルモード
@@ -40,17 +40,20 @@ const calendar = useCalendarApp({
 
 import { Callout } from 'nextra/components';
 
-<Callout type="warning">
-  マルチフレームワーク対応に伴い、コアパッケージにはカラーピッカー（以前の `react-color`）が含まれなくなりました。[Content Slots](/docs-ja/features/content-slots) を使用して、独自のカラーピッカーコンポーネントを提供する必要があります。
+<Callout type='warning'>
+  マルチフレームワーク対応に伴い、コアパッケージにはカラーピッカー（以前の
+  `react-color`）が含まれなくなりました。[Content
+  Slots](/docs-ja/features/content-slots)
+  を使用して、独自のカラーピッカーコンポーネントを提供する必要があります。
 </Callout>
 
-<div className="mt-8" />
+<div className='mt-8' />
 
 <DocImg
-  width="542"
-  height="542"
-  alt="モーダルモード"
-  src="/images/docs/modal-mode.png"
+  width='542'
+  height='542'
+  alt='モーダルモード'
+  src='/images/docs/modal-mode.png'
 />
 
 ```tsx
@@ -97,13 +100,13 @@ createSidebarPlugin({
 ```tsx
 createSidebarPlugin({
   renderCalendarContextMenu: (calendar, onClose) => (
-    <div className="bg-white shadow-lg border rounded p-2">
-      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+    <div className='bg-white shadow-lg border rounded p-2'>
+      <div className='px-3 py-1.5 text-xs font-semibold text-gray-500'>
         {calendar.name}
       </div>
-      <div className="my-1 h-px bg-gray-200" />
+      <div className='my-1 h-px bg-gray-200' />
       <button
-        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+        className='w-full text-left px-3 py-2 text-sm hover:bg-gray-100'
         onClick={() => {
           console.log('カスタムアクション:', calendar.id);
           onClose();

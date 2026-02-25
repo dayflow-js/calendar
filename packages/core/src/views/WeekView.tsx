@@ -1,16 +1,8 @@
+import { RefObject, JSX } from 'preact';
 import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
-import { formatTime, extractHourFromDate } from '@/utils';
-import { useLocale } from '@/locale';
-import { Event, ViewType, WeekViewProps } from '@/types';
-import { useDragForView } from '@/plugins/dragBridge';
-import { ViewType as DragViewType } from '@/types';
-import { defaultDragConfig } from '@/core/config';
+
 import ViewHeader from '@/components/common/ViewHeader';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
-import { temporalToDate } from '@/utils/temporal';
-import { useCalendarDrop } from '@/hooks/useCalendarDrop';
-import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
-import { calendarContainer } from '@/styles/classNames';
 import { AllDayRow } from '@/components/weekView/AllDayRow';
 import { TimeGrid } from '@/components/weekView/TimeGrid';
 import {
@@ -21,6 +13,21 @@ import {
   calculateNewEventLayout,
   calculateDragLayout,
 } from '@/components/weekView/util';
+import { defaultDragConfig } from '@/core/config';
+import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
+import { useLocale } from '@/locale';
+import { useDragForView } from '@/plugins/dragBridge';
+import { calendarContainer } from '@/styles/classNames';
+import {
+  Event,
+  ViewType,
+  WeekViewProps,
+  ViewType as DragViewType,
+  WeekDayDragState,
+} from '@/types';
+import { formatTime, extractHourFromDate } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 
 const WeekView = ({
   app,
@@ -33,7 +40,7 @@ const WeekView = ({
   onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
-}: WeekViewProps) => {
+}: WeekViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
   const { t, getWeekDaysLabels, locale } = useLocale();
 
   // Stabilize currentDate reference to avoid unnecessary re-renders
@@ -123,13 +130,13 @@ const WeekView = ({
   >(null);
 
   const selectedEventId =
-    propSelectedEventId !== undefined
-      ? propSelectedEventId
-      : internalSelectedId;
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
   const detailPanelEventId =
-    propDetailPanelEventId !== undefined
-      ? propDetailPanelEventId
-      : internalDetailPanelEventId;
+    propDetailPanelEventId === undefined
+      ? internalDetailPanelEventId
+      : propDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -155,13 +162,19 @@ const WeekView = ({
   const [draftEvent, setDraftEvent] = useState<Event | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Mobile Swipe Navigation Logic
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   // References
   const allDayRowRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const topFrozenContentRef = useRef<HTMLDivElement>(null);
   const leftFrozenContentRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = (e: any) => {
+  const handleScroll = (
+    e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>
+  ) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
     if (topFrozenContentRef.current) {
       const baseTranslateX = isCompact ? '-33.333%' : '0px';
@@ -177,9 +190,6 @@ const WeekView = ({
     }
   };
 
-  // Mobile Swipe Navigation Logic
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const touchStartPos = useRef({ x: 0, y: 0 });
   const isHorizontalSwipe = useRef(false);
 
@@ -205,10 +215,12 @@ const WeekView = ({
       const deltaY = e.touches[0].clientY - touchStartPos.current.y;
 
       // Detect horizontal swipe on first move
-      if (!isHorizontalSwipe.current && Math.abs(deltaX) > 10) {
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          isHorizontalSwipe.current = true;
-        }
+      if (
+        !isHorizontalSwipe.current &&
+        Math.abs(deltaX) > 10 &&
+        Math.abs(deltaX) > Math.abs(deltaY)
+      ) {
+        isHorizontalSwipe.current = true;
       }
 
       if (isHorizontalSwipe.current) {
@@ -280,9 +292,10 @@ const WeekView = ({
   }, [isCompact, app, currentWeekStart, isTransitioning, swipeOffset]);
 
   // Events for the current week (or custom 2-day range)
-  const currentWeekEvents = useMemo(() => {
-    return filterWeekEvents(events, displayStart, displayDays);
-  }, [events, displayStart, displayDays]);
+  const currentWeekEvents = useMemo(
+    () => filterWeekEvents(events, displayStart, displayDays),
+    [events, displayStart, displayDays]
+  );
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -326,9 +339,10 @@ const WeekView = ({
   ]);
 
   // Organize the hierarchy of all-day events to avoid overlap
-  const organizedAllDaySegments = useMemo(() => {
-    return organizeAllDaySegments(currentWeekEvents, displayStart, displayDays);
-  }, [currentWeekEvents, displayStart, displayDays]);
+  const organizedAllDaySegments = useMemo(
+    () => organizeAllDaySegments(currentWeekEvents, displayStart, displayDays),
+    [currentWeekEvents, displayStart, displayDays]
+  );
 
   // Calculate the required height for the all-day event area
   const allDayAreaHeight = useMemo(() => {
@@ -344,9 +358,10 @@ const WeekView = ({
   }, [organizedAllDaySegments, ALL_DAY_HEIGHT, isCompact]);
 
   // Calculate event layouts
-  const eventLayouts = useMemo(() => {
-    return calculateEventLayouts(currentWeekEvents, displayStart, displayDays);
-  }, [currentWeekEvents, displayStart, displayDays]);
+  const eventLayouts = useMemo(
+    () => calculateEventLayouts(currentWeekEvents, displayStart, displayDays),
+    [currentWeekEvents, displayStart, displayDays]
+  );
 
   // Use drag functionality provided by the plugin
   const {
@@ -413,7 +428,9 @@ const WeekView = ({
         setNewlyCreatedEventId(event.id);
       }
     },
-    onEventEdit: () => {},
+    onEventEdit: () => {
+      /* noop */
+    },
     currentWeekStart: displayStart,
     events: currentWeekEvents,
     calculateNewEventLayout: (targetDay, startHour, endHour) =>
@@ -435,23 +452,27 @@ const WeekView = ({
     isMobile,
   });
 
-  const handleTouchStart = (e: any, dayIndex: number, hour: number) => {
+  const handleTouchStart = (e: TouchEvent, dayIndex: number, hour: number) => {
     if (!isMobile && !isTouch) return;
     const touch = e.touches[0];
     const clientX = touch.clientX;
     const clientY = touch.clientY;
-    const target = e.currentTarget;
+    const target = e.currentTarget as HTMLElement;
 
     longPressTimerRef.current = setTimeout(() => {
       const mockEvent = {
-        preventDefault: () => {},
-        stopPropagation: () => {},
+        preventDefault: () => {
+          /* noop */
+        },
+        stopPropagation: () => {
+          /* noop */
+        },
         touches: [{ clientX, clientY }],
         changedTouches: [{ clientX, clientY }],
         target: target,
         currentTarget: target,
         cancelable: true,
-      } as unknown as any;
+      } as unknown as TouchEvent;
 
       handleCreateStart?.(mockEvent, dayIndex, hour);
     }, 500);
@@ -508,9 +529,7 @@ const WeekView = ({
     });
   }, [isMobile, locale, getWeekDaysLabels, weekDaysLabels]);
 
-  const allDayLabelText = useMemo(() => {
-    return t('allDay');
-  }, [t]);
+  const allDayLabelText = useMemo(() => t('allDay'), [t]);
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
@@ -653,10 +672,18 @@ const WeekView = ({
         ALL_DAY_HEIGHT={ALL_DAY_HEIGHT}
         HOUR_HEIGHT={HOUR_HEIGHT}
         FIRST_HOUR={FIRST_HOUR}
-        dragState={dragState}
+        dragState={dragState as WeekDayDragState | null}
         isDragging={isDragging}
-        handleMoveStart={handleMoveStart}
-        handleResizeStart={handleResizeStart}
+        handleMoveStart={
+          handleMoveStart as (e: MouseEvent | TouchEvent, event: Event) => void
+        }
+        handleResizeStart={
+          handleResizeStart as (
+            e: MouseEvent | TouchEvent,
+            event: Event,
+            direction: string
+          ) => void
+        }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
         onDateChange={onDateChange}
@@ -696,10 +723,18 @@ const WeekView = ({
         handleTouchMove={handleTouchMove}
         handleDragOver={handleDragOver}
         handleDrop={handleDrop}
-        dragState={dragState}
+        dragState={dragState as WeekDayDragState | null}
         isDragging={isDragging}
-        handleMoveStart={handleMoveStart}
-        handleResizeStart={handleResizeStart}
+        handleMoveStart={
+          handleMoveStart as (e: MouseEvent | TouchEvent, event: Event) => void
+        }
+        handleResizeStart={
+          handleResizeStart as (
+            e: MouseEvent | TouchEvent,
+            event: Event,
+            direction: string
+          ) => void
+        }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
         onDateChange={onDateChange}
@@ -725,8 +760,8 @@ const WeekView = ({
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
-        onSave={(updatedEvent: any) => {
-          if (events.find(e => e.id === updatedEvent.id)) {
+        onSave={(updatedEvent: Event) => {
+          if (events.some(e => e.id === updatedEvent.id)) {
             app.updateEvent(updatedEvent.id, updatedEvent);
           } else {
             app.addEvent(updatedEvent);

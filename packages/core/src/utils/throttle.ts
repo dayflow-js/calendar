@@ -6,14 +6,14 @@
  * @param wait - The number of milliseconds to throttle invocations to
  * @returns The throttled function
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): T & { cancel: () => void } {
   let timeout: ReturnType<typeof setTimeout> | null = null;
   let previous = 0;
 
-  const throttled = function (this: any, ...args: Parameters<T>) {
+  const throttled = function (this: unknown, ...args: Parameters<T>) {
     const now = Date.now();
     const remaining = wait - (now - previous);
 

@@ -1,9 +1,6 @@
+import type { CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+import { CalendarApp } from '@dayflow/core';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import {
-  CalendarApp,
-  CalendarAppConfig,
-  UseCalendarAppReturn,
-} from '@dayflow/core';
 
 export function useCalendarApp(
   config: CalendarAppConfig
@@ -14,7 +11,9 @@ export function useCalendarApp(
   const configRef = useRef(config);
 
   useEffect(() => {
-    if (!app) return;
+    if (!app) {
+      return;
+    }
     // Subscribe to state changes to trigger React re-renders
     const unsubscribe = app.subscribe(() => {
       setTick((tick: number) => tick + 1);

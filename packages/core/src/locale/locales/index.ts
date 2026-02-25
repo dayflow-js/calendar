@@ -1,5 +1,6 @@
+import { Locale } from '@/locale/types';
+
 import en from './en';
-import { Locale } from '../types';
 
 export { en };
 
@@ -16,7 +17,7 @@ export type SupportedLang = string;
 /**
  * Registers a new locale in the global registry.
  * This allows plugins to provide additional translations.
- * 
+ *
  * @param locale The locale object to register
  */
 export function registerLocale(locale: Locale) {

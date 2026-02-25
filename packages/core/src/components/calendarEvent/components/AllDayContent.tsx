@@ -1,5 +1,5 @@
-import { Event, ViewMode } from '@/types';
-import { CalendarDays } from '../../common/Icons';
+import { CalendarDays } from '@/components/common/Icons';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
 import {
   eventIcon,
   eventTitleSmall,
@@ -7,12 +7,12 @@ import {
   resizeHandleLeft,
   resizeHandleRight,
 } from '@/styles/classNames';
-import { MultiDayEventSegment } from '../../monthView/WeekComponent';
+import { Event, ViewMode } from '@/types';
 
 interface AllDayContentProps {
   event: Event;
   isEditable: boolean;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onResizeStart?: (e: MouseEvent, event: Event, direction: string) => void;
   isMultiDay?: boolean;
   segment?: MultiDayEventSegment;
   mode?: ViewMode;
@@ -29,7 +29,7 @@ const AllDayContent = ({
   isCompact,
 }: AllDayContentProps) => {
   const showIcon = event.icon !== false;
-  const customIcon = typeof event.icon !== 'boolean' ? event.icon : null;
+  const customIcon = typeof event.icon === 'boolean' ? null : event.icon;
 
   // Calculate title offset for mobile 2-column mode
   const titleOffsetStyle = (() => {
@@ -80,7 +80,7 @@ const AllDayContent = ({
 
       {showIcon &&
         (customIcon ? (
-          <div className="mr-1 shrink-0">{customIcon}</div>
+          <div className='mr-1 shrink-0'>{customIcon}</div>
         ) : (
           <CalendarDays className={eventIcon} />
         ))}

@@ -10,13 +10,14 @@ class Logger {
 
   constructor() {
     this.isDevelopment =
-      (globalThis as any).process?.env?.NODE_ENV !== 'production';
+      (globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } })
+        .process?.env?.NODE_ENV !== 'production';
   }
 
   private formatMessage(
     level: LogLevel,
     message: string,
-    ...args: any[]
+    ...args: unknown[]
   ): void {
     if (!this.isDevelopment) return;
 
@@ -36,22 +37,24 @@ class Logger {
       case 'debug':
         console.debug(prefix, message, ...args);
         break;
+      default:
+        break;
     }
   }
 
-  log(message: string, ...args: any[]): void {
+  log(message: string, ...args: unknown[]): void {
     this.formatMessage('log', message, ...args);
   }
 
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     this.formatMessage('warn', message, ...args);
   }
 
-  error(message: string, ...args: any[]): void {
+  error(message: string, ...args: unknown[]): void {
     this.formatMessage('error', message, ...args);
   }
 
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     this.formatMessage('debug', message, ...args);
   }
 }

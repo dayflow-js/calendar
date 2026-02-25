@@ -9,7 +9,9 @@
  */
 
 import { Temporal } from 'temporal-polyfill';
-import { Event } from '../types';
+
+import { Event } from '@/types';
+
 import { temporalToDate } from './temporal';
 
 // ============================================================================
@@ -22,9 +24,8 @@ import { temporalToDate } from './temporal';
  * @param events Array of events
  * @returns Filtered events
  */
-export const getEventsForDay = (dayIndex: number, events: Event[]) => {
-  return events.filter(event => event.day === dayIndex && !event.allDay);
-};
+export const getEventsForDay = (dayIndex: number, events: Event[]) =>
+  events.filter(event => event.day === dayIndex && !event.allDay);
 
 /**
  * Get all-day events for a specific day index
@@ -38,8 +39,8 @@ export const getAllDayEventsForDay = (
   dayIndex: number,
   events: Event[],
   weekStart?: Date
-) => {
-  return events.filter(event => {
+) =>
+  events.filter(event => {
     if (!event.allDay) return false;
 
     // If no weekStart provided, use simple logic (backward compatibility)
@@ -62,7 +63,6 @@ export const getAllDayEventsForDay = (
     // Check if current date is within event's date range (inclusive)
     return currentDate >= eventStartDate && currentDate <= eventEndDate;
   });
-};
 
 /**
  * Get Date object for a specific day index relative to week start
@@ -139,18 +139,17 @@ const dateToTemporal = (
       month: date.getMonth() + 1,
       day: date.getDate(),
     });
-  } else {
-    return Temporal.ZonedDateTime.from({
-      year: date.getFullYear(),
-      month: date.getMonth() + 1,
-      day: date.getDate(),
-      hour: date.getHours(),
-      minute: date.getMinutes(),
-      second: date.getSeconds(),
-      millisecond: date.getMilliseconds(),
-      timeZone: Temporal.Now.timeZoneId(),
-    });
   }
+  return Temporal.ZonedDateTime.from({
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    second: date.getSeconds(),
+    millisecond: date.getMilliseconds(),
+    timeZone: Temporal.Now.timeZoneId(),
+  });
 };
 
 /**
@@ -215,8 +214,8 @@ export const isEventInWeek = (eventDate: Date, weekStart: Date): boolean => {
 export const recalculateEventDays = (
   events: Event[],
   weekStart: Date
-): Event[] => {
-  return events.map(event => {
+): Event[] =>
+  events.map(event => {
     const eventDate = temporalToDate(event.start);
     const newDay = calculateDayIndex(eventDate, weekStart);
 
@@ -225,7 +224,6 @@ export const recalculateEventDays = (
       day: newDay,
     };
   });
-};
 
 /**
  * Get day index by Date (relative to week start)

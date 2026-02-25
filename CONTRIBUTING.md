@@ -27,10 +27,10 @@ If you have forked the repository and want to run the examples locally, follow t
     ```
     The application typically runs at `http://localhost:5529`.
 
-`feat:` - for new features  
-`fix:` - for bug fixes  
-`docs:` - for documentation updates  
-`style:` - for code style changes (formatting, missing semi-colons, etc.)  
-`refactor:` - for code refactoring without adding features or fixing bugs  
-`test:` - for adding or updating tests  
+`feat:` - for new features
+`fix:` - for bug fixes
+`docs:` - for documentation updates
+`style:` - for code style changes (formatting, missing semi-colons, etc.)
+`refactor:` - for code refactoring without adding features or fixing bugs
+`test:` - for adding or updating tests
 `chore:` - for maintenance tasks (build process, dependencies, etc.)

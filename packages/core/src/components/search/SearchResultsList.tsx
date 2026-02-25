@@ -1,13 +1,14 @@
 import { useMemo } from 'preact/hooks';
-import { Loader2 } from '../common/Icons';
-import { CalendarSearchEvent } from '../../types/search';
-import { useLocale } from '../../locale/useLocale';
+
+import { Loader2 } from '@/components/common/Icons';
+import { useLocale } from '@/locale/useLocale';
+import { CalendarSearchEvent } from '@/types/search';
 import {
   groupSearchResults,
   getSearchHeaderInfo,
   getDateObj,
   normalizeDate,
-} from '../../utils/searchUtils';
+} from '@/utils/searchUtils';
 
 interface SearchResultsListProps {
   loading: boolean;
@@ -16,6 +17,22 @@ interface SearchResultsListProps {
   onResultClick?: (event: CalendarSearchEvent) => void;
   emptyText?: string | Record<string, string>;
 }
+
+const SearchIconPlaceholder = () => (
+  <svg
+    className='w-12 h-12 text-gray-300 dark:text-gray-600'
+    fill='none'
+    viewBox='0 0 24 24'
+    stroke='currentColor'
+  >
+    <path
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      strokeWidth={1}
+      d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+    />
+  </svg>
+);
 
 const SearchResultsList = ({
   loading,
@@ -29,14 +46,13 @@ const SearchResultsList = ({
   const today = useMemo(() => normalizeDate(new Date()), []);
 
   // Group events by date (sorted)
-  const groupedEvents = useMemo(() => {
-    return groupSearchResults(results, today);
-  }, [results, today]);
+  const groupedEvents = useMemo(
+    () => groupSearchResults(results, today),
+    [results, today]
+  );
 
   // Helper to get time string
-  const getTime = (d: any) => {
-    return getDateObj(d);
-  };
+  const getTime = (d: unknown) => getDateObj(d);
 
   const getEmptyText = () => {
     if (typeof emptyText === 'string') return emptyText;
@@ -48,8 +64,8 @@ const SearchResultsList = ({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-40 text-gray-500">
-        <Loader2 className="w-8 h-8 animate-spin mb-2" />
+      <div className='flex flex-col items-center justify-center h-40 text-gray-500'>
+        <Loader2 className='w-8 h-8 animate-spin mb-2' />
         <span>Loading...</span>
       </div>
     );
@@ -57,15 +73,15 @@ const SearchResultsList = ({
 
   if (results.length === 0) {
     return keyword ? (
-      <div className="flex flex-col items-center justify-center h-40 text-gray-500">
+      <div className='flex flex-col items-center justify-center h-40 text-gray-500'>
         <SearchIconPlaceholder />
-        <span className="mt-2 text-sm">{getEmptyText()}</span>
+        <span className='mt-2 text-sm'>{getEmptyText()}</span>
       </div>
     ) : null;
   }
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {groupedEvents.map(group => {
         const { title, colorClass } = getSearchHeaderInfo(
           group.date,
@@ -81,7 +97,7 @@ const SearchResultsList = ({
             >
               {title}
             </h3>
-            <div className="flex flex-col">
+            <div className='flex flex-col'>
               {group.events.map(event => {
                 const start = getTime(event.start);
                 const end = getTime(event.end);
@@ -100,24 +116,24 @@ const SearchResultsList = ({
                 return (
                   <div key={event.id}>
                     <div
-                      className="p-2 mx-2 mb-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group"
+                      className='p-2 mx-2 mb-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group'
                       onClick={() => onResultClick?.(event)}
                     >
-                      <div className="flex items-stretch gap-3">
+                      <div className='flex items-stretch gap-3'>
                         <div
-                          className="w-1 rounded-full shrink-0"
+                          className='w-1 rounded-full shrink-0'
                           style={{ backgroundColor: event.color || '#3b82f6' }}
                         />
-                        <div className="flex-1 min-w-0 flex justify-between items-start">
-                          <div className="font-medium text-black dark:text-white truncate pr-2 text-sm">
+                        <div className='flex-1 min-w-0 flex justify-between items-start'>
+                          <div className='font-medium text-black dark:text-white truncate pr-2 text-sm'>
                             {event.title}
                           </div>
-                          <div className="text-xs flex flex-col items-end shrink-0 leading-tight">
-                            <div className="text-black dark:text-white">
+                          <div className='text-xs flex flex-col items-end shrink-0 leading-tight'>
+                            <div className='text-black dark:text-white'>
                               {startTimeStr}
                             </div>
                             {endTimeStr && (
-                              <div className="text-gray-500 dark:text-gray-400">
+                              <div className='text-gray-500 dark:text-gray-400'>
                                 {endTimeStr}
                               </div>
                             )}
@@ -125,7 +141,7 @@ const SearchResultsList = ({
                         </div>
                       </div>
                     </div>
-                    <div className="mx-2 border-b border-gray-200 dark:border-gray-700" />
+                    <div className='mx-2 border-b border-gray-200 dark:border-gray-700' />
                   </div>
                 );
               })}
@@ -136,21 +152,5 @@ const SearchResultsList = ({
     </div>
   );
 };
-
-const SearchIconPlaceholder = () => (
-  <svg
-    className="w-12 h-12 text-gray-300 dark:text-gray-600"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1}
-      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-    />
-  </svg>
-);
 
 export default SearchResultsList;

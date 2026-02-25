@@ -1,4 +1,5 @@
-import { h, Fragment } from 'preact';
+import { h, ComponentChildren } from 'preact';
+import { createPortal } from 'preact/compat';
 import {
   useCallback,
   useEffect,
@@ -7,41 +8,42 @@ import {
   useContext,
   useState,
 } from 'preact/hooks';
+
+import CalendarHeader from '@/components/common/CalendarHeader';
+import { CreateCalendarDialog } from '@/components/common/CreateCalendarDialog';
+import DefaultEventDetailDialog from '@/components/common/DefaultEventDetailDialog';
+import { QuickCreateEventPopup } from '@/components/common/QuickCreateEventPopup';
+import { MobileEventDrawer } from '@/components/mobileEventDrawer';
+import MobileSearchDialog from '@/components/search/MobileSearchDialog';
+import SearchDrawer from '@/components/search/SearchDrawer';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { LocaleProvider } from '@/locale/LocaleProvider';
+import { LocaleCode, Locale, LocaleMessages } from '@/locale/types';
+import { useLocale } from '@/locale/useLocale';
+import { useSidebarBridge } from '@/plugins/sidebarBridge';
 import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
   TNode,
   Event as CalendarEvent,
-} from '../types';
-import { ThemeMode } from '../types/calendarTypes';
-import { LocaleCode, Locale, LocaleMessages } from '../locale/types';
-import { CalendarSearchProps } from '../types/search';
-import DefaultEventDetailDialog from '../components/common/DefaultEventDetailDialog';
-import CalendarHeader from '../components/common/CalendarHeader';
-import SearchDrawer from '../components/search/SearchDrawer';
-import MobileSearchDialog from '../components/search/MobileSearchDialog';
-import { QuickCreateEventPopup } from '../components/common/QuickCreateEventPopup';
-import { CreateCalendarDialog } from '../components/common/CreateCalendarDialog';
-import { MobileEventDrawer } from '../components/mobileEventDrawer';
-import { ThemeProvider } from '../contexts/ThemeContext';
-import { LocaleProvider } from '../locale/LocaleProvider';
-import { useLocale } from '../locale/useLocale';
-import { createPortal } from 'preact/compat';
+} from '@/types';
+import { ThemeMode } from '@/types/calendarTypes';
+import { CalendarSearchProps } from '@/types/search';
+
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
-import { useSidebarBridge } from '../plugins/sidebarBridge';
 import { useAppSubscription } from './hooks/useAppSubscription';
-import { useResponsive } from './hooks/useResponsive';
-import { useSearchController } from './hooks/useSearchController';
 import { useEventDialogController } from './hooks/useEventDialogController';
 import { useQuickCreateController } from './hooks/useQuickCreateController';
+import { useResponsive } from './hooks/useResponsive';
+import { useSearchController } from './hooks/useSearchController';
 
 interface CalendarRootProps {
   app: ICalendarApp;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
   customMessages?: LocaleMessages;
   search?: CalendarSearchProps;
   titleBarSlot?:
@@ -63,12 +65,12 @@ const CalendarInternalLocaleProvider = ({
 }: {
   locale: LocaleCode | Locale;
   messages?: LocaleMessages;
-  children: any;
+  children: ComponentChildren;
 }) => {
   const context = useLocale();
 
   if (!context.isDefault) {
-    return <Fragment>{children}</Fragment>;
+    return children;
   }
 
   return (
@@ -112,9 +114,10 @@ export const CalendarRoot = ({
   // Theme
   const [theme, setTheme] = useState<ThemeMode>(() => app.getTheme());
 
-  useEffect(() => {
-    return app.subscribeThemeChange(newTheme => setTheme(newTheme));
-  }, [app]);
+  useEffect(
+    () => app.subscribeThemeChange(newTheme => setTheme(newTheme)),
+    [app]
+  );
 
   const handleThemeChange = useCallback(
     (newTheme: ThemeMode) => app.setTheme(newTheme),
@@ -124,7 +127,9 @@ export const CalendarRoot = ({
   // Patches the app callback so that app.dismissUI() collapses any open
   // UI layer (detail panel or mobile drawer) and chains the previous handler.
   useEffect(() => {
-    const callbacks = (app as any).callbacks;
+    const callbacks = (
+      app as unknown as { callbacks: { onDismissUI?: () => void } }
+    ).callbacks;
     const prevDismiss = callbacks.onDismissUI;
 
     callbacks.onDismissUI = () => {
@@ -149,7 +154,9 @@ export const CalendarRoot = ({
     if (!isMobile || !eventDialog.detailPanelEventId) return;
 
     const rawEventId = eventDialog.detailPanelEventId.split('::')[0];
-    const event = app.getEvents().find((e: CalendarEvent) => e.id === rawEventId);
+    const event = app
+      .getEvents()
+      .find((e: CalendarEvent) => e.id === rawEventId);
     if (event) {
       quickCreate.setMobileDraftEvent(event);
       quickCreate.setIsMobileDrawerOpen(true);
@@ -199,12 +206,13 @@ export const CalendarRoot = ({
   );
 
   const miniSidebarWidth =
-    collapsedSafeAreaLeft != null ? '0px' : sidebar.miniWidth;
+    collapsedSafeAreaLeft === null ? sidebar.miniWidth : '0px';
 
+  const effectiveCollapsedSafeAreaLeft = collapsedSafeAreaLeft ?? null;
   const safeAreaLeft =
-    collapsedSafeAreaLeft != null && sidebar.isCollapsed
-      ? collapsedSafeAreaLeft
-      : sidebar.safeAreaLeft;
+    effectiveCollapsedSafeAreaLeft === null || !sidebar.isCollapsed
+      ? sidebar.safeAreaLeft
+      : effectiveCollapsedSafeAreaLeft;
 
   const headerConfig = app.getCalendarHeaderConfig();
 
@@ -233,7 +241,7 @@ export const CalendarRoot = ({
     if (!eventDialog.dialogProps) return null;
 
     const DialogComponent = effectiveEventDetailDialog!;
-    const portalTarget = typeof document !== 'undefined' ? document.body : null;
+    const portalTarget = typeof document === 'undefined' ? null : document.body;
     if (!portalTarget) return null;
 
     const isOverridden =
@@ -242,15 +250,15 @@ export const CalendarRoot = ({
     return (
       <ContentSlot
         store={customRenderingStore}
-        generatorName="eventDetailDialog"
+        generatorName='eventDetailDialog'
         generatorArgs={eventDialog.dialogProps}
         defaultContent={
-          !isOverridden
-            ? createPortal(
+          isOverridden
+            ? null
+            : createPortal(
                 h(DialogComponent, eventDialog.dialogProps),
                 portalTarget
               )
-            : null
         }
       />
     );
@@ -266,10 +274,10 @@ export const CalendarRoot = ({
         locale={app.state.locale}
         messages={customMessages}
       >
-        <div className="df-calendar-container relative flex flex-row overflow-hidden select-none">
+        <div className='df-calendar-container relative flex flex-row overflow-hidden select-none'>
           <ContentSlot
             store={customRenderingStore}
-            generatorName="titleBarSlot"
+            generatorName='titleBarSlot'
             generatorArgs={titleBarSlotArgs}
             defaultContent={
               titleBarSlot &&
@@ -281,7 +289,7 @@ export const CalendarRoot = ({
 
           {sidebar.enabled && (
             <aside
-              className="absolute top-0 bottom-0 left-0 z-0 h-full"
+              className='absolute top-0 bottom-0 left-0 z-0 h-full'
               style={{ width: sidebar.width }}
             >
               {sidebar.content}
@@ -300,9 +308,9 @@ export const CalendarRoot = ({
           >
             {renderHeader()}
 
-            <div className="flex-1 overflow-hidden relative" ref={calendarRef}>
-              <div className="calendar-renderer h-full relative flex flex-row">
-                <div className="flex-1 h-full overflow-hidden">
+            <div className='flex-1 overflow-hidden relative' ref={calendarRef}>
+              <div className='calendar-renderer h-full relative flex flex-row'>
+                <div className='flex-1 h-full overflow-hidden'>
                   <ViewComponent {...viewProps} />
                 </div>
 

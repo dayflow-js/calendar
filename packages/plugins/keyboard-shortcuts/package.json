@@ -28,7 +28,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c",
     "clean": "rimraf dist node_modules",
     "typecheck": "tsc --noEmit"
   },
@@ -42,6 +42,9 @@
     "rollup-plugin-dts": "catalog:",
     "temporal-polyfill": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:*"
   },
   "peerDependencies": {
     "@dayflow/core": "workspace:*"

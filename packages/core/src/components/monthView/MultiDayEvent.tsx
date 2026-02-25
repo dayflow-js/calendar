@@ -1,6 +1,9 @@
-import { useState, useRef } from 'preact/hooks';
 import { memo } from 'preact/compat';
-import { Event } from '../../types';
+import { useState, useRef } from 'preact/hooks';
+
+import { getEventIcon } from '@/components/monthView/util';
+import { monthEventColorBar } from '@/styles/classNames';
+import { Event } from '@/types';
 import {
   getLineColor,
   getSelectedBgColor,
@@ -10,9 +13,7 @@ import {
   formatTime,
   extractHourFromDate,
   getEventEndHour,
-} from '../../utils';
-import { getEventIcon } from '../../components/monthView/util';
-import { monthEventColorBar } from '../../styles/classNames';
+} from '@/utils';
 
 export interface MultiDayEventSegment {
   id: string;
@@ -40,8 +41,12 @@ interface MultiDayEventProps {
   isDragging: boolean;
   isResizing?: boolean;
   isSelected?: boolean;
-  onMoveStart: (e: any, event: Event) => void;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
   onEventLongPress?: (eventId: string) => void;
   isMobile?: boolean;
   isDraggable?: boolean;
@@ -96,7 +101,7 @@ export const MultiDayEvent = memo(
     const adjustedLeft = `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`;
     const adjustedWidth = `calc(${widthPercent}% - ${HORIZONTAL_MARGIN * 2}px)`;
 
-    const handleMouseDown = (e: any) => {
+    const handleMouseDown = (e: MouseEvent) => {
       if (!isDraggable && !viewable) return;
       e.preventDefault();
       e.stopPropagation();
@@ -106,7 +111,7 @@ export const MultiDayEvent = memo(
       const isResizeHandle = target.closest('.resize-handle');
 
       if (!isResizeHandle && isDraggable) {
-        onMoveStart(e, segment.event);
+        onMoveStart?.(e, segment.event);
       }
     };
 
@@ -124,7 +129,7 @@ export const MultiDayEvent = memo(
     );
     const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
-    const handleTouchStart = (e: any) => {
+    const handleTouchStart = (e: TouchEvent) => {
       if (!onMoveStart || !isMobile || (!isDraggable && !viewable)) return;
       e.stopPropagation();
       setIsPressed(true);
@@ -132,7 +137,7 @@ export const MultiDayEvent = memo(
       const touch = e.touches[0];
       const clientX = touch.clientX;
       const clientY = touch.clientY;
-      const currentTarget = e.currentTarget;
+      const currentTarget = e.currentTarget as HTMLElement;
 
       touchStartPosRef.current = { x: clientX, y: clientY };
 
@@ -142,12 +147,16 @@ export const MultiDayEvent = memo(
         }
 
         const syntheticEvent = {
-          preventDefault: () => {},
-          stopPropagation: () => {},
+          preventDefault: () => {
+            /* noop */
+          },
+          stopPropagation: () => {
+            /* noop */
+          },
           currentTarget,
           touches: [{ clientX, clientY }],
           cancelable: false,
-        } as unknown as any;
+        } as unknown as MouseEvent | TouchEvent;
 
         if (isDraggable) {
           onMoveStart(syntheticEvent, segment.event);
@@ -158,7 +167,7 @@ export const MultiDayEvent = memo(
       }, 500);
     };
 
-    const handleTouchMove = (e: any) => {
+    const handleTouchMove = (e: TouchEvent) => {
       if (longPressTimerRef.current && touchStartPosRef.current) {
         const dx = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
         const dy = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
@@ -221,11 +230,11 @@ export const MultiDayEvent = memo(
         };
 
         return (
-          <div className="flex items-center min-w-0 w-full pointer-events-auto">
+          <div className='flex items-center min-w-0 w-full pointer-events-auto'>
             {segment.isFirstSegment && getEventIcon(segment.event) && (
-              <div className="shrink-0 mr-1">
+              <div className='shrink-0 mr-1'>
                 <div
-                  className="rounded-full p-0.5 text-white flex items-center justify-center"
+                  className='rounded-full p-0.5 text-white flex items-center justify-center'
                   style={{
                     backgroundColor: getLineColor(calendarId),
                     width: '12px',
@@ -237,13 +246,13 @@ export const MultiDayEvent = memo(
               </div>
             )}
 
-            <div className="flex-1 min-w-0">
-              <div className="truncate text-xs">{getDisplayText()}</div>
+            <div className='flex-1 min-w-0'>
+              <div className='truncate text-xs'>{getDisplayText()}</div>
             </div>
 
             {segment.isLastSegment && segment.segmentType !== 'single' && (
-              <div className="shrink-0 ml-1 text-white/80 dark:text-white/90">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80"></div>
+              <div className='shrink-0 ml-1 text-white/80 dark:text-white/90'>
+                <div className='w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80'></div>
               </div>
             )}
           </div>
@@ -270,12 +279,12 @@ export const MultiDayEvent = memo(
           : undefined;
 
       return (
-        <div className="relative flex items-center min-w-0 w-full pointer-events-auto">
+        <div className='relative flex items-center min-w-0 w-full pointer-events-auto'>
           <div
             className={monthEventColorBar}
             style={{ backgroundColor: getLineColor(calendarId) }}
           />
-          <div className="flex items-center min-w-0 flex-1">
+          <div className='flex items-center min-w-0 flex-1'>
             <span
               className={`whitespace-nowrap overflow-hidden block ${isMobile ? 'mobile-mask-fade' : 'truncate'} font-medium text-xs`}
             >
@@ -294,7 +303,7 @@ export const MultiDayEvent = memo(
             !segment.event.allDay &&
             endHour !== 24 &&
             !isMobile && (
-              <span className="text-xs font-medium whitespace-nowrap ml-auto">
+              <span className='text-xs font-medium whitespace-nowrap ml-auto'>
                 {`ends ${endTimeText}`}
               </span>
             )}
@@ -309,7 +318,7 @@ export const MultiDayEvent = memo(
 
     return (
       <div
-        className="absolute px-1 text-xs select-none flex items-center transition-all duration-200 hover:shadow-sm dark:hover:shadow-lg dark:hover:shadow-black/20 group"
+        className='absolute px-1 text-xs select-none flex items-center transition-all duration-200 hover:shadow-sm dark:hover:shadow-lg dark:hover:shadow-black/20 group'
         style={{
           left: adjustedLeft,
           width: adjustedWidth,
@@ -345,13 +354,13 @@ export const MultiDayEvent = memo(
           <>
             {segment.isFirstSegment && (
               <div
-                className="absolute left-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none"
+                className='absolute left-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none'
                 style={{ borderColor: getLineColor(calendarId) }}
               />
             )}
             {segment.isLastSegment && (
               <div
-                className="absolute right-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none"
+                className='absolute right-5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-2 rounded-full z-50 pointer-events-none'
                 style={{ borderColor: getLineColor(calendarId) }}
               />
             )}
@@ -359,7 +368,7 @@ export const MultiDayEvent = memo(
         )}
         {renderResizeHandle('left')}
         <div
-          className="flex-1 min-w-0"
+          className='flex-1 min-w-0'
           style={{
             cursor: isResizing ? 'ew-resize' : 'pointer',
           }}
@@ -372,6 +381,6 @@ export const MultiDayEvent = memo(
   }
 );
 
-(MultiDayEvent as any).displayName = 'MultiDayEvent';
+(MultiDayEvent as { displayName?: string }).displayName = 'MultiDayEvent';
 
 export default MultiDayEvent;

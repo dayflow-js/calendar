@@ -1,19 +1,21 @@
+import { ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
+
+import { getWeekDaysLabels, getMonthLabels } from './intl';
 import { LocaleContext } from './LocaleContext';
 import { t as translate } from './translator';
-import { getWeekDaysLabels, getMonthLabels } from './intl';
-import { isValidLocale } from './utils';
 import type {
   LocaleCode,
   LocaleMessages,
   TranslationKey,
   Locale,
 } from './types';
+import { isValidLocale } from './utils';
 
 export interface LocaleProviderProps {
   locale?: LocaleCode | Locale;
   messages?: LocaleMessages;
-  children?: any;
+  children?: ComponentChildren;
 }
 
 export const LocaleProvider = ({
@@ -54,7 +56,7 @@ export const LocaleProvider = ({
         // 4. Replace variables if any
         if (vars) {
           Object.entries(vars).forEach(([k, v]) => {
-            text = text.replace(new RegExp(`{${k}}`, 'g'), v);
+            text = text.replaceAll(new RegExp(`{${k}}`, 'g'), v);
           });
         }
 

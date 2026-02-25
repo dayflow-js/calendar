@@ -1,38 +1,43 @@
-declare module "@dayflow/svelte" {
-    import { SvelteComponent } from "svelte";
-    import {
-        CalendarApp,
-        CalendarAppConfig,
-        UseCalendarAppReturn,
-        CalendarRegistry,
-        createEventsPlugin,
-        createDayView,
-        createWeekView,
-        createMonthView,
-        createYearView,
-        ViewType
-    } from "@dayflow/core";
+declare module '@dayflow/svelte' {
+  import type { CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+  import {
+    CalendarApp,
+    CalendarRegistry,
+    createEventsPlugin,
+    createDayView,
+    createWeekView,
+    createMonthView,
+    createYearView,
+    ViewType,
+  } from '@dayflow/core';
+  import { SvelteComponent } from 'svelte';
 
-    /**
-     * Svelte store based hook for DayFlow
-     */
-    export function useCalendarApp(config: CalendarAppConfig): UseCalendarAppReturn;
+  /**
+   * Svelte store based hook for DayFlow
+   */
+  export function useCalendarApp(
+    config: CalendarAppConfig
+  ): UseCalendarAppReturn;
 
-    /**
-     * DayFlow Calendar Svelte Component
-     */
-    export class DayFlowCalendar extends SvelteComponent<any, any, any> {}
+  /**
+   * DayFlow Calendar Svelte Component
+   */
+  export class DayFlowCalendar extends SvelteComponent<
+    unknown,
+    unknown,
+    unknown
+  > {}
 
-    export {
-        CalendarApp,
-        CalendarRegistry,
-        createEventsPlugin,
-        createDayView,
-        createWeekView,
-        createMonthView,
-        createYearView,
-        ViewType
-    };
+  export {
+    CalendarApp,
+    CalendarRegistry,
+    createEventsPlugin,
+    createDayView,
+    createWeekView,
+    createMonthView,
+    createYearView,
+    ViewType,
+  };
 
-    export default DayFlowCalendar;
+  export default DayFlowCalendar;
 }

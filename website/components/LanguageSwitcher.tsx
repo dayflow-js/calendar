@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import cn from 'clsx';
 import { Languages } from 'lucide-react';
-import clsx from 'clsx';
 import { useTheme } from 'next-themes';
-import { getBasePath } from '../utils/basePath';
+import React, { useState, useEffect, useMemo } from 'react';
+
+import { getBasePath } from '@/utils/basePath';
 
 const locales = [
   { code: 'en', name: 'English' },
@@ -21,7 +22,7 @@ export function LanguageSwitcher() {
 
   const triggerClasses = useMemo(
     () =>
-      clsx(
+      cn(
         'inline-flex items-center justify-center h-9 rounded-md transition-colors',
         isDarkMode
           ? 'text-gray-200 hover:bg-gray-800 focus-visible:outline-white'
@@ -32,7 +33,7 @@ export function LanguageSwitcher() {
 
   const dropdownClasses = useMemo(
     () =>
-      clsx(
+      cn(
         'absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 focus:outline-none',
         isDarkMode ? 'bg-gray-900 ring-white/10' : 'bg-white ring-black/5'
       ),
@@ -41,7 +42,7 @@ export function LanguageSwitcher() {
 
   const itemClasses = useMemo(
     () =>
-      clsx(
+      cn(
         'flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors',
         isDarkMode ? 'text-gray-200 hover:bg-gray-800' : 'text-gray-700'
       ),
@@ -56,7 +57,7 @@ export function LanguageSwitcher() {
 
     // Remove basePath if present
     if (basePath && path.startsWith(basePath)) {
-      path = path.substring(basePath.length);
+      path = path.slice(basePath.length);
     }
 
     if (path.startsWith('/docs-zh')) {
@@ -74,7 +75,7 @@ export function LanguageSwitcher() {
 
     // Remove basePath if present
     if (basePath && path.startsWith(basePath)) {
-      path = path.substring(basePath.length);
+      path = path.slice(basePath.length);
     }
 
     let newPath = path;
@@ -91,11 +92,11 @@ export function LanguageSwitcher() {
       // Remove any existing locale prefix to get the content path
       let contentPath = path;
       if (path.startsWith('/docs-zh')) {
-        contentPath = path.substring('/docs-zh'.length) || '/';
+        contentPath = path.slice('/docs-zh'.length) || '/';
       } else if (path.startsWith('/docs-ja')) {
-        contentPath = path.substring('/docs-ja'.length) || '/';
+        contentPath = path.slice('/docs-ja'.length) || '/';
       } else if (path.startsWith('/docs')) {
-        contentPath = path.substring('/docs'.length) || '/';
+        contentPath = path.slice('/docs'.length) || '/';
       }
 
       // Ensure contentPath starts with /
@@ -132,65 +133,66 @@ export function LanguageSwitcher() {
   // Avoid hydration mismatch
   if (!mounted) {
     return (
-      <div className="relative inline-block text-left">
+      <div className='relative inline-block text-left'>
         <button
-          type="button"
+          type='button'
           disabled
-          className={clsx(triggerClasses, 'opacity-50')}
-          aria-label="Language selector"
+          className={cn(triggerClasses, 'opacity-50')}
+          aria-label='Language selector'
         >
-          <Languages className="h-5 w-5" />
+          <Languages className='h-5 w-5' />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="relative inline-block text-left">
+    <div className='relative inline-block text-left'>
       <button
-        type="button"
+        type='button'
         onClick={() => setIsOpen(!isOpen)}
         className={triggerClasses}
         aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-label="Language selector"
+        aria-haspopup='true'
+        aria-label='Language selector'
       >
-        <Languages className="h-5 w-5" />
+        <Languages className='h-5 w-5' />
       </button>
 
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className='fixed inset-0 z-10'
             onClick={() => setIsOpen(false)}
           />
           <div className={dropdownClasses}>
-            <div className="py-1" role="menu" aria-orientation="vertical">
+            <div className='py-1' role='menu' aria-orientation='vertical'>
               {locales.map(locale => (
                 <button
+                  type='button'
                   key={locale.code}
                   onClick={() => {
                     switchLanguage(locale.code);
                     setIsOpen(false);
                   }}
-                  className={clsx(
+                  className={cn(
                     itemClasses,
                     currentLocale === locale.code &&
                       (isDarkMode ? 'bg-gray-800/60' : 'bg-gray-50')
                   )}
-                  role="menuitem"
+                  role='menuitem'
                 >
                   <span>{locale.name}</span>
                   {currentLocale === locale.code && (
                     <svg
-                      className="ml-auto h-4 w-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                      className='ml-auto h-4 w-4'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
                       />
                     </svg>
                   )}

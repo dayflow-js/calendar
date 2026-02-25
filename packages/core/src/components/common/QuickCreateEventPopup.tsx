@@ -1,3 +1,5 @@
+import { RefObject } from 'preact';
+import { createPortal } from 'preact/compat';
 import {
   useState,
   useEffect,
@@ -5,15 +7,15 @@ import {
   useMemo,
   useLayoutEffect,
 } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
-import { ICalendarApp, Event } from '../../types';
-import { generateUniKey } from '../../utils/helpers';
-import { useLocale } from '../../locale';
-import { dateToZonedDateTime } from '../../utils/temporal';
+
+import { useLocale } from '@/locale';
+import { ICalendarApp, Event } from '@/types';
+import { generateUniKey } from '@/utils/helpers';
+import { dateToZonedDateTime } from '@/utils/temporal';
 
 interface QuickCreateEventPopupProps {
   app: ICalendarApp;
-  anchorRef: any;
+  anchorRef: RefObject<HTMLElement>;
   onClose: () => void;
   isOpen: boolean;
 }
@@ -26,6 +28,17 @@ interface SuggestionItem {
   start: Date;
   end: Date;
 }
+
+// Format time for display (e.g., 10:00 - 11:00)
+const formatTime = (d: Date) =>
+  d.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+const formatTimeRange = (start: Date, end: Date) =>
+  `${formatTime(start)} - ${formatTime(end)}`;
 
 export const QuickCreateEventPopup = ({
   app,
@@ -131,8 +144,7 @@ export const QuickCreateEventPopup = ({
     // History Suggestions
     // Filter events that match input (fuzzy-ish: simple includes)
     // Deduplicate by title
-    const seenTitles = new Set<string>();
-    seenTitles.add(inputValue.toLowerCase()); // Don't show exact match again in history if it's same as input
+    const seenTitles = new Set<string>([inputValue.toLowerCase()]); // Don't show exact match again in history if it's same as input
 
     const matchedEvents = allEvents.filter(
       e =>
@@ -248,17 +260,6 @@ export const QuickCreateEventPopup = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, suggestions, selectedIndex]);
 
-  // Format time for display (e.g., 10:00 - 11:00)
-  const formatTimeRange = (start: Date, end: Date) => {
-    const format = (d: Date) =>
-      d.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-    return `${format(start)} - ${format(end)}`;
-  };
-
   if (!isOpen) return null;
 
   return createPortal(
@@ -271,15 +272,15 @@ export const QuickCreateEventPopup = ({
         visibility: isReady ? 'visible' : 'hidden',
       }}
     >
-      <div className="p-4 pb-2">
-        <div className="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <div className='p-4 pb-2'>
+        <div className='mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
           {t('quickCreateEvent') || 'Quick Create Event'}
         </div>
-        <div className="relative">
+        <div className='relative'>
           <input
             ref={inputRef}
-            type="text"
-            className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+            type='text'
+            className='w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition'
             placeholder={
               t('quickCreatePlaceholder') || 'Enter title (e.g. Code review)'
             }
@@ -289,9 +290,9 @@ export const QuickCreateEventPopup = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto max-h-75 py-1 px-2">
+      <div className='flex-1 overflow-y-auto max-h-75 py-1 px-2'>
         {suggestions.length === 0 && inputValue && (
-          <div className="px-4 py-3 text-sm text-gray-400 text-center">
+          <div className='px-4 py-3 text-sm text-gray-400 text-center'>
             {t('noSuggestions') || 'Type to create'}
           </div>
         )}
@@ -308,19 +309,19 @@ export const QuickCreateEventPopup = ({
             onMouseEnter={() => setSelectedIndex(index)}
           >
             <div
-              className="w-1 h-8 rounded-full mr-3 shrink-0"
+              className='w-1 h-8 rounded-full mr-3 shrink-0'
               style={{ backgroundColor: item.color }}
             />
-            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+            <div className='flex-1 min-w-0 flex flex-col gap-0.5'>
+              <div className='text-sm font-medium text-gray-900 dark:text-gray-100 truncate'>
                 {item.title}
               </div>
-              <div className="flex">
-                <span className="font-semibold text-[10px] px-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-500 dark:text-gray-400">
+              <div className='flex'>
+                <span className='font-semibold text-[10px] px-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-500 dark:text-gray-400'>
                   {item.type === 'new' ? t('today') : t('tomorrow')}
                 </span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className='text-xs text-gray-500 dark:text-gray-400'>
                 {formatTimeRange(item.start, item.end)}
               </div>
             </div>

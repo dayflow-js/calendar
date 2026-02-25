@@ -223,10 +223,10 @@ function MultiViewCalendar() {
   });
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className='h-screen flex flex-col'>
       {/* View Switcher */}
-      <div className="border-b p-4">
-        <div className="flex gap-2">
+      <div className='border-b p-4'>
+        <div className='flex gap-2'>
           <button onClick={() => calendar.changeView(ViewType.DAY)}>Day</button>
           <button onClick={() => calendar.changeView(ViewType.WEEK)}>
             Week
@@ -241,7 +241,7 @@ function MultiViewCalendar() {
       </div>
 
       {/* Calendar */}
-      <div className="flex-1">
+      <div className='flex-1'>
         <DayFlowCalendar calendar={calendar} />
       </div>
     </div>

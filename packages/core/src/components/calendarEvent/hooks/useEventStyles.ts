@@ -1,8 +1,10 @@
+import { RefObject } from 'preact';
+
+import { getTimeColumnWidth } from '@/components/calendarEvent/utils';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { ViewType, Event, EventLayout } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
-import { MultiDayEventSegment } from '../../monthView/WeekComponent';
-import { YearMultiDaySegment } from '../../yearView/utils';
-import { getTimeColumnWidth } from '../utils';
 
 interface UseEventStylesProps {
   event: Event;
@@ -23,11 +25,13 @@ interface UseEventStylesProps {
   isDraggable: boolean;
   canOpenDetail: boolean;
   eventVisibility: 'visible' | 'sticky-top' | 'sticky-bottom';
-  calendarRef: { current: HTMLElement | null };
+  calendarRef: RefObject<HTMLElement>;
   isMobile: boolean;
-  eventRef: { current: HTMLElement | null };
+  eventRef: RefObject<HTMLElement>;
   getActiveDayIdx: () => number;
-  getDayMetricsWrapper: (dayIndex: number) => { left: number; width: number } | null;
+  getDayMetricsWrapper: (
+    dayIndex: number
+  ) => { left: number; width: number } | null;
   multiDaySegmentInfo?: {
     startHour: number;
     endHour: number;
@@ -113,7 +117,7 @@ export const useEventStyles = ({
     }
 
     if (isAllDay) {
-      const styles: any = {
+      const styles: Record<string, unknown> = {
         height: `${allDayHeight - 4}px`,
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
@@ -184,103 +188,84 @@ export const useEventStyles = ({
       cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
     };
 
-    if (isEventSelected && showDetailPanel) {
-      if (
-        eventVisibility === 'sticky-top' ||
-        eventVisibility === 'sticky-bottom'
-      ) {
-        const calendarRect = calendarRef.current?.getBoundingClientRect();
-        if (calendarRect) {
-          const activeDayIndex = getActiveDayIdx();
-          const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
-          const columnCount = isDayView ? 1 : (columnsPerRow || 7);
-          let dayColumnWidth =
-            (calendarRect.width - timeColumnWidth) / columnCount;
-          let dayStartX =
-            calendarRect.left +
-            timeColumnWidth +
-            (isDayView ? 0 : activeDayIndex * dayColumnWidth);
+    if (
+      isEventSelected &&
+      showDetailPanel &&
+      (eventVisibility === 'sticky-top' || eventVisibility === 'sticky-bottom')
+    ) {
+      const calendarRect = calendarRef.current?.getBoundingClientRect();
+      if (calendarRect) {
+        const activeDayIndex = getActiveDayIdx();
+        const timeColumnWidth = getTimeColumnWidth(calendarRef, isMobile);
+        const columnCount = isDayView ? 1 : columnsPerRow || 7;
+        let dayColumnWidth =
+          (calendarRect.width - timeColumnWidth) / columnCount;
+        let dayStartX =
+          calendarRect.left +
+          timeColumnWidth +
+          (isDayView ? 0 : activeDayIndex * dayColumnWidth);
 
-          if (isMonthView) {
-            dayColumnWidth = calendarRect.width / 7;
-            dayStartX = calendarRect.left + activeDayIndex * dayColumnWidth;
-          }
+        if (isMonthView) {
+          dayColumnWidth = calendarRect.width / 7;
+          dayStartX = calendarRect.left + activeDayIndex * dayColumnWidth;
+        }
 
-          const overrideMetrics = getDayMetricsWrapper(activeDayIndex);
-          if (overrideMetrics) {
-            dayStartX = overrideMetrics.left;
-            dayColumnWidth = overrideMetrics.width;
-          }
+        const overrideMetrics = getDayMetricsWrapper(activeDayIndex);
+        if (overrideMetrics) {
+          dayStartX = overrideMetrics.left;
+          dayColumnWidth = overrideMetrics.width;
+        }
 
-          let scrollContainer =
-            calendarRef.current?.querySelector('.calendar-content');
-          if (!scrollContainer) {
-            scrollContainer =
-              calendarRef.current?.querySelector('.calendar-renderer');
-          }
-          const contentRect = scrollContainer?.getBoundingClientRect();
-          const parentRect =
-            eventRef.current?.parentElement?.getBoundingClientRect();
-          let stickyLeft: number;
-          let stickyWidth: number;
+        let scrollContainer =
+          calendarRef.current?.querySelector('.calendar-content');
+        if (!scrollContainer) {
+          scrollContainer =
+            calendarRef.current?.querySelector('.calendar-renderer');
+        }
+        const contentRect = scrollContainer?.getBoundingClientRect();
+        const parentRect =
+          eventRef.current?.parentElement?.getBoundingClientRect();
+        let stickyLeft: number;
+        let stickyWidth: number;
 
-          if (parentRect && parentRect.width > 0) {
-            if (layout) {
-              stickyLeft =
-                parentRect.left + (layout.left / 100) * parentRect.width;
-              stickyWidth = isDayView
-                ? (layout.width / 100) * parentRect.width
-                : ((layout.width - 1) / 100) * parentRect.width;
-            } else {
-              stickyLeft = parentRect.left;
-              stickyWidth = isDayView ? parentRect.width : parentRect.width - 3;
-            }
+        if (parentRect && parentRect.width > 0) {
+          if (layout) {
+            stickyLeft =
+              parentRect.left + (layout.left / 100) * parentRect.width;
+            stickyWidth = isDayView
+              ? (layout.width / 100) * parentRect.width
+              : ((layout.width - 1) / 100) * parentRect.width;
           } else {
-            const metrics = getDayMetricsWrapper(activeDayIndex);
-            const currentDayStartX = metrics?.left ?? dayStartX;
-            const currentDayColumnWidth = metrics?.width ?? dayColumnWidth;
-
-            stickyLeft = currentDayStartX;
-            stickyWidth = currentDayColumnWidth - 3;
-
-            if (layout) {
-              stickyLeft =
-                currentDayStartX + (layout.left / 100) * currentDayColumnWidth;
-              stickyWidth = isDayView
-                ? (layout.width / 100) * currentDayColumnWidth
-                : ((layout.width - 1) / 100) * currentDayColumnWidth;
-            }
+            stickyLeft = parentRect.left;
+            stickyWidth = isDayView ? parentRect.width : parentRect.width - 3;
           }
+        } else {
+          const metrics = getDayMetricsWrapper(activeDayIndex);
+          const currentDayStartX = metrics?.left ?? dayStartX;
+          const currentDayColumnWidth = metrics?.width ?? dayColumnWidth;
 
-          if (eventVisibility === 'sticky-top') {
-            let topPosition = contentRect ? contentRect.top : calendarRect.top;
-            topPosition = Math.max(topPosition, 0);
-            topPosition = Math.max(topPosition, calendarRect.top);
-            topPosition = Math.min(topPosition, calendarRect.bottom - 6);
-            topPosition = Math.min(topPosition, window.innerHeight - 6);
+          stickyLeft = currentDayStartX;
+          stickyWidth = currentDayColumnWidth - 3;
 
-            return {
-              position: 'fixed' as const,
-              top: `${topPosition}px`,
-              left: `${stickyLeft}px`,
-              width: `${stickyWidth}px`,
-              height: '6px',
-              zIndex: 1000,
-              overflow: 'hidden',
-            };
+          if (layout) {
+            stickyLeft =
+              currentDayStartX + (layout.left / 100) * currentDayColumnWidth;
+            stickyWidth = isDayView
+              ? (layout.width / 100) * currentDayColumnWidth
+              : ((layout.width - 1) / 100) * currentDayColumnWidth;
           }
+        }
 
-          let bottomPosition = contentRect
-            ? contentRect.bottom
-            : calendarRect.bottom;
-          bottomPosition = Math.min(bottomPosition, window.innerHeight);
-          bottomPosition = Math.min(bottomPosition, calendarRect.bottom);
-          bottomPosition = Math.max(bottomPosition, calendarRect.top + 6);
-          bottomPosition = Math.max(bottomPosition, 6);
+        if (eventVisibility === 'sticky-top') {
+          let topPosition = contentRect ? contentRect.top : calendarRect.top;
+          topPosition = Math.max(topPosition, 0);
+          topPosition = Math.max(topPosition, calendarRect.top);
+          topPosition = Math.min(topPosition, calendarRect.bottom - 6);
+          topPosition = Math.min(topPosition, window.innerHeight - 6);
 
           return {
             position: 'fixed' as const,
-            top: `${bottomPosition - 6}px`,
+            top: `${topPosition}px`,
             left: `${stickyLeft}px`,
             width: `${stickyWidth}px`,
             height: '6px',
@@ -288,6 +273,24 @@ export const useEventStyles = ({
             overflow: 'hidden',
           };
         }
+
+        let bottomPosition = contentRect
+          ? contentRect.bottom
+          : calendarRect.bottom;
+        bottomPosition = Math.min(bottomPosition, window.innerHeight);
+        bottomPosition = Math.min(bottomPosition, calendarRect.bottom);
+        bottomPosition = Math.max(bottomPosition, calendarRect.top + 6);
+        bottomPosition = Math.max(bottomPosition, 6);
+
+        return {
+          position: 'fixed' as const,
+          top: `${bottomPosition - 6}px`,
+          left: `${stickyLeft}px`,
+          width: `${stickyWidth}px`,
+          height: '6px',
+          zIndex: 1000,
+          overflow: 'hidden',
+        };
       }
     }
 

@@ -9,7 +9,9 @@
  */
 
 import { Temporal } from 'temporal-polyfill';
-import { Event } from '../types';
+
+import { Event } from '@/types';
+
 import {
   dateToPlainDate,
   dateToPlainDateTime,
@@ -39,7 +41,7 @@ export interface CreateEventParams {
   // Event properties
   allDay?: boolean;
   calendarId?: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 /**
@@ -63,7 +65,7 @@ export interface CreateTimezoneEventParams {
 
   // Event properties
   calendarId?: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -300,7 +302,7 @@ export function convertDateEvent(
   options?: {
     description?: string;
     calendarId?: string;
-    meta?: Record<string, any>;
+    meta?: Record<string, unknown>;
   }
 ): Event {
   return createEvent({
@@ -326,7 +328,7 @@ export function convertDateEventWithTimeZone(
   options?: {
     description?: string;
     calendarId?: string;
-    meta?: Record<string, any>;
+    meta?: Record<string, unknown>;
   }
 ): Event {
   return createTimezoneEvent({

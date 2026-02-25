@@ -1,8 +1,10 @@
 // Factory function for creating Year view
 import { h } from 'preact';
-import { YearViewConfig, ViewFactory, ViewType } from '../types';
+
+import { YearViewConfig, YearViewProps, ViewFactory, ViewType } from '@/types';
+import YearView from '@/views/YearView';
+
 import { ViewAdapter } from './ViewAdapter';
-import YearView from '../views/YearView';
 
 // Default Year view configuration
 const defaultYearViewConfig: YearViewConfig = {
@@ -15,8 +17,8 @@ export const createYearView: ViewFactory<YearViewConfig> = (config = {}) => {
   const finalConfig = { ...defaultYearViewConfig, ...config };
 
   // Create adapter component
-  const YearViewAdapter: any = (props: any) => {
-    return h(ViewAdapter, {
+  const YearViewAdapter = (props: YearViewProps) =>
+    h(ViewAdapter, {
       viewType: ViewType.YEAR,
       originalComponent: YearView,
       app: props.app,
@@ -31,7 +33,6 @@ export const createYearView: ViewFactory<YearViewConfig> = (config = {}) => {
       onEventSelect: props.onEventSelect,
       onDetailPanelToggle: props.onDetailPanelToggle,
     });
-  };
 
   // Set display name for debugging
   YearViewAdapter.displayName = 'YearViewAdapter';

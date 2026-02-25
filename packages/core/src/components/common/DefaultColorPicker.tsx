@@ -1,15 +1,16 @@
-import { useMemo } from 'preact/hooks';
-import { BlossomColorPicker } from './BlossomColorPicker';
 import {
   hexToHsl,
   lightnessToSliderValue,
 } from '@dayflow/blossom-color-picker';
+import { useMemo } from 'preact/hooks';
+
+import { BlossomColorPicker } from './BlossomColorPicker';
 
 interface DefaultColorPickerProps {
   color: string;
   onChange: (color: { hex: string }, isPending?: boolean) => void;
   onClose?: () => void;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const DefaultColorPicker = ({
@@ -18,7 +19,7 @@ export const DefaultColorPicker = ({
   onClose,
 }: DefaultColorPickerProps) => {
   const blossomValue = useMemo(() => {
-    const { h, s, l } = hexToHsl(color);
+    const { h, l } = hexToHsl(color);
     const sliderValue = lightnessToSliderValue(l);
 
     return {
@@ -31,7 +32,7 @@ export const DefaultColorPicker = ({
   }, [color]);
 
   return (
-    <div className="flex justify-center">
+    <div className='flex justify-center'>
       <BlossomColorPicker
         defaultValue={blossomValue}
         coreSize={36}

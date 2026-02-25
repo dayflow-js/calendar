@@ -1,7 +1,10 @@
-import { useCallback, useState, useRef } from 'preact/hooks';
+import {
+  hexToHsl,
+  lightnessToSliderValue,
+} from '@dayflow/blossom-color-picker';
 import {
   createPortal,
-  Event,
+  Event as CalendarEvent,
   ContextMenu,
   ContextMenuItem,
   ContextMenuSeparator,
@@ -18,20 +21,19 @@ import {
   downloadICS,
   generateUniKey,
 } from '@dayflow/core';
-import {
-  hexToHsl,
-  lightnessToSliderValue,
-} from '@dayflow/blossom-color-picker';
-import type { CalendarSidebarRenderProps } from './plugin';
-import { SidebarHeader } from './components/SidebarHeader';
+import { JSX } from 'preact';
+import { useCallback, useState, useRef } from 'preact/hooks';
+
 import { CalendarList } from './components/CalendarList';
-import { MergeMenuItem } from './components/MergeMenuItem';
-import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { DeleteCalendarDialog } from './components/DeleteCalendarDialog';
 import {
   ImportCalendarDialog,
   NEW_CALENDAR_ID,
 } from './components/ImportCalendarDialog';
+import { MergeCalendarDialog } from './components/MergeCalendarDialog';
+import { MergeMenuItem } from './components/MergeMenuItem';
+import { SidebarHeader } from './components/SidebarHeader';
+import type { CalendarSidebarRenderProps } from './plugin';
 
 const DefaultCalendarSidebar = ({
   app,
@@ -51,9 +53,9 @@ const DefaultCalendarSidebar = ({
     string | null
   >(null);
   const editingCalendarId =
-    propEditingCalendarId !== undefined
-      ? propEditingCalendarId
-      : localEditingCalendarId;
+    propEditingCalendarId === undefined
+      ? localEditingCalendarId
+      : propEditingCalendarId;
   const setEditingCalendarId =
     propSetEditingCalendarId || setLocalEditingCalendarId;
   // File input ref for import
@@ -115,30 +117,36 @@ const DefaultCalendarSidebar = ({
 
   // Import Calendar State
   const [importState, setImportState] = useState<{
-    events: Event[];
+    events: CalendarEvent[];
     filename: string;
   } | null>(null);
 
-  const handleContextMenu = useCallback((e: any, calendarId: string) => {
-    e.preventDefault();
-    e.stopPropagation(); // Stop propagation to prevent sidebar context menu
-    setContextMenu({
-      x: e.clientX,
-      y: e.clientY,
-      calendarId,
-      rowRect: e.currentTarget.getBoundingClientRect(),
-    });
-    setSidebarContextMenu(null);
-  }, []);
+  const handleContextMenu = useCallback(
+    (e: JSX.TargetedMouseEvent<HTMLElement>, calendarId: string) => {
+      e.preventDefault();
+      e.stopPropagation(); // Stop propagation to prevent sidebar context menu
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        calendarId,
+        rowRect: e.currentTarget.getBoundingClientRect(),
+      });
+      setSidebarContextMenu(null);
+    },
+    []
+  );
 
-  const handleSidebarContextMenu = useCallback((e: any) => {
-    e.preventDefault();
-    setSidebarContextMenu({
-      x: e.clientX,
-      y: e.clientY,
-    });
-    setContextMenu(null);
-  }, []);
+  const handleSidebarContextMenu = useCallback(
+    (e: JSX.TargetedMouseEvent<HTMLElement>) => {
+      e.preventDefault();
+      setSidebarContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+      });
+      setContextMenu(null);
+    },
+    []
+  );
 
   const handleCloseContextMenu = useCallback(() => {
     setContextMenu(null);
@@ -255,25 +263,28 @@ const DefaultCalendarSidebar = ({
     handleCloseSidebarContextMenu();
   }, [handleCloseSidebarContextMenu]);
 
-  const handleFileChange = useCallback(async (e: any) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileChange = useCallback(
+    async (e: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>) => {
+      const file = e.currentTarget.files?.[0];
+      if (!file) return;
 
-    const result = await importICSFile(file);
+      const result = await importICSFile(file);
 
-    // Show dialog if found at least one valid event, even if there were some parsing errors
-    if (result.events.length > 0) {
-      setImportState({
-        events: result.events,
-        filename: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-      });
-    }
+      // Show dialog if found at least one valid event, even if there were some parsing errors
+      if (result.events.length > 0) {
+        setImportState({
+          events: result.events,
+          filename: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+        });
+      }
 
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, []);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    []
+  );
 
   const handleImportConfirm = useCallback(
     (targetCalendarId: string) => {
@@ -359,18 +370,63 @@ const DefaultCalendarSidebar = ({
         onCollapseToggle={() => setCollapsed(!isCollapsed)}
       />
 
-      {!isCollapsed ? (
+      {isCollapsed ? (
+        <CalendarList
+          calendars={calendars}
+          onToggleVisibility={toggleCalendarVisibility}
+          onReorder={
+            isDraggable
+              ? app.reorderCalendars
+              : () => {
+                  /* noop */
+                }
+          }
+          onRename={
+            isEditable
+              ? (id, newName) => app.updateCalendar(id, { name: newName })
+              : () => {
+                  /* noop */
+                }
+          }
+          onContextMenu={
+            isEditable
+              ? handleContextMenu
+              : () => {
+                  /* noop */
+                }
+          }
+          editingId={editingCalendarId}
+          setEditingId={setEditingCalendarId}
+          activeContextMenuCalendarId={contextMenu?.calendarId}
+          isDraggable={isDraggable}
+          isEditable={isEditable}
+        />
+      ) : (
         <>
           <CalendarList
             calendars={calendars}
             onToggleVisibility={toggleCalendarVisibility}
-            onReorder={isDraggable ? app.reorderCalendars : () => {}}
+            onReorder={
+              isDraggable
+                ? app.reorderCalendars
+                : () => {
+                    /* noop */
+                  }
+            }
             onRename={
               isEditable
                 ? (id, newName) => app.updateCalendar(id, { name: newName })
-                : () => {}
+                : () => {
+                    /* noop */
+                  }
             }
-            onContextMenu={isEditable ? handleContextMenu : () => {}}
+            onContextMenu={
+              isEditable
+                ? handleContextMenu
+                : () => {
+                    /* noop */
+                  }
+            }
             editingId={editingCalendarId}
             setEditingId={setEditingCalendarId}
             activeContextMenuCalendarId={contextMenu?.calendarId}
@@ -378,7 +434,7 @@ const DefaultCalendarSidebar = ({
             isEditable={isEditable}
           />
 
-          <div className="border-t border-gray-200 dark:border-slate-800">
+          <div className='border-t border-gray-200 dark:border-slate-800'>
             <MiniCalendar
               visibleMonth={app.getVisibleMonth()}
               currentDate={app.getCurrentDate()}
@@ -388,23 +444,6 @@ const DefaultCalendarSidebar = ({
             />
           </div>
         </>
-      ) : (
-        <CalendarList
-          calendars={calendars}
-          onToggleVisibility={toggleCalendarVisibility}
-          onReorder={isDraggable ? app.reorderCalendars : () => {}}
-          onRename={
-            isEditable
-              ? (id, newName) => app.updateCalendar(id, { name: newName })
-              : () => {}
-          }
-          onContextMenu={isEditable ? handleContextMenu : () => {}}
-          editingId={editingCalendarId}
-          setEditingId={setEditingCalendarId}
-          activeContextMenuCalendarId={contextMenu?.calendarId}
-          isDraggable={isDraggable}
-          isEditable={isEditable}
-        />
       )}
 
       {contextMenu && (
@@ -413,10 +452,10 @@ const DefaultCalendarSidebar = ({
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={handleCloseContextMenu}
-          className="w-64 p-2"
+          className='w-64 p-2'
         >
           <ContentSlot
-            generatorName="calendarContextMenu"
+            generatorName='calendarContextMenu'
             generatorArgs={{
               calendar: calendars.find(c => c.id === contextMenu.calendarId)!,
               onClose: handleCloseContextMenu,
@@ -463,7 +502,7 @@ const DefaultCalendarSidebar = ({
             x={sidebarContextMenu.x}
             y={sidebarContextMenu.y}
             onClose={handleCloseSidebarContextMenu}
-            className="w-max p-2"
+            className='w-max p-2'
           >
             <ContextMenuItem
               onClick={() => {
@@ -491,8 +530,8 @@ const DefaultCalendarSidebar = ({
       {/* Hidden file input for ICS import */}
       <input
         ref={fileInputRef}
-        type="file"
-        accept=".ics"
+        type='file'
+        accept='.ics'
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
@@ -539,14 +578,14 @@ const DefaultCalendarSidebar = ({
       {customColorPicker &&
         createPortal(
           <div
-            className="fixed inset-0 z-50"
+            className='fixed inset-0 z-50'
             onMouseDown={() => {
               app.updateCalendar(customColorPicker.calendarId, {});
               setCustomColorPicker(null);
             }}
           >
             <div
-              className="absolute flex items-center justify-center"
+              className='absolute flex items-center justify-center'
               style={{
                 top: customColorPicker.y,
                 left: customColorPicker.x,
@@ -582,9 +621,9 @@ const DefaultCalendarSidebar = ({
                 />
               ) : (
                 <ContentSlot
-                  generatorName="colorPicker"
+                  generatorName='colorPicker'
                   generatorArgs={{
-                    variant: 'sketch', // TODO: change name
+                    variant: 'sketch', // Pending: change name
                     color: customColorPicker.currentColor,
                     onChange: (color: { hex: string }) => {
                       setCustomColorPicker(prev =>

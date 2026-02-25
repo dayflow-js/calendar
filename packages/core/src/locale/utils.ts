@@ -19,9 +19,9 @@ export function normalizeLocale(locale: string): SupportedLang {
  */
 export function isValidLocale(locale: string): boolean {
   try {
-    new Intl.DateTimeFormat(locale);
+    const _ = new Intl.DateTimeFormat(locale);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

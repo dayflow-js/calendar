@@ -1,18 +1,23 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'preact/hooks';
-import { extractHourFromDate } from '@/utils';
-import { useLocale } from '@/locale';
-import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
+import { RefObject } from 'preact';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'preact/hooks';
+
+import ViewHeader from '@/components/common/ViewHeader';
+import { MobileEventDrawer } from '@/components/mobileEventDrawer';
+import WeekComponent from '@/components/monthView/WeekComponent';
+import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
 } from '@/hooks/virtualScroll';
+import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
-import ViewHeader from '@/components/common/ViewHeader';
-import WeekComponent from '@/components/monthView/WeekComponent';
-import { MobileEventDrawer } from '@/components/mobileEventDrawer';
-import { temporalToDate } from '@/utils/temporal';
-import { useCalendarDrop } from '@/hooks/useCalendarDrop';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
   monthViewContainer,
   weekHeaderRow,
@@ -20,6 +25,9 @@ import {
   dayLabel,
   scrollContainer,
 } from '@/styles/classNames';
+import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
+import { extractHourFromDate } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 
 const MonthView = ({
   app,
@@ -30,7 +38,7 @@ const MonthView = ({
   onEventSelect: propOnEventSelect,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
-}: MonthViewProps) => {
+}: MonthViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
@@ -164,29 +172,35 @@ const MonthView = ({
   >(null);
 
   const selectedEventId =
-    propSelectedEventId !== undefined
-      ? propSelectedEventId
-      : internalSelectedId;
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
   const detailPanelEventId =
-    propDetailPanelEventId !== undefined
-      ? propDetailPanelEventId
-      : internalDetailPanelEventId;
+    propDetailPanelEventId === undefined
+      ? internalDetailPanelEventId
+      : propDetailPanelEventId;
 
-  const setSelectedEventId = useCallback((id: string | null) => {
-    if (propOnEventSelect) {
-      propOnEventSelect(id);
-    } else {
-      setInternalSelectedId(id);
-    }
-  }, [propOnEventSelect]);
+  const setSelectedEventId = useCallback(
+    (id: string | null) => {
+      if (propOnEventSelect) {
+        propOnEventSelect(id);
+      } else {
+        setInternalSelectedId(id);
+      }
+    },
+    [propOnEventSelect]
+  );
 
-  const setDetailPanelEventId = useCallback((id: string | null) => {
-    if (propOnDetailPanelToggle) {
-      propOnDetailPanelToggle(id);
-    } else {
-      setInternalDetailPanelEventId(id);
-    }
-  }, [propOnDetailPanelToggle]);
+  const setDetailPanelEventId = useCallback(
+    (id: string | null) => {
+      if (propOnDetailPanelToggle) {
+        propOnDetailPanelToggle(id);
+      } else {
+        setInternalDetailPanelEventId(id);
+      }
+    },
+    [propOnDetailPanelToggle]
+  );
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -267,11 +281,11 @@ const MonthView = ({
       );
     },
     onEventCreate: (event: Event) => {
-      if (screenSize !== 'desktop') {
+      if (screenSize === 'desktop') {
+        app.addEvent(event);
+      } else {
         setDraftEvent(event);
         setIsDrawerOpen(true);
-      } else {
-        app.addEvent(event);
       }
     },
     onEventEdit: (event: Event) => {
@@ -290,9 +304,10 @@ const MonthView = ({
     },
   });
 
-  const weekDaysLabels = useMemo(() => {
-    return getWeekDaysLabels(locale, 'short');
-  }, [locale, getWeekDaysLabels]);
+  const weekDaysLabels = useMemo(
+    () => getWeekDaysLabels(locale, 'short'),
+    [locale, getWeekDaysLabels]
+  );
 
   const {
     currentMonth,
@@ -331,9 +346,10 @@ const MonthView = ({
 
   // Calculate actual container height and remaining space
   const [actualContainerHeight, setActualContainerHeight] = useState(0);
-  const remainingSpace = useMemo(() => {
-    return actualContainerHeight - weekHeight * 6;
-  }, [actualContainerHeight, weekHeight]);
+  const remainingSpace = useMemo(
+    () => actualContainerHeight - weekHeight * 6,
+    [actualContainerHeight, weekHeight]
+  );
 
   const { visibleWeeks, startIndex: effectiveStartIndex } = useMemo(() => {
     const { visibleItems, displayStartIndex } = virtualData;
@@ -363,9 +379,10 @@ const MonthView = ({
     return { visibleWeeks: targetWeeks, startIndex: displayStartIndex };
   }, [virtualData]);
 
-  const topSpacerHeight = useMemo(() => {
-    return effectiveStartIndex * weekHeight;
-  }, [effectiveStartIndex, weekHeight]);
+  const topSpacerHeight = useMemo(
+    () => effectiveStartIndex * weekHeight,
+    [effectiveStartIndex, weekHeight]
+  );
 
   const initialLoadRef = useRef(true);
   const pendingNavigation = useRef(false);
@@ -377,7 +394,6 @@ const MonthView = ({
   useEffect(() => {
     if (isNavigating) {
       pendingNavigation.current = true;
-      return;
     }
   }, [isNavigating]);
 
@@ -481,13 +497,19 @@ const MonthView = ({
     setWeekHeight(height);
   }, []);
 
-  const handleEventUpdate = useCallback((updatedEvent: Event) => {
-    app.updateEvent(updatedEvent.id, updatedEvent);
-  }, [app]);
+  const handleEventUpdate = useCallback(
+    (updatedEvent: Event) => {
+      app.updateEvent(updatedEvent.id, updatedEvent);
+    },
+    [app]
+  );
 
-  const handleEventDelete = useCallback((eventId: string) => {
-    app.deleteEvent(eventId);
-  }, [app]);
+  const handleEventDelete = useCallback(
+    (eventId: string) => {
+      app.deleteEvent(eventId);
+    },
+    [app]
+  );
 
   const handleChangeView = (view: ViewType) => {
     app.changeView(view);
@@ -522,7 +544,7 @@ const MonthView = ({
     [screenSize, isTouch, setSelectedEventId]
   );
 
-  // TODO: remove getCustomTitle and using app.currentDate to fixed
+  // Pending: remove getCustomTitle and using app.currentDate to fixed
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
     return isAsianLocale
@@ -554,7 +576,7 @@ const MonthView = ({
       <div className={weekHeaderRow} onContextMenu={e => e.preventDefault()}>
         <div className={`${weekGrid} px-2`}>
           {weekDaysLabels.map((day, i) => (
-            <div key={i} className={dayLabel}>
+            <div key={`${day}-${i}`} className={dayLabel}>
               {day}
             </div>
           ))}
@@ -639,8 +661,8 @@ const MonthView = ({
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
-        onSave={(updatedEvent: any) => {
-          if (events.find(e => e.id === updatedEvent.id)) {
+        onSave={(updatedEvent: Event) => {
+          if (events.some(e => e.id === updatedEvent.id)) {
             app.updateEvent(updatedEvent.id, updatedEvent);
           } else {
             app.addEvent(updatedEvent);

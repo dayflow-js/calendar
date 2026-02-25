@@ -1,11 +1,14 @@
+import { ComponentChildren } from 'preact';
 import { useRef, useEffect, useContext, useState } from 'preact/hooks';
+
 import { CustomRenderingContext } from './CustomRenderingContext';
+import { CustomRenderingStore } from './CustomRenderingStore';
 
 interface ContentSlotProps {
   generatorName: string; // e.g. 'eventContent'
-  generatorArgs?: any; // e.g. { event, view }
-  defaultContent?: any; // Preact vnode as fallback
-  store?: any;
+  generatorArgs?: unknown; // e.g. { event, view }
+  defaultContent?: ComponentChildren; // Preact vnode as fallback
+  store?: CustomRenderingStore | null;
 }
 
 let guid = 0;

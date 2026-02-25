@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from 'preact/hooks';
-import { ICalendarApp } from '../../types';
+
 import { useLocale } from '@/locale';
-import { ChevronDown } from './Icons';
+import { TranslationKey } from '@/locale/types';
 import { dropdownPanel, textGray500 } from '@/styles/classNames';
+import { ICalendarApp } from '@/types';
+
+import { ChevronDown } from './Icons';
 
 interface ViewSwitcherProps {
   calendar: ICalendarApp;
@@ -17,11 +20,6 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
   // Get all registered views
   const registeredViews = Array.from(calendar.state.views.keys());
   const currentView = calendar.state.currentView;
-
-  // If there's only one view (or none), no need to show the switcher
-  if (registeredViews.length <= 1) {
-    return null;
-  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -41,17 +39,23 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
     }
   }, [isOpen]);
 
+  // If there's only one view (or none), no need to show the switcher
+  if (registeredViews.length <= 1) {
+    return null;
+  }
+
   if (mode === 'select') {
     return (
-      <div className="relative inline-block" ref={dropdownRef}>
+      <div className='relative inline-block' ref={dropdownRef}>
         <button
+          type='button'
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between"
+          className='flex items-center gap-2 px-3 h-7 text-sm font-medium border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 shadow-sm min-w-30 justify-between'
           aria-expanded={isOpen}
-          aria-haspopup="listbox"
+          aria-haspopup='listbox'
         >
-          <span className="text-gray-900 dark:text-gray-100">
-            {t(currentView as any)}
+          <span className='text-gray-900 dark:text-gray-100'>
+            {t(currentView as TranslationKey)}
           </span>
           <span
             className={`${textGray500} transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -64,26 +68,26 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
           <div
             className={`absolute top-full mt-1 left-0 z-50 w-full min-w-30 ${dropdownPanel} animate-in`}
           >
-            <div className="p-1" role="listbox">
+            <div className='p-1' role='listbox'>
               {registeredViews.map(viewType => (
                 <button
+                  type='button'
                   key={viewType}
                   onClick={() => {
                     calendar.changeView(viewType);
                     setIsOpen(false);
                     // Force update might be needed if not handled by app subscribe
-                    if ((calendar as any).triggerRender)
-                      (calendar as any).triggerRender();
+                    calendar.triggerRender();
                   }}
                   className={`w-full text-left px-3 py-0.5 rounded text-sm transition-colors duration-150 focus:outline-none ${
                     currentView === viewType
                       ? 'bg-primary/10 text-primary font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
-                  role="option"
+                  role='option'
                   aria-selected={currentView === viewType}
                 >
-                  {t(viewType as any)}
+                  {t(viewType as TranslationKey)}
                 </button>
               ))}
             </div>
@@ -110,9 +114,10 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
   }
 
   return (
-    <div className="inline-flex items-center gap-1 p-0.5 mb-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+    <div className='inline-flex items-center gap-1 p-0.5 mb-1 bg-gray-100 dark:bg-gray-800 rounded-lg'>
       {registeredViews.map(viewType => (
         <button
+          type='button'
           key={viewType}
           className={`px-4 h-6 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none ${
             currentView === viewType
@@ -121,11 +126,10 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
           }`}
           onClick={() => {
             calendar.changeView(viewType);
-            if ((calendar as any).triggerRender)
-              (calendar as any).triggerRender();
+            calendar.triggerRender();
           }}
         >
-          {t(viewType as any)}
+          {t(viewType as TranslationKey)}
         </button>
       ))}
     </div>

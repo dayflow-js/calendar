@@ -1,5 +1,5 @@
-import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
 
 const calendarIds = [
   'team',

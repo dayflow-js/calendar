@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useTheme } from 'next-themes';
+import cn from 'cn';
 import { Sun, Moon } from 'lucide-react';
-import clsx from 'clsx';
+import { useTheme } from 'next-themes';
+import React, { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -14,22 +14,22 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="p-2 h-9 w-9" />;
+    return <div className='p-2 h-9 w-9' />;
   }
 
   const isDark = resolvedTheme === 'dark';
 
   return (
     <button
-      type="button"
+      type='button'
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className={clsx(
+      className={cn(
         'inline-flex items-center justify-center h-9 rounded-md transition-colors',
         isDark ? 'text-gray-200' : 'text-gray-700'
       )}
-      aria-label="Toggle theme"
+      aria-label='Toggle theme'
     >
-      {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {isDark ? <Sun className='h-5 w-5' /> : <Moon className='h-5 w-5' />}
     </button>
   );
 }

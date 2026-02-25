@@ -1,4 +1,4 @@
-import type { ICalendarApp, TNode } from '../types';
+import type { ICalendarApp, TNode } from '@/types';
 
 export interface SidebarBridgeReturn {
   enabled: boolean;
@@ -23,7 +23,9 @@ const NO_OP: SidebarBridgeReturn = {
   enabled: false,
   width: '0px',
   isCollapsed: false,
-  toggleCollapsed: () => {},
+  toggleCollapsed: () => {
+    /* noop */
+  },
   miniWidth: '0px',
   content: null,
   extraContent: null,

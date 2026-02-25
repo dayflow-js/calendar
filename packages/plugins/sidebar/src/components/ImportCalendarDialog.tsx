@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'preact/hooks';
 import {
   createPortal,
   CalendarType,
@@ -7,6 +6,7 @@ import {
   Check,
   ChevronsUpDown,
 } from '@dayflow/core';
+import { useState, useRef, useEffect } from 'preact/hooks';
 
 interface ImportCalendarDialogProps {
   calendars: CalendarType[];
@@ -81,7 +81,7 @@ export const ImportCalendarDialog = ({
           width: rect.width,
         }}
       >
-        <div className="py-1">
+        <div className='py-1'>
           {calendars.map(calendar => (
             <div
               key={calendar.id}
@@ -89,7 +89,7 @@ export const ImportCalendarDialog = ({
               onClick={() => handleSelect(calendar.id)}
             >
               <div
-                className="mr-3 h-3 w-3 shrink-0 rounded-sm"
+                className='mr-3 h-3 w-3 shrink-0 rounded-sm'
                 style={{ backgroundColor: calendar.colors.lineColor }}
               />
               <span
@@ -98,11 +98,11 @@ export const ImportCalendarDialog = ({
                 {calendar.name || calendar.id}
               </span>
               {selectedCalendarId === calendar.id && (
-                <Check className="ml-2 w-4 h-4 text-primary shrink-0" />
+                <Check className='ml-2 w-4 h-4 text-primary shrink-0' />
               )}
             </div>
           ))}
-          <div className="border-t border-gray-100 dark:border-slate-700 my-1" />
+          <div className='border-t border-gray-100 dark:border-slate-700 my-1' />
           <div
             className={`flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 ${isNewSelected ? 'bg-primary/10' : ''}`}
             onClick={() => handleSelect(NEW_CALENDAR_ID)}
@@ -113,7 +113,7 @@ export const ImportCalendarDialog = ({
               {t('newCalendar') || 'New Calendar'}: {filename}
             </span>
             {isNewSelected && (
-              <Check className="ml-2 w-4 h-4 text-primary shrink-0" />
+              <Check className='ml-2 w-4 h-4 text-primary shrink-0' />
             )}
           </div>
         </div>
@@ -123,26 +123,26 @@ export const ImportCalendarDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+    <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/50'>
+      <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900'>
+        <h2 className='mb-4 text-lg font-semibold text-gray-900 dark:text-white'>
           {t('addSchedule') || 'Add Schedule'}
         </h2>
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+        <p className='mb-4 text-sm text-gray-600 dark:text-gray-300'>
           {t('importCalendarMessage') ||
             'This calendar contains new events. Please select a target calendar.'}
         </p>
 
-        <div className="relative">
+        <div className='relative'>
           <button
             ref={triggerRef}
-            type="button"
-            className="flex items-center w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            type='button'
+            className='flex items-center w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm'
             onClick={() => setIsOpen(!isOpen)}
           >
             {!isNewSelected && selectedCalendar && (
               <div
-                className="mr-3 h-3 w-3 shrink-0 rounded-sm"
+                className='mr-3 h-3 w-3 shrink-0 rounded-sm'
                 style={{ backgroundColor: selectedCalendar.colors.lineColor }}
               />
             )}
@@ -153,19 +153,19 @@ export const ImportCalendarDialog = ({
                 ? `${t('newCalendar')}: ${filename}`
                 : selectedCalendar?.name || selectedCalendar?.id}
             </span>
-            <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+            <ChevronsUpDown className='w-4 h-4 text-gray-400 shrink-0 ml-2' />
           </button>
           {renderDropdown()}
         </div>
 
-        <div className="mt-8 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className={cancelButton}>
+        <div className='mt-8 flex justify-end gap-3'>
+          <button type='button' onClick={onCancel} className={cancelButton}>
             {t('cancel') || 'Cancel'}
           </button>
           <button
-            type="button"
+            type='button'
             onClick={() => onConfirm(selectedCalendarId)}
-            className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            className='rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm'
           >
             {t('ok') || 'OK'}
           </button>

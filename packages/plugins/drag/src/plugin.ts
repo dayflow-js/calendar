@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-explicit-any
 import {
   registerDragImplementation,
   CalendarPlugin,
@@ -8,6 +9,7 @@ import {
   DragPluginConfig,
   DragService,
 } from '@dayflow/core';
+
 import { useDrag } from './hooks';
 
 export function createDragPlugin(
@@ -32,29 +34,37 @@ export function createDragPlugin(
     updateConfig: (updates: Partial<DragPluginConfig>) => {
       Object.assign(finalConfig, updates);
     },
-    isViewSupported: (viewType: ViewType): boolean => {
-      return finalConfig.supportedViews.includes(viewType);
-    },
+    isViewSupported: (viewType: ViewType): boolean =>
+      finalConfig.supportedViews.includes(viewType),
   };
 
   return {
     name: 'drag',
     config: finalConfig,
-    install: (app: ICalendarApp) => {
-      if ((globalThis as any).process?.env?.NODE_ENV !== 'production') {
+    install: (_app: ICalendarApp) => {
+      if (
+        (globalThis as unknown as { process?: { env?: { NODE_ENV?: string } } })
+          .process?.env?.NODE_ENV !== 'production'
+      ) {
         console.log('[DayFlow] Drag plugin installed');
       }
 
       registerDragImplementation(
         (app: ICalendarApp, options: DragHookOptions): DragHookReturn => {
-          const result = useDrag({ ...options, app });
+          const result = useDrag({ ...options, app } as any);
 
           const currentDragService = app.getPlugin<DragService>('drag');
           if (!currentDragService) {
             return {
-              handleMoveStart: () => {},
-              handleCreateStart: () => {},
-              handleResizeStart: () => {},
+              handleMoveStart: () => {
+                /* noop */
+              },
+              handleCreateStart: () => {
+                /* noop */
+              },
+              handleResizeStart: () => {
+                /* noop */
+              },
               handleCreateAllDayEvent: undefined,
               dragState: result.dragState,
               isDragging: false,
@@ -62,7 +72,9 @@ export function createDragPlugin(
           }
 
           const cfg = currentDragService.getConfig();
-          const isSupported = currentDragService.isViewSupported(options.viewType);
+          const isSupported = currentDragService.isViewSupported(
+            options.viewType
+          );
           const readOnlyConfig = app.getReadOnlyConfig();
           const isDraggable = readOnlyConfig.draggable !== false;
           const isEditable = !app.state.readOnly;
@@ -76,20 +88,26 @@ export function createDragPlugin(
           return {
             handleMoveStart:
               isSupported && cfg.enableDrag && isDraggable
-                ? result.handleMoveStart
-                : () => {},
+                ? (result.handleMoveStart as any)
+                : () => {
+                    /* noop */
+                  },
             handleCreateStart:
               isSupported && cfg.enableCreate && isEditable
-                ? result.handleCreateStart
-                : () => {},
+                ? (result.handleCreateStart as any)
+                : () => {
+                    /* noop */
+                  },
             handleResizeStart:
               isSupported && cfg.enableResize && isEditable
-                ? result.handleResizeStart
+                ? (result.handleResizeStart as any)
                 : undefined,
             handleCreateAllDayEvent:
               isSupported && cfg.enableAllDayCreate && isEditable
-                ? result.handleCreateAllDayEvent
-                : () => {},
+                ? (result.handleCreateAllDayEvent as any)
+                : () => {
+                    /* noop */
+                  },
             dragState: result.dragState,
             isDragging: isSupported && isDraggable ? result.isDragging : false,
           };

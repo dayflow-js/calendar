@@ -24,8 +24,14 @@ export * from './factories';
 
 // Plugins
 export { createEventsPlugin } from './plugins/eventsPlugin';
-export { registerDragImplementation, useDragForView } from './plugins/dragBridge';
-export { registerSidebarImplementation, useSidebarBridge } from './plugins/sidebarBridge';
+export {
+  registerDragImplementation,
+  useDragForView,
+} from './plugins/dragBridge';
+export {
+  registerSidebarImplementation,
+  useSidebarBridge,
+} from './plugins/sidebarBridge';
 export type { SidebarBridgeReturn } from './plugins/sidebarBridge';
 
 // Context Menu Primitives

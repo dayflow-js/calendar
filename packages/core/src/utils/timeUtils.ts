@@ -5,9 +5,10 @@
  * Handles 24-hour format, time rounding, and special cases like midnight crossings.
  */
 
-import { Event } from '../types';
-import { temporalToDate } from './temporal';
+import { Event } from '@/types';
+
 import { extractHourFromDate } from './dateTimeUtils';
+import { temporalToDate } from './temporal';
 
 // ============================================================================
 // Time Tools
@@ -17,39 +18,6 @@ import { extractHourFromDate } from './dateTimeUtils';
  * Time step for calendar grid (0.25 = 15 minutes)
  */
 export const TIME_STEP = 0.25;
-
-/**
- * Format hours and minutes to HH:MM format
- * @param hours Hour number (supports decimals, e.g., 14.5 = 14:30)
- * @param minutes Optional minutes (if not provided, extracted from decimal hours)
- * @returns Formatted time string (e.g., "14:30")
- */
-export const formatTime = (hours: number, minutes = 0) => {
-  const h = Math.floor(hours);
-  const m = minutes || Math.round((hours - h) * 60);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-};
-
-/**
- * Format event time range as a string
- * @param event Event object
- * @returns Formatted time range (e.g., "14:00 - 16:00" or "All day")
- */
-export const formatEventTimeRange = (event: Event) => {
-  const startHour = extractHourFromDate(event.start);
-  const endHour = getEventEndHour(event);
-  return `${formatTime(startHour)} - ${formatTime(endHour)}`;
-};
-
-/**
- * Round hour to nearest time step
- * @param hour Hour number
- * @returns Rounded hour
- */
-export const roundToTimeStep = (hour: number) => {
-  const step = TIME_STEP;
-  return Math.round(hour / step) * step;
-};
 
 /**
  * Get event end hour (handles cross-day events less than 24 hours)
@@ -93,4 +61,37 @@ export const getEventEndHour = (event: Event): number => {
   }
 
   return endHour;
+};
+
+/**
+ * Format hours and minutes to HH:MM format
+ * @param hours Hour number (supports decimals, e.g., 14.5 = 14:30)
+ * @param minutes Optional minutes (if not provided, extracted from decimal hours)
+ * @returns Formatted time string (e.g., "14:30")
+ */
+export const formatTime = (hours: number, minutes = 0) => {
+  const h = Math.floor(hours);
+  const m = minutes || Math.round((hours - h) * 60);
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+};
+
+/**
+ * Format event time range as a string
+ * @param event Event object
+ * @returns Formatted time range (e.g., "14:00 - 16:00" or "All day")
+ */
+export const formatEventTimeRange = (event: Event) => {
+  const startHour = extractHourFromDate(event.start);
+  const endHour = getEventEndHour(event);
+  return `${formatTime(startHour)} - ${formatTime(endHour)}`;
+};
+
+/**
+ * Round hour to nearest time step
+ * @param hour Hour number
+ * @returns Rounded hour
+ */
+export const roundToTimeStep = (hour: number) => {
+  const step = TIME_STEP;
+  return Math.round(hour / step) * step;
 };

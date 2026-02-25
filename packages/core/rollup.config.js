@@ -1,12 +1,13 @@
-import resolve from '@rollup/plugin-node-resolve';
+import path from 'node:path';
+
 import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import { dts } from 'rollup-plugin-dts';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
-import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { dts } from 'rollup-plugin-dts';
-import path from 'path';
 
 export default [
   {
@@ -52,7 +53,7 @@ export default [
         inject: false,
         extract: 'styles.css',
         config: {
-          path: './postcss.build.js',
+          path: './postcss.build.mjs',
         },
         use: {
           sass: false,
@@ -81,7 +82,16 @@ export default [
   {
     input: 'dist/types/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [dts()],
+    plugins: [
+      dts({
+        compilerOptions: {
+          baseUrl: '.',
+          paths: {
+            '@/*': ['./dist/types/*'],
+          },
+        },
+      }),
+    ],
     external: [/\.css$/],
   },
 ];

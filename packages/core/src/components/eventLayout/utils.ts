@@ -1,5 +1,6 @@
 import { Event } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils/helpers';
+
 import { LayoutWeekEvent } from './types';
 
 export function toLayoutEvent(event: Event): LayoutWeekEvent {

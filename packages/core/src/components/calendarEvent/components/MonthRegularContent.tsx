@@ -1,11 +1,10 @@
-import { Event } from '@/types';
-import { ICalendarApp } from '@/types';
-import { getLineColor, extractHourFromDate } from '@/utils';
 import {
   monthRegularContent,
   monthEventColorBar,
   textXs,
 } from '@/styles/classNames';
+import { Event, ICalendarApp } from '@/types';
+import { getLineColor, extractHourFromDate } from '@/utils';
 
 interface MonthRegularContentProps {
   event: Event;
@@ -30,7 +29,7 @@ const MonthRegularContent = ({
 
   return (
     <div className={monthRegularContent}>
-      <div className="flex items-center flex-1 min-w-0">
+      <div className='flex items-center flex-1 min-w-0'>
         <div
           style={{
             backgroundColor: getLineColor(
@@ -49,7 +48,7 @@ const MonthRegularContent = ({
       {!hideTime && !isMobile && (
         <span
           className={`${textXs} ml-1 shrink-0 ${isEventSelected ? 'text-white' : ''}`}
-          style={!isEventSelected ? { opacity: 0.8 } : undefined}
+          style={isEventSelected ? undefined : { opacity: 0.8 }}
         >
           {startTime}
         </span>

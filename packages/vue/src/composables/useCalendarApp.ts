@@ -1,9 +1,6 @@
+import type { CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+import { CalendarApp } from '@dayflow/core';
 import { onUnmounted, reactive } from 'vue';
-import {
-  CalendarApp,
-  CalendarAppConfig,
-  UseCalendarAppReturn,
-} from '@dayflow/core';
 
 export function useCalendarApp(
   config: CalendarAppConfig

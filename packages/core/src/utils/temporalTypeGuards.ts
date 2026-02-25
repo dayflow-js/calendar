@@ -14,7 +14,7 @@ import { Temporal } from 'temporal-polyfill';
 /**
  * Check if temporal is PlainDate (date only, no time)
  */
-export function isPlainDate(temporal: any): temporal is Temporal.PlainDate {
+export function isPlainDate(temporal: unknown): temporal is Temporal.PlainDate {
   return (
     temporal !== null &&
     typeof temporal === 'object' &&
@@ -30,7 +30,7 @@ export function isPlainDate(temporal: any): temporal is Temporal.PlainDate {
  * Check if temporal is PlainDateTime (date + time, no timezone)
  */
 export function isPlainDateTime(
-  temporal: any
+  temporal: unknown
 ): temporal is Temporal.PlainDateTime {
   return (
     temporal !== null &&
@@ -46,7 +46,7 @@ export function isPlainDateTime(
  * Check if temporal is ZonedDateTime (date + time + timezone)
  */
 export function isZonedDateTime(
-  temporal: any
+  temporal: unknown
 ): temporal is Temporal.ZonedDateTime {
   return (
     temporal !== null &&
@@ -110,7 +110,7 @@ export function temporalToDate(
         temporal.hour,
         temporal.minute
       );
-    } catch (e) {
+    } catch {
       return new Date(
         temporal.year,
         temporal.month - 1,
@@ -122,7 +122,7 @@ export function temporalToDate(
   }
 
   // Fallback for other types
-  return new Date(temporal as any);
+  return new Date(temporal);
 }
 
 /**
@@ -216,9 +216,8 @@ export function extractHourFromTemporal(
   }
 
   // Both PlainDateTime and ZonedDateTime have hour/minute
-  const hour = (temporal as any).hour;
-  const minute = (temporal as any).minute;
-  return hour + minute / 60;
+  const t = temporal as unknown as { hour: number; minute: number };
+  return t.hour + t.minute / 60;
 }
 
 /**
@@ -256,6 +255,30 @@ export function setHourInTemporal(
 // ============================================================================
 
 /**
+ * Get PlainDate from any Temporal type or Date
+ */
+export function getPlainDate(
+  temporal:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime
+    | Date
+): Temporal.PlainDate {
+  if (temporal instanceof Date) {
+    return dateToPlainDate(temporal);
+  }
+  if (isPlainDate(temporal)) {
+    return temporal;
+  }
+  if (isPlainDateTime(temporal)) {
+    return temporal.toPlainDate();
+  }
+  return (
+    temporal as unknown as { toPlainDate: () => Temporal.PlainDate }
+  ).toPlainDate();
+}
+
+/**
  * Check if two Temporal objects represent the same day
  */
 export function isSameTemporal(
@@ -283,26 +306,4 @@ export function isSameTemporal(
   const date2 = getPlainDate(t2);
 
   return date1.equals(date2);
-}
-
-/**
- * Get PlainDate from any Temporal type or Date
- */
-export function getPlainDate(
-  temporal:
-    | Temporal.PlainDate
-    | Temporal.PlainDateTime
-    | Temporal.ZonedDateTime
-    | Date
-): Temporal.PlainDate {
-  if (temporal instanceof Date) {
-    return dateToPlainDate(temporal);
-  }
-  if (isPlainDate(temporal)) {
-    return temporal;
-  }
-  if (isPlainDateTime(temporal)) {
-    return temporal.toPlainDate();
-  }
-  return (temporal as any).toPlainDate();
 }

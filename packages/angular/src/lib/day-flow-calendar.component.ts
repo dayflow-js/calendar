@@ -1,24 +1,23 @@
 import {
-  Component,
-  Input,
   ElementRef,
-  ViewChild,
   OnChanges,
   OnDestroy,
   AfterViewInit,
   SimpleChanges,
-  ChangeDetectionStrategy,
   TemplateRef,
   ChangeDetectorRef,
+  Component,
+  Input,
+  ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
-import {
-  CalendarRenderer,
+import type {
   ICalendarApp,
-  CalendarApp,
   CalendarAppConfig,
   UseCalendarAppReturn,
   CustomRendering,
 } from '@dayflow/core';
+import { CalendarRenderer, CalendarApp } from '@dayflow/core';
 
 @Component({
   selector: 'dayflow-calendar',
@@ -52,14 +51,14 @@ export class DayFlowCalendarComponent
   @Input() calendar!: ICalendarApp | UseCalendarAppReturn | CalendarAppConfig;
 
   // Templates for custom content injection
-  @Input() eventContent?: TemplateRef<any>;
-  @Input() eventDetailContent?: TemplateRef<any>;
-  @Input() eventDetailDialog?: TemplateRef<any>;
-  @Input() headerContent?: TemplateRef<any>;
-  @Input() createCalendarDialog?: TemplateRef<any>;
-  @Input() titleBarSlot?: TemplateRef<any>;
-  @Input() colorPicker?: TemplateRef<any>;
-  @Input() colorPickerWrapper?: TemplateRef<any>;
+  @Input() eventContent?: TemplateRef<unknown>;
+  @Input() eventDetailContent?: TemplateRef<unknown>;
+  @Input() eventDetailDialog?: TemplateRef<unknown>;
+  @Input() headerContent?: TemplateRef<unknown>;
+  @Input() createCalendarDialog?: TemplateRef<unknown>;
+  @Input() titleBarSlot?: TemplateRef<unknown>;
+  @Input() colorPicker?: TemplateRef<unknown>;
+  @Input() colorPickerWrapper?: TemplateRef<unknown>;
   @Input() collapsedSafeAreaLeft?: number;
 
   @ViewChild('container') container!: ElementRef<HTMLElement>;
@@ -72,18 +71,23 @@ export class DayFlowCalendarComponent
   constructor(private cdr: ChangeDetectorRef) {}
 
   private get app(): ICalendarApp {
-    if (this.internalApp) return this.internalApp;
+    if (this.internalApp) {
+      return this.internalApp;
+    }
 
     if (this.calendar instanceof CalendarApp) {
       return this.calendar;
     }
 
-    if ((this.calendar as any).app) {
-      return (this.calendar as any).app;
+    if ((this.calendar as { app?: ICalendarApp; views?: unknown[] }).app) {
+      return (this.calendar as { app?: ICalendarApp; views?: unknown[] }).app!;
     }
 
     // If it's a config object, we create an internal instance
-    if (typeof (this.calendar as any).views !== 'undefined') {
+    if (
+      (this.calendar as { app?: ICalendarApp; views?: unknown[] }).views !==
+      undefined
+    ) {
       this.internalApp = new CalendarApp(this.calendar as CalendarAppConfig);
       return this.internalApp;
     }
@@ -112,7 +116,9 @@ export class DayFlowCalendarComponent
   }
 
   private initCalendar() {
-    if (!this.container || !this.calendar) return;
+    if (!this.container || !this.calendar) {
+      return;
+    }
 
     this.renderer = new CalendarRenderer(this.app);
     this.renderer.setProps({
@@ -123,33 +129,56 @@ export class DayFlowCalendarComponent
     this.unsubscribe = this.renderer
       .getCustomRenderingStore()
       .subscribe(renderings => {
-        this.customRenderings = Array.from(renderings.values());
+        this.customRenderings = [...renderings.values()];
         this.cdr.markForCheck();
       });
   }
 
   private destroyCalendar() {
-    if (this.unsubscribe) this.unsubscribe();
-    if (this.renderer) this.renderer.unmount();
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+    if (this.renderer) {
+      this.renderer.unmount();
+    }
     this.unsubscribe = undefined;
     this.renderer = undefined;
   }
 
-  getTemplate(name: string): TemplateRef<any> | null {
+  getTemplate(name: string): TemplateRef<unknown> | null {
     // Switch avoids allocating a new Record on every change-detection cycle.
     switch (name) {
-      case 'eventContent': return this.eventContent ?? null;
-      case 'eventDetailContent': return this.eventDetailContent ?? null;
-      case 'eventDetailDialog': return this.eventDetailDialog ?? null;
-      case 'headerContent': return this.headerContent ?? null;
-      case 'createCalendarDialog': return this.createCalendarDialog ?? null;
-      case 'titleBarSlot': return this.titleBarSlot ?? null;
-      case 'colorPicker': return this.colorPicker ?? null;
-      case 'colorPickerWrapper': return this.colorPickerWrapper ?? null;
-      default: return null;
+      case 'eventContent': {
+        return this.eventContent ?? null;
+      }
+      case 'eventDetailContent': {
+        return this.eventDetailContent ?? null;
+      }
+      case 'eventDetailDialog': {
+        return this.eventDetailDialog ?? null;
+      }
+      case 'headerContent': {
+        return this.headerContent ?? null;
+      }
+      case 'createCalendarDialog': {
+        return this.createCalendarDialog ?? null;
+      }
+      case 'titleBarSlot': {
+        return this.titleBarSlot ?? null;
+      }
+      case 'colorPicker': {
+        return this.colorPicker ?? null;
+      }
+      case 'colorPickerWrapper': {
+        return this.colorPickerWrapper ?? null;
+      }
+      default: {
+        return null;
+      }
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   trackById(_index: number, item: CustomRendering) {
     return item.id;
   }

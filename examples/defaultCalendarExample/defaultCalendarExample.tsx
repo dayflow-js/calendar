@@ -1,4 +1,8 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Event, CalendarType, EventChange } from '@dayflow/core';
+import { createDragPlugin } from '@dayflow/plugin-drag';
+import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
+import { createLocalizationPlugin, zh } from '@dayflow/plugin-localization';
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -9,23 +13,18 @@ import {
   ViewType,
   UseCalendarAppReturn,
 } from '@dayflow/react';
-import { createDragPlugin } from '@dayflow/plugin-drag';
-import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
-import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
-import { Event, CalendarType } from '@dayflow/core';
+import { getWebsiteCalendars } from '@examples/utils/palette';
+import { generateSampleEvents } from '@examples/utils/sampleData';
 import { Sun, Moon } from 'lucide-react';
-import { generateSampleEvents } from '../utils/sampleData';
-import { getWebsiteCalendars } from '../utils/palette';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 
-interface DefaultCalendarExampleProps {}
-
-const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = () => {
+const DefaultCalendarExample: React.FC = () => {
   const [events] = useState<Event[]>(generateSampleEvents());
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
 
-  const [isMobile, setIsMobile] = React.useState(true);
+  const [_, setIsMobile] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -34,59 +33,83 @@ const DefaultCalendarExample: React.FC<DefaultCalendarExampleProps> = () => {
 
   const dragPlugin = useMemo(() => createDragPlugin(), []);
   const keyboardPlugin = useMemo(() => createKeyboardShortcutsPlugin(), []);
-  const sidebarPlugin = createSidebarPlugin({
-    createCalendarMode: 'modal',
-    colorPickerMode: 'blossom',
-  });
+
+  const plugins = [
+    dragPlugin,
+    keyboardPlugin,
+    createSidebarPlugin({
+      createCalendarMode: 'modal',
+      colorPickerMode: 'default',
+    }),
+    createLocalizationPlugin({
+      locales: [zh],
+    }),
+  ];
+  // .filter(plugin => !(isMobile && plugin.name === 'sidebar'));
 
   const calendar = useCalendarApp({
     views: [
-      createDayView(),
-      createWeekView(),
+      createDayView({}),
+      createWeekView({
+        mode: 'compact',
+        // timeFormat: '12h',
+        // showAllDay: false,
+      }),
       createMonthView(),
       createYearView({
         mode: 'fixed-week',
+        // showTimedEventsInYearView: true,
       }),
     ],
     events: events,
     calendars: getWebsiteCalendars(),
     defaultCalendar: 'work',
-    plugins: [keyboardPlugin, sidebarPlugin, dragPlugin],
+    // useEventDetailDialog: true,
+    // switcherMode: 'select',
+    plugins: plugins,
+    // locale: zh,
     defaultView: ViewType.MONTH,
-    useEventDetailDialog: true,
+    // useEventDetailDialog: true,
     theme: { mode: 'auto' as const },
     // switcherMode: 'select' as const,
-    // readOnly: true,
+    // readOnly: {
+    //   viewable: true,
+    // },
     callbacks: {
       onEventCreate: async (event: Event) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => {
+          setTimeout(resolve, 500);
+        });
         console.log('create event:', event);
       },
-      onEventClick: async (event: Event) => {
+      onEventClick: (event: Event) => {
         console.log('click event:', event);
       },
-      onEventUpdate: async (event: Event) => {
+      onEventUpdate: (event: Event) => {
         console.log('update event:', event);
       },
-      onEventDelete: async (eventId: string) => {
+      onEventDelete: (eventId: string) => {
         console.log('delete event:', eventId);
       },
-      onMoreEventsClick: async (date: Date) => {
+      onMoreEventsClick: (date: Date) => {
         console.log('more events click date:', date);
         calendarRef.current?.selectDate(date);
         calendarRef.current?.changeView(ViewType.DAY);
       },
-      onCalendarUpdate: async (calendar: CalendarType) => {
-        console.log('update calendar:', calendar);
+      onCalendarUpdate: (cal: CalendarType) => {
+        console.log('update calendar:', cal);
       },
-      onCalendarDelete: async (calendarId: string) => {
+      onCalendarDelete: (calendarId: string) => {
         console.log('delete calendar:', calendarId);
       },
-      onCalendarCreate: async (calendar: CalendarType) => {
-        console.log('create calendar:', calendar);
+      onCalendarCreate: (cal: CalendarType) => {
+        console.log('create calendar:', cal);
       },
-      onCalendarMerge: async (sourceId: string, targetId: string) => {
+      onCalendarMerge: (sourceId: string, targetId: string) => {
         console.log('merge calendar:', sourceId, targetId);
+      },
+      onEventBatchChange: (event: EventChange[]) => {
+        console.log('batch change events:', event);
       },
     },
   });
@@ -130,13 +153,14 @@ const ThemeToggle = () => {
   };
 
   return (
-    <div className="flex items-center gap-4 shrink-0">
+    <div className='flex shrink-0 items-center gap-4'>
       <button
+        type='button'
         onClick={toggleTheme}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 transition-colors shadow-sm"
+        className='flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700'
       >
         {isDark ? <Sun size={18} /> : <Moon size={18} />}
-        <span className="text-sm font-medium">{isDark ? 'Light' : 'Dark'}</span>
+        <span className='text-sm font-medium'>{isDark ? 'Light' : 'Dark'}</span>
       </button>
     </div>
   );
@@ -144,12 +168,12 @@ const ThemeToggle = () => {
 
 export function CalendarTypesExample() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <div className="">
+    <div className='min-h-screen bg-gray-50 p-2 text-gray-900 transition-colors duration-200 dark:bg-slate-950 dark:text-gray-100'>
+      <div className=''>
         {/* Header */}
-        <div className="flex justify-between gap-4 mb-4 px-4 items-center">
-          <div className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">
+        <div className='mb-4 flex items-center justify-between gap-4 px-4'>
+          <div className='space-y-4'>
+            <h1 className='text-3xl font-bold tracking-tight'>
               Calendar Example
             </h1>
           </div>
@@ -157,7 +181,7 @@ export function CalendarTypesExample() {
         </div>
 
         {/* Calendar Instance */}
-        <div className="px-4 my-4 pb-4 mb-4">
+        <div>
           <DefaultCalendarExample />
         </div>
       </div>

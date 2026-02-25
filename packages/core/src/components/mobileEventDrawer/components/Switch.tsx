@@ -7,9 +7,7 @@ interface SwitchProps {
 export const Switch = ({ checked, onChange, disabled }: SwitchProps) => (
   <div
     className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors ${
-      disabled
-        ? 'cursor-default opacity-50'
-        : 'cursor-pointer'
+      disabled ? 'cursor-default opacity-50' : 'cursor-pointer'
     } ${checked ? 'bg-green-500' : 'bg-gray-300'}`}
     onClick={() => !disabled && onChange(!checked)}
   >

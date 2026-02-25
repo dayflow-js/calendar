@@ -1,3 +1,4 @@
+import { RefObject, JSX } from 'preact';
 import {
   useMemo,
   useRef,
@@ -6,7 +7,13 @@ import {
   useEffect,
 } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
+
+import { CalendarEvent } from '@/components/calendarEvent';
+import ViewHeader from '@/components/common/ViewHeader';
+import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
+import { useDragForView } from '@/plugins/dragBridge';
+import { scrollbarHide } from '@/styles/classNames';
 import {
   Event,
   ViewType,
@@ -15,16 +22,12 @@ import {
   ICalendarApp,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
-import { useDragForView } from '@/plugins/dragBridge';
-import ViewHeader from '@/components/common/ViewHeader';
-import { CalendarEvent } from '../calendarEvent';
+
 import { YearMultiDaySegment } from './utils';
-import { GridContextMenu } from '@/components/contextMenu';
-import { scrollbarHide } from '@/styles/classNames';
 
 interface FixedWeekYearViewProps {
   app: ICalendarApp;
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
   config?: {
@@ -201,13 +204,13 @@ export const FixedWeekYearView = ({
   >(null);
 
   const selectedEventId =
-    propSelectedEventId !== undefined
-      ? propSelectedEventId
-      : internalSelectedId;
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
   const detailPanelEventId =
-    propDetailPanelEventId !== undefined
-      ? propDetailPanelEventId
-      : internalDetailPanelEventId;
+    propDetailPanelEventId === undefined
+      ? internalDetailPanelEventId
+      : propDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -235,7 +238,7 @@ export const FixedWeekYearView = ({
     date: Date;
   } | null>(null);
 
-  const handleContextMenu = (e: any, date: Date) => {
+  const handleContextMenu = (e: MouseEvent, date: Date) => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, date });
@@ -321,7 +324,7 @@ export const FixedWeekYearView = ({
 
   // Handle double click on cell - create all-day or timed event based on config
   const handleCellDoubleClick = useCallback(
-    (e: any, date: Date) => {
+    (e: unknown, date: Date) => {
       if (showTimedEvents) {
         // Use default drag behavior for timed events
         handleCreateStart?.(e, date);
@@ -353,9 +356,9 @@ export const FixedWeekYearView = ({
 
     const formattedLabels = sundayStartLabels.map(label => {
       if (locale.startsWith('zh')) {
-        return label.charAt(label.length - 1);
+        return label.at(-1);
       }
-      const twoChars = label.substring(0, 2);
+      const twoChars = label.slice(0, 2);
       return twoChars.charAt(0).toUpperCase() + twoChars.slice(1).toLowerCase();
     });
 
@@ -367,9 +370,7 @@ export const FixedWeekYearView = ({
   }, [locale, getWeekDaysLabels, totalColumns]);
 
   // Helper to check if a date is today
-  const isDateToday = (date: Date) => {
-    return date.getTime() === today.getTime();
-  };
+  const isDateToday = (date: Date) => date.getTime() === today.getTime();
 
   // Filter events for the current year
   const yearEvents = useMemo(() => {
@@ -441,15 +442,18 @@ export const FixedWeekYearView = ({
   }, [currentYear, locale, totalColumns, yearEvents]);
 
   // Handle scroll synchronization
-  const handleContentScroll = useCallback((e: any) => {
-    const target = e.currentTarget;
-    if (weekLabelsRef.current) {
-      weekLabelsRef.current.scrollLeft = target.scrollLeft;
-    }
-    if (monthLabelsRef.current) {
-      monthLabelsRef.current.scrollTop = target.scrollTop;
-    }
-  }, []);
+  const handleContentScroll = useCallback(
+    (e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>) => {
+      const target = e.currentTarget;
+      if (weekLabelsRef.current) {
+        weekLabelsRef.current.scrollLeft = target.scrollLeft;
+      }
+      if (monthLabelsRef.current) {
+        monthLabelsRef.current.scrollTop = target.scrollTop;
+      }
+    },
+    []
+  );
 
   // Measure scrollbar dimensions to sync the sidebar/header padding
   useEffect(() => {
@@ -461,8 +465,8 @@ export const FixedWeekYearView = ({
         // Vertical scrollbar width = offsetWidth - clientWidth
         const vScrollbar = el.offsetWidth - el.clientWidth;
 
-        setScrollbarHeight(prev => (prev !== hScrollbar ? hScrollbar : prev));
-        setScrollbarWidth(prev => (prev !== vScrollbar ? vScrollbar : prev));
+        setScrollbarHeight(prev => (prev === hScrollbar ? prev : hScrollbar));
+        setScrollbarWidth(prev => (prev === vScrollbar ? prev : vScrollbar));
       }
     };
 
@@ -487,7 +491,7 @@ export const FixedWeekYearView = ({
 
   return (
     <div
-      className="h-full bg-white dark:bg-gray-900 overflow-hidden select-none"
+      className='h-full bg-white dark:bg-gray-900 overflow-hidden select-none'
       style={{
         display: 'grid',
         gridTemplateColumns: '3rem 1fr',
@@ -496,7 +500,7 @@ export const FixedWeekYearView = ({
       onContextMenu={e => e.preventDefault()}
     >
       {/* Year Header */}
-      <div className="col-span-2">
+      <div className='col-span-2'>
         <ViewHeader
           calendar={app}
           viewType={ViewType.YEAR}
@@ -519,19 +523,19 @@ export const FixedWeekYearView = ({
       </div>
 
       {/* Corner - Fixed */}
-      <div className="bg-gray-50 dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-800 z-30" />
+      <div className='bg-gray-50 dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-800 z-30' />
 
       {/* Week Labels Header */}
       <div
         ref={weekLabelsRef}
-        className="overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800"
+        className='overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'
       >
         <div
-          className="flex"
+          className='flex'
           style={{ minWidth: `calc(1352px + ${scrollbarWidth}px)` }}
         >
           <div
-            className="grid flex-1"
+            className='grid flex-1'
             style={{
               gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
               minWidth: '1352px',
@@ -542,7 +546,7 @@ export const FixedWeekYearView = ({
               const isWeekend = dayIndex === 0 || dayIndex === 6;
               return (
                 <div
-                  key={i}
+                  key={`label-${i}`}
                   className={`text-center py-2 text-[10px] font-bold tracking-wider border-r border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 ${isWeekend ? 'df-year-view-weekend-header' : ''}`}
                 >
                   {label}
@@ -553,7 +557,7 @@ export const FixedWeekYearView = ({
           {/* Spacer to compensate for vertical scrollbar in content area */}
           {scrollbarWidth > 0 && (
             <div
-              className="shrink-0 bg-gray-50 dark:bg-gray-900"
+              className='shrink-0 bg-gray-50 dark:bg-gray-900'
               style={{ width: `${scrollbarWidth}px` }}
             />
           )}
@@ -563,13 +567,13 @@ export const FixedWeekYearView = ({
       {/* Month Labels Sidebar */}
       <div
         ref={monthLabelsRef}
-        className="overflow-hidden bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700"
+        className='overflow-hidden bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700'
       >
-        <div className="flex flex-col min-h-full">
+        <div className='flex flex-col min-h-full'>
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 grow shrink-0"
+              className='flex items-center justify-center border-b border-gray-200 dark:border-gray-700 font-bold text-[10px] text-gray-500 dark:text-gray-400 grow shrink-0'
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {month.monthName}
@@ -578,7 +582,7 @@ export const FixedWeekYearView = ({
           {/* Spacer to compensate for horizontal scrollbar in content area */}
           {scrollbarHeight > 0 && (
             <div
-              className="shrink-0 bg-white dark:bg-gray-900"
+              className='shrink-0 bg-white dark:bg-gray-900'
               style={{ height: `${scrollbarHeight}px` }}
             />
           )}
@@ -592,18 +596,18 @@ export const FixedWeekYearView = ({
         onScroll={handleContentScroll}
       >
         <div
-          className="flex flex-col min-h-full"
+          className='flex flex-col min-h-full'
           style={{ minWidth: '1352px' }}
         >
           {monthsData.map(month => (
             <div
               key={month.monthIndex}
-              className="relative grow shrink-0"
+              className='relative grow shrink-0'
               style={{ minHeight: `${month.minHeight}px` }}
             >
               {/* Background grid cells */}
               <div
-                className="grid absolute inset-0 z-0"
+                className='grid absolute inset-0 z-0'
                 style={{
                   gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
                 }}
@@ -615,7 +619,7 @@ export const FixedWeekYearView = ({
                   if (!date) {
                     return (
                       <div
-                        key={`empty-${dayIndex}`}
+                        key={`empty-${month.monthIndex}-${dayIndex}`}
                         className={`bg-gray-50/80 dark:bg-gray-800/40 border-r border-b border-gray-200 dark:border-gray-700 ${isWeekend ? 'df-year-view-weekend-cell' : ''}`}
                       />
                     );
@@ -639,18 +643,10 @@ export const FixedWeekYearView = ({
                       onDblClick={e => handleCellDoubleClick(e, date)}
                       onContextMenu={e => handleContextMenu(e, date)}
                     >
-                      <span
-                        className={`
+                      <span className={`
                           text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full
-                          ${
-                            isToday
-                              ? 'bg-primary text-primary-foreground font-bold shadow-sm'
-                              : 'text-gray-700 dark:text-gray-300'
-                          }
-                        `}
-                      >
-                        {date.getDate()}
-                      </span>
+                          ${isToday ? 'bg-primary text-primary-foreground font-bold shadow-sm' : 'text-gray-700 dark:text-gray-300'}
+                        `}>{date.getDate()}</span>
                     </div>
                   );
                 })}
@@ -659,12 +655,12 @@ export const FixedWeekYearView = ({
               {/* Event segments overlay */}
               {month.eventSegments.length > 0 && (
                 <div
-                  className="absolute inset-0 pointer-events-none z-20"
+                  className='absolute inset-0 pointer-events-none z-20'
                   style={{ top: 20 }}
                 >
-                  <div className="relative w-full h-full">
+                  <div className='relative w-full h-full'>
                     {month.eventSegments.map(segment => (
-                      <div key={segment.id} className="pointer-events-auto">
+                      <div key={segment.id} className='pointer-events-auto'>
                         <CalendarEvent
                           event={segment.event}
                           viewType={ViewType.YEAR}
@@ -711,11 +707,15 @@ export const FixedWeekYearView = ({
           app={app}
           onCreateEvent={() => {
             const syntheticEvent = {
-              preventDefault: () => {},
-              stopPropagation: () => {},
+              preventDefault: () => {
+                /* noop */
+              },
+              stopPropagation: () => {
+                /* noop */
+              },
               clientX: contextMenu.x,
               clientY: contextMenu.y,
-            } as unknown as any;
+            } as unknown;
             handleCellDoubleClick(syntheticEvent, contextMenu.date);
           }}
         />

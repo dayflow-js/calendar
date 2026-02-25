@@ -1,5 +1,5 @@
-import { CalendarConfig } from '../types';
-import { getLineColor as resolveLineColor } from '../utils/colorUtils';
+import { CalendarConfig } from '@/types';
+import { getLineColor as resolveLineColor } from '@/utils/colorUtils';
 
 export const defaultDragConfig = {
   HOUR_HEIGHT: 72,
@@ -43,6 +43,12 @@ export const defaultCalendarConfig: CalendarConfig = {
   views: defaultViewConfigs,
 };
 
+// Utility function to check if value is an object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isObject(item: any): item is Record<string, any> {
+  return item && typeof item === 'object' && !Array.isArray(item);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function deepMerge<T extends Record<string, any>>(
   target: T,
@@ -64,12 +70,6 @@ export function deepMerge<T extends Record<string, any>>(
   }
 
   return deepMerge(target, ...sources);
-}
-
-// Utility function to check if value is an object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isObject(item: any): item is Record<string, any> {
-  return item && typeof item === 'object' && !Array.isArray(item);
 }
 
 export function createCalendarConfig(

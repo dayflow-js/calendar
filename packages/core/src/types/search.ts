@@ -2,7 +2,7 @@ import { Event } from './event';
 
 export type CalendarSearchEvent = Event & {
   color?: string; // For calendar color
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export interface CalendarSearchProps {

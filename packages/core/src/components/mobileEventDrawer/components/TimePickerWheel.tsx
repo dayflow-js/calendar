@@ -5,10 +5,7 @@ interface TimePickerWheelProps {
   onChange: (d: Date) => void;
 }
 
-export const TimePickerWheel = ({
-  date,
-  onChange,
-}: TimePickerWheelProps & any) => {
+export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
   const originalHours = Array.from({ length: 24 }, (_, i) => i);
   const originalMinutes = Array.from({ length: 12 }, (_, i) => i * 5);
   // Triple the arrays for infinite scroll simulation
@@ -66,7 +63,10 @@ export const TimePickerWheel = ({
     }
   };
 
-  const onScroll = (e: any, type: 'hour' | 'minute') => {
+  const onScroll = (
+    e: { currentTarget: HTMLDivElement },
+    type: 'hour' | 'minute'
+  ) => {
     const target = e.currentTarget;
     let scrollTop = target.scrollTop;
 
@@ -123,26 +123,22 @@ export const TimePickerWheel = ({
   };
 
   return (
-    <div className="flex h-56 overflow-hidden rounded-lg mt-2 relative ">
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
+    <div className='flex h-56 overflow-hidden rounded-lg mt-2 relative '>
+      <style>{`
             .no-scrollbar::-webkit-scrollbar { display: none; }
             .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        `,
-        }}
-      />
+        `}</style>
       <div
         ref={hourRef}
-        className="flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar"
+        className='flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar'
         style={{ touchAction: 'pan-y' }}
         onScroll={e => onScroll(e, 'hour')}
       >
         <div style={{ height: spacerHeight }}></div>
         {hours.map((h, i) => (
           <div
-            key={i} // Use index as key because values are repeated
-            className="h-8 flex items-center justify-end pr-5 snap-center cursor-pointer"
+            key={`h-${i}-${h}`}
+            className='h-8 flex items-center justify-end pr-5 snap-center cursor-pointer'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setHours(h);
@@ -165,15 +161,15 @@ export const TimePickerWheel = ({
       </div>
       <div
         ref={minRef}
-        className="flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar"
+        className='flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar'
         style={{ touchAction: 'pan-y' }}
         onScroll={e => onScroll(e, 'minute')}
       >
         <div style={{ height: spacerHeight }}></div>
         {minutes.map((m, i) => (
           <div
-            key={i} // Use index as key
-            className="h-8 flex items-center justify-start pl-5 snap-center cursor-pointer"
+            key={`m-${i}-${m}`}
+            className='h-8 flex items-center justify-start pl-5 snap-center cursor-pointer'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setMinutes(m);
@@ -195,7 +191,7 @@ export const TimePickerWheel = ({
         <div style={{ height: spacerHeight }}></div>
       </div>
       {/* Selection Highlight */}
-      <div className="absolute top-24 left-2 right-2 h-8 bg-gray-300/20 dark:bg-gray-500/20 pointer-events-none border border-gray-300 dark:border-gray-600 rounded-lg"></div>
+      <div className='absolute top-24 left-2 right-2 h-8 bg-gray-300/20 dark:bg-gray-500/20 pointer-events-none border border-gray-300 dark:border-gray-600 rounded-lg'></div>
     </div>
   );
 };

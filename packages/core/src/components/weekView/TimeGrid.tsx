@@ -1,16 +1,9 @@
+import { RefObject, JSX } from 'preact';
 import { useState, useRef } from 'preact/hooks';
-import { ICalendarApp } from '@/types';
+
 import CalendarEventComponent from '@/components/calendarEvent';
-import { formatTime, getEventsForDay, scrollbarTakesSpace } from '@/utils';
-import {
-  EventLayout,
-  Event,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  WeekDayDragState,
-  ViewType,
-  ViewMode,
-} from '@/types';
+import { GridContextMenu } from '@/components/contextMenu';
+import { analyzeMultiDayRegularEvent } from '@/components/monthView/util';
 import {
   timeSlot,
   timeLabel,
@@ -20,36 +13,61 @@ import {
   currentTimeLabel,
   timeGridBoundary,
 } from '@/styles/classNames';
-import { analyzeMultiDayRegularEvent } from '@/components/monthView/util';
-import { GridContextMenu } from '@/components/contextMenu';
+import {
+  EventLayout,
+  Event as CalendarEvent,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  WeekDayDragState,
+  ViewType,
+  ViewMode,
+  ICalendarApp,
+} from '@/types';
+import { formatTime, getEventsForDay, scrollbarTakesSpace } from '@/utils';
 
 interface TimeGridProps {
   app: ICalendarApp;
   timeSlots: Array<{ hour: number; label: string }>;
   weekDaysLabels: string[];
   currentWeekStart: Date;
-  currentWeekEvents: Event[];
+  currentWeekEvents: CalendarEvent[];
   eventLayouts: Map<number, Map<string, EventLayout>>;
   gridWidth: string;
   isMobile: boolean;
   isTouch: boolean;
-  scrollerRef: any;
-  timeGridRef: any;
-  leftFrozenContentRef: any;
-  calendarRef: any;
-  handleScroll: (e: any) => void;
-  handleCreateStart?: (e: any, dayIndex: number, hour: number) => void;
-  handleTouchStart: (e: any, dayIndex: number, hour: number) => void;
+  scrollerRef: RefObject<HTMLDivElement>;
+  timeGridRef: RefObject<HTMLDivElement>;
+  leftFrozenContentRef: RefObject<HTMLDivElement>;
+  calendarRef: RefObject<HTMLDivElement>;
+  handleScroll: (
+    e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>
+  ) => void;
+  handleCreateStart?: (
+    e: MouseEvent | TouchEvent,
+    dayIndex: number,
+    hour: number
+  ) => void;
+  handleTouchStart: (e: TouchEvent, dayIndex: number, hour: number) => void;
   handleTouchEnd: () => void;
-  handleTouchMove: () => void;
-  handleDragOver: (e: any) => void;
-  handleDrop: (e: any, date: Date, hour?: number, allDay?: boolean) => void;
-  dragState: any;
+  handleTouchMove: (e: TouchEvent) => void;
+  handleDragOver: (e: DragEvent) => void;
+  handleDrop: (
+    e: DragEvent,
+    date: Date,
+    hour?: number,
+    allDay?: boolean
+  ) => void;
+  dragState: WeekDayDragState | null;
   isDragging: boolean;
-  handleMoveStart: any;
-  handleResizeStart: any;
-  handleEventUpdate: (event: Event) => void;
+  handleMoveStart: (e: MouseEvent | TouchEvent, event: CalendarEvent) => void;
+  handleResizeStart: (
+    e: MouseEvent | TouchEvent,
+    event: CalendarEvent,
+    direction: string
+  ) => void;
+  handleEventUpdate: (event: CalendarEvent) => void;
   handleEventDelete: (id: string) => void;
+
   onDateChange?: (date: Date) => void;
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
@@ -114,7 +132,7 @@ export const TimeGrid = ({
   LAST_HOUR,
   showStartOfDayLabel,
 }: TimeGridProps) => {
-  const columnStyle: any = { flexShrink: 0 };
+  const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -123,7 +141,7 @@ export const TimeGrid = ({
   } | null>(null);
   const hasScrollbarSpace = scrollbarTakesSpace();
 
-  const handleContextMenu = (e: any, dayIndex: number, hour: number) => {
+  const handleContextMenu = (e: MouseEvent, dayIndex: number, hour: number) => {
     e.preventDefault();
     if (isMobile) return;
 
@@ -131,7 +149,7 @@ export const TimeGrid = ({
     date.setDate(currentWeekStart.getDate() + dayIndex);
 
     if (timeGridRef.current) {
-      const rect = timeGridRef.current.getBoundingClientRect();
+      const rect = (timeGridRef.current as HTMLElement).getBoundingClientRect();
       const relativeY = e.clientY - rect.top;
       // Convert relativeY to hours based on grid scale
       const floatHour = relativeY / HOUR_HEIGHT + FIRST_HOUR;
@@ -152,16 +170,16 @@ export const TimeGrid = ({
   };
 
   return (
-    <div className="flex flex-1 overflow-hidden relative">
+    <div className='flex flex-1 overflow-hidden relative'>
       {/* Left Frozen Column */}
       <div
-        className="w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10"
+        className='w-12 md:w-20 shrink-0 overflow-hidden relative bg-white dark:bg-gray-900 z-10'
         onContextMenu={e => e.preventDefault()}
       >
         <div ref={leftFrozenContentRef}>
           {/* Top boundary spacer with start-of-day label */}
-          <div className="h-3 relative">
-            <div className="absolute -bottom-1 right-2 text-[10px] md:text-[12px] text-gray-500 dark:text-gray-400 select-none">
+          <div className='h-3 relative'>
+            <div className='absolute -bottom-1 right-2 text-[10px] md:text-[12px] text-gray-500 dark:text-gray-400 select-none'>
               {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
             </div>
           </div>
@@ -172,7 +190,7 @@ export const TimeGrid = ({
               </div>
             </div>
           ))}
-          <div className="relative">
+          <div className='relative'>
             <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
               00:00
             </div>
@@ -189,7 +207,7 @@ export const TimeGrid = ({
 
               return (
                 <div
-                  className="absolute left-0 w-full z-20 pointer-events-none flex items-center justify-end"
+                  className='absolute left-0 w-full z-20 pointer-events-none flex items-center justify-end'
                   style={{
                     top: `${topPx}px`,
                     transform: 'translateY(-50%)',
@@ -209,9 +227,9 @@ export const TimeGrid = ({
         className={`flex-1 overflow-auto relative calendar-content ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
         onScroll={handleScroll}
       >
-        <div className="flex" style={{ width: gridWidth, minWidth: '100%' }}>
+        <div className='flex' style={{ width: gridWidth, minWidth: '100%' }}>
           {/* Time Grid */}
-          <div className="grow">
+          <div className='grow'>
             {/* Top boundary */}
             <div className={`${timeGridBoundary} border-t-0 flex`}>
               {weekDaysLabels.map((_, dayIndex) => (
@@ -222,7 +240,7 @@ export const TimeGrid = ({
                 />
               ))}
             </div>
-            <div ref={timeGridRef} className="relative">
+            <div ref={timeGridRef} className='relative'>
               {/* Current time line */}
               {isCurrentWeek &&
                 currentTime &&
@@ -251,13 +269,13 @@ export const TimeGrid = ({
                         zIndex: 20,
                       }}
                     >
-                      <div className="flex items-center w-0">
+                      <div className='flex items-center w-0'>
                         {/* Empty left part since it is in frozen column now */}
                       </div>
 
-                      <div className="flex flex-1">
+                      <div className='flex flex-1'>
                         {weekDaysLabels.map((_, idx) => (
-                          <div key={idx} className="flex-1 flex items-center">
+                          <div key={idx} className='flex-1 flex items-center'>
                             <div
                               className={`h-0.5 w-full relative ${
                                 idx === todayIndex
@@ -270,7 +288,7 @@ export const TimeGrid = ({
                             >
                               {idx === todayIndex && todayIndex !== 0 && (
                                 <div
-                                  className="absolute w-2 h-2 bg-primary rounded-full"
+                                  className='absolute w-2 h-2 bg-primary rounded-full'
                                   style={{ top: '-3px', left: '-4px' }}
                                 />
                               )}
@@ -337,7 +355,7 @@ export const TimeGrid = ({
                 // Collect all event segments for this day
                 const dayEvents = getEventsForDay(dayIndex, currentWeekEvents);
                 const allEventSegments: Array<{
-                  event: Event;
+                  event: CalendarEvent;
                   segmentInfo?: {
                     startHour: number;
                     endHour: number;
@@ -383,7 +401,7 @@ export const TimeGrid = ({
                 return (
                   <div
                     key={`events-day-${dayIndex}`}
-                    className="absolute top-0 pointer-events-none"
+                    className='absolute top-0 pointer-events-none'
                     style={{
                       left: `calc(${(100 / daysToShow) * dayIndex}%)`,
                       width: `${100 / daysToShow}%`,
@@ -477,12 +495,15 @@ export const TimeGrid = ({
                 contextMenu.date.getMinutes() / 60;
 
               const syntheticEvent = {
-                preventDefault: () => {},
-                stopPropagation: () => {},
+                preventDefault: () => {
+                  /* noop */
+                },
+                stopPropagation: () => {
+                  /* noop */
+                },
                 clientX: contextMenu.x,
                 clientY: contextMenu.y,
-              } as unknown as any;
-
+              } as unknown as MouseEvent;
               handleCreateStart(syntheticEvent, diffDays, preciseHour);
             }
           }}

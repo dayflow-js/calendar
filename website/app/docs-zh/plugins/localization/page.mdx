@@ -18,17 +18,24 @@ pnpm add @dayflow/plugin-localization
 
 ```tsx copy
 import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
-import { createLocalizationPlugin, zh, ja, fr } from '@dayflow/plugin-localization';
+import {
+  createLocalizationPlugin,
+  zh,
+  ja,
+  fr,
+} from '@dayflow/plugin-localization';
 
 function MyCalendar() {
   const calendar = useCalendarApp({
-    views: [/* 视图配置 */],
+    views: [
+      /* 视图配置 */
+    ],
     plugins: [
       createLocalizationPlugin({
-        locales: [zh, ja, fr] // 注册你需要的语言包
-      })
+        locales: [zh, ja, fr], // 注册你需要的语言包
+      }),
     ],
-    locale: 'zh-CN' // 设置当前语言
+    locale: 'zh-CN', // 设置当前语言
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -49,15 +56,15 @@ interface LocalizationConfig {
 
 `@dayflow/plugin-localization` 包含以下语言包：
 
-| 导出名称 | 语言 | 语言代码 |
-| :--- | :--- | :--- |
-| `zh` | 中文 | `zh-CN` |
-| `ja` | 日语 | `ja-JP` |
-| `ko` | 韩语 | `ko-KR` |
-| `fr` | 法语 | `fr-FR` |
-| `de` | 德语 | `de-DE` |
-| `es` | 西班牙语 | `es-ES` |
-| `en` | 英语 | `en-US` (核心库已内置) |
+| 导出名称 | 语言     | 语言代码               |
+| :------- | :------- | :--------------------- |
+| `zh`     | 中文     | `zh-CN`                |
+| `ja`     | 日语     | `ja-JP`                |
+| `ko`     | 韩语     | `ko-KR`                |
+| `fr`     | 法语     | `fr-FR`                |
+| `de`     | 德语     | `de-DE`                |
+| `es`     | 西班牙语 | `es-ES`                |
+| `en`     | 英语     | `en-US` (核心库已内置) |
 
 ## 自定义语言包
 
@@ -72,15 +79,15 @@ const myCustomLocale = {
     week: 'Semana',
     month: 'Mês',
     // ... 其他所有翻译键值
-  }
+  },
 };
 
 const calendar = useCalendarApp({
   plugins: [
     createLocalizationPlugin({
-      locales: [myCustomLocale]
-    })
+      locales: [myCustomLocale],
+    }),
   ],
-  locale: 'pt-BR'
+  locale: 'pt-BR',
 });
 ```

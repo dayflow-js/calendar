@@ -1,4 +1,5 @@
 import { memo } from 'preact/compat';
+
 import { useLocale } from '@/locale';
 
 interface YearDayCellProps {
@@ -6,10 +7,10 @@ interface YearDayCellProps {
   isToday: boolean;
   locale: string;
   onSelectDate: (date: Date) => void;
-  onCreateStart?: (e: any, targetDate: Date) => void;
+  onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
   onMoreEventsClick?: (date: Date) => void;
   moreCount?: number;
-  onContextMenu?: (e: any, date: Date) => void;
+  onContextMenu?: (e: MouseEvent, date: Date) => void;
 }
 
 export const YearDayCell = memo(
@@ -48,9 +49,9 @@ export const YearDayCell = memo(
         }}
         data-date={dateString}
       >
-        <div className="flex items-center px-1 py-1 shrink-0 h-6">
+        <div className='flex items-center px-1 py-1 shrink-0 h-6'>
           {isFirstDay && (
-            <span className="text-[9px] font-bold text-primary-foreground bg-primary px-1 py-0.5 rounded-sm leading-none">
+            <span className='text-[9px] font-bold text-primary-foreground bg-primary px-1 py-0.5 rounded-sm leading-none'>
               {monthLabel}
             </span>
           )}
@@ -66,9 +67,9 @@ export const YearDayCell = memo(
         </div>
 
         {moreCount > 0 && (
-          <div className="absolute bottom-0.5 left-1 z-20">
+          <div className='absolute bottom-0.5 left-1 z-20'>
             <span
-              className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline"
+              className='text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer hover:underline'
               onClick={e => {
                 e.stopPropagation();
                 onMoreEventsClick?.(date);
@@ -83,4 +84,4 @@ export const YearDayCell = memo(
   }
 );
 
-(YearDayCell as any).displayName = 'YearDayCell';
+(YearDayCell as { displayName?: string }).displayName = 'YearDayCell';

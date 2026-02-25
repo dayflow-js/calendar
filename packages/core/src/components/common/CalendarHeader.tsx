@@ -1,12 +1,15 @@
+import { JSX } from 'preact';
 import { useContext, useCallback, useMemo } from 'preact/hooks';
-import { ViewType, CalendarHeaderProps } from '../../types';
-import ViewSwitcher from './ViewSwitcher';
+
+import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
+import { useLocale } from '@/locale/useLocale';
+import { ContentSlot } from '@/renderer/ContentSlot';
+import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
+import { iconButton, searchInput, textGray500 } from '@/styles/classNames';
+import { ViewType, CalendarHeaderProps } from '@/types';
+
 import { Plus, Search } from './Icons';
-import { useResponsiveMonthConfig } from '../../hooks/virtualScroll';
-import { useLocale } from '../../locale/useLocale';
-import { iconButton, searchInput, textGray500 } from '../../styles/classNames';
-import { ContentSlot } from '../../renderer/ContentSlot';
-import { CustomRenderingContext } from '../../renderer/CustomRenderingContext';
+import ViewSwitcher from './ViewSwitcher';
 
 const CalendarHeader = ({
   calendar,
@@ -27,8 +30,8 @@ const CalendarHeader = ({
   const { t } = useLocale();
 
   const handleSearchChange = useCallback(
-    (e: any) => {
-      const newValue = e.target.value;
+    (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+      const newValue = e.currentTarget.value;
       if (newValue !== searchValue) {
         onSearchChange?.(newValue);
       }
@@ -70,7 +73,7 @@ const CalendarHeader = ({
   return (
     <ContentSlot
       store={customRenderingStore}
-      generatorName="headerContent"
+      generatorName='headerContent'
       generatorArgs={headerProps}
       defaultContent={
         <div
@@ -86,10 +89,11 @@ const CalendarHeader = ({
           onContextMenu={e => e.preventDefault()}
         >
           {/* Left Section: Add Calendar Button Only */}
-          <div className="df-header-left flex items-center mb-1">
+          <div className='df-header-left flex items-center mb-1'>
             {onAddCalendar && isEditable && (
               <button
-                id="dayflow-add-event-btn"
+                type='button'
+                id='dayflow-add-event-btn'
                 onClick={onAddCalendar}
                 className={iconButton}
                 title={
@@ -104,7 +108,7 @@ const CalendarHeader = ({
           </div>
 
           {/* Middle Section: ViewSwitcher (if mode is buttons) */}
-          <div className="df-header-mid flex-1 flex justify-center">
+          <div className='df-header-mid flex-1 flex justify-center'>
             {isSwitcherCentered && (
               <ViewSwitcher mode={switcherMode} calendar={calendar} />
             )}
@@ -120,6 +124,7 @@ const CalendarHeader = ({
 
             {/* Mobile Search Icon */}
             <button
+              type='button'
               onClick={onSearchClick}
               className={`md:hidden ${iconButton}`}
               title={t('search') || 'Search'}
@@ -128,15 +133,15 @@ const CalendarHeader = ({
             </button>
 
             {/* Desktop Search Bar */}
-            <div className="relative hidden md:block group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-400 group-focus-within:text-primary transition-colors">
+            <div className='relative hidden md:block group'>
+              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <span className='text-gray-400 group-focus-within:text-primary transition-colors'>
                   <Search width={16} height={16} />
                 </span>
               </div>
               <input
-                id="dayflow-search-input"
-                type="text"
+                id='dayflow-search-input'
+                type='text'
                 placeholder={t('search') || 'Search'}
                 value={searchValue}
                 onChange={handleSearchChange}
@@ -144,21 +149,22 @@ const CalendarHeader = ({
               />
               {searchValue && (
                 <button
+                  type='button'
                   onClick={handleClearSearch}
-                  className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  className='absolute inset-y-0 right-0 pr-2 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
                 >
                   <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    width='14'
+                    height='14'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                   >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                    <line x1='18' y1='6' x2='6' y2='18'></line>
+                    <line x1='6' y1='6' x2='18' y2='18'></line>
                   </svg>
                 </button>
               )}

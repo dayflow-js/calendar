@@ -31,80 +31,80 @@ const CustomDialog: EventDetailDialogRenderer = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-md sm:py-10"
-      data-event-detail-dialog="true"
+      className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-md sm:py-10'
+      data-event-detail-dialog='true'
     >
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
+      <div className='relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5'>
         <div
-          className="absolute inset-x-0 top-0 h-44"
+          className='absolute inset-x-0 top-0 h-44'
           style={{
             background: `linear-gradient(135deg, ${accent}, #0f172a)`,
           }}
         />
 
-        <header className="relative px-8 pt-10 pb-6 text-white">
-          <p className="text-xs uppercase tracking-[0.25em] text-white/70">
+        <header className='relative px-8 pt-10 pb-6 text-white'>
+          <p className='text-xs uppercase tracking-[0.25em] text-white/70'>
             Hosted by {event.meta?.owner ?? 'Team'}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold leading-tight">
+          <h2 className='mt-2 text-3xl font-semibold leading-tight'>
             {event.title}
           </h2>
           {event.description && (
-            <p className="mt-3 max-w-xl text-sm text-white/80">
+            <p className='mt-3 max-w-xl text-sm text-white/80'>
               {event.description}
             </p>
           )}
         </header>
 
-        <section className="relative grid gap-6 px-8 pb-8 sm:grid-cols-[1.6fr,1fr]">
-          <article className="rounded-2xl border border-gray-100 bg-white/70 p-5 shadow-sm backdrop-blur">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <section className='relative grid gap-6 px-8 pb-8 sm:grid-cols-[1.6fr,1fr]'>
+          <article className='rounded-2xl border border-gray-100 bg-white/70 p-5 shadow-sm backdrop-blur'>
+            <h3 className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
               Schedule
             </h3>
-            <p className="mt-3 text-sm text-gray-700">
+            <p className='mt-3 text-sm text-gray-700'>
               {event.allDay
                 ? 'All day'
                 : `${event.start.toString()} → ${event.end?.toString()}`}
             </p>
           </article>
 
-          <aside className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <aside className='rounded-2xl border border-gray-100 bg-white p-5 shadow-sm'>
+            <h3 className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
               Personalize
             </h3>
-            <p className="mt-2 text-xs text-gray-500">
+            <p className='mt-2 text-xs text-gray-500'>
               Sync with your brand palette or priority signal.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className='mt-4 flex flex-wrap gap-2'>
               {['#6366f1', '#f97316', '#22c55e', '#0ea5e9'].map(color => (
                 <button
                   key={color}
-                  type="button"
+                  type='button'
                   onClick={() => handleColor(color)}
-                  className="h-9 w-9 rounded-full border-2 border-white shadow-sm ring-offset-2 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  className='h-9 w-9 rounded-full border-2 border-white shadow-sm ring-offset-2 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
                   style={{ backgroundColor: color }}
                 />
               ))}
             </div>
 
             <button
-              type="button"
+              type='button'
               onClick={() => {
                 onEventDelete(event.id);
                 onClose();
               }}
-              className="mt-4 w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+              className='mt-4 w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100'
             >
               Delete event
             </button>
           </aside>
         </section>
 
-        <footer className="border-t border-gray-100 bg-gray-50 px-8 py-4 flex justify-end">
+        <footer className='border-t border-gray-100 bg-gray-50 px-8 py-4 flex justify-end'>
           <button
-            type="button"
+            type='button'
             onClick={onClose}
-            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-gray-400 hover:text-gray-900"
+            className='rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-gray-400 hover:text-gray-900'
           >
             Close
           </button>

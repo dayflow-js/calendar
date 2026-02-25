@@ -1,22 +1,26 @@
-import { Event, ViewType } from '@/types';
+import { RefObject } from 'preact';
+
 import {
   baseEvent,
   eventShadow,
   allDayRounded,
   regularEventRounded,
 } from '@/styles/classNames';
+import { Event, ViewType } from '@/types';
 /**
  * Gets the actual width of the time column from the DOM
  */
 export const getTimeColumnWidth = (
-  calendarRef: { current: HTMLElement | null },
+  calendarRef: RefObject<HTMLElement>,
   isMobile: boolean
 ): number => {
   if (!calendarRef.current) return isMobile ? 48 : 80;
   const timeColumn = calendarRef.current.querySelector('.df-time-column');
-  return timeColumn 
-    ? timeColumn.getBoundingClientRect().width 
-    : (isMobile ? 48 : 80);
+  return timeColumn
+    ? timeColumn.getBoundingClientRect().width
+    : isMobile
+      ? 48
+      : 80;
 };
 
 /**
@@ -24,7 +28,7 @@ export const getTimeColumnWidth = (
  */
 export const getDayMetrics = (
   dayIndex: number,
-  calendarRef: { current: HTMLElement | null },
+  calendarRef: RefObject<HTMLElement>,
   viewType: ViewType,
   isMobile: boolean
 ): { left: number; width: number } | null => {
@@ -73,8 +77,8 @@ export const getActiveDayIndex = (
 
   if (detailPanelEventId === detailPanelKey) {
     const keyParts = detailPanelKey.split('::');
-    const suffix = keyParts[keyParts.length - 1];
-    if (suffix.startsWith('day-')) {
+    const suffix = keyParts.at(-1);
+    if (suffix && suffix.startsWith('day-')) {
       const parsed = Number(suffix.replace('day-', ''));
       if (!Number.isNaN(parsed)) {
         return parsed;
@@ -96,7 +100,7 @@ export const getActiveDayIndex = (
  */
 export const getClickedDayIndex = (
   clientX: number,
-  calendarRef: { current: HTMLElement | null },
+  calendarRef: RefObject<HTMLElement>,
   viewType: ViewType,
   isMobile: boolean
 ): number | null => {
@@ -140,7 +144,8 @@ export const getEventClasses = (
   } else if (!isMonthView && !isYearView) {
     classes += ' df-week-event flex flex-col';
   } else if (isYearView) {
-    classes += ' df-year-event transition-colors group px-1 overflow-hidden whitespace-nowrap cursor-pointer';
+    classes +=
+      ' df-year-event transition-colors group px-1 overflow-hidden whitespace-nowrap cursor-pointer';
   }
 
   const getAllDayClass = () => {

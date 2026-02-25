@@ -16,12 +16,15 @@ The plugin system allows you to:
 Day Flow provides several built-in and official plugins:
 
 ### [Localization](../localization)
+
 Support for multiple languages. Extracting non-English locales into a plugin allows for a smaller core bundle for English-only applications.
 
 ### [Drag & Drop](../drag)
+
 Enables interactive event management including moving, resizing, and double-click to create events.
 
 ### [Events Service](../events)
+
 Provides advanced event management capabilities including validation, filtering, and date-range querying.
 
 ---
@@ -45,7 +48,7 @@ export const myPlugin: CalendarPlugin = {
   install(app: ICalendarApp) {
     console.log('Plugin installed!');
     // Extend app functionality here
-  }
+  },
 };
 ```
 

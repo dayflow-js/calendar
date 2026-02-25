@@ -35,230 +35,6 @@ export interface KeyboardShortcutsConfig {
   };
 }
 
-export function createKeyboardShortcutsPlugin(
-  config: KeyboardShortcutsConfig = {}
-): CalendarPlugin {
-  const { enabled = true, keyMap = {} } = config;
-
-  return {
-    name: 'keyboard-shortcuts',
-    install(app: ICalendarApp) {
-      if (!enabled) return;
-
-      const handleKeyDown = async (e: KeyboardEvent) => {
-        const activeElement = document.activeElement;
-        const isTyping =
-          activeElement &&
-          (activeElement.tagName === 'INPUT' ||
-            activeElement.tagName === 'TEXTAREA' ||
-            (activeElement as HTMLElement).isContentEditable);
-
-        // 1. Search (Cmd/Ctrl + F)
-        const searchKey = keyMap.search || 'f';
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === searchKey) {
-          e.preventDefault();
-          const searchInput = document.getElementById('dayflow-search-input');
-          if (searchInput) {
-            searchInput.focus();
-          }
-          return;
-        }
-
-        // 2. Today (Cmd/Ctrl + T)
-        const todayKey = keyMap.today || 't';
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === todayKey) {
-          e.preventDefault();
-          app.goToToday();
-          return;
-        }
-
-        // 3. Quick Create (Cmd/Ctrl + N)
-        const newEventKey = keyMap.newEvent || 'n';
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === newEventKey) {
-          e.preventDefault();
-          const addBtn = document.getElementById('dayflow-add-event-btn');
-          if (addBtn) {
-            addBtn.click();
-          }
-          return;
-        }
-
-        // 4. Dismiss (Esc)
-        if (e.key === 'Escape') {
-          app.dismissUI();
-          return;
-        }
-
-        // Navigation (Left/Right) - only if not typing
-        if (!isTyping) {
-          const prevKey = keyMap.prev || 'ArrowLeft';
-          const nextKey = keyMap.next || 'ArrowRight';
-
-          if (e.key === prevKey) {
-            e.preventDefault();
-            app.goToPrevious();
-            return;
-          }
-          if (e.key === nextKey) {
-            e.preventDefault();
-            app.goToNext();
-            return;
-          }
-        }
-
-        // 5. Tab Navigation
-        if (e.key === 'Tab') {
-          e.preventDefault();
-          handleTabNavigation(app, e.shiftKey);
-          return;
-        }
-
-        // 6. Clipboard & Undo Operations (Cmd/Ctrl + C/X/V/Z)
-        if ((e.metaKey || e.ctrlKey) && !isTyping) {
-          const undoKey = keyMap.undo || 'z';
-          const copyKey = keyMap.copy || 'c';
-          const cutKey = keyMap.cut || 'x';
-          const pasteKey = keyMap.paste || 'v';
-
-          switch (e.key.toLowerCase()) {
-            case undoKey:
-              e.preventDefault();
-              app.undo();
-              break;
-            case copyKey:
-              const selectedIdC = app.state.selectedEventId;
-              if (selectedIdC) {
-                const event = app.getEvents().find(ev => ev.id === selectedIdC);
-                if (event) {
-                  try {
-                    await navigator.clipboard.writeText(
-                      JSON.stringify(event, null, 2)
-                    );
-                    clipboardStore.setEvent(event);
-                  } catch (err) {
-                    console.error('Failed to copy event', err);
-                  }
-                }
-              }
-              break;
-            case cutKey:
-              const selectedIdX = app.state.selectedEventId;
-              if (selectedIdX) {
-                const event = app.getEvents().find(ev => ev.id === selectedIdX);
-                if (event) {
-                  try {
-                    await navigator.clipboard.writeText(
-                      JSON.stringify(event, null, 2)
-                    );
-                    clipboardStore.setEvent(event);
-                    app.deleteEvent(event.id);
-                    app.selectEvent(null);
-                  } catch (err) {
-                    console.error('Failed to cut event', err);
-                  }
-                }
-              }
-              break;
-            case pasteKey:
-              handlePaste(app);
-              break;
-          }
-        }
-
-        // 7. Delete (Backspace/Delete)
-        const deleteKey = keyMap.delete || 'Delete';
-        if (e.key === 'Backspace' || e.key === deleteKey) {
-          if (isTyping) return;
-
-          const selectedIdD = app.state.selectedEventId;
-          if (selectedIdD) {
-            app.deleteEvent(selectedIdD);
-            app.selectEvent(null);
-          }
-        }
-      };
-      if (typeof window !== 'undefined') {
-        window.addEventListener('keydown', handleKeyDown);
-      }
-
-      // Cleanup is tricky for plugins as there's no uninstall yet in DayFlow core,
-      // but we can store it or just let it live with the app instance.
-    },
-  };
-}
-
-async function handlePaste(app: ICalendarApp) {
-  try {
-    let eventData = clipboardStore.getEvent();
-    if (!eventData) {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        try {
-          eventData = JSON.parse(text);
-        } catch (e) {}
-      }
-    }
-
-    if (
-      eventData &&
-      typeof eventData === 'object' &&
-      (eventData as any).title
-    ) {
-      const originalStart = temporalToDate(eventData.start as any);
-      const originalEnd = temporalToDate(eventData.end as any);
-      const duration = originalEnd.getTime() - originalStart.getTime();
-
-      let targetStart = new Date();
-      const selectedId = app.state.selectedEventId;
-
-      if (selectedId) {
-        const selectedEvent = app.getEvents().find(e => e.id === selectedId);
-        if (selectedEvent) {
-          targetStart = temporalToDate(selectedEvent.start);
-        } else {
-          targetStart = new Date(app.getCurrentDate());
-        }
-      } else {
-        targetStart = new Date(app.getCurrentDate());
-      }
-
-      targetStart.setHours(
-        originalStart.getHours(),
-        originalStart.getMinutes(),
-        originalStart.getSeconds(),
-        0
-      );
-
-      const targetEnd = new Date(
-        targetStart.getTime() + (duration > 0 ? duration : 3600000)
-      );
-      const { _segmentInfo, ...cleanEventData } = eventData as any;
-
-      const newEvent: Event = {
-        ...cleanEventData,
-        id: generateUniKey(),
-        start: eventData.allDay
-          ? dateToPlainDate(targetStart)
-          : dateToZonedDateTime(targetStart, Temporal.Now.timeZoneId()),
-        end: eventData.allDay
-          ? dateToPlainDate(targetEnd)
-          : dateToZonedDateTime(targetEnd, Temporal.Now.timeZoneId()),
-        calendarId:
-          eventData.calendarId &&
-          app.getCalendarRegistry().has(eventData.calendarId)
-            ? eventData.calendarId
-            : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
-      };
-
-      app.addEvent(newEvent);
-      app.selectEvent(newEvent.id);
-      app.highlightEvent(newEvent.id);
-    }
-  } catch (err) {
-    console.error('Failed to paste', err);
-  }
-}
-
 function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
   const events = app.getEvents();
   const currentView = app.state.currentView;
@@ -304,13 +80,16 @@ function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
       const year = currentDate.getFullYear();
       const yearConfig = app.getViewConfig(ViewType.YEAR);
       const showTimedEvents =
-        (yearConfig as any).showTimedEventsInYearView ?? false;
+        (yearConfig as { showTimedEventsInYearView?: boolean })
+          .showTimedEventsInYearView ?? false;
       visibleEvents = events.filter(e => {
         if (!showTimedEvents && !e.allDay) return false;
         return temporalToDate(e.start).getFullYear() === year;
       });
       break;
     }
+    default:
+      break;
   }
 
   visibleEvents.sort((a, b) => {
@@ -345,4 +124,240 @@ function handleTabNavigation(app: ICalendarApp, reverse: boolean) {
     app.selectEvent(nextEvent.id);
     app.highlightEvent(nextEvent.id);
   }
+}
+
+async function handlePaste(app: ICalendarApp) {
+  try {
+    let eventData = clipboardStore.getEvent();
+    if (!eventData) {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        try {
+          eventData = JSON.parse(text);
+        } catch (err) {
+          console.error('Failed to parse clipboard text:', err);
+        }
+      }
+    }
+
+    if (
+      eventData &&
+      typeof eventData === 'object' &&
+      (eventData as { title?: string }).title
+    ) {
+      const originalStart = temporalToDate(eventData.start as unknown as Date);
+      const originalEnd = temporalToDate(eventData.end as unknown as Date);
+      const duration = originalEnd.getTime() - originalStart.getTime();
+
+      let targetStart = new Date();
+      const selectedId = app.state.selectedEventId;
+
+      if (selectedId) {
+        const selectedEvent = app.getEvents().find(e => e.id === selectedId);
+        if (selectedEvent) {
+          targetStart = temporalToDate(selectedEvent.start);
+        } else {
+          targetStart = new Date(app.getCurrentDate());
+        }
+      } else {
+        targetStart = new Date(app.getCurrentDate());
+      }
+
+      targetStart.setHours(
+        originalStart.getHours(),
+        originalStart.getMinutes(),
+        originalStart.getSeconds(),
+        0
+      );
+
+      const targetEnd = new Date(
+        targetStart.getTime() + (duration > 0 ? duration : 3600000)
+      );
+      const cleanEventData = eventData;
+
+      const newEvent: Event = {
+        ...cleanEventData,
+        id: generateUniKey(),
+        start: eventData.allDay
+          ? dateToPlainDate(targetStart)
+          : dateToZonedDateTime(targetStart, Temporal.Now.timeZoneId()),
+        end: eventData.allDay
+          ? dateToPlainDate(targetEnd)
+          : dateToZonedDateTime(targetEnd, Temporal.Now.timeZoneId()),
+        calendarId:
+          eventData.calendarId &&
+          app.getCalendarRegistry().has(eventData.calendarId)
+            ? eventData.calendarId
+            : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
+      };
+
+      app.addEvent(newEvent);
+      app.selectEvent(newEvent.id);
+      app.highlightEvent(newEvent.id);
+    }
+  } catch (err) {
+    console.error('Failed to paste', err);
+  }
+}
+
+export function createKeyboardShortcutsPlugin(
+  config: KeyboardShortcutsConfig = {}
+): CalendarPlugin {
+  const { enabled = true, keyMap = {} } = config;
+
+  return {
+    name: 'keyboard-shortcuts',
+    install(app: ICalendarApp) {
+      if (!enabled) return;
+
+      const handleKeyDown = async (e: KeyboardEvent) => {
+        const activeElement = document.activeElement;
+        const isTyping =
+          activeElement &&
+          (activeElement.tagName === 'INPUT' ||
+            activeElement.tagName === 'TEXTAREA' ||
+            (activeElement as HTMLElement).isContentEditable);
+
+        // 1. Search (Cmd/Ctrl + F)
+        const searchKey = keyMap.search || 'f';
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === searchKey) {
+          e.preventDefault();
+          const searchInput = document.querySelector(
+            '#dayflow-search-input'
+          ) as HTMLElement | null;
+          if (searchInput) {
+            searchInput.focus();
+          }
+          return;
+        }
+
+        // 2. Today (Cmd/Ctrl + T)
+        const todayKey = keyMap.today || 't';
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === todayKey) {
+          e.preventDefault();
+          app.goToToday();
+          return;
+        }
+
+        // 3. Quick Create (Cmd/Ctrl + N)
+        const newEventKey = keyMap.newEvent || 'n';
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === newEventKey) {
+          e.preventDefault();
+          const addBtn = document.querySelector(
+            '#dayflow-add-event-btn'
+          ) as HTMLElement | null;
+          if (addBtn) {
+            addBtn.click();
+          }
+          return;
+        }
+
+        // 4. Dismiss (Esc)
+        if (e.key === 'Escape') {
+          app.dismissUI();
+          return;
+        }
+
+        // Navigation (Left/Right) - only if not typing
+        if (!isTyping) {
+          const prevKey = keyMap.prev || 'ArrowLeft';
+          const nextKey = keyMap.next || 'ArrowRight';
+
+          if (e.key === prevKey) {
+            e.preventDefault();
+            app.goToPrevious();
+            return;
+          }
+          if (e.key === nextKey) {
+            e.preventDefault();
+            app.goToNext();
+            return;
+          }
+        }
+
+        // 5. Tab Navigation
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          handleTabNavigation(app, e.shiftKey);
+          return;
+        }
+
+        // 6. Clipboard & Undo Operations (Cmd/Ctrl + C/X/V/Z)
+        if ((e.metaKey || e.ctrlKey) && !isTyping) {
+          const undoKey = keyMap.undo || 'z';
+          const copyKey = keyMap.copy || 'c';
+          const cutKey = keyMap.cut || 'x';
+          const pasteKey = keyMap.paste || 'v';
+
+          switch (e.key.toLowerCase()) {
+            case undoKey: {
+              e.preventDefault();
+              app.undo();
+              break;
+            }
+            case copyKey: {
+              const selectedIdC = app.state.selectedEventId;
+              if (selectedIdC) {
+                const event = app.getEvents().find(ev => ev.id === selectedIdC);
+                if (event) {
+                  try {
+                    await navigator.clipboard.writeText(
+                      JSON.stringify(event, null, 2)
+                    );
+                    clipboardStore.setEvent(event);
+                  } catch (err) {
+                    console.error('Failed to copy event', err);
+                  }
+                }
+              }
+              break;
+            }
+            case cutKey: {
+              const selectedIdX = app.state.selectedEventId;
+              if (selectedIdX) {
+                const event = app.getEvents().find(ev => ev.id === selectedIdX);
+                if (event) {
+                  try {
+                    await navigator.clipboard.writeText(
+                      JSON.stringify(event, null, 2)
+                    );
+                    clipboardStore.setEvent(event);
+                    app.deleteEvent(event.id);
+                    app.selectEvent(null);
+                  } catch (err) {
+                    console.error('Failed to cut event', err);
+                  }
+                }
+              }
+              break;
+            }
+            case pasteKey: {
+              handlePaste(app);
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        // 7. Delete (Backspace/Delete)
+        const deleteKey = keyMap.delete || 'Delete';
+        if (e.key === 'Backspace' || e.key === deleteKey) {
+          if (isTyping) return;
+
+          const selectedIdD = app.state.selectedEventId;
+          if (selectedIdD) {
+            app.deleteEvent(selectedIdD);
+            app.selectEvent(null);
+          }
+        }
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('keydown', handleKeyDown);
+      }
+
+      // Cleanup is tricky for plugins as there's no uninstall yet in DayFlow core,
+      // but we can store it or just let it live with the app instance.
+    },
+  };
 }

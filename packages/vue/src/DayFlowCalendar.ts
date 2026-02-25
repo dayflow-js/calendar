@@ -1,3 +1,10 @@
+import type {
+  ICalendarApp,
+  CustomRendering,
+  UseCalendarAppReturn,
+} from '@dayflow/core';
+import { CalendarRenderer } from '@dayflow/core';
+import type { PropType } from 'vue';
 import {
   defineComponent,
   h,
@@ -5,17 +12,10 @@ import {
   onMounted,
   onUnmounted,
   shallowRef,
-  PropType,
   Teleport,
   computed,
   watch,
 } from 'vue';
-import {
-  CalendarRenderer,
-  ICalendarApp,
-  CustomRendering,
-  UseCalendarAppReturn,
-} from '@dayflow/core';
 
 export const DayFlowCalendar = defineComponent({
   name: 'DayFlowCalendar',
@@ -38,12 +38,16 @@ export const DayFlowCalendar = defineComponent({
     let storeUnsubscribe: (() => void) | null = null;
 
     // Extract underlying app instance
-    const app = computed(() => {
-      return (props.calendar as any).app || props.calendar;
-    });
+    const app = computed<ICalendarApp>(
+      () =>
+        (props.calendar as UseCalendarAppReturn).app ||
+        (props.calendar as ICalendarApp)
+    );
 
     function initRenderer(appInstance: ICalendarApp) {
-      if (!container.value) return;
+      if (!container.value) {
+        return;
+      }
 
       // Tear down the previous renderer if the app instance was replaced.
       storeUnsubscribe?.();
@@ -55,7 +59,7 @@ export const DayFlowCalendar = defineComponent({
       r.mount(container.value);
 
       storeUnsubscribe = r.getCustomRenderingStore().subscribe(renderings => {
-        customRenderings.value = Array.from(renderings.values());
+        customRenderings.value = [...renderings.values()];
       });
 
       // Synchronize slot overrides
@@ -72,7 +76,9 @@ export const DayFlowCalendar = defineComponent({
     // Recreate the renderer when the calendar prop is replaced (e.g. after
     // client-side navigation to a different calendar instance).
     watch(app, newApp => {
-      if (container.value) initRenderer(newApp);
+      if (container.value) {
+        initRenderer(newApp);
+      }
     });
 
     onMounted(() => {

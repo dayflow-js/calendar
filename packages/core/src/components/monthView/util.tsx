@@ -1,8 +1,14 @@
-import { Event } from '@/types';
-import { CalendarDays, Gift, Heart, MapPin, Star } from '../common/Icons';
+import {
+  CalendarDays,
+  Gift,
+  Heart,
+  MapPin,
+  Star,
+} from '@/components/common/Icons';
 import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
-import { temporalToDate } from '@/utils/temporal';
+import { Event } from '@/types';
 import { daysDifference } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 
 export const getEventIcon = (event: Event) => {
   if (event.icon === false) return null;
@@ -17,14 +23,14 @@ export const getEventIcon = (event: Event) => {
     title.includes('vacation') ||
     title.includes('假期')
   ) {
-    return <Gift className="h-3 w-3" />;
+    return <Gift className='h-3 w-3' />;
   }
   if (
     title.includes('birthday') ||
     title.includes('anniversary') ||
     title.includes('生日')
   ) {
-    return <Heart className="h-3 w-3" />;
+    return <Heart className='h-3 w-3' />;
   }
   if (
     title.includes('conference') ||
@@ -32,17 +38,17 @@ export const getEventIcon = (event: Event) => {
     title.includes('会议') ||
     title.includes('研讨')
   ) {
-    return <Star className="h-3 w-3" />;
+    return <Star className='h-3 w-3' />;
   }
   if (
     title.includes('trip') ||
     title.includes('travel') ||
     title.includes('旅行')
   ) {
-    return <MapPin className="h-3 w-3" />;
+    return <MapPin className='h-3 w-3' />;
   }
 
-  return <CalendarDays className="h-3 w-3" />;
+  return <CalendarDays className='h-3 w-3' />;
 };
 
 // Analyze multi-day events and generate segments for the current week (supports all-day events and multi-day regular events)
@@ -177,7 +183,8 @@ export const analyzeMultiDayEventsForWeek = (
     // Determine segment type
     const isFirstSegment = eventStart >= weekStart;
     const isLastSegment = eventEnd <= weekEnd;
-    const isWeekBoundary = startDayIndex === 0 || endDayIndex === daysInWeek - 1;
+    const isWeekBoundary =
+      startDayIndex === 0 || endDayIndex === daysInWeek - 1;
 
     let segmentType: MultiDayEventSegment['segmentType'];
 
@@ -185,7 +192,9 @@ export const analyzeMultiDayEventsForWeek = (
       segmentType = 'single';
     } else if (isFirstSegment) {
       segmentType =
-        isWeekBoundary && endDayIndex === daysInWeek - 1 ? 'start-week-end' : 'start';
+        isWeekBoundary && endDayIndex === daysInWeek - 1
+          ? 'start-week-end'
+          : 'start';
     } else if (isLastSegment) {
       segmentType =
         isWeekBoundary && startDayIndex === 0 ? 'end-week-start' : 'end';

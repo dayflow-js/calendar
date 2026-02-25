@@ -1,13 +1,17 @@
-import { Event } from '@/types';
-import { getLineColor } from '@/utils';
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
+import { Event } from '@/types';
+import { getLineColor } from '@/utils';
 
 interface YearEventContentProps {
   event: Event;
   segment: YearMultiDaySegment;
   isEditable: boolean;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
 }
 
 const YearEventContent = ({
@@ -36,7 +40,7 @@ const YearEventContent = ({
         onMouseDown={e => {
           e.preventDefault();
           e.stopPropagation();
-          onResizeStart(e, event, isLeft ? 'left' : 'right');
+          onResizeStart(e as MouseEvent, event, isLeft ? 'left' : 'right');
         }}
         onClick={e => {
           e.preventDefault();
@@ -54,11 +58,11 @@ const YearEventContent = ({
       };
 
       return (
-        <div className="df-year-event-content flex items-center min-w-0 w-full pointer-events-auto h-full">
+        <div className='df-year-event-content flex items-center min-w-0 w-full pointer-events-auto h-full'>
           {segment.isFirstSegment && getEventIcon(event) && (
-            <div className="df-year-event-icon shrink-0 mr-1">
+            <div className='df-year-event-icon shrink-0 mr-1'>
               <div
-                className="rounded-full p-0.5 text-white flex items-center justify-center"
+                className='rounded-full p-0.5 text-white flex items-center justify-center'
                 style={{
                   backgroundColor: getLineColor(calendarId),
                   width: '12px',
@@ -70,9 +74,9 @@ const YearEventContent = ({
             </div>
           )}
 
-          <div className="flex-1 min-w-0">
+          <div className='flex-1 min-w-0'>
             <div
-              className="df-year-event-title text-[12px] leading-none whitespace-nowrap overflow-hidden"
+              className='df-year-event-title text-[12px] leading-none whitespace-nowrap overflow-hidden'
               style={{
                 maskImage:
                   'linear-gradient(to right, black 70%, transparent 100%)',
@@ -86,8 +90,8 @@ const YearEventContent = ({
 
           {/* Add small indicator for continuation if needed, similar to MultiDayEvent */}
           {segment.isLastSegment && !segment.isFirstSegment && (
-            <div className="shrink-0 ml-1 text-white/80 dark:text-white/90">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80"></div>
+            <div className='shrink-0 ml-1 text-white/80 dark:text-white/90'>
+              <div className='w-1.5 h-1.5 rounded-full bg-white/60 dark:bg-white/80'></div>
             </div>
           )}
         </div>
@@ -98,20 +102,20 @@ const YearEventContent = ({
     const titleText = segment.isFirstSegment ? event.title : '';
 
     return (
-      <div className="df-year-event-content w-full h-full flex items-center overflow-hidden gap-1 pointer-events-auto">
+      <div className='df-year-event-content w-full h-full flex items-center overflow-hidden gap-1 pointer-events-auto'>
         {!isAllDay && (
           <span
             style={{ backgroundColor: lineColor }}
-            className="df-year-event-indicator inline-block w-0.75 h-3 shrink-0 rounded-full"
+            className='df-year-event-indicator inline-block w-0.75 h-3 shrink-0 rounded-full'
           ></span>
         )}
         {isAllDay && icon && (
-          <div className="df-year-event-icon shrink-0 flex items-center justify-center opacity-80 scale-75">
+          <div className='df-year-event-icon shrink-0 flex items-center justify-center opacity-80 scale-75'>
             {icon}
           </div>
         )}
         <span
-          className="df-year-event-title w-full block font-medium whitespace-nowrap overflow-hidden leading-none text-[12px]"
+          className='df-year-event-title w-full block font-medium whitespace-nowrap overflow-hidden leading-none text-[12px]'
           style={{
             maskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
             WebkitMaskImage:

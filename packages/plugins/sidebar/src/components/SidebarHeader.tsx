@@ -20,19 +20,19 @@ export const SidebarHeader = ({
   return (
     <div className={sidebarHeader}>
       <button
-        type="button"
+        type='button'
         aria-label={isCollapsed ? t('expandSidebar') : t('collapseSidebar')}
         className={sidebarHeaderToggle}
         onClick={onCollapseToggle}
       >
         {isCollapsed ? (
-          <PanelRightClose className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <PanelRightClose className='h-4 w-4 text-gray-500 dark:text-gray-400' />
         ) : (
-          <PanelRightOpen className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <PanelRightOpen className='h-4 w-4 text-gray-500 dark:text-gray-400' />
         )}
       </button>
       {!isCollapsed && (
-        <div className="flex flex-1 justify-between items-center ml-3">
+        <div className='flex flex-1 justify-between items-center ml-3'>
           <span className={sidebarHeaderTitle}>{t('calendars')}</span>
         </div>
       )}

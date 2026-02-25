@@ -5,7 +5,7 @@
  * Based on RFC 5545 iCalendar specification.
  */
 
-import { Event } from '../../types/event';
+import { Event } from '@/types/event';
 
 /**
  * ICS VEVENT raw data structure (intermediate format after parsing)

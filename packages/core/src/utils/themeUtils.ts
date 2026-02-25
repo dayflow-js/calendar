@@ -105,9 +105,7 @@ export const conditionalTheme = (
   condition: boolean,
   whenTrue: string,
   whenFalse: string
-): string => {
-  return condition ? whenTrue : whenFalse;
-};
+): string => (condition ? whenTrue : whenFalse);
 
 /**
  * Merge multiple class names, filtering out falsy values
@@ -123,9 +121,7 @@ export const conditionalTheme = (
  */
 export const mergeClasses = (
   ...classes: (string | undefined | null | false)[]
-): string => {
-  return classes.filter(Boolean).join(' ');
-};
+): string => classes.filter(Boolean).join(' ');
 
 /**
  * Resolve the currently applied theme on the document.
@@ -144,9 +140,9 @@ export const resolveAppliedTheme = (
   const root = document.documentElement;
 
   const overrideAttributes = [
-    root.getAttribute('data-dayflow-theme-override'),
-    root.getAttribute('data-theme-override'),
-    root.getAttribute('data-theme'),
+    root.dataset.dayflowThemeOverride,
+    root.dataset.themeOverride,
+    root.dataset.theme,
   ];
 
   for (const attr of overrideAttributes) {

@@ -1,3 +1,4 @@
+import { RefObject } from 'preact';
 import {
   useMemo,
   useRef,
@@ -6,7 +7,18 @@ import {
   useCallback,
 } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
+
+import ViewHeader from '@/components/common/ViewHeader';
+import { GridContextMenu } from '@/components/contextMenu';
+import { groupDaysIntoRows } from '@/components/yearView/utils';
+import { YearRowComponent } from '@/components/yearView/YearRowComponent';
 import { useLocale } from '@/locale';
+import { useDragForView } from '@/plugins/dragBridge';
+import {
+  monthViewContainer,
+  scrollContainer,
+  scrollbarHide,
+} from '@/styles/classNames';
 import {
   Event,
   ViewType,
@@ -17,20 +29,10 @@ import {
   YearViewConfig,
 } from '@/types';
 import { temporalToDate } from '@/utils/temporal';
-import ViewHeader from '@/components/common/ViewHeader';
-import { useDragForView } from '@/plugins/dragBridge';
-import {
-  monthViewContainer,
-  scrollContainer,
-  scrollbarHide,
-} from '@/styles/classNames';
-import { groupDaysIntoRows } from '@/components/yearView/utils';
-import { YearRowComponent } from '@/components/yearView/YearRowComponent';
-import { GridContextMenu } from '@/components/contextMenu';
 
 export interface YearViewProps {
   app: ICalendarApp;
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
   config?: YearViewConfig;
@@ -73,13 +75,13 @@ export const DefaultYearView = ({
   >(null);
 
   const selectedEventId =
-    propSelectedEventId !== undefined
-      ? propSelectedEventId
-      : internalSelectedId;
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
   const detailPanelEventId =
-    propDetailPanelEventId !== undefined
-      ? propDetailPanelEventId
-      : internalDetailPanelEventId;
+    propDetailPanelEventId === undefined
+      ? internalDetailPanelEventId
+      : propDetailPanelEventId;
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -140,7 +142,7 @@ export const DefaultYearView = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const resizeTimeoutRef = useRef<any>(null);
+  const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const container = scrollElementRef.current;
@@ -214,7 +216,7 @@ export const DefaultYearView = ({
 
   // Handle double click on cell - create all-day or timed event based on config
   const handleCellDoubleClick = useCallback(
-    (e: any, date: Date) => {
+    (e: unknown, date: Date) => {
       if (showTimedEvents) {
         // Use default drag behavior for timed events
         handleCreateStart?.(e, date);
@@ -247,18 +249,21 @@ export const DefaultYearView = ({
     const start = new Date(currentYear, 0, 1);
     const end = new Date(currentYear, 11, 31);
 
-    const current = new Date(start);
-    while (current <= end) {
-      days.push(new Date(current));
-      current.setDate(current.getDate() + 1);
+    for (
+      let time = start.getTime();
+      time <= end.getTime();
+      time += 24 * 60 * 60 * 1000
+    ) {
+      days.push(new Date(time));
     }
     return days;
   }, [currentYear]);
 
   // Group days into rows
-  const rows = useMemo(() => {
-    return groupDaysIntoRows(yearDays, columnsPerRow);
-  }, [yearDays, columnsPerRow]);
+  const rows = useMemo(
+    () => groupDaysIntoRows(yearDays, columnsPerRow),
+    [yearDays, columnsPerRow]
+  );
 
   // Filter events for the current year
   const yearEvents = useMemo(() => {
@@ -311,7 +316,7 @@ export const DefaultYearView = ({
         }}
       >
         <div
-          className="w-full flex flex-col border-t border-l border-gray-100 dark:border-gray-800"
+          className='w-full flex flex-col border-t border-l border-gray-100 dark:border-gray-800'
           style={{
             opacity: isLayoutReady ? 1 : 0,
             transition: 'opacity 0.2s ease',
@@ -356,11 +361,15 @@ export const DefaultYearView = ({
           onCreateEvent={() => {
             if (contextMenu && contextMenu.date) {
               const syntheticEvent = {
-                preventDefault: () => {},
-                stopPropagation: () => {},
+                preventDefault: () => {
+                  /* noop */
+                },
+                stopPropagation: () => {
+                  /* noop */
+                },
                 clientX: contextMenu.x,
                 clientY: contextMenu.y,
-              } as unknown as any;
+              } as unknown;
               handleCellDoubleClick(syntheticEvent, contextMenu.date);
             }
           }}

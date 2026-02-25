@@ -7,6 +7,7 @@
     "build": "turbo run build",
     "clean": "turbo run clean && rimraf node_modules pnpm-lock.yaml",
     "dev": "turbo run dev",
+    "format": "oxfmt .",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
     "publish:all": "./scripts/publish.sh all",
@@ -34,8 +35,14 @@
     "rimraf": "catalog:",
     "tailwindcss": "catalog:",
     "temporal-polyfill": "catalog:",
+    "tsc-alias": "^1.8.16",
     "turbo": "^2.8.10",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.0",
+  "oxfmt": {
+    "experimentalSortImports": {
+      "newlines-between": "never"
+    }
+  }
 }
