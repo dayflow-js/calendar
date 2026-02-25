@@ -1,5 +1,10 @@
 {
   "files.eol": "\n",
+
+  "prettier.enable": false,
+  "eslint.enable": false,
+  "oxc.enable": true,
+
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
@@ -20,22 +25,10 @@
     "**/coverage/**": true
   },
 
-  "[javascript]": {
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "[typescript]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[jsonc]": {
+  "[json][jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[css]": {
