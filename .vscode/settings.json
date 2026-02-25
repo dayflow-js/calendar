@@ -2,7 +2,7 @@
   "files.eol": "\n",
 
   "prettier.enable": false,
-  "eslint.enable": false,
+  // "eslint.enable": false,
   "oxc.enable": true,
 
   "editor.tabSize": 2,
