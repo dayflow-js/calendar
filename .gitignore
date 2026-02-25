@@ -23,7 +23,10 @@ yarn-error.log*
 *.pem
 
 # Debug
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.zed/settings.json
 .idea
 
 # Local env files

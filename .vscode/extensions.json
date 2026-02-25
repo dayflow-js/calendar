@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "oxc.oxc-vscode",
+        "bradlc.vscode-tailwindcss",
+        "svelte.svelte-vscode",
+    ]
+}
