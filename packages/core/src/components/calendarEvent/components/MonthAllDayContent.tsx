@@ -1,6 +1,6 @@
-import { Event } from '@/types';
-import { CalendarDays } from '../../common/Icons';
+import { CalendarDays } from '@/components/common/Icons';
 import { monthAllDayContent, mr1, eventIcon } from '@/styles/classNames';
+import { Event } from '@/types';
 
 interface MonthAllDayContentProps {
   event: Event;
@@ -12,7 +12,7 @@ const MonthAllDayContent = ({
   isEventSelected,
 }: MonthAllDayContentProps) => {
   const showIcon = event.icon !== false;
-  const customIcon = typeof event.icon !== 'boolean' ? event.icon : null;
+  const customIcon = typeof event.icon === 'boolean' ? null : event.icon;
 
   return (
     <div className={monthAllDayContent}>

@@ -1,5 +1,3 @@
-import { h } from 'preact';
-import { useState, useCallback, useMemo, useEffect } from 'preact/hooks';
 import {
   CalendarPlugin,
   ICalendarApp,
@@ -15,6 +13,9 @@ import {
   ContentSlot,
   CreateCalendarDialog,
 } from '@dayflow/core';
+import { h } from 'preact';
+import { useState, useCallback, useMemo, useEffect } from 'preact/hooks';
+
 import DefaultCalendarSidebar from './DefaultCalendarSidebar';
 
 const DEFAULT_SIDEBAR_WIDTH = '240px';
@@ -92,11 +93,13 @@ export function createSidebarPlugin(
             setSidebarVersion(prev => prev + 1);
           }, []);
 
-          useEffect(() => {
-            return app.subscribe(() => {
-              refreshSidebar();
-            });
-          }, [app, refreshSidebar]);
+          useEffect(
+            () =>
+              app.subscribe(() => {
+                refreshSidebar();
+              }),
+            [app, refreshSidebar]
+          );
 
           const calendars = useMemo(
             () => app.getCalendars(),
@@ -192,8 +195,8 @@ export function createSidebarPlugin(
             if (!showCreateDialog) return null;
 
             const onClose = () => setShowCreateDialog(false);
-            const onCreate = (newCalendar: any) => {
-              app.createCalendar(newCalendar);
+            const onCreate = (newCalendar: unknown) => {
+              app.createCalendar(newCalendar as CalendarType);
               setShowCreateDialog(false);
               refreshSidebar();
             };

@@ -22,8 +22,8 @@ function MyCalendar() {
     plugins: [
       createKeyboardShortcutsPlugin({
         // 可选配置
-      })
-    ]
+      }),
+    ],
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -32,19 +32,19 @@ function MyCalendar() {
 
 ## 默认快捷键
 
-| 操作 | 快捷键 (Mac) | 快捷键 (Windows/Linux) |
-| :--- | :--- | :--- |
-| **跳转到今天** | `Cmd + T` | `Ctrl + T` |
-| **搜索** | `Cmd + F` | `Ctrl + F` |
-| **新建事件** | `Cmd + N` | `Ctrl + N` |
-| **视图导航** | `左箭头` / `右箭头` | `左箭头` / `右箭头` |
-| **循环选择事件** | `Tab` / `Shift + Tab` | `Tab` / `Shift + Tab` |
-| **撤销** | `Cmd + Z` | `Ctrl + Z` |
-| **复制事件** | `Cmd + C` | `Ctrl + C` |
-| **剪切事件** | `Cmd + X` | `Ctrl + X` |
-| **粘贴事件** | `Cmd + V` | `Ctrl + V` |
-| **删除事件** | `Backspace` / `Delete` | `Backspace` / `Delete` |
-| **关闭弹窗/面板** | `Esc` | `Esc` |
+| 操作              | 快捷键 (Mac)           | 快捷键 (Windows/Linux) |
+| :---------------- | :--------------------- | :--------------------- |
+| **跳转到今天**    | `Cmd + T`              | `Ctrl + T`             |
+| **搜索**          | `Cmd + F`              | `Ctrl + F`             |
+| **新建事件**      | `Cmd + N`              | `Ctrl + N`             |
+| **视图导航**      | `左箭头` / `右箭头`    | `左箭头` / `右箭头`    |
+| **循环选择事件**  | `Tab` / `Shift + Tab`  | `Tab` / `Shift + Tab`  |
+| **撤销**          | `Cmd + Z`              | `Ctrl + Z`             |
+| **复制事件**      | `Cmd + C`              | `Ctrl + C`             |
+| **剪切事件**      | `Cmd + X`              | `Ctrl + X`             |
+| **粘贴事件**      | `Cmd + V`              | `Ctrl + V`             |
+| **删除事件**      | `Backspace` / `Delete` | `Backspace` / `Delete` |
+| **关闭弹窗/面板** | `Esc`                  | `Esc`                  |
 
 ## 配置项
 
@@ -58,7 +58,7 @@ createKeyboardShortcutsPlugin({
     prev: 'ArrowLeft',
     next: 'ArrowRight',
     delete: 'Delete',
-    newEvent: 'n'
-  }
-})
+    newEvent: 'n',
+  },
+});
 ```

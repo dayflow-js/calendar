@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
 import { usePathname } from 'next/navigation';
+import React from 'react';
 
 interface ColorSwatchProps {
   name: string;
@@ -17,43 +17,41 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({
   darkColor,
   lightLabel,
   darkLabel,
-}) => {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-        {name}
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        {/* Light mode color */}
-        <div className="flex flex-col gap-1">
-          <div
-            className="h-16 w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
-            style={{ backgroundColor: lightColor }}
-          />
-          <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-            {lightColor}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-500">
-            {lightLabel}
-          </div>
+}) => (
+  <div className='flex flex-col gap-2'>
+    <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
+      {name}
+    </div>
+    <div className='grid grid-cols-2 gap-2'>
+      {/* Light mode color */}
+      <div className='flex flex-col gap-1'>
+        <div
+          className='h-16 w-full rounded-lg border border-gray-200 shadow-sm dark:border-gray-700'
+          style={{ backgroundColor: lightColor }}
+        />
+        <div className='font-mono text-xs text-gray-600 dark:text-gray-400'>
+          {lightColor}
         </div>
-        {/* Dark mode color */}
-        <div className="flex flex-col gap-1">
-          <div
-            className="h-16 w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
-            style={{ backgroundColor: darkColor }}
-          />
-          <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-            {darkColor}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-500">
-            {darkLabel}
-          </div>
+        <div className='text-xs text-gray-500 dark:text-gray-500'>
+          {lightLabel}
+        </div>
+      </div>
+      {/* Dark mode color */}
+      <div className='flex flex-col gap-1'>
+        <div
+          className='h-16 w-full rounded-lg border border-gray-200 shadow-sm dark:border-gray-700'
+          style={{ backgroundColor: darkColor }}
+        />
+        <div className='font-mono text-xs text-gray-600 dark:text-gray-400'>
+          {darkColor}
+        </div>
+        <div className='text-xs text-gray-500 dark:text-gray-500'>
+          {darkLabel}
         </div>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 const translations = {
   en: {
@@ -135,8 +133,8 @@ export const DefaultColorPalette: React.FC = () => {
   ];
 
   return (
-    <div className="not-prose my-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className='not-prose my-8'>
+      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
         {colors.map(color => (
           <ColorSwatch
             key={color.key}
@@ -148,7 +146,7 @@ export const DefaultColorPalette: React.FC = () => {
           />
         ))}
       </div>
-      <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20 p-4 text-sm text-blue-800 dark:text-blue-200">
+      <div className='mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-200'>
         <strong>{t.tip}</strong> {t.wcagNote}
       </div>
     </div>

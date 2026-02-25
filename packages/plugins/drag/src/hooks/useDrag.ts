@@ -1,17 +1,18 @@
-import { useMemo } from 'preact/hooks';
 import {
   useDragProps,
   useDragReturn,
   ViewType,
   getLineColor,
 } from '@dayflow/core';
-import { defaultDragConfig } from '../utils/defaultDragConfig';
+import { defaultDragConfig } from '@drag/utils/defaultDragConfig';
+import { useMemo } from 'preact/hooks';
+
 import { useDragCommon } from './useDragCommon';
-import { useDragState } from './useDragState';
-import { useDragManager } from './useDragManager';
 import { useDragHandlers } from './useDragHandlers';
-import { useWeekDayDrag } from './useWeekDayDrag';
+import { useDragManager } from './useDragManager';
+import { useDragState } from './useDragState';
 import { useMonthDrag } from './useMonthDrag';
+import { useWeekDayDrag } from './useWeekDayDrag';
 
 export const useDrag = (options: useDragProps): useDragReturn => {
   // Merge default configuration with user-provided configuration

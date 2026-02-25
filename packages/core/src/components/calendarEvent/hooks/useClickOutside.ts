@@ -1,8 +1,9 @@
+import { RefObject } from 'preact';
 import { useEffect } from 'preact/hooks';
 
 interface UseClickOutsideProps {
-  eventRef: { current: HTMLElement | null };
-  detailPanelRef: { current: HTMLElement | null };
+  eventRef: RefObject<HTMLElement>;
+  detailPanelRef: RefObject<HTMLElement>;
   eventId: string;
   isEventSelected: boolean;
   showDetailPanel: boolean;

@@ -15,17 +15,17 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
 ```
 
-| プロパティ    | 型                                                                       | 説明                                                                                                             | 必須 |
-| ------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ---- |
-| `id`          | `string`                                                                 | イベントを一意に識別する ID                                                                                      | 必須 |
-| `title`       | `string`                                                                 | カレンダーに表示するタイトル                                                                                     | 必須 |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 開始日時。イベント種別に合わせて型を選択                                                                         | 必須 |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う                                                                                 | 必須 |
-| `description` | `string`                                                                 | メモや詳細。表示方法は自由                                                                                       | 任意 |
-| `allDay`      | `boolean`                                                                | true なら終日イベントとして描画                                                                                  | 任意 |
-| `icon`        | `boolean \| Node`                                                        | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`Node`：カスタムアイコン      | 任意 |
-| `calendarId`  | `string`                                                                 | 複数カレンダーを使う場合のカテゴリ ID                                                                            | 任意 |
-| `meta`        | `Record<string, any>`                                                    | 任意の追加データ（場所・参加者など）                                                                             | 任意 |
+| プロパティ    | 型                                                                       | 説明                                                                                                        | 必須 |
+| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ---- |
+| `id`          | `string`                                                                 | イベントを一意に識別する ID                                                                                 | 必須 |
+| `title`       | `string`                                                                 | カレンダーに表示するタイトル                                                                                | 必須 |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 開始日時。イベント種別に合わせて型を選択                                                                    | 必須 |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 終了日時。`start` と同じ型を使う                                                                            | 必須 |
+| `description` | `string`                                                                 | メモや詳細。表示方法は自由                                                                                  | 任意 |
+| `allDay`      | `boolean`                                                                | true なら終日イベントとして描画                                                                             | 任意 |
+| `icon`        | `boolean \| Node`                                                        | イベント用カスタムアイコン。`true`（デフォルト）：デフォルト表示、`false`：非表示、`Node`：カスタムアイコン | 任意 |
+| `calendarId`  | `string`                                                                 | 複数カレンダーを使う場合のカテゴリ ID                                                                       | 任意 |
+| `meta`        | `Record<string, any>`                                                    | 任意の追加データ（場所・参加者など）                                                                        | 任意 |
 
 ## イベントの作り方
 

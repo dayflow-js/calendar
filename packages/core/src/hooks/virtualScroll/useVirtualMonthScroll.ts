@@ -1,3 +1,4 @@
+import { JSX } from 'preact';
 import {
   useState,
   useEffect,
@@ -5,15 +6,16 @@ import {
   useRef,
   useCallback,
 } from 'preact/hooks';
-import { WeeksData } from '../../types';
-import { generateWeekData, generateWeekRange } from '../../utils';
+
+import { WeeksData } from '@/types';
 import {
   UseVirtualMonthScrollProps,
   UseVirtualMonthScrollReturn,
   VIRTUAL_MONTH_SCROLL_CONFIG,
   VirtualWeekItem,
   WeekDataCache,
-} from '../../types/monthView';
+} from '@/types/monthView';
+import { generateWeekData, generateWeekRange } from '@/utils';
 
 let cachedConfig: {
   weekHeight: number;
@@ -70,16 +72,15 @@ export const useResponsiveMonthConfig = () => {
             screenSize: 'tablet' as const,
             weeksPerView,
           };
-        } else {
-          return {
-            weekHeight: Math.max(
-              VIRTUAL_MONTH_SCROLL_CONFIG.WEEK_HEIGHT,
-              dynamicWeekHeight
-            ),
-            screenSize: 'desktop' as const,
-            weeksPerView,
-          };
         }
+        return {
+          weekHeight: Math.max(
+            VIRTUAL_MONTH_SCROLL_CONFIG.WEEK_HEIGHT,
+            dynamicWeekHeight
+          ),
+          screenSize: 'desktop' as const,
+          weeksPerView,
+        };
       })();
 
       // Update global cache
@@ -208,7 +209,7 @@ export const useVirtualMonthScroll = ({
       setTimeout(() => {
         try {
           if (direction === 'future') {
-            const lastWeek = weeksData[weeksData.length - 1];
+            const lastWeek = weeksData.at(-1)!;
             const newWeeks: WeeksData[] = [];
 
             for (let i = 1; i <= count; i++) {
@@ -325,7 +326,7 @@ export const useVirtualMonthScroll = ({
           maxDays = days;
           const [month, year] = monthKey.split('-');
           weekDominantMonth = month;
-          weekDominantYear = parseInt(year);
+          weekDominantYear = Number.parseInt(year, 10);
         }
       });
 
@@ -346,15 +347,13 @@ export const useVirtualMonthScroll = ({
               onCurrentMonthChange?.(weekDominantMonth, weekDominantYear);
             }
           }
-        } else {
-          if (
-            weekDominantMonth !== currentMonth ||
-            weekDominantYear !== currentYear
-          ) {
-            setCurrentMonth(weekDominantMonth);
-            setCurrentYear(weekDominantYear);
-            onCurrentMonthChange?.(weekDominantMonth, weekDominantYear);
-          }
+        } else if (
+          weekDominantMonth !== currentMonth ||
+          weekDominantYear !== currentYear
+        ) {
+          setCurrentMonth(weekDominantMonth);
+          setCurrentYear(weekDominantYear);
+          onCurrentMonthChange?.(weekDominantMonth, weekDominantYear);
         }
       }
     },
@@ -372,7 +371,7 @@ export const useVirtualMonthScroll = ({
 
   // Scroll handler
   const handleScroll = useCallback(
-    (e: any) => {
+    (e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>) => {
       const now = performance.now();
       if (
         now - lastScrollTime.current <
@@ -455,7 +454,7 @@ export const useVirtualMonthScroll = ({
       targetWeekStart.setHours(0, 0, 0, 0);
 
       const firstWeek = weeksData[0];
-      const lastWeek = weeksData[weeksData.length - 1];
+      const lastWeek = weeksData.at(-1)!;
 
       let weeksDiff = 0;
       let needsPastData = false;
@@ -591,7 +590,18 @@ export const useVirtualMonthScroll = ({
       )
     );
 
-    if (targetWeekIndex !== -1) {
+    if (targetWeekIndex === -1) {
+      // If first day of current month not found in current data, use scrollToDate method
+      setIsNavigating(true);
+      isNavigatingRef.current = true;
+      requestAnimationFrame(() => {
+        scrollToDate(firstDayOfMonth, true);
+        setTimeout(() => {
+          isNavigatingRef.current = false;
+          setIsNavigating(false);
+        }, 200);
+      });
+    } else {
       const targetTop = targetWeekIndex * weekHeight;
       const element = scrollElementRef.current;
 
@@ -619,17 +629,6 @@ export const useVirtualMonthScroll = ({
           });
         });
       }
-    } else {
-      // If first day of current month not found in current data, use scrollToDate method
-      setIsNavigating(true);
-      isNavigatingRef.current = true;
-      requestAnimationFrame(() => {
-        scrollToDate(firstDayOfMonth, true);
-        setTimeout(() => {
-          isNavigatingRef.current = false;
-          setIsNavigating(false);
-        }, 200);
-      });
     }
   }, [weeksData, weekHeight, onCurrentMonthChange, scrollToDate]);
 
@@ -721,11 +720,12 @@ export const useVirtualMonthScroll = ({
   }, [isInitialized, initialScrollTop, isEnabled]);
 
   // Cleanup
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, []);
+    },
+    []
+  );
 
   return {
     scrollTop,

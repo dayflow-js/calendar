@@ -16,12 +16,15 @@ Day Flow 使用插件架构来扩展功能。插件提供模块化的功能特�
 Day Flow 提供以下官方插件：
 
 ### [多语言](../localization)
+
 支持多种语言。将非英文语言包提取到插件中，可以让仅使用英文的应用拥有更小的核心包体积。
 
 ### [拖拽 (Drag & Drop)](../drag)
+
 启用交互式事件管理，包括移动、调整大小以及双击创建事件。
 
 ### [事件服务 (Events Service)](../events)
+
 提供高级事件管理功能，包括验证、过滤和日期范围查询。
 
 ---
@@ -45,6 +48,6 @@ export const myPlugin: CalendarPlugin = {
   install(app: ICalendarApp) {
     console.log('插件已安装！');
     // 在此处扩展应用功能
-  }
+  },
 };
 ```

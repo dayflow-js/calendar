@@ -101,22 +101,22 @@ export function generateDarkColors(baseColor: string): ColorSet {
 
 All DayFlow theme tokens use the `--df-color-` prefix to avoid collisions with any host application variables.
 
-| Variable | Purpose |
-|---|---|
-| `--df-color-background` | Calendar background |
-| `--df-color-foreground` | Primary text color |
-| `--df-color-hover` | Hover state background |
-| `--df-color-border` | Borders and dividers |
-| `--df-color-card` | Card / panel background |
-| `--df-color-card-foreground` | Card text color |
-| `--df-color-muted` | Subtle background areas |
-| `--df-color-muted-foreground` | Muted / secondary text |
-| `--df-color-primary` | Primary accent (buttons, selected states) |
-| `--df-color-primary-foreground` | Text on primary-colored backgrounds |
-| `--df-color-secondary` | Secondary accent |
-| `--df-color-secondary-foreground` | Text on secondary-colored backgrounds |
-| `--df-color-destructive` | Destructive actions |
-| `--df-color-destructive-foreground` | Text on destructive backgrounds |
+| Variable                            | Purpose                                   |
+| ----------------------------------- | ----------------------------------------- |
+| `--df-color-background`             | Calendar background                       |
+| `--df-color-foreground`             | Primary text color                        |
+| `--df-color-hover`                  | Hover state background                    |
+| `--df-color-border`                 | Borders and dividers                      |
+| `--df-color-card`                   | Card / panel background                   |
+| `--df-color-card-foreground`        | Card text color                           |
+| `--df-color-muted`                  | Subtle background areas                   |
+| `--df-color-muted-foreground`       | Muted / secondary text                    |
+| `--df-color-primary`                | Primary accent (buttons, selected states) |
+| `--df-color-primary-foreground`     | Text on primary-colored backgrounds       |
+| `--df-color-secondary`              | Secondary accent                          |
+| `--df-color-secondary-foreground`   | Text on secondary-colored backgrounds     |
+| `--df-color-destructive`            | Destructive actions                       |
+| `--df-color-destructive-foreground` | Text on destructive backgrounds           |
 
 ## Override Methods
 
@@ -127,16 +127,16 @@ Set variables directly on `.df-calendar-container`. Because this rule is outside
 ```css
 /* styles/globals.css */
 .df-calendar-container {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
-  --df-color-border:     #e0e7ff;
+  --df-color-border: #e0e7ff;
 }
 
 /* Dark mode — target the container when the .dark class is on an ancestor */
 .dark .df-calendar-container {
-  --df-color-primary:    #a5b4fc;
+  --df-color-primary: #a5b4fc;
   --df-color-background: #1e1e2e;
-  --df-color-border:     #312e81;
+  --df-color-border: #312e81;
 }
 ```
 
@@ -157,12 +157,12 @@ DayFlow's defaults live inside `@layer df-theme`. You can declare a higher-prior
 
 @layer dayflow-overrides {
   :where(:root) {
-    --df-color-primary:    #6366f1;
+    --df-color-primary: #6366f1;
     --df-color-background: #f9fafb;
   }
 
   :where(.dark) {
-    --df-color-primary:    #a5b4fc;
+    --df-color-primary: #a5b4fc;
     --df-color-background: #1e1e2e;
   }
 }
@@ -181,7 +181,7 @@ Wrap the library import in a named layer so that Tailwind's built-in `@layer the
 
 /* @theme creates variables inside @layer theme, which outranks @layer dayflow */
 @theme {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
 }
 ```
@@ -217,9 +217,9 @@ System-preference dark mode (no explicit class) is also supported automatically.
 @import 'tailwindcss';
 
 @theme {
-  --df-color-primary:              #6366f1;
-  --df-color-primary-foreground:   #ffffff;
-  --df-color-secondary:            #8b5cf6;
+  --df-color-primary: #6366f1;
+  --df-color-primary-foreground: #ffffff;
+  --df-color-secondary: #8b5cf6;
   --df-color-secondary-foreground: #ffffff;
 }
 ```
@@ -229,7 +229,7 @@ System-preference dark mode (no explicit class) is also supported automatically.
 ```tsx
 function ThemedCalendar({ calendar }) {
   return (
-    <div className="rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700">
+    <div className='rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700'>
       <DayFlowCalendar calendar={calendar} />
     </div>
   );
@@ -284,15 +284,15 @@ Pair it with CSS variable overrides for full visual consistency:
 ```css
 /* Ocean theme CSS tokens */
 .df-calendar-container {
-  --df-color-primary:    #0369a1;
+  --df-color-primary: #0369a1;
   --df-color-background: #f0f9ff;
-  --df-color-border:     #bae6fd;
+  --df-color-border: #bae6fd;
 }
 
 .dark .df-calendar-container {
-  --df-color-primary:    #7dd3fc;
+  --df-color-primary: #7dd3fc;
   --df-color-background: #0c1220;
-  --df-color-border:     #0c4a6e;
+  --df-color-border: #0c4a6e;
 }
 ```
 

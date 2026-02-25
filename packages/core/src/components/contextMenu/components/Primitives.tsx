@@ -1,14 +1,15 @@
-import { h, cloneElement, isValidElement } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { cloneElement, isValidElement, ComponentChildren } from 'preact';
 import { createPortal, forwardRef } from 'preact/compat';
-import { ChevronRight } from '../../common/Icons';
+import { useEffect, useRef, useState } from 'preact/hooks';
+
+import { ChevronRight } from '@/components/common/Icons';
 import { useLocale } from '@/locale';
 
 interface ContextMenuProps {
   x: number;
   y: number;
   onClose: () => void;
-  children: any;
+  children: ComponentChildren;
   className?: string;
 }
 
@@ -18,11 +19,11 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
     // Sync external ref with internal ref
     const setRefs = (node: HTMLDivElement | null) => {
-      (internalRef as any).current = node;
+      internalRef.current = node;
       if (typeof ref === 'function') {
         ref(node);
-      } else if (ref) {
-        (ref as any).current = node;
+      } else if (ref && 'current' in ref) {
+        ref.current = node;
       }
     };
 
@@ -83,7 +84,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     }, [onClose]);
 
     // Ensure menu stays within viewport
-    const style: any = {
+    const style: Record<string, number | string> = {
       top: y,
       left: x,
     };
@@ -91,10 +92,10 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     return createPortal(
       <div
         ref={setRefs}
-        className={`fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out ${className || ''}`}
+        className={`animate-in fade-in-0 zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
         style={style}
         onContextMenu={e => e.preventDefault()}
-        data-context-menu-root="true"
+        data-context-menu-root='true'
       >
         {children}
       </div>,
@@ -113,53 +114,52 @@ export const ContextMenuItem = ({
   disabled,
 }: {
   onClick: () => void;
-  children: any;
-  icon?: any;
+  children: ComponentChildren;
+  icon?: ComponentChildren;
   danger?: boolean;
   disabled?: boolean;
-}) => {
-  return (
-    <div
-      className={`relative flex cursor-default select-none items-center rounded-sm px-3 py-0.5 text-[12px] outline-none transition-colors group
-        ${
-          disabled
-            ? 'pointer-events-none opacity-50'
-            : 'focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white'
-        }
-        ${
-          danger
-            ? 'text-destructive focus:text-destructive-foreground focus:bg-destructive hover:bg-destructive hover:text-destructive-foreground'
-            : 'text-slate-900 dark:text-slate-50'
-        }`}
-      onClick={e => {
-        e.stopPropagation();
-        if (!disabled) onClick();
-      }}
-      data-disabled={disabled}
-    >
-      {icon && <span className="mr-2 h-4 w-4">{icon}</span>}
-      {children}
-    </div>
-  );
-};
-
-export const ContextMenuSeparator = () => (
-  <div className="-mx-1 my-1 h-px bg-slate-200 dark:bg-slate-800" />
+}) => (
+  <div
+    className={`group relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none ${
+      disabled
+        ? 'pointer-events-none opacity-50'
+        : 'hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white'
+    } ${
+      danger
+        ? 'text-destructive hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground'
+        : 'text-slate-900 dark:text-slate-50'
+    }`}
+    onClick={e => {
+      e.stopPropagation();
+      if (!disabled) onClick();
+    }}
+    data-disabled={disabled}
+  >
+    {icon && <span className='mr-2 h-4 w-4'>{icon}</span>}
+    {children}
+  </div>
 );
 
-export const ContextMenuLabel: any = ({ children }: any) => (
-  <div className="px-3 py-0.5 text-[12px] font-semibold text-slate-950 dark:text-slate-50">
+export const ContextMenuSeparator = () => (
+  <div className='-mx-1 my-1 h-px bg-slate-200 dark:bg-slate-800' />
+);
+
+export const ContextMenuLabel = ({
+  children,
+}: {
+  children: ComponentChildren;
+}) => (
+  <div className='px-3 py-0.5 text-[12px] font-semibold text-slate-950 dark:text-slate-50'>
     {children}
   </div>
 );
 
 // --- Submenu Components ---
-
-interface ContextMenuSubProps {
-  children: any;
-}
-
-export const ContextMenuSub: any = ({ children }: any) => {
+export const ContextMenuSub = ({
+  children,
+}: {
+  children: ComponentChildren;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -177,23 +177,23 @@ export const ContextMenuSub: any = ({ children }: any) => {
     }, 100);
   };
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   return (
     <div
-      className="relative"
+      className='relative'
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {(Array.isArray(children) ? children : [children]).map(child => {
         if (isValidElement(child)) {
-          // @ts-ignore
           return cloneElement(child, { isOpen });
         }
         return child;
@@ -202,32 +202,33 @@ export const ContextMenuSub: any = ({ children }: any) => {
   );
 };
 
-interface ContextMenuSubTriggerProps {
-  children: any;
-  icon?: any;
-  isOpen?: boolean; // Injected by ContextMenuSub
-}
+export const ContextMenuSubTrigger = ({
+  children,
+  icon,
+  isOpen,
+}: {
+  children: ComponentChildren;
+  icon?: ComponentChildren;
+  isOpen?: boolean;
+}) => (
+  <div
+    className={`relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white ${isOpen ? 'bg-primary text-white' : ''}`}
+  >
+    {icon && <span className='mr-2 h-4 w-4'>{icon}</span>}
+    <span className='grow text-left'>{children}</span>
+    <ChevronRight
+      className={`ml-auto h-4 w-4 ${isOpen ? 'text-white opacity-100' : 'opacity-60'}`}
+    />
+  </div>
+);
 
-export const ContextMenuSubTrigger: any = ({ children, icon, isOpen }: any) => {
-  return (
-    <div
-      className={`relative flex cursor-default select-none items-center rounded-sm px-3 py-0.5 text-[12px] outline-none transition-colors focus:bg-primary focus:text-white hover:bg-primary hover:text-white dark:focus:bg-primary dark:focus:text-white dark:hover:bg-primary dark:hover:text-white ${isOpen ? 'bg-primary text-white' : ''}`}
-    >
-      {icon && <span className="mr-2 h-4 w-4">{icon}</span>}
-      <span className="grow text-left">{children}</span>
-      <ChevronRight
-        className={`ml-auto h-4 w-4 ${isOpen ? 'text-white opacity-100' : 'opacity-60'}`}
-      />
-    </div>
-  );
-};
-
-interface ContextMenuSubContentProps {
-  children: any;
-  isOpen?: boolean; // Injected by ContextMenuSub
-}
-
-export const ContextMenuSubContent: any = ({ children, isOpen }: any) => {
+export const ContextMenuSubContent = ({
+  children,
+  isOpen,
+}: {
+  children: ComponentChildren;
+  isOpen?: boolean;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<'right' | 'left'>('right');
 
@@ -252,14 +253,14 @@ export const ContextMenuSubContent: any = ({ children, isOpen }: any) => {
   return (
     <div
       ref={ref}
-      className={`absolute top-0 z-50 min-w-32 whitespace-nowrap overflow-hidden rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 animate-in fade-in-0 zoom-in-95 duration-100 ease-out`}
+      className={`animate-in fade-in-0 zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
       style={{
         left: position === 'right' ? '100%' : 'auto',
         right: position === 'left' ? '100%' : 'auto',
         marginLeft: position === 'right' ? '0.25rem' : 0,
         marginRight: position === 'left' ? '0.25rem' : 0,
       }}
-      data-submenu-content="true"
+      data-submenu-content='true'
     >
       {children}
     </div>
@@ -288,14 +289,14 @@ export const ContextMenuColorPicker = ({
   const { t } = useLocale();
   return (
     <div>
-      <div className="grid grid-cols-7 gap-2 p-1 px-3">
+      <div className='grid grid-cols-7 gap-2 p-1 px-3'>
         {COLORS.map(color => (
           <button
             key={color}
-            type="button"
-            className={`h-5 w-5 rounded-full border border-gray-200 dark:border-gray-600 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary dark:focus:ring-offset-slate-800 ${
+            type='button'
+            className={`h-5 w-5 rounded-full border border-gray-200 transition-transform hover:scale-110 focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:outline-none dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
               selectedColor?.toLowerCase() === color.toLowerCase()
-                ? 'ring-2 ring-offset-1 ring-primary dark:ring-offset-slate-800'
+                ? 'ring-2 ring-primary ring-offset-1 dark:ring-offset-slate-800'
                 : ''
             }`}
             style={{ backgroundColor: color }}
@@ -309,7 +310,7 @@ export const ContextMenuColorPicker = ({
       </div>
       {onCustomColor && (
         <div
-          className="mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white transition-colors"
+          className='mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 transition-colors hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white'
           onClick={e => {
             e.stopPropagation();
             onCustomColor();

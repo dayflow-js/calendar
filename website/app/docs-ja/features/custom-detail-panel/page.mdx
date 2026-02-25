@@ -18,10 +18,10 @@ import { CustomDetailPanelShowcase } from '@/components/FeatureShowcase';
 import type { EventDetailContentProps } from '@dayflow/core';
 
 const CustomContent = ({ event, onEventUpdate }: EventDetailContentProps) => (
-  <div className="space-y-3">
-    <h3 className="text-lg font-semibold">{event.title}</h3>
+  <div className='space-y-3'>
+    <h3 className='text-lg font-semibold'>{event.title}</h3>
     <button
-      className="rounded-full bg-indigo-600 px-3 py-1 text-sm text-white"
+      className='rounded-full bg-indigo-600 px-3 py-1 text-sm text-white'
       onClick={() => onEventUpdate({ ...event, color: '#2563eb' })}
     >
       企業カラーに更新

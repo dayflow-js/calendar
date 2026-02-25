@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Head } from 'nextra/components';
+
 import 'nextra-theme-docs/style.css';
 import './globals.css';
 import { withBasePath } from '@/utils/basePath';
+
 import '@dayflow/core/dist/styles.css';
 
 export const metadata: Metadata = {
@@ -74,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang='en' dir='ltr' suppressHydrationWarning>
       <Head />
       <body>{children}</body>
     </html>

@@ -1,15 +1,23 @@
+// oxlint-disable typescript/no-explicit-any
 // Core type definitions
-import { Event } from './event';
-import { ViewSwitcherMode } from '../components/common/ViewHeader';
+import { h, AnyComponent, ComponentChildren } from 'preact';
+
+import { ViewSwitcherMode } from '@/components/common/ViewHeader';
+import { CalendarRegistry } from '@/core/calendarRegistry';
+import { Locale } from '@/locale/types';
+
 import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
-import { CalendarRegistry } from '../core/calendarRegistry';
-import { Locale } from '../locale/types';
-import { MobileEventRenderer } from './mobileEvent';
+import { Event } from './event';
 
 /** Generic type for framework-specific components */
-export type TComponent = any;
+export type TComponent = AnyComponent<any, any>;
 /** Generic type for framework-specific nodes/elements */
-export type TNode = any;
+export type TNode = ComponentChildren;
+
+/**
+ * Custom mobile event renderer (Drawer or Dialog)
+ */
+export type MobileEventRenderer = AnyComponent<any, any>;
 
 /**
  * View type enum
@@ -102,7 +110,11 @@ export interface CreateCalendarDialogProps {
 export interface CalendarHeaderProps {
   calendar: ICalendarApp;
   switcherMode?: ViewSwitcherMode;
-  onAddCalendar?: (e: any) => void;
+  onAddCalendar?: (
+    e:
+      | h.JSX.TargetedMouseEvent<HTMLElement>
+      | h.JSX.TargetedTouchEvent<HTMLElement>
+  ) => void;
   onSearchChange?: (value: string) => void;
   /** Triggered when search icon is clicked (typically on mobile) */
   onSearchClick?: () => void;

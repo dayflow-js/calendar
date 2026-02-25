@@ -1,11 +1,14 @@
-import { useState, useRef, useEffect } from 'preact/hooks';
+import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
-import { ChevronsUpDown, Check } from './Icons';
+import { useState, useRef, useEffect } from 'preact/hooks';
+
 import {
   getDefaultCalendarRegistry,
   CalendarRegistry,
-} from '../../core/calendarRegistry';
+} from '@/core/calendarRegistry';
 import { calendarPickerDropdown } from '@/styles/classNames';
+
+import { ChevronsUpDown, Check } from './Icons';
 
 export interface CalendarOption {
   label: string;
@@ -34,7 +37,7 @@ export const CalendarPicker = ({
   disabled = false,
 }: CalendarPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownStyle, setDropdownStyle] = useState<any>({});
+  const [dropdownStyle, setDropdownStyle] = useState<JSX.CSSProperties>({});
   const pickerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -44,7 +47,7 @@ export const CalendarPicker = ({
       const rect = triggerRef.current.getBoundingClientRect();
       const isMobile = variant === 'mobile';
 
-      const style: any = {
+      const style: JSX.CSSProperties = {
         position: 'fixed',
         zIndex: 10001,
         minWidth: isMobile ? '12rem' : `${rect.width}px`,
@@ -95,7 +98,10 @@ export const CalendarPicker = ({
   };
 
   // Handle color selection
-  const handleSelect = (e: any, optionValue: string) => {
+  const handleSelect = (
+    e: JSX.TargetedMouseEvent<HTMLElement>,
+    optionValue: string
+  ) => {
     e.stopPropagation();
     onChange(optionValue);
     setIsOpen(false);
@@ -109,28 +115,28 @@ export const CalendarPicker = ({
     if (variant === 'mobile') {
       return createPortal(
         <div
-          data-calendar-picker-dropdown="true"
+          data-calendar-picker-dropdown='true'
           style={dropdownStyle}
           className={calendarPickerDropdown}
         >
           {options.map(opt => (
             <div
               key={opt.value}
-              className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${opt.value === value ? 'bg-gray-50 dark:bg-gray-700/50' : ''}`}
+              className={`flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${opt.value === value ? 'bg-gray-50 dark:bg-gray-700/50' : ''}`}
               onClick={e => handleSelect(e, opt.value)}
             >
-              <div className="flex items-center flex-1 min-w-0 mr-3">
-                <div className="w-5 flex justify-center mr-2">
+              <div className='mr-3 flex min-w-0 flex-1 items-center'>
+                <div className='mr-2 flex w-5 justify-center'>
                   {opt.value === value && (
-                    <Check className="w-4 h-4 text-primary" />
+                    <Check className='h-4 w-4 text-primary' />
                   )}
                 </div>
-                <span className="text-sm text-gray-700 dark:text-gray-200 truncate">
+                <span className='truncate text-sm text-gray-700 dark:text-gray-200'>
                   {opt.label}
                 </span>
               </div>
               <span
-                className="w-3 h-3 rounded-full shrink-0"
+                className='h-3 w-3 shrink-0 rounded-full'
                 style={{ backgroundColor: getColorForCalendarId(opt.value) }}
               />
             </div>
@@ -142,30 +148,30 @@ export const CalendarPicker = ({
 
     return createPortal(
       <ul
-        data-calendar-picker-dropdown="true"
+        data-calendar-picker-dropdown='true'
         style={dropdownStyle}
-        className="bg-white dark:bg-gray-700 rounded-md shadow-lg dark:shadow-gray-900/50 overflow-hidden border border-gray-200 dark:border-gray-600 transition-all duration-200 origin-top-left animate-in fade-in zoom-in-95"
+        className='animate-in fade-in zoom-in-95 origin-top-left overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg transition-all duration-200 dark:border-gray-600 dark:bg-gray-700 dark:shadow-gray-900/50'
       >
         {options.map(opt => (
           <li
             key={opt.value}
-            className={`flex items-center px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${
+            className={`flex cursor-pointer items-center px-2 py-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 ${
               value === opt.value ? 'font-semibold' : ''
             }`}
             onClick={e => handleSelect(e, opt.value)}
           >
             {value === opt.value ? (
-              <span className="mr-2 text-sm text-primary">
+              <span className='mr-2 text-sm text-primary'>
                 <Check width={12} height={12} />
               </span>
             ) : (
-              <div className="mr-2 text-sm w-3 h-3">&nbsp;</div>
+              <div className='mr-2 h-3 w-3 text-sm'>&nbsp;</div>
             )}
             <span
-              className="w-3 h-3 mr-2 rounded-sm shrink-0"
+              className='mr-2 h-3 w-3 shrink-0 rounded-sm'
               style={{ backgroundColor: getColorForCalendarId(opt.value) }}
             />
-            <span className="text-sm whitespace-nowrap text-gray-700 dark:text-gray-200">
+            <span className='text-sm whitespace-nowrap text-gray-700 dark:text-gray-200'>
               {opt.label}
             </span>
           </li>
@@ -177,24 +183,25 @@ export const CalendarPicker = ({
 
   if (variant === 'mobile') {
     return (
-      <div className="relative inline-block" ref={pickerRef}>
+      <div className='relative inline-block' ref={pickerRef}>
         <button
+          type='button'
           ref={triggerRef}
           disabled={disabled}
           onClick={e => {
             e.stopPropagation();
             if (!disabled) setIsOpen(!isOpen);
           }}
-          className={`flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-1.5 transition-colors ${disabled ? 'opacity-50 cursor-default' : ''}`}
+          className={`flex items-center space-x-2 rounded-md bg-gray-100 px-3 py-1.5 transition-colors dark:bg-gray-700 ${disabled ? 'cursor-default opacity-50' : ''}`}
         >
           <span
-            className="w-3 h-3 rounded-full"
+            className='h-3 w-3 rounded-full'
             style={{ backgroundColor: getColorForCalendarId(value) }}
           />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          <span className='text-sm font-medium text-gray-700 dark:text-gray-200'>
             {currentOption?.label || value}
           </span>
-          <ChevronsUpDown className="w-4 h-4 text-gray-400" />
+          <ChevronsUpDown className='h-4 w-4 text-gray-400' />
         </button>
         {renderDropdown()}
       </div>
@@ -202,21 +209,21 @@ export const CalendarPicker = ({
   }
 
   return (
-    <div className="relative inline-block" ref={pickerRef}>
+    <div className='relative inline-block' ref={pickerRef}>
       <button
         ref={triggerRef}
-        type="button"
+        type='button'
         onClick={e => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-md px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors h-8"
+        className='flex h-8 items-center space-x-2 rounded-md bg-gray-100 px-2 py-1 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600'
       >
         <span
-          className="w-4 h-4 rounded-sm shrink-0"
+          className='h-4 w-4 shrink-0 rounded-sm'
           style={{ backgroundColor: getColorForCalendarId(value) }}
         />
-        <ChevronsUpDown className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+        <ChevronsUpDown className='h-4 w-4 text-gray-600 dark:text-gray-300' />
       </button>
       {renderDropdown()}
     </div>

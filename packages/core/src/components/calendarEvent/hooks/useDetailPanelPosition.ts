@@ -1,8 +1,10 @@
+import { RefObject } from 'preact';
 import { useState, useCallback, useEffect } from 'preact/hooks';
+
+import { getTimeColumnWidth } from '@/components/calendarEvent/utils';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { Event, ViewType, EventDetailPosition } from '@/types';
-import { MultiDayEventSegment } from '../../monthView/WeekComponent';
-import { YearMultiDaySegment } from '../../yearView/utils';
-import { getTimeColumnWidth } from '../utils';
 
 interface UseDetailPanelPositionProps {
   event: Event;
@@ -10,11 +12,17 @@ interface UseDetailPanelPositionProps {
   isMultiDay: boolean;
   segment?: MultiDayEventSegment;
   yearSegment?: YearMultiDaySegment;
-  multiDaySegmentInfo?: any;
-  calendarRef: { current: HTMLElement | null };
-  eventRef: { current: HTMLElement | null };
-  detailPanelRef: { current: HTMLElement | null };
-  selectedEventElementRef: { current: HTMLElement | null };
+  multiDaySegmentInfo?: {
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
+  calendarRef: RefObject<HTMLElement>;
+  eventRef: RefObject<HTMLElement>;
+  detailPanelRef: RefObject<HTMLElement>;
+  selectedEventElementRef: RefObject<HTMLElement>;
   isMobile: boolean;
   eventVisibility: 'visible' | 'sticky-top' | 'sticky-bottom';
   firstHour: number;
@@ -24,7 +32,9 @@ interface UseDetailPanelPositionProps {
   detailPanelEventId?: string | null;
   detailPanelKey: string;
   getActiveDayIdx: () => number;
-  getDayMetricsWrapper: (dayIndex: number) => { left: number; width: number } | null;
+  getDayMetricsWrapper: (
+    dayIndex: number
+  ) => { left: number; width: number } | null;
 }
 
 export const useDetailPanelPosition = ({
@@ -187,7 +197,7 @@ export const useDetailPanelPosition = ({
     getDayMetricsWrapper,
     selectedEventElementRef,
     detailPanelRef,
-    eventRef
+    eventRef,
   ]);
 
   useEffect(() => {

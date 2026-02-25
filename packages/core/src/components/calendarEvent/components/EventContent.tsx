@@ -1,18 +1,19 @@
-import { ViewType, Event, ICalendarApp, ViewMode } from '@/types';
-import MultiDayEvent from '../../monthView/MultiDayEvent';
-import MonthRegularContent from './MonthRegularContent';
-import MonthAllDayContent from './MonthAllDayContent';
+import MultiDayEvent from '@/components/monthView/MultiDayEvent';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { YearMultiDaySegment } from '@/components/yearView/utils';
+import { ContentSlot } from '@/renderer/ContentSlot';
+import { CustomRenderingStore } from '@/renderer/CustomRenderingStore';
+import { ViewType, Event, ICalendarApp, ViewMode, EventLayout } from '@/types';
+
 import AllDayContent from './AllDayContent';
+import MonthAllDayContent from './MonthAllDayContent';
+import MonthRegularContent from './MonthRegularContent';
 import RegularEventContent from './RegularEventContent';
 import YearEventContent from './YearEventContent';
-import { ContentSlot } from '../../../renderer/ContentSlot';
-import { MultiDayEventSegment } from '../../monthView/WeekComponent';
-import { YearMultiDaySegment } from '../../yearView/utils';
 
 interface EventContentProps {
   event: Event;
   viewType: ViewType;
-  isAllDay: boolean;
   isMultiDay: boolean;
   segment?: MultiDayEventSegment;
   yearSegment?: YearMultiDaySegment;
@@ -29,19 +30,28 @@ interface EventContentProps {
   isMobile: boolean;
   mode?: ViewMode;
   isCompact?: boolean;
-  mobilePageStart?: Date;
   app?: ICalendarApp;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
-  multiDaySegmentInfo?: any;
-  customRenderingStore: any;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
+  multiDaySegmentInfo?: {
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
+  customRenderingStore: CustomRenderingStore | null;
+  // oxlint-disable-next-line typescript/no-explicit-any
   eventContentSlotArgs: any;
-  layout?: any;
+  layout?: EventLayout;
 }
 
 export const EventContent = ({
   event,
   viewType,
-  isAllDay,
   isMultiDay,
   segment,
   yearSegment,
@@ -58,13 +68,11 @@ export const EventContent = ({
   isMobile,
   mode = 'standard',
   isCompact,
-  mobilePageStart,
   app,
   onResizeStart,
   multiDaySegmentInfo,
   customRenderingStore,
   eventContentSlotArgs,
-  layout,
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
@@ -88,7 +96,6 @@ export const EventContent = ({
           isDragging={isBeingDragged || isEventSelected}
           isResizing={isBeingResized}
           isSelected={isEventSelected}
-          onMoveStart={() => {}} // Note: onMoveStart is handled via onMouseDown in CalendarEvent
           onResizeStart={onResizeStart}
           isMobile={isMobile}
           isDraggable={isDraggable}
@@ -137,7 +144,7 @@ export const EventContent = ({
   return (
     <ContentSlot
       store={customRenderingStore}
-      generatorName="eventContent"
+      generatorName='eventContent'
       generatorArgs={eventContentSlotArgs}
       defaultContent={defaultContent}
     />

@@ -1,3 +1,4 @@
+import { JSX } from 'preact';
 import {
   useState,
   useEffect,
@@ -5,11 +6,12 @@ import {
   useRef,
   useCallback,
 } from 'preact/hooks';
+
 import {
   UseVirtualScrollProps,
   UseVirtualScrollReturn,
   VirtualItem,
-} from '../../types';
+} from '@/types';
 
 // Virtual scroll configuration
 export const VIRTUAL_SCROLL_CONFIG = {
@@ -32,11 +34,76 @@ export const VIRTUAL_SCROLL_CONFIG = {
   YEAR_HEIGHT: 700, // Desktop: initial min height
 } as const;
 
-// Performance monitoring class
-export class VirtualScrollPerformance {
-  private static metrics = {
+// Performance monitoring
+let metrics = {
+  scrollEvents: 0,
+  renderTime: [] as number[],
+  cacheHits: 0,
+  cacheMisses: 0,
+  startTime: Date.now(),
+  frameDrops: 0,
+  avgScrollDelta: 0,
+  totalScrollDistance: 0,
+};
+
+export const trackScrollEvent = (scrollDelta: number = 0) => {
+  metrics.scrollEvents++;
+  metrics.totalScrollDistance += Math.abs(scrollDelta);
+  metrics.avgScrollDelta = metrics.totalScrollDistance / metrics.scrollEvents;
+};
+
+export const trackRenderTime = (time: number) => {
+  metrics.renderTime.push(time);
+  if (time > 16.67) {
+    // Exceeds one frame time
+    metrics.frameDrops++;
+  }
+  // Keep only the last 100 render times
+  if (metrics.renderTime.length > 100) {
+    metrics.renderTime.shift();
+  }
+};
+
+export const trackCacheHit = () => {
+  metrics.cacheHits++;
+};
+
+export const trackCacheMiss = () => {
+  metrics.cacheMisses++;
+};
+
+export const getMetrics = () => {
+  const avgRenderTime =
+    metrics.renderTime.length > 0
+      ? metrics.renderTime.reduce((a, b) => a + b, 0) /
+        metrics.renderTime.length
+      : 0;
+
+  const cacheHitRate =
+    metrics.cacheHits + metrics.cacheMisses > 0
+      ? (metrics.cacheHits / (metrics.cacheHits + metrics.cacheMisses)) * 100
+      : 0;
+
+  const uptime = Date.now() - metrics.startTime;
+  const fps = avgRenderTime > 0 ? 1000 / avgRenderTime : 0;
+
+  return {
+    scrollEvents: metrics.scrollEvents,
+    avgRenderTime: Math.round(avgRenderTime * 100) / 100,
+    cacheHitRate: Math.round(cacheHitRate * 100) / 100,
+    uptime: Math.round(uptime / 1000),
+    scrollEventsPerSecond:
+      Math.round((metrics.scrollEvents / (uptime / 1000)) * 100) / 100,
+    estimatedFPS: Math.round(fps),
+    frameDrops: metrics.frameDrops,
+    avgScrollDelta: Math.round(metrics.avgScrollDelta * 100) / 100,
+  };
+};
+
+export const resetMetrics = () => {
+  metrics = {
     scrollEvents: 0,
-    renderTime: [] as number[],
+    renderTime: [],
     cacheHits: 0,
     cacheMisses: 0,
     startTime: Date.now(),
@@ -44,134 +111,7 @@ export class VirtualScrollPerformance {
     avgScrollDelta: 0,
     totalScrollDistance: 0,
   };
-
-  static trackScrollEvent(scrollDelta: number = 0) {
-    this.metrics.scrollEvents++;
-    this.metrics.totalScrollDistance += Math.abs(scrollDelta);
-    this.metrics.avgScrollDelta =
-      this.metrics.totalScrollDistance / this.metrics.scrollEvents;
-  }
-
-  static trackRenderTime(time: number) {
-    this.metrics.renderTime.push(time);
-    if (time > 16.67) {
-      // Exceeds one frame time
-      this.metrics.frameDrops++;
-    }
-    // Keep only the last 100 render times
-    if (this.metrics.renderTime.length > 100) {
-      this.metrics.renderTime.shift();
-    }
-  }
-
-  static trackCacheHit() {
-    this.metrics.cacheHits++;
-  }
-
-  static trackCacheMiss() {
-    this.metrics.cacheMisses++;
-  }
-
-  static getMetrics() {
-    const avgRenderTime =
-      this.metrics.renderTime.length > 0
-        ? this.metrics.renderTime.reduce((a, b) => a + b, 0) /
-          this.metrics.renderTime.length
-        : 0;
-
-    const cacheHitRate =
-      this.metrics.cacheHits + this.metrics.cacheMisses > 0
-        ? (this.metrics.cacheHits /
-            (this.metrics.cacheHits + this.metrics.cacheMisses)) *
-          100
-        : 0;
-
-    const uptime = Date.now() - this.metrics.startTime;
-    const fps = avgRenderTime > 0 ? 1000 / avgRenderTime : 0;
-
-    return {
-      scrollEvents: this.metrics.scrollEvents,
-      avgRenderTime: Math.round(avgRenderTime * 100) / 100,
-      cacheHitRate: Math.round(cacheHitRate * 100) / 100,
-      uptime: Math.round(uptime / 1000),
-      scrollEventsPerSecond:
-        Math.round((this.metrics.scrollEvents / (uptime / 1000)) * 100) / 100,
-      estimatedFPS: Math.round(fps),
-      frameDrops: this.metrics.frameDrops,
-      avgScrollDelta: Math.round(this.metrics.avgScrollDelta * 100) / 100,
-    };
-  }
-
-  static reset() {
-    this.metrics = {
-      scrollEvents: 0,
-      renderTime: [],
-      cacheHits: 0,
-      cacheMisses: 0,
-      startTime: Date.now(),
-      frameDrops: 0,
-      avgScrollDelta: 0,
-      totalScrollDistance: 0,
-    };
-  }
-}
-
-// High-performance cache class
-export class YearDataCache<T> {
-  private cache = new Map<number, T>();
-  private accessOrder: number[] = [];
-  private maxSize: number;
-
-  constructor(maxSize: number = VIRTUAL_SCROLL_CONFIG.BUFFER_SIZE) {
-    this.maxSize = maxSize;
-  }
-
-  get(year: number): T | undefined {
-    const data = this.cache.get(year);
-    if (data) {
-      VirtualScrollPerformance.trackCacheHit();
-      this.updateAccessOrder(year);
-      return data;
-    }
-    VirtualScrollPerformance.trackCacheMiss();
-    return undefined;
-  }
-
-  set(year: number, data: T): void {
-    if (this.cache.size >= this.maxSize) {
-      // Remove least recently used item (LRU)
-      const oldestYear = this.accessOrder.shift();
-      if (oldestYear !== undefined) {
-        this.cache.delete(oldestYear);
-      }
-    }
-
-    this.cache.set(year, data);
-    this.updateAccessOrder(year);
-  }
-
-  private updateAccessOrder(year: number): void {
-    const index = this.accessOrder.indexOf(year);
-    if (index > -1) {
-      this.accessOrder.splice(index, 1);
-    }
-    this.accessOrder.push(year);
-  }
-
-  getSize(): number {
-    return this.cache.size;
-  }
-
-  getHitRate(): number {
-    const metrics = VirtualScrollPerformance.getMetrics();
-    return metrics.cacheHitRate;
-  }
-
-  clear(): void {
-    this.cache.clear();
-    this.accessOrder = [];
-  }
-}
+};
 
 // Responsive configuration Hook
 export const useResponsiveConfig = () => {
@@ -290,14 +230,14 @@ export const useVirtualScroll = ({
     }
 
     const renderTime = performance.now() - startTime;
-    VirtualScrollPerformance.trackRenderTime(renderTime);
+    trackRenderTime(renderTime);
 
     return { totalHeight, visibleItems };
   }, [scrollTop, containerHeight, yearHeight]);
 
   // Scroll handling - remove initialization check
   const handleScroll = useCallback(
-    (e: any) => {
+    (e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>) => {
       const now = performance.now();
       if (now - lastScrollTime.current < VIRTUAL_SCROLL_CONFIG.SCROLL_THROTTLE)
         return;
@@ -308,7 +248,7 @@ export const useVirtualScroll = ({
       const scrollDelta = Math.abs(newScrollTop - lastScrollTop.current);
       lastScrollTop.current = newScrollTop;
 
-      VirtualScrollPerformance.trackScrollEvent(scrollDelta);
+      trackScrollEvent(scrollDelta);
 
       requestAnimationFrame(() => {
         setScrollTop(newScrollTop);
@@ -391,11 +331,12 @@ export const useVirtualScroll = ({
   }, [scrollToYear]);
 
   // Cleanup
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, []);
+    },
+    []
+  );
 
   return {
     scrollTop,

@@ -1,12 +1,3 @@
-import { Event } from '@/types';
-import { ICalendarApp } from '@/types';
-import {
-  formatEventTimeRange,
-  getLineColor,
-  extractHourFromDate,
-  getEventEndHour,
-  formatTime,
-} from '@/utils';
 import {
   eventColorBar,
   eventTitleSmall,
@@ -15,6 +6,14 @@ import {
   resizeHandleBottom,
   resizeHandleRight,
 } from '@/styles/classNames';
+import { Event, ICalendarApp } from '@/types';
+import {
+  formatEventTimeRange,
+  getLineColor,
+  extractHourFromDate,
+  getEventEndHour,
+  formatTime,
+} from '@/utils';
 
 interface RegularEventContentProps {
   event: Event;
@@ -29,7 +28,11 @@ interface RegularEventContentProps {
   isEditable: boolean;
   isTouchEnabled: boolean;
   isEventSelected: boolean;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
 }
 
 const RegularEventContent = ({
@@ -71,7 +74,7 @@ const RegularEventContent = ({
         }}
       />
       <div
-        className={`h-full flex flex-col overflow-hidden pl-3 ${getDynamicPadding()}`}
+        className={`flex h-full flex-col overflow-hidden pl-3 ${getDynamicPadding()}`}
       >
         <div
           className={`${eventTitleSmall} pr-1`}
@@ -128,7 +131,7 @@ const RegularEventContent = ({
         <>
           {/* Top-Right Indicator (Start Time) */}
           <div
-            className="absolute -top-1.5 right-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+            className='absolute -top-1.5 right-5 z-50 h-2.5 w-2.5 rounded-full border-2 bg-white'
             style={{
               borderColor: getLineColor(calendarId, app?.getCalendarRegistry()),
             }}
@@ -139,7 +142,7 @@ const RegularEventContent = ({
           />
           {/* Bottom-Left Indicator (End Time) */}
           <div
-            className="absolute -bottom-1.5 left-5 w-2.5 h-2.5 bg-white border-2 rounded-full z-50"
+            className='absolute -bottom-1.5 left-5 z-50 h-2.5 w-2.5 rounded-full border-2 bg-white'
             style={{
               borderColor: getLineColor(calendarId, app?.getCalendarRegistry()),
             }}

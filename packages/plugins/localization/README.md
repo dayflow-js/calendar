@@ -14,18 +14,18 @@ views, and plugin architecture.
 
 ### Monthly, Weekly, Daily and Various View Types
 
-| Monthly                                 | Weekly                                 |
-| --------------------------------------- | -------------------------------------- |
+| Monthly                                                                                          | Weekly                                                                                          |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/MonthView.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/WeekView.png) |
 
-| Daily                                 | Event Stack Level                        |
-| ------------------------------------- | ---------------------------------------- |
+| Daily                                                                                          | Event Stack Level                                                                                 |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/DayView.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/stackLevel.png) |
 
 ### Default Panel (with multiple Event Detail Panel options available)
 
-| Detail Popup                        | Detail Dialog                        |
-| ----------------------------------- | ------------------------------------ |
+| Detail Popup                                                                                 | Detail Dialog                                                                                 |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/popup.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/dialog.png) |
 
 ### Easy to resize and drag

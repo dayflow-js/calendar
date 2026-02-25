@@ -1,4 +1,6 @@
+import { RefObject } from 'preact';
 import { useEffect, useCallback } from 'preact/hooks';
+
 import { Event, ViewType } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 
@@ -6,11 +8,17 @@ interface UseEventVisibilityProps {
   event: Event;
   isEventSelected: boolean;
   showDetailPanel: boolean;
-  eventRef: { current: HTMLElement | null };
-  calendarRef: { current: HTMLElement | null };
+  eventRef: RefObject<HTMLElement>;
+  calendarRef: RefObject<HTMLElement>;
   isAllDay: boolean;
   viewType: ViewType;
-  multiDaySegmentInfo?: any;
+  multiDaySegmentInfo?: {
+    startHour: number;
+    endHour: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
   firstHour: number;
   hourHeight: number;
   updatePanelPosition: () => void;
@@ -95,10 +103,11 @@ export const useEventVisibility = ({
         if (originalBottom >= scrollTop) {
           nextVisibility = 'visible';
         }
-      } else if (eventVisibility === 'sticky-bottom') {
-        if (originalTop <= scrollBottom - STICKY_THRESHOLD) {
-          nextVisibility = 'visible';
-        }
+      } else if (
+        eventVisibility === 'sticky-bottom' &&
+        originalTop <= scrollBottom - STICKY_THRESHOLD
+      ) {
+        nextVisibility = 'visible';
       }
     }
 

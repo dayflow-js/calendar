@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill';
-import { Event, ViewType, ICalendarApp } from '../../types';
+
+import { Event, ViewType, ICalendarApp } from '@/types';
 import {
   generateUniKey,
   temporalToDate,
@@ -30,14 +31,15 @@ export const handlePasteEvent = async (
       }
     }
 
-    if (eventData && typeof eventData === 'object' && eventData.title) {
+    if (eventData && typeof eventData === 'object' && 'title' in eventData) {
+      const typedEvent = eventData as Event;
       // Calculate duration of original event using utility to handle Temporal objects
-      const originalStart = temporalToDate(eventData.start as any);
-      const originalEnd = temporalToDate(eventData.end as any);
+      const originalStart = temporalToDate(typedEvent.start as unknown as Date);
+      const originalEnd = temporalToDate(typedEvent.end as unknown as Date);
       const duration = originalEnd.getTime() - originalStart.getTime();
 
       // Clean up internal fields that shouldn't be copied
-      const { _segmentInfo, ...cleanEventData } = eventData as any;
+      const cleanEventData = eventData;
 
       // Target dates
       const targetStartDate = new Date(date);
@@ -53,7 +55,7 @@ export const handlePasteEvent = async (
         originalStart.getHours() !== 0 || originalStart.getMinutes() !== 0;
 
       if (
-        !eventData.allDay &&
+        !typedEvent.allDay &&
         (isMonthOrYear || (isClickedAtMidnight && originalHadTime))
       ) {
         targetStartDate.setHours(
@@ -70,19 +72,20 @@ export const handlePasteEvent = async (
 
       const newEvent: Event = {
         ...cleanEventData,
+        title: typedEvent.title,
         id: generateUniKey(),
         // Use Temporal objects consistently
-        start: eventData.allDay
+        start: typedEvent.allDay
           ? dateToPlainDate(targetStartDate)
           : dateToZonedDateTime(targetStartDate, Temporal.Now.timeZoneId()),
-        end: eventData.allDay
+        end: typedEvent.allDay
           ? dateToPlainDate(targetEndDate)
           : dateToZonedDateTime(targetEndDate, Temporal.Now.timeZoneId()),
         // Ensure it belongs to a valid calendar
         calendarId:
-          eventData.calendarId &&
-          app.getCalendarRegistry().has(eventData.calendarId)
-            ? eventData.calendarId
+          typedEvent.calendarId &&
+          app.getCalendarRegistry().has(typedEvent.calendarId)
+            ? typedEvent.calendarId
             : app.getCalendarRegistry().getDefaultCalendarId() || 'default',
       };
 

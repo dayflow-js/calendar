@@ -1,14 +1,9 @@
+import { RefObject, JSX } from 'preact';
 import { useState } from 'preact/hooks';
-import { ICalendarApp } from '@/types';
+
 import CalendarEventComponent from '@/components/calendarEvent';
-import {
-  Event,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  WeekDayDragState,
-  ViewType,
-  ViewMode,
-} from '@/types';
+import { GridContextMenu } from '@/components/contextMenu';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
 import {
   allDayRow,
   allDayContent,
@@ -18,9 +13,18 @@ import {
   dateNumber,
   miniCalendarToday,
 } from '@/styles/classNames';
-import { GridContextMenu } from '@/components/contextMenu';
-import { CompactHeader } from './CompactHeader';
+import {
+  Event,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  WeekDayDragState,
+  ViewType,
+  ViewMode,
+  ICalendarApp,
+} from '@/types';
 import { scrollbarTakesSpace } from '@/utils';
+
+import { CompactHeader } from './CompactHeader';
 
 interface AllDayRowProps {
   app: ICalendarApp;
@@ -46,21 +50,25 @@ interface AllDayRowProps {
   currentWeekStart: Date;
   gridWidth: string;
   allDayAreaHeight: number;
-  organizedAllDaySegments: any[]; // Replace 'any' with specific type if possible
+  organizedAllDaySegments: Array<MultiDayEventSegment & { row: number }>;
   allDayLabelText: string;
   isMobile: boolean;
   isTouch: boolean;
   showAllDay?: boolean;
-  calendarRef: any;
-  allDayRowRef: any;
-  topFrozenContentRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
+  allDayRowRef: RefObject<HTMLDivElement>;
+  topFrozenContentRef: RefObject<HTMLDivElement>;
   ALL_DAY_HEIGHT: number;
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
-  dragState: any;
+  dragState: WeekDayDragState | null;
   isDragging: boolean;
-  handleMoveStart: any;
-  handleResizeStart: any;
+  handleMoveStart: (e: MouseEvent | TouchEvent, event: Event) => void;
+  handleResizeStart: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
   onDateChange?: (date: Date) => void;
@@ -70,9 +78,17 @@ interface AllDayRowProps {
   setSelectedEventId: (id: string | null) => void;
   detailPanelEventId: string | null;
   setDetailPanelEventId: (id: string | null) => void;
-  handleCreateAllDayEvent?: (e: any, dayIndex: number) => void;
-  handleDragOver: (e: any) => void;
-  handleDrop: (e: any, date: Date, hour?: number, allDay?: boolean) => void;
+  handleCreateAllDayEvent?: (
+    e: MouseEvent | TouchEvent,
+    dayIndex: number
+  ) => void;
+  handleDragOver: (e: DragEvent) => void;
+  handleDrop: (
+    e: DragEvent,
+    date: Date,
+    hour?: number,
+    allDay?: boolean
+  ) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
 }
@@ -119,7 +135,7 @@ export const AllDayRow = ({
   customDetailPanelContent,
   customEventDetailDialog,
 }: AllDayRowProps) => {
-  const columnStyle: any = { flexShrink: 0 };
+  const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -127,7 +143,7 @@ export const AllDayRow = ({
   } | null>(null);
   const hasScrollbarSpace = scrollbarTakesSpace();
 
-  const handleContextMenu = (e: any, dayIndex: number) => {
+  const handleContextMenu = (e: MouseEvent, dayIndex: number) => {
     e.preventDefault();
     if (isMobile) return;
 
@@ -139,7 +155,7 @@ export const AllDayRow = ({
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className='flex w-full flex-col'>
       {/* Mobile 7-day Header with Segmented Control */}
       {(mode === 'compact' || isCompact) &&
         fullWeekDates &&
@@ -159,7 +175,7 @@ export const AllDayRow = ({
         {/* Left Frozen Column - outside scroll area, matching TimeGrid sidebar */}
         {showAllDay && (
           <div
-            className="w-12 md:w-20 shrink-0 bg-white dark:bg-gray-900 z-20 flex flex-col"
+            className='z-20 flex w-12 shrink-0 flex-col bg-white md:w-20 dark:bg-gray-900'
             onContextMenu={e => e.preventDefault()}
           >
             {/* Header spacer - flexes to match weekday header height */}
@@ -168,7 +184,7 @@ export const AllDayRow = ({
             ></div>
             {/* All Day Label */}
             <div
-              className="flex items-center justify-end p-1 text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 select-none"
+              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 select-none md:text-xs dark:text-gray-400'
               style={{ minHeight: `${allDayAreaHeight}px` }}
             >
               {allDayLabelText}
@@ -178,7 +194,7 @@ export const AllDayRow = ({
 
         {/* Top Frozen Content - overflow hidden, content positioned via transform */}
         <div
-          className="flex-1 overflow-hidden relative transition-[min-height] duration-300 ease-in-out"
+          className='relative flex-1 overflow-hidden transition-[min-height] duration-300 ease-in-out'
           style={{
             scrollbarGutter: 'stable',
             minHeight: showAllDay
@@ -188,7 +204,7 @@ export const AllDayRow = ({
         >
           <div
             ref={topFrozenContentRef}
-            className="flex flex-col"
+            className='flex flex-col'
             style={{ width: gridWidth, minWidth: '100%' }}
           >
             {/* Weekday titles row */}
@@ -208,18 +224,18 @@ export const AllDayRow = ({
                   >
                     {isMobile ? (
                       <>
-                        <div className="text-[12px] leading-tight text-gray-500 font-medium">
+                        <div className='text-[12px] leading-tight font-medium text-gray-500'>
                           {mobileWeekDaysLabels[i]}
                         </div>
                         <div
-                          className={`${dateNumber} w-7 h-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}
+                          className={`${dateNumber} h-7 w-7 text-base font-medium ${weekDates[i].isToday ? miniCalendarToday : ''}`}
                         >
                           {weekDates[i].date}
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="inline-flex items-center justify-center text-sm mt-1 mr-1">
+                        <div className='mt-1 mr-1 inline-flex items-center justify-center text-sm'>
                           {day}
                         </div>
                         <div
@@ -276,57 +292,53 @@ export const AllDayRow = ({
                     );
                   })}
                   {/* Multi-day event overlay */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {organizedAllDaySegments.map(segment => {
-                      return (
-                        <CalendarEventComponent
-                          key={segment.event.id}
-                          event={segment.event}
-                          segment={segment}
-                          segmentIndex={segment.row}
-                          isAllDay={true}
-                          isMultiDay={true}
-                          allDayHeight={ALL_DAY_HEIGHT}
-                          calendarRef={calendarRef}
-                          viewType={ViewType.WEEK}
-                          columnsPerRow={weekDaysLabels.length}
-                          isBeingDragged={
-                            isDragging &&
-                            (dragState as WeekDayDragState)?.eventId ===
-                              segment.event.id &&
-                            (dragState as WeekDayDragState)?.mode === 'move'
-                          }
-                          hourHeight={HOUR_HEIGHT}
-                          firstHour={FIRST_HOUR}
-                          onMoveStart={handleMoveStart}
-                          onResizeStart={handleResizeStart}
-                          onEventUpdate={handleEventUpdate}
-                          onEventDelete={handleEventDelete}
-                          newlyCreatedEventId={newlyCreatedEventId}
-                          onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
-                          selectedEventId={selectedEventId}
-                          detailPanelEventId={detailPanelEventId}
-                          onEventSelect={(eventId: string | null) => {
-                            setSelectedEventId(eventId);
-                          }}
-                          onEventLongPress={(eventId: string) => {
-                            if (isMobile || isTouch)
-                              setSelectedEventId(eventId);
-                          }}
-                          onDetailPanelToggle={(eventId: string | null) =>
-                            setDetailPanelEventId(eventId)
-                          }
-                          customDetailPanelContent={customDetailPanelContent}
-                          customEventDetailDialog={customEventDetailDialog}
-                          app={app}
-                          isMobile={isMobile}
-                          mode={mode}
-                          isCompact={isCompact}
-                          mobilePageStart={mobilePageStart}
-                          enableTouch={isTouch}
-                        />
-                      );
-                    })}
+                  <div className='pointer-events-none absolute inset-0'>
+                    {organizedAllDaySegments.map(segment => (
+                      <CalendarEventComponent
+                        key={segment.event.id}
+                        event={segment.event}
+                        segment={segment}
+                        segmentIndex={segment.row}
+                        isAllDay={true}
+                        isMultiDay={true}
+                        allDayHeight={ALL_DAY_HEIGHT}
+                        calendarRef={calendarRef}
+                        viewType={ViewType.WEEK}
+                        columnsPerRow={weekDaysLabels.length}
+                        isBeingDragged={
+                          isDragging &&
+                          (dragState as WeekDayDragState)?.eventId ===
+                            segment.event.id &&
+                          (dragState as WeekDayDragState)?.mode === 'move'
+                        }
+                        hourHeight={HOUR_HEIGHT}
+                        firstHour={FIRST_HOUR}
+                        onMoveStart={handleMoveStart}
+                        onResizeStart={handleResizeStart}
+                        onEventUpdate={handleEventUpdate}
+                        onEventDelete={handleEventDelete}
+                        newlyCreatedEventId={newlyCreatedEventId}
+                        onDetailPanelOpen={() => setNewlyCreatedEventId(null)}
+                        selectedEventId={selectedEventId}
+                        detailPanelEventId={detailPanelEventId}
+                        onEventSelect={(eventId: string | null) => {
+                          setSelectedEventId(eventId);
+                        }}
+                        onEventLongPress={(eventId: string) => {
+                          if (isMobile || isTouch) setSelectedEventId(eventId);
+                        }}
+                        onDetailPanelToggle={(eventId: string | null) =>
+                          setDetailPanelEventId(eventId)
+                        }
+                        customDetailPanelContent={customDetailPanelContent}
+                        customEventDetailDialog={customEventDetailDialog}
+                        app={app}
+                        isMobile={isMobile}
+                        mode={mode}
+                        isCompact={isCompact}
+                        enableTouch={isTouch}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -347,7 +359,10 @@ export const AllDayRow = ({
                   (24 * 60 * 60 * 1000)
               );
               handleCreateAllDayEvent?.(
-                { clientX: contextMenu.x, clientY: contextMenu.y } as any,
+                {
+                  clientX: contextMenu.x,
+                  clientY: contextMenu.y,
+                } as MouseEvent,
                 currentDayIndex
               );
             }}

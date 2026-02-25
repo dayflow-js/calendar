@@ -1,5 +1,8 @@
-import { useMemo } from 'preact/hooks';
+import { RefObject } from 'preact';
 import { memo } from 'preact/compat';
+import { useMemo } from 'preact/hooks';
+
+import { CalendarEvent } from '@/components/calendarEvent';
 import {
   Event,
   MonthEventDragState,
@@ -8,22 +11,26 @@ import {
   ICalendarApp,
   ViewType,
 } from '@/types';
-import { YearDayCell } from './YearDayCell';
-import { CalendarEvent } from '../calendarEvent';
+
 import { analyzeMultiDayEventsForRow } from './utils';
+import { YearDayCell } from './YearDayCell';
 
 interface YearRowComponentProps {
   rowDays: Date[];
   events: Event[];
   columnsPerRow: number;
   app: ICalendarApp;
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   locale: string;
   isDragging: boolean;
   dragState: MonthEventDragState;
-  onMoveStart?: (e: any, event: Event) => void;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
-  onCreateStart?: (e: any, targetDate: Date) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
+  onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
   selectedEventId: string | null;
   onEventSelect: (eventId: string | null) => void;
   onMoreEventsClick?: (date: Date) => void;
@@ -65,19 +72,22 @@ export const YearRowComponent = memo(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const handleContextMenu = (e: any, date: Date) => {
+    const handleContextMenu = (e: MouseEvent, date: Date) => {
       e.preventDefault();
       e.stopPropagation();
       onContextMenu({ x: e.clientX, y: e.clientY, date });
     };
 
-    const segments = useMemo(() => {
-      return analyzeMultiDayEventsForRow(events, rowDays, columnsPerRow);
-    }, [events, rowDays, columnsPerRow]);
+    const segments = useMemo(
+      () => analyzeMultiDayEventsForRow(events, rowDays, columnsPerRow),
+      [events, rowDays, columnsPerRow]
+    );
 
     const { visibleSegments, moreCounts } = useMemo(() => {
       // 1. Calculate how many events are in each column
-      const colCounts = new Array(rowDays.length).fill(0);
+      const colCounts = Array.from({ length: rowDays.length }).fill(
+        0
+      ) as number[];
       segments.forEach(segment => {
         // Be careful with boundaries
         const start = Math.max(0, segment.startCellIndex);
@@ -89,7 +99,7 @@ export const YearRowComponent = memo(
       });
 
       const visible: typeof segments = [];
-      const counts = new Array(rowDays.length).fill(0);
+      const counts = Array.from({ length: rowDays.length }).fill(0) as number[];
 
       // 2. Determine visibility for each segment
       segments.forEach(segment => {
@@ -129,7 +139,7 @@ export const YearRowComponent = memo(
 
     return (
       <div
-        className="relative w-full"
+        className='relative w-full'
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${columnsPerRow}, 1fr)`,
@@ -145,7 +155,7 @@ export const YearRowComponent = memo(
               date={date}
               isToday={isToday}
               locale={locale}
-              onSelectDate={(d: any) => {
+              onSelectDate={(d: Date) => {
                 app.selectDate(d);
               }}
               onCreateStart={onCreateStart}
@@ -156,7 +166,7 @@ export const YearRowComponent = memo(
           );
         })}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className='pointer-events-none absolute inset-0'
           style={{
             top: HEADER_HEIGHT,
             bottom: 0,
@@ -165,9 +175,9 @@ export const YearRowComponent = memo(
           }}
           onContextMenu={e => e.preventDefault()}
         >
-          <div className="relative w-full h-full">
+          <div className='relative h-full w-full'>
             {visibleSegments.map(segment => (
-              <div key={segment.id} className="pointer-events-auto">
+              <div key={segment.id} className='pointer-events-auto'>
                 <CalendarEvent
                   event={segment.event}
                   viewType={ViewType.YEAR}
@@ -205,4 +215,4 @@ export const YearRowComponent = memo(
   }
 );
 
-(YearRowComponent as any).displayName = 'YearRowComponent';
+(YearRowComponent as { displayName?: string }).displayName = 'YearRowComponent';

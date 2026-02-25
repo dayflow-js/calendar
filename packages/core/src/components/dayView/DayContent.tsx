@@ -1,18 +1,10 @@
+import { RefObject } from 'preact';
 import { useRef, useState } from 'preact/hooks';
-import { ICalendarApp } from '@/types';
-import { useLocale } from '@/locale';
-import {
-  Event,
-  EventLayout,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  WeekDayDragState,
-  ViewType,
-} from '@/types';
-import ViewHeader from '@/components/common/ViewHeader';
+
 import CalendarEventComponent from '@/components/calendarEvent';
-import { formatTime, scrollbarTakesSpace } from '@/utils';
+import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
+import { useLocale } from '@/locale';
 import {
   allDayRow,
   allDayLabel,
@@ -29,6 +21,16 @@ import {
   midnightLabel,
   cn,
 } from '@/styles/classNames';
+import {
+  Event,
+  EventLayout,
+  EventDetailContentRenderer,
+  EventDetailDialogRenderer,
+  WeekDayDragState,
+  ViewType,
+  ICalendarApp,
+} from '@/types';
+import { formatTime, scrollbarTakesSpace } from '@/utils';
 
 interface DayContentProps {
   app: ICalendarApp;
@@ -48,24 +50,40 @@ interface DayContentProps {
   setNewlyCreatedEventId: (id: string | null) => void;
   detailPanelEventId: string | null;
   setDetailPanelEventId: (id: string | null) => void;
-  dragState: any;
+  dragState: WeekDayDragState | null;
   isDragging: boolean;
-  handleMoveStart: any;
-  handleResizeStart: any;
-  handleCreateStart: any;
-  handleCreateAllDayEvent: any;
-  handleTouchStart: any;
-  handleTouchEnd: any;
-  handleTouchMove: any;
-  handleDragOver: any;
-  handleDrop: any;
+  handleMoveStart: (e: MouseEvent | TouchEvent, event: Event) => void;
+  handleResizeStart: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
+  handleCreateStart: (
+    e: MouseEvent | TouchEvent,
+    dayIndex: number,
+    hour: number
+  ) => void;
+  handleCreateAllDayEvent: (
+    e: MouseEvent | TouchEvent,
+    dayIndex: number
+  ) => void;
+  handleTouchStart: (e: TouchEvent, dayIndex: number) => void;
+  handleTouchEnd: (e: TouchEvent) => void;
+  handleTouchMove: (e: TouchEvent) => void;
+  handleDragOver: (e: DragEvent) => void;
+  handleDrop: (
+    e: DragEvent,
+    date: Date,
+    hour?: number,
+    allDay?: boolean
+  ) => void;
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
   onDateChange?: (date: Date) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  calendarRef: any;
-  allDayRowRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
+  allDayRowRef: RefObject<HTMLDivElement>;
   switcherMode: string;
   isMobile: boolean;
   isTouch: boolean;
@@ -150,13 +168,15 @@ export const DayContent = ({
     );
   };
 
-  const handleContextMenu = (e: any, isAllDay: boolean) => {
+  const handleContextMenu = (e: MouseEvent, isAllDay: boolean) => {
     e.preventDefault();
     if (isMobile) return;
 
     const date = new Date(currentDate);
 
-    if (!isAllDay) {
+    if (isAllDay) {
+      date.setHours(0, 0, 0, 0);
+    } else {
       const rect = calendarRef.current
         ?.querySelector('.calendar-content')
         ?.getBoundingClientRect();
@@ -179,8 +199,6 @@ export const DayContent = ({
 
         date.setHours(finalHour, finalMinutes, 0, 0);
       }
-    } else {
-      date.setHours(0, 0, 0, 0);
     }
 
     setContextMenu({ x: e.clientX, y: e.clientY, date });
@@ -188,7 +206,7 @@ export const DayContent = ({
 
   return (
     <div
-      className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full md:w-[70%] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}
+      className={`flex-none ${switcherMode === 'buttons' ? '' : 'md:w-[60%]'} w-full border-r border-gray-200 bg-white md:w-[70%] dark:border-gray-700 dark:bg-gray-900`}
       onContextMenu={e => e.preventDefault()}
     >
       <div className={`relative ${flexCol} h-full`}>
@@ -213,7 +231,7 @@ export const DayContent = ({
           <div
             className={cn(
               allDayRow,
-              'border-t border-gray-200 dark:border-gray-700 items-stretch'
+              'items-stretch border-t border-gray-200 dark:border-gray-700'
             )}
             ref={allDayRowRef}
             style={{
@@ -223,21 +241,21 @@ export const DayContent = ({
             onContextMenu={e => handleContextMenu(e, true)}
           >
             <div
-              className={`${allDayLabel} w-12 text-[10px] md:w-20 md:text-xs flex items-center`}
+              className={`${allDayLabel} flex w-12 items-center text-[10px] md:w-20 md:text-xs`}
               onContextMenu={e => e.preventDefault()}
             >
               {t('allDay')}
             </div>
             <div
               className={cn(
-                'flex flex-1 relative self-stretch',
+                'relative flex flex-1 self-stretch',
                 !isMobile && hasScrollbarSpace
                   ? 'border-r border-gray-200 dark:border-gray-700'
                   : ''
               )}
             >
               <div
-                className="w-full relative"
+                className='relative w-full'
                 style={{ minHeight: `${allDayAreaHeight}px` }}
                 onClick={() => onDateChange?.(currentDate)}
                 onMouseDown={e => {
@@ -335,7 +353,7 @@ export const DayContent = ({
           className={`${calendarContent} df-day-time-grid`}
           style={{ position: 'relative', scrollbarGutter: 'stable' }}
         >
-          <div className="relative flex">
+          <div className='relative flex'>
             {/* Current time line */}
             {isToday &&
               currentTime &&
@@ -357,14 +375,14 @@ export const DayContent = ({
                       marginTop: '0.75rem',
                     }}
                   >
-                    <div className="flex items-center w-12 md:w-20">
-                      <div className="relative w-full flex items-center"></div>
+                    <div className='flex w-12 items-center md:w-20'>
+                      <div className='relative flex w-full items-center'></div>
                       <div className={currentTimeLabel}>
                         {formatTime(hours)}
                       </div>
                     </div>
 
-                    <div className="flex-1 flex items-center">
+                    <div className='flex flex-1 items-center'>
                       <div className={currentTimeLineBar} />
                     </div>
                   </div>
@@ -377,7 +395,7 @@ export const DayContent = ({
               onContextMenu={e => e.preventDefault()}
             >
               {/* Top boundary spacer */}
-              <div className="h-3" />
+              <div className='h-3' />
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
                   <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
@@ -388,7 +406,7 @@ export const DayContent = ({
             </div>
 
             {/* Time grid */}
-            <div className="grow select-none">
+            <div className='grow select-none'>
               {/* Top boundary */}
               <div
                 className={cn(
@@ -404,7 +422,7 @@ export const DayContent = ({
                   {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
                 </div>
               </div>
-              <div className="relative" style={{ WebkitTouchCallout: 'none' }}>
+              <div className='relative' style={{ WebkitTouchCallout: 'none' }}>
                 {timeSlots.map((_slot, slotIndex) => (
                   <div
                     key={slotIndex}
@@ -478,7 +496,7 @@ export const DayContent = ({
                 </div>
 
                 {/* Event layer */}
-                <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
+                <div className='pointer-events-none absolute top-0 right-0 bottom-0 left-0'>
                   {currentDayEvents
                     .filter(event => !event.allDay)
                     .map(event => {
@@ -563,7 +581,10 @@ export const DayContent = ({
 
               if (isAllDay) {
                 handleCreateAllDayEvent?.(
-                  { clientX: contextMenu.x, clientY: contextMenu.y } as any,
+                  {
+                    clientX: contextMenu.x,
+                    clientY: contextMenu.y,
+                  } as MouseEvent,
                   currentDayIndex
                 );
               } else {
@@ -571,11 +592,15 @@ export const DayContent = ({
                   contextMenu.date.getHours() +
                   contextMenu.date.getMinutes() / 60;
                 const syntheticEvent = {
-                  preventDefault: () => {},
-                  stopPropagation: () => {},
+                  preventDefault: () => {
+                    /* noop */
+                  },
+                  stopPropagation: () => {
+                    /* noop */
+                  },
                   clientX: contextMenu.x,
                   clientY: contextMenu.y,
-                } as unknown as any;
+                } as MouseEvent;
                 handleCreateStart(syntheticEvent, currentDayIndex, preciseHour);
               }
             }

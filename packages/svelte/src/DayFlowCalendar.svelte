@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { onMount, onDestroy, tick } from 'svelte';
-  import {
-    CalendarRenderer,
-    type ICalendarApp,
-    type UseCalendarAppReturn,
-    type CustomRendering,
-  } from '@dayflow/core';
+  import { onMount, onDestroy, tick } from "svelte";
+  import { CalendarRenderer } from "@dayflow/core";
+  import type {
+    ICalendarApp,
+    UseCalendarAppReturn,
+    CustomRendering,
+  } from "@dayflow/core";
 
-  let {
+  const {
     calendar,
     eventContent = null,
     eventDetailContent = null,
@@ -20,14 +20,14 @@
     collapsedSafeAreaLeft = null,
   } = $props<{
     calendar: ICalendarApp | UseCalendarAppReturn;
-    eventContent?: any;
-    eventDetailContent?: any;
-    eventDetailDialog?: any;
-    headerContent?: any;
-    createCalendarDialog?: any;
-    titleBarSlot?: any;
-    colorPicker?: any;
-    colorPickerWrapper?: any;
+    eventContent?: unknown;
+    eventDetailContent?: unknown;
+    eventDetailDialog?: unknown;
+    headerContent?: unknown;
+    createCalendarDialog?: unknown;
+    titleBarSlot?: unknown;
+    colorPicker?: unknown;
+    colorPickerWrapper?: unknown;
     collapsedSafeAreaLeft?: number | null;
   }>();
 
@@ -38,9 +38,11 @@
   let mounted = $state(false);
 
   // Guard for browser environment
-  const isBrowser = typeof window !== 'undefined';
+  const isBrowser = typeof window !== "undefined";
 
-  const app = $derived((calendar as any).app || calendar);
+  const app = $derived(
+    ("app" in calendar ? calendar.app : calendar) as ICalendarApp,
+  );
 
   const renderProps = $derived({
     eventContent,
@@ -52,10 +54,12 @@
     colorPicker,
     colorPickerWrapper,
     collapsedSafeAreaLeft,
-  } as Record<string, any>);
+  } as Record<string, unknown>);
 
   onMount(async () => {
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     await tick();
 
@@ -63,12 +67,12 @@
     renderer.setProps(renderProps);
     renderer.mount(container);
 
-    unsubscribe = renderer.getCustomRenderingStore().subscribe(renderings => {
-      customRenderings = Array.from(renderings.values());
+    unsubscribe = renderer.getCustomRenderingStore().subscribe((renderings) => {
+      customRenderings = [...renderings.values()];
     });
 
     const activeOverrides = Object.keys(renderProps).filter(
-      key => renderProps[key] !== null
+      (key) => renderProps[key] !== null,
     );
     renderer.getCustomRenderingStore().setOverrides(activeOverrides);
 
@@ -76,29 +80,37 @@
   });
 
   onDestroy(() => {
-    if (unsubscribe) unsubscribe();
-    if (renderer) renderer.unmount();
+    if (unsubscribe) {
+      unsubscribe();
+    }
+    if (renderer) {
+      renderer.unmount();
+    }
   });
 
   // Reactively forward prop changes to the renderer after mount.
   // `mounted` is $state so this effect re-runs when it becomes true, and
-  // again whenever any renderProp value changes.
+  // again whenever unknown renderProp value changes.
   $effect(() => {
-    if (!mounted || !renderer) return;
+    if (!mounted || !renderer) {
+      return;
+    }
     renderer.setProps(renderProps);
     const activeOverrides = Object.keys(renderProps).filter(
-      key => renderProps[key] !== null
+      (key) => renderProps[key] !== null,
     );
     renderer.getCustomRenderingStore().setOverrides(activeOverrides);
   });
 
   function portal(node: HTMLElement, target: HTMLElement) {
-    if (!target || !node || !isBrowser) return;
-    target.appendChild(node);
+    if (!target || !node || !isBrowser) {
+      return;
+    }
+    target.append(node);
     return {
       destroy() {
         if (node.parentNode === target) {
-          target.removeChild(node);
+          node.remove();
         }
       },
     };
@@ -110,10 +122,10 @@
 
   {#if mounted}
     {#each customRenderings as rendering (rendering.id)}
-      {@const Component = renderProps[rendering.generatorName]}
+      {@const Component = renderProps[rendering.generatorName] as any}
       {#if Component && rendering.containerEl}
         <div use:portal={rendering.containerEl}>
-          <Component {...rendering.generatorArgs} />
+          <Component {...rendering.generatorArgs as any} />
         </div>
       {/if}
     {/each}

@@ -1,7 +1,8 @@
 import { useCallback } from 'preact/hooks';
-import { Event, CalendarColors, ICalendarApp } from '../types';
 import { Temporal } from 'temporal-polyfill';
+
 import { useLocale } from '@/locale';
+import { Event, CalendarColors, ICalendarApp } from '@/types';
 
 export interface CalendarDropData {
   calendarId: string;
@@ -17,12 +18,12 @@ export interface CalendarDropOptions {
 
 export interface CalendarDropReturn {
   handleDrop: (
-    e: any,
+    e: DragEvent,
     dropDate: Date,
     dropHour?: number,
     isAllDay?: boolean
   ) => Event | null;
-  handleDragOver: (e: any) => void;
+  handleDragOver: (e: DragEvent) => void;
 }
 
 /**
@@ -34,9 +35,12 @@ export function useCalendarDrop(
   const { app, onEventCreated } = options;
   const { t } = useLocale();
 
-  const handleDragOver = useCallback((e: any) => {
+  const handleDragOver = useCallback((e: DragEvent) => {
     // Check if the drag data is from a calendar
-    if (e.dataTransfer.types.includes('application/x-dayflow-calendar')) {
+    if (
+      e.dataTransfer &&
+      e.dataTransfer.types.includes('application/x-dayflow-calendar')
+    ) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
     }
@@ -44,12 +48,14 @@ export function useCalendarDrop(
 
   const handleDrop = useCallback(
     (
-      e: any,
+      e: DragEvent,
       dropDate: Date,
       dropHour?: number,
       isAllDay?: boolean
     ): Event | null => {
       e.preventDefault();
+
+      if (!e.dataTransfer) return null;
 
       // Get calendar data from drag event
       const dragDataStr = e.dataTransfer.getData(
@@ -86,7 +92,17 @@ export function useCalendarDrop(
             second: 59,
           });
           allDay = true;
-        } else if (dropHour !== undefined) {
+        } else if (dropHour === undefined) {
+          // For Month view - create timed event 9:00-10:00
+          start = Temporal.PlainDateTime.from({
+            year: dropDate.getFullYear(),
+            month: dropDate.getMonth() + 1,
+            day: dropDate.getDate(),
+            hour: 9,
+            minute: 0,
+          });
+          end = start.add({ hours: 1 });
+        } else {
           // For Day/Week view with specific hour
           start = Temporal.PlainDateTime.from({
             year: dropDate.getFullYear(),
@@ -97,20 +113,10 @@ export function useCalendarDrop(
           });
           // Default 1 hour span
           end = start.add({ hours: 1 });
-        } else {
-          // For Month view - create timed event 9:00-10:00
-          start = Temporal.PlainDateTime.from({
-            year: dropDate.getFullYear(),
-            month: dropDate.getMonth() + 1,
-            day: dropDate.getDate(),
-            hour: 9,
-            minute: 0,
-          });
-          end = start.add({ hours: 1 });
         }
 
         // Generate unique event ID
-        const eventId = `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const eventId = `event-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
         // Create new event
         const newEvent: Event = {

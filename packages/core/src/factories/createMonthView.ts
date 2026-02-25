@@ -1,8 +1,15 @@
 // Factory function for creating Month view
 import { h } from 'preact';
-import { MonthViewConfig, ViewFactory, ViewType } from '../types';
+
+import {
+  MonthViewConfig,
+  MonthViewProps,
+  ViewFactory,
+  ViewType,
+} from '@/types';
+import MonthView from '@/views/MonthView';
+
 import { ViewAdapter } from './ViewAdapter';
-import MonthView from '../views/MonthView';
 
 // Default Month view configuration
 const defaultMonthViewConfig: MonthViewConfig = {
@@ -17,8 +24,8 @@ export const createMonthView: ViewFactory<MonthViewConfig> = (config = {}) => {
   const finalConfig = { ...defaultMonthViewConfig, ...config };
 
   // Create adapter component
-  const MonthViewAdapter: any = (props: any) => {
-    return h(ViewAdapter, {
+  const MonthViewAdapter = (props: MonthViewProps) =>
+    h(ViewAdapter, {
       viewType: ViewType.MONTH,
       originalComponent: MonthView,
       app: props.app,
@@ -34,7 +41,6 @@ export const createMonthView: ViewFactory<MonthViewConfig> = (config = {}) => {
       onEventSelect: props.onEventSelect,
       onDetailPanelToggle: props.onDetailPanelToggle,
     });
-  };
 
   // Set display name for debugging
   MonthViewAdapter.displayName = 'MonthViewAdapter';

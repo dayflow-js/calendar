@@ -3,6 +3,7 @@ import {
   DragIndicatorRenderer,
   useLocale,
 } from '@dayflow/core';
+
 import { DefaultDragIndicatorRenderer } from './DefaultDragIndicator';
 
 interface DragIndicatorComponentProps extends DragIndicatorProps {
@@ -20,7 +21,7 @@ const DragIndicatorComponent = ({
   getDynamicPadding,
   renderer = DefaultDragIndicatorRenderer,
   isMobile,
-}: DragIndicatorComponentProps & any) => {
+}: DragIndicatorComponentProps) => {
   const { t } = useLocale();
   const eventTitle = title || (allDay ? t('newAllDayEvent') : t('newEvent'));
 
@@ -38,19 +39,18 @@ const DragIndicatorComponent = ({
           getDynamicPadding,
           isMobile,
         });
-      } else {
-        return renderer.renderRegularContent({
-          drag,
-          color,
-          title: eventTitle,
-          layout,
-          allDay,
-          formatTime,
-          getLineColor,
-          getDynamicPadding,
-          isMobile,
-        });
       }
+      return renderer.renderRegularContent({
+        drag,
+        color,
+        title: eventTitle,
+        layout,
+        allDay,
+        formatTime,
+        getLineColor,
+        getDynamicPadding,
+        isMobile,
+      });
     }
 
     return renderer.renderDefaultContent({
@@ -66,7 +66,7 @@ const DragIndicatorComponent = ({
     });
   };
 
-  return <div className="drag-indicator-content">{renderContent()}</div>;
+  return <div className='drag-indicator-content'>{renderContent()}</div>;
 };
 
 export default DragIndicatorComponent;

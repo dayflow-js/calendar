@@ -14,5 +14,5 @@
  * @returns Unique key string
  */
 export function generateUniKey() {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }

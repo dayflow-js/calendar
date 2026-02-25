@@ -9,6 +9,7 @@
  */
 
 import { Temporal } from 'temporal-polyfill';
+
 import {
   extractHourFromTemporal,
   createTemporalWithHour,
@@ -174,6 +175,4 @@ export const isMultiDayEvent = (
     | Temporal.PlainDate
     | Temporal.PlainDateTime
     | Temporal.ZonedDateTime
-): boolean => {
-  return !isSameDay(start, end);
-};
+): boolean => !isSameDay(start, end);

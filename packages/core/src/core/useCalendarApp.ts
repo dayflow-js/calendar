@@ -5,16 +5,18 @@ import {
   useEffect,
   useRef,
 } from 'preact/hooks';
-import { CalendarApp } from './CalendarApp';
+
 import {
   CalendarAppConfig,
   UseCalendarAppReturn,
   ViewType,
   CalendarType,
   RangeChangeReason,
-} from '../types';
-import { Event } from '../types';
-import { isDeepEqual } from '../utils/helpers';
+  Event,
+} from '@/types';
+import { isDeepEqual } from '@/utils/helpers';
+
+import { CalendarApp } from './CalendarApp';
 
 export function useCalendarApp(
   config: CalendarAppConfig
@@ -42,13 +44,14 @@ export function useCalendarApp(
     });
   }, []);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (updateTimerRef.current !== null) {
         cancelAnimationFrame(updateTimerRef.current);
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   // Synchronize state changes
   useEffect(() => {
@@ -191,7 +194,14 @@ export function useCalendarApp(
   );
 
   const applyEventsChanges = useCallback(
-    (changes: any, isPending?: boolean) => {
+    (
+      changes: {
+        add?: Event[];
+        update?: Array<{ id: string; updates: Partial<Event> }>;
+        delete?: string[];
+      },
+      isPending?: boolean
+    ) => {
       app.applyEventsChanges(changes, isPending);
       triggerUpdate();
     },

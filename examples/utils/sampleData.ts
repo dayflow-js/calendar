@@ -1,5 +1,5 @@
-import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
 
 const calendarIds = [
   'team',
@@ -361,7 +361,7 @@ export const generateSampleEvents = (): Event[] => {
           def.title
         )
       );
-    } catch (e) {
+    } catch {
       // Ignore invalid dates (e.g. leap years edge cases in simple config)
     }
   });

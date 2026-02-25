@@ -1,4 +1,6 @@
-import { WeeksData } from '.';
+import { JSX, RefObject } from 'preact';
+
+import { WeeksData } from './calendar';
 
 export interface UseVirtualMonthScrollProps {
   currentDate: Date;
@@ -22,17 +24,19 @@ export interface UseVirtualMonthScrollReturn {
     visibleItems: VirtualWeekItem[];
     displayStartIndex: number; // Index of the first week that should actually be displayed
   };
-  scrollElementRef: any;
-  handleScroll: (e: any) => void;
+  scrollElementRef: RefObject<HTMLDivElement>;
+  handleScroll: (
+    e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>
+  ) => void;
   scrollToDate: (targetDate: Date, smooth?: boolean) => void;
   handlePreviousMonth: () => void;
   handleNextMonth: () => void;
   handleToday: () => void;
-  setScrollTop: React.Dispatch<React.SetStateAction<number>>;
-  setContainerHeight: React.Dispatch<React.SetStateAction<number>>;
-  setCurrentMonth: React.Dispatch<React.SetStateAction<string>>;
-  setCurrentYear: React.Dispatch<React.SetStateAction<number>>;
-  setIsScrolling: React.Dispatch<React.SetStateAction<boolean>>;
+  setScrollTop: (val: number | ((prev: number) => number)) => void;
+  setContainerHeight: (val: number | ((prev: number) => number)) => void;
+  setCurrentMonth: (val: string | ((prev: string) => string)) => void;
+  setCurrentYear: (val: number | ((prev: number) => number)) => void;
+  setIsScrolling: (val: boolean | ((prev: boolean) => boolean)) => void;
   cache: WeekDataCache;
   scrollElementRefCallback: (element: HTMLDivElement | null) => void;
   weeksData: WeeksData[];
@@ -70,12 +74,12 @@ export class WeekDataCache {
     this.maxSize = maxSize;
   }
 
-  private getKey(date: Date): string {
+  private static getKey(date: Date): string {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   }
 
   get(weekStartDate: Date): WeeksData | undefined {
-    const key = this.getKey(weekStartDate);
+    const key = WeekDataCache.getKey(weekStartDate);
     const data = this.cache.get(key);
     if (data) {
       this.updateAccessOrder(key);
@@ -85,7 +89,7 @@ export class WeekDataCache {
   }
 
   set(weekStartDate: Date, data: WeeksData): void {
-    const key = this.getKey(weekStartDate);
+    const key = WeekDataCache.getKey(weekStartDate);
 
     if (this.cache.size >= this.maxSize) {
       const oldestKey = this.accessOrder.shift();

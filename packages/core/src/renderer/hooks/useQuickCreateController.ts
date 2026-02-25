@@ -1,17 +1,21 @@
+import { JSX, RefObject } from 'preact';
 import { useState, useCallback, useRef } from 'preact/hooks';
-import { ICalendarApp, Event } from '../../types';
-import { generateUniKey } from '../../utils/helpers';
-import { dateToZonedDateTime } from '../../utils/temporal';
+
+import { ICalendarApp, Event } from '@/types';
+import { generateUniKey } from '@/utils/helpers';
+import { dateToZonedDateTime } from '@/utils/temporal';
 
 export interface QuickCreateController {
   isQuickCreateOpen: boolean;
   setIsQuickCreateOpen: (open: boolean) => void;
-  quickCreateAnchorRef: { current: HTMLElement | null };
+  quickCreateAnchorRef: RefObject<HTMLElement>;
   isMobileDrawerOpen: boolean;
   setIsMobileDrawerOpen: (open: boolean) => void;
   mobileDraftEvent: Event | null;
   setMobileDraftEvent: (event: Event | null) => void;
-  handleAddButtonClick: (e: any) => void;
+  handleAddButtonClick: (
+    e: JSX.TargetedMouseEvent<HTMLElement> | JSX.TargetedTouchEvent<HTMLElement>
+  ) => void;
   isCreateCalendarOpen: boolean;
   setIsCreateCalendarOpen: (open: boolean) => void;
 }
@@ -36,7 +40,11 @@ export function useQuickCreateController(
   }, []);
 
   const handleAddButtonClick = useCallback(
-    (e: any) => {
+    (
+      e:
+        | JSX.TargetedMouseEvent<HTMLElement>
+        | JSX.TargetedTouchEvent<HTMLElement>
+    ) => {
       const isEditable = !app.state.readOnly;
       if (!isEditable) return;
 
@@ -67,7 +75,9 @@ export function useQuickCreateController(
         if (isQuickCreateOpen) {
           setIsQuickCreateOpen(false);
         } else {
-          (quickCreateAnchorRef as any).current = e.currentTarget;
+          (
+            quickCreateAnchorRef as unknown as { current: EventTarget | null }
+          ).current = e.currentTarget;
           setIsQuickCreateOpen(true);
         }
       } else {

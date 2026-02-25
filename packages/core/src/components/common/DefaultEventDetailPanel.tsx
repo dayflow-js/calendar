@@ -1,16 +1,18 @@
-import { useMemo, useState, useEffect } from 'preact/hooks';
+import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
+import { useMemo, useState, useEffect } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
-import { EventDetailPanelProps, CalendarType } from '../../types';
-import { isPlainDate } from '../../utils/temporal';
-import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
-import CalendarPicker, { CalendarOption } from './CalendarPicker';
-import RangePicker from '../rangePicker';
-import { useTheme } from '../../contexts/ThemeContext';
-import { resolveAppliedTheme } from '../../utils/themeUtils';
-import { ICalendarApp } from '@/types';
+
+import RangePicker from '@/components/rangePicker';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
 import { useLocale } from '@/locale';
 import { eventDetailPanel } from '@/styles/classNames';
+import { EventDetailPanelProps, CalendarType, ICalendarApp } from '@/types';
+import { isPlainDate } from '@/utils/temporal';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
+
+import { CalendarOption, CalendarPicker } from './CalendarPicker';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
   app?: ICalendarApp;
@@ -77,6 +79,35 @@ const DefaultEventDetailPanel = ({
     return () => clearTimeout(timer);
   }, [description, event]);
 
+  const eventTimeZone = useMemo(() => {
+    if (!isPlainDate(event.start)) {
+      return (
+        (event.start as Temporal.ZonedDateTime).timeZoneId ||
+        Temporal.Now.timeZoneId()
+      );
+    }
+
+    if (event.end && !isPlainDate(event.end)) {
+      return (
+        (event.end as Temporal.ZonedDateTime).timeZoneId ||
+        Temporal.Now.timeZoneId()
+      );
+    }
+
+    return Temporal.Now.timeZoneId();
+  }, [event.end, event.start]);
+
+  // Get visible calendar type options
+  const colorOptions: CalendarOption[] = useMemo(() => {
+    const registry = app
+      ? app.getCalendarRegistry()
+      : getDefaultCalendarRegistry();
+    return registry.getVisible().map((cal: CalendarType) => ({
+      label: cal.name,
+      value: cal.id,
+    }));
+  }, [app, app?.getCalendars()]); // Depend on app.getCalendars() to update when calendars change
+
   // Check if dark mode is active (either via theme context or DOM class)
   const isDark =
     appliedTheme === 'dark' ||
@@ -89,17 +120,6 @@ const DefaultEventDetailPanel = ({
 
   const arrowBgColor = isDark ? '#1f2937' : 'white';
   const arrowBorderColor = isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
-
-  // Get visible calendar type options
-  const colorOptions: CalendarOption[] = useMemo(() => {
-    const registry = app
-      ? app.getCalendarRegistry()
-      : getDefaultCalendarRegistry();
-    return registry.getVisible().map((cal: CalendarType) => ({
-      label: cal.name,
-      value: cal.id,
-    }));
-  }, [app, app?.getCalendars()]); // Depend on app.getCalendars() to update when calendars change
 
   const convertToAllDay = () => {
     const plainDate = isPlainDate(event.start)
@@ -141,26 +161,6 @@ const DefaultEventDetailPanel = ({
     });
   };
 
-  const eventTimeZone = useMemo(() => {
-    if (!isPlainDate(event.start)) {
-      return (
-        (event.start as any).timeZoneId ||
-        (event.start as Temporal.ZonedDateTime).timeZoneId ||
-        Temporal.Now.timeZoneId()
-      );
-    }
-
-    if (event.end && !isPlainDate(event.end)) {
-      return (
-        (event.end as any).timeZoneId ||
-        (event.end as Temporal.ZonedDateTime).timeZoneId ||
-        Temporal.Now.timeZoneId()
-      );
-    }
-
-    return Temporal.Now.timeZoneId();
-  }, [event.end, event.start]);
-
   const handleAllDayRangeChange = (
     nextRange: [Temporal.ZonedDateTime, Temporal.ZonedDateTime]
   ) => {
@@ -173,8 +173,8 @@ const DefaultEventDetailPanel = ({
   };
 
   // Calculate arrow style
-  const calculateArrowStyle = (): any => {
-    let arrowStyle: any = {};
+  const calculateArrowStyle = (): JSX.CSSProperties => {
+    let arrowStyle: JSX.CSSProperties = {};
 
     if (eventVisibility === 'sticky-top') {
       const calendarContent =
@@ -206,8 +206,10 @@ const DefaultEventDetailPanel = ({
       if (panelElement) {
         const panelRect = panelElement.getBoundingClientRect();
         const computedStyle = window.getComputedStyle(panelElement);
-        const paddingBottom = parseInt(computedStyle.paddingBottom, 10) || 0;
-        const borderBottom = parseInt(computedStyle.borderBottomWidth, 10) || 0;
+        const paddingBottom =
+          Number.parseInt(computedStyle.paddingBottom, 10) || 0;
+        const borderBottom =
+          Number.parseInt(computedStyle.borderBottomWidth, 10) || 0;
 
         arrowTop = panelRect.height - paddingBottom - borderBottom - 6 + 11;
       }
@@ -259,9 +261,9 @@ const DefaultEventDetailPanel = ({
             const panelRect = panelElement.getBoundingClientRect();
             const computedStyle = window.getComputedStyle(panelElement);
             const paddingBottom =
-              parseInt(computedStyle.paddingBottom, 10) || 0;
+              Number.parseInt(computedStyle.paddingBottom, 10) || 0;
             const borderBottom =
-              parseInt(computedStyle.borderBottomWidth, 10) || 0;
+              Number.parseInt(computedStyle.borderBottomWidth, 10) || 0;
 
             maxArrowY = panelRect.height - paddingBottom - borderBottom + 11;
           }
@@ -299,7 +301,7 @@ const DefaultEventDetailPanel = ({
     <div
       ref={panelRef}
       className={`${eventDetailPanel} p-4`}
-      data-event-detail-panel="true"
+      data-event-detail-panel='true'
       data-event-id={event.id}
       style={{
         top: `${position.top}px`,
@@ -309,21 +311,25 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+      <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
         {t('eventTitle')}
       </span>
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <div className="flex-1">
+      <div className='mb-3 flex items-center justify-between gap-3'>
+        <div className='flex-1'>
           <input
             id={`event-title-${event.id}`}
-            name="title"
-            type="text"
+            name='title'
+            type='text'
             value={title}
             readOnly={!isEditable}
             disabled={!isEditable}
-            onChange={(e: any) => setTitle((e.target as HTMLInputElement).value)}
-            onInput={(e: any) => setTitle((e.target as HTMLInputElement).value)}
-            className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setTitle((e.target as HTMLInputElement).value)
+            }
+            onInput={(e: React.FormEvent<HTMLInputElement>) =>
+              setTitle((e.target as HTMLInputElement).value)
+            }
+            className='w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
           />
         </div>
         {isEditable && (
@@ -342,13 +348,13 @@ const DefaultEventDetailPanel = ({
       </div>
 
       {isAllDay ? (
-        <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+        <div className='mb-3'>
+          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
             {t('dateRange')}
           </div>
           <RangePicker
             value={[event.start, event.end]}
-            format="YYYY-MM-DD"
+            format='YYYY-MM-DD'
             showTime={false}
             timeZone={eventTimeZone}
             matchTriggerWidth
@@ -358,8 +364,8 @@ const DefaultEventDetailPanel = ({
           />
         </div>
       ) : (
-        <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+        <div className='mb-3'>
+          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
             {t('timeRange')}
           </div>
           <RangePicker
@@ -381,44 +387,49 @@ const DefaultEventDetailPanel = ({
         </div>
       )}
 
-      <div className="mb-3">
-        <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+      <div className='mb-3'>
+        <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
           {t('note')}
         </span>
         <textarea
           id={`event-note-${event.id}`}
-          name="note"
+          name='note'
           value={description}
           readOnly={!isEditable}
           disabled={!isEditable}
-          onChange={e => setDescription((e.target as HTMLTextAreaElement).value)}
+          onChange={e =>
+            setDescription((e.target as HTMLTextAreaElement).value)
+          }
           onInput={e => setDescription((e.target as HTMLTextAreaElement).value)}
           rows={3}
-          className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
+          className='w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
           placeholder={t('addNotePlaceholder')}
         />
       </div>
 
       {isEditable && (
-        <div className="flex space-x-2">
-          {!isAllDay ? (
+        <div className='flex space-x-2'>
+          {isAllDay ? (
             <button
-              className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
-              onClick={convertToAllDay}
-            >
-              {t('setAsAllDay')}
-            </button>
-          ) : (
-            <button
-              className="px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary text-xs font-medium transition"
+              type='button'
+              className='rounded bg-primary px-2 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary'
               onClick={convertToRegular}
             >
               {t('setAsTimed')}
             </button>
+          ) : (
+            <button
+              type='button'
+              className='rounded bg-primary px-2 py-1 text-xs font-medium text-primary-foreground transition hover:bg-primary'
+              onClick={convertToAllDay}
+            >
+              {t('setAsAllDay')}
+            </button>
           )}
 
           <button
-            className="px-2 py-1 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 text-xs font-medium transition"
+            type='button'
+            className='rounded bg-destructive px-2 py-1 text-xs font-medium text-destructive-foreground transition hover:bg-destructive/90'
             onClick={() => onEventDelete(event.id)}
           >
             {t('delete')}

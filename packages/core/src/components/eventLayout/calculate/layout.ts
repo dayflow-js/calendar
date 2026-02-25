@@ -1,48 +1,45 @@
+import { LAYOUT_CONFIG } from '@/components/eventLayout/constants';
+import {
+  LayoutNode,
+  LayoutCalculationParams,
+  LayoutWeekEvent,
+} from '@/components/eventLayout/types';
+import {
+  getStartHour,
+  getEndHour,
+  shouldBeParallel,
+} from '@/components/eventLayout/utils';
 import { EventLayout } from '@/types';
-import { LayoutNode, LayoutCalculationParams, LayoutWeekEvent } from '../types';
-import { LAYOUT_CONFIG } from '../constants';
-import { getStartHour, getEndHour, shouldBeParallel } from '../utils';
-
-/**
- * Calculate layout from nested structure
- */
-export function calculateLayoutFromStructure(
-  rootNodes: LayoutNode[],
-  layoutMap: Map<string, EventLayout>,
-  params: LayoutCalculationParams = {}
-): void {
-  const edgeMargin =
-    params.viewType === 'day' ? 0 : LAYOUT_CONFIG.EDGE_MARGIN_PERCENT;
-  const totalWidth = 100 - edgeMargin;
-
-  if (rootNodes.length === 1) {
-    calculateNodeLayoutWithVirtualParallel(
-      rootNodes[0],
-      0,
-      totalWidth,
-      layoutMap,
-      params
-    );
-  } else if (rootNodes.length > 1) {
-    const nodeCount = rootNodes.length;
-    const totalMargin = LAYOUT_CONFIG.MARGIN_BETWEEN * (nodeCount - 1);
-    const nodeWidth = (totalWidth - totalMargin) / nodeCount;
-
-    rootNodes.forEach((node, index) => {
-      const left = index * (nodeWidth + LAYOUT_CONFIG.MARGIN_BETWEEN);
-      calculateNodeLayoutWithVirtualParallel(
-        node,
-        left,
-        Math.max(nodeWidth, LAYOUT_CONFIG.MIN_WIDTH),
-        layoutMap,
-        params
-      );
-    });
-  }
-}
 
 function getIndentStepPercent(viewType?: 'week' | 'day'): number {
   return viewType === 'day' ? 0.5 : 2.5;
+}
+
+function calculateEventImportance(event: LayoutWeekEvent): number {
+  const duration = getEndHour(event) - getStartHour(event);
+  return Math.max(0.1, Math.min(1.0, duration / 4));
+}
+
+function findBranchRootIndent(
+  node: LayoutNode,
+  viewType?: 'week' | 'day'
+): number | null {
+  let current = node;
+  while (current.parent && current.parent.depth > 0) current = current.parent;
+  return current.depth === 1
+    ? current.depth * getIndentStepPercent(viewType)
+    : null;
+}
+
+function shouldChildrenBeParallel(childEvents: LayoutWeekEvent[]): boolean {
+  if (childEvents.length < 2) return false;
+  for (let i = 0; i < childEvents.length; i++) {
+    for (let j = i + 1; j < childEvents.length; j++) {
+      if (shouldBeParallel(childEvents[i], childEvents[j], LAYOUT_CONFIG))
+        return true;
+    }
+  }
+  return false;
 }
 
 function calculateNodeLayoutWithVirtualParallel(
@@ -87,7 +84,7 @@ function calculateNodeLayoutWithVirtualParallel(
 
   if (node.children.length === 0) return;
 
-  const sortedChildren = [...node.children].sort(
+  const sortedChildren = [...node.children].toSorted(
     (a, b) =>
       getEndHour(b.event) -
       getStartHour(b.event) -
@@ -102,26 +99,25 @@ function calculateNodeLayoutWithVirtualParallel(
       layoutMap,
       params
     );
+  } else if (shouldChildrenBeParallel(sortedChildren.map(c => c.event))) {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    calculateParallelChildrenLayout(
+      sortedChildren,
+      nodeLeft,
+      nodeWidth,
+      layoutMap,
+      params
+    );
   } else {
-    if (shouldChildrenBeParallel(sortedChildren.map(c => c.event))) {
-      calculateParallelChildrenLayout(
-        sortedChildren,
+    sortedChildren.forEach(child =>
+      calculateNodeLayoutWithVirtualParallel(
+        child,
         nodeLeft,
         nodeWidth,
         layoutMap,
         params
-      );
-    } else {
-      sortedChildren.forEach(child =>
-        calculateNodeLayoutWithVirtualParallel(
-          child,
-          nodeLeft,
-          nodeWidth,
-          layoutMap,
-          params
-        )
-      );
-    }
+      )
+    );
   }
 }
 
@@ -189,7 +185,7 @@ function calculateParallelChildrenLayout(
     });
 
     if (child.children.length > 0) {
-      const sorted = [...child.children].sort(
+      const sorted = [...child.children].toSorted(
         (a, b) =>
           getEndHour(b.event) -
           getStartHour(b.event) -
@@ -203,54 +199,63 @@ function calculateParallelChildrenLayout(
           layoutMap,
           params
         );
+      } else if (shouldChildrenBeParallel(sorted.map(c => c.event))) {
+        calculateParallelChildrenLayout(
+          sorted,
+          childLeft,
+          childWidth,
+          layoutMap,
+          params
+        );
       } else {
-        if (shouldChildrenBeParallel(sorted.map(c => c.event))) {
-          calculateParallelChildrenLayout(
-            sorted,
+        sorted.forEach(gc =>
+          calculateNodeLayoutWithVirtualParallel(
+            gc,
             childLeft,
             childWidth,
             layoutMap,
             params
-          );
-        } else {
-          sorted.forEach(gc =>
-            calculateNodeLayoutWithVirtualParallel(
-              gc,
-              childLeft,
-              childWidth,
-              layoutMap,
-              params
-            )
-          );
-        }
+          )
+        );
       }
     }
   });
 }
 
-function findBranchRootIndent(
-  node: LayoutNode,
-  viewType?: 'week' | 'day'
-): number | null {
-  let current = node;
-  while (current.parent && current.parent.depth > 0) current = current.parent;
-  return current.depth === 1
-    ? current.depth * getIndentStepPercent(viewType)
-    : null;
-}
+/**
+ * Calculate layout from nested structure
+ */
+export function calculateLayoutFromStructure(
+  rootNodes: LayoutNode[],
+  layoutMap: Map<string, EventLayout>,
+  params: LayoutCalculationParams = {}
+): void {
+  const edgeMargin =
+    params.viewType === 'day' ? 0 : LAYOUT_CONFIG.EDGE_MARGIN_PERCENT;
+  const totalWidth = 100 - edgeMargin;
 
-function shouldChildrenBeParallel(childEvents: LayoutWeekEvent[]): boolean {
-  if (childEvents.length < 2) return false;
-  for (let i = 0; i < childEvents.length; i++) {
-    for (let j = i + 1; j < childEvents.length; j++) {
-      if (shouldBeParallel(childEvents[i], childEvents[j], LAYOUT_CONFIG))
-        return true;
-    }
+  if (rootNodes.length === 1) {
+    calculateNodeLayoutWithVirtualParallel(
+      rootNodes[0],
+      0,
+      totalWidth,
+      layoutMap,
+      params
+    );
+  } else if (rootNodes.length > 1) {
+    const nodeCount = rootNodes.length;
+    const totalMargin = LAYOUT_CONFIG.MARGIN_BETWEEN * (nodeCount - 1);
+    const nodeWidth = (totalWidth - totalMargin) / nodeCount;
+
+    rootNodes.forEach((node, index) => {
+      const left = index * (nodeWidth + LAYOUT_CONFIG.MARGIN_BETWEEN);
+      calculateNodeLayoutWithVirtualParallel(
+        node,
+        left,
+        Math.max(nodeWidth, LAYOUT_CONFIG.MIN_WIDTH),
+        layoutMap,
+        params
+      );
+    });
   }
-  return false;
-}
-
-function calculateEventImportance(event: LayoutWeekEvent): number {
-  const duration = getEndHour(event) - getStartHour(event);
-  return Math.max(0.1, Math.min(1.0, duration / 4));
 }

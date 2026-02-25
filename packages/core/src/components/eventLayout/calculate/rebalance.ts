@@ -1,21 +1,16 @@
-import { LayoutWeekEvent, ParallelGroup, LayoutNode } from '../types';
-import { canEventContain, shouldBeParallel } from '../utils';
-import { LAYOUT_CONFIG } from '../constants';
+import {
+  LayoutWeekEvent,
+  ParallelGroup,
+  LayoutNode,
+} from '@/components/eventLayout/types';
+import { canEventContain } from '@/components/eventLayout/utils';
 
-export function rebalanceLoadByGroups(
-  parallelGroups: ParallelGroup[],
-  allNodes: LayoutNode[]
-): void {
-  for (let i = parallelGroups.length - 1; i >= 1; i--) {
-    const groupNodes = parallelGroups[i].events.map(
-      e => allNodes.find(node => node.event.id === e.id)!
-    );
-
-    const parentLoads = calculateParentLoads(groupNodes, allNodes);
-    if (needsRebalancing(parentLoads)) {
-      rebalanceGroupLoad(parentLoads);
-    }
+function countDescendants(node: LayoutNode): number {
+  let count = 0;
+  for (const child of node.children) {
+    count += 1 + countDescendants(child);
   }
+  return count;
 }
 
 function calculateParentLoads(
@@ -28,67 +23,23 @@ function calculateParentLoads(
   return allNodes
     .filter(node => node.depth === parentLevel)
     .map(node => ({ node, load: countDescendants(node) }))
-    .sort((a, b) => b.load - a.load);
-}
-
-function countDescendants(node: LayoutNode): number {
-  let count = 0;
-  for (const child of node.children) {
-    count += 1 + countDescendants(child);
-  }
-  return count;
+    .toSorted((a, b) => b.load - a.load);
 }
 
 function needsRebalancing(
   parentLoads: Array<{ node: LayoutNode; load: number }>
 ): boolean {
   if (parentLoads.length < 2) return false;
-  return parentLoads[0].load - parentLoads[parentLoads.length - 1].load >= 2;
+  return parentLoads[0].load - parentLoads.at(-1)!.load >= 2;
 }
 
-function rebalanceGroupLoad(
-  parentLoads: Array<{ node: LayoutNode; load: number }>
+function setParentChildRelation(
+  parent: LayoutWeekEvent,
+  child: LayoutWeekEvent
 ): void {
-  const maxIterations = 5;
-  let iteration = 0;
-
-  while (iteration < maxIterations) {
-    parentLoads.sort((a, b) => b.load - a.load);
-    const heaviest = parentLoads[0];
-    const lightest = parentLoads[parentLoads.length - 1];
-
-    if (heaviest.load - lightest.load < 2) break;
-
-    const transferableLeaf = findTransferableLeaf(heaviest.node, lightest.node);
-    if (transferableLeaf) {
-      transferNode(transferableLeaf, lightest.node);
-      heaviest.load--;
-      lightest.load++;
-      iteration++;
-    } else {
-      break;
-    }
-  }
-}
-
-function findTransferableLeaf(
-  heavyRoot: LayoutNode,
-  lightRoot: LayoutNode
-): LayoutNode | null {
-  const leaves: LayoutNode[] = [];
-  collectLeaves(heavyRoot, leaves);
-  return (
-    leaves.find(leaf => canEventContain(lightRoot.event, leaf.event)) ||
-    leaves[0] ||
-    null
-  );
-}
-
-function collectLeaves(node: LayoutNode, leaves: LayoutNode[]): void {
-  if (node.children.length === 0) {
-    leaves.push(node);
-  } else {
-    node.children.forEach(child => collectLeaves(child, leaves));
+  child.parentId = parent.id;
+  if (!parent.children.includes(child.id)) {
+    parent.children.push(child.id);
   }
 }
 
@@ -116,12 +67,64 @@ function transferNode(leafNode: LayoutNode, newParent: LayoutNode): void {
   }
 }
 
-function setParentChildRelation(
-  parent: LayoutWeekEvent,
-  child: LayoutWeekEvent
+function collectLeaves(node: LayoutNode, leaves: LayoutNode[]): void {
+  if (node.children.length === 0) {
+    leaves.push(node);
+  } else {
+    node.children.forEach(child => collectLeaves(child, leaves));
+  }
+}
+
+function findTransferableLeaf(
+  heavyRoot: LayoutNode,
+  lightRoot: LayoutNode
+): LayoutNode | null {
+  const leaves: LayoutNode[] = [];
+  collectLeaves(heavyRoot, leaves);
+  return (
+    leaves.find(leaf => canEventContain(lightRoot.event, leaf.event)) ||
+    leaves[0] ||
+    null
+  );
+}
+
+function rebalanceGroupLoad(
+  parentLoads: Array<{ node: LayoutNode; load: number }>
 ): void {
-  child.parentId = parent.id;
-  if (!parent.children.includes(child.id)) {
-    parent.children.push(child.id);
+  const maxIterations = 5;
+  let iteration = 0;
+
+  while (iteration < maxIterations) {
+    parentLoads.sort((a, b) => b.load - a.load);
+    const heaviest = parentLoads[0];
+    const lightest = parentLoads.at(-1)!;
+
+    if (heaviest.load - lightest.load < 2) break;
+
+    const transferableLeaf = findTransferableLeaf(heaviest.node, lightest.node);
+    if (transferableLeaf) {
+      transferNode(transferableLeaf, lightest.node);
+      heaviest.load--;
+      lightest.load++;
+      iteration++;
+    } else {
+      break;
+    }
+  }
+}
+
+export function rebalanceLoadByGroups(
+  parallelGroups: ParallelGroup[],
+  allNodes: LayoutNode[]
+): void {
+  for (let i = parallelGroups.length - 1; i >= 1; i--) {
+    const groupNodes = parallelGroups[i].events.map(
+      e => allNodes.find(node => node.event.id === e.id)!
+    );
+
+    const parentLoads = calculateParentLoads(groupNodes, allNodes);
+    if (needsRebalancing(parentLoads)) {
+      rebalanceGroupLoad(parentLoads);
+    }
   }
 }

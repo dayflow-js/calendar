@@ -1,29 +1,22 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
-import { useTheme } from 'next-themes';
-import { Temporal } from 'temporal-polyfill';
-import {
-  CalendarRange,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  createWeekView,
-  createDayView,
-  ViewType,
-} from '@dayflow/react';
+import { CalendarType, Event, temporalToDate } from '@dayflow/core';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import {
   createSidebarPlugin,
   CalendarSidebarRenderProps,
 } from '@dayflow/plugin-sidebar';
-import { CalendarType, Event, temporalToDate } from '@dayflow/core';
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  ViewType,
+} from '@dayflow/react';
+import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import React, { useMemo, useCallback } from 'react';
+import { Temporal } from 'temporal-polyfill';
+
 import { getWebsiteCalendars } from '@/utils/palette';
 
 const SIDEBAR_CALENDAR_IDS = new Set([
@@ -156,7 +149,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
         };
       })
       .filter(item => item.startDate.getTime() >= now)
-      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+      .toSorted((a, b) => a.startDate.getTime() - b.startDate.getTime())
       .slice(0, 4);
   }, [app, calendars]);
 
@@ -164,83 +157,83 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
 
   if (isCollapsed) {
     return (
-      <div className="h-full pl-2 bg-slate-900 py-4 text-slate-100">
+      <div className='h-full bg-slate-900 py-4 pl-2 text-slate-100'>
         <button
-          type="button"
+          type='button'
           onClick={() => setCollapsed(false)}
-          className="rounded-full bg-slate-800 p-2 text-slate-300 transition hover:bg-slate-700"
-          aria-label="Expand sidebar"
+          className='rounded-full bg-slate-800 p-2 text-slate-300 transition hover:bg-slate-700'
+          aria-label='Expand sidebar'
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className='h-5 w-5' />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col bg-slate-950 text-slate-100">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+    <div className='flex h-full flex-col bg-slate-950 text-slate-100'>
+      <div className='flex items-center justify-between border-b border-white/10 px-4 py-3'>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className='text-xs font-semibold tracking-wide text-slate-500 uppercase'>
             Workspace
           </p>
-          <p className="text-base font-semibold text-white">DayFlow Team</p>
+          <p className='text-base font-semibold text-white'>DayFlow Team</p>
         </div>
         <button
-          type="button"
+          type='button'
           onClick={() => setCollapsed(true)}
-          className="rounded-full bg-slate-900 p-2 text-slate-400 transition hover:text-white"
-          aria-label="Collapse sidebar"
+          className='rounded-full bg-slate-900 p-2 text-slate-400 transition hover:text-white'
+          aria-label='Collapse sidebar'
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className='h-5 w-5' />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="flex items-center justify-between text-xs uppercase tracking-wide text-slate-500">
+      <div className='flex-1 overflow-y-auto px-4 py-4'>
+        <div className='flex items-center justify-between text-xs tracking-wide text-slate-500 uppercase'>
           <span>Calendars</span>
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <button
-              type="button"
+              type='button'
               onClick={() => toggleAll(true)}
-              className="inline-flex items-center gap-1 text-emerald-400 transition hover:text-emerald-300"
+              className='inline-flex items-center gap-1 text-emerald-400 transition hover:text-emerald-300'
             >
-              <Eye className="h-3.5 w-3.5" />
+              <Eye className='h-3.5 w-3.5' />
               Show all
             </button>
             <button
-              type="button"
+              type='button'
               onClick={() => toggleAll(false)}
-              className="inline-flex items-center gap-1 text-slate-400 transition hover:text-slate-300"
+              className='inline-flex items-center gap-1 text-slate-400 transition hover:text-slate-300'
             >
-              <EyeOff className="h-3.5 w-3.5" />
+              <EyeOff className='h-3.5 w-3.5' />
               Hide all
             </button>
           </div>
         </div>
 
-        <div className="mt-3 space-y-2">
+        <div className='mt-3 space-y-2'>
           {calendars.map(calendar => (
             <button
               key={calendar.id}
-              type="button"
+              type='button'
               onClick={() =>
                 toggleCalendarVisibility(calendar.id, !calendar.isVisible)
               }
               className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm shadow-sm transition ${
                 calendar.isVisible
                   ? 'border-slate-700 bg-slate-900/70 hover:border-slate-600'
-                  : 'border-slate-800 bg-slate-950 hover:border-slate-800/80 text-slate-500'
+                  : 'border-slate-800 bg-slate-950 text-slate-500 hover:border-slate-800/80'
               }`}
             >
-              <span className="inline-flex items-center gap-2">
-                <span className="text-lg leading-none">
+              <span className='inline-flex items-center gap-2'>
+                <span className='text-lg leading-none'>
                   {calendar.icon ?? ''}
                 </span>
                 <span>{calendar.name}</span>
               </span>
               <span
-                className="h-2.5 w-2.5 rounded-full"
+                className='h-2.5 w-2.5 rounded-full'
                 style={{
                   backgroundColor: calendar.isVisible
                     ? (calendar.colors?.lineColor ?? '#22c55e')
@@ -251,16 +244,16 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
           ))}
         </div>
 
-        <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <div className='mt-6 rounded-xl border border-slate-800 bg-slate-900/70 p-4'>
+          <p className='text-xs font-semibold tracking-wide text-slate-400 uppercase'>
             Upcoming
           </p>
-          <ul className="mt-3 space-y-3 text-sm">
+          <ul className='mt-3 space-y-3 text-sm'>
             {upcoming.length ? (
               upcoming.map(item => (
-                <li key={item.event.id} className="space-y-1">
-                  <p className="font-medium text-white">{item.event.title}</p>
-                  <p className="text-xs text-slate-400">
+                <li key={item.event.id} className='space-y-1'>
+                  <p className='font-medium text-white'>{item.event.title}</p>
+                  <p className='text-xs text-slate-400'>
                     {item.startDate.toLocaleString(undefined, {
                       month: 'short',
                       day: 'numeric',
@@ -269,14 +262,14 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
                     })}
                   </p>
                   {item.calendar && (
-                    <p className="text-xs text-slate-500">
+                    <p className='text-xs text-slate-500'>
                       {item.calendar.icon} {item.calendar.name}
                     </p>
                   )}
                 </li>
               ))
             ) : (
-              <li className="text-xs text-slate-500">
+              <li className='text-xs text-slate-500'>
                 No upcoming events scheduled.
               </li>
             )}
@@ -284,7 +277,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
         </div>
       </div>
 
-      <div className="border-t border-white/10 px-4 py-3 text-xs text-slate-500">
+      <div className='border-t border-white/10 px-4 py-3 text-xs text-slate-500'>
         {hiddenCount
           ? `${hiddenCount} calendar${hiddenCount > 1 ? 's' : ''} hidden`
           : 'All calendars visible'}
@@ -295,7 +288,7 @@ const CustomSidebarPanel: React.FC<CalendarSidebarRenderProps> = ({
 
 const ShowcaseWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="mt-6">{children}</div>;
+}) => <div className='mt-6'>{children}</div>;
 
 export const SidebarCustomShowcase: React.FC = () => {
   const renderSidebar = useCallback(

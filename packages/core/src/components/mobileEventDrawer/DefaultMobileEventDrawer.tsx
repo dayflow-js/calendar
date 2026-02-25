@@ -1,13 +1,23 @@
+import { JSX } from 'preact';
+import { createPortal } from 'preact/compat';
 import { useState, useEffect, useMemo } from 'preact/hooks';
-import { Event, MobileEventProps, CalendarType } from '@/types';
-import { MiniCalendar } from '../common/MiniCalendar';
-import { CalendarPicker, CalendarOption } from '../common/CalendarPicker';
-import { formatTime, isEventEqual } from '@/utils';
+
+import {
+  CalendarPicker,
+  CalendarOption,
+} from '@/components/common/CalendarPicker';
+import { MiniCalendar } from '@/components/common/MiniCalendar';
 import { useLocale } from '@/locale';
+import {
+  Event as CalendarEvent,
+  MobileEventProps,
+  CalendarType,
+} from '@/types';
+import { formatTime, isEventEqual } from '@/utils';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
+
 import { Switch } from './components/Switch';
 import { TimePickerWheel } from './components/TimePickerWheel';
-import { createPortal } from 'preact/compat';
 
 export const MobileEventDrawer = ({
   isOpen,
@@ -163,7 +173,7 @@ export const MobileEventDrawer = ({
       finalEnd.setHours(0, 0, 0, 0);
     }
 
-    const currentEvent: Event = {
+    const currentEvent: CalendarEvent = {
       ...draftEvent,
       title,
       calendarId,
@@ -206,7 +216,7 @@ export const MobileEventDrawer = ({
       start: dateToZonedDateTime(finalStart),
       end: dateToZonedDateTime(finalEnd),
     };
-    onSave(updated as Event);
+    onSave(updated as CalendarEvent);
   };
 
   const toggleExpand = (
@@ -215,13 +225,12 @@ export const MobileEventDrawer = ({
     setExpandedPicker(prev => (prev === key ? null : key));
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString(locale, {
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     });
-  };
 
   const handleDateChange = (type: 'start' | 'end', d: Date) => {
     if (type === 'start') {
@@ -275,28 +284,29 @@ export const MobileEventDrawer = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-10000 flex items-end pointer-events-none">
+    <div className='pointer-events-none fixed inset-0 z-10000 flex items-end'>
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/30 pointer-events-auto transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+        className={`pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         style={{ touchAction: 'none' }}
         onClick={onClose}
       />
 
       {/* Drawer */}
       <div
-        className={`relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-2xl shadow-xl h-[85vh] flex flex-col pointer-events-auto overflow-hidden ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}
+        className={`pointer-events-auto relative flex h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-gray-100 shadow-xl dark:bg-gray-800 ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
         {/* Header Actions */}
-        <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        <div className='flex items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900'>
           <button
+            type='button'
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 px-2 py-1"
+            className='px-2 py-1 text-gray-500 hover:text-gray-700'
           >
             {t('cancel')}
           </button>
-          <span className="font-semibold text-lg">
+          <span className='text-lg font-semibold'>
             {!isEditable && isEditing
               ? t('viewEvent')
               : isEditing
@@ -305,72 +315,88 @@ export const MobileEventDrawer = ({
           </span>
           {isEditable && (
             <button
+              type='button'
               onClick={handleSave}
               disabled={!hasChanges}
-              className={`font-bold px-2 py-1 transition-colors ${
+              className={`px-2 py-1 font-bold transition-colors ${
                 hasChanges
                   ? 'text-primary'
-                  : 'text-gray-400 cursor-not-allowed opacity-50'
+                  : 'cursor-not-allowed text-gray-400 opacity-50'
               }`}
             >
               {isEditing ? t('done') : t('create')}
             </button>
           )}
-          {!isEditable && <span className="w-12" />}
+          {!isEditable && <span className='w-12' />}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className='flex-1 space-y-4 overflow-y-auto p-4'>
           {/* Title */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3">
+          <div className='rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
             <input
-              type="text"
+              type='text'
               placeholder={t('titlePlaceholder')}
               value={title}
-              onChange={(e: any) => isEditable && setTitle(e.target.value)}
+              onChange={(
+                e: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>
+              ) => isEditable && setTitle(e.currentTarget.value)}
               readOnly={!isEditable}
-              className="w-full bg-transparent text-xl font-medium placeholder-gray-400 focus:outline-none"
+              className='w-full bg-transparent text-xl font-medium placeholder-gray-400 focus:outline-none'
               autoFocus={isEditable}
             />
           </div>
 
           {/* Calendar */}
           {calendars.length > 0 && (
-            <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center relative">
-              <span className="text-gray-700 dark:text-gray-300">
+            <div className='relative flex items-center justify-between rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
+              <span className='text-gray-700 dark:text-gray-300'>
                 {t('calendar')}
               </span>
               <CalendarPicker
                 options={calendarOptions}
                 value={calendarId}
-                onChange={isEditable ? setCalendarId : () => {}}
+                onChange={
+                  isEditable
+                    ? setCalendarId
+                    : () => {
+                        /* noop */
+                      }
+                }
                 registry={app.getCalendarRegistry()}
-                variant="mobile"
+                variant='mobile'
                 disabled={!isEditable}
               />
             </div>
           )}
 
           {/* All-day */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3 flex justify-between items-center">
-            <span className="text-gray-700 dark:text-gray-300">
+          <div className='flex items-center justify-between rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
+            <span className='text-gray-700 dark:text-gray-300'>
               {t('allDay')}
             </span>
             <Switch
               checked={isAllDay}
-              onChange={isEditable ? setIsAllDay : () => {}}
+              onChange={
+                isEditable
+                  ? setIsAllDay
+                  : () => {
+                      /* noop */
+                    }
+              }
               disabled={!isEditable}
             />
           </div>
 
           {/* Starts */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
-              <span className="text-gray-700 dark:text-gray-300">
+          <div className='overflow-hidden rounded-lg bg-white dark:bg-gray-900'>
+            <div className='flex items-center justify-between border-b border-gray-100 px-4 py-3 last:border-0 dark:border-gray-800'>
+              <span className='text-gray-700 dark:text-gray-300'>
                 {t('starts')}
               </span>
-              <div className="flex space-x-2">
+              <div className='flex space-x-2'>
                 <button
-                  className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                  type='button'
+                  className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'start-date' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                   onClick={() => isEditable && toggleExpand('start-date')}
                   disabled={!isEditable}
                 >
@@ -378,7 +404,8 @@ export const MobileEventDrawer = ({
                 </button>
                 {!isAllDay && (
                   <button
-                    className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'start-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                    type='button'
+                    className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'start-time' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                     onClick={() => isEditable && toggleExpand('start-time')}
                     disabled={!isEditable}
                   >
@@ -393,7 +420,7 @@ export const MobileEventDrawer = ({
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-date' ? 'max-h-100' : 'max-h-0'}`}
             >
-              <div className="">
+              <div className=''>
                 <MiniCalendar
                   currentDate={startDate}
                   visibleMonth={startVisibleMonth}
@@ -406,7 +433,7 @@ export const MobileEventDrawer = ({
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'start-time' ? 'max-h-75' : 'max-h-0'}`}
             >
-              <div className="">
+              <div className=''>
                 <TimePickerWheel
                   date={startDate}
                   onChange={handleStartTimeChange}
@@ -416,14 +443,15 @@ export const MobileEventDrawer = ({
           </div>
 
           {/* Ends */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
-              <span className="text-gray-700 dark:text-gray-300">
+          <div className='overflow-hidden rounded-lg bg-white dark:bg-gray-900'>
+            <div className='flex items-center justify-between border-b border-gray-100 px-4 py-3 last:border-0 dark:border-gray-800'>
+              <span className='text-gray-700 dark:text-gray-300'>
                 {t('ends')}
               </span>
-              <div className="flex space-x-2">
+              <div className='flex space-x-2'>
                 <button
-                  className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-date' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                  type='button'
+                  className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'end-date' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                   onClick={() => isEditable && toggleExpand('end-date')}
                   disabled={!isEditable}
                 >
@@ -431,7 +459,8 @@ export const MobileEventDrawer = ({
                 </button>
                 {!isAllDay && (
                   <button
-                    className={`px-3 py-1 rounded-md transition-colors ${expandedPicker === 'end-time' ? 'bg-gray-200 dark:bg-gray-700 text-primary dark:text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
+                    type='button'
+                    className={`rounded-md px-3 py-1 transition-colors ${expandedPicker === 'end-time' ? 'bg-gray-200 text-primary dark:bg-gray-700 dark:text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
                     onClick={() => isEditable && toggleExpand('end-time')}
                     disabled={!isEditable}
                   >
@@ -443,7 +472,7 @@ export const MobileEventDrawer = ({
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'end-date' ? 'max-h-100' : 'max-h-0'}`}
             >
-              <div className="">
+              <div className=''>
                 <MiniCalendar
                   currentDate={endDate}
                   visibleMonth={endVisibleMonth}
@@ -456,7 +485,7 @@ export const MobileEventDrawer = ({
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedPicker === 'end-time' ? 'max-h-75' : 'max-h-0'}`}
             >
-              <div className="">
+              <div className=''>
                 <TimePickerWheel
                   date={endDate}
                   onChange={handleEndTimeChange}
@@ -466,21 +495,24 @@ export const MobileEventDrawer = ({
           </div>
 
           {/* Notes */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg px-4 py-3">
+          <div className='rounded-lg bg-white px-4 py-3 dark:bg-gray-900'>
             <textarea
               placeholder={t('notesPlaceholder')}
               value={notes}
-              onChange={(e: any) => isEditable && setNotes(e.target.value)}
+              onChange={(
+                e: JSX.TargetedEvent<HTMLTextAreaElement, globalThis.Event>
+              ) => isEditable && setNotes(e.currentTarget.value)}
               readOnly={!isEditable}
-              className="w-full bg-transparent text-base placeholder-gray-400 focus:outline-none min-h-20"
+              className='min-h-20 w-full bg-transparent text-base placeholder-gray-400 focus:outline-none'
             />
           </div>
 
           {/* Delete button — only for existing events that can be edited */}
           {isEditable && isEditing && onEventDelete && draftEvent && (
             <button
+              type='button'
               onClick={() => onEventDelete(draftEvent.id)}
-              className="w-full bg-white dark:bg-gray-900 rounded-lg px-4 py-3 text-red-500 font-medium text-left"
+              className='w-full rounded-lg bg-white px-4 py-3 text-left font-medium text-red-500 dark:bg-gray-900'
             >
               {t('delete')}
             </button>

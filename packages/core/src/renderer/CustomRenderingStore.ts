@@ -2,7 +2,7 @@ export interface CustomRendering {
   id: string;
   containerEl: HTMLElement; // The placeholder div created by Preact
   generatorName: string; // e.g. 'eventContent', 'titleBarSlot'
-  generatorArgs: any; // Arguments passed to the framework-specific generator
+  generatorArgs: unknown; // Arguments passed to the framework-specific generator
 }
 
 export type CustomRenderingListener = (

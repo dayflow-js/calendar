@@ -1,21 +1,22 @@
 import { EventLayout, Event } from '@/types';
-import { LayoutCalculationParams } from './types';
-import { toLayoutEvent } from './utils';
+
 import {
   groupOverlappingEvents,
   analyzeParallelGroups,
 } from './calculate/grouping';
-import { buildNestedStructure } from './calculate/structure';
 import { calculateLayoutFromStructure } from './calculate/layout';
+import { buildNestedStructure } from './calculate/structure';
 import { LAYOUT_CONFIG } from './constants';
+import { LayoutCalculationParams } from './types';
+import { toLayoutEvent } from './utils';
 
-export class EventLayoutCalculator {
+export const EventLayoutCalculator = {
   /**
    * Calculate layout for all events in a day
    * @param dayEvents Array of events for the day
    * @param params Layout calculation parameters
    */
-  static calculateDayEventLayouts(
+  calculateDayEventLayouts(
     dayEvents: Event[],
     params: LayoutCalculationParams = {}
   ): Map<string, EventLayout> {
@@ -58,7 +59,7 @@ export class EventLayoutCalculator {
         });
       } else {
         // Complex layout
-        const sortedEvents = [...group].sort((a, b) => {
+        const sortedEvents = [...group].toSorted((a, b) => {
           if (a._startHour! !== b._startHour!)
             return a._startHour! - b._startHour!;
           return b._endHour! - b._startHour! - (a._endHour! - a._startHour!);
@@ -71,5 +72,5 @@ export class EventLayoutCalculator {
     }
 
     return layoutMap;
-  }
-}
+  },
+};

@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import {
   isMultiDayEvent,
   extractHourFromDate,
@@ -5,8 +7,7 @@ import {
   roundToTimeStep,
   generateUniKey,
   isSameDay,
-} from '../helpers';
-import { Temporal } from 'temporal-polyfill';
+} from '@/utils/helpers';
 
 describe('helpers', () => {
   describe('isMultiDayEvent', () => {

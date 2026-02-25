@@ -1,10 +1,6 @@
 // Calendar Registry - Manages calendar types and color resolution
 
-import {
-  CalendarType,
-  ThemeMode,
-  CalendarColors,
-} from '../types/calendarTypes';
+import { CalendarType, ThemeMode, CalendarColors } from '@/types/calendarTypes';
 
 /**
  * Default calendar types
@@ -373,7 +369,7 @@ export class CalendarRegistry {
    */
   resolveColors(calendarId?: string, theme?: ThemeMode): CalendarColors {
     const activeTheme = theme || this.currentTheme;
-    const isDark = this.isDarkTheme(activeTheme);
+    const isDark = CalendarRegistry.isDarkTheme(activeTheme);
 
     // Try to get the specified calendar
     let calendar: CalendarType | undefined;
@@ -420,7 +416,7 @@ export class CalendarRegistry {
   /**
    * Check if the current theme is dark
    */
-  private isDarkTheme(theme: ThemeMode): boolean {
+  private static isDarkTheme(theme: ThemeMode): boolean {
     if (theme === 'dark') return true;
     if (theme === 'light') return false;
 
@@ -435,7 +431,7 @@ export class CalendarRegistry {
   /**
    * Validate calendar configuration
    */
-  validate(calendar: Partial<CalendarType>): string[] {
+  static validate(calendar: Partial<CalendarType>): string[] {
     const errors: string[] = [];
 
     if (!calendar.id) {
@@ -446,9 +442,7 @@ export class CalendarRegistry {
       errors.push('Calendar type must have a name');
     }
 
-    if (!calendar.colors) {
-      errors.push('Calendar type must have colors configuration');
-    } else {
+    if (calendar.colors) {
       if (!calendar.colors.eventColor) {
         errors.push('Calendar colors must include eventColor');
       }
@@ -461,6 +455,8 @@ export class CalendarRegistry {
       if (!calendar.colors.textColor) {
         errors.push('Calendar colors must include textColor');
       }
+    } else {
+      errors.push('Calendar type must have colors configuration');
     }
 
     return errors;

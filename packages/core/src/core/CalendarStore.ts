@@ -1,5 +1,5 @@
-import { Event } from '../types/event';
-import { EventChange } from '../types/core';
+import { EventChange } from '@/types/core';
+import { Event } from '@/types/event';
 
 /**
  * CalendarStore
@@ -165,17 +165,15 @@ export class CalendarStore {
           // = Delete(A)  (The original state A is now gone)
           changeMap.set(id, { type: 'delete', event: prev.before });
         }
-      } else if (prev.type === 'delete') {
+      } else if (prev.type === 'delete' && change.type === 'create') {
         // PREV: Delete(A)
-        if (change.type === 'create') {
-          // + CURR: Create(B) (where B.id === A.id)
-          // = Update(A->B)
-          changeMap.set(id, {
-            type: 'update',
-            before: prev.event,
-            after: change.event,
-          });
-        }
+        // + CURR: Create(B) (where B.id === A.id)
+        // = Update(A->B)
+        changeMap.set(id, {
+          type: 'update',
+          before: prev.event,
+          after: change.event,
+        });
       }
     }
 

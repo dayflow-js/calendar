@@ -1,10 +1,9 @@
-// Plugin-related type definitions
-import React from 'preact/hooks';
-import { Event } from './event';
-import { EventLayout } from './layout';
+import { DragConfig } from './config';
 import { ViewType } from './core';
 import { MonthDragState, WeekDayDragState } from './dragIndicator';
-import { DragConfig } from './config';
+// Plugin-related type definitions
+import { Event } from './event';
+import { EventLayout } from './layout';
 
 /**
  * Events service interface
@@ -48,8 +47,8 @@ export interface EventsPluginConfig {
  * Drag Hook options
  */
 export interface DragHookOptions extends Partial<DragConfig> {
-  calendarRef: any;
-  allDayRowRef?: any;
+  calendarRef: unknown;
+  allDayRowRef?: unknown;
   viewType: ViewType;
   onEventsUpdate: (
     updateFunc: (events: Event[]) => Event[],
@@ -77,10 +76,10 @@ export interface DragHookOptions extends Partial<DragConfig> {
  * Drag Hook return value
  */
 export interface DragHookReturn {
-  handleMoveStart?: (e: any, event: Event) => void;
-  handleCreateStart?: (e: any, ...args: (Date | number)[]) => void;
-  handleResizeStart?: (e: any, event: Event, direction: string) => void;
-  handleCreateAllDayEvent?: (e: any, dayIndex: number) => void;
+  handleMoveStart?: (e: unknown, event: Event) => void;
+  handleCreateStart?: (e: unknown, ...args: (Date | number)[]) => void;
+  handleResizeStart?: (e: unknown, event: Event, direction: string) => void;
+  handleCreateAllDayEvent?: (e: unknown, dayIndex: number) => void;
   dragState: MonthDragState | WeekDayDragState;
   isDragging: boolean;
 }

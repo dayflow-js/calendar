@@ -54,7 +54,7 @@ export function scrollbarTakesSpace(): boolean {
   const styleEl = document.createElement('style');
   styleEl.textContent =
     '.df-calendar-container .__df_measure__::-webkit-scrollbar { display: block !important; }';
-  document.head.appendChild(styleEl);
+  document.head.append(styleEl);
 
   // Test inside .df-calendar-container so scoped scrollbar CSS applies
   const container = document.createElement('div');
@@ -66,13 +66,13 @@ export function scrollbarTakesSpace(): boolean {
   div.className = '__df_measure__';
   div.style.cssText = 'width:100px;height:100px;overflow:scroll';
 
-  container.appendChild(div);
-  document.body.appendChild(container);
+  container.append(div);
+  document.body.append(container);
 
   const takesSpace = div.offsetWidth - div.clientWidth > 0;
 
-  document.body.removeChild(container);
-  document.head.removeChild(styleEl);
+  container.remove();
+  styleEl.remove();
 
   return takesSpace;
 }

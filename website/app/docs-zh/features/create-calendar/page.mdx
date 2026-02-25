@@ -28,10 +28,10 @@ const calendar = useCalendarApp({
 在内联模式下，点击创建按钮会立即在列表中添加一个名为“未命名”的新日历，并使其进入编辑模式。用户可以直接在侧边栏中输入名称。系统会自动为该日历分配一个随机颜色。
 
 <DocImg
-  width="207"
-  height="211"
-  alt="内联模式"
-  src="/images/docs/inline-mode.png"
+  width='207'
+  height='211'
+  alt='内联模式'
+  src='/images/docs/inline-mode.png'
 />
 
 ### 弹窗模式
@@ -40,17 +40,19 @@ const calendar = useCalendarApp({
 
 import { Callout } from 'nextra/components';
 
-<Callout type="warning">
-  由于采用了多框架架构，核心包不再内置颜色选择器（以前是 `react-color`）。您需要通过 [Content Slots](/docs-zh/features/content-slots) 自行导入颜色选择器组件。
+<Callout type='warning'>
+  由于采用了多框架架构，核心包不再内置颜色选择器（以前是
+  `react-color`）。您需要通过 [Content Slots](/docs-zh/features/content-slots)
+  自行导入颜色选择器组件。
 </Callout>
 
-<div className="mt-8" />
+<div className='mt-8' />
 
 <DocImg
-  width="542"
-  height="542"
-  alt="弹窗模式"
-  src="/images/docs/modal-mode.png"
+  width='542'
+  height='542'
+  alt='弹窗模式'
+  src='/images/docs/modal-mode.png'
 />
 
 ```tsx
@@ -97,13 +99,13 @@ createSidebarPlugin({
 ```tsx
 createSidebarPlugin({
   renderCalendarContextMenu: (calendar, onClose) => (
-    <div className="bg-white shadow-lg border rounded p-2">
-      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+    <div className='bg-white shadow-lg border rounded p-2'>
+      <div className='px-3 py-1.5 text-xs font-semibold text-gray-500'>
         {calendar.name}
       </div>
-      <div className="my-1 h-px bg-gray-200" />
+      <div className='my-1 h-px bg-gray-200' />
       <button
-        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+        className='w-full text-left px-3 py-2 text-sm hover:bg-gray-100'
         onClick={() => {
           console.log('自定义操作：', calendar.id);
           onClose();

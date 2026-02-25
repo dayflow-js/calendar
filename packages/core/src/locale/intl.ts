@@ -50,7 +50,7 @@ export const getWeekDaysLabels = (
     date.setDate(baseDate.getDate() + i);
     try {
       labels.push(date.toLocaleDateString(locale, { weekday: format }));
-    } catch (err) {
+    } catch {
       labels.push(date.toLocaleDateString('en-US', { weekday: format }));
     }
   }
@@ -69,7 +69,7 @@ export const getMonthLabels = (
     const date = new Date(2024, i, 1);
     try {
       labels.push(date.toLocaleDateString(locale, { month: format }));
-    } catch (err) {
+    } catch {
       labels.push(date.toLocaleDateString('en-US', { month: format }));
     }
   }

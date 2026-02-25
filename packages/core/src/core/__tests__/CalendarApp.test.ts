@@ -1,9 +1,10 @@
-import { CalendarApp } from '../CalendarApp';
-import { ICalendarApp, ViewType } from '@/types';
 import { Temporal } from 'temporal-polyfill';
+
+import { CalendarApp } from '@/core/CalendarApp';
+import { createDayView } from '@/factories/createDayView';
 import { createMonthView } from '@/factories/createMonthView';
 import { createWeekView } from '@/factories/createWeekView';
-import { createDayView } from '@/factories/createDayView';
+import { ViewType } from '@/types';
 
 describe('CalendarApp', () => {
   describe('Event Management', () => {
@@ -183,7 +184,9 @@ describe('CalendarApp', () => {
         locale: { code: '!!invalid!!', messages: {} },
       });
 
-      expect((app.state.locale as any).code).toBe('en-US');
+      expect((app.state.locale as unknown as { code: string }).code).toBe(
+        'en-US'
+      );
     });
   });
 });

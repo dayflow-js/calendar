@@ -1,5 +1,5 @@
-import { Event } from './event';
 import { ICalendarApp } from './core';
+import { Event } from './event';
 
 /**
  * Mobile event drawer/dialog Props
@@ -18,8 +18,3 @@ export interface MobileEventProps {
   /** The ICalendarApp instance providing built-in services */
   app: ICalendarApp;
 }
-
-/**
- * Custom mobile event renderer (Drawer or Dialog)
- */
-export type MobileEventRenderer = any;

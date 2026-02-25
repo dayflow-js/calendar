@@ -39,13 +39,11 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       } else if (currentPath === '/docs') {
         window.location.href = '/docs-zh';
       }
-    } else {
+    } else if (currentPath.startsWith('/docs-zh/')) {
       // Convert /docs-zh/xyz to /docs/xyz
-      if (currentPath.startsWith('/docs-zh/')) {
-        window.location.href = currentPath.replace('/docs-zh/', '/docs/');
-      } else if (currentPath === '/docs-zh') {
-        window.location.href = '/docs';
-      }
+      window.location.href = currentPath.replace('/docs-zh/', '/docs/');
+    } else if (currentPath === '/docs-zh') {
+      window.location.href = '/docs';
     }
   };
 
@@ -63,10 +61,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     }
   }, [mounted]);
 
+  const contextValue = React.useMemo(() => ({ locale, setLocale }), [locale]);
+
   return (
-    <I18nContext.Provider value={{ locale, setLocale }}>
-      {children}
-    </I18nContext.Provider>
+    <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>
   );
 }
 

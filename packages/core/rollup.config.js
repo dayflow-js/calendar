@@ -1,12 +1,12 @@
-import resolve from '@rollup/plugin-node-resolve';
+import path from 'node:path';
+
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import postcss from 'rollup-plugin-postcss';
+import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
-import { visualizer } from 'rollup-plugin-visualizer';
+import typescript from '@rollup/plugin-typescript';
 import { dts } from 'rollup-plugin-dts';
-import path from 'path';
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default [
   {
@@ -46,20 +46,6 @@ export default [
           '**/*.spec.tsx',
         ],
       }),
-      postcss({
-        extensions: ['.css'],
-        minimize: false,
-        inject: false,
-        extract: 'styles.css',
-        config: {
-          path: './postcss.build.js',
-        },
-        use: {
-          sass: false,
-          stylus: false,
-          less: false,
-        },
-      }),
       terser(),
       visualizer({
         filename: 'bundle-analysis.html',
@@ -81,7 +67,16 @@ export default [
   {
     input: 'dist/types/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [dts()],
+    plugins: [
+      dts({
+        compilerOptions: {
+          baseUrl: '.',
+          paths: {
+            '@/*': ['./dist/types/*'],
+          },
+        },
+      }),
+    ],
     external: [/\.css$/],
   },
 ];
