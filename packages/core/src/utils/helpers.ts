@@ -41,6 +41,8 @@ export {
   formatEventTimeRange,
   roundToTimeStep,
   getEventEndHour,
+  generateSecondaryTimeSlots,
+  getTimezoneDisplayLabel,
 } from './timeUtils';
 
 // Re-export Date constants

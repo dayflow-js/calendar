@@ -30,7 +30,12 @@ import {
   ViewType as DragViewType,
   WeekDayDragState,
 } from '@/types';
-import { formatTime, extractHourFromDate } from '@/utils';
+import {
+  formatTime,
+  extractHourFromDate,
+  generateSecondaryTimeSlots,
+  getTimezoneDisplayLabel,
+} from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
 
 const DayView = ({
@@ -59,6 +64,7 @@ const DayView = ({
     allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
     timeFormat = '24h',
+    secondaryTimeZone,
   } = config;
 
   const HOUR_HEIGHT = configHourHeight;
@@ -318,7 +324,7 @@ const DayView = ({
         currentDate,
         layoutEvents
       ),
-    TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
+    TIME_COLUMN_WIDTH: secondaryTimeZone && !isMobile ? 88 : isMobile ? 48 : 80,
     isMobile,
   });
 
@@ -395,6 +401,33 @@ const DayView = ({
     hour: i + FIRST_HOUR,
     label: formatTime(i + FIRST_HOUR, 0, timeFormat),
   }));
+
+  const secondaryTimeSlots = useMemo(
+    () =>
+      secondaryTimeZone
+        ? generateSecondaryTimeSlots(timeSlots, secondaryTimeZone, timeFormat)
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [secondaryTimeZone, timeFormat, FIRST_HOUR]
+  );
+
+  const primaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(
+            Intl.DateTimeFormat().resolvedOptions().timeZone
+          )
+        : undefined,
+    [secondaryTimeZone]
+  );
+
+  const secondaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(secondaryTimeZone)
+        : undefined,
+    [secondaryTimeZone]
+  );
 
   // Date selection handling
   const handleDateSelect = useCallback(
@@ -494,6 +527,9 @@ const DayView = ({
         showAllDay={showAllDay}
         showStartOfDayLabel={showStartOfDayLabel}
         timeFormat={timeFormat}
+        secondaryTimeSlots={secondaryTimeSlots}
+        primaryTzLabel={primaryTzLabel}
+        secondaryTzLabel={secondaryTzLabel}
       />
       <RightPanel
         app={app}

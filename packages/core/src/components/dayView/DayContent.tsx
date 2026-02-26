@@ -96,6 +96,9 @@ interface DayContentProps {
   showAllDay: boolean;
   showStartOfDayLabel: boolean;
   timeFormat?: '12h' | '24h';
+  secondaryTimeSlots?: string[];
+  primaryTzLabel?: string;
+  secondaryTzLabel?: string;
 }
 
 export const DayContent = ({
@@ -146,7 +149,13 @@ export const DayContent = ({
   showAllDay,
   showStartOfDayLabel,
   timeFormat = '24h',
+  secondaryTimeSlots,
+  primaryTzLabel,
+  secondaryTzLabel,
 }: DayContentProps) => {
+  const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
+  // On mobile the time column is too narrow for dual labels — hide secondary TZ display
+  const showSecondaryTz = hasSecondaryTz && !isMobile;
   const { t, locale } = useLocale();
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
   const [contextMenu, setContextMenu] = useState<{
@@ -306,8 +315,7 @@ export const DayContent = ({
                     }
                     selectedEventId={selectedEventId}
                     onEventSelect={(eventId: string | null) => {
-                      const isViewable =
-                        app.getReadOnlyConfig().viewable !== false;
+                      const isViewable = app.getReadOnlyConfig().viewable;
                       const isReadOnly = app.state.readOnly;
                       const evt = events.find(e => e.id === eventId);
                       if (
@@ -374,13 +382,13 @@ export const DayContent = ({
                       width: '100%',
                       height: 0,
                       zIndex: 20,
-                      marginTop: '0.75rem',
+                      marginTop: showSecondaryTz ? '2rem' : '0.75rem',
                     }}
                   >
                     <div className='flex w-12 items-center md:w-20'>
                       <div className='relative flex w-full items-center'></div>
                       <div className={currentTimeLabel}>
-                        {formatTime(hours, 0, timeFormat)}
+                        {formatTime(hours, 0, timeFormat, false)}
                       </div>
                     </div>
 
@@ -393,29 +401,57 @@ export const DayContent = ({
 
             {/* Time column */}
             <div
-              className={`${timeColumn} w-12 md:w-20`}
+              className={`${timeColumn} ${showSecondaryTz ? 'w-20 md:w-22' : 'w-12 md:w-20'}`}
               onContextMenu={e => e.preventDefault()}
             >
-              {/* Top boundary spacer */}
-              <div className='h-3' />
+              {/* Top boundary spacer — expands to include timezone header when active */}
+              <div className={showSecondaryTz ? 'h-8' : 'h-3'}>
+                {showSecondaryTz && (
+                  /* Timezone header: secondary LEFT, primary RIGHT */
+                  <div className='flex items-center justify-evenly gap-1 pt-1 pr-1 pb-0.5'>
+                    <span className='text-[9px]select-none text-gray-500 md:text-[10px] dark:text-gray-400'>
+                      {secondaryTzLabel}
+                    </span>
+                    <span className='text-[9px] text-gray-500 md:text-[10px] dark:text-gray-400'>
+                      {primaryTzLabel}
+                    </span>
+                  </div>
+                )}
+              </div>
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
-                  <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                    {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
-                  </div>
+                  {showSecondaryTz ? (
+                    <div className='absolute top-0 right-0 flex w-full -translate-y-1/2 items-center justify-evenly gap-1 text-gray-500 select-none dark:text-gray-400'>
+                      <span className='text-[10px] md:text-[12px]'>
+                        {showStartOfDayLabel && slotIndex === 0
+                          ? ''
+                          : (secondaryTimeSlots?.[slotIndex] ?? '')}
+                      </span>
+                      <span className='text-[10px] text-gray-500 md:text-[12px] dark:text-gray-400'>
+                        {showStartOfDayLabel && slotIndex === 0
+                          ? ''
+                          : slot.label}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+                      {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
             {/* Time grid */}
             <div className='grow select-none'>
-              {/* Top boundary */}
+              {/* Top boundary — height must match time column spacer */}
               <div
                 className={cn(
                   timeGridBoundary,
                   !isMobile && hasScrollbarSpace ? 'border-r' : '',
                   'border-t-0'
                 )}
+                style={showSecondaryTz ? { height: '2rem' } : undefined}
               >
                 <div
                   className={`${midnightLabel} -left-9.5`}
@@ -496,9 +532,22 @@ export const DayContent = ({
                     !isMobile && hasScrollbarSpace ? 'border-r' : ''
                   )}
                 >
-                  <div className={`${midnightLabel} -left-9.5`}>
-                    {formatTime(0, 0, timeFormat)}
-                  </div>
+                  {showSecondaryTz ? (
+                    <div
+                      className='absolute -top-2.5 flex items-center justify-evenly text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'
+                      style={{
+                        left: isMobile ? '-5rem' : '-5.5rem',
+                        width: isMobile ? '5rem' : '5.5rem',
+                      }}
+                    >
+                      <span>{secondaryTimeSlots?.[0] ?? ''}</span>
+                      <span>{formatTime(0, 0, timeFormat)}</span>
+                    </div>
+                  ) : (
+                    <div className={`${midnightLabel} -left-9.5`}>
+                      {formatTime(0, 0, timeFormat)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Event layer */}
@@ -534,8 +583,7 @@ export const DayContent = ({
                           }
                           selectedEventId={selectedEventId}
                           onEventSelect={(eventId: string | null) => {
-                            const isViewable =
-                              app.getReadOnlyConfig().viewable !== false;
+                            const isViewable = app.getReadOnlyConfig().viewable;
                             const evt = events.find(e => e.id === eventId);
                             if ((isMobile || isTouch) && evt && isViewable) {
                               setDraftEvent(evt);

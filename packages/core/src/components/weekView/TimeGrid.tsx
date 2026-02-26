@@ -42,6 +42,9 @@ interface TimeGridProps {
   handleScroll: (
     e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>
   ) => void;
+  secondaryTimeSlots?: string[];
+  primaryTzLabel?: string;
+  secondaryTzLabel?: string;
   handleCreateStart?: (
     e: MouseEvent | TouchEvent,
     dayIndex: number,
@@ -133,7 +136,13 @@ export const TimeGrid = ({
   LAST_HOUR,
   showStartOfDayLabel,
   timeFormat = '24h',
+  secondaryTimeSlots,
+  primaryTzLabel,
+  secondaryTzLabel,
 }: TimeGridProps) => {
+  const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
+  // On mobile the time column is too narrow for dual labels — hide secondary TZ display
+  const showSecondaryTz = hasSecondaryTz && !isMobile;
   const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
   const [contextMenu, setContextMenu] = useState<{
@@ -175,27 +184,78 @@ export const TimeGrid = ({
     <div className='relative flex flex-1 overflow-hidden'>
       {/* Left Frozen Column */}
       <div
-        className='relative z-10 w-12 shrink-0 overflow-hidden bg-white md:w-20 dark:bg-gray-900'
+        className={`relative z-10 w-12 shrink-0 overflow-hidden bg-white md:w-20 dark:bg-gray-900`}
         onContextMenu={e => e.preventDefault()}
       >
         <div ref={leftFrozenContentRef}>
-          {/* Top boundary spacer with start-of-day label */}
-          <div className='relative h-3'>
-            <div className='absolute right-2 -bottom-1 text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'>
-              {showStartOfDayLabel ? formatTime(FIRST_HOUR, 0, timeFormat) : ''}
-            </div>
+          {/* Top boundary spacer — expands to include timezone header when active */}
+          <div className={`relative ${showSecondaryTz ? 'h-8' : 'h-3'}`}>
+            {showSecondaryTz ? (
+              <>
+                {/* Timezone header: secondary LEFT, primary RIGHT */}
+                <div className='flex items-center justify-evenly pt-1 pr-1 pb-0.5'>
+                  <span className='text-[9px] text-gray-500 select-none md:text-[10px] dark:text-gray-400'>
+                    {secondaryTzLabel}
+                  </span>
+                  <span className='text-[9px] text-gray-500 select-none md:text-[10px] dark:text-gray-400'>
+                    {primaryTzLabel}
+                  </span>
+                </div>
+                {/* Start-of-day label: secondary LEFT, primary RIGHT */}
+                <div className='absolute right-0 -bottom-1 flex w-full items-center justify-evenly select-none'>
+                  <span className='text-[10px] text-gray-500 md:text-[12px] dark:text-gray-400'>
+                    {showStartOfDayLabel ? (secondaryTimeSlots?.[0] ?? '') : ''}
+                  </span>
+                  <span className='text-[10px] text-gray-500 md:text-[12px] dark:text-gray-400'>
+                    {showStartOfDayLabel
+                      ? formatTime(FIRST_HOUR, 0, timeFormat)
+                      : ''}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className='absolute right-2 -bottom-1 text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'>
+                {showStartOfDayLabel
+                  ? formatTime(FIRST_HOUR, 0, timeFormat)
+                  : ''}
+              </div>
+            )}
           </div>
           {timeSlots.map((slot, slotIndex) => (
             <div key={slotIndex} className={timeSlot}>
-              <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
-              </div>
+              {showSecondaryTz ? (
+                <div className='absolute top-0 right-0 flex w-full -translate-y-1/2 items-center justify-evenly text-gray-500 select-none dark:text-gray-400'>
+                  <span className='text-[10px] md:text-[12px]'>
+                    {showStartOfDayLabel && slotIndex === 0
+                      ? ''
+                      : (secondaryTimeSlots?.[slotIndex] ?? '')}
+                  </span>
+                  <span className='text-[10px] md:text-[12px]'>
+                    {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
+                  </span>
+                </div>
+              ) : (
+                <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+                  {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
+                </div>
+              )}
             </div>
           ))}
           <div className='relative'>
-            <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-              {formatTime(0, 0, timeFormat)}
-            </div>
+            {showSecondaryTz ? (
+              <div className='absolute top-0 right-0 flex w-full -translate-y-1/2 items-center justify-evenly text-gray-500 select-none dark:text-gray-400'>
+                <span className='text-[10px] md:text-[12px]'>
+                  {secondaryTimeSlots?.[0] ?? ''}
+                </span>
+                <span className='text-[10px] md:text-[12px]'>
+                  {formatTime(0, 0, timeFormat)}
+                </span>
+              </div>
+            ) : (
+              <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+                {formatTime(0, 0, timeFormat)}
+              </div>
+            )}
           </div>
           {/* Current Time Label */}
           {isCurrentWeek &&
@@ -213,11 +273,11 @@ export const TimeGrid = ({
                   style={{
                     top: `${topPx}px`,
                     transform: 'translateY(-50%)',
-                    marginTop: '0.75rem',
+                    marginTop: showSecondaryTz ? '2rem' : '0.75rem',
                   }}
                 >
                   <div className={currentTimeLabel}>
-                    {formatTime(hours, 0, timeFormat)}
+                    {formatTime(hours, 0, timeFormat, false)}
                   </div>
                 </div>
               );
@@ -234,8 +294,11 @@ export const TimeGrid = ({
         <div className='flex' style={{ width: gridWidth, minWidth: '100%' }}>
           {/* Time Grid */}
           <div className='grow'>
-            {/* Top boundary */}
-            <div className={`${timeGridBoundary} flex border-t-0`}>
+            {/* Top boundary — height must match left column spacer */}
+            <div
+              className={`${timeGridBoundary} flex border-t-0`}
+              style={showSecondaryTz ? { height: '2rem' } : undefined}
+            >
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
                   key={`top-${dayIndex}`}

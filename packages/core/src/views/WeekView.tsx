@@ -26,7 +26,12 @@ import {
   ViewType as DragViewType,
   WeekDayDragState,
 } from '@/types';
-import { formatTime, extractHourFromDate } from '@/utils';
+import {
+  formatTime,
+  extractHourFromDate,
+  generateSecondaryTimeSlots,
+  getTimezoneDisplayLabel,
+} from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
 
 const WeekView = ({
@@ -51,7 +56,6 @@ const WeekView = ({
   const events = app.getEvents();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
-  const sidebarWidth = screenSize === 'mobile' ? 48 : 80;
   const timeGridRef = useRef<HTMLDivElement>(null);
   const [isTouch, setIsTouch] = useState(false);
 
@@ -64,7 +68,15 @@ const WeekView = ({
     showAllDay = true,
     mode: configMode,
     timeFormat = '24h',
+    secondaryTimeZone,
   } = config;
+
+  const sidebarWidth =
+    secondaryTimeZone && screenSize !== 'mobile'
+      ? 88
+      : screenSize === 'mobile'
+        ? 48
+        : 80;
 
   // Use standardized names internally (matching previous uppercase names for compatibility with minimal changes)
   const HOUR_HEIGHT = configHourHeight;
@@ -537,6 +549,33 @@ const WeekView = ({
     label: formatTime(i + FIRST_HOUR, 0, timeFormat),
   }));
 
+  const secondaryTimeSlots = useMemo(
+    () =>
+      secondaryTimeZone
+        ? generateSecondaryTimeSlots(timeSlots, secondaryTimeZone, timeFormat)
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [secondaryTimeZone, timeFormat, FIRST_HOUR]
+  );
+
+  const primaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(
+            Intl.DateTimeFormat().resolvedOptions().timeZone
+          )
+        : undefined,
+    [secondaryTimeZone]
+  );
+
+  const secondaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(secondaryTimeZone)
+        : undefined,
+    [secondaryTimeZone]
+  );
+
   // Generate week date data
   const weekDates = useMemo(() => {
     const today = new Date();
@@ -754,6 +793,9 @@ const WeekView = ({
         LAST_HOUR={LAST_HOUR}
         showStartOfDayLabel={showStartOfDayLabel}
         timeFormat={timeFormat}
+        secondaryTimeSlots={secondaryTimeSlots}
+        primaryTzLabel={primaryTzLabel}
+        secondaryTzLabel={secondaryTzLabel}
       />
 
       <MobileEventDrawerComponent

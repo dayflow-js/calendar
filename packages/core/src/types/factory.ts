@@ -87,6 +87,7 @@ export interface ViewFactoryConfig {
 export interface DayViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
+  secondaryTimeZone?: string;
 }
 
 /**
@@ -98,6 +99,7 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   startOfWeek?: number;
   scrollToCurrentTime?: boolean;
   mode?: ViewMode;
+  secondaryTimeZone?: string;
 }
 
 /**
