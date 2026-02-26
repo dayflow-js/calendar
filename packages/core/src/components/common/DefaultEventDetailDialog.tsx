@@ -1,15 +1,17 @@
-import { useMemo, useState, useEffect } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
+import { useMemo, useState, useEffect } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
-import { EventDetailDialogProps } from '../../types/eventDetail';
-import { isPlainDate } from '../../utils/temporal';
-import { getDefaultCalendarRegistry } from '../../core/calendarRegistry';
-import { isEventEqual } from '../../utils/eventUtils';
-import CalendarPicker, { CalendarOption } from './CalendarPicker';
-import RangePicker from '../rangePicker';
-import { ICalendarApp } from '../../types';
+
+import RangePicker from '@/components/rangePicker';
+import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
 import { useLocale } from '@/locale';
 import { dialogContainer } from '@/styles/classNames';
+import { ICalendarApp } from '@/types';
+import { EventDetailDialogProps } from '@/types/eventDetail';
+import { isEventEqual } from '@/utils/eventUtils';
+import { isPlainDate } from '@/utils/temporal';
+
+import { CalendarPicker, CalendarOption } from './CalendarPicker';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: ICalendarApp;
@@ -22,7 +24,6 @@ interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
 const DefaultEventDetailDialog = ({
   event,
   isOpen,
-  isAllDay,
   onEventUpdate,
   onEventDelete,
   onClose,
@@ -52,9 +53,10 @@ const DefaultEventDetailDialog = ({
     onClose();
   };
 
-  const hasChanges = useMemo(() => {
-    return !isEventEqual(event, editedEvent);
-  }, [event, editedEvent]);
+  const hasChanges = useMemo(
+    () => !isEventEqual(event, editedEvent),
+    [event, editedEvent]
+  );
 
   const convertToAllDay = () => {
     const plainDate = isPlainDate(editedEvent.start)
@@ -99,7 +101,6 @@ const DefaultEventDetailDialog = ({
   const eventTimeZone = useMemo(() => {
     if (!isPlainDate(editedEvent.start)) {
       return (
-        (editedEvent.start as any).timeZoneId ||
         (editedEvent.start as Temporal.ZonedDateTime).timeZoneId ||
         Temporal.Now.timeZoneId()
       );
@@ -107,7 +108,6 @@ const DefaultEventDetailDialog = ({
 
     if (editedEvent.end && !isPlainDate(editedEvent.end)) {
       return (
-        (editedEvent.end as any).timeZoneId ||
         (editedEvent.end as Temporal.ZonedDateTime).timeZoneId ||
         Temporal.Now.timeZoneId()
       );
@@ -137,7 +137,7 @@ const DefaultEventDetailDialog = ({
   }
 
   // Handle backdrop click, but ignore clicks from popup components (e.g., RangePicker)
-  const handleBackdropClick = (e: any) => {
+  const handleBackdropClick = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
 
     // Check if clicked on RangePicker or ColorPicker popup content
@@ -153,13 +153,13 @@ const DefaultEventDetailDialog = ({
 
   const dialogContent = (
     <div
-      className="fixed inset-0 flex items-center justify-center"
+      className='fixed inset-0 flex items-center justify-center'
       style={{ pointerEvents: 'auto', zIndex: 9998 }}
-      data-event-detail-dialog="true"
+      data-event-detail-dialog='true'
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 dark:bg-black/80"
+        className='absolute inset-0 bg-black/60 dark:bg-black/80'
         onClick={handleBackdropClick}
       />
 
@@ -167,46 +167,47 @@ const DefaultEventDetailDialog = ({
       <div className={dialogContainer}>
         {/* Close button */}
         <button
+          type='button'
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-200 transition"
-          aria-label="Close"
+          className='absolute top-4 right-4 text-gray-400 transition hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-200'
+          aria-label='Close'
         >
           <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+            className='h-5 w-5'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinecap='round'
+              strokeLinejoin='round'
               strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
+              d='M6 18L18 6M6 6l12 12'
             />
           </svg>
         </button>
 
         {/* Content */}
         <div>
-          <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+          <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
             {t('eventTitle')}
           </span>
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div className="flex-1">
+          <div className='mb-4 flex items-center justify-between gap-3'>
+            <div className='flex-1'>
               <input
                 id={`event-dialog-title-${editedEvent.id}`}
-                name="title"
-                type="text"
+                name='title'
+                type='text'
                 value={editedEvent.title}
                 readOnly={!isEditable}
                 disabled={!isEditable}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setEditedEvent({
                     ...editedEvent,
                     title: (e.target as HTMLInputElement).value,
                   });
                 }}
-                className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+                className='w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
               />
             </div>
             {isEditable && (
@@ -224,14 +225,14 @@ const DefaultEventDetailDialog = ({
             )}
           </div>
 
-          {!!editedEvent.allDay ? (
-            <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+          {editedEvent.allDay ? (
+            <div className='mb-4'>
+              <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
                 {t('dateRange')}
               </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
-                format="YYYY-MM-DD"
+                format='YYYY-MM-DD'
                 showTime={false}
                 timeZone={eventTimeZone}
                 matchTriggerWidth
@@ -242,8 +243,8 @@ const DefaultEventDetailDialog = ({
               />
             </div>
           ) : (
-            <div className="mb-4">
-              <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+            <div className='mb-4'>
+              <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
                 {t('timeRange')}
               </div>
               <RangePicker
@@ -275,13 +276,13 @@ const DefaultEventDetailDialog = ({
             </div>
           )}
 
-          <div className="mb-4">
-            <span className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+          <div className='mb-4'>
+            <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
               {t('note')}
             </span>
             <textarea
               id={`event-dialog-note-${editedEvent.id}`}
-              name="note"
+              name='note'
               value={editedEvent.description ?? ''}
               readOnly={!isEditable}
               disabled={!isEditable}
@@ -292,31 +293,34 @@ const DefaultEventDetailDialog = ({
                 })
               }
               rows={4}
-              className="w-full border border-slate-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
+              className='w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
               placeholder={t('addNotePlaceholder')}
             />
           </div>
 
           {isEditable && (
-            <div className="flex space-x-2">
-              {!editedEvent.allDay ? (
+            <div className='flex space-x-2'>
+              {editedEvent.allDay ? (
                 <button
-                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition"
-                  onClick={convertToAllDay}
-                >
-                  {t('setAsAllDay')}
-                </button>
-              ) : (
-                <button
-                  className="px-3 py-2 bg-secondary/10 text-secondary rounded-lg hover:bg-secondary/20 text-xs font-medium transition"
+                  type='button'
+                  className='rounded-lg bg-secondary/10 px-3 py-2 text-xs font-medium text-secondary transition hover:bg-secondary/20'
                   onClick={convertToRegular}
                 >
                   {t('setAsTimed')}
                 </button>
+              ) : (
+                <button
+                  type='button'
+                  className='rounded-lg bg-secondary/10 px-3 py-2 text-xs font-medium text-secondary transition hover:bg-secondary/20'
+                  onClick={convertToAllDay}
+                >
+                  {t('setAsAllDay')}
+                </button>
               )}
 
               <button
-                className="px-3 py-2 bg-destructive border border-border text-destructive-foreground rounded-lg hover:bg-destructive/90 text-xs font-medium transition"
+                type='button'
+                className='rounded-lg border border-border bg-destructive px-3 py-2 text-xs font-medium text-destructive-foreground transition hover:bg-destructive/90'
                 onClick={() => {
                   onEventDelete(event.id);
                   onClose();
@@ -326,10 +330,11 @@ const DefaultEventDetailDialog = ({
               </button>
 
               <button
-                className={`px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-medium transition ml-auto ${
+                type='button'
+                className={`ml-auto rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition ${
                   hasChanges
-                    ? 'hover:bg-primary/90 shadow-lg shadow-primary/20'
-                    : 'opacity-50 cursor-not-allowed grayscale-[0.5]'
+                    ? 'shadow-lg shadow-primary/20 hover:bg-primary/90'
+                    : 'cursor-not-allowed opacity-50 grayscale-[0.5]'
                 }`}
                 onClick={handleSave}
                 disabled={!hasChanges}

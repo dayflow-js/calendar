@@ -1,4 +1,5 @@
 import { useContext } from 'preact/hooks';
+
 import { LocaleContext, LocaleContextValue } from './LocaleContext';
 
 /**

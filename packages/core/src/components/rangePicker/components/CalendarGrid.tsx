@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill';
-import { compareDates } from '../utils';
+
+import { compareDates } from '@/components/rangePicker/utils';
 
 interface CalendarGridProps {
   calendarDays: Temporal.PlainDate[];
@@ -19,7 +20,7 @@ const CalendarGrid = ({
   weekDayLabels,
   disabled,
   onDaySelect,
-}: CalendarGridProps & any) => {
+}: CalendarGridProps) => {
   const renderDayCell = (day: Temporal.PlainDate) => {
     const isOutsideMonth = day.month !== visibleMonth.month;
     const isStart = compareDates(day, startDate) === 0;
@@ -46,7 +47,7 @@ const CalendarGrid = ({
     return (
       <button
         key={day.toString()}
-        type="button"
+        type='button'
         disabled={disabled}
         onClick={() => onDaySelect(day)}
         className={`${baseClasses} ${stateClass}`}
@@ -58,12 +59,12 @@ const CalendarGrid = ({
 
   return (
     <>
-      <div className="grid grid-cols-7 gap-1 px-1 pb-3 pt-2 text-center text-[12px] uppercase tracking-wide text-slate-400 dark:text-gray-500">
-        {weekDayLabels.map((day: any, index: any) => (
-          <span key={index}>{day}</span>
+      <div className='grid grid-cols-7 gap-1 px-1 pt-2 pb-3 text-center text-[12px] tracking-wide text-slate-400 uppercase dark:text-gray-500'>
+        {weekDayLabels.map((day: string) => (
+          <span key={day}>{day}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1 px-1 ">
+      <div className='grid grid-cols-7 gap-1 px-1'>
         {calendarDays.map(renderDayCell)}
       </div>
     </>

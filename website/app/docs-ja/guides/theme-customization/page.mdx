@@ -93,22 +93,22 @@ export const buildDarkColors = (base: string): ColorSet => ({
 
 DayFlow のすべてのテーマトークンは `--df-color-` プレフィックスを持ち、ホストアプリの変数との衝突を防ぎます。
 
-| 変数 | 用途 |
-|---|---|
-| `--df-color-background` | カレンダーの背景 |
-| `--df-color-foreground` | 主テキスト色 |
-| `--df-color-hover` | ホバー時の背景 |
-| `--df-color-border` | ボーダーと区切り線 |
-| `--df-color-card` | カード・パネルの背景 |
-| `--df-color-card-foreground` | カード内テキスト色 |
-| `--df-color-muted` | 控えめな背景エリア |
-| `--df-color-muted-foreground` | 補助テキスト色 |
-| `--df-color-primary` | 主アクセント（ボタン、選択状態など） |
-| `--df-color-primary-foreground` | プライマリ背景上のテキスト |
-| `--df-color-secondary` | セカンダリアクセント |
-| `--df-color-secondary-foreground` | セカンダリ背景上のテキスト |
-| `--df-color-destructive` | 削除など破壊的アクション |
-| `--df-color-destructive-foreground` | デストラクティブ背景上のテキスト |
+| 変数                                | 用途                                 |
+| ----------------------------------- | ------------------------------------ |
+| `--df-color-background`             | カレンダーの背景                     |
+| `--df-color-foreground`             | 主テキスト色                         |
+| `--df-color-hover`                  | ホバー時の背景                       |
+| `--df-color-border`                 | ボーダーと区切り線                   |
+| `--df-color-card`                   | カード・パネルの背景                 |
+| `--df-color-card-foreground`        | カード内テキスト色                   |
+| `--df-color-muted`                  | 控えめな背景エリア                   |
+| `--df-color-muted-foreground`       | 補助テキスト色                       |
+| `--df-color-primary`                | 主アクセント（ボタン、選択状態など） |
+| `--df-color-primary-foreground`     | プライマリ背景上のテキスト           |
+| `--df-color-secondary`              | セカンダリアクセント                 |
+| `--df-color-secondary-foreground`   | セカンダリ背景上のテキスト           |
+| `--df-color-destructive`            | 削除など破壊的アクション             |
+| `--df-color-destructive-foreground` | デストラクティブ背景上のテキスト     |
 
 ## 上書き方法
 
@@ -119,16 +119,16 @@ DayFlow のすべてのテーマトークンは `--df-color-` プレフィック
 ```css copy
 /* styles/globals.css */
 .df-calendar-container {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
-  --df-color-border:     #e0e7ff;
+  --df-color-border: #e0e7ff;
 }
 
 /* ダークモード — 祖先要素に .dark クラスがあるとき */
 .dark .df-calendar-container {
-  --df-color-primary:    #a5b4fc;
+  --df-color-primary: #a5b4fc;
   --df-color-background: #1e1e2e;
-  --df-color-border:     #312e81;
+  --df-color-border: #312e81;
 }
 ```
 
@@ -149,12 +149,12 @@ DayFlow のデフォルト値は `@layer df-theme` の中にあります。ラ�
 
 @layer dayflow-overrides {
   :where(:root) {
-    --df-color-primary:    #6366f1;
+    --df-color-primary: #6366f1;
     --df-color-background: #f9fafb;
   }
 
   :where(.dark) {
-    --df-color-primary:    #a5b4fc;
+    --df-color-primary: #a5b4fc;
     --df-color-background: #1e1e2e;
   }
 }
@@ -173,7 +173,7 @@ DayFlow のデフォルト値は `@layer df-theme` の中にあります。ラ�
 
 /* @theme は @layer theme の中に変数を生成し、@layer dayflow より優先される */
 @theme {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
 }
 ```
@@ -207,7 +207,7 @@ document.documentElement.classList.toggle('dark', isDark);
 ```tsx copy
 function ThemedCalendar({ calendar }) {
   return (
-    <div className="rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700">
+    <div className='rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700'>
       <DayFlowCalendar calendar={calendar} />
     </div>
   );
@@ -247,15 +247,15 @@ CSS 変数の上書きと組み合わせると、見た目を完全に統一で�
 ```css copy
 /* Ocean テーマ CSS トークン */
 .df-calendar-container {
-  --df-color-primary:    #0369a1;
+  --df-color-primary: #0369a1;
   --df-color-background: #f0f9ff;
-  --df-color-border:     #bae6fd;
+  --df-color-border: #bae6fd;
 }
 
 .dark .df-calendar-container {
-  --df-color-primary:    #7dd3fc;
+  --df-color-primary: #7dd3fc;
   --df-color-background: #0c1220;
-  --df-color-border:     #0c4a6e;
+  --df-color-border: #0c4a6e;
 }
 ```
 

@@ -1,4 +1,5 @@
 import { createContext } from 'preact';
+
 import type { LocaleCode, TranslationKey } from './types';
 
 export interface LocaleContextValue {

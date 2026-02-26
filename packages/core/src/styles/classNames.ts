@@ -567,9 +567,7 @@ export const py2 = 'py-2';
  */
 export const cn = (
   ...classNames: (string | undefined | null | false)[]
-): string => {
-  return classNames.filter(Boolean).join(' ');
-};
+): string => classNames.filter(Boolean).join(' ');
 
 /**
  * Combine class names based on condition
@@ -584,6 +582,4 @@ export const conditional = (
   condition: boolean,
   whenTrue: string,
   whenFalse?: string
-): string => {
-  return cn(base, condition ? whenTrue : whenFalse);
-};
+): string => cn(base, condition ? whenTrue : whenFalse);

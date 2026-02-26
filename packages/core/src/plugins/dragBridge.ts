@@ -1,6 +1,9 @@
-import type { ICalendarApp, DragHookOptions, DragHookReturn } from '../types';
+import type { ICalendarApp, DragHookOptions, DragHookReturn } from '@/types';
 
-type DragForViewFn = (app: ICalendarApp, options: DragHookOptions) => DragHookReturn;
+type DragForViewFn = (
+  app: ICalendarApp,
+  options: DragHookOptions
+) => DragHookReturn;
 
 let impl: DragForViewFn | null = null;
 
@@ -9,10 +12,16 @@ export function registerDragImplementation(fn: DragForViewFn) {
 }
 
 const NO_OP: DragHookReturn = {
-  handleMoveStart: () => {},
-  handleCreateStart: () => {},
+  handleMoveStart: () => {
+    /* noop */
+  },
+  handleCreateStart: () => {
+    /* noop */
+  },
   handleResizeStart: undefined,
-  handleCreateAllDayEvent: () => {},
+  handleCreateAllDayEvent: () => {
+    /* noop */
+  },
   dragState: {
     active: false,
     mode: null,

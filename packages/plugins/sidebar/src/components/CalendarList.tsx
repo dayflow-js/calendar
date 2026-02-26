@@ -1,12 +1,13 @@
-import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 import { CalendarType } from '@dayflow/core';
+import { JSX } from 'preact';
+import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 
 interface CalendarListProps {
   calendars: CalendarType[];
   onToggleVisibility: (id: string, visible: boolean) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onRename: (id: string, newName: string) => void;
-  onContextMenu: (e: any, id: string) => void;
+  onContextMenu: (e: JSX.TargetedMouseEvent<HTMLElement>, id: string) => void;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   activeContextMenuCalendarId?: string | null;
@@ -48,7 +49,7 @@ export const CalendarList = ({
   } | null>(null);
 
   const handleDragStart = useCallback(
-    (calendar: CalendarType, e: any) => {
+    (calendar: CalendarType, e: JSX.TargetedDragEvent<HTMLElement>) => {
       // Prevent dragging when editing or not draggable
       if (editingId || !isDraggable) {
         e.preventDefault();
@@ -63,13 +64,15 @@ export const CalendarList = ({
         calendarColors: calendar.colors,
         calendarIcon: calendar.icon,
       };
-      e.dataTransfer.setData(
-        'application/x-dayflow-calendar',
-        JSON.stringify(dragData)
-      );
-      e.dataTransfer.effectAllowed = 'copy';
+      if (e.dataTransfer) {
+        e.dataTransfer.setData(
+          'application/x-dayflow-calendar',
+          JSON.stringify(dragData)
+        );
+        e.dataTransfer.effectAllowed = 'copy';
+      }
     },
-    [editingId]
+    [editingId, isDraggable]
   );
 
   const handleDragEnd = useCallback(() => {
@@ -78,7 +81,7 @@ export const CalendarList = ({
   }, []);
 
   const handleDragOver = useCallback(
-    (e: any, targetId: string) => {
+    (e: JSX.TargetedDragEvent<HTMLElement>, targetId: string) => {
       e.preventDefault();
       if (draggedCalendarId === targetId) {
         setDropTarget(null);
@@ -169,7 +172,7 @@ export const CalendarList = ({
   }, [setEditingId]);
 
   const handleRenameKeyDown = useCallback(
-    (e: any) => {
+    (e: JSX.TargetedKeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         handleRenameSave();
       } else if (e.key === 'Escape') {
@@ -196,8 +199,8 @@ export const CalendarList = ({
   }, [editingId, calendars]);
 
   return (
-    <div className="df-calendar-list flex-1 overflow-y-auto px-2 pb-3">
-      <ul className="space-y-1 relative">
+    <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
+      <ul className='relative space-y-1'>
         {calendars.map(calendar => {
           const isVisible = calendar.isVisible !== false;
           const calendarColor = calendar.colors?.lineColor || '#3b82f6';
@@ -210,14 +213,14 @@ export const CalendarList = ({
           return (
             <li
               key={calendar.id}
-              className="df-calendar-list-item relative"
+              className='df-calendar-list-item relative'
               onDragOver={e => handleDragOver(e, calendar.id)}
               onDragLeave={handleDragLeave}
               onDrop={() => handleDrop(calendar)}
               onContextMenu={e => onContextMenu(e, calendar.id)}
             >
               {isDropTarget && dropTarget.position === 'top' && (
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none" />
+                <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-primary' />
               )}
               <div
                 draggable={isDraggable && !editingId}
@@ -232,12 +235,12 @@ export const CalendarList = ({
                   title={calendar.name}
                 >
                   <input
-                    type="checkbox"
-                    className="calendar-checkbox cursor-pointer shrink-0"
+                    type='checkbox'
+                    className='calendar-checkbox shrink-0 cursor-pointer'
                     style={
                       {
                         '--checkbox-color': calendarColor,
-                      } as any
+                      } as Record<string, string | number>
                     }
                     checked={isVisible}
                     onChange={event =>
@@ -249,8 +252,8 @@ export const CalendarList = ({
                   />
                   {showIcon && (
                     <span
-                      className="ml-2 flex h-5 w-5 shrink-0 items-center justify-center text-xs font-semibold text-white"
-                      aria-hidden="true"
+                      className='ml-2 flex h-5 w-5 shrink-0 items-center justify-center text-xs font-semibold text-white'
+                      aria-hidden='true'
                     >
                       {getCalendarInitials(calendar)}
                     </span>
@@ -258,19 +261,19 @@ export const CalendarList = ({
                   {editingId === calendar.id ? (
                     <input
                       ref={editInputRef}
-                      type="text"
+                      type='text'
                       value={editingName}
                       onChange={e =>
                         setEditingName((e.target as HTMLInputElement).value)
                       }
                       onBlur={handleRenameSave}
                       onKeyDown={handleRenameKeyDown}
-                      className="ml-2 flex-1 min-w-0 h-5 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100"
+                      className='ml-2 h-5 min-w-0 flex-1 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
                       onClick={e => e.stopPropagation()}
                     />
                   ) : (
                     <span
-                      className="flex-1 pl-1 truncate text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white ml-2"
+                      className='ml-2 flex-1 truncate pl-1 text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white'
                       onDblClick={() => handleRenameStart(calendar)}
                     >
                       {calendar.name || calendar.id}
@@ -279,7 +282,7 @@ export const CalendarList = ({
                 </div>
               </div>
               {isDropTarget && dropTarget.position === 'bottom' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary z-10 pointer-events-none" />
+                <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-primary' />
               )}
             </li>
           );

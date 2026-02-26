@@ -1,0 +1,41 @@
+// https://oxc.rs/docs/guide/usage/formatter/config-file-reference.html
+
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "jsxSingleQuote": true,
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "sortPackageJson": {
+    "sortScripts": true,
+  },
+  "sortImports": {
+    "ignoreCase": true,
+    "newlinesBetween": true,
+    "order": "asc",
+  },
+  "sortTailwindcss": {
+    "stylesheet": "./packages/core/src/styles/tailwind.css",
+    "attributes": ["class", "className"],
+    "functions": ["clsx", "cn", "cva", "tw"],
+  },
+  "ignorePatterns": [
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lock",
+    "pnpm-workspace.yaml",
+    ".turbo",
+    ".cache",
+    ".output",
+    "dist",
+  ],
+}

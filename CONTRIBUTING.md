@@ -16,20 +16,21 @@ If you have forked the repository and want to run the examples locally, follow t
 2.  **Install dependencies:**
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 3.  **Start the development server:**
-    This command will start the Vite server and launch the example application.
+    Go to the core package directory and start the Vite server to launch the example application.
     ```bash
-    npm run dev
+    cd packages/core
+    pnpm run dev
     ```
     The application typically runs at `http://localhost:5529`.
 
-`feat:` - for new features  
-`fix:` - for bug fixes  
-`docs:` - for documentation updates  
-`style:` - for code style changes (formatting, missing semi-colons, etc.)  
-`refactor:` - for code refactoring without adding features or fixing bugs  
-`test:` - for adding or updating tests  
+`feat:` - for new features
+`fix:` - for bug fixes
+`docs:` - for documentation updates
+`style:` - for code style changes (formatting, missing semi-colons, etc.)
+`refactor:` - for code refactoring without adding features or fixing bugs
+`test:` - for adding or updating tests
 `chore:` - for maintenance tasks (build process, dependencies, etc.)

@@ -1,7 +1,14 @@
-import { h, createContext } from 'preact';
-import { useContext, useEffect, useState, useCallback } from 'preact/hooks';
-import { ThemeMode } from '../types/calendarTypes';
-import { resolveAppliedTheme } from '../utils/themeUtils';
+import { h, createContext, ComponentChildren } from 'preact';
+import {
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from 'preact/hooks';
+
+import { ThemeMode } from '@/types/calendarTypes';
+import { resolveAppliedTheme } from '@/utils/themeUtils';
 
 /**
  * Theme Context Type
@@ -24,7 +31,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
  * Theme Provider Props
  */
 export interface ThemeProviderProps {
-  children: any;
+  children: ComponentChildren;
   /** Initial theme mode */
   initialTheme?: ThemeMode;
   /** Callback when theme changes */
@@ -94,7 +101,6 @@ export const ThemeProvider = ({
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
     } else if (mediaQuery.addListener) {
-      // @ts-ignore - deprecated but needed for older browsers
       mediaQuery.addListener(handleChange);
     }
 
@@ -102,7 +108,6 @@ export const ThemeProvider = ({
       if (mediaQuery.removeEventListener) {
         mediaQuery.removeEventListener('change', handleChange);
       } else if (mediaQuery.removeListener) {
-        // @ts-ignore - deprecated but needed for older browsers
         mediaQuery.removeListener(handleChange);
       }
     };
@@ -128,13 +133,13 @@ export const ThemeProvider = ({
 
     // Track which theme DayFlow applied for other consumers if needed
     if (theme === 'auto') {
-      root.removeAttribute('data-dayflow-theme-override');
+      delete root.dataset.dayflowThemeOverride;
     } else {
-      root.setAttribute('data-dayflow-theme-override', targetTheme);
+      root.dataset.dayflowThemeOverride = targetTheme;
     }
 
     // Set data attribute for CSS selectors
-    root.setAttribute('data-theme', targetTheme);
+    root.dataset.theme = targetTheme;
   }, [effectiveTheme, theme, systemTheme]);
 
   /**
@@ -146,11 +151,14 @@ export const ThemeProvider = ({
     }
   }, [theme, effectiveTheme, onThemeChange]);
 
-  const value: ThemeContextType = {
-    theme,
-    effectiveTheme,
-    setTheme,
-  };
+  const value: ThemeContextType = useMemo(
+    () => ({
+      theme,
+      effectiveTheme,
+      setTheme,
+    }),
+    [theme, effectiveTheme, setTheme]
+  );
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

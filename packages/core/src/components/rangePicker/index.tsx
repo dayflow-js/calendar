@@ -1,3 +1,5 @@
+import { JSX } from 'preact';
+import { createPortal } from 'preact/compat';
 import {
   useCallback,
   useEffect,
@@ -5,9 +7,10 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { createPortal } from 'preact/compat';
 import { Temporal } from 'temporal-polyfill';
-import { isPlainDate } from '../../utils/temporal';
+
+import { MoveRight } from '@/components/common/Icons';
+import { getMonthLabels, getWeekDaysLabels } from '@/locale';
 import {
   mergeFormatTemplate,
   buildParseRegExp,
@@ -15,12 +18,12 @@ import {
   getZoneId,
   normalizeToZoned,
   formatTemporal,
-} from '../../utils/rangePicker';
-import { MoveRight } from '../common/Icons';
-import { getMonthLabels, getWeekDaysLabels } from '@/locale';
-import { RangePickerProps, ZonedRange } from './types';
-import { DEFAULT_FORMAT, DEFAULT_TIME_FORMAT } from './constants';
+} from '@/utils/rangePicker';
+import { isPlainDate } from '@/utils/temporal';
+
 import RangePickerPanel from './components/RangePickerPanel';
+import { DEFAULT_FORMAT, DEFAULT_TIME_FORMAT } from './constants';
+import { RangePickerProps, ZonedRange } from './types';
 
 const RangePicker = ({
   value,
@@ -37,9 +40,10 @@ const RangePicker = ({
   matchTriggerWidth = false,
   locale = 'en-US',
 }: RangePickerProps) => {
-  const localeCode = useMemo(() => {
-    return typeof locale === 'string' ? locale : locale?.code || 'en-US';
-  }, [locale]);
+  const localeCode = useMemo(
+    () => (typeof locale === 'string' ? locale : locale?.code || 'en-US'),
+    [locale]
+  );
 
   const isTimeEnabled = useMemo(() => {
     if (showTime === undefined) return true;
@@ -47,13 +51,15 @@ const RangePicker = ({
     return Boolean(showTime);
   }, [showTime]);
 
-  const monthLabels = useMemo(() => {
-    return getMonthLabels(localeCode, 'short');
-  }, [localeCode]);
+  const monthLabels = useMemo(
+    () => getMonthLabels(localeCode, 'short'),
+    [localeCode]
+  );
 
-  const weekDayLabels = useMemo(() => {
-    return getWeekDaysLabels(localeCode, 'narrow');
-  }, [localeCode]);
+  const weekDayLabels = useMemo(
+    () => getWeekDaysLabels(localeCode, 'narrow'),
+    [localeCode]
+  );
 
   const effectiveTimeFormat = useMemo(() => {
     if (!isTimeEnabled) {
@@ -80,11 +86,11 @@ const RangePicker = ({
   const normalizedValue = useMemo<ZonedRange>(() => {
     const zone =
       timeZone ??
-      (!isPlainDate(value[0])
-        ? getZoneId(value[0] as Temporal.ZonedDateTime)
-        : !isPlainDate(value[1])
-          ? getZoneId(value[1] as Temporal.ZonedDateTime)
-          : Temporal.Now.timeZoneId());
+      (isPlainDate(value[0])
+        ? isPlainDate(value[1])
+          ? Temporal.Now.timeZoneId()
+          : getZoneId(value[1] as Temporal.ZonedDateTime)
+        : getZoneId(value[0] as Temporal.ZonedDateTime));
 
     const start = normalizeToZoned(value[0], zone);
     const end = normalizeToZoned(value[1], zone, start);
@@ -108,10 +114,10 @@ const RangePicker = ({
   );
   const [isOpen, setIsOpenInternal] = useState(false);
 
-  const setIsOpen = useCallback((value: boolean) => {
-    setIsOpenInternal(value);
+  const setIsOpen = useCallback((val: boolean) => {
+    setIsOpenInternal(val);
   }, []);
-  const [popupPlacement, setPopupPlacement] = useState(placement);
+  const [_, setPopupPlacement] = useState(placement);
   const popupPlacementRef = useRef(placement);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -558,73 +564,76 @@ const RangePicker = ({
   );
 
   const handleInputChange = useCallback(
-    (field: 'start' | 'end') => (event: any) => {
-      const newValue = event.target.value;
-      isEditingRef.current = true;
-      updateInputValue(field, newValue);
+    (field: 'start' | 'end') =>
+      (event: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>) => {
+        const newValue = event.currentTarget.value;
+        isEditingRef.current = true;
+        updateInputValue(field, newValue);
 
-      // Try to parse and sync to popup in real-time
-      const index = field === 'start' ? 0 : 1;
-      const reference = draftRangeRef.current[index];
-      const zoneId = getZoneId(reference);
-      const parsed = parseTemporalString(
-        newValue,
-        parseRegExp,
-        reference,
-        zoneId
-      );
-      if (parsed) {
-        updateRange(field, parsed);
-        const month = parsed.toPlainDate().with({ day: 1 });
-        setVisibleMonth(month);
-        scrollToActiveTime(field);
-      }
-    },
+        // Try to parse and sync to popup in real-time
+        const index = field === 'start' ? 0 : 1;
+        const reference = draftRangeRef.current[index];
+        const zoneId = getZoneId(reference);
+        const parsed = parseTemporalString(
+          newValue,
+          parseRegExp,
+          reference,
+          zoneId
+        );
+        if (parsed) {
+          updateRange(field, parsed);
+          const month = parsed.toPlainDate().with({ day: 1 });
+          setVisibleMonth(month);
+          scrollToActiveTime(field);
+        }
+      },
     [updateInputValue, parseRegExp, updateRange, scrollToActiveTime]
   );
 
   const handleInputBlur = useCallback(
-    (field: 'start' | 'end') => (event: any) => {
-      if (disabled) return;
-      isEditingRef.current = false;
+    (field: 'start' | 'end') =>
+      (event: JSX.TargetedFocusEvent<HTMLInputElement>) => {
+        if (disabled) return;
+        isEditingRef.current = false;
 
-      if (isOpen) {
-        // Reset input text to canonical format of current draftRange
-        // (draftRange was already synced in real-time for valid inputs)
-        const index = field === 'start' ? 0 : 1;
-        const formatted = formatTemporal(
-          draftRangeRef.current[index],
-          format,
-          effectiveTimeFormat
-        );
-        setInputValues(prev => {
-          const next: [string, string] = [...prev] as [string, string];
-          next[index] = formatted;
-          return next;
-        });
-        return;
-      }
+        if (isOpen) {
+          // Reset input text to canonical format of current draftRange
+          // (draftRange was already synced in real-time for valid inputs)
+          const index = field === 'start' ? 0 : 1;
+          const formatted = formatTemporal(
+            draftRangeRef.current[index],
+            format,
+            effectiveTimeFormat
+          );
+          setInputValues(prev => {
+            const next: [string, string] = [...prev] as [string, string];
+            next[index] = formatted;
+            return next;
+          });
+          return;
+        }
 
-      // Only commit if popup is closed
-      const relatedTarget = event.relatedTarget as HTMLElement;
-      if (!relatedTarget || !containerRef.current?.contains(relatedTarget)) {
-        commitInputValue(field, event.target.value);
-      }
-    },
+        // Only commit if popup is closed
+        const relatedTarget = event.relatedTarget as HTMLElement;
+        if (!relatedTarget || !containerRef.current?.contains(relatedTarget)) {
+          commitInputValue(field, event.currentTarget.value);
+        }
+      },
     [commitInputValue, disabled, isOpen, format, effectiveTimeFormat]
   );
 
   const handleInputKeyDown = useCallback(
-    (field: 'start' | 'end') => (event: any) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        isEditingRef.current = false;
-        commitInputValue(field, event.currentTarget.value);
-      }
-      if (event.key === 'Escape') {
-        event.currentTarget.blur();
-      }
-    },
+    (field: 'start' | 'end') =>
+      (event: JSX.TargetedKeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          isEditingRef.current = false;
+          commitInputValue(field, event.currentTarget.value);
+        }
+        if (event.key === 'Escape') {
+          event.currentTarget.blur();
+        }
+      },
     [commitInputValue]
   );
 
@@ -648,7 +657,7 @@ const RangePicker = ({
     const startOfMonth = visibleMonth;
     const offset = startOfMonth.dayOfWeek % 7;
     const gridStart = startOfMonth.subtract({ days: offset });
-    return Array.from({ length: 42 }, (_, index) =>
+    return Array.from({ length: 42 }, (__, index) =>
       gridStart.add({ days: index })
     );
   }, [visibleMonth]);
@@ -752,18 +761,18 @@ const RangePicker = ({
     };
   }, [isOpen, adjustPopupPlacement]);
 
-  const getPopupStyle = (): any => {
+  const getPopupStyle = (): JSX.CSSProperties => {
     if (!containerRef.current) return {};
 
     const triggerRect = containerRef.current.getBoundingClientRect();
-    const placement = popupPlacementRef.current;
-    const style: any = {
+    const placementDom = popupPlacementRef.current;
+    const style: JSX.CSSProperties = {
       position: 'fixed',
       zIndex: 9999,
     };
 
     // Vertical positioning
-    if (placement.startsWith('bottom')) {
+    if (placementDom.startsWith('bottom')) {
       style.top = triggerRect.bottom + 8;
     } else {
       style.bottom = window.innerHeight - triggerRect.top + 8;
@@ -784,60 +793,60 @@ const RangePicker = ({
   };
 
   return (
-    <div className="relative max-w-100" ref={containerRef}>
+    <div className='relative max-w-100' ref={containerRef}>
       <div
         className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${
           disabled
-            ? 'cursor-not-allowed border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 text-slate-400 dark:text-gray-500'
+            ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500'
             : isOpen
-              ? 'border-primary bg-white dark:bg-gray-700 shadow-md'
-              : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700'
+              ? 'border-primary bg-white shadow-md dark:bg-gray-700'
+              : 'border-slate-200 bg-white dark:border-gray-600 dark:bg-gray-700'
         }`}
       >
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <input
-            type="text"
-            name="range-start"
+            type='text'
+            name='range-start'
             value={inputValues[0]}
             onChange={handleInputChange('start')}
             onFocus={() => openPanelForField('start')}
             onClick={() => openPanelForField('start')}
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
               disabled
                 ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
                 : focusedField === 'start' && isOpen
-                  ? ' bg-white dark:bg-gray-700 text-primary'
+                  ? 'bg-white text-primary dark:bg-gray-700'
                   : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
             }`}
             placeholder={formatTemplate}
-            autoComplete="off"
+            autoComplete='off'
             disabled={disabled}
           />
         </div>
 
-        <MoveRight className="text-slate-400 dark:text-gray-500" />
+        <MoveRight className='text-slate-400 dark:text-gray-500' />
 
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <input
-            type="text"
-            name="range-end"
+            type='text'
+            name='range-end'
             value={inputValues[1]}
             onChange={handleInputChange('end')}
             onFocus={() => openPanelForField('end')}
             onClick={() => openPanelForField('end')}
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 ${
+            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
               disabled
                 ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
                 : focusedField === 'end' && isOpen
-                  ? 'bg-white dark:bg-gray-700 text-primary'
+                  ? 'bg-white text-primary dark:bg-gray-700'
                   : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
             }`}
             placeholder={formatTemplate}
-            autoComplete="off"
+            autoComplete='off'
             disabled={disabled}
           />
         </div>

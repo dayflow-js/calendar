@@ -1,6 +1,10 @@
-import { LayoutWeekEvent, ParallelGroup } from '../types';
-import { eventsOverlap, getStartHour, getEndHour } from '../utils';
-import { LAYOUT_CONFIG } from '../constants';
+import { LAYOUT_CONFIG } from '@/components/eventLayout/constants';
+import { LayoutWeekEvent, ParallelGroup } from '@/components/eventLayout/types';
+import {
+  eventsOverlap,
+  getStartHour,
+  getEndHour,
+} from '@/components/eventLayout/utils';
 
 /**
  * Group overlapping events using BFS

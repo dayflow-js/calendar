@@ -1,12 +1,13 @@
-import TodayBox from './TodayBox';
+import { useLocale } from '@/locale';
 import {
   headerContainer,
   headerTitle,
   headerSubtitle,
   textGray900,
-} from '../../styles/classNames';
-import { ICalendarApp } from '../../types';
-import { useLocale } from '@/locale';
+} from '@/styles/classNames';
+import { ICalendarApp } from '@/types';
+
+import TodayBox from './TodayBox';
 
 export type ViewHeaderType = 'day' | 'week' | 'month' | 'year';
 export type ViewSwitcherMode = 'buttons' | 'select';
@@ -56,7 +57,7 @@ const ViewHeader = ({
   const { locale } = useLocale();
   // Determine whether to show TodayBox based on view type
   // Default: show for all views if callbacks are provided, unless explicitly set to false
-  const shouldShowTodayBox = showTodayBox !== undefined ? showTodayBox : true;
+  const shouldShowTodayBox = showTodayBox === undefined ? true : showTodayBox;
 
   // Generate default title
   const getDefaultTitle = (): string => {
@@ -100,7 +101,7 @@ const ViewHeader = ({
       style={{ position: 'relative' }}
       onContextMenu={e => e.preventDefault()}
     >
-      <div className="flex-1">
+      <div className='flex-1'>
         {/* For Year view: show sticky year if available, otherwise show title */}
         {viewType === 'year' && stickyYear ? (
           <div
@@ -149,7 +150,7 @@ const ViewHeader = ({
 
       {/* Right side: TodayBox */}
       {shouldShowTodayBox && onPrevious && onNext && onToday && (
-        <div className="flex items-center gap-2">
+        <div className='flex items-center gap-2'>
           <TodayBox
             handlePreviousMonth={onPrevious}
             handleNextMonth={onNext}

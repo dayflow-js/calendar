@@ -1,18 +1,26 @@
 import { useRef, useState } from 'preact/hooks';
-import { Event } from '@/types';
+
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { Event, ICalendarApp } from '@/types';
 
 interface UseEventInteractionProps {
   event: Event;
   isTouchEnabled: boolean;
-  onMoveStart?: (e: any, event: Event) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onEventLongPress?: (eventId: string) => void;
   onEventSelect?: (eventId: string | null) => void;
   onDetailPanelToggle?: (key: string | null) => void;
   canOpenDetail: boolean;
-  app?: any;
-  multiDaySegmentInfo?: any;
+  app?: ICalendarApp;
+  multiDaySegmentInfo?: {
+    startHour?: number;
+    endHour?: number;
+    isFirst: boolean;
+    isLast: boolean;
+    dayIndex?: number;
+  };
   isMultiDay?: boolean;
-  segment?: any;
+  segment?: MultiDayEventSegment;
   detailPanelKey: string;
 }
 
@@ -35,7 +43,7 @@ export const useEventInteraction = ({
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handleTouchStart = (e: any) => {
+  const handleTouchStart = (e: TouchEvent) => {
     if (!onMoveStart || !isTouchEnabled) return;
     e.stopPropagation();
     setIsPressed(true);
@@ -43,7 +51,7 @@ export const useEventInteraction = ({
     const touch = e.touches[0];
     const clientX = touch.clientX;
     const clientY = touch.clientY;
-    const currentTarget = e.currentTarget;
+    const currentTarget = e.currentTarget as HTMLElement;
 
     touchStartPosRef.current = { x: clientX, y: clientY };
 
@@ -55,12 +63,16 @@ export const useEventInteraction = ({
       }
 
       const syntheticEvent = {
-        preventDefault: () => {},
-        stopPropagation: () => {},
+        preventDefault: () => {
+          /* noop */
+        },
+        stopPropagation: () => {
+          /* noop */
+        },
         currentTarget: currentTarget,
         touches: [{ clientX, clientY }],
         cancelable: false,
-      } as unknown as any;
+      } as unknown as MouseEvent | TouchEvent;
 
       if (multiDaySegmentInfo) {
         const adjustedEvent = {
@@ -92,7 +104,7 @@ export const useEventInteraction = ({
     }, 500);
   };
 
-  const handleTouchMove = (e: any) => {
+  const handleTouchMove = (e: TouchEvent) => {
     if (longPressTimerRef.current && touchStartPosRef.current) {
       const dx = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
       const dy = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
@@ -105,7 +117,7 @@ export const useEventInteraction = ({
     }
   };
 
-  const handleTouchEnd = (e: any) => {
+  const handleTouchEnd = (e: TouchEvent) => {
     setIsPressed(false);
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);

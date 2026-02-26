@@ -1,8 +1,9 @@
-import { ContextMenu, ContextMenuItem } from './Primitives';
+import { handlePasteEvent } from '@/components/contextMenu/utils';
 import { useLocale } from '@/locale';
-import { ICalendarApp, ViewType } from '../../../types';
+import { ICalendarApp, ViewType } from '@/types';
 import { clipboardStore } from '@/utils/clipboardStore';
-import { handlePasteEvent } from '../utils';
+
+import { ContextMenu, ContextMenuItem } from './Primitives';
 
 interface GridContextMenuProps {
   x: number;
@@ -32,7 +33,7 @@ const GridContextMenu = ({
   };
 
   return (
-    <ContextMenu x={x} y={y} onClose={onClose} className="df-context-menu">
+    <ContextMenu x={x} y={y} onClose={onClose} className='df-context-menu'>
       <ContextMenuItem
         onClick={() => {
           onCreateEvent();

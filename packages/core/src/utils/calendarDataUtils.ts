@@ -5,7 +5,8 @@
  * including days, weeks, and month/year metadata.
  */
 
-import { DayData, WeeksData } from '../types';
+import { DayData, WeeksData } from '@/types';
+
 import { monthNames, shortMonthNames } from './dateConstants';
 import { getWeekRange } from './dateRangeUtils';
 
@@ -40,28 +41,6 @@ export const generateDayData = (date: string | number | Date) => {
 };
 
 /**
- * Generate week data (7 days starting from given date)
- * @param startDate Week start date
- * @returns Week data with days array, startDate, and monthYear
- */
-export const generateWeekData = (startDate: string | number | Date) => {
-  const week = [];
-  const startDateClone = new Date(startDate);
-
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(startDateClone);
-    week.push(generateDayData(date));
-    startDateClone.setDate(startDateClone.getDate() + 1);
-  }
-
-  return {
-    days: week,
-    startDate: new Date(startDate),
-    monthYear: getMonthYearOfWeek(week),
-  };
-};
-
-/**
  * Determine which month and year a week belongs to (based on majority of days)
  * @param days Array of day data
  * @returns Month name, month index, and year
@@ -91,6 +70,28 @@ export const getMonthYearOfWeek = (days: DayData[]) => {
     month: monthNames[monthIndex],
     monthIndex,
     year,
+  };
+};
+
+/**
+ * Generate week data (7 days starting from given date)
+ * @param startDate Week start date
+ * @returns Week data with days array, startDate, and monthYear
+ */
+export const generateWeekData = (startDate: string | number | Date) => {
+  const week = [];
+  const startDateClone = new Date(startDate);
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startDateClone);
+    week.push(generateDayData(date));
+    startDateClone.setDate(startDateClone.getDate() + 1);
+  }
+
+  return {
+    days: week,
+    startDate: new Date(startDate),
+    monthYear: getMonthYearOfWeek(week),
   };
 };
 

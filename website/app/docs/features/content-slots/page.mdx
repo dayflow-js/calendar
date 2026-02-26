@@ -13,7 +13,7 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 ## Available Slots
 
 | Generator Name       | Description                                                      | Arguments                                                       |
-|:---------------------|:-----------------------------------------------------------------|:----------------------------------------------------------------|
+| :------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------- |
 | `eventContent`       | The internal content of an event card.                           | `{ event, isAllDay, isMobile }`                                 |
 | `eventDetailContent` | The content shown in the popover/panel when an event is clicked. | `{ event, position, onClose }`                                  |
 | `colorPicker`        | A small color picker used in the sidebar.                        | `{ color, onChange, variant: 'sketch' }`                        |
@@ -47,7 +47,7 @@ function MyCalendar() {
         <SketchPicker
           color={args.color}
           onChange={color => args.onChange({ hex: color.hex })}
-          width="220px"
+          width='220px'
         />
       )}
       colorPickerWrapper={args => (

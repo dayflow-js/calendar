@@ -1,12 +1,13 @@
 import { useMemo, useCallback } from 'preact/hooks';
+
 import {
   ViewType,
   ViewAdapterProps,
   BaseViewProps,
   EventsService,
   DragService,
-} from '../types';
-import { Event } from '../types';
+  Event,
+} from '@/types';
 
 export const ViewAdapter = ({
   originalComponent: OriginalComponent,
@@ -85,9 +86,7 @@ export const ViewAdapter = ({
   );
 
   // Merge configuration
-  const mergedConfig = useMemo(() => {
-    return { ...config };
-  }, [config]);
+  const mergedConfig = useMemo(() => ({ ...config }), [config]);
 
   // Prepare props to pass to original component
   const viewProps: BaseViewProps = useMemo(
@@ -161,6 +160,8 @@ export const ViewAdapter = ({
           case ViewType.MONTH:
             newDate.setMonth(newDate.getMonth() - 1);
             break;
+          default:
+            break;
         }
         handleDateChange(newDate);
       },
@@ -175,6 +176,8 @@ export const ViewAdapter = ({
             break;
           case ViewType.MONTH:
             newDate.setMonth(newDate.getMonth() + 1);
+            break;
+          default:
             break;
         }
         handleDateChange(newDate);

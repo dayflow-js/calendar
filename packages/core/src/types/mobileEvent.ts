@@ -1,5 +1,5 @@
-import { Event } from './event';
 import { ICalendarApp } from './core';
+import { Event } from './event';
 
 /**
  * Mobile event drawer/dialog Props
@@ -20,8 +20,3 @@ export interface MobileEventProps {
   /** Time format for event display */
   timeFormat?: '12h' | '24h';
 }
-
-/**
- * Custom mobile event renderer (Drawer or Dialog)
- */
-export type MobileEventRenderer = any;

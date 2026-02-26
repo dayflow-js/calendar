@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'preact/hooks';
-import { ICalendarApp, Event, EventDetailDialogRenderer } from '../../types';
-import { isPlainDate } from '../../utils/temporal';
+
+import { ICalendarApp, Event, EventDetailDialogRenderer } from '@/types';
+import { isPlainDate } from '@/utils/temporal';
 
 export interface DialogProps {
   event: Event;
@@ -68,7 +69,9 @@ export function useEventDialogController(
     if (!effectiveEventDetailDialog || !detailPanelEventId) return null;
 
     const rawEventId = detailPanelEventId.split('::')[0];
-    const selectedEvent = app.getEvents().find((e: Event) => e.id === rawEventId);
+    const selectedEvent = app
+      .getEvents()
+      .find((e: Event) => e.id === rawEventId);
     if (!selectedEvent) return null;
 
     return {

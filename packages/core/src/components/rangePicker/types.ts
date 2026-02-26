@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill';
-import { Locale } from '../../locale/types';
+
+import { Locale } from '@/locale/types';
 
 export type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
 

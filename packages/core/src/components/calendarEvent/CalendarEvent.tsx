@@ -6,17 +6,26 @@ import {
   useMemo,
   useContext,
 } from 'preact/hooks';
+
+import { EventContextMenu } from '@/components/contextMenu';
+import { ContentSlot } from '@/renderer/ContentSlot';
+import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
+import { Event, ViewType } from '@/types';
 import {
   getSelectedBgColor,
   getEventBgColor,
   getEventTextColor,
 } from '@/utils';
-import { Event, ViewType } from '@/types';
-import { CalendarEventProps } from './types';
-import { EventContextMenu } from '@/components/contextMenu';
-import { ContentSlot } from '../../renderer/ContentSlot';
-import { CustomRenderingContext } from '../../renderer/CustomRenderingContext';
 
+import { EventContent } from './components/EventContent';
+import { EventDetailPanel } from './components/EventDetailPanel';
+import { useClickOutside } from './hooks/useClickOutside';
+import { useDetailPanelPosition } from './hooks/useDetailPanelPosition';
+import { useEventActions } from './hooks/useEventActions';
+import { useEventInteraction } from './hooks/useEventInteraction';
+import { useEventStyles } from './hooks/useEventStyles';
+import { useEventVisibility } from './hooks/useEventVisibility';
+import { CalendarEventProps } from './types';
 // Import extracted utils and hooks
 import {
   getDayMetrics,
@@ -24,14 +33,6 @@ import {
   getClickedDayIndex,
   getEventClasses,
 } from './utils';
-import { useEventInteraction } from './hooks/useEventInteraction';
-import { useEventVisibility } from './hooks/useEventVisibility';
-import { useClickOutside } from './hooks/useClickOutside';
-import { useEventStyles } from './hooks/useEventStyles';
-import { useDetailPanelPosition } from './hooks/useDetailPanelPosition';
-import { useEventActions } from './hooks/useEventActions';
-import { EventDetailPanel } from './components/EventDetailPanel';
-import { EventContent } from './components/EventContent';
 
 const CalendarEvent = ({
   event,
@@ -67,7 +68,6 @@ const CalendarEvent = ({
   isMobile = false,
   mode = 'standard',
   isCompact = false,
-  mobilePageStart,
   enableTouch,
   hideTime,
   timeFormat = '24h',
@@ -89,14 +89,15 @@ const CalendarEvent = ({
   const detailPanelKey =
     isMultiDay && segment
       ? `${event.id}::${segment.id}`
-      : multiDaySegmentInfo?.dayIndex !== undefined
-        ? `${event.id}::day-${multiDaySegmentInfo.dayIndex}`
-        : isYearView && yearSegment
+      : multiDaySegmentInfo?.dayIndex === undefined
+        ? isYearView && yearSegment
           ? yearSegment.id
-          : event.id;
+          : event.id
+        : `${event.id}::day-${multiDaySegmentInfo.dayIndex}`;
 
   const showDetailPanel = detailPanelEventId === detailPanelKey;
-  const showDetailPanelForClickOutside = showDetailPanel && !customEventDetailDialog;
+  const showDetailPanelForClickOutside =
+    showDetailPanel && !customEventDetailDialog;
 
   const readOnlyConfig = app?.getReadOnlyConfig();
   const isEditable = !app?.state.readOnly;
@@ -128,9 +129,9 @@ const CalendarEvent = ({
   });
 
   const isEventSelected =
-    (selectedEventId !== undefined
-      ? selectedEventId === event.id
-      : isSelected) ||
+    (selectedEventId === undefined
+      ? isSelected
+      : selectedEventId === event.id) ||
     isPressed ||
     isBeingDragged;
 
@@ -143,71 +144,83 @@ const CalendarEvent = ({
     selectedDayIndexRef.current = dayIndex;
   };
 
-  const getActiveDayIdx = useCallback(() =>
-    getActiveDayIndex(
-      event,
-      detailPanelEventId || undefined,
-      detailPanelKey,
-      selectedDayIndexRef.current,
-      multiDaySegmentInfo,
-      segment
-    ), [event, detailPanelEventId, detailPanelKey, multiDaySegmentInfo, segment]);
+  const getActiveDayIdx = useCallback(
+    () =>
+      getActiveDayIndex(
+        event,
+        detailPanelEventId || undefined,
+        detailPanelKey,
+        selectedDayIndexRef.current,
+        multiDaySegmentInfo,
+        segment
+      ),
+    [event, detailPanelEventId, detailPanelKey, multiDaySegmentInfo, segment]
+  );
 
-  const getClickedDayIdx = useCallback((clientX: number) =>
-    getClickedDayIndex(clientX, calendarRef, viewType, isMobile), [calendarRef, viewType, isMobile]);
+  const getClickedDayIdx = useCallback(
+    (clientX: number) =>
+      getClickedDayIndex(clientX, calendarRef, viewType, isMobile),
+    [calendarRef, viewType, isMobile]
+  );
 
-  const getDayMetricsWrapper = useCallback((dayIndex: number) =>
-    getDayMetrics(dayIndex, calendarRef, viewType, isMobile), [calendarRef, viewType, isMobile]);
+  const getDayMetricsWrapper = useCallback(
+    (dayIndex: number) =>
+      getDayMetrics(dayIndex, calendarRef, viewType, isMobile),
+    [calendarRef, viewType, isMobile]
+  );
 
   // Positioning Hook
-  const { detailPanelPosition, setDetailPanelPosition, updatePanelPosition } = useDetailPanelPosition({
-    event,
-    viewType,
-    isMultiDay,
-    segment,
-    yearSegment,
-    multiDaySegmentInfo,
-    calendarRef,
-    eventRef,
-    detailPanelRef,
-    selectedEventElementRef,
-    isMobile,
-    eventVisibility,
-    firstHour,
-    hourHeight,
-    columnsPerRow,
-    showDetailPanel,
-    detailPanelEventId,
-    detailPanelKey,
-    getActiveDayIdx,
-    getDayMetricsWrapper,
-  });
+  const { detailPanelPosition, setDetailPanelPosition, updatePanelPosition } =
+    useDetailPanelPosition({
+      event,
+      viewType,
+      isMultiDay,
+      segment,
+      yearSegment,
+      multiDaySegmentInfo,
+      calendarRef,
+      eventRef,
+      detailPanelRef,
+      selectedEventElementRef,
+      isMobile,
+      eventVisibility,
+      firstHour,
+      hourHeight,
+      columnsPerRow,
+      showDetailPanel,
+      detailPanelEventId,
+      detailPanelKey,
+      getActiveDayIdx,
+      getDayMetricsWrapper,
+    });
 
   // Actions Hook
-  const { handleClick, handleDoubleClick, handleContextMenu } = useEventActions({
-    event,
-    viewType,
-    isAllDay,
-    isMultiDay,
-    segment,
-    multiDaySegmentInfo,
-    calendarRef,
-    firstHour,
-    hourHeight,
-    isMobile,
-    canOpenDetail,
-    detailPanelKey,
-    app,
-    onEventSelect,
-    onDetailPanelToggle,
-    setIsSelected,
-    setDetailPanelPosition,
-    setContextMenuPosition,
-    setActiveDayIndex,
-    getClickedDayIdx,
-    updatePanelPosition,
-    selectedEventElementRef,
-  });
+  const { handleClick, handleDoubleClick, handleContextMenu } = useEventActions(
+    {
+      event,
+      viewType,
+      isAllDay,
+      isMultiDay,
+      segment,
+      multiDaySegmentInfo,
+      calendarRef,
+      firstHour,
+      hourHeight,
+      isMobile,
+      canOpenDetail,
+      detailPanelKey,
+      app,
+      onEventSelect,
+      onDetailPanelToggle,
+      setIsSelected,
+      setDetailPanelPosition,
+      setContextMenuPosition,
+      setActiveDayIndex,
+      getClickedDayIdx,
+      updatePanelPosition,
+      selectedEventElementRef,
+    }
+  );
 
   // Styles Hook
   const { calculateEventStyle } = useEventStyles({
@@ -292,7 +305,14 @@ const CalendarEvent = ({
 
   // Memoized args for the eventContent ContentSlot
   const eventContentSlotArgs = useMemo(
-    () => ({ event, isAllDay, isMobile, isMonthView: viewType === ViewType.MONTH, segment, layout }),
+    () => ({
+      event,
+      isAllDay,
+      isMobile,
+      isMonthView: viewType === ViewType.MONTH,
+      segment,
+      layout,
+    }),
     [event, isAllDay, isMobile, viewType, segment, layout]
   );
 
@@ -301,7 +321,7 @@ const CalendarEvent = ({
     () => (
       <ContentSlot
         store={customRenderingStore}
-        generatorName="eventDetailContent"
+        generatorName='eventDetailContent'
         generatorArgs={panelSlotArgs}
       />
     ),
@@ -379,14 +399,15 @@ const CalendarEvent = ({
         onMouseDown={e => {
           if (!isTouchEnabled) setIsPressed(true);
           if (onMoveStart) {
+            const mouseEvent = e as MouseEvent;
             if (multiDaySegmentInfo) {
-              onMoveStart(e, {
+              onMoveStart(mouseEvent, {
                 ...event,
                 day: multiDaySegmentInfo.dayIndex ?? event.day,
                 _segmentInfo: multiDaySegmentInfo,
               } as Event);
             } else if (isMultiDay && segment) {
-              onMoveStart(e, {
+              onMoveStart(mouseEvent, {
                 ...event,
                 day: segment.startDayIndex,
                 _segmentInfo: {
@@ -396,7 +417,7 @@ const CalendarEvent = ({
                 },
               } as Event);
             } else {
-              onMoveStart(e, event);
+              onMoveStart(mouseEvent, event);
             }
           }
         }}
@@ -409,7 +430,6 @@ const CalendarEvent = ({
         <EventContent
           event={event}
           viewType={viewType}
-          isAllDay={isAllDay}
           isMultiDay={isMultiDay}
           segment={segment}
           yearSegment={yearSegment}
@@ -426,7 +446,6 @@ const CalendarEvent = ({
           isMobile={isMobile}
           mode={mode}
           isCompact={isCompact}
-          mobilePageStart={mobilePageStart}
           app={app}
           onResizeStart={onResizeStart}
           multiDaySegmentInfo={multiDaySegmentInfo}
@@ -450,7 +469,7 @@ const CalendarEvent = ({
           }}
         />
       )}
-      
+
       <EventDetailPanel
         showDetailPanel={showDetailPanel}
         customEventDetailDialog={customEventDetailDialog}

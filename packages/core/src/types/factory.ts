@@ -1,18 +1,20 @@
-// View factory type definitions
+import { AnyComponent, RefObject } from 'preact';
+
+import { ViewSwitcherMode } from '@/components/common/ViewHeader';
+
 import { CalendarView, ViewType, ICalendarApp, ViewMode } from './core';
 import { Event } from './event';
-import { EventLayout } from './layout';
 import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
 } from './eventDetail';
-import { ViewSwitcherMode } from '../components/common/ViewHeader';
+import { EventLayout } from './layout';
 
 /**
  * Common Props interface for view components
  * Base properties for all view components
  */
-export interface BaseViewProps<TConfig = any> {
+export interface BaseViewProps<TConfig = unknown> {
   // Core application instance
   app: ICalendarApp;
 
@@ -41,38 +43,30 @@ export interface BaseViewProps<TConfig = any> {
   // Customization
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   switcherMode?: ViewSwitcherMode;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 /**
  * Day view specific Props
  */
-export interface DayViewProps extends BaseViewProps<DayViewConfig> {
-  // Day view specific properties
-}
+export type DayViewProps = BaseViewProps<DayViewConfig>;
 
 /**
  * Week view specific Props
  */
-export interface WeekViewProps extends BaseViewProps<WeekViewConfig> {
-  // Week view specific properties
-}
+export type WeekViewProps = BaseViewProps<WeekViewConfig>;
 
 /**
  * Month view specific Props
  */
-export interface MonthViewProps extends BaseViewProps<MonthViewConfig> {
-  // Month view specific properties
-}
+export type MonthViewProps = BaseViewProps<MonthViewConfig>;
 
 /**
  * Year view specific Props
  */
-export interface YearViewProps extends BaseViewProps<YearViewConfig> {
-  // Year view specific properties
-}
+export type YearViewProps = BaseViewProps<YearViewConfig>;
 
 /**
  * View factory configuration interface
@@ -128,7 +122,8 @@ export interface YearViewConfig extends ViewFactoryConfig {
  */
 export interface ViewAdapterProps extends BaseViewProps {
   viewType: ViewType;
-  originalComponent: any;
+  // oxlint-disable-next-line typescript/no-explicit-any
+  originalComponent: AnyComponent<any, any>;
   config: ViewFactoryConfig;
   className?: string;
 }
@@ -140,8 +135,8 @@ export interface ViewAdapterProps extends BaseViewProps {
 export interface DragIntegrationProps {
   app: ICalendarApp;
   viewType: ViewType;
-  calendarRef: any;
-  allDayRowRef?: any;
+  calendarRef: RefObject<HTMLDivElement>;
+  allDayRowRef?: RefObject<HTMLDivElement>;
   events: Event[];
   onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => void;
   onEventCreate: (event: Event) => void;

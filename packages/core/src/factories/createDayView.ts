@@ -1,8 +1,10 @@
 // Factory function for creating Day view
 import { h } from 'preact';
+
+import { DayViewConfig, DayViewProps, ViewFactory, ViewType } from '@/types';
+import DayView from '@/views/DayView';
+
 import { ViewAdapter } from './ViewAdapter';
-import DayView from '../views/DayView';
-import { DayViewConfig, ViewFactory, ViewType } from '../types';
 
 // Default Day view configuration
 const defaultDayViewConfig: DayViewConfig = {
@@ -24,8 +26,8 @@ export const createDayView: ViewFactory<DayViewConfig> = (config = {}) => {
   const finalConfig = { ...defaultDayViewConfig, ...config };
 
   // Create adapter component
-  const DayViewAdapter: any = (props: any) => {
-    return h(ViewAdapter, {
+  const DayViewAdapter = (props: DayViewProps) =>
+    h(ViewAdapter, {
       viewType: ViewType.DAY,
       originalComponent: DayView,
       app: props.app,
@@ -41,7 +43,6 @@ export const createDayView: ViewFactory<DayViewConfig> = (config = {}) => {
       detailPanelEventId: props.detailPanelEventId,
       onDetailPanelToggle: props.onDetailPanelToggle,
     });
-  };
 
   // Set display name for debugging
   DayViewAdapter.displayName = 'DayViewAdapter';

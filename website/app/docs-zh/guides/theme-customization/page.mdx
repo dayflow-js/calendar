@@ -101,22 +101,22 @@ export function generateDarkColors(baseColor: string): ColorSet {
 
 所有 DayFlow 主题 token 均使用 `--df-color-` 前缀，以避免与宿主应用的变量命名冲突。
 
-| 变量 | 用途 |
-|---|---|
-| `--df-color-background` | 日历背景色 |
-| `--df-color-foreground` | 主文本颜色 |
-| `--df-color-hover` | 悬停状态背景色 |
-| `--df-color-border` | 边框和分割线 |
-| `--df-color-card` | 卡片 / 面板背景色 |
-| `--df-color-card-foreground` | 卡片内文本颜色 |
-| `--df-color-muted` | 低调背景区域 |
-| `--df-color-muted-foreground` | 辅助 / 次要文本颜色 |
-| `--df-color-primary` | 主强调色（按钮、选中状态等） |
-| `--df-color-primary-foreground` | 主色背景上的文本 |
-| `--df-color-secondary` | 次要强调色 |
-| `--df-color-secondary-foreground` | 次要色背景上的文本 |
-| `--df-color-destructive` | 破坏性操作（删除等） |
-| `--df-color-destructive-foreground` | 破坏性背景上的文本 |
+| 变量                                | 用途                         |
+| ----------------------------------- | ---------------------------- |
+| `--df-color-background`             | 日历背景色                   |
+| `--df-color-foreground`             | 主文本颜色                   |
+| `--df-color-hover`                  | 悬停状态背景色               |
+| `--df-color-border`                 | 边框和分割线                 |
+| `--df-color-card`                   | 卡片 / 面板背景色            |
+| `--df-color-card-foreground`        | 卡片内文本颜色               |
+| `--df-color-muted`                  | 低调背景区域                 |
+| `--df-color-muted-foreground`       | 辅助 / 次要文本颜色          |
+| `--df-color-primary`                | 主强调色（按钮、选中状态等） |
+| `--df-color-primary-foreground`     | 主色背景上的文本             |
+| `--df-color-secondary`              | 次要强调色                   |
+| `--df-color-secondary-foreground`   | 次要色背景上的文本           |
+| `--df-color-destructive`            | 破坏性操作（删除等）         |
+| `--df-color-destructive-foreground` | 破坏性背景上的文本           |
 
 ## 覆盖方法
 
@@ -127,16 +127,16 @@ export function generateDarkColors(baseColor: string): ColorSet {
 ```css
 /* styles/globals.css */
 .df-calendar-container {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
-  --df-color-border:     #e0e7ff;
+  --df-color-border: #e0e7ff;
 }
 
 /* 深色模式 — 当祖先元素带有 .dark 类时生效 */
 .dark .df-calendar-container {
-  --df-color-primary:    #a5b4fc;
+  --df-color-primary: #a5b4fc;
   --df-color-background: #1e1e2e;
-  --df-color-border:     #312e81;
+  --df-color-border: #312e81;
 }
 ```
 
@@ -157,12 +157,12 @@ DayFlow 的默认值位于 `@layer df-theme` 中。可以在导入库之前声�
 
 @layer dayflow-overrides {
   :where(:root) {
-    --df-color-primary:    #6366f1;
+    --df-color-primary: #6366f1;
     --df-color-background: #f9fafb;
   }
 
   :where(.dark) {
-    --df-color-primary:    #a5b4fc;
+    --df-color-primary: #a5b4fc;
     --df-color-background: #1e1e2e;
   }
 }
@@ -181,7 +181,7 @@ DayFlow 的默认值位于 `@layer df-theme` 中。可以在导入库之前声�
 
 /* @theme 在 @layer theme 中生成变量，优先级高于 @layer dayflow */
 @theme {
-  --df-color-primary:    #6366f1;
+  --df-color-primary: #6366f1;
   --df-color-background: #f9fafb;
 }
 ```
@@ -215,7 +215,7 @@ document.documentElement.classList.toggle('dark', isDark);
 ```tsx
 function ThemedCalendar({ calendar }) {
   return (
-    <div className="rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700">
+    <div className='rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700'>
       <DayFlowCalendar calendar={calendar} />
     </div>
   );
@@ -270,15 +270,15 @@ export const oceanTheme = {
 ```css
 /* Ocean 主题 CSS token */
 .df-calendar-container {
-  --df-color-primary:    #0369a1;
+  --df-color-primary: #0369a1;
   --df-color-background: #f0f9ff;
-  --df-color-border:     #bae6fd;
+  --df-color-border: #bae6fd;
 }
 
 .dark .df-calendar-container {
-  --df-color-primary:    #7dd3fc;
+  --df-color-primary: #7dd3fc;
   --df-color-background: #0c1220;
-  --df-color-border:     #0c4a6e;
+  --df-color-border: #0c4a6e;
 }
 ```
 

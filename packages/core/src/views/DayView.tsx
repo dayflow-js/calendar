@@ -1,3 +1,4 @@
+import { RefObject } from 'preact';
 import {
   useState,
   useEffect,
@@ -5,20 +6,9 @@ import {
   useCallback,
   useRef,
 } from 'preact/hooks';
-import { formatTime, extractHourFromDate } from '@/utils';
-import { Event, DayViewProps } from '@/types';
-import { EventLayoutCalculator } from '@/components/eventLayout';
-import { useDragForView } from '@/plugins/dragBridge';
-import { ViewType as DragViewType } from '@/types';
-import { defaultDragConfig } from '@/core/config';
-import { MobileEventDrawer } from '@/components/mobileEventDrawer';
-import { temporalToDate } from '@/utils/temporal';
-import { useCalendarDrop } from '@/hooks/useCalendarDrop';
-import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
-import { bgGray50 } from '@/styles/classNames';
-import { RightPanel } from '@/components/dayView/RightPanel';
+
 import { DayContent } from '@/components/dayView/DayContent';
-import { getWeekStart } from '@/components/weekView/util';
+import { RightPanel } from '@/components/dayView/RightPanel';
 import {
   filterDayEvents,
   normalizeLayoutEvents,
@@ -26,6 +16,22 @@ import {
   calculateNewEventLayout,
   calculateDragLayout,
 } from '@/components/dayView/util';
+import { EventLayoutCalculator } from '@/components/eventLayout';
+import { MobileEventDrawer } from '@/components/mobileEventDrawer';
+import { getWeekStart } from '@/components/weekView/util';
+import { defaultDragConfig } from '@/core/config';
+import { useCalendarDrop } from '@/hooks/useCalendarDrop';
+import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
+import { useDragForView } from '@/plugins/dragBridge';
+import { bgGray50 } from '@/styles/classNames';
+import {
+  Event,
+  DayViewProps,
+  ViewType as DragViewType,
+  WeekDayDragState,
+} from '@/types';
+import { formatTime, extractHourFromDate } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 
 const DayView = ({
   app,
@@ -39,7 +45,7 @@ const DayView = ({
   onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
-}: DayViewProps) => {
+}: DayViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
   const events = app.getEvents();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
@@ -78,19 +84,21 @@ const DayView = ({
   >(null);
 
   const selectedEventId =
-    propSelectedEventId !== undefined
-      ? propSelectedEventId
-      : internalSelectedId;
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
   const detailPanelEventId =
-    propDetailPanelEventId !== undefined
-      ? propDetailPanelEventId
-      : internalDetailPanelEventId;
+    propDetailPanelEventId === undefined
+      ? internalDetailPanelEventId
+      : propDetailPanelEventId;
 
-  const selectedEvent = useMemo(() => {
-    return selectedEventId
-      ? events.find(e => e.id === selectedEventId) || null
-      : null;
-  }, [selectedEventId, events]);
+  const selectedEvent = useMemo(
+    () =>
+      selectedEventId
+        ? events.find(e => e.id === selectedEventId) || null
+        : null,
+    [selectedEventId, events]
+  );
 
   const setSelectedEventId = (id: string | null) => {
     if (propOnEventSelect) {
@@ -191,26 +199,31 @@ const DayView = ({
   );
 
   // Events for the current date
-  const currentDayEvents = useMemo(() => {
-    return filterDayEvents(events, currentDate, currentWeekStart);
-  }, [events, currentDate, currentWeekStart]);
+  const currentDayEvents = useMemo(
+    () => filterDayEvents(events, currentDate, currentWeekStart),
+    [events, currentDate, currentWeekStart]
+  );
 
   // Prepare events for layout calculation
-  const layoutEvents = useMemo(() => {
-    return normalizeLayoutEvents(currentDayEvents, currentDate);
-  }, [currentDayEvents, currentDate]);
+  const layoutEvents = useMemo(
+    () => normalizeLayoutEvents(currentDayEvents, currentDate),
+    [currentDayEvents, currentDate]
+  );
 
   // Calculate event layouts
-  const eventLayouts = useMemo(() => {
-    return EventLayoutCalculator.calculateDayEventLayouts(layoutEvents, {
-      viewType: 'day',
-    });
-  }, [layoutEvents]);
+  const eventLayouts = useMemo(
+    () =>
+      EventLayoutCalculator.calculateDayEventLayouts(layoutEvents, {
+        viewType: 'day',
+      }),
+    [layoutEvents]
+  );
 
   // Organize all-day events into rows to avoid overlap
-  const organizedAllDayEvents = useMemo(() => {
-    return organizeAllDayEvents(currentDayEvents);
-  }, [currentDayEvents]);
+  const organizedAllDayEvents = useMemo(
+    () => organizeAllDayEvents(currentDayEvents),
+    [currentDayEvents]
+  );
 
   const allDayAreaHeight = useMemo(() => {
     if (organizedAllDayEvents.length === 0) return ALL_DAY_HEIGHT;
@@ -278,7 +291,9 @@ const DayView = ({
         setNewlyCreatedEventId(event.id);
       }
     },
-    onEventEdit: () => {},
+    onEventEdit: () => {
+      /* noop */
+    },
     currentWeekStart,
     events: currentDayEvents,
     calculateNewEventLayout: (targetDay, startHour, endHour) =>
@@ -307,33 +322,39 @@ const DayView = ({
     isMobile,
   });
 
-  const handleTouchStart = (e: any, dayIndex: number) => {
+  const handleTouchStart = (e: TouchEvent, dayIndex: number) => {
     if (!isMobile && !isTouch) return;
     const touch = e.touches[0];
     const clientX = touch.clientX;
     const clientY = touch.clientY;
-    const target = e.currentTarget;
+    const target = e.currentTarget as HTMLElement;
 
     longPressTimerRef.current = setTimeout(() => {
-      const rect = calendarRef.current
+      const rect = (calendarRef.current as HTMLElement)
         ?.querySelector('.calendar-content')
         ?.getBoundingClientRect();
 
       if (!rect) return;
-      const container = calendarRef.current?.querySelector('.calendar-content');
+      const container = (calendarRef.current as HTMLElement)?.querySelector(
+        '.calendar-content'
+      );
       const scrollTop = container ? container.scrollTop : 0;
       const relativeY = clientY - rect.top + scrollTop;
       const clickedHour = FIRST_HOUR + relativeY / HOUR_HEIGHT;
 
       const mockEvent = {
-        preventDefault: () => {},
-        stopPropagation: () => {},
+        preventDefault: () => {
+          /* noop */
+        },
+        stopPropagation: () => {
+          /* noop */
+        },
         touches: [{ clientX, clientY }],
         changedTouches: [{ clientX, clientY }],
         target: target,
         currentTarget: target,
         cancelable: true,
-      } as unknown as any;
+      } as unknown as TouchEvent;
 
       handleCreateStart?.(mockEvent, dayIndex, clickedHour);
     }, 500);
@@ -424,12 +445,31 @@ const DayView = ({
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         detailPanelEventId={detailPanelEventId}
         setDetailPanelEventId={setDetailPanelEventId}
-        dragState={dragState}
+        dragState={dragState as WeekDayDragState | null}
         isDragging={isDragging}
-        handleMoveStart={handleMoveStart}
-        handleResizeStart={handleResizeStart}
-        handleCreateStart={handleCreateStart}
-        handleCreateAllDayEvent={handleCreateAllDayEvent}
+        handleMoveStart={
+          handleMoveStart as (e: MouseEvent | TouchEvent, event: Event) => void
+        }
+        handleResizeStart={
+          handleResizeStart as (
+            e: MouseEvent | TouchEvent,
+            event: Event,
+            direction: string
+          ) => void
+        }
+        handleCreateStart={
+          handleCreateStart as (
+            e: MouseEvent | TouchEvent,
+            dayIndex: number,
+            hour: number
+          ) => void
+        }
+        handleCreateAllDayEvent={
+          handleCreateAllDayEvent as (
+            e: MouseEvent | TouchEvent,
+            dayIndex: number
+          ) => void
+        }
         handleTouchStart={handleTouchStart}
         handleTouchEnd={handleTouchEnd}
         handleTouchMove={handleTouchMove}
@@ -461,7 +501,7 @@ const DayView = ({
         visibleMonth={visibleMonth}
         currentDayEvents={currentDayEvents}
         selectedEvent={selectedEvent}
-        setSelectedEvent={(e: any) => setSelectedEventId(e ? e.id : null)}
+        setSelectedEvent={e => setSelectedEventId(e ? e.id : null)}
         handleMonthChange={handleMonthChange}
         handleDateSelect={handleDateSelect}
         switcherMode={switcherMode}
@@ -473,8 +513,8 @@ const DayView = ({
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
-        onSave={(updatedEvent: any) => {
-          if (events.find(e => e.id === updatedEvent.id)) {
+        onSave={(updatedEvent: Event) => {
+          if (events.some(e => e.id === updatedEvent.id)) {
             app.updateEvent(updatedEvent.id, updatedEvent);
           } else {
             app.addEvent(updatedEvent);

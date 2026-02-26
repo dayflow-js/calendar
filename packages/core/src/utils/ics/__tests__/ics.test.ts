@@ -1,7 +1,8 @@
-import { parseICS } from '../icsParser';
-import { generateICS } from '../icsGenerator';
-import { Event } from '../../../types/event';
 import { Temporal } from 'temporal-polyfill';
+
+import { Event } from '@/types/event';
+import { generateICS } from '@/utils/ics/icsGenerator';
+import { parseICS } from '@/utils/ics/icsParser';
 
 describe('ICS Utilities', () => {
   const mockDate = Temporal.PlainDateTime.from('2025-01-15T10:00:00');
@@ -82,7 +83,7 @@ END:VCALENDAR`;
       expect(ics).toContain('SUMMARY:Test Event');
       expect(ics).toContain('DESCRIPTION:This is a test event');
       expect(ics).toContain('LOCATION:Test Location');
-      expect(ics).toContain('CATEGORIES:Work\,Meeting'); // Escaped comma
+      expect(ics).toContain('CATEGORIES:Work,Meeting'); // Escaped comma
       expect(ics).toContain('END:VCALENDAR');
     });
   });
@@ -107,8 +108,8 @@ END:VCALENDAR`;
       // Date comparison might need care due to types (PlainDateTime vs ZonedDateTime)
       // But values should match
       expect(parsedEvent.start.year).toBe(mockEvent.start.year);
-      expect((parsedEvent.start as any).minute).toBe(
-        (mockEvent.start as any).minute
+      expect((parsedEvent.start as unknown as { minute: number }).minute).toBe(
+        (mockEvent.start as unknown as { minute: number }).minute
       );
     });
   });

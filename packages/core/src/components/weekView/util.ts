@@ -1,11 +1,12 @@
-import { Event, EventLayout } from '@/types';
-import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
-import { createDateWithHour, getDateByDayIndex } from '@/utils';
 import { EventLayoutCalculator } from '@/components/eventLayout';
 import {
   analyzeMultiDayRegularEvent,
   analyzeMultiDayEventsForWeek,
 } from '@/components/monthView/util';
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { Event, EventLayout } from '@/types';
+import { createDateWithHour, getDateByDayIndex } from '@/utils';
+import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 
 // ... existing code ...
 
@@ -53,10 +54,8 @@ export const calculateEventLayouts = (
           };
           dayEventsForLayout.push(virtualEvent);
         }
-      } else {
-        if (event.day === day) {
-          dayEventsForLayout.push(event);
-        }
+      } else if (event.day === day) {
+        dayEventsForLayout.push(event);
       }
     });
 
@@ -123,13 +122,15 @@ export const organizeAllDaySegments = (
     currentWeekStart,
     daysToShow
   );
-  const segments = multiDaySegments.filter((seg: any) => seg.event.allDay);
+  const segments = multiDaySegments.filter(
+    (seg: MultiDayEventSegment) => seg.event.allDay
+  );
 
-  segments.sort((a: any, b: any) => {
+  segments.sort((a: MultiDayEventSegment, b: MultiDayEventSegment) => {
     // Use absolute start time for stable sorting across window shifts
     const aStart = temporalToDate(a.event.start).getTime();
     const bStart = temporalToDate(b.event.start).getTime();
-    
+
     if (aStart !== bStart) {
       return aStart - bStart;
     }
@@ -138,26 +139,31 @@ export const organizeAllDaySegments = (
     return bDays - aDays;
   });
 
-  const segmentsWithRow: Array<(typeof multiDaySegments)[0] & { row: number }> =
-    [];
+  const segmentsWithRow: Array<MultiDayEventSegment & { row: number }> = [];
 
-  segments.forEach((segment: any) => {
+  segments.forEach((segment: MultiDayEventSegment) => {
     let row = 0;
     let foundRow = false;
 
     while (!foundRow) {
-      const hasConflict = segmentsWithRow.some((existing: any) => {
-        if (existing.row !== row) return false;
-        return !(
-          segment.endDayIndex < existing.startDayIndex ||
-          segment.startDayIndex > existing.endDayIndex
-        );
-      });
+      let hasConflict = false;
+      for (const existing of segmentsWithRow) {
+        if (existing.row === row) {
+          const conflict = !(
+            segment.endDayIndex < existing.startDayIndex ||
+            segment.startDayIndex > existing.endDayIndex
+          );
+          if (conflict) {
+            hasConflict = true;
+            break;
+          }
+        }
+      }
 
-      if (!hasConflict) {
-        foundRow = true;
-      } else {
+      if (hasConflict) {
         row++;
+      } else {
+        foundRow = true;
       }
     }
 

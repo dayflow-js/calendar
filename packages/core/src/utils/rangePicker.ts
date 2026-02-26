@@ -1,13 +1,14 @@
+// oxlint-disable typescript/no-explicit-any
 import { Temporal } from 'temporal-polyfill';
+
 import { isPlainDate } from './temporalTypeGuards';
 
 const TOKEN_REGEX = /(YYYY|YY|MM|DD|HH|mm)/g;
 
 export const pad = (input: number) => input.toString().padStart(2, '0');
 
-const sanitizeFormatTemplate = (template: string): string => {
-  return template.replace(/(H{1,2}):MM/g, (_match, hours) => `${hours}:mm`);
-};
+const sanitizeFormatTemplate = (template: string): string =>
+  template.replaceAll(/(H{1,2}):MM/g, (_match, hours) => `${hours}:mm`);
 
 export const mergeFormatTemplate = (
   dateFormat: string,
@@ -23,7 +24,7 @@ export const mergeFormatTemplate = (
 };
 
 const escapeRegExp = (value: string): string =>
-  value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  value.replaceAll(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
 export const buildParseRegExp = (template: string): RegExp => {
   let lastIndex = 0;
@@ -96,12 +97,8 @@ export const getZoneId = (value: Temporal.ZonedDateTime): string => {
   if (asAny.timeZoneId && typeof asAny.timeZoneId === 'string') {
     return asAny.timeZoneId;
   }
-  if ('timeZoneId' in value && typeof value.timeZoneId === 'string') {
-    return value.timeZoneId;
-  }
-  const tzObject = (value as any).timeZone;
-  if (tzObject && typeof tzObject.id === 'string') {
-    return tzObject.id;
+  if (asAny.timeZone && typeof asAny.timeZone.id === 'string') {
+    return asAny.timeZone.id;
   }
   if (typeof asAny.timeZone === 'string') {
     return asAny.timeZone;
@@ -131,11 +128,13 @@ export const normalizeToZoned = (
     return Temporal.ZonedDateTime.from(isoString);
   }
 
+  const asAny = input as any;
+
   // Check if PlainDateTime
-  if ('hour' in input && !('timeZone' in input)) {
+  if ('hour' in asAny && !('timeZone' in asAny)) {
     const zoneId = fallbackZone ?? Temporal.Now.timeZoneId();
     // Try to use toZonedDateTime if available (proper PlainDateTime)
-    if (typeof (input as any).toZonedDateTime === 'function') {
+    if (typeof asAny.toZonedDateTime === 'function') {
       try {
         return (input as Temporal.PlainDateTime).toZonedDateTime(zoneId);
       } catch {
@@ -145,22 +144,24 @@ export const normalizeToZoned = (
     // Manual construction for PlainDateTime-like objects
     return Temporal.ZonedDateTime.from({
       timeZone: zoneId,
-      year: (input as any).year,
-      month: (input as any).month,
-      day: (input as any).day,
-      hour: (input as any).hour,
-      minute: (input as any).minute,
-      second: (input as any).second ?? 0,
-      millisecond: (input as any).millisecond ?? 0,
-      microsecond: (input as any).microsecond ?? 0,
-      nanosecond: (input as any).nanosecond ?? 0,
+      year: asAny.year as number,
+      month: asAny.month as number,
+      day: asAny.day as number,
+      hour: asAny.hour as number,
+      minute: asAny.minute as number,
+      second: (asAny.second as number) ?? 0,
+      millisecond: (asAny.millisecond as number) ?? 0,
+      microsecond: (asAny.microsecond as number) ?? 0,
+      nanosecond: (asAny.nanosecond as number) ?? 0,
     });
   }
 
   try {
-    return Temporal.ZonedDateTime.from(input as any);
+    return Temporal.ZonedDateTime.from(
+      input as string | Temporal.ZonedDateTimeLike
+    );
   } catch {
-    const candidate = input as any;
+    const candidate = asAny;
     const resolvedZone =
       (typeof candidate?.timeZone === 'string'
         ? candidate.timeZone

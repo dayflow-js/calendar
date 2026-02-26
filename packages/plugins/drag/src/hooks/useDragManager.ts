@@ -1,5 +1,3 @@
-import { h, render } from 'preact';
-import { useRef, useCallback } from 'preact/hooks';
 import {
   EventLayout,
   Event,
@@ -14,8 +12,10 @@ import {
   LocaleProvider,
   dateToZonedDateTime,
 } from '@dayflow/core';
-import DragIndicatorComponent from '../components/DragIndicatorComponent';
-import MonthDragIndicatorComponent from '../components/MonthDragIndicator';
+import DragIndicatorComponent from '@drag/components/DragIndicatorComponent';
+import MonthDragIndicatorComponent from '@drag/components/MonthDragIndicator';
+import { h, render } from 'preact';
+import { useRef, useCallback } from 'preact/hooks';
 
 export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
   const { t, locale } = useLocale();
@@ -113,7 +113,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         indicator.style.left = `${drag.startX - indicatorWidth / 2}px`;
         indicator.style.top = `${drag.startY - indicatorHeight / 2}px`;
 
-        document.body.appendChild(indicator);
+        document.body.append(indicator);
 
         // Render month view content
         const now = new Date();
@@ -132,7 +132,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         render(
           h(
-            LocaleProvider as any,
+            LocaleProvider,
             { locale },
             h(MonthDragIndicatorComponent, {
               event: eventForComponent,
@@ -162,7 +162,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             if (drag.allDay && isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
               indicator.style.top = `${sourceElement.offsetTop - 2}px`;
-              const gutterOffset = !isMobile ? 11 : 0;
+              const gutterOffset = isMobile ? 0 : 11;
               indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
               indicator.style.height = `${sourceRect.height}px`;
             } else if (drag.allDay && !isDayView) {
@@ -190,64 +190,62 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             indicator.style.opacity = '0.8';
             indicator.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
           }
-        } else {
+        } else if (drag.allDay) {
           // Calculate position logic
-          if (drag.allDay) {
-            indicator.style.top = '2px';
-            indicator.style.height = `${ALL_DAY_HEIGHT - 4}px`;
-            indicator.style.marginBottom = '3px';
-            indicator.className = 'rounded-xl shadow-sm';
+          indicator.style.top = '2px';
+          indicator.style.height = `${ALL_DAY_HEIGHT - 4}px`;
+          indicator.style.marginBottom = '3px';
+          indicator.className = 'rounded-xl shadow-sm';
 
+          if (isDayView) {
+            indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
+            const gutterOffset = isMobile ? 0 : 11;
+            indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
+          } else {
+            const totalWidth = isMobile ? '175%' : '100%';
+            const dayColumnWidth = `calc(${totalWidth} / 7)`;
+            indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
+            indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
+          }
+        } else {
+          const gridOffset = getGridOffset();
+          const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
+          const height = (drag.endHour - drag.startHour) * HOUR_HEIGHT;
+          indicator.style.top = `${top + 3 + gridOffset}px`;
+          indicator.style.height = `${height - 4}px`;
+          indicator.style.color = '#fff';
+          indicator.className = 'rounded-sm shadow-sm';
+
+          if (layout) {
             if (isDayView) {
               indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-              const gutterOffset = !isMobile ? 11 : 0;
-              indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
-            } else {
-              const totalWidth = isMobile ? '175%' : '100%';
-              const dayColumnWidth = `calc(${totalWidth} / 7)`;
-              indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
-              indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
-            }
-          } else {
-            const gridOffset = getGridOffset();
-            const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
-            const height = (drag.endHour - drag.startHour) * HOUR_HEIGHT;
-            indicator.style.top = `${top + 3 + gridOffset}px`;
-            indicator.style.height = `${height - 4}px`;
-            indicator.style.color = '#fff';
-            indicator.className = 'rounded-sm shadow-sm';
-
-            if (layout) {
-              if (isDayView) {
-                indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-                indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
-              } else {
-                const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-                const dayWidth = `calc(${totalWidth} / 7)`;
-                indicator.style.left = `calc((${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
-                indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
-              }
-              indicator.style.zIndex = String(1000);
+              indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
               const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-              const dayColumnWidth = isDayView
-                ? `calc(100% - ${TIME_COLUMN_WIDTH}px)`
-                : `calc(${totalWidth} / 7)`;
-              indicator.style.left = isDayView
-                ? `${TIME_COLUMN_WIDTH}px`
-                : `calc(${dayColumnWidth} * ${drag.dayIndex})`;
-              indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
+              const dayWidth = `calc(${totalWidth} / 7)`;
+              indicator.style.left = `calc((${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
+              indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
             }
+            indicator.style.zIndex = String(1000);
+          } else {
+            const totalWidth = isMobile && !isDayView ? '175%' : '100%';
+            const dayColumnWidth = isDayView
+              ? `calc(100% - ${TIME_COLUMN_WIDTH}px)`
+              : `calc(${totalWidth} / 7)`;
+            indicator.style.left = isDayView
+              ? `${TIME_COLUMN_WIDTH}px`
+              : `calc(${dayColumnWidth} * ${drag.dayIndex})`;
+            indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
           }
         }
 
         // Add to corresponding container
         if (drag.allDay) {
-          allDayRowRef?.current?.appendChild(indicator);
+          allDayRowRef?.current?.append(indicator);
         } else {
           calendarRef.current
             ?.querySelector('.calendar-content')
-            ?.appendChild(indicator);
+            ?.append(indicator);
         }
 
         // Save props for subsequent updates
@@ -256,7 +254,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         // Render Week/Day view content
         render(
           h(
-            LocaleProvider as any,
+            LocaleProvider,
             { locale },
             h(DragIndicatorComponent, {
               drag,
@@ -318,8 +316,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
       if (isDateGridView) {
         const [clientX, clientY] = args as [number, number];
-        const width = parseFloat(indicator.style.width) || 120;
-        const height = parseFloat(indicator.style.height) || 22;
+        const width = Number.parseFloat(indicator.style.width) || 120;
+        const height = Number.parseFloat(indicator.style.height) || 22;
 
         requestAnimationFrame(() => {
           indicator.style.left = `${clientX - width / 2}px`;
@@ -332,19 +330,19 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         // Ensure in correct container
         if (isAllDay && indicator.parentElement !== allDayRowRef?.current) {
-          allDayRowRef?.current?.appendChild(indicator);
+          allDayRowRef?.current?.append(indicator);
         } else if (!isAllDay) {
           const calendarContent =
             calendarRef.current?.querySelector('.calendar-content');
           if (indicator.parentElement !== calendarContent) {
-            calendarContent?.appendChild(indicator);
+            calendarContent?.append(indicator);
           }
         }
 
         if (isAllDay) {
           if (isDayView) {
             indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-            const gutterOffset = !isMobile ? 11 : 0;
+            const gutterOffset = isMobile ? 0 : 11;
             indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
           } else {
             const totalWidth = isMobile && !isDayView ? '175%' : '100%';
@@ -410,7 +408,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
           render(
             h(
-              LocaleProvider as any,
+              LocaleProvider,
               { locale },
               h(DragIndicatorComponent, {
                 drag: updatedDrag,

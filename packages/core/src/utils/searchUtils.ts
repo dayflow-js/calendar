@@ -1,16 +1,25 @@
+import { Temporal } from 'temporal-polyfill';
+
+import { TranslationKey } from '@/locale/types';
+import { CalendarSearchEvent } from '@/types/search';
+
 import { temporalToDate } from './temporal';
-import { CalendarSearchEvent } from '../types/search';
 
 /**
  * Helper to get date object from event start
  * @param dateInput Date, string, or Temporal object
  * @returns Date object
  */
-export const getDateObj = (dateInput: any): Date => {
+export const getDateObj = (dateInput: unknown): Date => {
   try {
     if (dateInput instanceof Date) return dateInput;
     if (typeof dateInput === 'string') return new Date(dateInput);
-    return temporalToDate(dateInput);
+    return temporalToDate(
+      dateInput as
+        | Temporal.PlainDate
+        | Temporal.PlainDateTime
+        | Temporal.ZonedDateTime
+    );
   } catch {
     return new Date();
   }
@@ -39,7 +48,7 @@ export const getSearchHeaderInfo = (
   groupDate: Date,
   today: Date,
   locale: string,
-  t: (key: any) => string
+  t: (key: TranslationKey) => string
 ): { title: string; colorClass: string } => {
   const diffTime = groupDate.getTime() - today.getTime();
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
@@ -58,7 +67,7 @@ export const getSearchHeaderInfo = (
       const relative = rtf.format(diffDays, 'day');
       title = relative.charAt(0).toUpperCase() + relative.slice(1);
       colorClass = 'text-black dark:text-white'; // Black/White for tomorrow/day after
-    } catch (e) {
+    } catch {
       title = groupDate.toLocaleDateString(locale, { weekday: 'long' });
     }
   } else {
@@ -107,7 +116,7 @@ export const groupSearchResults = (
   }
 
   // Sort groups by time
-  const sortedGroups = Array.from(groupsMap.values()).sort(
+  const sortedGroups = Array.from(groupsMap.values()).toSorted(
     (a, b) => a.date.getTime() - b.date.getTime()
   );
 

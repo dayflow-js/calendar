@@ -1,4 +1,4 @@
-import { EventLayout, Event } from '@/types';
+import { Event } from '@/types';
 
 export interface LayoutWeekEvent extends Event {
   parentId?: string;

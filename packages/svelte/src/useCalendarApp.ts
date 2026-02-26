@@ -1,11 +1,6 @@
-import { writable } from 'svelte/store';
-import type { Writable } from 'svelte/store';
 import { CalendarApp } from '@dayflow/core';
-import type {
-  CalendarAppConfig,
-  UseCalendarAppReturn,
-  ICalendarApp,
-} from '@dayflow/core';
+import type { CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
+import { writable } from 'svelte/store';
 
 export function useCalendarApp(
   config: CalendarAppConfig
@@ -19,13 +14,13 @@ export function useCalendarApp(
     events: app.getEvents(),
   });
 
-  const unsubscribe = app.subscribe(updatedApp => {
-    stateStore.set({
-      currentView: updatedApp.state.currentView,
-      currentDate: updatedApp.state.currentDate,
-      events: updatedApp.getEvents(),
-    });
-  });
+  // const unsubscribe = app.subscribe(updatedApp => {
+  //   stateStore.set({
+  //     currentView: updatedApp.state.currentView,
+  //     currentDate: updatedApp.state.currentDate,
+  //     events: updatedApp.getEvents(),
+  //   });
+  // });
 
   // Proxy the state properties
   const result = {

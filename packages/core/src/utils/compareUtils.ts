@@ -2,7 +2,7 @@
  * Performs a deep comparison between two values to determine if they are equivalent.
  * Supports primitives, Date objects, and plain objects/arrays.
  */
-export function isDeepEqual(a: any, b: any): boolean {
+export function isDeepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
 
   if (a instanceof Date && b instanceof Date) {
@@ -29,8 +29,11 @@ export function isDeepEqual(a: any, b: any): boolean {
     return false;
   }
 
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+
   for (const key of keysA) {
-    if (!keysB.includes(key) || !isDeepEqual(a[key], b[key])) {
+    if (!keysB.includes(key) || !isDeepEqual(objA[key], objB[key])) {
       return false;
     }
   }

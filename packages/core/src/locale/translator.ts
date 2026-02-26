@@ -1,7 +1,7 @@
-import { LOCALES } from './locales';
-import { normalizeLocale } from './utils';
 import { getIntlLabel, capitalize } from './intl';
+import { LOCALES } from './locales';
 import type { TranslationKey, LocaleCode } from './types';
+import { normalizeLocale } from './utils';
 
 /**
  * Core translation function.
@@ -13,7 +13,7 @@ import type { TranslationKey, LocaleCode } from './types';
 export function t(key: TranslationKey, locale: LocaleCode = 'en-US'): string {
   // 1. Try Intl API for specific keys
   if (['today', 'day', 'week', 'month', 'year'].includes(key)) {
-    const intl = getIntlLabel(key as any, locale);
+    const intl = getIntlLabel(key as 'day' | 'week' | 'month' | 'year', locale);
     if (intl) return capitalize(intl);
   }
 

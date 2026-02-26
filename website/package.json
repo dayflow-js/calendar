@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 4142",
     "build": "next build && npm run postbuild",
-    "postbuild": "pagefind --site out --output-path out/_pagefind",
     "build-dev": "next build && npm run postbuild && npx serve@latest out",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "next dev --port 4142",
+    "lint": "eslint",
+    "postbuild": "pagefind --site out --output-path out/_pagefind",
+    "start": "next start"
   },
   "dependencies": {
     "@dayflow/core": "^3.1.2",

@@ -4,8 +4,8 @@ import { sveltePreprocess } from 'svelte-preprocess';
 const config = {
   preprocess: sveltePreprocess(),
   compilerOptions: {
-    runes: true
-  }
+    runes: true,
+  },
 };
 
 export default config;

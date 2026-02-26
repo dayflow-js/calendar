@@ -1,3 +1,7 @@
+import { RefObject } from 'preact';
+
+import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
+import { YearMultiDaySegment } from '@/components/yearView/utils';
 import {
   Event,
   EventLayout,
@@ -7,15 +11,13 @@ import {
   ViewType,
   ViewMode,
 } from '@/types';
-import { MultiDayEventSegment } from '../monthView/WeekComponent';
-import { YearMultiDaySegment } from '../yearView/utils';
 
 export interface CalendarEventProps {
   event: Event;
   layout?: EventLayout;
   isAllDay?: boolean;
   allDayHeight?: number;
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   isBeingDragged?: boolean;
   isBeingResized?: boolean;
   viewType: ViewType;
@@ -29,8 +31,12 @@ export interface CalendarEventProps {
   newlyCreatedEventId?: string | null;
   selectedEventId?: string | null;
   detailPanelEventId?: string | null;
-  onMoveStart?: (e: any, event: Event) => void;
-  onResizeStart?: (e: any, event: Event, direction: string) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
+  onResizeStart?: (
+    e: MouseEvent | TouchEvent,
+    event: Event,
+    direction: string
+  ) => void;
   onEventUpdate: (updatedEvent: Event) => void;
   onEventDelete: (eventId: string) => void;
   onDetailPanelOpen?: () => void;
@@ -56,8 +62,6 @@ export interface CalendarEventProps {
   mode?: ViewMode;
   /** Whether the current view is in mobile 2-column mode */
   isCompact?: boolean;
-  /** The start date of the mobile page (for 2-column mode) */
-  mobilePageStart?: Date;
   /** Force enable touch interactions regardless of isMobile */
   enableTouch?: boolean;
   /** Whether to hide the time in the event display (Month view regular events only) */

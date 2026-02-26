@@ -37,7 +37,7 @@ export function analyzeMultiDayEventsForRow(
   if (rowDays.length === 0) return [];
 
   const rowStart = rowDays[0];
-  const rowEnd = rowDays[rowDays.length - 1];
+  const rowEnd = rowDays.at(-1)!;
 
   // Normalize row start/end to midnight
   const rowStartMs = new Date(

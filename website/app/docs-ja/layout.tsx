@@ -1,16 +1,17 @@
 import { Footer, Layout, Navbar } from 'nextra-theme-docs';
 import { Banner } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
+
+import { BrandLogo } from '@/components/BrandLogo';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { BrandLogo } from '@/components/BrandLogo';
 
-const banner = <Banner storageKey="nextra-banner">DayFlowへようこそ</Banner>;
+const banner = <Banner storageKey='nextra-banner'>DayFlowへようこそ</Banner>;
 const navbar = (
   <Navbar
     logo={<BrandLogo />}
-    projectLink="https://github.com/dayflow-js/dayflow"
-    chatLink="https://discord.gg/9vdFZKJqBb"
+    projectLink='https://github.com/dayflow-js/dayflow'
+    chatLink='https://discord.gg/9vdFZKJqBb'
   >
     <LanguageSwitcher />
     <ThemeToggle />
@@ -28,7 +29,7 @@ export default async function DocsJaLayout({
       banner={banner}
       navbar={navbar}
       pageMap={await getPageMap('/docs-ja')}
-      docsRepositoryBase="https://github.com/dayflow-js/dayflow/blob/main/website"
+      docsRepositoryBase='https://github.com/dayflow-js/dayflow/blob/main/website'
       footer={footer}
       sidebar={{
         toggleButton: false,

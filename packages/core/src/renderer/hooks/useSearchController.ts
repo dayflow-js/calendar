@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'preact/hooks';
-import { ICalendarApp } from '../../types';
-import { CalendarSearchProps, CalendarSearchEvent } from '../../types/search';
-import { temporalToDate } from '../../utils/temporal';
+import { Temporal } from 'temporal-polyfill';
+
+import { ICalendarApp } from '@/types';
+import { CalendarSearchProps, CalendarSearchEvent } from '@/types/search';
+import { temporalToDate } from '@/utils/temporal';
 
 export interface SearchController {
   searchKeyword: string;
@@ -72,7 +74,8 @@ export function useSearchController(
             ...e,
             color:
               app.getCalendarRegistry().get(e.calendarId || '')?.colors
-                .lineColor || app.getCalendarRegistry().resolveColors().lineColor,
+                .lineColor ||
+              app.getCalendarRegistry().resolveColors().lineColor,
           }));
           results = searchConfig.customSearch({
             keyword: searchKeyword,
@@ -125,7 +128,12 @@ export function useSearchController(
       } else if (typeof event.start === 'string') {
         date = new Date(event.start);
       } else {
-        date = temporalToDate(event.start as any);
+        date = temporalToDate(
+          event.start as
+            | Temporal.PlainDate
+            | Temporal.PlainDateTime
+            | Temporal.ZonedDateTime
+        );
       }
       app.setCurrentDate(date);
       app.highlightEvent(event.id);

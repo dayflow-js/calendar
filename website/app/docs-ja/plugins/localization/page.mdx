@@ -18,17 +18,24 @@ pnpm add @dayflow/plugin-localization
 
 ```tsx copy
 import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
-import { createLocalizationPlugin, zh, ja, fr } from '@dayflow/plugin-localization';
+import {
+  createLocalizationPlugin,
+  zh,
+  ja,
+  fr,
+} from '@dayflow/plugin-localization';
 
 function MyCalendar() {
   const calendar = useCalendarApp({
-    views: [/* ビューの設定 */],
+    views: [
+      /* ビューの設定 */
+    ],
     plugins: [
       createLocalizationPlugin({
-        locales: [zh, ja, fr] // 必要な言語を登録
-      })
+        locales: [zh, ja, fr], // 必要な言語を登録
+      }),
     ],
-    locale: 'ja-JP' // 現在のロケールを設定
+    locale: 'ja-JP', // 現在のロケールを設定
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -49,15 +56,15 @@ interface LocalizationConfig {
 
 現在、`@dayflow/plugin-localization` パッケージでは以下のロケールが利用可能です：
 
-| エクスポート | 言語 | ロケールコード |
-| :--- | :--- | :--- |
-| `zh` | 中国語 | `zh-CN` |
-| `ja` | 日本語 | `ja-JP` |
-| `ko` | 韓国語 | `ko-KR` |
-| `fr` | フランス語 | `fr-FR` |
-| `de` | ドイツ語 | `de-DE` |
-| `es` | スペイン語 | `es-ES` |
-| `en` | 英語 | `en-US` (コアに内蔵済み) |
+| エクスポート | 言語       | ロケールコード           |
+| :----------- | :--------- | :----------------------- |
+| `zh`         | 中国語     | `zh-CN`                  |
+| `ja`         | 日本語     | `ja-JP`                  |
+| `ko`         | 韓国語     | `ko-KR`                  |
+| `fr`         | フランス語 | `fr-FR`                  |
+| `de`         | ドイツ語   | `de-DE`                  |
+| `es`         | スペイン語 | `es-ES`                  |
+| `en`         | 英語       | `en-US` (コアに内蔵済み) |
 
 ## カスタムロケール
 
@@ -72,15 +79,15 @@ const myCustomLocale = {
     week: 'Semana',
     month: 'Mês',
     // ... 他のすべての翻訳キー
-  }
+  },
 };
 
 const calendar = useCalendarApp({
   plugins: [
     createLocalizationPlugin({
-      locales: [myCustomLocale]
-    })
+      locales: [myCustomLocale],
+    }),
   ],
-  locale: 'pt-BR'
+  locale: 'pt-BR',
 });
 ```

@@ -2,6 +2,7 @@
 // Ensures consistent server and client rendering, avoiding hydration errors
 
 import { Temporal } from 'temporal-polyfill';
+
 import { isPlainDate, isZonedDateTime } from './temporal';
 
 /**
@@ -17,7 +18,7 @@ export const formatDateConsistent = (
 ): string => {
   if (!date) return '';
 
-  let year: number, month: number, day: number;
+  let day: number, month: number, year: number;
 
   if (date instanceof Date) {
     year = date.getFullYear();

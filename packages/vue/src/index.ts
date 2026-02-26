@@ -1,7 +1,7 @@
-import DayFlowCalendar from './DayFlowCalendar';
-export { DayFlowCalendar };
+import DayFlowCalendarComponent from './DayFlowCalendar';
+export { DayFlowCalendarComponent as DayFlowCalendar };
 export { useCalendarApp } from './composables/useCalendarApp';
-export default DayFlowCalendar;
+export default DayFlowCalendarComponent;
 
 // Re-export core parts for convenience
 export {

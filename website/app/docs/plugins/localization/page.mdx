@@ -18,17 +18,24 @@ To enable support for additional languages, register the plugin and provide the 
 
 ```tsx copy
 import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
-import { createLocalizationPlugin, zh, ja, fr } from '@dayflow/plugin-localization';
+import {
+  createLocalizationPlugin,
+  zh,
+  ja,
+  fr,
+} from '@dayflow/plugin-localization';
 
 function MyCalendar() {
   const calendar = useCalendarApp({
-    views: [/* your views */],
+    views: [
+      /* your views */
+    ],
     plugins: [
       createLocalizationPlugin({
-        locales: [zh, ja, fr] // Register the languages you need
-      })
+        locales: [zh, ja, fr], // Register the languages you need
+      }),
     ],
-    locale: 'zh-CN' // Set the current locale
+    locale: 'zh-CN', // Set the current locale
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -49,15 +56,15 @@ interface LocalizationConfig {
 
 The following locales are currently available in the `@dayflow/plugin-localization` package:
 
-| Export | Language | Locale Code |
-| :--- | :--- | :--- |
-| `zh` | Chinese | `zh-CN` |
-| `ja` | Japanese | `ja-JP` |
-| `ko` | Korean | `ko-KR` |
-| `fr` | French | `fr-FR` |
-| `de` | German | `de-DE` |
-| `es` | Spanish | `es-ES` |
-| `en` | English | `en-US` (Also built-in to core) |
+| Export | Language | Locale Code                     |
+| :----- | :------- | :------------------------------ |
+| `zh`   | Chinese  | `zh-CN`                         |
+| `ja`   | Japanese | `ja-JP`                         |
+| `ko`   | Korean   | `ko-KR`                         |
+| `fr`   | French   | `fr-FR`                         |
+| `de`   | German   | `de-DE`                         |
+| `es`   | Spanish  | `es-ES`                         |
+| `en`   | English  | `en-US` (Also built-in to core) |
 
 ## Custom Locales
 
@@ -72,15 +79,15 @@ const myCustomLocale = {
     week: 'Semana',
     month: 'Mês',
     // ... all other translation keys
-  }
+  },
 };
 
 const calendar = useCalendarApp({
   plugins: [
     createLocalizationPlugin({
-      locales: [myCustomLocale]
-    })
+      locales: [myCustomLocale],
+    }),
   ],
-  locale: 'pt-BR'
+  locale: 'pt-BR',
 });
 ```

@@ -22,8 +22,8 @@ function MyCalendar() {
     plugins: [
       createKeyboardShortcutsPlugin({
         // オプション設定
-      })
-    ]
+      }),
+    ],
   });
 
   return <DayFlowCalendar calendar={calendar} />;
@@ -32,19 +32,19 @@ function MyCalendar() {
 
 ## デフォルトのショートカット
 
-| 操作 | キー (Mac) | キー (Windows/Linux) |
-| :--- | :--- | :--- |
-| **今日に移動** | `Cmd + T` | `Ctrl + T` |
-| **検索** | `Cmd + F` | `Ctrl + F` |
-| **新規イベント** | `Cmd + N` | `Ctrl + N` |
-| **ナビゲーション** | `ArrowLeft` / `ArrowRight` | `ArrowLeft` / `ArrowRight` |
-| **イベントのタブ移動** | `Tab` / `Shift + Tab` | `Tab` / `Shift + Tab` |
-| **元に戻す** | `Cmd + Z` | `Ctrl + Z` |
-| **イベントをコピー** | `Cmd + C` | `Ctrl + C` |
-| **イベントを切り取り** | `Cmd + X` | `Ctrl + X` |
-| **イベントを貼り付け** | `Cmd + V` | `Ctrl + V` |
-| **イベントを削除** | `Backspace` / `Delete` | `Backspace` / `Delete` |
-| **ダイアログ/パネルを閉じる** | `Esc` | `Esc` |
+| 操作                          | キー (Mac)                 | キー (Windows/Linux)       |
+| :---------------------------- | :------------------------- | :------------------------- |
+| **今日に移動**                | `Cmd + T`                  | `Ctrl + T`                 |
+| **検索**                      | `Cmd + F`                  | `Ctrl + F`                 |
+| **新規イベント**              | `Cmd + N`                  | `Ctrl + N`                 |
+| **ナビゲーション**            | `ArrowLeft` / `ArrowRight` | `ArrowLeft` / `ArrowRight` |
+| **イベントのタブ移動**        | `Tab` / `Shift + Tab`      | `Tab` / `Shift + Tab`      |
+| **元に戻す**                  | `Cmd + Z`                  | `Ctrl + Z`                 |
+| **イベントをコピー**          | `Cmd + C`                  | `Ctrl + C`                 |
+| **イベントを切り取り**        | `Cmd + X`                  | `Ctrl + X`                 |
+| **イベントを貼り付け**        | `Cmd + V`                  | `Ctrl + V`                 |
+| **イベントを削除**            | `Backspace` / `Delete`     | `Backspace` / `Delete`     |
+| **ダイアログ/パネルを閉じる** | `Esc`                      | `Esc`                      |
 
 ## 設定
 
@@ -58,7 +58,7 @@ createKeyboardShortcutsPlugin({
     prev: 'ArrowLeft',
     next: 'ArrowRight',
     delete: 'Delete',
-    newEvent: 'n'
-  }
-})
+    newEvent: 'n',
+  },
+});
 ```

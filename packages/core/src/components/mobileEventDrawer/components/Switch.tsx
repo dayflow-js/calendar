@@ -6,15 +6,13 @@ interface SwitchProps {
 
 export const Switch = ({ checked, onChange, disabled }: SwitchProps) => (
   <div
-    className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors ${
-      disabled
-        ? 'cursor-default opacity-50'
-        : 'cursor-pointer'
+    className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors ${
+      disabled ? 'cursor-default opacity-50' : 'cursor-pointer'
     } ${checked ? 'bg-green-500' : 'bg-gray-300'}`}
     onClick={() => !disabled && onChange(!checked)}
   >
     <div
-      className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform ${checked ? 'translate-x-5' : ''}`}
+      className={`h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${checked ? 'translate-x-5' : ''}`}
     />
   </div>
 );

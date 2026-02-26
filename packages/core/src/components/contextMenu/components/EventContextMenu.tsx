@@ -1,4 +1,8 @@
-import { Check } from '../../common/Icons';
+import { Check } from '@/components/common/Icons';
+import { useLocale } from '@/locale';
+import { Event, ICalendarApp, TNode } from '@/types';
+import { clipboardStore } from '@/utils/clipboardStore';
+
 import {
   ContextMenu,
   ContextMenuItem,
@@ -7,9 +11,6 @@ import {
   ContextMenuSubTrigger,
   ContextMenuSubContent,
 } from './Primitives';
-import { Event, ICalendarApp } from '../../../types';
-import { useLocale } from '@/locale';
-import { clipboardStore } from '@/utils/clipboardStore';
 
 interface EventContextMenuProps {
   event: Event;
@@ -65,10 +66,12 @@ const EventContextMenu = ({
   };
 
   // Custom user slot
-  const customContent = (app as any).callbacks?.renderEventContextMenu?.(
+  // oxlint-disable-next-line typescript/no-explicit-any
+  const callbacks = (app as any).callbacks;
+  const customContent = callbacks?.renderEventContextMenu?.(
     event,
     onClose
-  );
+  ) as TNode;
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
@@ -85,13 +88,13 @@ const EventContextMenu = ({
                 key={cal.id}
                 onClick={() => handleMoveToCalendar(cal.id)}
               >
-                <div className="flex items-center w-full">
-                  <div className="w-4 shrink-0">
-                    {isSelected && <Check className="w-3 h-3 text-primary" />}
+                <div className='flex w-full items-center'>
+                  <div className='w-4 shrink-0'>
+                    {isSelected && <Check className='h-3 w-3 text-primary' />}
                   </div>
-                  <div className="flex items-center gap-1.5 min-w-0">
+                  <div className='flex min-w-0 items-center gap-1.5'>
                     <div
-                      className="w-3 h-3 rounded-sm shrink-0"
+                      className='h-3 w-3 shrink-0 rounded-sm'
                       style={{ backgroundColor: cal.colors.lineColor }}
                     />
                     <span

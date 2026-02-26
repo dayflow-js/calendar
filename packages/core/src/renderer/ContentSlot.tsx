@@ -1,11 +1,14 @@
+import { ComponentChildren } from 'preact';
 import { useRef, useEffect, useContext, useState } from 'preact/hooks';
+
 import { CustomRenderingContext } from './CustomRenderingContext';
+import { CustomRenderingStore } from './CustomRenderingStore';
 
 interface ContentSlotProps {
   generatorName: string; // e.g. 'eventContent'
-  generatorArgs?: any; // e.g. { event, view }
-  defaultContent?: any; // Preact vnode as fallback
-  store?: any;
+  generatorArgs?: unknown; // e.g. { event, view }
+  defaultContent?: ComponentChildren; // Preact vnode as fallback
+  store?: CustomRenderingStore | null;
 }
 
 let guid = 0;
@@ -78,7 +81,7 @@ export function ContentSlot({
   return (
     <div
       ref={containerRef}
-      className={`df-content-slot ${isEventSlot || isSidebarSlot ? 'flex-1 flex flex-col h-full' : ''}`}
+      className={`df-content-slot ${isEventSlot || isSidebarSlot ? 'flex h-full flex-1 flex-col' : ''}`}
     >
       {!isOverridden && defaultContent}
     </div>

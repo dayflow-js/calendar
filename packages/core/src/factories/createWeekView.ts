@@ -1,12 +1,10 @@
 // Factory function for creating Week view
 import { h } from 'preact';
-import {
-  WeekViewConfig,
-  ViewFactory,
-  ViewType,
-} from '../types';
+
+import { WeekViewConfig, WeekViewProps, ViewFactory, ViewType } from '@/types';
+import WeekView from '@/views/WeekView';
+
 import { ViewAdapter } from './ViewAdapter';
-import WeekView from '../views/WeekView';
 
 // Default Week view configuration
 const defaultWeekViewConfig: WeekViewConfig = {
@@ -30,8 +28,8 @@ export const createWeekView: ViewFactory<WeekViewConfig> = (config = {}) => {
   const finalConfig = { ...defaultWeekViewConfig, ...config };
 
   // Create adapter component
-  const WeekViewAdapter: any = (props: any) => {
-    return h(ViewAdapter, {
+  const WeekViewAdapter = (props: WeekViewProps) =>
+    h(ViewAdapter, {
       viewType: ViewType.WEEK,
       originalComponent: WeekView,
       app: props.app,
@@ -47,7 +45,6 @@ export const createWeekView: ViewFactory<WeekViewConfig> = (config = {}) => {
       onEventSelect: props.onEventSelect,
       onDetailPanelToggle: props.onDetailPanelToggle,
     });
-  };
 
   // Set display name for debugging
   WeekViewAdapter.displayName = 'WeekViewAdapter';

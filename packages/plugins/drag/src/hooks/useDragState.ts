@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useMemo } from 'preact/hooks';
+// oxlint-disable typescript/no-explicit-any
 import {
   MonthDragState,
   UnifiedDragRef,
@@ -6,8 +6,10 @@ import {
   ViewType,
   WeekDayDragState,
   UseDragStateReturn,
+  Event as CalendarEvent,
 } from '@dayflow/core';
-import { throttle } from '../utils/throttle';
+import { throttle } from '@drag/utils/throttle';
+import { useRef, useCallback, useState, useMemo } from 'preact/hooks';
 
 export const useDragState = (options: useDragProps): UseDragStateReturn => {
   const { viewType, onEventsUpdate } = options;
@@ -82,8 +84,10 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
   const throttledSetEvents = useMemo(
     () =>
       throttle(
-        (updateFunc, dragState?: string) =>
-          onEventsUpdate(updateFunc, dragState === 'resize'),
+        ((
+          updateFunc: (events: CalendarEvent[]) => CalendarEvent[],
+          interactionType?: string
+        ) => onEventsUpdate(updateFunc, interactionType === 'resize')) as any,
         isMonthView ? 16 : 8
       ),
     [isMonthView, onEventsUpdate]

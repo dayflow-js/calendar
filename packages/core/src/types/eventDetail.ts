@@ -1,8 +1,10 @@
-// Event detail panel related type definitions
+// oxlint-disable typescript/no-explicit-any
+import { AnyComponent, RefObject } from 'preact';
 
-import { Event } from './event';
+import { ICalendarApp } from '@/types';
+
 import { EventDetailPosition } from './dragIndicator';
-import { ICalendarApp } from '../types';
+import { Event } from './event';
 
 // Re-export EventDetailPosition for convenience
 export type { EventDetailPosition } from './dragIndicator';
@@ -16,15 +18,15 @@ export interface EventDetailPanelProps {
   /** Panel position information */
   position: EventDetailPosition;
   /** Panel DOM reference */
-  panelRef: any;
+  panelRef: RefObject<HTMLDivElement>;
   /** Whether the event is all-day */
   isAllDay: boolean;
   /** Event visibility state */
   eventVisibility: 'visible' | 'sticky-top' | 'sticky-bottom';
   /** Calendar container reference */
-  calendarRef: any;
+  calendarRef: RefObject<HTMLDivElement>;
   /** Selected event element reference */
-  selectedEventElementRef: any;
+  selectedEventElementRef: RefObject<HTMLElement | null>;
   /** Event update callback */
   onEventUpdate: (updatedEvent: Event) => void;
   /** Event delete callback */
@@ -36,7 +38,7 @@ export interface EventDetailPanelProps {
 /**
  * Custom event detail panel renderer (full panel including positioning and styling)
  */
-export type EventDetailPanelRenderer = any;
+export type EventDetailPanelRenderer = AnyComponent<EventDetailPanelProps, any>;
 
 /**
  * Event detail content Props (excluding panel container, content only)
@@ -52,12 +54,16 @@ export interface EventDetailContentProps {
   onEventDelete: (eventId: string) => void;
   /** Close panel callback (optional) */
   onClose?: () => void;
+  app?: ICalendarApp;
 }
 
 /**
  * Custom event detail content renderer (content only, will be wrapped in default panel)
  */
-export type EventDetailContentRenderer = any;
+export type EventDetailContentRenderer = AnyComponent<
+  EventDetailContentProps,
+  any
+>;
 
 /**
  * Event detail dialog Props
@@ -81,4 +87,7 @@ export interface EventDetailDialogProps {
 /**
  * Custom event detail dialog renderer (Dialog/Modal mode)
  */
-export type EventDetailDialogRenderer = any;
+export type EventDetailDialogRenderer = AnyComponent<
+  EventDetailDialogProps,
+  any
+>;

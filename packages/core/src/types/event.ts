@@ -1,5 +1,5 @@
-import { Temporal } from 'temporal-polyfill';
 import { ComponentChildren } from 'preact';
+import { Temporal } from 'temporal-polyfill';
 
 /**
  * Calendar event interface (using Temporal API)
@@ -16,7 +16,7 @@ export interface Event {
   // - Temporal.ZonedDateTime: Cross-timezone events (date + time + timezone)
   start: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime;
   end: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime;
-  // TODO: make allDay to internal derived field, because we can infer allDay from start/end types(PlainDate)
+  // Pending: make allDay to internal derived field, because we can infer allDay from start/end types(PlainDate)
   allDay?: boolean;
 
   // all day icon
@@ -25,7 +25,7 @@ export interface Event {
   // Calendar type reference
   calendarId?: string;
 
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 
   // Internal use fields (for rendering and layout calculation)
   day?: number;

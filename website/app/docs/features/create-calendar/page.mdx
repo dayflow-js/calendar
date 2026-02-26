@@ -28,10 +28,10 @@ const calendar = useCalendarApp({
 In inline mode, clicking the create button immediately adds a new "Untitled" calendar to the list and places it in edit mode. Users can type the name directly in the sidebar. The calendar is assigned a random color automatically.
 
 <DocImg
-  width="207"
-  height="211"
-  alt="Inline Mode"
-  src="/images/docs/inline-mode.png"
+  width='207'
+  height='211'
+  alt='Inline Mode'
+  src='/images/docs/inline-mode.png'
 />
 
 ### Modal Mode
@@ -40,17 +40,20 @@ In modal mode, clicking the create button opens a dialog where users can enter t
 
 import { Callout } from 'nextra/components';
 
-<Callout type="warning">
-  The built-in color picker (previously `react-color`) is no longer included in the core package to maintain framework-agnosticism. You need to provide your own color picker component using [Content Slots](/docs/features/content-slots).
+<Callout type='warning'>
+  The built-in color picker (previously `react-color`) is no longer included in
+  the core package to maintain framework-agnosticism. You need to provide your
+  own color picker component using [Content
+  Slots](/docs/features/content-slots).
 </Callout>
 
-<div className="mt-8" />
+<div className='mt-8' />
 
 <DocImg
-  width="542"
-  height="542"
-  alt="Modal Mode"
-  src="/images/docs/modal-mode.png"
+  width='542'
+  height='542'
+  alt='Modal Mode'
+  src='/images/docs/modal-mode.png'
 />
 
 ```tsx
@@ -97,13 +100,13 @@ You can customize the context menu by providing a `renderCalendarContextMenu` fu
 ```tsx
 createSidebarPlugin({
   renderCalendarContextMenu: (calendar, onClose) => (
-    <div className="bg-white shadow-lg border rounded p-2">
-      <div className="px-3 py-1.5 text-xs font-semibold text-gray-500">
+    <div className='bg-white shadow-lg border rounded p-2'>
+      <div className='px-3 py-1.5 text-xs font-semibold text-gray-500'>
         {calendar.name}
       </div>
-      <div className="my-1 h-px bg-gray-200" />
+      <div className='my-1 h-px bg-gray-200' />
       <button
-        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+        className='w-full text-left px-3 py-2 text-sm hover:bg-gray-100'
         onClick={() => {
           console.log('Custom action for', calendar.id);
           onClose();

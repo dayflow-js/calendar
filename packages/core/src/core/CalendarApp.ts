@@ -1,4 +1,6 @@
-// TODO: refactor to split into multiple files if it grows too large
+import { Locale } from '@/locale/types';
+import { isValidLocale } from '@/locale/utils';
+// Pending: refactor to split into multiple files if it grows too large
 import {
   ICalendarApp,
   CalendarAppConfig,
@@ -13,19 +15,19 @@ import {
   TNode,
   RangeChangeReason,
   EventChange,
-} from '../types';
-import { Event } from '../types';
+  Event,
+  CalendarHeaderProps,
+} from '@/types';
+import { ThemeMode } from '@/types/calendarTypes';
+import { getWeekRange } from '@/utils/dateRangeUtils';
+import { isDeepEqual } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
+
 import {
   CalendarRegistry,
   setDefaultCalendarRegistry,
 } from './calendarRegistry';
 import { CalendarStore } from './CalendarStore';
-import { logger } from '../utils/logger';
-
-import { ThemeMode } from '../types/calendarTypes';
-import { isValidLocale } from '../locale/utils';
-import { isDeepEqual } from '../utils/helpers';
-import { getWeekRange } from '../utils/dateRangeUtils';
 
 export class CalendarApp implements ICalendarApp {
   public state: CalendarAppState;
@@ -34,11 +36,11 @@ export class CalendarApp implements ICalendarApp {
   private store: CalendarStore;
   private visibleMonth: Date;
   private useEventDetailDialog: boolean;
-  private useCalendarHeader: boolean | ((props: any) => TNode);
+  private useCalendarHeader: boolean | ((props: CalendarHeaderProps) => TNode);
   private customMobileEventRenderer?: MobileEventRenderer;
   private themeChangeListeners: Set<(theme: ThemeMode) => void>;
   private listeners: Set<(app: ICalendarApp) => void>;
-  private undoStack: Array<{ type: string; data: any }> = [];
+  private undoStack: Array<{ type: string; data: unknown }> = [];
   private pendingSnapshot: Event[] | null = null;
   private readonly MAX_UNDO_STACK = 50;
 
@@ -51,7 +53,7 @@ export class CalendarApp implements ICalendarApp {
       switcherMode: config.switcherMode || 'buttons',
       plugins: new Map(),
       views: new Map(),
-      locale: this.resolveLocale(config.locale),
+      locale: CalendarApp.resolveLocale(config.locale),
       highlightedEventId: null,
       selectedEventId: null,
       readOnly: config.readOnly || false,
@@ -122,7 +124,7 @@ export class CalendarApp implements ICalendarApp {
     };
   }
 
-  private resolveLocale(locale?: string | any): string | any {
+  private static resolveLocale(locale?: string | Locale): string | Locale {
     if (!locale) {
       return 'en-US';
     }
@@ -131,8 +133,12 @@ export class CalendarApp implements ICalendarApp {
       return isValidLocale(locale) ? locale : 'en-US';
     }
 
-    if (locale && typeof locale === 'object' && !isValidLocale(locale.code)) {
-      return { ...locale, code: 'en-US' };
+    if (
+      locale &&
+      typeof locale === 'object' &&
+      !isValidLocale((locale as Locale).code)
+    ) {
+      return { ...(locale as Locale), code: 'en-US' };
     }
 
     return locale;
@@ -165,7 +171,7 @@ export class CalendarApp implements ICalendarApp {
 
     const lastState = this.undoStack.pop();
     if (lastState?.type === 'events_snapshot') {
-      this.state.events = lastState.data;
+      this.state.events = lastState.data as Event[];
       this.store = new CalendarStore(this.state.events);
       this.setupStoreListeners();
 
@@ -196,9 +202,8 @@ export class CalendarApp implements ICalendarApp {
     if (this.state.readOnly === true) return false;
     if (typeof this.state.readOnly === 'object') {
       return false;
-    } else {
-      return true;
     }
+    return true;
   };
 
   // View management
@@ -288,6 +293,8 @@ export class CalendarApp implements ICalendarApp {
         this.emitVisibleRange(start, end, reason);
         break;
       }
+      default:
+        break;
     }
   };
 
@@ -300,9 +307,7 @@ export class CalendarApp implements ICalendarApp {
     this.notify();
   };
 
-  getCurrentDate = (): Date => {
-    return new Date(this.state.currentDate);
-  };
+  getCurrentDate = (): Date => new Date(this.state.currentDate);
 
   setVisibleMonth = (date: Date): void => {
     const next = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -317,9 +322,7 @@ export class CalendarApp implements ICalendarApp {
     this.notify();
   };
 
-  getVisibleMonth = (): Date => {
-    return new Date(this.visibleMonth);
-  };
+  getVisibleMonth = (): Date => new Date(this.visibleMonth);
 
   goToToday = (): void => {
     this.setCurrentDate(new Date());
@@ -340,6 +343,8 @@ export class CalendarApp implements ICalendarApp {
       case ViewType.YEAR:
         newDate.setFullYear(newDate.getFullYear() - 1);
         break;
+      default:
+        break;
     }
     this.setCurrentDate(newDate);
   };
@@ -358,6 +363,8 @@ export class CalendarApp implements ICalendarApp {
         break;
       case ViewType.YEAR:
         newDate.setFullYear(newDate.getFullYear() + 1);
+        break;
+      default:
         break;
     }
     this.setCurrentDate(newDate);
@@ -387,16 +394,14 @@ export class CalendarApp implements ICalendarApp {
       if (!this.pendingSnapshot) {
         this.pendingSnapshot = [...this.state.events];
       }
-    } else {
+    } else if (this.pendingSnapshot) {
       // Finalizing an operation
-      if (this.pendingSnapshot) {
-        // We have a snapshot from the start of the interaction
-        this.pushToUndo(this.pendingSnapshot);
-        this.pendingSnapshot = null;
-      } else {
-        // Single step operation (like delete or paste)
-        this.pushToUndo();
-      }
+      // We have a snapshot from the start of the interaction
+      this.pushToUndo(this.pendingSnapshot);
+      this.pendingSnapshot = null;
+    } else {
+      // Single step operation (like delete or paste)
+      this.pushToUndo();
     }
 
     // Handle Pending State (Direct Mutation)
@@ -488,13 +493,11 @@ export class CalendarApp implements ICalendarApp {
       if (!this.pendingSnapshot) {
         this.pendingSnapshot = [...this.state.events];
       }
+    } else if (this.pendingSnapshot) {
+      this.pushToUndo(this.pendingSnapshot);
+      this.pendingSnapshot = null;
     } else {
-      if (this.pendingSnapshot) {
-        this.pushToUndo(this.pendingSnapshot);
-        this.pendingSnapshot = null;
-      } else {
-        this.pushToUndo();
-      }
+      this.pushToUndo();
     }
 
     if (isPending) {
@@ -530,9 +533,7 @@ export class CalendarApp implements ICalendarApp {
     this.store.deleteEvent(id);
   };
 
-  getAllEvents = (): Event[] => {
-    return [...this.state.events];
-  };
+  getAllEvents = (): Event[] => [...this.state.events];
 
   onEventClick = (event: Event): void => {
     this.callbacks.onEventClick?.(event);
@@ -584,9 +585,7 @@ export class CalendarApp implements ICalendarApp {
     });
   };
 
-  getCalendars = (): CalendarType[] => {
-    return this.calendarRegistry.getAll();
-  };
+  getCalendars = (): CalendarType[] => this.calendarRegistry.getAll();
 
   reorderCalendars = (fromIndex: number, toIndex: number): void => {
     this.calendarRegistry.reorder(fromIndex, toIndex);
@@ -663,9 +662,9 @@ export class CalendarApp implements ICalendarApp {
     // onRender and notify will be triggered by store callbacks
   };
 
-  getCalendarHeaderConfig = (): boolean | ((props: any) => TNode) => {
-    return this.useCalendarHeader;
-  };
+  getCalendarHeaderConfig = ():
+    | boolean
+    | ((props: CalendarHeaderProps) => TNode) => this.useCalendarHeader;
 
   // Plugin management
   private installPlugin = (plugin: CalendarPlugin): void => {
@@ -683,9 +682,7 @@ export class CalendarApp implements ICalendarApp {
     return plugin?.api as T;
   };
 
-  hasPlugin = (name: string): boolean => {
-    return this.state.plugins.has(name);
-  };
+  hasPlugin = (name: string): boolean => this.state.plugins.has(name);
 
   // Get plugin configuration
   getPluginConfig = (pluginName: string): Record<string, unknown> => {
@@ -718,19 +715,14 @@ export class CalendarApp implements ICalendarApp {
   };
 
   // Get CalendarRegistry instance
-  getCalendarRegistry = (): CalendarRegistry => {
-    return this.calendarRegistry;
-  };
+  getCalendarRegistry = (): CalendarRegistry => this.calendarRegistry;
 
   // Get whether to use event detail dialog
-  getUseEventDetailDialog = (): boolean => {
-    return this.useEventDetailDialog;
-  };
+  getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
 
   // Get custom mobile event renderer
-  getCustomMobileEventRenderer = (): MobileEventRenderer | undefined => {
-    return this.customMobileEventRenderer;
-  };
+  getCustomMobileEventRenderer = (): MobileEventRenderer | undefined =>
+    this.customMobileEventRenderer;
 
   // Update configuration dynamically
   updateConfig = (config: Partial<CalendarAppConfig>): void => {
@@ -783,7 +775,7 @@ export class CalendarApp implements ICalendarApp {
       hasChanged = true;
     }
     if (config.locale !== undefined) {
-      const newLocale = this.resolveLocale(config.locale);
+      const newLocale = CalendarApp.resolveLocale(config.locale);
       if (!isDeepEqual(newLocale, this.state.locale)) {
         this.state.locale = newLocale;
         hasChanged = true;
@@ -819,9 +811,7 @@ export class CalendarApp implements ICalendarApp {
    * Get current theme mode
    * @returns Current theme mode
    */
-  getTheme = (): ThemeMode => {
-    return this.calendarRegistry.getTheme();
-  };
+  getTheme = (): ThemeMode => this.calendarRegistry.getTheme();
 
   /**
    * Subscribe to theme changes

@@ -1,10 +1,10 @@
 import {
-  Directive,
-  Input,
   ElementRef,
   OnChanges,
   SimpleChanges,
   OnDestroy,
+  Directive,
+  Input,
 } from '@angular/core';
 
 @Directive({
@@ -17,13 +17,13 @@ export class DayFlowPortalDirective implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['targetEl'] && this.targetEl) {
-      this.targetEl.appendChild(this.el.nativeElement);
+      this.targetEl.append(this.el.nativeElement);
     }
   }
 
   ngOnDestroy() {
     if (this.el.nativeElement.parentNode === this.targetEl) {
-      this.targetEl.removeChild(this.el.nativeElement);
+      this.el.nativeElement.remove();
     }
   }
 }
