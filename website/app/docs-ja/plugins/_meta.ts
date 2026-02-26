@@ -5,7 +5,7 @@ const meta: MetaRecord = {
     title: '概要',
   },
   localization: {
-    title: 'ローカライズ',
+    title: 'i18n',
   },
   drag: {
     title: 'ドラッグ＆ドロップ',

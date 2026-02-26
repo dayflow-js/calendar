@@ -268,9 +268,9 @@ export function InteractiveCalendar() {
                           <CircleAlert className='h-3 w-3 text-slate-400' />
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent side='top' className='max-w-50 p-3'>
-                        <p className='mb-2 text-xs font-semibold'>Shortcuts</p>
-                        <ul className='space-y-1 text-[10px]'>
+                      <TooltipContent side='top' className='w-56 p-3'>
+                        <p className='mb-2 text-sm font-semibold'>Shortcuts</p>
+                        <ul className='space-y-1.5 text-xs'>
                           <li className='flex justify-between gap-4'>
                             <span>Search</span>{' '}
                             <kbd className='font-sans opacity-70'>⌘F</kbd>
@@ -294,6 +294,18 @@ export function InteractiveCalendar() {
                           <li className='flex justify-between gap-4'>
                             <span>Prev/Next</span>{' '}
                             <kbd className='font-sans opacity-70'>← / →</kbd>
+                          </li>
+                          <li className='flex justify-between gap-4'>
+                            <span>Copy Event</span>{' '}
+                            <kbd className='font-sans opacity-70'>⌘C</kbd>
+                          </li>
+                          <li className='flex justify-between gap-4'>
+                            <span>Paste Event</span>{' '}
+                            <kbd className='font-sans opacity-70'>⌘V</kbd>
+                          </li>
+                          <li className='flex justify-between gap-4'>
+                            <span>Cut Event</span>{' '}
+                            <kbd className='font-sans opacity-70'>⌘X</kbd>
                           </li>
                           <li className='flex justify-between gap-4'>
                             <span>Delete</span>{' '}
