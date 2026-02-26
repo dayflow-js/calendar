@@ -1,5 +1,11 @@
 import { RefObject, JSX } from 'preact';
-import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useLayoutEffect,
+} from 'preact/hooks';
 
 import ViewHeader from '@/components/common/ViewHeader';
 import { MobileEventDrawer } from '@/components/mobileEventDrawer';
@@ -95,10 +101,11 @@ const WeekView = ({
 
   const mode = configMode || (isMobile ? 'compact' : 'standard');
   const isCompact = mode === 'compact';
+  const startOfWeek = config.startOfWeek ?? 1;
 
   const standardWeekStart = useMemo(
-    () => getWeekStart(currentDate),
-    [currentDate]
+    () => getWeekStart(currentDate, startOfWeek),
+    [currentDate, startOfWeek]
   );
 
   // Mobile Page Start (Synced with currentDate)
@@ -521,8 +528,15 @@ const WeekView = ({
         return d.toLocaleDateString(locale, { weekday: 'short' });
       });
     }
-    return getWeekDaysLabels(locale, 'short');
-  }, [locale, getWeekDaysLabels, isCompact, displayStart, displayDays]);
+    return getWeekDaysLabels(locale, 'short', startOfWeek);
+  }, [
+    locale,
+    getWeekDaysLabels,
+    isCompact,
+    displayStart,
+    displayDays,
+    startOfWeek,
+  ]);
 
   const mobileWeekDaysLabels = useMemo(() => {
     if (!isMobile) return [];
@@ -667,6 +681,27 @@ const WeekView = ({
 
     return today >= start && today < end;
   }, [displayStart, displayDays]);
+
+  // Initial scroll to current time
+  useLayoutEffect(() => {
+    if (config.scrollToCurrentTime && scrollerRef.current) {
+      const scrollContainer = scrollerRef.current;
+      const now = new Date();
+      const hour = now.getHours() + now.getMinutes() / 60;
+      const containerHeight = scrollContainer.clientHeight;
+      const top = Math.max(
+        0,
+        (hour - FIRST_HOUR) * HOUR_HEIGHT - containerHeight / 2
+      );
+
+      scrollContainer.scrollTop = top;
+
+      // Sync frozen columns immediately to avoid flashing
+      if (leftFrozenContentRef.current) {
+        leftFrozenContentRef.current.style.transform = `translateY(${-top}px)`;
+      }
+    }
+  }, []); // Run once on mount
 
   // Timer
   useEffect(() => {

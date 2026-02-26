@@ -69,13 +69,13 @@ export const calculateEventLayouts = (
   return allLayouts;
 };
 
-export const getWeekStart = (date: Date): Date => {
+export const getWeekStart = (date: Date, startOfWeek: number = 1): Date => {
   const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(date);
-  monday.setDate(diff);
-  monday.setHours(0, 0, 0, 0);
-  return monday;
+  const diff = (day - startOfWeek + 7) % 7;
+  const start = new Date(date);
+  start.setDate(date.getDate() - diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
 };
 
 // Filter events for the current week

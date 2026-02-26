@@ -5,6 +5,7 @@ import {
   useMemo,
   useCallback,
   useRef,
+  useLayoutEffect,
 } from 'preact/hooks';
 
 import { DayContent } from '@/components/dayView/DayContent';
@@ -450,6 +451,24 @@ const DayView = ({
     current.setHours(0, 0, 0, 0);
     return current.getTime() === today.getTime();
   }, [currentDate]);
+
+  // Initial scroll to current time
+  useLayoutEffect(() => {
+    if (config.scrollToCurrentTime) {
+      const scrollContainer =
+        calendarRef.current?.querySelector('.calendar-content');
+      if (scrollContainer) {
+        const now = new Date();
+        const hour = now.getHours() + now.getMinutes() / 60;
+        const containerHeight = (scrollContainer as HTMLElement).clientHeight;
+
+        scrollContainer.scrollTop = Math.max(
+          0,
+          (hour - FIRST_HOUR) * HOUR_HEIGHT - containerHeight / 2
+        );
+      }
+    }
+  }, []); // Run once on mount
 
   // Timer
   useEffect(() => {

@@ -23,6 +23,7 @@ import {
   ICalendarApp,
 } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
+import { getWeekNumber, scrollbarTakesSpace } from '@/utils';
 import { extractHourFromDate } from '@/utils/helpers';
 import { logger } from '@/utils/logger';
 import { temporalToDate } from '@/utils/temporal';
@@ -56,6 +57,8 @@ interface WeekComponentProps {
   screenSize: 'mobile' | 'tablet' | 'desktop';
   isScrolling: boolean;
   isDragging: boolean;
+  showWeekNumbers?: boolean;
+  showMonthIndicator?: boolean;
   item: VirtualWeekItem;
   weekHeight: number; // Use this instead of item.height to avoid sync issues
   events: Event[];
@@ -299,6 +302,8 @@ const WeekComponent = memo(
     screenSize,
     isScrolling,
     isDragging,
+    showWeekNumbers,
+    showMonthIndicator = true,
     item,
     weekHeight,
     events,
@@ -732,9 +737,11 @@ const WeekComponent = memo(
             belongsToCurrentMonth
               ? 'text-gray-800 dark:text-gray-100'
               : 'text-gray-400 dark:text-gray-600',
-            screenSize !== 'desktop' && dayIndex === 6
-              ? 'border-r-0'
-              : 'last:border-r'
+            dayIndex === 6
+              ? scrollbarTakesSpace()
+                ? 'last:border-r'
+                : 'border-r-0'
+              : ''
           )}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
@@ -780,6 +787,11 @@ const WeekComponent = memo(
         >
           {/* Date number area */}
           <div className={monthDateNumberContainer}>
+            {showWeekNumbers && dayIndex === 0 && screenSize !== 'mobile' && (
+              <span className='mr-auto ml-1 text-[10px] font-medium text-gray-400 dark:text-gray-500'>
+                {getWeekNumber(day.date)}
+              </span>
+            )}
             {
               <span
                 className={` ${monthDateNumber} ${day.isToday ? 'bg-primary text-primary-foreground' : belongsToCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'} `}
@@ -840,7 +852,7 @@ const WeekComponent = memo(
         style={{ height: weekHeightPx }}
       >
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
-        {firstDayOfMonth && (
+        {showMonthIndicator && firstDayOfMonth && (
           <div
             className={` ${monthTitle} ${shouldShowMonthTitle ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} `}
             style={{

@@ -14,8 +14,9 @@ import { ViewAdapter } from './ViewAdapter';
 // Default Month view configuration
 const defaultMonthViewConfig: MonthViewConfig = {
   // Month view specific configuration
-  showOtherMonth: true,
   showWeekNumbers: false,
+  showMonthIndicator: true,
+  startOfWeek: 1, // Monday
 };
 
 // Month view factory function

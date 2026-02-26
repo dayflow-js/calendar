@@ -31,6 +31,7 @@ import { temporalToDate } from '@/utils/temporal';
 
 const MonthView = ({
   app,
+  config,
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
@@ -42,6 +43,7 @@ const MonthView = ({
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
+  const startOfWeek = config.startOfWeek ?? 1;
   const calendarSignature = app
     .getCalendars()
     .map(c => c.id + c.colors.lineColor)
@@ -71,8 +73,8 @@ const MonthView = ({
       const weekStart = new Date(date);
       weekStart.setHours(0, 0, 0, 0);
       const day = weekStart.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      weekStart.setDate(weekStart.getDate() + diff);
+      const diff = (day - startOfWeek + 7) % 7;
+      weekStart.setDate(weekStart.getDate() - diff);
       weekStart.setHours(0, 0, 0, 0);
       return weekStart;
     };
@@ -218,12 +220,12 @@ const MonthView = ({
   // Calculate the week start time for the current date (used for event day field calculation)
   const currentWeekStart = useMemo(() => {
     const day = currentDate.getDay();
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(currentDate);
-    monday.setDate(diff);
-    monday.setHours(0, 0, 0, 0);
-    return monday;
-  }, [currentDate]);
+    const diff = (day - startOfWeek + 7) % 7;
+    const start = new Date(currentDate);
+    start.setDate(currentDate.getDate() - diff);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }, [currentDate, startOfWeek]);
 
   const {
     handleMoveStart,
@@ -305,8 +307,8 @@ const MonthView = ({
   });
 
   const weekDaysLabels = useMemo(
-    () => getWeekDaysLabels(locale, 'short'),
-    [locale, getWeekDaysLabels]
+    () => getWeekDaysLabels(locale, 'short', startOfWeek),
+    [locale, getWeekDaysLabels, startOfWeek]
   );
 
   const {
@@ -339,6 +341,7 @@ const MonthView = ({
     },
     initialWeeksToLoad: 156,
     locale: locale,
+    startOfWeek: startOfWeek,
     isEnabled: isWeekHeightInitialized,
   });
 
@@ -589,7 +592,8 @@ const MonthView = ({
         style={{
           scrollSnapType: 'y mandatory',
           overflow: 'hidden auto',
-          visibility: isWeekHeightInitialized ? 'visible' : 'hidden',
+          opacity: isWeekHeightInitialized ? 1 : 0,
+          transition: 'opacity 0.2s ease',
         }}
         onScroll={handleScroll}
       >
@@ -616,6 +620,8 @@ const MonthView = ({
               key={`week-${item.weekData.startDate.getTime()}`}
               item={adjustedItem}
               weekHeight={weekHeight}
+              showWeekNumbers={config.showWeekNumbers}
+              showMonthIndicator={config.showMonthIndicator}
               currentMonth={currentMonth}
               currentYear={currentYear}
               screenSize={screenSize}

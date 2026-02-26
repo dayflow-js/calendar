@@ -106,8 +106,9 @@ export interface WeekViewConfig extends ViewFactoryConfig {
  * Month view factory configuration
  */
 export interface MonthViewConfig extends ViewFactoryConfig {
-  showOtherMonth?: boolean;
   showWeekNumbers?: boolean;
+  showMonthIndicator?: boolean;
+  startOfWeek?: number;
 }
 
 /**
@@ -116,6 +117,7 @@ export interface MonthViewConfig extends ViewFactoryConfig {
 export interface YearViewConfig extends ViewFactoryConfig {
   mode?: 'year-canvas' | 'fixed-week';
   showTimedEventsInYearView?: boolean;
+  startOfWeek?: number;
 }
 
 /**

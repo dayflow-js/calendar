@@ -7,7 +7,8 @@ export interface LocaleContextValue {
   t: (key: TranslationKey, vars?: Record<string, string>) => string;
   getWeekDaysLabels: (
     locale: string,
-    format?: 'long' | 'short' | 'narrow'
+    format?: 'long' | 'short' | 'narrow',
+    startOfWeek?: number
   ) => string[];
   getMonthLabels: (
     locale: string,

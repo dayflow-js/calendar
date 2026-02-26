@@ -180,11 +180,11 @@ export const AllDayRow = ({
           >
             {/* Header spacer - flexes to match weekday header height */}
             <div
-              className={`flex-1 border-b border-gray-200 dark:border-gray-700 ${mode === 'compact' || isCompact ? 'hidden' : ''}`}
+              className={`flex-1 border-b border-gray-200 transition-all duration-300 ease-in-out dark:border-gray-700 ${mode === 'compact' || isCompact ? 'hidden' : ''}`}
             ></div>
             {/* All Day Label */}
             <div
-              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 select-none md:text-xs dark:text-gray-400'
+              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 transition-[min-height] duration-300 ease-in-out select-none md:text-xs dark:text-gray-400'
               style={{ minHeight: `${allDayAreaHeight}px` }}
             >
               {allDayLabelText}

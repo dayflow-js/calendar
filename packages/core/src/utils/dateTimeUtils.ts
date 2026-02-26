@@ -108,6 +108,21 @@ export const getEndOfDay = (
 };
 
 /**
+ * Get the ISO week number for a given date
+ * @param date Date object
+ * @returns Week number (1-53)
+ */
+export const getWeekNumber = (date: Date): number => {
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+};
+
+/**
  * Check if two dates are on the same day
  * @param date1 Date 1
  * @param date2 Date 2

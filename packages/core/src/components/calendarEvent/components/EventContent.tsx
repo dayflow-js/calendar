@@ -74,7 +74,6 @@ export const EventContent = ({
   multiDaySegmentInfo,
   customRenderingStore,
   eventContentSlotArgs,
-  layout,
   timeFormat = '24h',
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;

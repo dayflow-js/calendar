@@ -32,6 +32,7 @@ interface FixedWeekYearViewProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
   config?: {
     showTimedEventsInYearView?: boolean;
+    startOfWeek?: number;
   };
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
@@ -55,11 +56,13 @@ const MIN_ROW_HEIGHT = 60; // 12 months × 60px = 720px, fits well in typical co
 function analyzeEventsForMonth(
   events: Event[],
   monthIndex: number,
-  year: number
+  year: number,
+  startOfWeek: number = 1
 ): { segments: MonthEventSegment[]; maxVisualRow: number } {
   const monthStart = new Date(year, monthIndex, 1);
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-  const paddingStart = monthStart.getDay(); // 0 (Sun) to 6 (Sat)
+  const monthStartDay = monthStart.getDay();
+  const paddingStart = (monthStartDay - startOfWeek + 7) % 7;
 
   const monthStartMs = monthStart.getTime();
   const monthEnd = new Date(year, monthIndex, daysInMonth, 23, 59, 59, 999);
@@ -185,6 +188,7 @@ export const FixedWeekYearView = ({
   const rawEvents = app.getEvents();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const startOfWeek = config?.startOfWeek ?? 1;
 
   // Refs for synchronized scrolling
   const weekLabelsRef = useRef<HTMLDivElement>(null);
@@ -278,14 +282,15 @@ export const FixedWeekYearView = ({
     for (let month = 0; month < 12; month++) {
       const monthStart = new Date(currentYear, month, 1);
       const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-      const startDay = monthStart.getDay();
-      const slots = startDay + daysInMonth;
+      const monthStartDay = monthStart.getDay();
+      const padding = (monthStartDay - startOfWeek + 7) % 7;
+      const slots = padding + daysInMonth;
       if (slots > maxSlots) {
         maxSlots = slots;
       }
     }
     return maxSlots;
-  }, [currentYear]);
+  }, [currentYear, startOfWeek]);
 
   // Drag and Drop Hook
   const {
@@ -351,10 +356,9 @@ export const FixedWeekYearView = ({
 
   // Generate week header labels
   const weekLabels = useMemo(() => {
-    const labels = getWeekDaysLabels(locale, 'short');
-    const sundayStartLabels = [labels[6], ...labels.slice(0, 6)];
+    const labels = getWeekDaysLabels(locale, 'short', startOfWeek);
 
-    const formattedLabels = sundayStartLabels.map(label => {
+    const formattedLabels = labels.map(label => {
       if (locale.startsWith('zh')) {
         return label.at(-1);
       }
@@ -367,7 +371,7 @@ export const FixedWeekYearView = ({
       result.push(formattedLabels[i % 7]);
     }
     return result;
-  }, [locale, getWeekDaysLabels, totalColumns]);
+  }, [locale, getWeekDaysLabels, totalColumns, startOfWeek]);
 
   // Helper to check if a date is today
   const isDateToday = (date: Date) => date.getTime() === today.getTime();
@@ -393,7 +397,8 @@ export const FixedWeekYearView = ({
     for (let month = 0; month < 12; month++) {
       const monthStart = new Date(currentYear, month, 1);
       const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-      const paddingStart = monthStart.getDay();
+      const monthStartDay = monthStart.getDay();
+      const paddingStart = (monthStartDay - startOfWeek + 7) % 7;
 
       const days: (Date | null)[] = [];
 
@@ -420,7 +425,8 @@ export const FixedWeekYearView = ({
       const { segments: eventSegments, maxVisualRow } = analyzeEventsForMonth(
         yearEvents,
         month,
-        currentYear
+        currentYear,
+        startOfWeek
       );
 
       // Calculate dynamic row height based on number of event rows
@@ -439,7 +445,7 @@ export const FixedWeekYearView = ({
       });
     }
     return data;
-  }, [currentYear, locale, totalColumns, yearEvents]);
+  }, [currentYear, locale, totalColumns, yearEvents, startOfWeek]);
 
   // Handle scroll synchronization
   const handleContentScroll = useCallback(
@@ -542,8 +548,8 @@ export const FixedWeekYearView = ({
             }}
           >
             {weekLabels.map((label, i) => {
-              const dayIndex = i % 7;
-              const isWeekend = dayIndex === 0 || dayIndex === 6;
+              const dayOfWeek = (i + startOfWeek) % 7;
+              const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
               return (
                 <div
                   key={`label-${i}`}
@@ -613,8 +619,8 @@ export const FixedWeekYearView = ({
                 }}
               >
                 {month.days.map((date, dayIndex) => {
-                  const weekdayIndex = dayIndex % 7;
-                  const isWeekend = weekdayIndex === 0 || weekdayIndex === 6;
+                  const dayOfWeek = (dayIndex + startOfWeek) % 7;
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
                   if (!date) {
                     return (

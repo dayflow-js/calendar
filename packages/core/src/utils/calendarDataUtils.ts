@@ -127,20 +127,22 @@ export const generateWeeksData = (centralDate: Date, monthsToLoad = 3) => {
  * Generate week range around a center date
  * @param centerDate Center date for range
  * @param totalWeeks Total number of weeks to generate
+ * @param startOfWeek Week start day (0: Sunday, 1: Monday, etc.)
  * @returns Array of weeks data
  */
 export function generateWeekRange(
   centerDate: Date,
-  totalWeeks: number
+  totalWeeks: number,
+  startOfWeek: number = 1
 ): WeeksData[] {
   const weeks: WeeksData[] = [];
   const startOffset = Math.floor(totalWeeks / 2);
 
-  // Find Monday of the center date's week
-  const centerWeekStart = new Date(centerDate);
+  // Find start of the week for the center date
   const dayOfWeek = centerDate.getDay();
-  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  centerWeekStart.setDate(centerDate.getDate() - daysToMonday);
+  const diff = (dayOfWeek - startOfWeek + 7) % 7;
+  const centerWeekStart = new Date(centerDate);
+  centerWeekStart.setDate(centerDate.getDate() - diff);
   centerWeekStart.setHours(0, 0, 0, 0);
 
   // Calculate start week

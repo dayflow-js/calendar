@@ -255,7 +255,8 @@ export class CalendarApp implements ICalendarApp {
         break;
       }
       case ViewType.WEEK: {
-        const { monday } = getWeekRange(this.state.currentDate);
+        const startOfWeek = (view?.config?.startOfWeek as number) ?? 1;
+        const { monday } = getWeekRange(this.state.currentDate, startOfWeek);
         const start = new Date(monday);
         const end = new Date(monday);
         end.setDate(end.getDate() + 7);
@@ -274,7 +275,8 @@ export class CalendarApp implements ICalendarApp {
           this.state.currentDate.getMonth(),
           1
         );
-        const { monday } = getWeekRange(firstDayOfMonth);
+        const startOfWeek = (view?.config?.startOfWeek as number) ?? 1;
+        const { monday } = getWeekRange(firstDayOfMonth, startOfWeek);
         const start = new Date(monday);
 
         const end = new Date(monday);
