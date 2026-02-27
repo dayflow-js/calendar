@@ -9,7 +9,6 @@ import {
   EventDetailDialogRenderer,
   ICalendarApp,
   ViewType,
-  ViewMode,
 } from '@/types';
 
 export interface CalendarEventProps {
@@ -58,10 +57,8 @@ export interface CalendarEventProps {
   app?: ICalendarApp;
   /** Whether the current view is in mobile mode */
   isMobile?: boolean;
-  /** View display mode */
-  mode?: ViewMode;
-  /** Whether the current view is in mobile 2-column mode */
-  isCompact?: boolean;
+  /** Whether the current view is in mobile sliding mode */
+  isSlidingView?: boolean;
   /** Force enable touch interactions regardless of isMobile */
   enableTouch?: boolean;
   /** Whether to hide the time in the event display (Month view regular events only) */

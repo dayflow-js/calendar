@@ -34,7 +34,7 @@
     "rimraf": "catalog:",
     "rxjs": "^7.8.1",
     "tslib": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "~5.5.0",
     "zone.js": "~0.14.10"
   },
   "peerDependencies": {

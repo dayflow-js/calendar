@@ -36,5 +36,8 @@ export * from './eventDetail';
 // Mobile event types
 export * from './mobileEvent';
 
+// TimeZone types
+export * from './timezone';
+
 // Calendar types and Theme types
 export * from './calendarTypes';

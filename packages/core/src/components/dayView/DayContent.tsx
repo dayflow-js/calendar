@@ -84,6 +84,7 @@ interface DayContentProps {
   customEventDetailDialog?: EventDetailDialogRenderer;
   calendarRef: RefObject<HTMLDivElement>;
   allDayRowRef: RefObject<HTMLDivElement>;
+  timeGridRef: RefObject<HTMLDivElement>;
   switcherMode: string;
   isMobile: boolean;
   isTouch: boolean;
@@ -137,6 +138,7 @@ export const DayContent = ({
   customEventDetailDialog,
   calendarRef,
   allDayRowRef,
+  timeGridRef,
   switcherMode,
   isMobile,
   isTouch,
@@ -462,7 +464,11 @@ export const DayContent = ({
                     : ''}
                 </div>
               </div>
-              <div className='relative' style={{ WebkitTouchCallout: 'none' }}>
+              <div
+                className='relative'
+                style={{ WebkitTouchCallout: 'none' }}
+                ref={timeGridRef}
+              >
                 {timeSlots.map((_slot, slotIndex) => (
                   <div
                     key={slotIndex}

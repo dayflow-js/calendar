@@ -274,7 +274,6 @@ export const useDragHandlers = (
       calculateDragLayout,
       checkIfInAllDayArea,
       createDragIndicator,
-      currentWeekStart,
       events,
       FIRST_HOUR,
       getColumnDayIndex,
@@ -286,6 +285,7 @@ export const useDragHandlers = (
       updateDragIndicator,
       dragRef,
       setDragState,
+      currentWeekStart,
     ]
   );
 
@@ -428,7 +428,6 @@ export const useDragHandlers = (
     resetDragState,
     onEventsUpdate,
     MIN_DURATION,
-    currentWeekStart,
     dragRef,
   ]);
 
@@ -653,20 +652,18 @@ export const useDragHandlers = (
 
             if (drag.resizeDirection === 'left') {
               // Adjust start date
-              const targetDate = currentWeekStart
+              newStartDate = currentWeekStart
                 ? getDateByDayIndex(currentWeekStart, targetDayIndex)
                 : new Date();
-              newStartDate = targetDate;
 
               if (newStartDate > newEndDate) {
                 newStartDate = newEndDate;
               }
             } else if (drag.resizeDirection === 'right') {
               // Adjust end date
-              const targetDate = currentWeekStart
+              newEndDate = currentWeekStart
                 ? getDateByDayIndex(currentWeekStart, targetDayIndex)
                 : new Date();
-              newEndDate = targetDate;
 
               if (newEndDate < newStartDate) {
                 newEndDate = newStartDate;
@@ -1012,7 +1009,7 @@ export const useDragHandlers = (
             ? dateToPlainDate(drag.originalEndDate!)
             : dateToZonedDateTime(drag.originalEndDate!);
 
-          throttledSetEvents((prev: Event[]) =>
+          onEventsUpdate?.(prev =>
             prev.map(event =>
               event.id === drag.eventId
                 ? {
@@ -1057,7 +1054,7 @@ export const useDragHandlers = (
                 ? dateToPlainDate(drag.originalEndDate!)
                 : dateToZonedDateTime(drag.originalEndDate!);
 
-              throttledSetEvents((prev: Event[]) =>
+              onEventsUpdate?.(prev =>
                 prev.map(event =>
                   event.id === drag.eventId
                     ? {
@@ -1085,7 +1082,7 @@ export const useDragHandlers = (
                 return prev;
               });
 
-              throttledSetEvents((prev: Event[]) =>
+              onEventsUpdate?.(prev =>
                 prev.map(event => {
                   if (event.id !== drag.eventId) return event;
 
@@ -1190,24 +1187,54 @@ export const useDragHandlers = (
             return prev;
           });
 
-          // For all-day event resize and regular event resize, no additional update needed here
-          // because it's already updated via throttledSetEvents in handleDragMove
-          // Only move operation needs to update day field here
-          if (drag.mode === 'move') {
-            onEventsUpdate?.(prev =>
-              prev.map(event =>
-                event.id === drag.eventId
-                  ? {
-                      ...event,
-                      day: drag.dayIndex,
-                    }
-                  : event
-              )
-            );
-          } else if (drag.mode === 'resize') {
-            // Finalize resize to trigger undo snapshot and onEventUpdate callback
-            onEventsUpdate?.(prev => [...prev]);
-          }
+          // For move and resize operations, we need to finalize the changes in the store
+          onEventsUpdate?.(prev =>
+            prev.map(event => {
+              if (event.id !== drag.eventId) return event;
+
+              if (drag.allDay) {
+                // All-day resize already has start/end in drag ref
+                const newStart = dateToPlainDate(
+                  drag.originalStartDate || temporalToDate(event.start)
+                );
+                const newEnd = dateToPlainDate(
+                  drag.originalEndDate || temporalToDate(event.end)
+                );
+                return {
+                  ...event,
+                  day: drag.dayIndex,
+                  start: newStart,
+                  end: newEnd,
+                  allDay: true,
+                };
+              }
+              // Regular event resize or move
+              const eventStartDate = temporalToDate(event.start);
+              const newEventDate = currentWeekStart
+                ? getDateByDayIndex(currentWeekStart, drag.dayIndex)
+                : eventStartDate;
+
+              const startDateObj = createDateWithHour(
+                newEventDate,
+                finalStartHour
+              ) as Date;
+              const endDateObj = createDateWithHour(
+                newEventDate,
+                finalEndHour
+              ) as Date;
+
+              const newStart = dateToZonedDateTime(startDateObj);
+              const newEnd = dateToZonedDateTime(endDateObj);
+
+              return {
+                ...event,
+                day: drag.dayIndex,
+                start: newStart,
+                end: newEnd,
+                allDay: false,
+              };
+            })
+          );
         }
       }
 

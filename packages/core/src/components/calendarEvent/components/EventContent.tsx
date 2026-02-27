@@ -3,7 +3,7 @@ import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingStore } from '@/renderer/CustomRenderingStore';
-import { ViewType, Event, ICalendarApp, ViewMode, EventLayout } from '@/types';
+import { ViewType, Event, ICalendarApp, EventLayout } from '@/types';
 
 import AllDayContent from './AllDayContent';
 import MonthAllDayContent from './MonthAllDayContent';
@@ -28,8 +28,7 @@ interface EventContentProps {
   isTouchEnabled: boolean;
   hideTime?: boolean;
   isMobile: boolean;
-  mode?: ViewMode;
-  isCompact?: boolean;
+  isSlidingView?: boolean;
   app?: ICalendarApp;
   onResizeStart?: (
     e: MouseEvent | TouchEvent,
@@ -67,8 +66,7 @@ export const EventContent = ({
   isTouchEnabled,
   hideTime,
   isMobile,
-  mode = 'standard',
-  isCompact,
+  isSlidingView,
   app,
   onResizeStart,
   multiDaySegmentInfo,
@@ -127,8 +125,7 @@ export const EventContent = ({
         onResizeStart={onResizeStart}
         isMultiDay={isMultiDay}
         segment={segment}
-        mode={mode}
-        isCompact={isCompact}
+        isSlidingView={isSlidingView}
       />
     ) : (
       <RegularEventContent

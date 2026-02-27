@@ -132,6 +132,80 @@ function setRelation(parent: LayoutWeekEvent, child: LayoutWeekEvent) {
   }
 }
 
+function countDescendants(node: LayoutNode): number {
+  let count = 0;
+  for (const child of node.children) {
+    count += 1 + countDescendants(child);
+  }
+  return count;
+}
+
+function buildTempNodeMap(
+  allEvents: LayoutWeekEvent[]
+): Map<string, LayoutNode> {
+  const nodeMap = new Map<string, LayoutNode>();
+
+  for (const event of allEvents) {
+    const node: LayoutNode = {
+      event,
+      children: [],
+      parent: null,
+      depth: 0,
+      isProcessed: false,
+    };
+    nodeMap.set(event.id, node);
+  }
+
+  for (const event of allEvents) {
+    if (event.parentId) {
+      const childNode = nodeMap.get(event.id);
+      const parentNode = nodeMap.get(event.parentId);
+      if (childNode && parentNode) {
+        childNode.parent = parentNode;
+        childNode.depth = parentNode.depth + 1;
+        parentNode.children.push(childNode);
+      }
+    }
+  }
+
+  return nodeMap;
+}
+
+function findAlternateBranchRoot(
+  event: LayoutWeekEvent,
+  nodeMap: Map<string, LayoutNode>
+): LayoutWeekEvent | null {
+  const eventNode = nodeMap.get(event.id);
+  if (!eventNode) return null;
+
+  let currentBranchRoot = eventNode;
+  while (currentBranchRoot.parent && currentBranchRoot.depth > 1) {
+    currentBranchRoot = currentBranchRoot.parent;
+  }
+
+  if (currentBranchRoot.depth !== 1) return null;
+
+  const rootNode = currentBranchRoot.parent;
+  if (!rootNode) return null;
+
+  const alternateBranches = rootNode.children.filter(
+    child => child.depth === 1 && child.event.id !== currentBranchRoot.event.id
+  );
+
+  let minLoad = Infinity;
+  let selectedBranch: LayoutNode | null = null;
+
+  for (const branch of alternateBranches) {
+    const load = countDescendants(branch);
+    if (load < minLoad) {
+      minLoad = load;
+      selectedBranch = branch;
+    }
+  }
+
+  return selectedBranch ? selectedBranch.event : null;
+}
+
 export function optimizeChildAssignments(
   childEvents: LayoutWeekEvent[],
   parentGroup: ParallelGroup,
@@ -166,9 +240,22 @@ export function optimizeChildAssignments(
         assignments.push({ child, parent });
         setRelation(parent, child);
       } else {
-        // Cross-branch parallel detection could go here if needed,
-        // but it requires NodeMap which is not fully available here.
-        // The original index.tsx uses a temporary node map.
+        // Find sibling events that overlap with current event
+        const siblingEvent = childEvents.find(
+          e => e.id !== child.id && eventsOverlap(e, child)
+        );
+        if (siblingEvent) {
+          const tempNodeMap = buildTempNodeMap(allEvents);
+          const alternateBranchRoot = findAlternateBranchRoot(
+            siblingEvent,
+            tempNodeMap
+          );
+
+          if (alternateBranchRoot) {
+            assignments.push({ child, parent: alternateBranchRoot });
+            setRelation(alternateBranchRoot, child);
+          }
+        }
       }
     }
     return assignments;

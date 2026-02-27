@@ -52,6 +52,8 @@ export const CompactHeader = ({
       {(() => {
         if (!mobilePageStart) return null;
 
+        const columnsPerPage = 2;
+
         const startIndex = fullWeekDates.findIndex(
           d => d.fullDate.getTime() === mobilePageStart.getTime()
         );
@@ -60,7 +62,7 @@ export const CompactHeader = ({
           startIndex === -1
             ? '0'
             : `calc(${((startIndex + 0.5) / 7) * 100}% - 16px)`;
-        // Width covers current column + next column (1/7 + 32px padding)
+        // Width covers 2 columns
         const capsuleWidth = `calc(${(1 / 7) * 100}% + 32px)`;
 
         return (
@@ -78,7 +80,7 @@ export const CompactHeader = ({
             {fullWeekDates.map((day, index) => {
               const isSelected = day.isCurrent;
               const isInsidePill =
-                index === startIndex || index === startIndex + 1;
+                index >= startIndex && index < startIndex + columnsPerPage;
 
               return (
                 <div

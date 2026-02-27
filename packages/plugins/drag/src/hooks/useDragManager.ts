@@ -22,6 +22,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
   const {
     calendarRef,
     allDayRowRef,
+    timeGridRef,
     viewType,
     getLineColor,
     getDynamicPadding,
@@ -146,6 +147,13 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         );
       } else {
         // Week/Day view indicator
+        const targetContainer = drag.allDay
+          ? allDayRowRef?.current
+          : timeGridRef?.current ||
+            calendarRef.current?.querySelector('.calendar-content');
+        const isInsideTimeGrid =
+          !drag.allDay && targetContainer === timeGridRef?.current;
+
         if (sourceElement) {
           const sourceRect = sourceElement.getBoundingClientRect();
           let containerRect;
@@ -166,8 +174,10 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
               indicator.style.height = `${sourceRect.height}px`;
             } else if (drag.allDay && !isDayView) {
-              const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-              const dayColumnWidth = `calc(${totalWidth} / 7)`;
+              const totalWidth =
+                options.gridWidth || (isMobile ? '175%' : '100%');
+              const daysToShow = options.displayDays || 7;
+              const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
 
               indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
               indicator.style.top = `${sourceElement.offsetTop - 2}px`;
@@ -178,10 +188,14 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               const containerEl =
                 calendarRef.current?.querySelector('.calendar-content');
               const scrollLeft = containerEl?.scrollLeft || 0;
-              const gridOffset = getGridOffset();
+              const gridOffset = isInsideTimeGrid ? 0 : getGridOffset();
 
-              indicator.style.left = `${sourceRect.left - containerRect.left + scrollLeft}px`;
-              indicator.style.top = `${top + 3 + gridOffset}px`;
+              indicator.style.left = isInsideTimeGrid
+                ? `${sourceRect.left - (timeGridRef?.current?.getBoundingClientRect().left || 0)}px`
+                : `${sourceRect.left - containerRect.left + scrollLeft}px`;
+              indicator.style.top = isInsideTimeGrid
+                ? `${top + 3}px`
+                : `${top + 3 + gridOffset}px`;
               indicator.style.width = `${sourceRect.width}px`;
               indicator.style.height = `${sourceRect.height}px`;
             }
@@ -202,51 +216,59 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             const gutterOffset = isMobile ? 0 : 11;
             indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
           } else {
-            const totalWidth = isMobile ? '175%' : '100%';
-            const dayColumnWidth = `calc(${totalWidth} / 7)`;
+            const totalWidth =
+              options.gridWidth || (isMobile ? '175%' : '100%');
+            const daysToShow = options.displayDays || 7;
+            const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
             indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
             indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
           }
         } else {
-          const gridOffset = getGridOffset();
+          const gridOffset = isInsideTimeGrid ? 0 : getGridOffset();
           const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
           const height = (drag.endHour - drag.startHour) * HOUR_HEIGHT;
-          indicator.style.top = `${top + 3 + gridOffset}px`;
+          indicator.style.top = isInsideTimeGrid
+            ? `${top + 3}px`
+            : `${top + 3 + gridOffset}px`;
           indicator.style.height = `${height - 4}px`;
           indicator.style.color = '#fff';
           indicator.className = 'rounded-sm shadow-sm';
 
+          const daysToShow = options.displayDays || 7;
+          const totalWidth = isInsideTimeGrid
+            ? '100%'
+            : options.gridWidth || (isMobile && !isDayView ? '175%' : '100%');
+
           if (layout) {
             if (isDayView) {
-              indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-              indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
+              indicator.style.left = isInsideTimeGrid
+                ? `${(layout.left / 100) * 100}%`
+                : `${TIME_COLUMN_WIDTH}px`;
+              indicator.style.width = isInsideTimeGrid
+                ? `calc(100% * ${layout.width / 100} - 3px)`
+                : `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
-              const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-              const dayWidth = `calc(${totalWidth} / 7)`;
+              const dayWidth = `calc(${totalWidth} / ${daysToShow})`;
               indicator.style.left = `calc((${dayWidth} * ${drag.dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
               indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
             }
             indicator.style.zIndex = String(1000);
+          } else if (isDayView) {
+            indicator.style.left = isInsideTimeGrid
+              ? '0px'
+              : `${TIME_COLUMN_WIDTH}px`;
+            indicator.style.width = isInsideTimeGrid
+              ? 'calc(100% - 3px)'
+              : `calc(100% - ${TIME_COLUMN_WIDTH}px - 3px)`;
           } else {
-            const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-            const dayColumnWidth = isDayView
-              ? `calc(100% - ${TIME_COLUMN_WIDTH}px)`
-              : `calc(${totalWidth} / 7)`;
-            indicator.style.left = isDayView
-              ? `${TIME_COLUMN_WIDTH}px`
-              : `calc(${dayColumnWidth} * ${drag.dayIndex})`;
+            const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
+            indicator.style.left = `calc(${dayColumnWidth} * ${drag.dayIndex})`;
             indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
           }
         }
 
         // Add to corresponding container
-        if (drag.allDay) {
-          allDayRowRef?.current?.append(indicator);
-        } else {
-          calendarRef.current
-            ?.querySelector('.calendar-content')
-            ?.append(indicator);
-        }
+        targetContainer?.append(indicator);
 
         // Save props for subsequent updates
         dragPropsRef.current = { drag, color, title, layout };
@@ -329,15 +351,17 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           args as [number, number, number, boolean?, EventLayout?];
 
         // Ensure in correct container
-        if (isAllDay && indicator.parentElement !== allDayRowRef?.current) {
-          allDayRowRef?.current?.append(indicator);
-        } else if (!isAllDay) {
-          const calendarContent =
+        const targetContainer = isAllDay
+          ? allDayRowRef?.current
+          : timeGridRef?.current ||
             calendarRef.current?.querySelector('.calendar-content');
-          if (indicator.parentElement !== calendarContent) {
-            calendarContent?.append(indicator);
-          }
+
+        if (indicator.parentElement !== targetContainer) {
+          targetContainer?.append(indicator);
         }
+
+        const isInsideTimeGrid =
+          !isAllDay && targetContainer === timeGridRef?.current;
 
         if (isAllDay) {
           if (isDayView) {
@@ -345,8 +369,10 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             const gutterOffset = isMobile ? 0 : 11;
             indicator.style.width = `calc(100% - ${TIME_COLUMN_WIDTH}px - ${2 + gutterOffset}px)`;
           } else {
-            const totalWidth = isMobile && !isDayView ? '175%' : '100%';
-            const dayColumnWidth = `calc(${totalWidth} / 7)`;
+            const totalWidth =
+              options.gridWidth || (isMobile && !isDayView ? '175%' : '100%');
+            const daysToShow = options.displayDays || 7;
+            const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
             indicator.style.left = `calc(${dayColumnWidth} * ${dayIndex})`;
             indicator.style.width = `calc(${dayColumnWidth} - 2px)`;
             indicator.style.top = '2px';
@@ -359,35 +385,48 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             'rounded-xl'
           );
         } else {
-          const gridOffset = getGridOffset();
+          const gridOffset = isInsideTimeGrid ? 0 : getGridOffset();
           const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
           const height = (endHour - startHour) * HOUR_HEIGHT;
-          indicator.style.top = `${top + 3 + gridOffset}px`;
+          indicator.style.top = isInsideTimeGrid
+            ? `${top + 3}px`
+            : `${top + 3 + gridOffset}px`;
           indicator.style.height = `${height - 4}px`;
           indicator.style.marginBottom = '0';
           indicator.className = indicator.className.replace(
             'rounded-xl',
             'rounded-sm'
           );
-          const totalWidth = isMobile && !isDayView ? '175%' : '100%';
+
+          const daysToShow = options.displayDays || 7;
+          const totalWidth = isInsideTimeGrid
+            ? '100%'
+            : options.gridWidth || (isMobile && !isDayView ? '175%' : '100%');
 
           if (layout) {
             if (isDayView) {
-              indicator.style.left = `${TIME_COLUMN_WIDTH}px`;
-              indicator.style.width = `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
+              indicator.style.left = isInsideTimeGrid
+                ? `${(layout.left / 100) * 100}%`
+                : `calc(${TIME_COLUMN_WIDTH}px + ((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.left / 100}))`;
+              indicator.style.width = isInsideTimeGrid
+                ? `calc(100% * ${layout.width / 100} - 3px)`
+                : `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
-              const dayWidth = `calc(${totalWidth} / 7)`;
+              const dayWidth = `calc(${totalWidth} / ${daysToShow})`;
               indicator.style.left = `calc((${dayWidth} * ${dayIndex}) + (${dayWidth} * ${layout.left / 100}))`;
               indicator.style.width = `calc((${dayWidth} * ${(layout.width - 1) / 100}))`;
             }
             indicator.style.zIndex = String(layout.zIndex + 10);
+          } else if (isDayView) {
+            indicator.style.left = isInsideTimeGrid
+              ? '0px'
+              : `${TIME_COLUMN_WIDTH}px`;
+            indicator.style.width = isInsideTimeGrid
+              ? 'calc(100% - 3px)'
+              : `calc(100% - ${TIME_COLUMN_WIDTH}px - 3px)`;
           } else {
-            const dayColumnWidth = isDayView
-              ? `calc(100% - ${TIME_COLUMN_WIDTH}px)`
-              : `calc(${totalWidth} / 7)`;
-            indicator.style.left = isDayView
-              ? `${TIME_COLUMN_WIDTH}px`
-              : `calc(${dayColumnWidth} * ${dayIndex})`;
+            const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
+            indicator.style.left = `calc(${dayColumnWidth} * ${dayIndex})`;
             indicator.style.width = `calc(${dayColumnWidth} - 3px)`;
           }
         }

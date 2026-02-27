@@ -2,13 +2,14 @@ import { AnyComponent, RefObject } from 'preact';
 
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 
-import { CalendarView, ViewType, ICalendarApp, ViewMode } from './core';
+import { CalendarView, ViewType, ICalendarApp } from './core';
 import { Event } from './event';
 import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
 } from './eventDetail';
 import { EventLayout } from './layout';
+import { TimeZoneValue } from './timezone';
 
 /**
  * Common Props interface for view components
@@ -87,7 +88,7 @@ export interface ViewFactoryConfig {
 export interface DayViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
-  secondaryTimeZone?: string;
+  secondaryTimeZone?: TimeZoneValue;
 }
 
 /**
@@ -98,8 +99,7 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   startOfWeek?: number;
   scrollToCurrentTime?: boolean;
-  mode?: ViewMode;
-  secondaryTimeZone?: string;
+  secondaryTimeZone?: TimeZoneValue;
 }
 
 /**

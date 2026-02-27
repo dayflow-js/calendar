@@ -66,8 +66,7 @@ const CalendarEvent = ({
   multiDaySegmentInfo,
   app,
   isMobile = false,
-  mode = 'standard',
-  isCompact = false,
+  isSlidingView = false,
   enableTouch,
   hideTime,
   timeFormat = '24h',
@@ -132,7 +131,7 @@ const CalendarEvent = ({
     (selectedEventId === undefined
       ? isSelected
       : selectedEventId === event.id) ||
-    isPressed ||
+    (!isTouchEnabled && isPressed) ||
     isBeingDragged;
 
   const [eventVisibility, setEventVisibility] = useState<
@@ -444,8 +443,7 @@ const CalendarEvent = ({
           isTouchEnabled={isTouchEnabled}
           hideTime={hideTime}
           isMobile={isMobile}
-          mode={mode}
-          isCompact={isCompact}
+          isSlidingView={isSlidingView}
           app={app}
           onResizeStart={onResizeStart}
           multiDaySegmentInfo={multiDaySegmentInfo}

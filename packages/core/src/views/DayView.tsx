@@ -198,6 +198,7 @@ const DayView = ({
 
   // References
   const allDayRowRef = useRef<HTMLDivElement>(null);
+  const timeGridRef = useRef<HTMLDivElement>(null);
 
   // Calculate the week start time for the current date
   const currentWeekStart = useMemo(
@@ -249,6 +250,7 @@ const DayView = ({
   } = useDragForView(app, {
     calendarRef,
     allDayRowRef: showAllDay ? allDayRowRef : undefined,
+    timeGridRef,
     viewType: DragViewType.DAY,
     onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => {
       const newEvents = updateFunc(currentDayEvents);
@@ -534,6 +536,7 @@ const DayView = ({
         customEventDetailDialog={customEventDetailDialog}
         calendarRef={calendarRef}
         allDayRowRef={allDayRowRef}
+        timeGridRef={timeGridRef}
         switcherMode={switcherMode}
         isMobile={isMobile}
         isTouch={isTouch}

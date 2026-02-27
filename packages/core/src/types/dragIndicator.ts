@@ -96,6 +96,7 @@ export interface UnifiedDragRef extends DragRef {
 export interface useDragProps extends Partial<DragConfig> {
   calendarRef: RefObject<HTMLDivElement>;
   allDayRowRef?: RefObject<HTMLDivElement>; // Required for Week/Day views
+  timeGridRef?: RefObject<HTMLDivElement>; // Optional, used for translated grid layouts
   viewType: ViewType;
   onEventsUpdate: (
     updateFunc: (events: Event[]) => Event[],
@@ -119,6 +120,8 @@ export interface useDragProps extends Partial<DragConfig> {
   renderer?: DragIndicatorRenderer; // Required for Week/Day views
   app?: ICalendarApp;
   isMobile?: boolean;
+  gridWidth?: string;
+  displayDays?: number;
 }
 
 // Unified drag state type definitions

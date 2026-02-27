@@ -7,7 +7,7 @@
 
 import { Temporal } from 'temporal-polyfill';
 
-import { Event } from '@/types';
+import { Event, TimeZoneValue } from '@/types';
 
 import { extractHourFromDate } from './dateTimeUtils';
 import { temporalToDate } from './temporal';
@@ -135,7 +135,7 @@ export const roundToTimeStep = (hour: number) => {
  */
 export const generateSecondaryTimeSlots = (
   timeSlots: Array<{ hour: number; label: string }>,
-  secondaryTimeZone: string,
+  secondaryTimeZone: TimeZoneValue,
   timeFormat: '12h' | '24h' = '24h',
   referenceDate: Date = new Date()
 ): string[] => {
@@ -172,7 +172,7 @@ export const generateSecondaryTimeSlots = (
  * @returns Short timezone label
  */
 export const getTimezoneDisplayLabel = (
-  timeZone: string,
+  timeZone: TimeZoneValue,
   date: Date = new Date()
 ): string => {
   try {
@@ -182,6 +182,6 @@ export const getTimezoneDisplayLabel = (
     }).formatToParts(date);
     return parts.find(p => p.type === 'timeZoneName')?.value ?? timeZone;
   } catch {
-    return timeZone;
+    return timeZone as string;
   }
 };
