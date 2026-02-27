@@ -191,7 +191,6 @@ export const useVirtualMonthScroll = ({
   // Cached week data retrieval
   const getCachedWeekData = useCallback((weekStartDate: Date): WeeksData => {
     let weekData = weekDataCache.current.get(weekStartDate);
-    console.log('weekData', weekData);
 
     if (!weekData) {
       weekData = generateWeekData(weekStartDate);

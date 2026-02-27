@@ -37,6 +37,8 @@ export function normalizeCssWidth(
   return defaultWidth;
 }
 
+let cachedScrollbarTakesSpace: boolean | null = null;
+
 /**
  * Check if the calendar's scrollbar takes up space in the layout.
  *
@@ -49,6 +51,7 @@ export function normalizeCssWidth(
  */
 export function scrollbarTakesSpace(): boolean {
   if (typeof document === 'undefined') return false;
+  if (cachedScrollbarTakesSpace !== null) return cachedScrollbarTakesSpace;
 
   // Override host-app ::-webkit-scrollbar { display: none } so measurement is accurate
   const styleEl = document.createElement('style');
@@ -74,5 +77,6 @@ export function scrollbarTakesSpace(): boolean {
   container.remove();
   styleEl.remove();
 
+  cachedScrollbarTakesSpace = takesSpace;
   return takesSpace;
 }

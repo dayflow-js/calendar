@@ -1,5 +1,5 @@
 import { RefObject } from 'preact';
-import { useRef, useState } from 'preact/hooks';
+import { useRef, useState, useMemo } from 'preact/hooks';
 
 import CalendarEventComponent from '@/components/calendarEvent';
 import ViewHeader from '@/components/common/ViewHeader';
@@ -165,7 +165,7 @@ export const DayContent = ({
     y: number;
     date: Date;
   } | null>(null);
-  const hasScrollbarSpace = scrollbarTakesSpace();
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
 
   // Measure offset from .calendar-content top to the first time grid row,
   // accounting for boundary elements above the grid

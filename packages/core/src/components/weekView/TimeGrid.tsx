@@ -1,5 +1,5 @@
 import { RefObject, CSSProperties, TargetedEvent } from 'preact';
-import { useState, useRef } from 'preact/hooks';
+import { useState, useRef, useMemo } from 'preact/hooks';
 
 import CalendarEventComponent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
@@ -143,7 +143,7 @@ export const TimeGrid = ({
     y: number;
     date: Date;
   } | null>(null);
-  const hasScrollbarSpace = scrollbarTakesSpace();
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
 
   const handleContextMenu = (e: MouseEvent, dayIndex: number, hour: number) => {
     e.preventDefault();
@@ -285,7 +285,13 @@ export const TimeGrid = ({
         <div
           ref={swipeContentRef}
           className='flex'
-          style={{ width: gridWidth, minWidth: '100%' }}
+          style={{
+            width: gridWidth,
+            minWidth: '100%',
+            transform: isSlidingView
+              ? 'translateX(calc(-100% / 3))'
+              : undefined,
+          }}
         >
           {/* Time Grid */}
           <div className='grow'>

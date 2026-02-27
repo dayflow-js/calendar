@@ -1,5 +1,5 @@
 import { RefObject, JSX } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useMemo } from 'preact/hooks';
 
 import CalendarEventComponent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
@@ -144,7 +144,7 @@ export const AllDayRow = ({
     y: number;
     date: Date;
   } | null>(null);
-  const hasScrollbarSpace = scrollbarTakesSpace();
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
   const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
   // On mobile the time column is too narrow for dual labels — hide secondary TZ display
   const showSecondaryTz = hasSecondaryTz && !isMobile;
@@ -221,7 +221,13 @@ export const AllDayRow = ({
           <div
             ref={topFrozenContentRef}
             className='flex flex-col'
-            style={{ width: gridWidth, minWidth: '100%' }}
+            style={{
+              width: gridWidth,
+              minWidth: '100%',
+              transform: isSlidingView
+                ? 'translateX(calc(-100% / 3))'
+                : undefined,
+            }}
           >
             {/* Weekday titles row */}
             {!isSlidingView && (
