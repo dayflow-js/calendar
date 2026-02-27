@@ -319,3 +319,28 @@
 .df-header-right {
   flex: 1;
 }
+
+/* Drag & Resize Utilities */
+.df-drag-active {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.df-drag-active * {
+  pointer-events: none;
+}
+
+.df-cursor-ns-resize,
+.df-cursor-ns-resize * {
+  cursor: ns-resize;
+}
+
+.df-cursor-ew-resize,
+.df-cursor-ew-resize * {
+  cursor: ew-resize;
+}
+
+.df-cursor-grabbing,
+.df-cursor-grabbing * {
+  cursor: grabbing;
+}

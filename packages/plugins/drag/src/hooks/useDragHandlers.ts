@@ -155,16 +155,20 @@ export const useDragHandlers = (
 
       // Set cursor based on drag mode and direction
       if (drag.mode === 'resize') {
+        document.body.classList.add('df-drag-active');
         if (drag.allDay) {
           // AllDay event resize (horizontal)
           document.body.style.cursor = 'ew-resize';
+          document.body.classList.add('df-cursor-ew-resize');
         } else {
           // Regular event resize (vertical)
           document.body.style.cursor = 'ns-resize';
+          document.body.classList.add('df-cursor-ns-resize');
         }
       } else {
         // Move mode
         document.body.style.cursor = 'grabbing';
+        document.body.classList.add('df-drag-active', 'df-cursor-grabbing');
       }
 
       const isInAllDayArea = checkIfInAllDayArea(clientY);
@@ -302,7 +306,13 @@ export const useDragHandlers = (
     if ((drag.mode === 'resize' || drag.mode === 'create') && !isEditable)
       return;
 
-    document.body.style.cursor = 'default';
+    document.body.style.cursor = '';
+    document.body.classList.remove(
+      'df-drag-active',
+      'df-cursor-ns-resize',
+      'df-cursor-ew-resize',
+      'df-cursor-grabbing'
+    );
 
     // If dragging but threshold not met (indicator not visible), treat as click/cancel
     if (drag.mode === 'move' && !drag.indicatorVisible) {
@@ -457,16 +467,20 @@ export const useDragHandlers = (
 
       // Set cursor based on drag mode and direction
       if (drag.mode === 'resize') {
+        document.body.classList.add('df-drag-active');
         if (isDateGridView || drag.allDay) {
           // MonthView or AllDay event resize (horizontal)
           document.body.style.cursor = 'ew-resize';
+          document.body.classList.add('df-cursor-ew-resize');
         } else {
           // Regular event resize in Week/Day view (vertical)
           document.body.style.cursor = 'ns-resize';
+          document.body.classList.add('df-cursor-ns-resize');
         }
       } else {
         // Move or create mode
         document.body.style.cursor = 'grabbing';
+        document.body.classList.add('df-drag-active', 'df-cursor-grabbing');
       }
 
       if (isDateGridView) {
@@ -1244,6 +1258,13 @@ export const useDragHandlers = (
         capture: true,
       });
       document.removeEventListener('touchend', handleDragEnd);
+      document.body.style.cursor = '';
+      document.body.classList.remove(
+        'df-drag-active',
+        'df-cursor-ns-resize',
+        'df-cursor-ew-resize',
+        'df-cursor-grabbing'
+      );
       removeDragIndicator();
       drag.indicatorVisible = false;
       drag.sourceElement = null;
