@@ -7,6 +7,9 @@ const meta: MetaRecord = {
   'theme-customization': {
     title: 'Theme Customization',
   },
+  timezones: {
+    title: 'Time Zones',
+  },
 };
 
 export default meta;
