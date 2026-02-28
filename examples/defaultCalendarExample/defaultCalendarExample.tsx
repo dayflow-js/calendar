@@ -1,8 +1,6 @@
 import { Event, CalendarType, EventChange } from '@dayflow/core';
 import { createDragPlugin } from '@dayflow/plugin-drag';
-import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
 import { createLocalizationPlugin, zh } from '@dayflow/plugin-localization';
-import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -15,14 +13,15 @@ import {
 } from '@dayflow/react';
 import { getWebsiteCalendars } from '@examples/utils/palette';
 import { generateSampleEvents } from '@examples/utils/sampleData';
+import { createSidebarPlugin } from '@sidebar/plugin';
 import { Sun, Moon } from 'lucide-react';
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const DefaultCalendarExample: React.FC = () => {
   const [events] = useState<Event[]>(generateSampleEvents());
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
 
-  const [_, setIsMobile] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -31,12 +30,15 @@ const DefaultCalendarExample: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const dragPlugin = useMemo(() => createDragPlugin(), []);
-  const keyboardPlugin = useMemo(() => createKeyboardShortcutsPlugin(), []);
-
   const plugins = [
-    dragPlugin,
-    keyboardPlugin,
+    createDragPlugin({
+      onEventDrop: (updatedEvent, _) => {
+        console.log('onEventDrop:', updatedEvent);
+      },
+      onEventResize: (updatedEvent, _) => {
+        console.log('onEventResize:', updatedEvent);
+      },
+    }),
     createSidebarPlugin({
       createCalendarMode: 'modal',
       colorPickerMode: 'default',
@@ -44,21 +46,29 @@ const DefaultCalendarExample: React.FC = () => {
     createLocalizationPlugin({
       locales: [zh],
     }),
-  ];
-  // .filter(plugin => !(isMobile && plugin.name === 'sidebar'));
+  ].filter(plugin => !(isMobile && plugin.name === 'sidebar'));
 
   const calendar = useCalendarApp({
     views: [
-      createDayView({}),
-      createWeekView({
-        mode: 'compact',
+      createDayView({
         // timeFormat: '12h',
+        // secondaryTimeZone: TimeZone.SYDNEY,
+      }),
+      createWeekView({
+        // mode: 'compact',
+        // timeFormat: '12h',
+        // secondaryTimeZone: TimeZone.SHANGHAI,
+        // startOfWeek: 2,
         // showAllDay: false,
       }),
-      createMonthView(),
+      createMonthView({
+        showWeekNumbers: true,
+        // showMonthIndicator: false,
+      }),
       createYearView({
-        mode: 'fixed-week',
-        // showTimedEventsInYearView: true,
+        // mode: 'fixed-week',
+        showTimedEventsInYearView: true,
+        startOfWeek: 7,
       }),
     ],
     events: events,

@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2026-02-28
+
+### New Features & Enhancements
+
+- **Drag & Drop Improvements**:
+  - Added `onEventDrop` and `onEventResize` callbacks to the drag plugin for better event handling.
+  - Updated Month and Year View all-day event drag indicators for better visual feedback.
+- **View Enhancements**:
+  - Added `secondaryTimeZone` label support for Day and Week Views.
+  - Added `timeFormat` configuration for Day and Week Views.
+  - Updated configuration options for `monthView` and `yearView`.
+- **Developer Experience**:
+  - Introduced `oxlint` for faster linting and improved code quality.
+  - Added `pre-commit` hooks and `format:check` scripts to ensure code consistency.
+  - Migrated to `pnpm workspace catalog` for better dependency management.
+  - Added `.editorconfig` and improved VSCode settings/extensions recommendations.
+
+### Performance
+
+- **Scrolling**: Optimized `MonthView` scrolling performance by memoizing scrollbar checks.
+
+### Fixed
+
+- **Layout**: Resolved `eventLayout` stacking issues and improved mobile `WeekView` layout.
+- **Framework Support**: Corrected `ng-packagr` configuration schema path for Angular.
+- **Build & Packaging**:
+  - Fixed CSS export errors and website build issues.
+  - Removed duplicate `peerDependencies` in `package.json` files.
+  - Fixed Tailwind CSS path configurations.
+- **UI/UX**: Fixed an issue where the "+ more" click in the website had no reaction.
+- **Documentation**: Corrected README image paths and updated view documentation.
+
+### Style
+
+- Improved Day/Week View event resize pointer display.
+- Cleaned up Tailwind CSS class formatting.
+- Resolved various lint warnings reported by `oxlint`.
+
 ## [3.1.0] - 2026-02-20
 
 ### Plugin Architecture & Decoupling

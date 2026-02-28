@@ -25,6 +25,12 @@ function MyCalendar() {
     enableDrag: true,
     enableResize: true,
     enableCreate: true,
+    onEventDrop: (updated, original) => {
+      console.log('Event moved:', updated);
+    },
+    onEventResize: (updated, original) => {
+      console.log('Event resized:', updated);
+    },
   });
 
   const calendar = useCalendarApp({
@@ -38,13 +44,15 @@ function MyCalendar() {
 
 ## Configuration
 
-| Property             | Type         | Default              | Description                                                   |
-| :------------------- | :----------- | :------------------- | :------------------------------------------------------------ |
-| `enableDrag`         | `boolean`    | `true`               | Allow moving events by dragging.                              |
-| `enableResize`       | `boolean`    | `true`               | Allow changing event duration by resizing.                    |
-| `enableCreate`       | `boolean`    | `true`               | Allow creating events by double-clicking the grid.            |
-| `enableAllDayCreate` | `boolean`    | `true`               | Allow creating all-day events by dragging in the all-day row. |
-| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH]` | Views where drag functionality should be enabled.             |
+| Property             | Type         | Default                    | Description                                                   |
+| :------------------- | :----------- | :------------------------- | :------------------------------------------------------------ |
+| `enableDrag`         | `boolean`    | `true`                     | Allow moving events by dragging.                              |
+| `enableResize`       | `boolean`    | `true`                     | Allow changing event duration by resizing.                    |
+| `enableCreate`       | `boolean`    | `true`                     | Allow creating events by double-clicking the grid.            |
+| `enableAllDayCreate` | `boolean`    | `true`                     | Allow creating all-day events by dragging in the all-day row. |
+| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | Views where drag functionality should be enabled.             |
+| `onEventDrop`        | `Function`   | -                          | Callback when an event is moved (drag-and-drop).              |
+| `onEventResize`      | `Function`   | -                          | Callback when an event is resized.                            |
 
 ## Plugin API
 
