@@ -1,61 +1,78 @@
-# @dayflow/plugin-drag
+# DayFlow
 
-Drag-and-drop plugin for DayFlow calendar. Enables moving, resizing, and creating events via mouse or touch interactions.
+**English** | [中文](README.zh.md) | [日本語](README.ja.md) | [Getting Started & Contributing](CONTRIBUTING.md)
 
-[![npm](https://img.shields.io/npm/v/@dayflow/plugin-drag?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/plugin-drag)
+A flexible and feature-rich calendar component library for **React, Vue, Angular, and Svelte** with drag-and-drop support, multiple views, and plugin architecture.
+
+[![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
 [![License](https://img.shields.io/github/license/dayflow-js/dayflow)](https://github.com/dayflow-js/dayflow/blob/main/LICENSE)
-
-## Installation
-
-```bash
-npm install @dayflow/plugin-drag
-# or
-pnpm add @dayflow/plugin-drag
-# or
-yarn add @dayflow/plugin-drag
-```
-
-## Usage
-
-```typescript
-import { createDragPlugin } from '@dayflow/plugin-drag';
-
-const dragPlugin = createDragPlugin({
-  enableDrag: true,
-  enableResize: true,
-  enableCreate: true,
-  enableAllDayCreate: true,
-  onEventDrop: (updatedEvent, originalEvent) => {
-    console.log('Event dropped:', updatedEvent);
-  },
-  onEventResize: (updatedEvent, originalEvent) => {
-    console.log('Event resized:', updatedEvent);
-  },
-});
-
-// Pass to your DayFlow instance
-```
-
-## Configuration
-
-| Parameter            | Type         | Default     | Description                                           |
-| -------------------- | ------------ | ----------- | ----------------------------------------------------- |
-| `enableDrag`         | `boolean`    | `true`      | Enable/disable event dragging (moving).               |
-| `enableResize`       | `boolean`    | `true`      | Enable/disable event resizing.                        |
-| `enableCreate`       | `boolean`    | `true`      | Enable/disable creating events via drag.              |
-| `enableAllDayCreate` | `boolean`    | `true`      | Enable/disable creating all-day events via drag.      |
-| `supportedViews`     | `ViewType[]` | All views   | Views that support drag operations.                   |
-| `onEventDrop`        | `Function`   | `undefined` | Callback fired when an event is dropped after moving. |
-| `onEventResize`      | `Function`   | `undefined` | Callback fired when an event is finished resizing.    |
+[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
 ## Features
 
-- **Event Moving**: Drag events to different times or days.
-- **Event Resizing**: Resize events from top or bottom (or left/right in month view).
-- **Quick Create**: Drag on empty grid space to create a new event.
-- **Multi-Day Support**: Drag and resize across day boundaries.
-- **Touch Support**: Fully compatible with touch devices.
+### Daily, Weekly, Monthly and Yearly View Types
 
-## License
+#### Day View
 
-MIT
+![Day View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/DayView.png)
+
+#### Week View
+
+![Week View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/WeekView.png)
+
+#### Month View
+
+![Month View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/MonthView.png)
+
+#### Year View(Fixed-Week)
+
+![Year View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/Year-Fixed-Week.png)
+
+#### Year View(Year-Canvas)
+
+![Year Canvas View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/Year-Canvas.png)
+
+### Mobile View Support
+
+#### Mobile Day & Year View
+
+![Mobile Day and Year View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/Mobile-Day-Year.png)
+
+#### Mobile Week & Month View
+
+![Mobile Week and Month View](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/Mobile-Week-Month.png)
+
+### Multiple Event Detail Panel options
+
+#### Detail Popup
+
+![Popup](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/popup.png)
+
+#### Detail Dialog
+
+![Dialog](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/dialog.png)
+
+### Dark Mode Support
+
+![Dark Mode](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/DarkMode.png)
+
+### Easy to resize and drag
+
+https://github.com/user-attachments/assets/726a5232-35a8-4fe3-8e7b-4de07c455353
+
+https://github.com/user-attachments/assets/957317e5-02d8-4419-a74b-62b7d191e347
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Bug Reports
+
+If you find a bug, please file an issue on [GitHub Issues](https://github.com/dayflow-js/dayflow/issues).
+
+## Support
+
+For questions and support, please open an issue on GitHub or go to discord.
+
+---

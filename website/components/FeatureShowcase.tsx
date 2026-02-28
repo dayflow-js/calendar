@@ -200,8 +200,8 @@ const useDemoCalendar = ({
 
 const DemoCalendar: React.FC<DemoCalendarProps> = ({
   switcherMode,
-  customDetailPanelContent,
-  customEventDetailDialog,
+  // customDetailPanelContent,
+  // customEventDetailDialog,
   useEventDetailDialog = false,
 }) => {
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
@@ -210,8 +210,8 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
     <div className='rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900'>
       <DayFlowCalendar
         calendar={calendar}
-        eventDetailContent={customDetailPanelContent}
-        eventDetailDialog={customEventDetailDialog}
+        // eventDetailContent={customDetailPanelContent}
+        // eventDetailDialog={customEventDetailDialog}
       />
     </div>
   );
@@ -284,13 +284,13 @@ export const CustomDetailPanelShowcase: React.FC = () => {
               <span className='font-medium text-slate-700 dark:text-slate-200'>
                 Owner:
               </span>
-              <span>{meta.owner ?? 'Unassigned'}</span>
+              <span>{`${meta.owner ?? 'Unassigned'}`}</span>
             </div>
             <div>
               <span className='font-medium text-slate-700 dark:text-slate-200'>
                 Location:
               </span>
-              <span>{meta.location ?? 'TBD'}</span>
+              <span>{`${meta.location ?? 'TBD'}`}</span>
             </div>
           </div>
 
@@ -677,7 +677,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                             Location
                           </p>
                           <p className='text-sm text-slate-900 dark:text-slate-100'>
-                            {location}
+                            {`${location}`}
                           </p>
                         </div>
                       </div>

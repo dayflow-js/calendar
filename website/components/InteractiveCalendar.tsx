@@ -140,7 +140,12 @@ export function InteractiveCalendar() {
     const v = [];
     if (selectedViews.includes(ViewType.DAY)) v.push(createDayView());
     if (selectedViews.includes(ViewType.WEEK)) v.push(createWeekView());
-    if (selectedViews.includes(ViewType.MONTH)) v.push(createMonthView());
+    if (selectedViews.includes(ViewType.MONTH))
+      v.push(
+        createMonthView({
+          showMonthIndicator: false,
+        })
+      );
     if (selectedViews.includes(ViewType.YEAR)) {
       v.push(createYearView({ mode: yearMode as never }));
     }

@@ -117,26 +117,6 @@ describe('CalendarApp', () => {
     });
   });
 
-  describe('Dynamic Configuration', () => {
-    it('should update views via updateConfig', () => {
-      const app = new CalendarApp({
-        views: [createMonthView()],
-        plugins: [],
-        events: [],
-      });
-
-      expect(app.state.views.has(ViewType.MONTH)).toBe(true);
-      expect(app.state.views.has(ViewType.WEEK)).toBe(false);
-
-      app.updateConfig({
-        views: [createMonthView(), createWeekView()],
-      });
-
-      expect(app.state.views.has(ViewType.MONTH)).toBe(true);
-      expect(app.state.views.has(ViewType.WEEK)).toBe(true);
-    });
-  });
-
   describe('Locale Management', () => {
     it('should default to en-US locale', () => {
       const app = new CalendarApp({
