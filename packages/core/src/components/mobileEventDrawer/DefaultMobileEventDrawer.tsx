@@ -13,7 +13,7 @@ import {
   MobileEventProps,
   CalendarType,
 } from '@/types';
-import { formatTime, isEventEqual } from '@/utils';
+import { formatTime, isEventDeepEqual } from '@/utils';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 
 import { Switch } from './components/Switch';
@@ -184,7 +184,7 @@ export const MobileEventDrawer = ({
       end: dateToZonedDateTime(finalEnd),
     };
 
-    return !isEventEqual(draftEvent, currentEvent);
+    return !isEventDeepEqual(draftEvent, currentEvent);
   }, [
     isOpen,
     draftEvent,

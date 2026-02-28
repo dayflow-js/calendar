@@ -33,12 +33,12 @@ import {
   WeekDayDragState,
 } from '@/types';
 import {
-  formatTime,
   extractHourFromDate,
   generateSecondaryTimeSlots,
   getTimezoneDisplayLabel,
+  hasEventChanged,
+  formatTime,
 } from '@/utils';
-import { temporalToDate } from '@/utils/temporal';
 
 const WeekView = ({
   app,
@@ -441,7 +441,8 @@ const WeekView = ({
     viewType: DragViewType.WEEK,
     onEventsUpdate: (
       updateFunc: (events: Event[]) => Event[],
-      isResizing?: boolean
+      isResizing?: boolean,
+      source?: 'drag' | 'resize'
     ) => {
       const newEvents = updateFunc(currentWeekEvents);
       // Find events that need to be deleted (in old list but not in new list)
@@ -459,18 +460,7 @@ const WeekView = ({
         if (!oldEventIds.has(e.id)) return false;
         const oldEvent = currentWeekEvents.find(old => old.id === e.id);
         // Check if there are real changes
-        return (
-          oldEvent &&
-          (temporalToDate(oldEvent.start).getTime() !==
-            temporalToDate(e.start).getTime() ||
-            temporalToDate(oldEvent.end).getTime() !==
-              temporalToDate(e.end).getTime() ||
-            oldEvent.day !== e.day ||
-            extractHourFromDate(oldEvent.start) !==
-              extractHourFromDate(e.start) ||
-            extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
-            oldEvent.title !== e.title)
-        );
+        return oldEvent && hasEventChanged(oldEvent, e);
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
@@ -480,7 +470,8 @@ const WeekView = ({
           add: eventsToAdd,
           update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
         },
-        isResizing
+        isResizing,
+        source
       );
     },
     onEventCreate: (event: Event) => {

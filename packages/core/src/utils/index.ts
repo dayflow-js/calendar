@@ -54,6 +54,7 @@ export * from './themeUtils';
 
 // Event creation helper functions
 export * from './eventHelpers';
+export * from './eventUtils';
 
 // Search utilities
 export * from './searchUtils';

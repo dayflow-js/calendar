@@ -201,10 +201,16 @@ export interface ICalendarApp {
       update?: Array<{ id: string; updates: Partial<Event> }>;
       delete?: string[];
     },
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   addEvent: (event: Event) => void;
-  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  updateEvent: (
+    id: string,
+    event: Partial<Event>,
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
+  ) => void;
   deleteEvent: (id: string) => void;
   getEvents: () => Event[];
   getAllEvents: () => Event[];
@@ -281,12 +287,18 @@ export interface UseCalendarAppReturn {
       update?: Array<{ id: string; updates: Partial<Event> }>;
       delete?: string[];
     },
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   changeView: (view: ViewType) => void;
   setCurrentDate: (date: Date) => void;
   addEvent: (event: Event) => void;
-  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  updateEvent: (
+    id: string,
+    event: Partial<Event>,
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
+  ) => void;
   deleteEvent: (id: string) => void;
   goToToday: () => void;
   goToPrevious: () => void;

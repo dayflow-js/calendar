@@ -185,11 +185,9 @@ export const calculateDayIndex = (eventDate: Date, weekStart: Date): number => {
   // Get week start date start time (00:00:00)
   const weekStartCopy = new Date(weekStart);
   weekStartCopy.setHours(0, 0, 0, 0);
-
   const diffTime = eventDateStart.getTime() - weekStartCopy.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays; // Note: Not limited to 0-6 range, as events can be outside current week
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Note: Not limited to 0-6 range, as events can be outside current week
 };
 
 /**
@@ -200,9 +198,8 @@ export const calculateDayIndex = (eventDate: Date, weekStart: Date): number => {
  */
 export const isEventInWeek = (eventDate: Date, weekStart: Date): boolean => {
   const dayIndex = calculateDayIndex(eventDate, weekStart);
-  const isInWeek = dayIndex >= 0 && dayIndex <= 6;
 
-  return isInWeek;
+  return dayIndex >= 0 && dayIndex <= 6;
 };
 
 /**
@@ -243,10 +240,9 @@ export const getDayIndexByDate = (
   targetDateCopy.setHours(0, 0, 0, 0);
 
   const diffTime = targetDateCopy.getTime() - weekStartCopy.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   // Don't limit return value, return actual day difference
-  return diffDays;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 };
 
 /**
@@ -417,7 +413,7 @@ export const createEventWithZonedDateTime = (
  * @param event2 Second event
  * @returns Whether events are equal in content
  */
-export const isEventEqual = (
+export const isEventDeepEqual = (
   event1: Event | null,
   event2: Event | null
 ): boolean => {
@@ -433,3 +429,21 @@ export const isEventEqual = (
     event1.end.toString() === event2.end.toString()
   );
 };
+
+/**
+ * Check if event's primary fields (start, end, title) have changed.
+ * This is commonly used to determine if an event update should be persisted
+ * after a drag or resize operation.
+ *
+ * @param oldEvent Original event
+ * @param newEvent Updated event
+ * @returns Whether primary fields have changed
+ */
+export const hasEventChanged = (oldEvent: Event, newEvent: Event): boolean =>
+  temporalToDate(oldEvent.start).getTime() !==
+    temporalToDate(newEvent.start).getTime() ||
+  temporalToDate(oldEvent.end).getTime() !==
+    temporalToDate(newEvent.end).getTime() ||
+  oldEvent.title !== newEvent.title ||
+  oldEvent.day !== newEvent.day ||
+  !!oldEvent.allDay !== !!newEvent.allDay;

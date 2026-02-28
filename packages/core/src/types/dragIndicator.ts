@@ -100,7 +100,8 @@ export interface useDragProps extends Partial<DragConfig> {
   viewType: ViewType;
   onEventsUpdate: (
     updateFunc: (events: Event[]) => Event[],
-    isResizing?: boolean
+    isResizing?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   onEventCreate: (event: Event) => void;
   onEventEdit?: (event: Event) => void; // Required for Month view

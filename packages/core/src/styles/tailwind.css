@@ -326,7 +326,10 @@
   -webkit-user-select: none;
 }
 
-.df-drag-active * {
+.df-drag-active .calendar-event,
+.df-drag-active .df-month-more-events,
+.df-drag-active .df-month-title,
+.df-drag-active .df-year-event-content {
   pointer-events: none;
 }
 

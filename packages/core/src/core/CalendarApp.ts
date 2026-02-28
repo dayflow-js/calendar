@@ -42,6 +42,7 @@ export class CalendarApp implements ICalendarApp {
   private listeners: Set<(app: ICalendarApp) => void>;
   private undoStack: Array<{ type: string; data: unknown }> = [];
   private pendingSnapshot: Event[] | null = null;
+  private pendingChangeSource: 'drag' | 'resize' | null = null;
   private readonly MAX_UNDO_STACK = 50;
 
   constructor(config: CalendarAppConfig) {
@@ -116,8 +117,14 @@ export class CalendarApp implements ICalendarApp {
       // Sync local state
       this.state.events = this.store.getAllEvents();
 
-      // Trigger generic batch callback
-      this.callbacks.onEventBatchChange?.(changes);
+      if (
+        this.pendingChangeSource !== 'drag' &&
+        this.pendingChangeSource !== 'resize'
+      ) {
+        // Trigger generic batch callback
+        this.callbacks.onEventBatchChange?.(changes);
+      }
+      this.pendingChangeSource = null;
 
       this.triggerRender();
       this.notify();
@@ -200,10 +207,7 @@ export class CalendarApp implements ICalendarApp {
    */
   private isInternalEditable = (): boolean => {
     if (this.state.readOnly === true) return false;
-    if (typeof this.state.readOnly === 'object') {
-      return false;
-    }
-    return true;
+    return typeof this.state.readOnly !== 'object';
   };
 
   // View management
@@ -386,7 +390,8 @@ export class CalendarApp implements ICalendarApp {
       update?: Array<{ id: string; updates: Partial<Event> }>;
       delete?: string[];
     },
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ): void => {
     if (!this.isInternalEditable() && !isPending) return;
 
@@ -434,6 +439,9 @@ export class CalendarApp implements ICalendarApp {
     }
 
     // Handle Committed State (Through Store)
+    if (source) {
+      this.pendingChangeSource = source;
+    }
     this.store.beginTransaction();
 
     if (changes.delete) {
@@ -479,7 +487,8 @@ export class CalendarApp implements ICalendarApp {
   updateEvent = (
     id: string,
     eventUpdate: Partial<Event>,
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ): void => {
     if (!this.isInternalEditable() && !isPending) {
       logger.warn('Cannot update event in read-only mode');
@@ -488,6 +497,10 @@ export class CalendarApp implements ICalendarApp {
 
     if (!this.isInternalEditable()) {
       return;
+    }
+
+    if (source) {
+      this.pendingChangeSource = source;
     }
 
     // Save state before update (Snapshotting)

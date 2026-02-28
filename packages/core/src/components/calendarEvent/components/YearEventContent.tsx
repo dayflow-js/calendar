@@ -7,6 +7,7 @@ interface YearEventContentProps {
   event: Event;
   segment: YearMultiDaySegment;
   isEditable: boolean;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onResizeStart?: (
     e: MouseEvent | TouchEvent,
     event: Event,
@@ -18,6 +19,7 @@ const YearEventContent = ({
   event,
   segment,
   isEditable,
+  onMoveStart,
   onResizeStart,
 }: YearEventContentProps) => {
   const isAllDay = !!event.allDay;
@@ -42,6 +44,10 @@ const YearEventContent = ({
           e.stopPropagation();
           onResizeStart(e as MouseEvent, event, isLeft ? 'left' : 'right');
         }}
+        onTouchStart={e => {
+          e.stopPropagation();
+          onResizeStart(e as TouchEvent, event, isLeft ? 'left' : 'right');
+        }}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
@@ -58,7 +64,15 @@ const YearEventContent = ({
       };
 
       return (
-        <div className='df-year-event-content pointer-events-auto flex h-full w-full min-w-0 items-center'>
+        <div
+          className='df-year-event-content pointer-events-auto flex h-full w-full min-w-0 items-center'
+          onMouseDown={e => {
+            if (onMoveStart) {
+              e.stopPropagation();
+              onMoveStart(e as MouseEvent, event);
+            }
+          }}
+        >
           {segment.isFirstSegment && getEventIcon(event) && (
             <div className='df-year-event-icon mr-1 shrink-0'>
               <div
@@ -102,7 +116,15 @@ const YearEventContent = ({
     const titleText = segment.isFirstSegment ? event.title : '';
 
     return (
-      <div className='df-year-event-content pointer-events-auto flex h-full w-full items-center gap-1 overflow-hidden'>
+      <div
+        className='df-year-event-content pointer-events-auto flex h-full w-full items-center gap-1 overflow-hidden'
+        onMouseDown={e => {
+          if (onMoveStart) {
+            e.stopPropagation();
+            onMoveStart(e as MouseEvent, event);
+          }
+        }}
+      >
         {!isAllDay && (
           <span
             style={{ backgroundColor: lineColor }}

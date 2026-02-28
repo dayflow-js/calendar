@@ -445,6 +445,7 @@ const CalendarEvent = ({
           isMobile={isMobile}
           isSlidingView={isSlidingView}
           app={app}
+          onMoveStart={onMoveStart}
           onResizeStart={onResizeStart}
           multiDaySegmentInfo={multiDaySegmentInfo}
           customRenderingStore={customRenderingStore}

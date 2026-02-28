@@ -36,8 +36,8 @@ import {
   extractHourFromDate,
   generateSecondaryTimeSlots,
   getTimezoneDisplayLabel,
+  hasEventChanged,
 } from '@/utils';
-import { temporalToDate } from '@/utils/temporal';
 
 const DayView = ({
   app,
@@ -252,7 +252,11 @@ const DayView = ({
     allDayRowRef: showAllDay ? allDayRowRef : undefined,
     timeGridRef,
     viewType: DragViewType.DAY,
-    onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => {
+    onEventsUpdate: (
+      updateFunc: (events: Event[]) => Event[],
+      _isResizing?: boolean,
+      source?: 'drag' | 'resize'
+    ) => {
       const newEvents = updateFunc(currentDayEvents);
 
       // Find events that need to be deleted (in old list but not in new list)
@@ -268,28 +272,21 @@ const DayView = ({
       // Find events that need to be updated (exist in both lists but content may differ)
       const eventsToUpdate = newEvents.filter(e => {
         if (!oldEventIds.has(e.id)) return false;
-        const oldEvent = currentDayEvents.find(old => old.id === e.id);
+        const oldEvent = events.find(old => old.id === e.id);
         // Check if there are real changes
-        return (
-          oldEvent &&
-          (temporalToDate(oldEvent.start).getTime() !==
-            temporalToDate(e.start).getTime() ||
-            temporalToDate(oldEvent.end).getTime() !==
-              temporalToDate(e.end).getTime() ||
-            oldEvent.day !== e.day ||
-            extractHourFromDate(oldEvent.start) !==
-              extractHourFromDate(e.start) ||
-            extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
-            oldEvent.title !== e.title)
-        );
+        return oldEvent && hasEventChanged(oldEvent, e);
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      app.applyEventsChanges({
-        delete: eventsToDelete.map(e => e.id),
-        add: eventsToAdd,
-        update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
-      });
+      app.applyEventsChanges(
+        {
+          delete: eventsToDelete.map(e => e.id),
+          add: eventsToAdd,
+          update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+        },
+        undefined,
+        source
+      );
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {

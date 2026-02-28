@@ -30,6 +30,7 @@ interface EventContentProps {
   isMobile: boolean;
   isSlidingView?: boolean;
   app?: ICalendarApp;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onResizeStart?: (
     e: MouseEvent | TouchEvent,
     event: Event,
@@ -68,6 +69,7 @@ export const EventContent = ({
   isMobile,
   isSlidingView,
   app,
+  onMoveStart,
   onResizeStart,
   multiDaySegmentInfo,
   customRenderingStore,
@@ -84,6 +86,7 @@ export const EventContent = ({
         event={event}
         segment={yearSegment}
         isEditable={isEditable}
+        onMoveStart={onMoveStart}
         onResizeStart={onResizeStart}
       />
     );
@@ -96,6 +99,7 @@ export const EventContent = ({
           isDragging={isBeingDragged || isEventSelected}
           isResizing={isBeingResized}
           isSelected={isEventSelected}
+          onMoveStart={onMoveStart}
           onResizeStart={onResizeStart}
           isMobile={isMobile}
           isDraggable={isDraggable}

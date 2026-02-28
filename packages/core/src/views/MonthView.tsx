@@ -26,7 +26,7 @@ import {
   scrollContainer,
 } from '@/styles/classNames';
 import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
-import { extractHourFromDate } from '@/utils';
+import { hasEventChanged } from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
 
 const MonthView = ({
@@ -238,7 +238,8 @@ const MonthView = ({
     viewType: ViewType.MONTH,
     onEventsUpdate: (
       updateFunc: (events: Event[]) => Event[],
-      isResizing?: boolean
+      isResizing?: boolean,
+      source?: 'drag' | 'resize'
     ) => {
       const newEvents = updateFunc(events);
 
@@ -255,21 +256,7 @@ const MonthView = ({
         if (!oldEventIds.has(e.id)) return false;
         const oldEvent = events.find(old => old.id === e.id);
         // Check if there are real changes
-        return (
-          oldEvent &&
-          (temporalToDate(oldEvent.start).getTime() !==
-            temporalToDate(e.start).getTime() ||
-            temporalToDate(oldEvent.end).getTime() !==
-              temporalToDate(e.end).getTime() ||
-            oldEvent.day !== e.day ||
-            extractHourFromDate(oldEvent.start) !==
-              extractHourFromDate(e.start) ||
-            extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
-            oldEvent.title !== e.title ||
-            // for All day events
-            oldEvent?.start !== e?.start ||
-            oldEvent?.end !== e?.end)
-        );
+        return oldEvent && hasEventChanged(oldEvent, e);
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
@@ -279,7 +266,8 @@ const MonthView = ({
           add: eventsToAdd,
           update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
         },
-        isResizing
+        isResizing,
+        source
       );
     },
     onEventCreate: (event: Event) => {
