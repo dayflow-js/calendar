@@ -205,14 +205,13 @@ export const CalendarRoot = ({
     [sidebar.isCollapsed, sidebar.toggleCollapsed]
   );
 
-  const miniSidebarWidth =
-    collapsedSafeAreaLeft === null ? sidebar.miniWidth : '0px';
+  const hasSafeAreaLeftValue = collapsedSafeAreaLeft !== undefined;
+  const miniSidebarWidth = hasSafeAreaLeftValue ? '0px' : sidebar.miniWidth;
 
-  const effectiveCollapsedSafeAreaLeft = collapsedSafeAreaLeft ?? null;
   const safeAreaLeft =
-    effectiveCollapsedSafeAreaLeft === null || !sidebar.isCollapsed
-      ? sidebar.safeAreaLeft
-      : effectiveCollapsedSafeAreaLeft;
+    hasSafeAreaLeftValue && sidebar.isCollapsed
+      ? collapsedSafeAreaLeft!
+      : sidebar.safeAreaLeft;
 
   const headerConfig = app.getCalendarHeaderConfig();
 

@@ -1553,6 +1553,11 @@ export const useDragHandlers = (
         drag.eventDurationDays = eventDurationDays;
         drag.currentSegmentDays = currentSegmentDays;
 
+        // Calculate click offset within source element
+        const rect = sourceElement.getBoundingClientRect();
+        drag.dragOffset = clientX - rect.left;
+        drag.dragOffsetY = clientY - rect.top;
+
         setDragState({
           active: true,
           mode: 'move',

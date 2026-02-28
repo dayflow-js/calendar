@@ -96,11 +96,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         if (sourceElement) {
           const sourceRect = sourceElement.getBoundingClientRect();
-          // Use the number of days occupied by the current segment rather than the entire event,
-          // to ensure the indicator always displays as single-day width
-          const segmentDays =
-            drag.currentSegmentDays ?? drag.eventDurationDays ?? 1;
-          indicatorWidth = sourceRect.width / segmentDays;
+          indicatorWidth = sourceRect.width;
           indicatorHeight = sourceRect.height;
           indicator.className = `rounded-sm shadow-sm ${sourceElement.className}`;
         } else {
@@ -111,10 +107,16 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         indicator.style.width = `${indicatorWidth}px`;
         indicator.style.height = `${indicatorHeight}px`;
-        indicator.style.left = `${drag.startX - indicatorWidth / 2}px`;
-        indicator.style.top = `${drag.startY - indicatorHeight / 2}px`;
+
+        const dragOffset = drag.dragOffset ?? indicatorWidth / 2;
+        const dragOffsetY = drag.dragOffsetY ?? indicatorHeight / 2;
+        indicator.style.left = `${drag.startX - dragOffset}px`;
+        indicator.style.top = `${drag.startY - dragOffsetY}px`;
 
         document.body.append(indicator);
+
+        // Save props for subsequent updates
+        dragPropsRef.current = { drag, color, title, layout };
 
         // Render month view content
         const now = new Date();
@@ -340,10 +342,13 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         const [clientX, clientY] = args as [number, number];
         const width = Number.parseFloat(indicator.style.width) || 120;
         const height = Number.parseFloat(indicator.style.height) || 22;
+        const dragOffset = dragPropsRef.current?.drag.dragOffset ?? width / 2;
+        const dragOffsetY =
+          dragPropsRef.current?.drag.dragOffsetY ?? height / 2;
 
         requestAnimationFrame(() => {
-          indicator.style.left = `${clientX - width / 2}px`;
-          indicator.style.top = `${clientY - height / 2}px`;
+          indicator.style.left = `${clientX - dragOffset}px`;
+          indicator.style.top = `${clientY - dragOffsetY}px`;
           indicator.style.transition = 'none';
         });
       } else {

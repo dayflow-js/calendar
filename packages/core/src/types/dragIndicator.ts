@@ -75,6 +75,7 @@ export interface UnifiedDragRef extends DragRef {
   originalDate?: Date | null;
   originalEvent?: Event | null;
   dragOffset?: number;
+  dragOffsetY?: number;
   originalStartDate?: Date | null;
   originalEndDate?: Date | null;
   eventDate?: Date;
