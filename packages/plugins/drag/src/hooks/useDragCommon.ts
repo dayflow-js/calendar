@@ -16,7 +16,6 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
     HOUR_HEIGHT = 72,
     FIRST_HOUR = 0,
     LAST_HOUR = 24,
-    isMobile,
   } = options;
 
   // View type check
@@ -50,29 +49,31 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
     (x: number) => {
       if (isMonthView || !calendarRef.current) return 0;
 
-      const calendarContent =
+      // Use the translated grid element if available to correctly handle mobile swipe offset
+      const gridElement =
+        options.timeGridRef?.current ||
+        calendarRef.current.querySelector('.df-time-grid-row') ||
         calendarRef.current.querySelector('.calendar-content');
-      if (!calendarContent) return 0;
 
-      const contentRect = calendarContent.getBoundingClientRect();
-      const scrollLeft = calendarContent.scrollLeft;
-      const containerWidth = contentRect.width;
+      if (!gridElement) return 0;
 
-      if (isWeekView) {
-        // WeekView on mobile has 175% width
-        const totalWidth = isMobile ? containerWidth * 1.75 : containerWidth;
-        const dayColumnWidth = totalWidth / 7;
+      const gridRect = gridElement.getBoundingClientRect();
+      const relativeX = x - gridRect.left;
 
-        // Determine relative X including scroll
-        const relativeX = x - contentRect.left + scrollLeft;
+      let totalWidth = gridRect.width;
+      const daysToShow = options.displayDays || (isWeekView ? 7 : 1);
+      const dayColumnWidth = totalWidth / daysToShow;
 
-        const columnIndex = Math.floor(relativeX / dayColumnWidth);
-        return Math.max(0, Math.min(6, columnIndex));
-      }
-      // DayView
-      return 0;
+      const columnIndex = Math.floor(relativeX / dayColumnWidth);
+      return Math.max(0, Math.min(daysToShow - 1, columnIndex));
     },
-    [calendarRef, isMonthView, isWeekView, isMobile]
+    [
+      calendarRef,
+      isMonthView,
+      isWeekView,
+      options.timeGridRef,
+      options.displayDays,
+    ]
   );
 
   const handleDirectScroll = useCallback(

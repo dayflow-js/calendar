@@ -1,5 +1,5 @@
-import { RefObject, JSX } from 'preact';
-import { useState, useRef } from 'preact/hooks';
+import { RefObject, CSSProperties, TargetedEvent } from 'preact';
+import { useState, useRef, useMemo } from 'preact/hooks';
 
 import CalendarEventComponent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
@@ -20,7 +20,6 @@ import {
   EventDetailDialogRenderer,
   WeekDayDragState,
   ViewType,
-  ViewMode,
   ICalendarApp,
 } from '@/types';
 import { formatTime, getEventsForDay, scrollbarTakesSpace } from '@/utils';
@@ -38,10 +37,10 @@ interface TimeGridProps {
   scrollerRef: RefObject<HTMLDivElement>;
   timeGridRef: RefObject<HTMLDivElement>;
   leftFrozenContentRef: RefObject<HTMLDivElement>;
+  swipeContentRef: RefObject<HTMLDivElement>;
   calendarRef: RefObject<HTMLDivElement>;
-  handleScroll: (
-    e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>
-  ) => void;
+  handleScroll: (e: TargetedEvent<HTMLDivElement, globalThis.Event>) => void;
+  secondaryTimeSlots?: string[];
   handleCreateStart?: (
     e: MouseEvent | TouchEvent,
     dayIndex: number,
@@ -77,14 +76,14 @@ interface TimeGridProps {
   setDetailPanelEventId: (id: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
-  mode?: ViewMode;
-  isCompact?: boolean;
+  isSlidingView?: boolean;
   isCurrentWeek: boolean;
   currentTime: Date | null;
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
   LAST_HOUR: number;
   showStartOfDayLabel: boolean;
+  timeFormat?: '12h' | '24h';
 }
 
 export const TimeGrid = ({
@@ -100,6 +99,7 @@ export const TimeGrid = ({
   scrollerRef,
   timeGridRef,
   leftFrozenContentRef,
+  swipeContentRef,
   calendarRef,
   handleScroll,
   handleCreateStart,
@@ -123,23 +123,27 @@ export const TimeGrid = ({
   setDetailPanelEventId,
   customDetailPanelContent,
   customEventDetailDialog,
-  mode = 'standard',
-  isCompact,
+  isSlidingView,
   isCurrentWeek,
   currentTime,
   HOUR_HEIGHT,
   FIRST_HOUR,
   LAST_HOUR,
   showStartOfDayLabel,
+  timeFormat = '24h',
+  secondaryTimeSlots,
 }: TimeGridProps) => {
-  const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
+  const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
+  // On mobile the time column is too narrow for dual labels — hide secondary TZ display
+  const showSecondaryTz = hasSecondaryTz && !isMobile;
+  const columnStyle: CSSProperties = { flexShrink: 0 };
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     date: Date;
   } | null>(null);
-  const hasScrollbarSpace = scrollbarTakesSpace();
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
 
   const handleContextMenu = (e: MouseEvent, dayIndex: number, hour: number) => {
     e.preventDefault();
@@ -171,29 +175,83 @@ export const TimeGrid = ({
 
   return (
     <div className='relative flex flex-1 overflow-hidden'>
-      {/* Left Frozen Column */}
+      {/* Single scrolling container using CSS Grid (auto | 1fr).
+          "auto" sizes the time-label column to its rendered Tailwind width
+          (w-12 on mobile, md:w-20 on desktop) without needing JS.
+          Both columns share the same scroll context so they scroll
+          vertically together natively — no JS transform sync needed. */}
       <div
-        className='relative z-10 w-12 shrink-0 overflow-hidden bg-white md:w-20 dark:bg-gray-900'
-        onContextMenu={e => e.preventDefault()}
+        ref={scrollerRef}
+        className={`calendar-content relative flex-1 overflow-auto ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
+        style={{ display: 'grid', gridTemplateColumns: 'auto 1fr' }}
+        onScroll={handleScroll}
       >
-        <div ref={leftFrozenContentRef}>
-          {/* Top boundary spacer with start-of-day label */}
-          <div className='relative h-3'>
-            <div className='absolute right-2 -bottom-1 text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'>
-              {showStartOfDayLabel ? formatTime(FIRST_HOUR) : ''}
-            </div>
+        {/* Time label column — first grid column (auto width = w-12 / md:w-20).
+            No overflow-hidden: renders at full content height alongside the grid. */}
+        <div
+          ref={leftFrozenContentRef}
+          className='sticky left-0 z-10 w-12 shrink-0 bg-white md:w-20 dark:bg-gray-900'
+          onContextMenu={e => e.preventDefault()}
+        >
+          {/* Top boundary spacer — expands to include timezone header when active */}
+          <div className={`relative h-3`}>
+            {showSecondaryTz ? (
+              <>
+                {/* Start-of-day label */}
+                <div className='absolute right-0 -bottom-1 flex w-full items-center justify-evenly select-none'>
+                  <span className='text-[10px] text-gray-500 md:text-[12px] dark:text-gray-400'>
+                    {showStartOfDayLabel ? (secondaryTimeSlots?.[0] ?? '') : ''}
+                  </span>
+                  <span className='text-[10px] text-gray-500 md:text-[12px] dark:text-gray-400'>
+                    {showStartOfDayLabel
+                      ? formatTime(FIRST_HOUR, 0, timeFormat)
+                      : ''}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className='absolute right-2 -bottom-1 text-[10px] text-gray-500 select-none md:text-[12px] dark:text-gray-400'>
+                {showStartOfDayLabel
+                  ? formatTime(FIRST_HOUR, 0, timeFormat)
+                  : ''}
+              </div>
+            )}
           </div>
           {timeSlots.map((slot, slotIndex) => (
             <div key={slotIndex} className={timeSlot}>
-              <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-                {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
-              </div>
+              {showSecondaryTz ? (
+                <div className='absolute top-0 right-0 flex w-full -translate-y-1/2 items-center justify-evenly text-gray-500 select-none dark:text-gray-400'>
+                  <span className='text-[10px] md:text-[12px]'>
+                    {showStartOfDayLabel && slotIndex === 0
+                      ? ''
+                      : (secondaryTimeSlots?.[slotIndex] ?? '')}
+                  </span>
+                  <span className='text-[10px] md:text-[12px]'>
+                    {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
+                  </span>
+                </div>
+              ) : (
+                <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+                  {showStartOfDayLabel && slotIndex === 0 ? '' : slot.label}
+                </div>
+              )}
             </div>
           ))}
           <div className='relative'>
-            <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
-              00:00
-            </div>
+            {showSecondaryTz ? (
+              <div className='absolute top-0 right-0 flex w-full -translate-y-1/2 items-center justify-evenly text-gray-500 select-none dark:text-gray-400'>
+                <span className='text-[10px] md:text-[12px]'>
+                  {secondaryTimeSlots?.[0] ?? ''}
+                </span>
+                <span className='text-[10px] md:text-[12px]'>
+                  {formatTime(0, 0, timeFormat)}
+                </span>
+              </div>
+            ) : (
+              <div className={`${timeLabel} text-[10px] md:text-[12px]`}>
+                {formatTime(0, 0, timeFormat)}
+              </div>
+            )}
           </div>
           {/* Current Time Label */}
           {isCurrentWeek &&
@@ -214,23 +272,30 @@ export const TimeGrid = ({
                     marginTop: '0.75rem',
                   }}
                 >
-                  <div className={currentTimeLabel}>{formatTime(hours)}</div>
+                  <div className={currentTimeLabel}>
+                    {formatTime(hours, 0, timeFormat, false)}
+                  </div>
                 </div>
               );
             })()}
         </div>
-      </div>
 
-      {/* Scroller */}
-      <div
-        ref={scrollerRef}
-        className={`calendar-content relative flex-1 overflow-auto ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
-        onScroll={handleScroll}
-      >
-        <div className='flex' style={{ width: gridWidth, minWidth: '100%' }}>
+        {/* Grid content — second grid column (1fr), swipe target on mobile.
+            gridWidth is relative to this grid track (scroller - sidebarWidth). */}
+        <div
+          ref={swipeContentRef}
+          className='flex'
+          style={{
+            width: gridWidth,
+            minWidth: '100%',
+            transform: isSlidingView
+              ? 'translateX(calc(-100% / 3))'
+              : undefined,
+          }}
+        >
           {/* Time Grid */}
           <div className='grow'>
-            {/* Top boundary */}
+            {/* Top boundary — height must match left column spacer */}
             <div className={`${timeGridBoundary} flex border-t-0`}>
               {weekDaysLabels.map((_, dayIndex) => (
                 <div
@@ -459,8 +524,7 @@ export const TimeGrid = ({
                           multiDaySegmentInfo={segmentInfo}
                           app={app}
                           isMobile={isMobile}
-                          mode={mode}
-                          isCompact={isCompact}
+                          isSlidingView={isSlidingView}
                           enableTouch={isTouch}
                         />
                       );

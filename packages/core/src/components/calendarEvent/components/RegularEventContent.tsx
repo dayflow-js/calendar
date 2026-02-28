@@ -33,6 +33,7 @@ interface RegularEventContentProps {
     event: Event,
     direction: string
   ) => void;
+  timeFormat?: '12h' | '24h';
 }
 
 const RegularEventContent = ({
@@ -43,6 +44,7 @@ const RegularEventContent = ({
   isTouchEnabled,
   isEventSelected,
   onResizeStart,
+  timeFormat = '24h',
 }: RegularEventContentProps) => {
   const startHour = multiDaySegmentInfo
     ? multiDaySegmentInfo.startHour
@@ -87,8 +89,8 @@ const RegularEventContent = ({
         {duration > 0.5 && (
           <div className={eventTime}>
             {multiDaySegmentInfo
-              ? `${formatTime(startHour)} - ${formatTime(endHour)}`
-              : formatEventTimeRange(event)}
+              ? `${formatTime(startHour, 0, timeFormat)} - ${formatTime(endHour, 0, timeFormat)}`
+              : formatEventTimeRange(event, timeFormat)}
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@ const meta: MetaRecord = {
     title: '概览',
   },
   localization: {
-    title: '多语言',
+    title: 'i18n',
   },
   drag: {
     title: '拖拽',

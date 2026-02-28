@@ -17,4 +17,6 @@ export interface MobileEventProps {
   draftEvent: Event | null;
   /** The ICalendarApp instance providing built-in services */
   app: ICalendarApp;
+  /** Time format for event display */
+  timeFormat?: '12h' | '24h';
 }

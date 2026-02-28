@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'preact/hooks';
 interface TimePickerWheelProps {
   date: Date;
   onChange: (d: Date) => void;
+  timeFormat?: '12h' | '24h';
 }
 
 export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {

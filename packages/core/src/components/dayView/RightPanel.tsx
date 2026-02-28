@@ -33,6 +33,7 @@ interface RightPanelProps {
   handleMonthChange: (offset: number) => void;
   handleDateSelect: (date: Date) => void;
   switcherMode: string;
+  timeFormat?: '12h' | '24h';
 }
 
 export const RightPanel = ({
@@ -45,6 +46,7 @@ export const RightPanel = ({
   handleMonthChange,
   handleDateSelect,
   switcherMode,
+  timeFormat = '24h',
 }: RightPanelProps) => {
   const { t, locale } = useLocale();
 
@@ -117,8 +119,12 @@ export const RightPanel = ({
                     <div className={`font-medium ${textSm}`}>{event.title}</div>
                     {!event.allDay && (
                       <div className={`${textXs} ${textGray600}`}>
-                        {formatTime(extractHourFromDate(event.start))} -{' '}
-                        {formatTime(getEventEndHour(event))}
+                        {formatTime(
+                          extractHourFromDate(event.start),
+                          0,
+                          timeFormat
+                        )}{' '}
+                        - {formatTime(getEventEndHour(event), 0, timeFormat)}
                       </div>
                     )}
                     {event.allDay && (

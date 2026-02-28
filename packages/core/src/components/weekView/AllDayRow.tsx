@@ -1,5 +1,5 @@
 import { RefObject, JSX } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useMemo } from 'preact/hooks';
 
 import CalendarEventComponent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
@@ -19,7 +19,6 @@ import {
   EventDetailDialogRenderer,
   WeekDayDragState,
   ViewType,
-  ViewMode,
   ICalendarApp,
 } from '@/types';
 import { scrollbarTakesSpace } from '@/utils';
@@ -44,8 +43,7 @@ interface AllDayRowProps {
     isCurrent: boolean;
     dayName: string;
   }>;
-  mode?: ViewMode;
-  isCompact?: boolean;
+  isSlidingView?: boolean;
   mobilePageStart?: Date;
   currentWeekStart: Date;
   gridWidth: string;
@@ -63,6 +61,9 @@ interface AllDayRowProps {
   FIRST_HOUR: number;
   dragState: WeekDayDragState | null;
   isDragging: boolean;
+  primaryTzLabel?: string;
+  secondaryTzLabel?: string;
+  secondaryTimeSlots?: string[];
   handleMoveStart: (e: MouseEvent | TouchEvent, event: Event) => void;
   handleResizeStart: (
     e: MouseEvent | TouchEvent,
@@ -99,8 +100,7 @@ export const AllDayRow = ({
   mobileWeekDaysLabels,
   weekDates,
   fullWeekDates,
-  mode = 'standard',
-  isCompact,
+  isSlidingView,
   mobilePageStart,
   currentWeekStart,
   gridWidth,
@@ -118,6 +118,9 @@ export const AllDayRow = ({
   FIRST_HOUR,
   dragState,
   isDragging,
+  primaryTzLabel,
+  secondaryTzLabel,
+  secondaryTimeSlots,
   handleMoveStart,
   handleResizeStart,
   handleEventUpdate,
@@ -141,7 +144,10 @@ export const AllDayRow = ({
     y: number;
     date: Date;
   } | null>(null);
-  const hasScrollbarSpace = scrollbarTakesSpace();
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
+  const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
+  // On mobile the time column is too narrow for dual labels — hide secondary TZ display
+  const showSecondaryTz = hasSecondaryTz && !isMobile;
 
   const handleContextMenu = (e: MouseEvent, dayIndex: number) => {
     e.preventDefault();
@@ -157,16 +163,14 @@ export const AllDayRow = ({
   return (
     <div className='flex w-full flex-col'>
       {/* Mobile 7-day Header with Segmented Control */}
-      {(mode === 'compact' || isCompact) &&
-        fullWeekDates &&
-        mobilePageStart && (
-          <CompactHeader
-            app={app}
-            fullWeekDates={fullWeekDates}
-            mobilePageStart={mobilePageStart}
-            onDateChange={onDateChange}
-          />
-        )}
+      {isSlidingView && fullWeekDates && mobilePageStart && (
+        <CompactHeader
+          app={app}
+          fullWeekDates={fullWeekDates}
+          mobilePageStart={mobilePageStart}
+          onDateChange={onDateChange}
+        />
+      )}
 
       <div
         className={`flex flex-none ${showAllDay ? 'border-b border-gray-200 dark:border-gray-700' : ''} relative z-10`}
@@ -180,11 +184,23 @@ export const AllDayRow = ({
           >
             {/* Header spacer - flexes to match weekday header height */}
             <div
-              className={`flex-1 border-b border-gray-200 dark:border-gray-700 ${mode === 'compact' || isCompact ? 'hidden' : ''}`}
-            ></div>
+              className={`flex flex-1 items-center border-b border-gray-200 transition-all duration-300 ease-in-out dark:border-gray-700 ${isSlidingView ? 'hidden' : ''}`}
+            >
+              {/* Timezone header: secondary LEFT, primary RIGHT */}
+              {showSecondaryTz && (
+                <div className='flex w-full items-center justify-evenly gap-0.5 pt-2 pb-0.5'>
+                  <span className='text-[9px] text-gray-500 select-none md:text-[10px] dark:text-gray-400'>
+                    {secondaryTzLabel}
+                  </span>
+                  <span className='text-[9px] text-gray-500 select-none md:text-[10px] dark:text-gray-400'>
+                    {primaryTzLabel}
+                  </span>
+                </div>
+              )}
+            </div>
             {/* All Day Label */}
             <div
-              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 select-none md:text-xs dark:text-gray-400'
+              className='flex items-center justify-end p-1 text-[10px] font-medium text-gray-500 transition-[min-height] duration-300 ease-in-out select-none md:text-xs dark:text-gray-400'
               style={{ minHeight: `${allDayAreaHeight}px` }}
             >
               {allDayLabelText}
@@ -198,17 +214,23 @@ export const AllDayRow = ({
           style={{
             scrollbarGutter: 'stable',
             minHeight: showAllDay
-              ? `${allDayAreaHeight + (mode === 'compact' || isCompact ? 0 : 36)}px`
+              ? `${allDayAreaHeight + (isSlidingView ? 0 : 36)}px`
               : 'auto',
           }}
         >
           <div
             ref={topFrozenContentRef}
             className='flex flex-col'
-            style={{ width: gridWidth, minWidth: '100%' }}
+            style={{
+              width: gridWidth,
+              minWidth: '100%',
+              transform: isSlidingView
+                ? 'translateX(calc(-100% / 3))'
+                : undefined,
+            }}
           >
             {/* Weekday titles row */}
-            {mode !== 'compact' && !isCompact && (
+            {!isSlidingView && (
               <div
                 className={weekDayHeader}
                 style={{
@@ -272,13 +294,6 @@ export const AllDayRow = ({
                           minHeight: `${allDayAreaHeight}px`,
                           ...columnStyle,
                         }}
-                        onClick={() => {
-                          const clickedDate = new Date(currentWeekStart);
-                          clickedDate.setDate(
-                            currentWeekStart.getDate() + dayIndex
-                          );
-                          onDateChange?.(clickedDate);
-                        }}
                         onMouseDown={e =>
                           handleCreateAllDayEvent?.(e, dayIndex)
                         }
@@ -334,8 +349,7 @@ export const AllDayRow = ({
                         customEventDetailDialog={customEventDetailDialog}
                         app={app}
                         isMobile={isMobile}
-                        mode={mode}
-                        isCompact={isCompact}
+                        isSlidingView={isSlidingView}
                         enableTouch={isTouch}
                       />
                     ))}

@@ -9,6 +9,7 @@ import { ViewAdapter } from './ViewAdapter';
 // Default Year view configuration
 const defaultYearViewConfig: YearViewConfig = {
   // Year view specific configuration
+  startOfWeek: 1, // Monday
 };
 
 // Year view factory function

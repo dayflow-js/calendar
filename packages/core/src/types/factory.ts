@@ -2,13 +2,14 @@ import { AnyComponent, RefObject } from 'preact';
 
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 
-import { CalendarView, ViewType, ICalendarApp, ViewMode } from './core';
+import { CalendarView, ViewType, ICalendarApp } from './core';
 import { Event } from './event';
 import {
   EventDetailContentRenderer,
   EventDetailDialogRenderer,
 } from './eventDetail';
 import { EventLayout } from './layout';
+import { TimeZoneValue } from './timezone';
 
 /**
  * Common Props interface for view components
@@ -78,6 +79,7 @@ export interface ViewFactoryConfig {
   firstHour?: number;
   lastHour?: number;
   allDayHeight?: number;
+  timeFormat?: '12h' | '24h';
 }
 
 /**
@@ -86,6 +88,7 @@ export interface ViewFactoryConfig {
 export interface DayViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
+  secondaryTimeZone?: TimeZoneValue;
 }
 
 /**
@@ -96,15 +99,16 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   showAllDay?: boolean;
   startOfWeek?: number;
   scrollToCurrentTime?: boolean;
-  mode?: ViewMode;
+  secondaryTimeZone?: TimeZoneValue;
 }
 
 /**
  * Month view factory configuration
  */
 export interface MonthViewConfig extends ViewFactoryConfig {
-  showOtherMonth?: boolean;
   showWeekNumbers?: boolean;
+  showMonthIndicator?: boolean;
+  startOfWeek?: number;
 }
 
 /**
@@ -113,6 +117,7 @@ export interface MonthViewConfig extends ViewFactoryConfig {
 export interface YearViewConfig extends ViewFactoryConfig {
   mode?: 'year-canvas' | 'fixed-week';
   showTimedEventsInYearView?: boolean;
+  startOfWeek?: number;
 }
 
 /**

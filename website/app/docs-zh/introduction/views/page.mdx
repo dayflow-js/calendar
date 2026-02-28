@@ -1,97 +1,21 @@
 # 日历视图
 
-DayFlow 自带日、周、月、年四种视图。它们在信息密度、交互方式和终端适配上各有侧重，因此推荐根据团队场景挑选或组合使用。
+Day Flow 支持四种不同的视图类型，每种类型都针对不同的用例和用户需求进行了优化。您可以以编程方式切换视图，或者提供 UI 供用户切换视图。
 
-## 四种视图一览
-
-### 月视图
-
-传统的网格式月历，适合从宏观角度浏览计划。
-
-**适用场景**
-
-- 长周期排期和资源规划
-- 一次性查看多条日程并快速调整
-- 多日事件或跨周项目的可视化
-
-**功能亮点**
-
-- 虚拟滚动，渲染上百条事件仍然顺滑
-- 桌面 / 平板 / 移动端响应式布局
-- 支持拖拽创建、移动、调整长度
-- 终日事件与跨日事件自动铺排
-
-```tsx copy {10}
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  ViewType,
-} from '@dayflow/core';
-
-function MonthOnly() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    defaultView: ViewType.MONTH,
-    initialDate: new Date(),
-  });
-
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
-
-### 周视图
-
-带 24 小时刻度的 7 天时间表，强调精确时间段。
-
-**适用场景**
-
-- 会议排期、班次排班、医疗预约等精确时间场景
-- 需要同时查看多个终日事件与带时间的事件
-- 键盘/鼠标混合操作的桌面应用
-
-**功能亮点**
-
-- 小时/半小时网格（24 小时制）
-- 当前时间指示、终日行、跨天事件铺排
-- 拖拽创建/移动、拖拽缩放调整时长
-- 双击创建、冲突检测和智能避让
-
-```tsx copy {10}
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createWeekView,
-  ViewType,
-} from '@dayflow/core';
-
-function WeekOnly() {
-  const calendar = useCalendarApp({
-    views: [createWeekView()],
-    defaultView: ViewType.WEEK,
-    initialDate: new Date(),
-  });
-
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+## 可用视图
 
 ### 日视图
 
-聚焦单日，左侧是 24 小时时间表，右侧可以放迷你月历和事件列表。
+日视图专注于单个日期，并带有详细的时间槽，非常适合管理每日日程。
 
-**适用场景**
+#### 配置
 
-- 专注当天的任务与会议，避免被其他日期干扰
-- 销售、客服等需要查看“今日待办 + 细节”的场景
-- 更适配移动端或窄屏设备
-
-**功能亮点**
-
-- 细粒度时间格、终日区域
-- 迷你日历 + 当日事件列表
-- 内置事件详情面板，可用 `customDetailPanelContent` 自定义
-- 拖拽/缩放操作与周视图保持一致
+| 属性                  | 类型             | 默认值      | 描述                               |
+| :-------------------- | :--------------- | :---------- | :--------------------------------- |
+| `showAllDay`          | `boolean`        | `true`      | 是否显示全天事件行。               |
+| `scrollToCurrentTime` | `boolean`        | `true`      | 初始加载时是否自动滚动到当前时间。 |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 时间轴的时间格式。                 |
+| `secondaryTimeZone`   | `string`         | `undefined` | 要显示的辅助时区。                 |
 
 ```tsx copy {10}
 import {
@@ -99,9 +23,9 @@ import {
   DayFlowCalendar,
   createDayView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
 
-function DayOnly() {
+function MyCalendar() {
   const calendar = useCalendarApp({
     views: [createDayView()],
     defaultView: ViewType.DAY,
@@ -112,39 +36,96 @@ function DayOnly() {
 }
 ```
 
-### 年视图
+### 周视图
 
-年视图采用“固定周（Fixed Week）”布局，提供全面的年度概览。与仅显示 12 个小日历的传统年视图不同，DayFlow 的年视图渲染一个连续的网格，您可以直观地看到跨越数天、数周甚至数月的长周期事件。
+周视图显示一个带有时间槽的 7 天网格，显示具有准确开始和结束时间的事件。
 
-**适用场景**
+#### 配置
 
-- 长期规划和路线图制定
-- 项目时间表和假期可视化
-- 年度休假管理
-- 高层级的日程概览
-
-**功能亮点**
-
-- **连续网格布局**：在一个可滚动的统一网格中展示整年。
-- **多日事件可视化**：事件渲染为连续的条状，便于查看持续时间和重叠情况。
-- **拖拽支持**：支持直接在年视图中移动和调整事件大小。
-- **事件创建**：双击任意日期即可创建新事件。
-- **虚拟滚动**：优化性能，轻松渲染成千上万个事件。
-- **定时事件**：可选择是否在全天事件旁显示定时事件（圆点/指示器）。
+| 属性                  | 类型             | 默认值      | 描述                                     |
+| :-------------------- | :--------------- | :---------- | :--------------------------------------- |
+| `showWeekends`        | `boolean`        | `true`      | 是否显示周六和周日。                     |
+| `showAllDay`          | `boolean`        | `true`      | 是否显示全天事件行。                     |
+| `startOfWeek`         | `number`         | `1`         | 一周的开始日期（0 为周日，1 为周一等）。 |
+| `scrollToCurrentTime` | `boolean`        | `true`      | 初始加载时是否自动滚动到当前时间。       |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 时间轴的时间格式。                       |
+| `secondaryTimeZone`   | `string`         | `undefined` | 要显示的辅助时区。                       |
 
 ```tsx copy {10}
 import {
   useCalendarApp,
   DayFlowCalendar,
+  createWeekView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 月视图
+
+月视图显示传统的日历网格，显示一个月中的所有日期。
+
+#### 配置
+
+| 属性                 | 类型      | 默认值  | 描述                                     |
+| :------------------- | :-------- | :------ | :--------------------------------------- |
+| `showWeekNumbers`    | `boolean` | `false` | 是否显示周数。                           |
+| `showMonthIndicator` | `boolean` | `true`  | 是否在滚动时显示月份指示标题。           |
+| `startOfWeek`        | `number`  | `1`     | 一周的开始日期（0 为周日，1 为周一等）。 |
+
+```tsx copy {10}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### 年视图
+
+年视图使用连续网格布局提供全面的年度概览。与仅显示 12 个小日历的传统年视图不同，DayFlow 的年视图渲染一个统一的网格，您可以直观地看到跨越数天、数周甚至数月的长周期事件。
+
+#### 配置
+
+| 属性                        | 类型                            | 默认值          | 描述                                                                 |
+| :-------------------------- | :------------------------------ | :-------------- | :------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week'` | `'year-canvas'` | 年视图的显示模式。                                                   |
+| `startOfWeek`               | `number`                        | `1`             | 设置周起始日（0 为周日，1 为周一等）。仅在 `fixed-week` 模式下使用。 |
+| `showTimedEventsInYearView` | `boolean`                       | `false`         | 是否在年视图中显示定时事件（圆点/指示器）。                          |
+
+```tsx copy {10-14}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
   createYearView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
 
-function YearOnly() {
+function MyCalendar() {
   const calendar = useCalendarApp({
     views: [
       createYearView({
-        showTimedEventsInYearView: true, // 可选：显示定时事件
+        showTimedEventsInYearView: true,
       }),
     ],
     defaultView: ViewType.YEAR,
@@ -155,9 +136,9 @@ function YearOnly() {
 }
 ```
 
-## 组合视图与切换
+## 使用多个视图
 
-想让用户自由切换，就把多个视图注册到 `views` 中，并在 UI 中调用 `calendar.changeView`。
+您可以注册多个视图并允许用户在它们之间切换：
 
 ```tsx copy {13-18}
 import {
@@ -168,7 +149,7 @@ import {
   createMonthView,
   createYearView,
   ViewType,
-} from '@dayflow/core';
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
 
 function MultiViewCalendar() {
   const calendar = useCalendarApp({
@@ -181,50 +162,54 @@ function MultiViewCalendar() {
     defaultView: ViewType.MONTH,
     initialDate: new Date(),
     callbacks: {
-      onViewChange: view => console.log('view changed:', view),
+      onViewChange: view => {
+        console.log('View changed to:', view);
+      },
     },
   });
 
   return (
-    <div className='h-screen flex flex-col gap-4'>
-      <div className='flex gap-2'>
-        <button onClick={() => calendar.changeView(ViewType.DAY)}>日</button>
-        <button onClick={() => calendar.changeView(ViewType.WEEK)}>周</button>
-        <button onClick={() => calendar.changeView(ViewType.MONTH)}>月</button>
-        <button onClick={() => calendar.changeView(ViewType.YEAR)}>年</button>
-      </div>
-      <div className='flex-1'>
-        <DayFlowCalendar calendar={calendar} />
-      </div>
+    <div className='h-screen'>
+      <DayFlowCalendar calendar={calendar} />
     </div>
   );
 }
 ```
 
-## API 控制
+## 编程控制视图
 
-日历实例提供统一 API，可被工具栏、快捷键或自定义按钮复用：
+### 切换视图
 
 ```tsx copy
-// 切换视图
+// 切换到特定视图
 calendar.changeView(ViewType.WEEK);
 
-// 日期导航
-calendar.goToToday();
-calendar.goToPrevious(); // 根据当前视图，跳转到上一天/周/月/年
-calendar.goToNext();
-calendar.selectDate(new Date(2024, 9, 15));
-
-// 读取当前视图
-const current = calendar.app.getCurrentView();
-console.log(current.type); // 'week'
+// 获取当前视图
+const currentView = calendar.app.getCurrentView();
+console.log(currentView.type); // 'week'
 ```
 
-如需更灵活的体验，可以配合 `switcherMode` 或完全自定义的按钮组。
+### 导航
+
+所有视图都支持相同的导航方法：
+
+```tsx copy
+// 跳转到今天
+calendar.goToToday();
+
+// 跳转到上一个周期（取决于当前视图，可能是日/周/月/年）
+calendar.goToPrevious();
+
+// 跳转到下一个周期
+calendar.goToNext();
+
+// 选择特定日期
+calendar.selectDate(new Date(2024, 9, 15));
+```
 
 ## ViewType 枚举
 
-```ts copy
+```tsx copy
 enum ViewType {
   DAY = 'day',
   WEEK = 'week',
@@ -232,8 +217,3 @@ enum ViewType {
   YEAR = 'year',
 }
 ```
-
-## 延伸阅读
-
-- [事件](/docs-zh/introduction/events)：为各视图提供统一的数据
-- [DayFlowCalendar](/docs-zh/introduction/dayflow-calendar)：了解容器如何协调视图和 UI

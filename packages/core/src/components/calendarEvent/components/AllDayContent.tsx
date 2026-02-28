@@ -7,7 +7,7 @@ import {
   resizeHandleLeft,
   resizeHandleRight,
 } from '@/styles/classNames';
-import { Event, ViewMode } from '@/types';
+import { Event } from '@/types';
 
 interface AllDayContentProps {
   event: Event;
@@ -15,8 +15,7 @@ interface AllDayContentProps {
   onResizeStart?: (e: MouseEvent, event: Event, direction: string) => void;
   isMultiDay?: boolean;
   segment?: MultiDayEventSegment;
-  mode?: ViewMode;
-  isCompact?: boolean;
+  isSlidingView?: boolean;
 }
 
 const AllDayContent = ({
@@ -25,17 +24,16 @@ const AllDayContent = ({
   onResizeStart,
   isMultiDay,
   segment,
-  mode = 'standard',
-  isCompact,
+  isSlidingView,
 }: AllDayContentProps) => {
   const showIcon = event.icon !== false;
   const customIcon = typeof event.icon === 'boolean' ? null : event.icon;
 
-  // Calculate title offset for mobile 2-column mode
+  // Calculate title offset for mobile sliding mode
   const titleOffsetStyle = (() => {
-    if ((mode !== 'compact' && !isCompact) || !isMultiDay || !segment)
-      return {};
-    // The current visible window starts at index 2 of the 6-day range
+    if (!isSlidingView || !isMultiDay || !segment) return {};
+
+    // The current visible window starts at index 2 of the 3-page range
     const visibleStartIndex = 2;
     // If the event starts before the visible window but ends within or after it
     if (

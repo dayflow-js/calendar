@@ -1,22 +1,14 @@
 {
   "name": "@dayflow/angular",
-  "version": "3.1.2",
+  "version": "3.2.3",
   "description": "Angular adapter for DayFlow calendar",
   "files": [
-    "dist",
+    "**/*.mjs",
+    "**/*.d.ts",
+    "**/*.json",
     "README.md",
     "LICENSE"
   ],
-  "main": "dist/fesm2022/dayflow-angular.mjs",
-  "module": "dist/fesm2022/dayflow-angular.mjs",
-  "typings": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/fesm2022/dayflow-angular.mjs",
-      "default": "./dist/fesm2022/dayflow-angular.mjs"
-    }
-  },
   "scripts": {
     "build": "ng-packagr -p ng-packagr.json",
     "clean": "rimraf dist node_modules",
@@ -34,7 +26,7 @@
     "rimraf": "catalog:",
     "rxjs": "^7.8.1",
     "tslib": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "~5.5.0",
     "zone.js": "~0.14.10"
   },
   "peerDependencies": {

@@ -77,9 +77,10 @@ export function useCalendarApp(
     app.updateEvent = (
       id: string,
       eventUpdate: Partial<Event>,
-      isPending?: boolean
+      isPending?: boolean,
+      source?: 'drag' | 'resize'
     ) => {
-      originalUpdateEvent(id, eventUpdate, isPending);
+      originalUpdateEvent(id, eventUpdate, isPending, source);
       setEvents([...app.getEvents()]);
     };
 
@@ -209,8 +210,13 @@ export function useCalendarApp(
   );
 
   const updateEvent = useCallback(
-    (id: string, event: Partial<Event>, isPending?: boolean) => {
-      app.updateEvent(id, event, isPending);
+    (
+      id: string,
+      event: Partial<Event>,
+      isPending?: boolean,
+      source?: 'drag' | 'resize'
+    ) => {
+      app.updateEvent(id, event, isPending, source);
       triggerUpdate();
     },
     [app, triggerUpdate]

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+
 import InteractiveCalendarComponent from './InteractiveCalendar';
 
 export function LiveDemo() {

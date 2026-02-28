@@ -116,6 +116,7 @@ export const useVirtualMonthScroll = ({
   onCurrentMonthChange,
   initialWeeksToLoad = 104,
   locale = 'en-US',
+  startOfWeek = 1,
   isEnabled = true,
 }: UseVirtualMonthScrollProps): UseVirtualMonthScrollReturn => {
   const targetNavigationRef = useRef<{ month: string; year: number } | null>(
@@ -137,8 +138,8 @@ export const useVirtualMonthScroll = ({
     const firstDayOfMonth = new Date(currentDate);
     firstDayOfMonth.setDate(1);
     firstDayOfMonth.setHours(0, 0, 0, 0);
-    return generateWeekRange(firstDayOfMonth, initialWeeksToLoad);
-  }, [currentDate, initialWeeksToLoad]);
+    return generateWeekRange(firstDayOfMonth, initialWeeksToLoad, startOfWeek);
+  }, [currentDate, initialWeeksToLoad, startOfWeek]);
 
   const initialScrollTop = useMemo(() => {
     const firstDayOfMonth = new Date(currentDate);
@@ -190,7 +191,6 @@ export const useVirtualMonthScroll = ({
   // Cached week data retrieval
   const getCachedWeekData = useCallback((weekStartDate: Date): WeeksData => {
     let weekData = weekDataCache.current.get(weekStartDate);
-    console.log('weekData', weekData);
 
     if (!weekData) {
       weekData = generateWeekData(weekStartDate);
@@ -446,11 +446,11 @@ export const useVirtualMonthScroll = ({
         return;
       }
 
-      // Calculate Monday of the week containing target date
+      // Calculate start of the week for the target date
       const dayOfWeek = targetDate.getDay();
-      const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const diff = (dayOfWeek - startOfWeek + 7) % 7;
       const targetWeekStart = new Date(targetDate);
-      targetWeekStart.setDate(targetDate.getDate() - daysToMonday);
+      targetWeekStart.setDate(targetDate.getDate() - diff);
       targetWeekStart.setHours(0, 0, 0, 0);
 
       const firstWeek = weeksData[0];

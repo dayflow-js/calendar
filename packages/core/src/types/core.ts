@@ -56,13 +56,6 @@ export type RangeChangeReason =
   | 'viewChange'
   | 'scroll';
 
-/**
- * View display mode
- * - standard: Full display (e.g., 7-day week)
- * - compact: Optimized for small screens (e.g., 2-day view on mobile)
- */
-export type ViewMode = 'standard' | 'compact';
-
 export type EventChange =
   | { type: 'create'; event: Event }
   | { type: 'update'; before: Event; after: Event }
@@ -208,10 +201,16 @@ export interface ICalendarApp {
       update?: Array<{ id: string; updates: Partial<Event> }>;
       delete?: string[];
     },
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   addEvent: (event: Event) => void;
-  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  updateEvent: (
+    id: string,
+    event: Partial<Event>,
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
+  ) => void;
   deleteEvent: (id: string) => void;
   getEvents: () => Event[];
   getAllEvents: () => Event[];
@@ -288,12 +287,18 @@ export interface UseCalendarAppReturn {
       update?: Array<{ id: string; updates: Partial<Event> }>;
       delete?: string[];
     },
-    isPending?: boolean
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   changeView: (view: ViewType) => void;
   setCurrentDate: (date: Date) => void;
   addEvent: (event: Event) => void;
-  updateEvent: (id: string, event: Partial<Event>, isPending?: boolean) => void;
+  updateEvent: (
+    id: string,
+    event: Partial<Event>,
+    isPending?: boolean,
+    source?: 'drag' | 'resize'
+  ) => void;
   deleteEvent: (id: string) => void;
   goToToday: () => void;
   goToPrevious: () => void;

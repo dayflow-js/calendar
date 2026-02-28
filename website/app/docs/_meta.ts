@@ -18,6 +18,9 @@ const meta: MetaRecord = {
       copyPage: false,
     },
   },
+  guides: {
+    title: 'Guides',
+  },
 };
 
 export default meta;

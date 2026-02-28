@@ -13,7 +13,7 @@ import {
   MobileEventProps,
   CalendarType,
 } from '@/types';
-import { formatTime, isEventEqual } from '@/utils';
+import { formatTime, isEventDeepEqual } from '@/utils';
 import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
 
 import { Switch } from './components/Switch';
@@ -26,6 +26,7 @@ export const MobileEventDrawer = ({
   onEventDelete,
   draftEvent,
   app,
+  timeFormat = '24h',
 }: MobileEventProps) => {
   const { locale, t } = useLocale();
   const readOnlyConfig = app.getReadOnlyConfig();
@@ -183,7 +184,7 @@ export const MobileEventDrawer = ({
       end: dateToZonedDateTime(finalEnd),
     };
 
-    return !isEventEqual(draftEvent, currentEvent);
+    return !isEventDeepEqual(draftEvent, currentEvent);
   }, [
     isOpen,
     draftEvent,
@@ -410,7 +411,9 @@ export const MobileEventDrawer = ({
                     disabled={!isEditable}
                   >
                     {formatTime(
-                      startDate.getHours() + startDate.getMinutes() / 60
+                      startDate.getHours() + startDate.getMinutes() / 60,
+                      0,
+                      timeFormat
                     )}
                   </button>
                 )}
@@ -437,6 +440,7 @@ export const MobileEventDrawer = ({
                 <TimePickerWheel
                   date={startDate}
                   onChange={handleStartTimeChange}
+                  timeFormat={timeFormat}
                 />
               </div>
             </div>
@@ -464,7 +468,11 @@ export const MobileEventDrawer = ({
                     onClick={() => isEditable && toggleExpand('end-time')}
                     disabled={!isEditable}
                   >
-                    {formatTime(endDate.getHours() + endDate.getMinutes() / 60)}
+                    {formatTime(
+                      endDate.getHours() + endDate.getMinutes() / 60,
+                      0,
+                      timeFormat
+                    )}
                   </button>
                 )}
               </div>
@@ -489,6 +497,7 @@ export const MobileEventDrawer = ({
                 <TimePickerWheel
                   date={endDate}
                   onChange={handleEndTimeChange}
+                  timeFormat={timeFormat}
                 />
               </div>
             </div>

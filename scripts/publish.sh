@@ -98,11 +98,17 @@ build_pkg() {
     step "Building $display_path"
     
     # Ensure LICENSE exists
-    cp "$ROOT/LICENSE" "$dir/LICENSE"
+    if [ ! -f "$dir/LICENSE" ]; then
+        cp "$ROOT/LICENSE" "$dir/LICENSE"
+    fi
 
-    # Transform README.md: Replace relative image paths with absolute GitHub URLs
-    # Example: ./assets/images/ -> https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/
-    sed 's|(\./assets/images/|(https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/|g' "$ROOT/README.md" > "$dir/README.md"
+    # Do not overwrite README.md if it already exists, 
+    # as they are manually managed and framework-specific.
+    if [ ! -f "$dir/README.md" ]; then
+        # Transform README.md: Replace relative image paths with absolute GitHub URLs
+        # Example: ./assets/images/ -> https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/
+        sed 's|(\./assets/images/|(https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/|g' "$ROOT/README.md" > "$dir/README.md"
+    fi
 
     if ! pnpm --filter "@dayflow/$name" run build > /dev/null; then
         err "Build failed for $name"
@@ -125,10 +131,35 @@ publish_pkg() {
     fi
 
     # SPECIAL HANDLING FOR ANGULAR DIST
-    # ng-packagr has already resolved workspace:* protocols in the dist/package.json.
-    # Using 'npm publish' here avoids pnpm trying to resolve workspace protocols in a standalone folder.
+    # ng-packagr doesn't resolve workspace:* protocols and may produce incorrect
+    # export conditions. We patch dist/package.json before publishing.
     if [[ "$dir" == *"packages/angular/dist" ]]; then
-        echo "  Detected Angular dist - using npm publish to avoid workspace resolution issues..."
+        local core_version=$(node -e "console.log(require('$ROOT/packages/core/package.json').version)")
+        echo "  Patching Angular dist/package.json (core: $core_version)..."
+
+        node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('$dir/package.json', 'utf8'));
+
+          // Replace workspace:* with actual core version
+          for (const section of ['peerDependencies', 'dependencies', 'optionalDependencies']) {
+            if (pkg[section]) {
+              for (const dep of Object.keys(pkg[section])) {
+                if (pkg[section][dep] === 'workspace:*') pkg[section][dep] = '$core_version';
+              }
+            }
+          }
+
+          // Add 'import' condition if missing (required by Vite/esbuild to resolve ESM entry)
+          const dot = pkg.exports && pkg.exports['.'];
+          if (dot && !dot.import && (dot.default || dot.esm2022)) {
+            dot.import = dot.default || dot.esm2022;
+          }
+
+          fs.writeFileSync('$dir/package.json', JSON.stringify(pkg, null, 2) + '\n');
+        "
+
+        echo "  Detected Angular dist - using npm publish..."
         if ! (cd "$dir" && npm publish --access public $DRY_RUN); then
             err "Failed to publish @dayflow/$name from $dir"
         fi

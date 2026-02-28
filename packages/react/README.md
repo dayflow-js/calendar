@@ -1,32 +1,59 @@
-# DayFlow
+# DayFlow React
 
-**English** | [中文](README.zh.md) | [日本語](README.ja.md) | [Getting Started & Contributing](CONTRIBUTING.md)
+A flexible and feature-rich React calendar component library with drag-and-drop support, multiple views, and plugin architecture.
 
-A flexible and feature-rich calendar component library for React applications with drag-and-drop support, multiple
-views, and plugin architecture.
-
-[![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
+[![npm](https://img.shields.io/npm/v/@dayflow/react?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/react)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
 [![License](https://img.shields.io/github/license/dayflow-js/dayflow)](https://github.com/dayflow-js/dayflow/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
 ## Features
 
-### Monthly, Weekly, Daily and Various View Types
+### Daily, Weekly, Monthly and Yearly View Types
 
-| Monthly                                                                                          | Weekly                                                                                          |
-| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/MonthView.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/WeekView.png) |
+#### Day View
 
-| Daily                                                                                          | Event Stack Level                                                                                 |
-| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/DayView.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/stackLevel.png) |
+![Day View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/DayView.png)
 
-### Default Panel (with multiple Event Detail Panel options available)
+#### Week View
 
-| Detail Popup                                                                                 | Detail Dialog                                                                                 |
-| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/popup.png) | ![image](https://raw.githubusercontent.com/dayflow-js/calendar/main/assets/images/dialog.png) |
+![Week View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/WeekView.png)
+
+#### Month View
+
+![Month View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/MonthView.png)
+
+#### Year View(Fixed-Week)
+
+![Year View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/Year-Fixed-Week.png)
+
+#### Year View(Year-Canvas)
+
+![Year Canvas View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/Year-Canvas.png)
+
+### Mobile View Support
+
+#### Mobile Day & Year View
+
+![Mobile Day and Year View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/Mobile-Day-Year.png)
+
+#### Mobile Week & Month View
+
+![Mobile Week and Month View](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/Mobile-Week-Month.png)
+
+### Multiple Event Detail Panel options
+
+#### Detail Popup
+
+![Popup](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/popup.png)
+
+#### Detail Dialog
+
+![Dialog](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/dialog.png)
+
+### Dark Mode Support
+
+![Dark Mode](https://raw.githubusercontent.com/dayflow-js/dayflow/main/assets/images/DarkMode.png)
 
 ### Easy to resize and drag
 
@@ -45,5 +72,3 @@ If you find a bug, please file an issue on [GitHub Issues](https://github.com/da
 ## Support
 
 For questions and support, please open an issue on GitHub or go to discord.
-
----

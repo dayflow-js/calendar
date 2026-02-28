@@ -3,7 +3,7 @@ import { MultiDayEventSegment } from '@/components/monthView/WeekComponent';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingStore } from '@/renderer/CustomRenderingStore';
-import { ViewType, Event, ICalendarApp, ViewMode, EventLayout } from '@/types';
+import { ViewType, Event, ICalendarApp, EventLayout } from '@/types';
 
 import AllDayContent from './AllDayContent';
 import MonthAllDayContent from './MonthAllDayContent';
@@ -28,9 +28,9 @@ interface EventContentProps {
   isTouchEnabled: boolean;
   hideTime?: boolean;
   isMobile: boolean;
-  mode?: ViewMode;
-  isCompact?: boolean;
+  isSlidingView?: boolean;
   app?: ICalendarApp;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onResizeStart?: (
     e: MouseEvent | TouchEvent,
     event: Event,
@@ -47,6 +47,7 @@ interface EventContentProps {
   // oxlint-disable-next-line typescript/no-explicit-any
   eventContentSlotArgs: any;
   layout?: EventLayout;
+  timeFormat?: '12h' | '24h';
 }
 
 export const EventContent = ({
@@ -66,13 +67,14 @@ export const EventContent = ({
   isTouchEnabled,
   hideTime,
   isMobile,
-  mode = 'standard',
-  isCompact,
+  isSlidingView,
   app,
+  onMoveStart,
   onResizeStart,
   multiDaySegmentInfo,
   customRenderingStore,
   eventContentSlotArgs,
+  timeFormat = '24h',
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
@@ -84,6 +86,7 @@ export const EventContent = ({
         event={event}
         segment={yearSegment}
         isEditable={isEditable}
+        onMoveStart={onMoveStart}
         onResizeStart={onResizeStart}
       />
     );
@@ -96,6 +99,7 @@ export const EventContent = ({
           isDragging={isBeingDragged || isEventSelected}
           isResizing={isBeingResized}
           isSelected={isEventSelected}
+          onMoveStart={onMoveStart}
           onResizeStart={onResizeStart}
           isMobile={isMobile}
           isDraggable={isDraggable}
@@ -125,8 +129,7 @@ export const EventContent = ({
         onResizeStart={onResizeStart}
         isMultiDay={isMultiDay}
         segment={segment}
-        mode={mode}
-        isCompact={isCompact}
+        isSlidingView={isSlidingView}
       />
     ) : (
       <RegularEventContent
@@ -137,6 +140,7 @@ export const EventContent = ({
         isTouchEnabled={isTouchEnabled}
         isEventSelected={isEventSelected}
         onResizeStart={onResizeStart}
+        timeFormat={timeFormat}
       />
     );
   }

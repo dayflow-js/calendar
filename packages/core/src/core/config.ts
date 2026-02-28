@@ -33,7 +33,6 @@ export const defaultViewConfigs = {
   month: {
     showWeekends: true,
     showAllDay: true,
-    showOtherMonth: true,
     weekHeight: 120,
   },
 };

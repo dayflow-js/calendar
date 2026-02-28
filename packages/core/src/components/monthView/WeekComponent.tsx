@@ -23,6 +23,7 @@ import {
   ICalendarApp,
 } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
+import { getWeekNumber, scrollbarTakesSpace } from '@/utils';
 import { extractHourFromDate } from '@/utils/helpers';
 import { logger } from '@/utils/logger';
 import { temporalToDate } from '@/utils/temporal';
@@ -56,6 +57,8 @@ interface WeekComponentProps {
   screenSize: 'mobile' | 'tablet' | 'desktop';
   isScrolling: boolean;
   isDragging: boolean;
+  showWeekNumbers?: boolean;
+  showMonthIndicator?: boolean;
   item: VirtualWeekItem;
   weekHeight: number; // Use this instead of item.height to avoid sync issues
   events: Event[];
@@ -299,6 +302,8 @@ const WeekComponent = memo(
     screenSize,
     isScrolling,
     isDragging,
+    showWeekNumbers,
+    showMonthIndicator = true,
     item,
     weekHeight,
     events,
@@ -407,6 +412,8 @@ const WeekComponent = memo(
     // Use the weekHeight prop instead of item.height to avoid jumps from virtual scroll sync delays
     const weekHeightPx = `${weekHeight}px`;
 
+    const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
+
     // Analyze multi-day events for the current week
     const multiDaySegments = useMemo(
       () => analyzeMultiDayEventsForWeek(events, weekData.startDate),
@@ -419,10 +426,52 @@ const WeekComponent = memo(
       [events, weekData.startDate]
     );
 
+    // Pre-compute events grouped by day to replace 7× O(n) filter calls on every render
+    const eventsByDayDate = useMemo(() => {
+      const map = new Map<string, Event[]>();
+      weekData.days.forEach(day => {
+        const dayDateStr = day.date.toDateString();
+        map.set(
+          dayDateStr,
+          constructedRenderEvents.filter(event => {
+            if (!event.start || !event.end) {
+              return temporalToDate(event.start).toDateString() === dayDateStr;
+            }
+            const startDate = temporalToDate(event.start);
+            const endDate = temporalToDate(event.end);
+            if (!event.allDay) {
+              const endHasTime =
+                endDate.getHours() !== 0 ||
+                endDate.getMinutes() !== 0 ||
+                endDate.getSeconds() !== 0;
+              if (!endHasTime) {
+                const durationMs = endDate.getTime() - startDate.getTime();
+                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+                if (durationMs > 0 && durationMs < ONE_DAY_MS) {
+                  return startDate.toDateString() === dayDateStr;
+                }
+              }
+            }
+            return (
+              startDate.toDateString() === dayDateStr ||
+              endDate.toDateString() === dayDateStr
+            );
+          })
+        );
+      });
+      return map;
+    }, [constructedRenderEvents, weekData.days]);
+
     // Organize multi-day event segments
     const organizedMultiDaySegments = useMemo(
       () => organizeMultiDaySegments(multiDaySegments),
       [multiDaySegments]
+    );
+
+    // Memoize flat segment list to avoid 7× flat() calls inside renderDayCell
+    const allSegments = useMemo(
+      () => organizedMultiDaySegments.flat(),
+      [organizedMultiDaySegments]
     );
 
     const dayLayerCounts = useMemo(() => {
@@ -474,39 +523,11 @@ const WeekComponent = memo(
     // Calculate effective max layers for multi-day overlay
     // If any day needs "+ x more" indicator, must use maxSlotsWithMore for the overlay
     const effectiveMaxLayers = useMemo(() => {
-      const allSegments = organizedMultiDaySegments.flat();
       // Check if any day has more total visual slots than maxSlots
       // Timed events can fill gaps in multi-day layers, so need to calculate properly
       for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
         const day = weekData.days[dayIndex];
-        // Get events for this day from constructedRenderEvents
-        const dayEvents = constructedRenderEvents.filter(event => {
-          if (!event.start || !event.end) {
-            return (
-              temporalToDate(event.start).toDateString() ===
-              day.date.toDateString()
-            );
-          }
-          const startDate = temporalToDate(event.start);
-          const endDate = temporalToDate(event.end);
-          if (!event.allDay) {
-            const endHasTime =
-              endDate.getHours() !== 0 ||
-              endDate.getMinutes() !== 0 ||
-              endDate.getSeconds() !== 0;
-            if (!endHasTime) {
-              const durationMs = endDate.getTime() - startDate.getTime();
-              const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-              if (durationMs > 0 && durationMs < ONE_DAY_MS) {
-                return startDate.toDateString() === day.date.toDateString();
-              }
-            }
-          }
-          return (
-            startDate.toDateString() === day.date.toDateString() ||
-            endDate.toDateString() === day.date.toDateString()
-          );
-        });
+        const dayEvents = eventsByDayDate.get(day.date.toDateString()) ?? [];
 
         // Filter out all-day events that have segments (they're already counted in multi-day layers)
         const timedEvents = dayEvents.filter(event => {
@@ -539,8 +560,8 @@ const WeekComponent = memo(
       return layoutParams.maxSlots;
     }, [
       weekData.days,
-      constructedRenderEvents,
-      organizedMultiDaySegments,
+      eventsByDayDate,
+      allSegments,
       dayLayerCounts,
       dayOccupiedLayers,
       layoutParams.maxSlots,
@@ -552,41 +573,6 @@ const WeekComponent = memo(
       () => Math.max(0, organizedMultiDaySegments.length * ROW_SPACING),
       [organizedMultiDaySegments]
     );
-
-    // Get events for a specific date
-    const getEventsForDay = (dayDate: Date): Event[] =>
-      constructedRenderEvents.filter(event => {
-        if (!event.start || !event.end) {
-          return (
-            temporalToDate(event.start).toDateString() ===
-            dayDate.toDateString()
-          );
-        }
-
-        const startDate = temporalToDate(event.start);
-        const endDate = temporalToDate(event.end);
-
-        // For normal events, check if they end at midnight and have a duration less than 24 hours
-        if (!event.allDay) {
-          const endHasTime =
-            endDate.getHours() !== 0 ||
-            endDate.getMinutes() !== 0 ||
-            endDate.getSeconds() !== 0;
-          if (!endHasTime) {
-            const durationMs = endDate.getTime() - startDate.getTime();
-            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-            if (durationMs > 0 && durationMs < ONE_DAY_MS) {
-              // Only match start date, not end date
-              return startDate.toDateString() === dayDate.toDateString();
-            }
-          }
-        }
-
-        return (
-          startDate.toDateString() === dayDate.toDateString() ||
-          endDate.toDateString() === dayDate.toDateString()
-        );
-      });
 
     // Render date cell
     const renderDayCell = (
@@ -602,12 +588,11 @@ const WeekComponent = memo(
 
       const belongsToCurrentMonth =
         dayMonthName === currentMonth && day.year === currentYear;
-      const dayEvents = getEventsForDay(day.date);
+      const dayEvents = eventsByDayDate.get(day.date.toDateString()) ?? [];
       const sortedEvents = sortDayEvents(dayEvents);
 
       // Filter out all-day events that are rendered as multi-day segments (they occupy their own layer)
       // This prevents double-counting: they already take a layer via segment, shouldn't also count as single-day
-      const allSegments = organizedMultiDaySegments.flat();
       const timedEventsOnly = sortedEvents.filter(event => {
         if (!event.allDay) return true; // Keep all timed events
         // Check if this all-day event has a segment (rendered separately in overlay)
@@ -732,9 +717,11 @@ const WeekComponent = memo(
             belongsToCurrentMonth
               ? 'text-gray-800 dark:text-gray-100'
               : 'text-gray-400 dark:text-gray-600',
-            screenSize !== 'desktop' && dayIndex === 6
-              ? 'border-r-0'
-              : 'last:border-r'
+            dayIndex === 6
+              ? hasScrollbarSpace
+                ? 'last:border-r'
+                : 'border-r-0'
+              : ''
           )}
           style={{ height: weekHeightPx }}
           data-date={createDateString(day.date)}
@@ -780,6 +767,11 @@ const WeekComponent = memo(
         >
           {/* Date number area */}
           <div className={monthDateNumberContainer}>
+            {showWeekNumbers && dayIndex === 0 && screenSize !== 'mobile' && (
+              <span className='mr-auto ml-1 text-[10px] font-medium text-gray-400 dark:text-gray-500'>
+                {getWeekNumber(day.date)}
+              </span>
+            )}
             {
               <span
                 className={` ${monthDateNumber} ${day.isToday ? 'bg-primary text-primary-foreground' : belongsToCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'} `}
@@ -840,7 +832,7 @@ const WeekComponent = memo(
         style={{ height: weekHeightPx }}
       >
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
-        {firstDayOfMonth && (
+        {showMonthIndicator && firstDayOfMonth && (
           <div
             className={` ${monthTitle} ${shouldShowMonthTitle ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} `}
             style={{

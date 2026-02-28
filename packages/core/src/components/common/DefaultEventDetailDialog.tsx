@@ -8,7 +8,7 @@ import { useLocale } from '@/locale';
 import { dialogContainer } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
 import { EventDetailDialogProps } from '@/types/eventDetail';
-import { isEventEqual } from '@/utils/eventUtils';
+import { isEventDeepEqual } from '@/utils/eventUtils';
 import { isPlainDate } from '@/utils/temporal';
 
 import { CalendarPicker, CalendarOption } from './CalendarPicker';
@@ -54,7 +54,7 @@ const DefaultEventDetailDialog = ({
   };
 
   const hasChanges = useMemo(
-    () => !isEventEqual(event, editedEvent),
+    () => !isEventDeepEqual(event, editedEvent),
     [event, editedEvent]
   );
 

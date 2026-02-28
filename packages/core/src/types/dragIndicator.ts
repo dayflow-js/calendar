@@ -75,6 +75,7 @@ export interface UnifiedDragRef extends DragRef {
   originalDate?: Date | null;
   originalEvent?: Event | null;
   dragOffset?: number;
+  dragOffsetY?: number;
   originalStartDate?: Date | null;
   originalEndDate?: Date | null;
   eventDate?: Date;
@@ -96,10 +97,12 @@ export interface UnifiedDragRef extends DragRef {
 export interface useDragProps extends Partial<DragConfig> {
   calendarRef: RefObject<HTMLDivElement>;
   allDayRowRef?: RefObject<HTMLDivElement>; // Required for Week/Day views
+  timeGridRef?: RefObject<HTMLDivElement>; // Optional, used for translated grid layouts
   viewType: ViewType;
   onEventsUpdate: (
     updateFunc: (events: Event[]) => Event[],
-    isResizing?: boolean
+    isResizing?: boolean,
+    source?: 'drag' | 'resize'
   ) => void;
   onEventCreate: (event: Event) => void;
   onEventEdit?: (event: Event) => void; // Required for Month view
@@ -119,6 +122,8 @@ export interface useDragProps extends Partial<DragConfig> {
   renderer?: DragIndicatorRenderer; // Required for Week/Day views
   app?: ICalendarApp;
   isMobile?: boolean;
+  gridWidth?: string;
+  displayDays?: number;
 }
 
 // Unified drag state type definitions

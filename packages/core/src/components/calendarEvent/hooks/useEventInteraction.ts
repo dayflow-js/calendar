@@ -29,7 +29,6 @@ export const useEventInteraction = ({
   isTouchEnabled,
   onMoveStart,
   onEventLongPress,
-  onEventSelect,
   onDetailPanelToggle,
   canOpenDetail,
   app,
@@ -45,7 +44,6 @@ export const useEventInteraction = ({
 
   const handleTouchStart = (e: TouchEvent) => {
     if (!onMoveStart || !isTouchEnabled) return;
-    e.stopPropagation();
     setIsPressed(true);
 
     const touch = e.touches[0];
@@ -127,12 +125,6 @@ export const useEventInteraction = ({
     if (isTouchEnabled && touchStartPosRef.current) {
       e.preventDefault();
       e.stopPropagation();
-
-      if (onEventSelect) {
-        onEventSelect(event.id);
-      } else if (canOpenDetail) {
-        setIsSelected(true);
-      }
 
       if (app) {
         app.onEventClick(event);

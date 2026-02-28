@@ -41,6 +41,8 @@ export {
   formatEventTimeRange,
   roundToTimeStep,
   getEventEndHour,
+  generateSecondaryTimeSlots,
+  getTimezoneDisplayLabel,
 } from './timeUtils';
 
 // Re-export Date constants
@@ -77,7 +79,7 @@ export {
   getEventsForWeek,
   createEventWithRealDate,
   updateEventWithRealDate,
-  isEventEqual,
+  isEventDeepEqual,
 } from './eventUtils';
 
 // Re-export Test data utilities

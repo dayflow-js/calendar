@@ -26,11 +26,12 @@ import {
   scrollContainer,
 } from '@/styles/classNames';
 import { Event, MonthEventDragState, ViewType, MonthViewProps } from '@/types';
-import { extractHourFromDate } from '@/utils';
+import { hasEventChanged } from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
 
 const MonthView = ({
   app,
+  config,
   customDetailPanelContent,
   customEventDetailDialog,
   calendarRef,
@@ -42,6 +43,7 @@ const MonthView = ({
   const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
+  const startOfWeek = config.startOfWeek ?? 1;
   const calendarSignature = app
     .getCalendars()
     .map(c => c.id + c.colors.lineColor)
@@ -71,8 +73,8 @@ const MonthView = ({
       const weekStart = new Date(date);
       weekStart.setHours(0, 0, 0, 0);
       const day = weekStart.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      weekStart.setDate(weekStart.getDate() + diff);
+      const diff = (day - startOfWeek + 7) % 7;
+      weekStart.setDate(weekStart.getDate() - diff);
       weekStart.setHours(0, 0, 0, 0);
       return weekStart;
     };
@@ -134,7 +136,7 @@ const MonthView = ({
     });
 
     return map;
-  }, [events]);
+  }, [events, startOfWeek]);
 
   // Responsive configuration
   const { screenSize } = useResponsiveMonthConfig();
@@ -218,12 +220,12 @@ const MonthView = ({
   // Calculate the week start time for the current date (used for event day field calculation)
   const currentWeekStart = useMemo(() => {
     const day = currentDate.getDay();
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(currentDate);
-    monday.setDate(diff);
-    monday.setHours(0, 0, 0, 0);
-    return monday;
-  }, [currentDate]);
+    const diff = (day - startOfWeek + 7) % 7;
+    const start = new Date(currentDate);
+    start.setDate(currentDate.getDate() - diff);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }, [currentDate, startOfWeek]);
 
   const {
     handleMoveStart,
@@ -236,7 +238,8 @@ const MonthView = ({
     viewType: ViewType.MONTH,
     onEventsUpdate: (
       updateFunc: (events: Event[]) => Event[],
-      isResizing?: boolean
+      isResizing?: boolean,
+      source?: 'drag' | 'resize'
     ) => {
       const newEvents = updateFunc(events);
 
@@ -253,21 +256,7 @@ const MonthView = ({
         if (!oldEventIds.has(e.id)) return false;
         const oldEvent = events.find(old => old.id === e.id);
         // Check if there are real changes
-        return (
-          oldEvent &&
-          (temporalToDate(oldEvent.start).getTime() !==
-            temporalToDate(e.start).getTime() ||
-            temporalToDate(oldEvent.end).getTime() !==
-              temporalToDate(e.end).getTime() ||
-            oldEvent.day !== e.day ||
-            extractHourFromDate(oldEvent.start) !==
-              extractHourFromDate(e.start) ||
-            extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
-            oldEvent.title !== e.title ||
-            // for All day events
-            oldEvent?.start !== e?.start ||
-            oldEvent?.end !== e?.end)
-        );
+        return oldEvent && hasEventChanged(oldEvent, e);
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
@@ -277,7 +266,8 @@ const MonthView = ({
           add: eventsToAdd,
           update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
         },
-        isResizing
+        isResizing,
+        source
       );
     },
     onEventCreate: (event: Event) => {
@@ -305,8 +295,8 @@ const MonthView = ({
   });
 
   const weekDaysLabels = useMemo(
-    () => getWeekDaysLabels(locale, 'short'),
-    [locale, getWeekDaysLabels]
+    () => getWeekDaysLabels(locale, 'short', startOfWeek),
+    [locale, getWeekDaysLabels, startOfWeek]
   );
 
   const {
@@ -339,6 +329,7 @@ const MonthView = ({
     },
     initialWeeksToLoad: 156,
     locale: locale,
+    startOfWeek: startOfWeek,
     isEnabled: isWeekHeightInitialized,
   });
 
@@ -369,14 +360,21 @@ const MonthView = ({
       return { visibleWeeks: [], startIndex: displayStartIndex };
     }
 
-    const targetWeeks = visibleItems.slice(startIdx, startIdx + 8);
+    // Pre-render 2 weeks before displayStartIndex as scroll-up buffer.
+    // This prevents blank gaps when React's scrollTop state lags behind the
+    // DOM scroll position during fast upward scrolling.
+    const SCROLL_UP_BUFFER = 2;
+    const bufferedStartIdx = Math.max(0, startIdx - SCROLL_UP_BUFFER);
+    const targetWeeks = visibleItems.slice(bufferedStartIdx, startIdx + 8);
+    const effectiveIdx =
+      visibleItems[bufferedStartIdx]?.index ?? displayStartIndex;
 
     if (targetWeeks.length >= 6) {
       previousVisibleWeeksRef.current = targetWeeks;
-      previousStartIndexRef.current = displayStartIndex;
+      previousStartIndexRef.current = effectiveIdx;
     }
 
-    return { visibleWeeks: targetWeeks, startIndex: displayStartIndex };
+    return { visibleWeeks: targetWeeks, startIndex: effectiveIdx };
   }, [virtualData]);
 
   const topSpacerHeight = useMemo(
@@ -423,10 +421,9 @@ const MonthView = ({
 
   const bottomSpacerHeight = useMemo(() => {
     const total = virtualData.totalHeight;
-    const WEEKS_TO_LOAD = 16;
     const occupied =
       effectiveStartIndex * weekHeight +
-      WEEKS_TO_LOAD * weekHeight +
+      visibleWeeks.length * weekHeight +
       remainingSpace;
     return Math.max(0, total - occupied);
   }, [
@@ -434,9 +431,10 @@ const MonthView = ({
     effectiveStartIndex,
     weekHeight,
     remainingSpace,
+    visibleWeeks.length,
   ]);
 
-  // ResizeObserver - Initialize weekHeight and handle container height changes
+  // ResizeObserver - Track container height and correct weekHeight if estimate was inaccurate
   useEffect(() => {
     const element = scrollElementRef.current;
     if (!element) return;
@@ -447,38 +445,29 @@ const MonthView = ({
         // Save actual container height for other calculations
         setActualContainerHeight(containerHeight);
 
-        // Only initialize weekHeight once to prevent fluctuations during scrolling
-        if (!isWeekHeightInitialized && containerHeight > 0) {
+        if (containerHeight > 0) {
+          // Use Math.ceil so 6 rows always fill (or slightly exceed) the
+          // container height, preventing blank space at the bottom row.
           const calculatedWeekHeight = Math.max(
             80,
-            Math.floor(containerHeight / 6)
+            Math.ceil(containerHeight / 6)
           );
 
-          // If weekHeight changed from initial value, adjust scrollTop to maintain position
-          // Do this synchronously in the same frame to prevent visible jump
+          // Only update if the accurate measurement differs from our estimate
           if (calculatedWeekHeight !== previousWeekHeightRef.current) {
             const currentScrollTop = element.scrollTop;
             if (currentScrollTop > 0) {
-              // Calculate which week currently showing
               const currentWeekIndex = Math.round(
                 currentScrollTop / previousWeekHeightRef.current
               );
-              // Recalculate scrollTop with new weekHeight
               const newScrollTop = currentWeekIndex * calculatedWeekHeight;
-
-              // Synchronously update both state and DOM
               element.scrollTop = newScrollTop;
               setScrollTop(newScrollTop);
             }
+
+            setWeekHeight(calculatedWeekHeight);
+            previousWeekHeightRef.current = calculatedWeekHeight;
           }
-
-          setWeekHeight(calculatedWeekHeight);
-          previousWeekHeightRef.current = calculatedWeekHeight;
-
-          // Use requestAnimationFrame to ensure visibility change happens after scrollTop is set
-          requestAnimationFrame(() => {
-            setIsWeekHeightInitialized(true);
-          });
         }
       }
     });
@@ -488,13 +477,18 @@ const MonthView = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [scrollElementRef, isWeekHeightInitialized, setScrollTop]);
+  }, [scrollElementRef, setScrollTop]);
 
+  // Synchronously estimate weekHeight from window size and mark as initialized immediately
+  // to avoid blank flash while waiting for ResizeObserver. ResizeObserver will correct
+  // if the estimate is inaccurate.
   useEffect(() => {
     const estimatedHeaderHeight = 150;
     const estimatedContainerHeight = window.innerHeight - estimatedHeaderHeight;
-    const height = Math.max(80, Math.floor(estimatedContainerHeight / 6));
+    const height = Math.max(80, Math.ceil(estimatedContainerHeight / 6));
     setWeekHeight(height);
+    previousWeekHeightRef.current = height;
+    setIsWeekHeightInitialized(true);
   }, []);
 
   const handleEventUpdate = useCallback(
@@ -587,7 +581,6 @@ const MonthView = ({
         ref={scrollElementRef}
         className={scrollContainer}
         style={{
-          scrollSnapType: 'y mandatory',
           overflow: 'hidden auto',
           visibility: isWeekHeightInitialized ? 'visible' : 'hidden',
         }}
@@ -611,15 +604,26 @@ const MonthView = ({
                 }
               : item;
 
+          // Only pass real isScrolling to the week containing the 1st of the month
+          // (for month title animation). Other weeks always receive false so memo()
+          // can bail out of re-rendering them when isScrolling changes.
+          const weekIsScrolling =
+            config.showMonthIndicator !== false &&
+            item.weekData.days.some(d => d.day === 1)
+              ? isScrolling
+              : false;
+
           return (
             <WeekComponent
               key={`week-${item.weekData.startDate.getTime()}`}
               item={adjustedItem}
               weekHeight={weekHeight}
+              showWeekNumbers={config.showWeekNumbers}
+              showMonthIndicator={config.showMonthIndicator}
               currentMonth={currentMonth}
               currentYear={currentYear}
               screenSize={screenSize}
-              isScrolling={isScrolling}
+              isScrolling={weekIsScrolling}
               calendarRef={calendarRef}
               events={weekEvents}
               onEventUpdate={handleEventUpdate}

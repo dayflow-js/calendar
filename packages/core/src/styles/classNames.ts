@@ -126,7 +126,7 @@ export const monthDayCell =
  * Month date number container
  */
 export const monthDateNumberContainer =
-  'df-month-date-number-container text-right px-2 h-[33px] relative z-20';
+  'df-month-date-number-container flex items-center justify-end text-right px-2 h-[33px] relative z-20';
 
 /**
  * Month date number

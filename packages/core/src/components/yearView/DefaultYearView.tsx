@@ -28,6 +28,7 @@ import {
   ICalendarApp,
   YearViewConfig,
 } from '@/types';
+import { hasEventChanged } from '@/utils';
 import { temporalToDate } from '@/utils/temporal';
 
 export interface YearViewProps {
@@ -189,17 +190,24 @@ export const DefaultYearView = ({
   } = useDragForView(app, {
     calendarRef,
     viewType: ViewType.YEAR,
-    onEventsUpdate: (updateFunc, isResizing) => {
+    onEventsUpdate: (updateFunc, isResizing, source) => {
       const newEvents = updateFunc(rawEvents);
-      newEvents.forEach(newEvent => {
+
+      // Find events that need to be updated
+      const eventsToUpdate = newEvents.filter(newEvent => {
         const oldEvent = rawEvents.find(e => e.id === newEvent.id);
-        if (
-          oldEvent &&
-          (oldEvent.start !== newEvent.start || oldEvent.end !== newEvent.end)
-        ) {
-          app.updateEvent(newEvent.id, newEvent, isResizing);
-        }
+        return oldEvent && hasEventChanged(oldEvent, newEvent);
       });
+
+      if (eventsToUpdate.length > 0) {
+        app.applyEventsChanges(
+          {
+            update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+          },
+          isResizing,
+          source
+        );
+      }
     },
     currentWeekStart: new Date(),
     events: rawEvents,

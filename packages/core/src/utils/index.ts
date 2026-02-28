@@ -2,6 +2,7 @@
 
 // All common utility functions
 export * from './helpers';
+export * from './dateTimeUtils';
 
 // Date formatting (preserving original exports)
 export * from './dateFormat';
@@ -53,6 +54,7 @@ export * from './themeUtils';
 
 // Event creation helper functions
 export * from './eventHelpers';
+export * from './eventUtils';
 
 // Search utilities
 export * from './searchUtils';

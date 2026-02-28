@@ -5,6 +5,7 @@ import {
   useMemo,
   useCallback,
   useRef,
+  useLayoutEffect,
 } from 'preact/hooks';
 
 import { DayContent } from '@/components/dayView/DayContent';
@@ -30,8 +31,13 @@ import {
   ViewType as DragViewType,
   WeekDayDragState,
 } from '@/types';
-import { formatTime, extractHourFromDate } from '@/utils';
-import { temporalToDate } from '@/utils/temporal';
+import {
+  formatTime,
+  extractHourFromDate,
+  generateSecondaryTimeSlots,
+  getTimezoneDisplayLabel,
+  hasEventChanged,
+} from '@/utils';
 
 const DayView = ({
   app,
@@ -58,6 +64,8 @@ const DayView = ({
     lastHour: configLastHour = defaultDragConfig.LAST_HOUR,
     allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
+    timeFormat = '24h',
+    secondaryTimeZone,
   } = config;
 
   const HOUR_HEIGHT = configHourHeight;
@@ -190,6 +198,7 @@ const DayView = ({
 
   // References
   const allDayRowRef = useRef<HTMLDivElement>(null);
+  const timeGridRef = useRef<HTMLDivElement>(null);
 
   // Calculate the week start time for the current date
   const currentWeekStart = useMemo(
@@ -241,8 +250,13 @@ const DayView = ({
   } = useDragForView(app, {
     calendarRef,
     allDayRowRef: showAllDay ? allDayRowRef : undefined,
+    timeGridRef,
     viewType: DragViewType.DAY,
-    onEventsUpdate: (updateFunc: (events: Event[]) => Event[]) => {
+    onEventsUpdate: (
+      updateFunc: (events: Event[]) => Event[],
+      _isResizing?: boolean,
+      source?: 'drag' | 'resize'
+    ) => {
       const newEvents = updateFunc(currentDayEvents);
 
       // Find events that need to be deleted (in old list but not in new list)
@@ -258,28 +272,21 @@ const DayView = ({
       // Find events that need to be updated (exist in both lists but content may differ)
       const eventsToUpdate = newEvents.filter(e => {
         if (!oldEventIds.has(e.id)) return false;
-        const oldEvent = currentDayEvents.find(old => old.id === e.id);
+        const oldEvent = events.find(old => old.id === e.id);
         // Check if there are real changes
-        return (
-          oldEvent &&
-          (temporalToDate(oldEvent.start).getTime() !==
-            temporalToDate(e.start).getTime() ||
-            temporalToDate(oldEvent.end).getTime() !==
-              temporalToDate(e.end).getTime() ||
-            oldEvent.day !== e.day ||
-            extractHourFromDate(oldEvent.start) !==
-              extractHourFromDate(e.start) ||
-            extractHourFromDate(oldEvent.end) !== extractHourFromDate(e.end) ||
-            oldEvent.title !== e.title)
-        );
+        return oldEvent && hasEventChanged(oldEvent, e);
       });
 
       // Perform operations - updateEvent will automatically trigger onEventUpdate callback
-      app.applyEventsChanges({
-        delete: eventsToDelete.map(e => e.id),
-        add: eventsToAdd,
-        update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
-      });
+      app.applyEventsChanges(
+        {
+          delete: eventsToDelete.map(e => e.id),
+          add: eventsToAdd,
+          update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+        },
+        undefined,
+        source
+      );
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {
@@ -317,7 +324,7 @@ const DayView = ({
         currentDate,
         layoutEvents
       ),
-    TIME_COLUMN_WIDTH: isMobile ? 48 : 80,
+    TIME_COLUMN_WIDTH: secondaryTimeZone && !isMobile ? 88 : isMobile ? 48 : 80,
     isMobile,
   });
 
@@ -392,8 +399,35 @@ const DayView = ({
 
   const timeSlots = Array.from({ length: 24 }, (_, i) => ({
     hour: i + FIRST_HOUR,
-    label: formatTime(i + FIRST_HOUR),
+    label: formatTime(i + FIRST_HOUR, 0, timeFormat),
   }));
+
+  const secondaryTimeSlots = useMemo(
+    () =>
+      secondaryTimeZone
+        ? generateSecondaryTimeSlots(timeSlots, secondaryTimeZone, timeFormat)
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [secondaryTimeZone, timeFormat, FIRST_HOUR]
+  );
+
+  const primaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(
+            Intl.DateTimeFormat().resolvedOptions().timeZone
+          )
+        : undefined,
+    [secondaryTimeZone]
+  );
+
+  const secondaryTzLabel = useMemo(
+    () =>
+      secondaryTimeZone
+        ? getTimezoneDisplayLabel(secondaryTimeZone)
+        : undefined,
+    [secondaryTimeZone]
+  );
 
   // Date selection handling
   const handleDateSelect = useCallback(
@@ -416,6 +450,24 @@ const DayView = ({
     current.setHours(0, 0, 0, 0);
     return current.getTime() === today.getTime();
   }, [currentDate]);
+
+  // Initial scroll to current time
+  useLayoutEffect(() => {
+    if (config.scrollToCurrentTime) {
+      const scrollContainer =
+        calendarRef.current?.querySelector('.calendar-content');
+      if (scrollContainer) {
+        const now = new Date();
+        const hour = now.getHours() + now.getMinutes() / 60;
+        const containerHeight = (scrollContainer as HTMLElement).clientHeight;
+
+        scrollContainer.scrollTop = Math.max(
+          0,
+          (hour - FIRST_HOUR) * HOUR_HEIGHT - containerHeight / 2
+        );
+      }
+    }
+  }, []); // Run once on mount
 
   // Timer
   useEffect(() => {
@@ -481,6 +533,7 @@ const DayView = ({
         customEventDetailDialog={customEventDetailDialog}
         calendarRef={calendarRef}
         allDayRowRef={allDayRowRef}
+        timeGridRef={timeGridRef}
         switcherMode={switcherMode}
         isMobile={isMobile}
         isTouch={isTouch}
@@ -492,6 +545,10 @@ const DayView = ({
         LAST_HOUR={LAST_HOUR}
         showAllDay={showAllDay}
         showStartOfDayLabel={showStartOfDayLabel}
+        timeFormat={timeFormat}
+        secondaryTimeSlots={secondaryTimeSlots}
+        primaryTzLabel={primaryTzLabel}
+        secondaryTzLabel={secondaryTzLabel}
       />
       <RightPanel
         app={app}
@@ -503,6 +560,7 @@ const DayView = ({
         handleMonthChange={handleMonthChange}
         handleDateSelect={handleDateSelect}
         switcherMode={switcherMode}
+        timeFormat={timeFormat}
       />
       <MobileEventDrawerComponent
         isOpen={isDrawerOpen}
@@ -521,6 +579,7 @@ const DayView = ({
         }}
         draftEvent={draftEvent}
         app={app}
+        timeFormat={timeFormat}
       />
     </div>
   );
