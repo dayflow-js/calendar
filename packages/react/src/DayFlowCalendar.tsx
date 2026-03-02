@@ -7,19 +7,46 @@ import type {
   EventDetailPosition,
   CalendarHeaderProps,
   CalendarType,
+  ViewType,
+  EventLayout,
 } from '@dayflow/core';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import type { ReactNode, FC } from 'react';
 import { createPortal } from 'react-dom';
 
+/** Args passed to all eventContent* slot renderers. */
+export interface EventContentSlotArgs {
+  event: Event;
+  viewType: ViewType;
+  isAllDay: boolean;
+  isMobile: boolean;
+  isSelected: boolean;
+  isDragging: boolean;
+  layout?: EventLayout;
+}
+
 export interface DayFlowCalendarProps {
   calendar: ICalendarApp | UseCalendarAppReturn;
-  /** Custom event content renderer (React) */
-  eventContent?: (args: {
-    event: Event;
-    isAllDay: boolean;
-    isMobile: boolean;
-  }) => ReactNode;
+  /** Custom event content renderer for all views and event types (React) */
+  eventContent?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for Day view timed events */
+  eventContentDay?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for Week view timed events */
+  eventContentWeek?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for Month view timed events */
+  eventContentMonth?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for Year view events */
+  eventContentYear?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for all-day events in all views */
+  eventContentAllDay?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for all-day events in Day view */
+  eventContentAllDayDay?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for all-day events in Week view */
+  eventContentAllDayWeek?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for all-day events in Month view */
+  eventContentAllDayMonth?: (args: EventContentSlotArgs) => ReactNode;
+  /** Custom event content renderer for all-day events in Year view */
+  eventContentAllDayYear?: (args: EventContentSlotArgs) => ReactNode;
   /** Custom event detail panel content (React) */
   eventDetailContent?: (args: {
     event: Event;

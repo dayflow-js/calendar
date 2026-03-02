@@ -1,3 +1,4 @@
+import { ComponentChildren } from 'preact';
 import { memo } from 'preact/compat';
 import { useState, useRef } from 'preact/hooks';
 
@@ -53,6 +54,8 @@ interface MultiDayEventProps {
   isEditable?: boolean;
   viewable?: boolean;
   isPopping?: boolean;
+  /** Optional slot renderer — receives the default visual content and wraps it in a ContentSlot */
+  renderSlot?: (defaultContent: ComponentChildren) => ComponentChildren;
 }
 
 const ROW_HEIGHT = 16;
@@ -88,6 +91,7 @@ export const MultiDayEvent = memo(
     isEditable = true,
     viewable = true,
     isPopping,
+    renderSlot,
   }: MultiDayEventProps) => {
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
@@ -381,7 +385,7 @@ export const MultiDayEvent = memo(
             cursor: isResizing ? 'ew-resize' : 'pointer',
           }}
         >
-          {renderEventContent()}
+          {renderSlot ? renderSlot(renderEventContent()) : renderEventContent()}
         </div>
         {renderResizeHandle('right')}
       </div>

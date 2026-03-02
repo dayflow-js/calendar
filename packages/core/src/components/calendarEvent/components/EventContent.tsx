@@ -11,9 +11,29 @@ import MonthRegularContent from './MonthRegularContent';
 import RegularEventContent from './RegularEventContent';
 import YearEventContent from './YearEventContent';
 
+/** Resolve the most specific overridden generator name, falling back to 'eventContent'. */
+function resolveGeneratorName(
+  store: CustomRenderingStore | null,
+  viewType: ViewType,
+  isAllDay: boolean
+): string {
+  const viewKey =
+    (viewType as string).charAt(0).toUpperCase() +
+    (viewType as string).slice(1);
+  const specificName = isAllDay
+    ? `eventContentAllDay${viewKey}` // e.g. 'eventContentAllDayDay'
+    : `eventContent${viewKey}`; // e.g. 'eventContentDay'
+
+  if (store?.isOverridden(specificName)) return specificName;
+  if (isAllDay && store?.isOverridden('eventContentAllDay'))
+    return 'eventContentAllDay';
+  return 'eventContent';
+}
+
 interface EventContentProps {
   event: Event;
   viewType: ViewType;
+  isAllDay: boolean;
   isMultiDay: boolean;
   segment?: MultiDayEventSegment;
   yearSegment?: YearMultiDaySegment;
@@ -53,6 +73,7 @@ interface EventContentProps {
 export const EventContent = ({
   event,
   viewType,
+  isAllDay,
   isMultiDay,
   segment,
   yearSegment,
@@ -79,48 +100,76 @@ export const EventContent = ({
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
 
-  let defaultContent;
+  const generatorName = resolveGeneratorName(
+    customRenderingStore,
+    viewType,
+    isAllDay
+  );
+
+  // Month multi-day: MultiDayEvent owns absolute positioning and resize handles.
+  // Year view: YearEventContent owns resize handles (CalendarEvent shell handles positioning).
+  // In both cases the ContentSlot is injected via renderSlot so those are preserved
+  // even when the user provides a custom event content renderer.
+  if (isMonthView && isMultiDay && segment) {
+    return (
+      <MultiDayEvent
+        segment={segment}
+        segmentIndex={segmentIndex ?? 0}
+        isDragging={isBeingDragged || isEventSelected}
+        isResizing={isBeingResized}
+        isSelected={isEventSelected}
+        onMoveStart={onMoveStart}
+        onResizeStart={onResizeStart}
+        isMobile={isMobile}
+        isDraggable={isDraggable}
+        isEditable={isEditable}
+        viewable={canOpenDetail}
+        isPopping={isPopping}
+        renderSlot={defaultContent => (
+          <ContentSlot
+            store={customRenderingStore}
+            generatorName={generatorName}
+            generatorArgs={eventContentSlotArgs}
+            defaultContent={defaultContent}
+          />
+        )}
+      />
+    );
+  }
+
   if (isYearView && yearSegment) {
-    defaultContent = (
+    return (
       <YearEventContent
         event={event}
         segment={yearSegment}
         isEditable={isEditable}
         onMoveStart={onMoveStart}
         onResizeStart={onResizeStart}
+        renderSlot={defaultContent => (
+          <ContentSlot
+            store={customRenderingStore}
+            generatorName={generatorName}
+            generatorArgs={eventContentSlotArgs}
+            defaultContent={defaultContent}
+          />
+        )}
       />
     );
-  } else if (isMonthView) {
-    if (isMultiDay && segment) {
-      defaultContent = (
-        <MultiDayEvent
-          segment={segment}
-          segmentIndex={segmentIndex ?? 0}
-          isDragging={isBeingDragged || isEventSelected}
-          isResizing={isBeingResized}
-          isSelected={isEventSelected}
-          onMoveStart={onMoveStart}
-          onResizeStart={onResizeStart}
-          isMobile={isMobile}
-          isDraggable={isDraggable}
-          isEditable={isEditable}
-          viewable={canOpenDetail}
-          isPopping={isPopping}
-        />
-      );
-    } else {
-      defaultContent = event.allDay ? (
-        <MonthAllDayContent event={event} isEventSelected={isEventSelected} />
-      ) : (
-        <MonthRegularContent
-          event={event}
-          app={app}
-          isEventSelected={isEventSelected}
-          hideTime={hideTime}
-          isMobile={isMobile}
-        />
-      );
-    }
+  }
+
+  let defaultContent;
+  if (isMonthView) {
+    defaultContent = event.allDay ? (
+      <MonthAllDayContent event={event} isEventSelected={isEventSelected} />
+    ) : (
+      <MonthRegularContent
+        event={event}
+        app={app}
+        isEventSelected={isEventSelected}
+        hideTime={hideTime}
+        isMobile={isMobile}
+      />
+    );
   } else {
     defaultContent = event.allDay ? (
       <AllDayContent
@@ -148,7 +197,7 @@ export const EventContent = ({
   return (
     <ContentSlot
       store={customRenderingStore}
-      generatorName='eventContent'
+      generatorName={generatorName}
       generatorArgs={eventContentSlotArgs}
       defaultContent={defaultContent}
     />

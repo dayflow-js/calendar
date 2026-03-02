@@ -674,6 +674,7 @@ export const FixedWeekYearView = ({
                       <div key={segment.id} className='pointer-events-auto'>
                         <CalendarEvent
                           event={segment.event}
+                          isAllDay={!!segment.event.allDay}
                           viewType={ViewType.YEAR}
                           yearSegment={segment}
                           columnsPerRow={totalColumns}

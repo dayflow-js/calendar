@@ -875,7 +875,7 @@ const WeekComponent = memo(
                         <CalendarEvent
                           key={segment.id}
                           event={segment.event}
-                          isAllDay={!!segment.event.allDay}
+                          isAllDay={true}
                           segment={segment}
                           segmentIndex={layerIndex}
                           viewType={ViewType.MONTH}
