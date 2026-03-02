@@ -10,6 +10,15 @@
   const {
     calendar,
     eventContent = null,
+    eventContentDay = null,
+    eventContentWeek = null,
+    eventContentMonth = null,
+    eventContentYear = null,
+    eventContentAllDay = null,
+    eventContentAllDayDay = null,
+    eventContentAllDayWeek = null,
+    eventContentAllDayMonth = null,
+    eventContentAllDayYear = null,
     eventDetailContent = null,
     eventDetailDialog = null,
     headerContent = null,
@@ -21,6 +30,15 @@
   } = $props<{
     calendar: ICalendarApp | UseCalendarAppReturn;
     eventContent?: unknown;
+    eventContentDay?: unknown;
+    eventContentWeek?: unknown;
+    eventContentMonth?: unknown;
+    eventContentYear?: unknown;
+    eventContentAllDay?: unknown;
+    eventContentAllDayDay?: unknown;
+    eventContentAllDayWeek?: unknown;
+    eventContentAllDayMonth?: unknown;
+    eventContentAllDayYear?: unknown;
     eventDetailContent?: unknown;
     eventDetailDialog?: unknown;
     headerContent?: unknown;
@@ -46,6 +64,15 @@
 
   const renderProps = $derived({
     eventContent,
+    eventContentDay,
+    eventContentWeek,
+    eventContentMonth,
+    eventContentYear,
+    eventContentAllDay,
+    eventContentAllDayDay,
+    eventContentAllDayWeek,
+    eventContentAllDayMonth,
+    eventContentAllDayYear,
     eventDetailContent,
     eventDetailDialog,
     headerContent,

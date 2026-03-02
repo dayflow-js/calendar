@@ -50,6 +50,15 @@ export class DayFlowCalendarComponent
 
   // Templates for custom content injection
   @Input() eventContent?: TemplateRef<unknown>;
+  @Input() eventContentDay?: TemplateRef<unknown>;
+  @Input() eventContentWeek?: TemplateRef<unknown>;
+  @Input() eventContentMonth?: TemplateRef<unknown>;
+  @Input() eventContentYear?: TemplateRef<unknown>;
+  @Input() eventContentAllDay?: TemplateRef<unknown>;
+  @Input() eventContentAllDayDay?: TemplateRef<unknown>;
+  @Input() eventContentAllDayWeek?: TemplateRef<unknown>;
+  @Input() eventContentAllDayMonth?: TemplateRef<unknown>;
+  @Input() eventContentAllDayYear?: TemplateRef<unknown>;
   @Input() eventDetailContent?: TemplateRef<unknown>;
   @Input() eventDetailDialog?: TemplateRef<unknown>;
   @Input() headerContent?: TemplateRef<unknown>;
@@ -102,10 +111,29 @@ export class DayFlowCalendarComponent
       this.internalApp = undefined;
       this.destroyCalendar();
       this.initCalendar();
-    } else if (changes['collapsedSafeAreaLeft'] && this.renderer) {
-      this.renderer.setProps({
-        collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
-      });
+    } else if (this.renderer) {
+      if (changes['collapsedSafeAreaLeft']) {
+        this.renderer.setProps({
+          collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
+        });
+      }
+      const contentSlotKeys = [
+        'eventContent',
+        'eventContentDay',
+        'eventContentWeek',
+        'eventContentMonth',
+        'eventContentYear',
+        'eventContentAllDay',
+        'eventContentAllDayDay',
+        'eventContentAllDayWeek',
+        'eventContentAllDayMonth',
+        'eventContentAllDayYear',
+      ];
+      if (contentSlotKeys.some(key => changes[key])) {
+        this.renderer
+          .getCustomRenderingStore()
+          .setOverrides(this.getActiveOverrides());
+      }
     }
   }
 
@@ -130,6 +158,35 @@ export class DayFlowCalendarComponent
         this.customRenderings = [...renderings.values()];
         this.cdr.markForCheck();
       });
+
+    this.renderer
+      .getCustomRenderingStore()
+      .setOverrides(this.getActiveOverrides());
+  }
+
+  private getActiveOverrides(): string[] {
+    const templateInputs: Record<string, TemplateRef<unknown> | undefined> = {
+      eventContent: this.eventContent,
+      eventContentDay: this.eventContentDay,
+      eventContentWeek: this.eventContentWeek,
+      eventContentMonth: this.eventContentMonth,
+      eventContentYear: this.eventContentYear,
+      eventContentAllDay: this.eventContentAllDay,
+      eventContentAllDayDay: this.eventContentAllDayDay,
+      eventContentAllDayWeek: this.eventContentAllDayWeek,
+      eventContentAllDayMonth: this.eventContentAllDayMonth,
+      eventContentAllDayYear: this.eventContentAllDayYear,
+      eventDetailContent: this.eventDetailContent,
+      eventDetailDialog: this.eventDetailDialog,
+      headerContent: this.headerContent,
+      createCalendarDialog: this.createCalendarDialog,
+      titleBarSlot: this.titleBarSlot,
+      colorPicker: this.colorPicker,
+      colorPickerWrapper: this.colorPickerWrapper,
+    };
+    return Object.keys(templateInputs).filter(
+      key => templateInputs[key] !== null && templateInputs[key] !== undefined
+    );
   }
 
   private destroyCalendar() {
@@ -148,6 +205,33 @@ export class DayFlowCalendarComponent
     switch (name) {
       case 'eventContent': {
         return this.eventContent ?? null;
+      }
+      case 'eventContentDay': {
+        return this.eventContentDay ?? null;
+      }
+      case 'eventContentWeek': {
+        return this.eventContentWeek ?? null;
+      }
+      case 'eventContentMonth': {
+        return this.eventContentMonth ?? null;
+      }
+      case 'eventContentYear': {
+        return this.eventContentYear ?? null;
+      }
+      case 'eventContentAllDay': {
+        return this.eventContentAllDay ?? null;
+      }
+      case 'eventContentAllDayDay': {
+        return this.eventContentAllDayDay ?? null;
+      }
+      case 'eventContentAllDayWeek': {
+        return this.eventContentAllDayWeek ?? null;
+      }
+      case 'eventContentAllDayMonth': {
+        return this.eventContentAllDayMonth ?? null;
+      }
+      case 'eventContentAllDayYear': {
+        return this.eventContentAllDayYear ?? null;
       }
       case 'eventDetailContent': {
         return this.eventDetailContent ?? null;

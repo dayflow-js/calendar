@@ -74,7 +74,7 @@ export function ContentSlot({
     });
   }, [generatorName, generatorArgs]);
 
-  const isEventSlot = generatorName === 'eventContent';
+  const isEventSlot = generatorName.startsWith('eventContent');
   const isSidebarSlot = generatorName === 'sidebar';
   const isOverridden = store?.isOverridden(generatorName);
 

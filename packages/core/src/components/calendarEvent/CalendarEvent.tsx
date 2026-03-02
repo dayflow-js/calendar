@@ -306,13 +306,24 @@ const CalendarEvent = ({
   const eventContentSlotArgs = useMemo(
     () => ({
       event,
+      viewType,
       isAllDay,
       isMobile,
-      isMonthView: viewType === ViewType.MONTH,
+      isSelected: isEventSelected,
+      isDragging: isBeingDragged,
       segment,
       layout,
     }),
-    [event, isAllDay, isMobile, viewType, segment, layout]
+    [
+      event,
+      viewType,
+      isAllDay,
+      isMobile,
+      isEventSelected,
+      isBeingDragged,
+      segment,
+      layout,
+    ]
   );
 
   // Stable contentRenderer for EventDetailPanelWithContent
@@ -429,6 +440,7 @@ const CalendarEvent = ({
         <EventContent
           event={event}
           viewType={viewType}
+          isAllDay={isAllDay}
           isMultiDay={isMultiDay}
           segment={segment}
           yearSegment={yearSegment}

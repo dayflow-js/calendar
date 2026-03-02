@@ -1,3 +1,5 @@
+import { ComponentChildren } from 'preact';
+
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { Event } from '@/types';
@@ -13,6 +15,8 @@ interface YearEventContentProps {
     event: Event,
     direction: string
   ) => void;
+  /** Optional slot renderer — receives the default visual content and wraps it in a ContentSlot */
+  renderSlot?: (defaultContent: ComponentChildren) => ComponentChildren;
 }
 
 const YearEventContent = ({
@@ -21,6 +25,7 @@ const YearEventContent = ({
   isEditable,
   onMoveStart,
   onResizeStart,
+  renderSlot,
 }: YearEventContentProps) => {
   const isAllDay = !!event.allDay;
   const calendarId = event.calendarId || 'blue';
@@ -153,7 +158,7 @@ const YearEventContent = ({
   return (
     <>
       {renderResizeHandle('left')}
-      {renderContent()}
+      {renderSlot ? renderSlot(renderContent()) : renderContent()}
       {renderResizeHandle('right')}
     </>
   );
