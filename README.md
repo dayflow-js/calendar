@@ -5,8 +5,8 @@
 A flexible and feature-rich calendar component library for **React, Vue, Angular, and Svelte** with drag-and-drop support, multiple views, and plugin architecture.
 
 [![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
-[![License](https://img.shields.io/github/license/dayflow-js/dayflow)](https://github.com/dayflow-js/dayflow/blob/main/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/calendar/pulls)
+[![License](https://img.shields.io/github/license/dayflow-js/calendar)](https://github.com/dayflow-js/calendar/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
 ## Features
@@ -69,7 +69,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Bug Reports
 
-If you find a bug, please file an issue on [GitHub Issues](https://github.com/dayflow-js/dayflow/issues).
+If you find a bug, please file an issue on [GitHub Issues](https://github.com/dayflow-js/calendar/issues).
 
 ## Support
 

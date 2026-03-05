@@ -13,9 +13,6 @@ const meta: MetaRecord = {
   'read-only': {
     title: '只读模式',
   },
-  'create-calendar': {
-    title: '创建日历',
-  },
   'content-slots': {
     title: '内容插槽',
   },

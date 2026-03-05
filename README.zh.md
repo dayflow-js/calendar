@@ -5,8 +5,8 @@
 一个灵活且功能丰富的 React 日历组件库，支持拖拽、多视图和插件架构。
 
 [![npm](https://img.shields.io/npm/v/@dayflow/core?logo=npm&color=blue&label=version)](https://www.npmjs.com/package/@dayflow/core)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/dayflow/pulls)
-[![License](https://img.shields.io/github/license/dayflow-js/dayflow)](https://github.com/dayflow-js/dayflow/blob/main/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?logo=github)](https://github.com/dayflow-js/calendar/pulls)
+[![License](https://img.shields.io/github/license/dayflow-js/calendar)](https://github.com/dayflow-js/calendar/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
 ## 功能特性
@@ -69,7 +69,7 @@ https://github.com/user-attachments/assets/957317e5-02d8-4419-a74b-62b7d191e347
 
 ## Bug 反馈
 
-如果您发现 Bug，请在 [GitHub Issues](https://github.com/dayflow-js/dayflow/issues) 上提交 issue。
+如果您发现 Bug，请在 [GitHub Issues](https://github.com/dayflow-js/calendar/issues) 上提交 issue。
 
 ## 支持
 

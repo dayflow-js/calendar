@@ -16,14 +16,15 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 
 ## 可用插槽
 
-| 生成器名称                        | 描述                                           | 参数                                                            |
-| :-------------------------------- | :--------------------------------------------- | :-------------------------------------------------------------- |
-| `eventContent`                    | 日历事件卡片的自定义渲染。支持针对不同视图重写 | `-`                                                             |
-| `eventDetailContent`              | 点击事件时弹出的面板/详情内容。                | `{ event, position, onClose, onEventDelete, onEventUpdate }`    |
-| `eventDetailDialog`               | 点击事件时弹出的自定义对话框内容。             | `{ event, isOpen, onClose, onEventDelete, onEventUpdate }`      |
-| `colorPicker`                     | 侧边栏中使用的小型颜色选择器。                 | `{ color, onChange, variant: 'sketch' }`                        |
-| `createCalendarDialogColorPicker` | 对话框中使用功能完整的颜色选择器。             | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `titleBarSlot`                    | 侧边栏标题栏中的额外内容。                     | `{ isCollapsed, toggleCollapsed }`                              |
+| 生成器名称                        | 描述                                             | 参数                                                                      |
+| :-------------------------------- | :----------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | 事件卡片的自定义渲染（例如 `eventContentDay`）。 | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | 点击事件时在弹出框/面板中显示的内容。            | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | 点击事件时显示的自定义对话框。                   | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | 用于事件颜色的迷你颜色选择器。                   | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | 用于侧边栏日历颜色的颜色选择器。                 | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | 对话框中使用功能完整的颜色选择器。               | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | 侧边栏标题栏中的额外内容。                       | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## 事件内容
 
@@ -158,6 +159,8 @@ export const CustomDetailDialogShowcase = () => {
 ## 示例：注入自定义颜色选择器
 
 默认情况下，DayFlow 使用内置的 `BlossomColorPicker`。如果您更喜欢使用 `react-color` 或 `vue-color` 等库，可以使用 `colorPicker` 插槽进行注入。
+
+<img src='/images/docs/colorPicker.png' alt='颜色选择器' />
 
 <ColorPickerShowcase />
 

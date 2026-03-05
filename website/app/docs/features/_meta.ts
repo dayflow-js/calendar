@@ -13,9 +13,6 @@ const meta: MetaRecord = {
   'read-only': {
     title: 'Read-only Mode',
   },
-  'create-calendar': {
-    title: 'Create Calendar',
-  },
   'content-slots': {
     title: 'Content Slots',
   },

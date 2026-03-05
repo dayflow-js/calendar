@@ -16,14 +16,15 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 
 ## Available Slots
 
-| Generator Name                    | Description                                                      | Arguments                                                       |
-| :-------------------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `eventContent`                    | Custom rendering for event cards. Supports per-view overrides.   | `-`                                                             |
-| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked. | `{ event, position, onClose, onEventDelete, onEventUpdate }`    |
-| `eventDetailDialog`               | Custom dialog shown when an event is clicked.                    | `{ event, isOpen, onClose, onEventDelete, onEventUpdate }`      |
-| `colorPicker`                     | A small color picker used in the sidebar.                        | `{ color, onChange, variant: 'sketch' }`                        |
-| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                    | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `titleBarSlot`                    | Extra content in the sidebar title bar.                          | `{ isCollapsed, toggleCollapsed }`                              |
+| Generator Name                    | Description                                                      | Arguments                                                                 |
+| :-------------------------------- | :--------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked. | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | Custom dialog shown when an event is clicked.                    | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | A small color picker used for event colors.                      | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.          | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                    | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | Extra content in the sidebar title bar.                          | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## Event Content
 
@@ -158,6 +159,8 @@ export const CustomDetailDialogShowcase = () => {
 ## Example: Injecting a Custom Color Picker
 
 By default, DayFlow uses a built-in `BlossomColorPicker`. If you prefer to use a library like `react-color` or `vue-color`, you can inject it using the `colorPicker` slots.
+
+<img src='/images/docs/colorPicker.png' alt='Color Picker' />
 
 ### React Example
 

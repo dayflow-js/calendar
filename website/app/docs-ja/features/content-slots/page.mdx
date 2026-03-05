@@ -16,14 +16,15 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 
 ## 利用可能なスロット
 
-| ジェネレーター名                  | 説明                                                               | 引数                                                            |
-| :-------------------------------- | :----------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `eventContent`                    | イベントカードのカスタムレンダリング。ビューごとの上書きをサポート | `-`                                                             |
-| `eventDetailContent`              | イベントクリック時に表示されるパネル/詳細コンテンツ。              | `{ event, position, onClose, onEventDelete, onEventUpdate }`    |
-| `eventDetailDialog`               | イベントクリック時に表示されるカスタムダイアログ。                 | `{ event, isOpen, onClose, onEventDelete, onEventUpdate }`      |
-| `colorPicker`                     | サイドバーで使用される小型のカラーピッカー。                       | `{ color, onChange, variant: 'sketch' }`                        |
-| `createCalendarDialogColorPicker` | ダイアログで使用されるフル機能のカラーピッカー。                   | `{ color, onChange, onAccept, onCancel, variant: 'photoshop' }` |
-| `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                       | `{ isCollapsed, toggleCollapsed }`                              |
+| ジェネレーター名                  | 説明                                                                  | 引数                                                                      |
+| :-------------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | イベントカードのカスタムレンダリング（例：`eventContentDay`）。       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。          | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | イベントの色に使用される小さなカラーピッカー。                        | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | サイドバーのカレンダーの色に使用されるカラーピッカー。                | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | ダイアログで使用されるフル機能のカラーピッカー。                      | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                          | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## イベントコンテンツ
 
@@ -158,6 +159,8 @@ export const CustomDetailDialogShowcase = () => {
 ## 例: カスタムカラーピッカーの注入
 
 デフォルトでは、DayFlow は組み込みの `BlossomColorPicker` を使用します。`react-color` や `vue-color` などのライブラリを使用したい場合は、`colorPicker` スロットを使用して注入できます。
+
+<img src='/images/docs/colorPicker.png' alt='カラーピッカー' />
 
 ### React の例
 

@@ -112,10 +112,7 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
 
   return (
     <div className='rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900'>
-      <DayFlowCalendar
-        calendar={calendar}
-        useEventDetailDialog={useEventDetailDialog}
-      />
+      <DayFlowCalendar calendar={calendar} />
     </div>
   );
 };

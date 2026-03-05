@@ -465,3 +465,33 @@ export const generateSampleEvents = (): Event[] => {
 
   return events;
 };
+
+export const generateMinimalSampleEvents = (): Event[] => {
+  const today = Temporal.Now.plainDateISO();
+  const windowStart = today.subtract({ days: 3 });
+  const events: Event[] = [];
+
+  const random = createRandom(54321);
+  const randomInt = createRandomInt(random);
+
+  for (let offset = 0; offset < 7; offset += 1) {
+    const date = windowStart.add({ days: offset });
+    const dayEvents = randomInt(1, 2);
+    for (let i = 0; i < dayEvents; i += 1) {
+      events.push(createTimedEvent(date, offset * 10 + i, randomInt));
+    }
+  }
+
+  // Add just a couple of all-day events
+  events.push(
+    createAllDayEvent(
+      today.subtract({ days: 1 }),
+      2,
+      999,
+      'team',
+      'Minimal Team Event'
+    )
+  );
+
+  return events;
+};
