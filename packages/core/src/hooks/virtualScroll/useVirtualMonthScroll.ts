@@ -548,25 +548,50 @@ export const useVirtualMonthScroll = ({
 
   // Navigation functions
   const handlePreviousMonth = useCallback(() => {
-    // use weeksData which contains month info.
-    const displayWeek = weeksData[virtualData.displayStartIndex];
-    const firstDayOfDisplay = displayWeek.days[0].date;
-    const targetDate = new Date(
-      firstDayOfDisplay.getFullYear(),
-      firstDayOfDisplay.getMonth() - 1,
-      1
-    );
+    const startIdx = virtualData.displayStartIndex;
+    const endIdx = Math.min(weeksData.length - 1, startIdx + 5);
+    const counts: Record<string, number> = {};
+    for (let i = startIdx; i <= endIdx; i++) {
+      weeksData[i]?.days.forEach(d => {
+        const k = `${d.month}-${d.year}`;
+        counts[k] = (counts[k] || 0) + 1;
+      });
+    }
+    let dominantMonth = 0;
+    let dominantYear = 0;
+    let max = 0;
+    for (const [key, count] of Object.entries(counts)) {
+      if (count > max) {
+        max = count;
+        [dominantMonth, dominantYear] = key.split('-').map(Number);
+      }
+    }
+    const targetDate = new Date(dominantYear, dominantMonth - 1, 1);
     scrollToDate(targetDate);
   }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 
   const handleNextMonth = useCallback(() => {
-    const displayWeek = weeksData[virtualData.displayStartIndex];
-    const firstDayOfDisplay = displayWeek.days[0].date;
-    const targetDate = new Date(
-      firstDayOfDisplay.getFullYear(),
-      firstDayOfDisplay.getMonth() + 1,
-      1
-    );
+    // Use the dominant month of the visible range so navigation is correct
+    // even when the display week's first day falls in the prior month.
+    const startIdx = virtualData.displayStartIndex;
+    const endIdx = Math.min(weeksData.length - 1, startIdx + 5);
+    const counts: Record<string, number> = {};
+    for (let i = startIdx; i <= endIdx; i++) {
+      weeksData[i]?.days.forEach(d => {
+        const k = `${d.month}-${d.year}`;
+        counts[k] = (counts[k] || 0) + 1;
+      });
+    }
+    let dominantMonth = 0;
+    let dominantYear = 0;
+    let max = 0;
+    for (const [key, count] of Object.entries(counts)) {
+      if (count > max) {
+        max = count;
+        [dominantMonth, dominantYear] = key.split('-').map(Number);
+      }
+    }
+    const targetDate = new Date(dominantYear, dominantMonth + 1, 1);
     scrollToDate(targetDate);
   }, [virtualData.displayStartIndex, weeksData, scrollToDate]);
 
@@ -653,21 +678,29 @@ export const useVirtualMonthScroll = ({
         startIndex + FIXED_WEEKS_TO_SHOW - 1
       );
 
-      let isVisible = false;
-
-      // Iterate through the visible weeks to see if the date is there
+      // Check if nextMonth/nextYear is already the dominant displayed month.
+      // Using dominant-month logic instead of raw date presence avoids a false
+      // positive when the 1st of the next month appears in the last row of the
+      // current month's 6-week grid (e.g. April 1 visible in March's view).
+      const monthDayCounts: Record<string, number> = {};
       for (let i = startIndex; i <= endIndex; i++) {
         const week = weeksData[i];
-        if (
-          week &&
-          week.days.some(
-            day => day.date.toDateString() === currentDate.toDateString()
-          )
-        ) {
-          isVisible = true;
-          break;
+        if (week) {
+          week.days.forEach(day => {
+            const key = `${day.month}-${day.year}`;
+            monthDayCounts[key] = (monthDayCounts[key] || 0) + 1;
+          });
         }
       }
+      let dominantKey = '';
+      let maxDayCount = 0;
+      for (const [key, count] of Object.entries(monthDayCounts)) {
+        if (count > maxDayCount) {
+          maxDayCount = count;
+          dominantKey = key;
+        }
+      }
+      const isVisible = dominantKey === `${nextMonth}-${nextYear}`;
 
       if (!isVisible) {
         const firstDayOfMonth = new Date(nextYear, nextMonth, 1);
