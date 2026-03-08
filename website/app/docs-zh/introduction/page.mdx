@@ -10,18 +10,25 @@ DayFlow 是一套围绕“即插即用的日历体验”打造的现代日历组
 
 ### 引入 DayFlow 样式
 
-Tailwind 之外，还需要把 DayFlow 的基础样式拉进来，通常在应用入口处加一行即可。
+还需要把 DayFlow 的基础样式拉进来，通常在应用入口处加一行即可。
 
 ```tsx copy
 // App.tsx or layout.tsx
 import '@dayflow/core/dist/styles.css';
 ```
 
-也可以在全局css文件中导入:
+也可以在全局 CSS 文件中导入：
 
 ```css copy
 /* src/index.css */
 @import '@dayflow/core/dist/styles.css';
+```
+
+**使用 Tailwind CSS？** 改为导入 `styles.components.css`，避免 CSS Reset 与你现有样式冲突：
+
+```tsx copy
+// Tailwind CSS 项目专用 — 不含 CSS Reset，不影响宿主样式
+import '@dayflow/core/dist/styles.components.css';
 ```
 
 import { Tabs } from 'nextra/components';

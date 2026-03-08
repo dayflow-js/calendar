@@ -142,62 +142,32 @@ Set variables directly on `.df-calendar-container`. Because this rule is outside
 
 This is the recommended approach for most projects. The variables are scoped to the calendar and do not affect anything outside it.
 
-### Method 2 — Named layer ordering (Tailwind v4)
-
-DayFlow's defaults live inside `@layer df-theme`. You can declare a higher-priority layer before importing the library, then put your overrides in it:
-
-```css
-/* app.css */
-
-/* Declare df-theme first so your layer wins */
-@layer df-theme, dayflow-overrides;
-
-@import '@dayflow/core/dist/styles.css';
-@import 'tailwindcss';
-
-@layer dayflow-overrides {
-  :where(:root) {
-    --df-color-primary: #6366f1;
-    --df-color-background: #f9fafb;
-  }
-
-  :where(.dark) {
-    --df-color-primary: #a5b4fc;
-    --df-color-background: #1e1e2e;
-  }
-}
-```
-
-### Method 3 — Wrap library in a layer (Tailwind v4 advanced)
-
-Wrap the library import in a named layer so that Tailwind's built-in `@layer theme` automatically outranks it, then use `@theme` to inject overrides:
-
-```css
-/* app.css */
-
-/* The layer declared first has the lowest priority */
-@import '@dayflow/core/dist/styles.css' layer(dayflow);
-@import 'tailwindcss';
-
-/* @theme creates variables inside @layer theme, which outranks @layer dayflow */
-@theme {
-  --df-color-primary: #6366f1;
-  --df-color-background: #f9fafb;
-}
-```
-
-> **Note:** Use `@theme` (not `@theme inline`) here. `@theme inline` inlines values into utility classes at build time and does **not** produce a runtime CSS custom property, so the calendar's `var(--df-color-*)` references would remain unaffected.
-
 ## Tailwind v4 Integration
 
 Tailwind v4 is configured entirely through CSS — there is no `tailwind.config.js`. The library's CSS already includes the necessary `@source` directives to scan its own components.
 
+### Choosing the right CSS file
+
+DayFlow ships two CSS bundles:
+
+| File                    | Contents                                             | Use when               |
+| ----------------------- | ---------------------------------------------------- | ---------------------- |
+| `styles.css`            | Full bundle including Tailwind preflight (CSS reset) | Not using Tailwind     |
+| `styles.components.css` | Component styles only, **no CSS reset**              | Already using Tailwind |
+
 ### Minimal setup
 
 ```css
-/* app.css */
-@import '@dayflow/core/dist/styles.css';
+/* app.css — for Tailwind projects */
+@import '@dayflow/core/dist/styles.components.css';
 @import 'tailwindcss';
+```
+
+If your project does **not** use Tailwind, import the full bundle instead:
+
+```css
+/* app.css — for non-Tailwind projects */
+@import '@dayflow/core/dist/styles.css';
 ```
 
 ### Dark mode

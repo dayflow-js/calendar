@@ -142,62 +142,32 @@ export function generateDarkColors(baseColor: string): ColorSet {
 
 大多数项目推荐使用此方法。变量仅作用于日历组件内部，不会影响外部元素。
 
-### 方法 2 — 具名层顺序控制（Tailwind v4）
-
-DayFlow 的默认值位于 `@layer df-theme` 中。可以在导入库之前声明一个优先级更高的层，将覆盖样式写入其中。
-
-```css
-/* app.css */
-
-/* 先声明 df-theme，确保自定义层的优先级更高 */
-@layer df-theme, dayflow-overrides;
-
-@import '@dayflow/core/dist/styles.css';
-@import 'tailwindcss';
-
-@layer dayflow-overrides {
-  :where(:root) {
-    --df-color-primary: #6366f1;
-    --df-color-background: #f9fafb;
-  }
-
-  :where(.dark) {
-    --df-color-primary: #a5b4fc;
-    --df-color-background: #1e1e2e;
-  }
-}
-```
-
-### 方法 3 — 将库隔离到独立层（Tailwind v4 进阶）
-
-将库的导入包裹在具名层中，使 Tailwind 内置的 `@layer theme` 自动获得更高优先级，然后通过 `@theme` 注入覆盖值。
-
-```css
-/* app.css */
-
-/* 先声明的层优先级最低 */
-@import '@dayflow/core/dist/styles.css' layer(dayflow);
-@import 'tailwindcss';
-
-/* @theme 在 @layer theme 中生成变量，优先级高于 @layer dayflow */
-@theme {
-  --df-color-primary: #6366f1;
-  --df-color-background: #f9fafb;
-}
-```
-
-> **注意：** 此处必须使用 `@theme`，而非 `@theme inline`。`@theme inline` 在构建时将值直接内联到工具类中，**不会**生成运行时 CSS 自定义属性，因此日历内部的 `var(--df-color-*)` 引用不会受到影响。
-
 ## Tailwind v4 集成
 
 Tailwind v4 完全通过 CSS 配置，不再需要 `tailwind.config.js`。库的 CSS 文件中已包含必要的 `@source` 指令用于扫描自身组件。
 
+### 选择正确的 CSS 文件
+
+DayFlow 提供两个 CSS 产物：
+
+| 文件                    | 内容                                       | 适用场景               |
+| ----------------------- | ------------------------------------------ | ---------------------- |
+| `styles.css`            | 完整包，含 Tailwind preflight（CSS Reset） | 不使用 Tailwind 的项目 |
+| `styles.components.css` | 仅含组件样式，**不含 CSS Reset**           | 已使用 Tailwind 的项目 |
+
 ### 最小配置
 
 ```css
-/* app.css */
-@import '@dayflow/core/dist/styles.css';
+/* app.css — Tailwind 项目 */
+@import '@dayflow/core/dist/styles.components.css';
 @import 'tailwindcss';
+```
+
+如果项目**不使用** Tailwind，改为导入完整包：
+
+```css
+/* app.css — 非 Tailwind 项目 */
+@import '@dayflow/core/dist/styles.css';
 ```
 
 ### 深色模式

@@ -134,62 +134,32 @@ DayFlow のすべてのテーマトークンは `--df-color-` プレフィック
 
 ほとんどのプロジェクトにはこの方法を推奨します。変数はカレンダー内部にのみ影響し、外部には漏れません。
 
-### 方法 2 — 名前付きレイヤーの順序指定（Tailwind v4）
-
-DayFlow のデフォルト値は `@layer df-theme` の中にあります。ライブラリをインポートする前に優先度の高いレイヤーを宣言し、そこに上書きを記述します。
-
-```css copy
-/* app.css */
-
-/* df-theme を先に宣言することで自分のレイヤーを優先させる */
-@layer df-theme, dayflow-overrides;
-
-@import '@dayflow/core/dist/styles.css';
-@import 'tailwindcss';
-
-@layer dayflow-overrides {
-  :where(:root) {
-    --df-color-primary: #6366f1;
-    --df-color-background: #f9fafb;
-  }
-
-  :where(.dark) {
-    --df-color-primary: #a5b4fc;
-    --df-color-background: #1e1e2e;
-  }
-}
-```
-
-### 方法 3 — ライブラリをレイヤー内に隔離（Tailwind v4 上級）
-
-ライブラリのインポートを名前付きレイヤーでラップすると、Tailwind の `@layer theme` が自動的に優先度を上回ります。その後 `@theme` で上書きを注入できます。
-
-```css copy
-/* app.css */
-
-/* 先に宣言したレイヤーが最低優先度になる */
-@import '@dayflow/core/dist/styles.css' layer(dayflow);
-@import 'tailwindcss';
-
-/* @theme は @layer theme の中に変数を生成し、@layer dayflow より優先される */
-@theme {
-  --df-color-primary: #6366f1;
-  --df-color-background: #f9fafb;
-}
-```
-
-> **注意：** ここでは `@theme inline` ではなく `@theme` を使ってください。`@theme inline` はビルド時にユーティリティクラスへ値を直接展開するものであり、ランタイムの CSS カスタムプロパティは生成されません。そのため、カレンダー内の `var(--df-color-*)` 参照には影響しません。
-
 ## Tailwind v4 との連携
 
 Tailwind v4 はすべて CSS で設定します。`tailwind.config.js` は不要です。ライブラリの CSS には自身のコンポーネントをスキャンする `@source` ディレクティブが含まれています。
 
+### CSS ファイルの選択
+
+DayFlow は 2 種類の CSS バンドルを提供します。
+
+| ファイル                | 内容                                                 | 使用場面                           |
+| ----------------------- | ---------------------------------------------------- | ---------------------------------- |
+| `styles.css`            | Tailwind preflight（CSS リセット）を含む完全バンドル | Tailwind を使わない場合            |
+| `styles.components.css` | コンポーネントスタイルのみ、**CSS リセットなし**     | すでに Tailwind を使用している場合 |
+
 ### 最小構成
 
 ```css copy
-/* app.css */
-@import '@dayflow/core/dist/styles.css';
+/* app.css — Tailwind プロジェクト向け */
+@import '@dayflow/core/dist/styles.components.css';
 @import 'tailwindcss';
+```
+
+Tailwind を使用していない場合は、完全バンドルをインポートしてください。
+
+```css copy
+/* app.css — Tailwind を使わないプロジェクト向け */
+@import '@dayflow/core/dist/styles.css';
 ```
 
 ### ダークモード

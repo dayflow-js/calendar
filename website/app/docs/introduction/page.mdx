@@ -37,6 +37,13 @@ Alternatively, you can import it in your CSS file:
 @import '@dayflow/core/dist/styles.css';
 ```
 
+**Using Tailwind CSS?** Import `styles.components.css` instead to avoid CSS reset conflicts with your existing styles:
+
+```tsx copy
+// For Tailwind CSS projects — no CSS reset, no conflicts
+import '@dayflow/core/dist/styles.components.css';
+```
+
 import { Tabs } from 'nextra/components';
 
 ## Basic Usage
