@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-drag",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Drag plugin for DayFlow calendar - event move, resize, and create via mouse/touch",
   "keywords": [
     "calendar",
