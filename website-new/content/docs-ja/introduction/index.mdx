@@ -1,0 +1,218 @@
+# はじめに
+
+DayFlow は「すぐに触れるカレンダー体験」を目指して設計された、マルチフレームワーク対応（React, Vue, Svelte, Angular）のコンポーネントスイートです。このページでは、最小構成で導入するための流れと、次に読むべきドキュメントをまとめました。
+
+### DayFlow のインストール
+
+フレームワークとパッケージマネージャーを選択して、インストールコマンドを取得します。
+
+<FrameworkInstall />
+
+### DayFlow のスタイルを読み込む
+
+**重要:** DayFlow のレイアウトを正しく表示するには、スタイルシートのインポートが必要です。アプリのエントリーポイント（App.tsx や layout.tsx など）でスタイルシートを 1 行追加してください。
+
+```tsx
+// App.tsx または layout.tsx
+import '@dayflow/core/dist/styles.css';
+```
+
+CSS ファイルで読み込みたい場合は次のように記述できます。
+
+```css
+/* src/index.css */
+@import '@dayflow/core/dist/styles.css';
+```
+
+**Tailwind CSS を使用している場合は？** 既存スタイルとの CSS リセット競合を避けるため、代わりに `styles.components.css` をインポートしてください。
+
+```tsx
+// Tailwind CSS プロジェクト向け — CSS リセットなし、競合なし
+import '@dayflow/core/dist/styles.components.css';
+```
+
+## 基本的な使い方
+
+使用しているフレームワークを選択して、DayFlow をプロジェクトに統合する方法を確認してください。
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createDayView,
+      createWeekView,
+      createMonthView,
+      createEventsPlugin,
+    } from '@dayflow/react';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+    import { createEvent, createAllDayEvent } from '@dayflow/core';
+    import '@dayflow/core/dist/styles.css';
+
+    function App() {
+      const calendar = useCalendarApp({
+        views: [createDayView(), createWeekView(), createMonthView()],
+        plugins: [createDragPlugin(), createEventsPlugin()],
+        events: [
+          createEvent({
+            id: '1',
+            title: 'チームミーティング',
+            start: new Date(2025, 10, 15, 10, 0),
+            end: new Date(2025, 10, 15, 11, 0),
+          }),
+          createAllDayEvent('2', '終日会議', new Date(2025, 10, 20)),
+        ],
+        initialDate: new Date(),
+      });
+
+      return (
+        <DayFlowCalendar calendar={calendar} />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import {
+      createDayView,
+      createWeekView,
+      createMonthView,
+      createEventsPlugin,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+    import '@dayflow/core/dist/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createDayView(), createWeekView(), createMonthView()],
+      plugins: [createDragPlugin(), createEventsPlugin()],
+      events: [
+        createEvent({
+          id: '1',
+          title: 'チームミーティング',
+          start: new Date(2025, 10, 15, 10, 0),
+          end: new Date(2025, 10, 15, 11, 0),
+        }),
+        createAllDayEvent('2', '終日会議', new Date(2025, 10, 20)),
+      ],
+      initialDate: new Date(),
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import {
+      createDayView,
+      createWeekView,
+      createMonthView,
+      createEventsPlugin,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import '@dayflow/core/dist/styles.css';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createDayView(), createWeekView(), createMonthView()],
+        plugins: [createDragPlugin(), createEventsPlugin()],
+        events: [
+          createEvent({
+            id: '1',
+            title: 'チームミーティング',
+            start: new Date(2025, 10, 15, 10, 0),
+            end: new Date(2025, 10, 15, 11, 0),
+          }),
+          createAllDayEvent('2', '終日会議', new Date(2025, 10, 20)),
+        ],
+        initialDate: new Date(),
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+    import {
+      createDayView,
+      createWeekView,
+      createMonthView,
+      createEventsPlugin,
+      createEvent,
+      createAllDayEvent
+    } from '@dayflow/core';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+    import '@dayflow/core/dist/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createDayView(), createWeekView(), createMonthView()],
+      plugins: [createDragPlugin(), createEventsPlugin()],
+      events: [
+        createEvent({
+          id: '1',
+          title: 'チームミーティング',
+          start: new Date(2025, 10, 15, 10, 0),
+          end: new Date(2025, 10, 15, 11, 0),
+        }),
+        createAllDayEvent('2', '終日会議', new Date(2025, 10, 20)),
+      ],
+      initialDate: new Date(),
+    });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+## スタイルのカスタマイズ
+
+デフォルトでは、カレンダーはコンテナの幅全体を占有します。CSS を使用して、高さやその他のスタイルをカスタマイズできます。例えば、レスポンシブな高さを設定するには次のようにします。
+
+```css
+.df-calendar-container {
+  --df-calendar-height: 760px !important;
+  height: var(--df-calendar-height, 760px) !important;
+}
+
+@media (max-width: 768px) {
+  .df-calendar-container {
+    --df-calendar-height: 550px !important;
+  }
+}
+```
+
+> 注: DayFlow は、日付/時刻の処理にモダンな [Temporal API](/docs-ja/temporal-migration) を内部で使用しています。ヘルパー関数 (`createEvent`) を使用することで、Temporal を直接意識することなくイベントを簡単に作成できます。
+
+## 次に読むとよいページ
+
+## 次に読むとよいページ
+
+- [イベント](/docs-ja/introduction/events)：予定作成・更新・削除の基本
+- [ビュー](/docs-ja/introduction/views)：日・週・月ビューの挙動
+- [サイドバー](/docs-ja/introduction/sidebar)：カレンダーリストやフィルターの構成
+- [機能一覧](/docs-ja/features)：DayFlow が提供する追加機能を俯瞰

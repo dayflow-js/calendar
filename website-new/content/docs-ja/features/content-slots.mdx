@@ -1,0 +1,207 @@
+import { EventContentShowcase } from '@/components/showcase/EventContentShowcase';
+import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPanelShowcase';
+import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
+import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
+
+# コンテンツスロット
+
+DayFlow はスロットベースのアーキテクチャを採用しており、使用しているフレームワーク（React、Vue など）からカスタム UI コンポーネントをコア日暦エンジンに直接注入できます。
+
+これは `ContentSlot` メカニズムによって実現されています。コアエンジンはほとんどの UI 要素に対して（Preact を使用した）デフォルトの実装を提供していますが、アプリケーションのデザインに合わせたり、特定のライブラリを使用したりするために、これらを上書きすることができます。
+
+## 仕組み
+
+1. **コアがスロットを定義**: `@dayflow/core` の内部で、特定の UI 領域が `ContentSlot` でラップされています。各スロットには `generatorName` と `generatorArgs` があります。
+2. **実装を提供**: `DayFlowCalendar` コンポーネントにコンポーネントまたはレンダー関数を渡します。アダプターは、コアで定義された正確な場所にコンポーネントをポータル（転送）します。
+
+## 利用可能なスロット
+
+| ジェネレーター名                  | 説明                                                                  | 引数                                                                      |
+| :-------------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | イベントカードのカスタムレンダリング（例：`eventContentDay`）。       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。          | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | イベントの色に使用される小さなカラーピッカー。                        | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | サイドバーのカレンダーの色に使用されるカラーピッカー。                | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | ダイアログで使用されるフル機能のカラーピッカー。                      | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                          | `{ isCollapsed, toggleCollapsed }`                                        |
+
+## イベントコンテンツ
+
+`eventContent` スロットを使用すると、カレンダー内でのイベントのレンダリング方法を完全にカスタマイズできます。他のスロットとは異なり、イベントコンテンツはビューごとに指定する**必要があります**。これは、各ビューの特定のイベント構造とレイアウトの整合性を保つためです。
+
+### ビュー固有のスロット
+
+| スロット名                | 説明                             |
+| :------------------------ | :------------------------------- |
+| `eventContentDay`         | 日ビューの定时イベントを上書き。 |
+| `eventContentWeek`        | 週ビューの定时イベントを上書き。 |
+| `eventContentMonth`       | 月ビューのイベントを上書き。     |
+| `eventContentYear`        | 年ビューのイベントを上書き。     |
+| `eventContentAllDayDay`   | 日ビューの終日イベントを上書き。 |
+| `eventContentAllDayWeek`  | 週ビューの終日イベントを上書き。 |
+| `eventContentAllDayMonth` | 月ビューの終日イベントを上書き。 |
+| `eventContentAllDayYear`  | 年ビューの終日イベントを上書き。 |
+
+<EventContentShowcase />
+
+<details>
+<summary>ソースコードを表示</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+export const EventContentShowcase = () => {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      // 日ビューのイベントレンダリングをカスタマイズ
+      eventContentDay={({ event, isSelected }) => (
+        <div className='custom-event-card'>
+          <span>{event.title}</span>
+          {/* ... カスタムアイコンやレイアウトを追加 */}
+        </div>
+      )}
+      // 月ビューのイベントレンダリングをカスタマイズ
+      eventContentMonth={({ event }) => (
+        <div className='flex items-center gap-1'>
+          <span>🗓️</span>
+          <span className='truncate'>{event.title}</span>
+        </div>
+      )}
+      // 簡潔にするため、他のビューの上書きは省略...
+    />
+  );
+};
+```
+
+</details>
+
+## イベント詳細コンテンツ
+
+`eventDetailContent` スロットを使用すると、イベントをクリックしたときに表示される詳細ポップオーバーまたはパネルのコンテンツをカスタマイズできます。
+
+<CustomDetailPanelShowcase />
+
+<details>
+<summary>ソースコードを表示</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailPanelShowcase = () => {
+  const detailPanel = useCallback(
+    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+      return (
+        <div className='p-4 space-y-3'>
+          <h5 className='font-bold'>{event.title}</h5>
+          <p>{event.description}</p>
+
+          <div className='flex gap-2'>
+            <button
+              onClick={() => onEventUpdate({ ...event, title: '更新済み' })}
+            >
+              更新
+            </button>
+            <button onClick={() => onEventDelete(event.id)}>削除</button>
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailContent={detailPanel} />
+  );
+};
+```
+
+</details>
+
+## イベント詳細ダイアログ
+
+イベント詳細の表示や編集にモーダル/ダイアログインターフェースを使用したい場合は、`eventDetailDialog` スロットを使用できます。これはモバイルファーストのアプリケーションや、複雑なイベントデータのために広いスペースが必要な場合に特に便利です。
+
+<CustomDetailDialogShowcase />
+
+<details>
+<summary>ソースコードを表示</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailDialogShowcase = () => {
+  const customDialog = useCallback(({ event, isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+        <div className='bg-white p-6 rounded-lg shadow-xl'>
+          <h2>{event.title}</h2>
+          {/* ... ここでカスタムダイアログ UI を構築 */}
+          <button onClick={onClose}>閉じる</button>
+        </div>
+      </div>
+    );
+  }, []);
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## 例: カスタムカラーピッカーの注入
+
+デフォルトでは、DayFlow は組み込みの `BlossomColorPicker` を使用します。`react-color` や `vue-color` などのライブラリを使用したい場合は、`colorPicker` スロットを使用して注入できます。
+
+<DocImg src='/images/docs/colorPicker.png' alt='カラーピッカー' />
+
+### React の例
+
+`react-color` をインストールします:
+
+```bash
+npm install react-color
+```
+
+`DayFlowCalendar` に注入します:
+
+<ColorPickerShowcase />
+
+<details>
+<summary>ソースコードを表示</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { SketchPicker, PhotoshopPicker } from 'react-color';
+
+function MyCalendar() {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      colorPicker={args => (
+        <SketchPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+        />
+      )}
+      createCalendarDialogColorPicker={args => (
+        <PhotoshopPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+          onAccept={args.onAccept}
+          onCancel={args.onCancel}
+        />
+      )}
+    />
+  );
+}
+```
+
+</details>

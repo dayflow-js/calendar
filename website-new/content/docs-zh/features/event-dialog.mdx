@@ -1,0 +1,28 @@
+import { EventDialogShowcase } from '@/components/showcase/FeatureShowcase';
+
+# 事件对话框
+
+DayFlow 自带的事件对话框涵盖了大多数团队需要的 CRUD 流程：创建/编辑/删除、全天与定时切换、日历颜色选择、备注输入等，都在同一个模态中完成。
+
+<EventDialogShowcase />
+
+## 使用方法
+
+当您使用 DayFlowCalendar 组件时，默认事件对话框会自动可用。只需点击任何事件即可打开对话框，或使用日历的 API 创建新事件。
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/core';
+
+<DayFlowCalendar calendar={calendar} useEventDetailDialog={true} />;
+```
+
+## 自定义
+
+若默认对话框不足以满足需求，可以通过 `customEventDetailDialog` 将其整体替换，UI 与交互完全由你掌控。参考 [自定义事件详情对话框](/docs-zh/features/custom-detail-dialog) 了解更多。
+
+```tsx
+<DayFlowCalendar
+  calendar={calendar}
+  customEventDetailDialog={YourCustomDialog}
+/>
+```

@@ -1,0 +1,267 @@
+# Global CSS Classes
+
+DayFlow provides a set of CSS classes with the `df-` prefix that allow you to customize the appearance of calendar components. These classes are designed for easy styling customization without modifying the core library.
+
+## Table of Contents
+
+- [Common Classes](#common)
+- [Day View Classes](#day-view)
+- [Week View Classes](#week-view)
+- [Month View Classes](#month-view)
+- [Year View Classes](#year-view)
+- [Mini Calendar Classes](#mini-calendar)
+- [Sidebar Classes](#sidebar)
+- [Navigation Classes](#navigation)
+- [Event Detail Classes](#event-detail)
+- [Content Slot Classes](#content-slots)
+
+---
+
+## Common
+
+Common CSS classes used across all calendar views.
+
+| Class Name                 | Description                                                                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `df-calendar-container`    | The outer root container that wraps both the Sidebar and the Calendar. Supports the `--df-calendar-height` CSS variable to set the component height. |
+| `df-calendar`              | Main calendar container (includes header and view content)                                                                                           |
+| `df-header`                | Calendar header section (includes title, today button, and view switcher)                                                                            |
+| `df-header-left`           | Left section of the header (title and navigation buttons)                                                                                            |
+| `df-header-mid`            | Middle section of the header (current date range title)                                                                                              |
+| `df-header-right`          | Right section of the header (view switcher and search)                                                                                               |
+| `df-navigation`            | Navigation controls container                                                                                                                        |
+| `df-event`                 | Base class for all events                                                                                                                            |
+| `df-event-title`           | Event title text                                                                                                                                     |
+| `df-event-time`            | Event time text                                                                                                                                      |
+| `df-event-color-bar`       | Colored bar on the left side of events (Day/Week view)                                                                                               |
+| `df-month-event-color-bar` | Colored indicator for regular events (Month view)                                                                                                    |
+| `df-all-day-row`           | All-day event row container                                                                                                                          |
+| `df-all-day-label`         | All-day label text                                                                                                                                   |
+| `df-all-day-content`       | All-day event content area                                                                                                                           |
+| `df-all-day-cell`          | Individual all-day event cell                                                                                                                        |
+| `df-date-number`           | Date number display                                                                                                                                  |
+| `df-current-time-line`     | Current time indicator line container                                                                                                                |
+| `df-current-time-label`    | Current time label text                                                                                                                              |
+| `df-current-time-bar`      | Current time horizontal line                                                                                                                         |
+
+---
+
+## Day View
+
+CSS classes specific to the Day View.
+
+| Class Name          | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `df-day-view`       | Day view container                                   |
+| `df-day-event`      | Individual event in day view                         |
+| `df-day-time-grid`  | Time grid container                                  |
+| `df-time-column`    | Time column (left sidebar with hours)                |
+| `df-time-slot`      | Individual time slot container (left column)         |
+| `df-time-label`     | Time label text (e.g., "1 PM")                       |
+| `df-time-grid-row`  | Horizontal row in the time grid                      |
+| `df-time-grid-cell` | Individual cell in the time grid                     |
+| `df-right-panel`    | Right panel in day view (mini calendar + event list) |
+
+---
+
+## Week View
+
+CSS classes specific to the Week View.
+
+| Class Name           | Description                                  |
+| -------------------- | -------------------------------------------- |
+| `df-week-view`       | Week view container                          |
+| `df-week-event`      | Individual event in week view                |
+| `df-week-header`     | Week header container with day names         |
+| `df-week-header-row` | The sticky header row containing day names   |
+| `df-week-day-cell`   | Individual weekday cell in header            |
+| `df-time-column`     | Time column (left sidebar with hours)        |
+| `df-time-slot`       | Individual time slot container (left column) |
+| `df-time-label`      | Time label text                              |
+| `df-time-grid-row`   | Horizontal row in the time grid              |
+| `df-time-grid-cell`  | Individual cell in the time grid             |
+
+---
+
+## Month View
+
+CSS classes specific to the Month View.
+
+| Class Name                       | Description                                |
+| -------------------------------- | ------------------------------------------ |
+| `df-month-view`                  | Month view container                       |
+| `df-month-grid`                  | The main grid container for the month view |
+| `df-month-day-cell`              | Individual day cell in month view          |
+| `df-month-date-number-container` | Container for date number area             |
+| `df-month-date-number`           | Date number in month view                  |
+| `df-month-more-events`           | "+ x more" indicator for hidden events     |
+| `df-month-title`                 | Floating month title during scroll         |
+
+---
+
+## Year View
+
+CSS classes specific to the Year View. These are particularly useful for customizing event appearance in the year overview.
+
+| Class Name                    | Description                                                          |
+| ----------------------------- | -------------------------------------------------------------------- |
+| `df-year-event`               | Event outer container - wraps the entire event element               |
+| `df-year-event-content`       | Event content container - contains icon, title, and other content    |
+| `df-year-event-title`         | Event title text - use this to customize title alignment, font, etc. |
+| `df-year-event-icon`          | Event icon container - for all-day event icons                       |
+| `df-year-event-indicator`     | Timed event color indicator - the colored dot/bar for timed events   |
+| `df-year-view-weekend-header` | Weekend day headers (Saturday/Sunday) in Fixed Week layout           |
+| `df-year-view-weekend-cell`   | Weekend grid cells (empty or date) in Fixed Week layout              |
+
+---
+
+## Mini Calendar
+
+CSS classes for the Mini Calendar component (usually found in the sidebar or day view).
+
+| Class Name                | Description                            |
+| ------------------------- | -------------------------------------- |
+| `df-mini-calendar`        | Mini calendar container                |
+| `df-mini-calendar-grid`   | The grid container for days            |
+| `df-mini-calendar-header` | Weekday header cell (e.g., "Mo", "Tu") |
+| `df-mini-calendar-day`    | Individual date cell                   |
+
+---
+
+## Sidebar
+
+CSS classes for the sidebar component.
+
+| Class Name                 | Description                           |
+| -------------------------- | ------------------------------------- |
+| `df-sidebar`               | Sidebar container                     |
+| `df-sidebar-header`        | Sidebar header container              |
+| `df-sidebar-header-toggle` | Sidebar collapse/expand toggle button |
+| `df-sidebar-header-title`  | Sidebar header title ("Calendars")    |
+| `df-calendar-list`         | Calendar list container               |
+| `df-calendar-list-item`    | Individual calendar item in list      |
+
+---
+
+## Navigation
+
+CSS classes for navigation buttons.
+
+| Class Name        | Description                          |
+| ----------------- | ------------------------------------ |
+| `df-nav-button`   | Navigation arrow buttons (prev/next) |
+| `df-today-button` | "Today" button                       |
+
+---
+
+## Event Detail
+
+CSS classes for event detail panels and dialogs.
+
+| Class Name              | Description                 |
+| ----------------------- | --------------------------- |
+| `df-event-detail-panel` | Floating event detail panel |
+| `df-dialog-overlay`     | Dialog background overlay   |
+| `df-dialog-container`   | Dialog content container    |
+
+---
+
+## Content Slots
+
+CSS classes used for the Content Slot rendering system.
+
+| Class Name        | Description                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `df-content-slot` | Container for a content slot                                                           |
+| `df-slot-[id]`    | Dynamic class assigned to a specific slot instance where `[id]` is a unique identifier |
+
+---
+
+## How to Customize
+
+To customize the appearance, you can target these classes in your global CSS file. Since DayFlow uses Tailwind CSS internally, you might need to use `!important` or increase selector specificity if your styles are being overridden.
+
+### Example
+
+```css
+/* Change the background of all events */
+.df-event {
+  border-radius: 8px !important;
+}
+
+/* Customize the current time indicator */
+.df-current-time-line {
+  z-index: 100;
+}
+.df-current-time-bar {
+  height: 3px !important;
+  background-color: #ef4444 !important;
+}
+
+/* Customize specific view */
+.df-day-view .df-event {
+  border-left: 4px solid #3b82f6;
+}
+
+/* Style the sidebar */
+.df-sidebar {
+  background-color: #f8fafc !important;
+}
+
+/* Style mini calendar */
+.df-mini-calendar-day:hover {
+  background-color: #e2e8f0;
+}
+
+/* Dark mode overrides */
+.dark .df-calendar {
+  background-color: #111827;
+}
+
+/* Style event detail panel */
+.df-event-detail-panel {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+```
+
+## Usage Tips
+
+1. **Specificity**: If your styles don't apply, increase specificity by wrapping the calendar in a custom class:
+
+   ```css
+   .my-custom-calendar .df-event { ... }
+   ```
+
+2. **Responsive Design**: Use media queries to adjust styles for mobile devices:
+
+   ```css
+   @media (max-width: 768px) {
+     .df-event-title {
+       font-size: 10px;
+     }
+     .df-time-label {
+       font-size: 10px;
+     }
+   }
+   ```
+
+3. **Dark Mode**: Use the `.dark` selector for dark mode specific styles:
+
+   ```css
+   .dark .df-month-day-cell {
+     border-color: #374151;
+   }
+   ```
+
+4. **CSS Variables**: DayFlow uses CSS custom properties for colors. Override them for global color changes:
+   ```css
+   :root {
+     --primary: #3b82f6;
+     --primary-foreground: #ffffff;
+   }
+   ```
+
+## Related Documentation
+
+- [Theme Customization](/docs/guides/theme-customization) - Advanced theming options
+- [Dark Mode](/docs/features/dark-mode) - Dark mode configuration

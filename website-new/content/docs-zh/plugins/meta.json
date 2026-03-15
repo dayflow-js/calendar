@@ -1,0 +1,11 @@
+{
+  "title": "插件",
+  "pages": [
+    "overview",
+    "localization",
+    "drag",
+    "events",
+    "keyboard-shortcuts",
+    "sidebar"
+  ]
+}

@@ -1,0 +1,197 @@
+import { EventContentShowcase } from '@/components/showcase/EventContentShowcase';
+import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPanelShowcase';
+import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
+import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
+
+# 内容插槽
+
+DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（React、Vue 等）中注入自定义 UI 组件到核心日历引擎中。
+
+这是通过 `ContentSlot` 机制实现的。虽然核心引擎为大多数 UI 元素提供了默认实现（使用 Preact），但您可以覆盖它们以符合您的应用设计或使用特定的第三方库。
+
+## 工作原理
+
+1. **核心定义插槽**：在 `@dayflow/core` 内部，某些 UI 区域被包装 in a `ContentSlot` 中。每个插槽都有一个 `generatorName`（生成器名称）和 `generatorArgs`（生成器参数）。
+2. **您提供实现**：您将组件或渲染函数传递给 `DayFlowCalendar` 组件。适配器随后会将您的组件以 Portal（传送门）的形式渲染到核心定义的精确位置。
+
+## 可用插槽
+
+| 生成器名称                        | 描述                                             | 参数                                                                      |
+| :-------------------------------- | :----------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | 事件卡片的自定义渲染（例如 `eventContentDay`）。 | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | 点击事件时在弹出框/面板中显示的内容。            | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | 点击事件时显示的自定义对话框。                   | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | 用于事件颜色的迷你颜色选择器。                   | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | 用于侧边栏日历颜色的颜色选择器。                 | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | 对话框中使用功能完整的颜色选择器。               | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | 侧边栏标题栏中的额外内容。                       | `{ isCollapsed, toggleCollapsed }`                                        |
+
+## 事件内容
+
+`eventContent` 插槽允许您完全自定义事件在日历中的渲染方式。与其他插槽不同，事件内容**必须**针对每个视图分别指定，以确保布局与每个视图特定的事件结构保持一致。
+
+### 视图特定插槽
+
+| 插槽名称                  | 描述                                   |
+| :------------------------ | :------------------------------------- |
+| `eventContentDay`         | 重写天视图（Day View）中的定时事件。   |
+| `eventContentWeek`        | 重写周视图（Week View）中的定时事件。  |
+| `eventContentMonth`       | 重写月视图（Month View）中的事件。     |
+| `eventContentYear`        | 重写年视图（Year View）中的事件。      |
+| `eventContentAllDayDay`   | 重写天视图（Day View）中的全天事件。   |
+| `eventContentAllDayWeek`  | 重写周视图（Week View）中的全天事件。  |
+| `eventContentAllDayMonth` | 重写月视图（Month View）中的全天事件。 |
+| `eventContentAllDayYear`  | 重写年视图（Year View）中的全天事件。  |
+
+<EventContentShowcase />
+
+<details>
+<summary>查看源代码</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+export const EventContentShowcase = () => {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      // 自定义天视图的事件渲染
+      eventContentDay={({ event, isSelected }) => (
+        <div className='custom-event-card'>
+          <span>{event.title}</span>
+          {/* ... 自定义图标或布局 */}
+        </div>
+      )}
+      // 自定义月视图的事件渲染
+      eventContentMonth={({ event }) => (
+        <div className='flex items-center gap-1'>
+          <span>🗓️</span>
+          <span className='truncate'>{event.title}</span>
+        </div>
+      )}
+      // 省略其他视图的重写以保持简洁...
+    />
+  );
+};
+```
+
+</details>
+
+## 事件详情内容
+
+`eventDetailContent` 插槽允许您自定义点击事件时在详情弹出层或面板中显示的内容。
+
+<CustomDetailPanelShowcase />
+
+<details>
+<summary>查看源代码</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailPanelShowcase = () => {
+  const detailPanel = useCallback(
+    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+      return (
+        <div className='p-4 space-y-3'>
+          <h5 className='font-bold'>{event.title}</h5>
+          <p>{event.description}</p>
+
+          <div className='flex gap-2'>
+            <button
+              onClick={() => onEventUpdate({ ...event, title: '已更新' })}
+            >
+              更新
+            </button>
+            <button onClick={() => onEventDelete(event.id)}>删除</button>
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailContent={detailPanel} />
+  );
+};
+```
+
+</details>
+
+## 事件详情对话框
+
+如果您更喜欢使用对话框/模态框来查看和编辑事件详情，可以使用 `eventDetailDialog` 插槽。这对于移动优先的应用或需要更多空间展示复杂事件数据的情况特别有用。
+
+<CustomDetailDialogShowcase />
+
+<details>
+<summary>查看源代码</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailDialogShowcase = () => {
+  const customDialog = useCallback(({ event, isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+        <div className='bg-white p-6 rounded-lg shadow-xl'>
+          <h2>{event.title}</h2>
+          {/* ... 在此构建您的自定义对话框 UI */}
+          <button onClick={onClose}>关闭</button>
+        </div>
+      </div>
+    );
+  }, []);
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## 示例：注入自定义颜色选择器
+
+默认情况下，DayFlow 使用内置的 `BlossomColorPicker`。如果您更喜欢使用 `react-color` 或 `vue-color` 等库，可以使用 `colorPicker` 插槽进行注入。
+
+<DocImg src='/images/docs/colorPicker.png' alt='颜色选择器' />
+
+<ColorPickerShowcase />
+
+<details>
+<summary>查看源代码</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { SketchPicker, PhotoshopPicker } from 'react-color';
+
+function MyCalendar() {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      colorPicker={args => (
+        <SketchPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+        />
+      )}
+      createCalendarDialogColorPicker={args => (
+        <PhotoshopPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+          onAccept={args.onAccept}
+          onCancel={args.onCancel}
+        />
+      )}
+    />
+  );
+}
+```
+
+</details>

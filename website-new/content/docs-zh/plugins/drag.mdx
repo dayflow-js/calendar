@@ -1,0 +1,66 @@
+# 拖拽插件
+
+拖拽插件启用了交互式的事件管理，允许用户直接在日历网格上移动、调整大小和创建事件。
+
+## 安装
+
+使用您喜欢的包管理器安装插件：
+
+```bash
+npm install @dayflow/plugin-drag
+```
+
+```tsx
+import { createDragPlugin } from '@dayflow/plugin-drag';
+```
+
+## 使用方法
+
+```tsx
+import { useCalendarApp, ViewType } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { createDragPlugin } from '@dayflow/plugin-drag';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+    onEventDrop: (updated, original) => {
+      console.log('Event moved:', updated);
+    },
+    onEventResize: (updated, original) => {
+      console.log('Event resized:', updated);
+    },
+  });
+
+  const calendar = useCalendarApp({
+    // ... 视图配置
+    plugins: [dragPlugin],
+  });
+
+  // ...
+}
+```
+
+## 配置项
+
+| 属性                 | 类型         | 默认值                     | 描述                                   |
+| :------------------- | :----------- | :------------------------- | :------------------------------------- |
+| `enableDrag`         | `boolean`    | `true`                     | 是否允许通过拖拽移动事件。             |
+| `enableResize`       | `boolean`    | `true`                     | 是否允许通过拖拽调整事件持续时间。     |
+| `enableCreate`       | `boolean`    | `true`                     | 是否允许通过双击网格创建事件。         |
+| `enableAllDayCreate` | `boolean`    | `true`                     | 是否允许在全天行通过拖拽创建全天事件。 |
+| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | 启用拖拽功能的视图类型。               |
+| `onEventDrop`        | `Function`   | -                          | 事件移动（拖放）时的回调。             |
+| `onEventResize`      | `Function`   | -                          | 事件调整大小时的回调。                 |
+
+## 插件 API
+
+您可以访问拖拽服务来动态更新配置：
+
+```tsx
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// 动态禁用调整大小功能
+dragService.updateConfig({ enableResize: false });
+```

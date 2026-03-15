@@ -1,0 +1,278 @@
+# 主题定制指南
+
+DayFlow Calendar 的外观由一组带命名空间的 CSS 自定义属性（`--df-color-*`）控制。所有 token 都定义在 `@layer df-theme` 内部，因此宿主应用无需使用 `!important` 即可覆盖它们——无论是否使用 Tailwind 都适用。
+
+## 目录
+
+- [日历类型自定义颜色](#日历类型自定义颜色)
+- [CSS 变量参考](#css-变量参考)
+- [覆盖方法](#覆盖方法)
+- [Tailwind v4 集成](#tailwind-v4-集成)
+- [创建自定义主题](#创建自定义主题)
+
+## 日历类型自定义颜色
+
+### 基础自定义颜色
+
+为每个日历类型定义独立的浅色和深色配色方案：
+
+```tsx
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'personal',
+      name: '个人日程',
+      colors: {
+        lineColor: '#0891b2', // cyan-600
+        eventColor: '#cffafe', // cyan-100
+        eventSelectedColor: '#a5f3fc', // cyan-200
+        textColor: '#164e63', // cyan-900
+      },
+      darkColors: {
+        lineColor: '#22d3ee', // cyan-400
+        eventColor: '#164e63', // cyan-900
+        eventSelectedColor: '#083344', // cyan-950
+        textColor: '#cffafe', // cyan-100
+      },
+    },
+  ],
+});
+```
+
+### 颜色属性说明
+
+- **lineColor**：边框和强调色（事件左侧竖条）
+- **eventColor**：事件背景填充色
+- **eventSelectedColor**：选中事件时的背景填充色
+- **textColor**：事件标题和时间的文字颜色
+
+### 品牌颜色集成
+
+```tsx
+{
+  id: 'brand',
+  name: '品牌活动',
+  colors: {
+    lineColor: '#6366f1',       // 品牌靛蓝色
+    eventColor: '#e0e7ff', // Indigo-100
+    eventSelectedColor: '#c7d2fe', // Indigo-200
+    textColor: '#312e81',       // Indigo-900
+  },
+  darkColors: {
+    lineColor: '#a5b4fc',       // Indigo-300
+    eventColor: '#312e81', // Indigo-900
+    eventSelectedColor: '#1e1b4b', // Indigo-950
+    textColor: '#e0e7ff',       // Indigo-100
+  },
+}
+```
+
+### 颜色生成工具函数
+
+```tsx
+// utils/colorGenerator.ts
+interface ColorSet {
+  lineColor: string;
+  eventColor: string;
+  eventSelectedColor: string;
+  textColor: string;
+}
+
+export function generateLightColors(baseColor: string): ColorSet {
+  return {
+    lineColor: baseColor,
+    eventColor: lighten(baseColor, 0.9),
+    eventSelectedColor: lighten(baseColor, 0.8),
+    textColor: darken(baseColor, 0.4),
+  };
+}
+
+export function generateDarkColors(baseColor: string): ColorSet {
+  return {
+    lineColor: lighten(baseColor, 0.3),
+    eventColor: darken(baseColor, 0.6),
+    eventSelectedColor: darken(baseColor, 0.7),
+    textColor: lighten(baseColor, 0.8),
+  };
+}
+```
+
+## CSS 变量参考
+
+所有 DayFlow 主题 token 均使用 `--df-color-` 前缀，以避免与宿主应用的变量命名冲突。
+
+| 变量                                | 用途                         |
+| ----------------------------------- | ---------------------------- |
+| `--df-color-background`             | 日历背景色                   |
+| `--df-color-foreground`             | 主文本颜色                   |
+| `--df-color-hover`                  | 悬停状态背景色               |
+| `--df-color-border`                 | 边框和分割线                 |
+| `--df-color-card`                   | 卡片 / 面板背景色            |
+| `--df-color-card-foreground`        | 卡片内文本颜色               |
+| `--df-color-muted`                  | 低调背景区域                 |
+| `--df-color-muted-foreground`       | 辅助 / 次要文本颜色          |
+| `--df-color-primary`                | 主强调色（按钮、选中状态等） |
+| `--df-color-primary-foreground`     | 主色背景上的文本             |
+| `--df-color-secondary`              | 次要强调色                   |
+| `--df-color-secondary-foreground`   | 次要色背景上的文本           |
+| `--df-color-destructive`            | 破坏性操作（删除等）         |
+| `--df-color-destructive-foreground` | 破坏性背景上的文本           |
+
+## 覆盖方法
+
+### 方法 1 — 容器级覆盖（适用于所有场景）
+
+直接在 `.df-calendar-container` 上设置变量。由于该规则不属于任何 `@layer`，它始终优先于库的默认值，与 Tailwind 版本无关。
+
+```css
+/* styles/globals.css */
+.df-calendar-container {
+  --df-color-primary: #6366f1;
+  --df-color-background: #f9fafb;
+  --df-color-border: #e0e7ff;
+}
+
+/* 深色模式 — 当祖先元素带有 .dark 类时生效 */
+.dark .df-calendar-container {
+  --df-color-primary: #a5b4fc;
+  --df-color-background: #1e1e2e;
+  --df-color-border: #312e81;
+}
+```
+
+大多数项目推荐使用此方法。变量仅作用于日历组件内部，不会影响外部元素。
+
+## Tailwind v4 集成
+
+Tailwind v4 完全通过 CSS 配置，不再需要 `tailwind.config.js`。库的 CSS 文件中已包含必要的 `@source` 指令用于扫描自身组件。
+
+### 选择正确的 CSS 文件
+
+DayFlow 提供两个 CSS 产物：
+
+| 文件                    | 内容                                       | 适用场景               |
+| ----------------------- | ------------------------------------------ | ---------------------- |
+| `styles.css`            | 完整包，含 Tailwind preflight（CSS Reset） | 不使用 Tailwind 的项目 |
+| `styles.components.css` | 仅含组件样式，**不含 CSS Reset**           | 已使用 Tailwind 的项目 |
+
+### 最小配置
+
+```css
+/* app.css — Tailwind 项目 */
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+```
+
+如果项目**不使用** Tailwind，改为导入完整包：
+
+```css
+/* app.css — 非 Tailwind 项目 */
+@import '@dayflow/core/dist/styles.css';
+```
+
+### 深色模式
+
+DayFlow 监听任意祖先元素（包括 `<html>`）上的 `.dark` 类，通过 JavaScript 进行切换：
+
+```ts
+document.documentElement.classList.toggle('dark', isDark);
+```
+
+无需显式设置类名时，也会自动响应系统级深色模式偏好。
+
+### 使用 Tailwind 工具类包裹日历
+
+```tsx
+function ThemedCalendar({ calendar }) {
+  return (
+    <div className='rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700'>
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## 创建自定义主题
+
+```tsx
+// themes/oceanTheme.ts
+export const oceanTheme = {
+  mode: 'light' as const,
+  calendarTypes: [
+    {
+      id: 'deep-ocean',
+      name: '深海蓝',
+      colors: {
+        lineColor: '#0369a1',
+        eventColor: '#e0f2fe',
+        eventSelectedColor: '#bae6fd',
+        textColor: '#0c4a6e',
+      },
+      darkColors: {
+        lineColor: '#7dd3fc',
+        eventColor: '#0c4a6e',
+        eventSelectedColor: '#083344',
+        textColor: '#e0f2fe',
+      },
+    },
+    {
+      id: 'coral-reef',
+      name: '珊瑚礁',
+      colors: {
+        lineColor: '#ea580c',
+        eventColor: '#ffedd5',
+        eventSelectedColor: '#fed7aa',
+        textColor: '#7c2d12',
+      },
+      darkColors: {
+        lineColor: '#fb923c',
+        eventColor: '#7c2d12',
+        eventSelectedColor: '#431407',
+        textColor: '#ffedd5',
+      },
+    },
+  ],
+};
+```
+
+配合 CSS 变量覆盖使用，可实现完整的视觉一致性：
+
+```css
+/* Ocean 主题 CSS token */
+.df-calendar-container {
+  --df-color-primary: #0369a1;
+  --df-color-background: #f0f9ff;
+  --df-color-border: #bae6fd;
+}
+
+.dark .df-calendar-container {
+  --df-color-primary: #7dd3fc;
+  --df-color-background: #0c1220;
+  --df-color-border: #0c4a6e;
+}
+```
+
+## 资源
+
+### 工具
+
+- [WebAIM 对比度检查器](https://webaim.org/resources/contrastchecker/) - 检验颜色对比度
+- [Coolors](https://coolors.co/) - 生成配色方案
+- [颜色对比度分析器](https://www.tpgi.com/color-contrast-checker/) - 桌面工具
+
+### 库
+
+- [chroma-js](https://gka.github.io/chroma.js/) - 颜色操作
+- [tinycolor2](https://github.com/bgrins/TinyColor) - 颜色工具
+- [color](https://github.com/Qix-/color) - 颜色转换
+
+### Tailwind 资源
+
+- [Tailwind v4 升级指南](https://tailwindcss.com/docs/upgrade-guide) - v3 → v4 迁移
+- [Tailwind CSS 层](https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer) - 层级文档
+
+## 相关文档
+
+- [深色模式](/docs-zh/features/dark-mode) - 深色模式概览与 API
+- [日历类型](/docs-zh/introduction/events#calendar-types) - 事件分类
+- [使用日历应用](/docs-zh/introduction/use-calendar-app) - 核心配置

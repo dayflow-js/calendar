@@ -1,0 +1,10 @@
+{
+  "title": "機能",
+  "pages": [
+    "calendar-header",
+    "event-dialog",
+    "switcher-mode",
+    "read-only",
+    "content-slots"
+  ]
+}

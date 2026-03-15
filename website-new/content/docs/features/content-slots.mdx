@@ -1,0 +1,207 @@
+import { EventContentShowcase } from '@/components/showcase/EventContentShowcase';
+import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPanelShowcase';
+import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
+import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
+
+# Content Slots
+
+DayFlow uses a slot-based architecture that allows you to inject custom UI components from your preferred framework (React, Vue, etc.) directly into the core calendar engine.
+
+This is powered by the `ContentSlot` mechanism. While the core engine provides default implementations for most UI elements (using Preact), you can override them to match your application's design or to use specific libraries.
+
+## How it Works
+
+1. **Core Defines a Slot**: Inside `@dayflow/core`, certain UI areas are wrapped in a `ContentSlot`. Each slot has a `generatorName` and `generatorArgs`.
+2. **You Provide the Implementation**: You pass a component or a render function to the `DayFlowCalendar` component. The adapter then portals your component into the exact location defined by the core.
+
+## Available Slots
+
+| Generator Name                    | Description                                                      | Arguments                                                                 |
+| :-------------------------------- | :--------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked. | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | Custom dialog shown when an event is clicked.                    | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `colorPicker`                     | A small color picker used for event colors.                      | `{ color, onChange, onChangeComplete }`                                   |
+| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.          | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                    | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `titleBarSlot`                    | Extra content in the sidebar title bar.                          | `{ isCollapsed, toggleCollapsed }`                                        |
+
+## Event Content
+
+The `eventContent` slots allow you to completely customize how events are rendered within the calendar. Unlike other slots, event content **must** be specified per view to ensure the layout remains consistent with each view's specific event structure.
+
+### View-Specific Slots
+
+| Slot Name                 | Description                             |
+| :------------------------ | :-------------------------------------- |
+| `eventContentDay`         | Overrides timed events in Day view.     |
+| `eventContentWeek`        | Overrides timed events in Week view.    |
+| `eventContentMonth`       | Overrides events in Month view.         |
+| `eventContentYear`        | Overrides events in Year view.          |
+| `eventContentAllDayDay`   | Overrides all-day events in Day view.   |
+| `eventContentAllDayWeek`  | Overrides all-day events in Week view.  |
+| `eventContentAllDayMonth` | Overrides all-day events in Month view. |
+| `eventContentAllDayYear`  | Overrides all-day events in Year view.  |
+
+<EventContentShowcase />
+
+<details>
+<summary>View Source Code</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+export const EventContentShowcase = () => {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      // Customize event rendering for Day View
+      eventContentDay={({ event, isSelected }) => (
+        <div className='custom-event-card'>
+          <span>{event.title}</span>
+          {/* ... add your custom icons or layout */}
+        </div>
+      )}
+      // Customize event rendering for Month View
+      eventContentMonth={({ event }) => (
+        <div className='flex items-center gap-1'>
+          <span>🗓️</span>
+          <span className='truncate'>{event.title}</span>
+        </div>
+      )}
+      // Omit other view overrides for brevity...
+    />
+  );
+};
+```
+
+</details>
+
+## Event Detail Content
+
+The `eventDetailContent` slot lets you customize the content displayed in the event detail popover or panel when an event is clicked.
+
+<CustomDetailPanelShowcase />
+
+<details>
+<summary>View Source Code</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailPanelShowcase = () => {
+  const detailPanel = useCallback(
+    ({ event, onEventDelete, onEventUpdate, onClose }) => {
+      return (
+        <div className='p-4 space-y-3'>
+          <h5 className='font-bold'>{event.title}</h5>
+          <p>{event.description}</p>
+
+          <div className='flex gap-2'>
+            <button
+              onClick={() => onEventUpdate({ ...event, title: 'Updated' })}
+            >
+              Update
+            </button>
+            <button onClick={() => onEventDelete(event.id)}>Delete</button>
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailContent={detailPanel} />
+  );
+};
+```
+
+</details>
+
+## Event Detail Dialog
+
+If you prefer a modal/dialog interface for viewing and editing event details, you can use the `eventDetailDialog` slot. This is particularly useful for mobile-first applications or when you need more space for complex event data.
+
+<CustomDetailDialogShowcase />
+
+<details>
+<summary>View Source Code</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { useCallback } from 'react';
+
+export const CustomDetailDialogShowcase = () => {
+  const customDialog = useCallback(({ event, isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+        <div className='bg-white p-6 rounded-lg shadow-xl'>
+          <h2>{event.title}</h2>
+          {/* ... build your custom dialog UI here */}
+          <button onClick={onClose}>Close</button>
+        </div>
+      </div>
+    );
+  }, []);
+
+  return (
+    <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## Example: Injecting a Custom Color Picker
+
+By default, DayFlow uses a built-in `BlossomColorPicker`. If you prefer to use a library like `react-color` or `vue-color`, you can inject it using the `colorPicker` slots.
+
+<DocImg src='/images/docs/colorPicker.png' alt='Color Picker' />
+
+### React Example
+
+Install `react-color`:
+
+```bash
+npm install react-color
+```
+
+Inject it into `DayFlowCalendar`:
+
+<ColorPickerShowcase />
+
+<details>
+<summary>View Source Code</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { SketchPicker, PhotoshopPicker } from 'react-color';
+
+function MyCalendar() {
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      colorPicker={args => (
+        <SketchPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+        />
+      )}
+      createCalendarDialogColorPicker={args => (
+        <PhotoshopPicker
+          color={args.color}
+          onChange={color => args.onChange({ hex: color.hex })}
+          onAccept={args.onAccept}
+          onCancel={args.onCancel}
+        />
+      )}
+    />
+  );
+}
+```
+
+</details>

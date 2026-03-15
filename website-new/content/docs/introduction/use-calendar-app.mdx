@@ -1,0 +1,278 @@
+---
+title: useCalendarApp
+---
+
+# useCalendarApp Reference
+
+`useCalendarApp(config: CalendarAppConfig)` is the hook that connects the DayFlow core to your application. Pass a single configuration object to register views, feed initial events, toggle optional UI, and connect lifecycle callbacks. This guide breaks down every available option.
+
+## Quick Start
+
+```tsx {11-16}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import '@dayflow/core/dist/styles.css';
+
+export function TeamCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    events: [],
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Configuration Overview
+
+| Option                      | Type                        | Required | Default                | Description                                                                                                        |
+| --------------------------- | --------------------------- | -------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `views`                     | `CalendarView[]`            | Required | —                      | Registers the view definitions (e.g., `createMonthView()`). At least one view is required.                         |
+| `plugins`                   | `CalendarPlugin[]`          | Optional | `[]`                   | Installs optional plugins (drag helpers, shortcuts, etc.). Each plugin receives the app instance during `install`. |
+| `events`                    | `Event[]`                   | Optional | `[]`                   | Initial event payload. Use `addEvent`/`updateEvent` afterward to mutate state.                                     |
+| `callbacks`                 | `CalendarCallbacks`         | Optional | `{}`                   | Lifecycle hooks that fire when views, dates, or events change—perfect for syncing with APIs.                       |
+| `defaultView`               | `ViewType`                  | Optional | `ViewType.WEEK`        | View that loads first; must exist in `views`.                                                                      |
+| `initialDate`               | `Date`                      | Optional | `new Date()`           | Starting focus date (also seeds visible month calculations).                                                       |
+| `switcherMode`              | `'buttons' \| 'select'`     | Optional | `'buttons'`            | Controls how the built-in view switcher renders in headers.                                                        |
+| `calendars`                 | `CalendarType[]`            | Optional | `[]`                   | Registers calendar categories (Work, Personal, etc.) with colors and visibility.                                   |
+| `defaultCalendar`           | `string`                    | Optional | First visible calendar | ID used when new events are created.                                                                               |
+| `theme`                     | `ThemeConfig`               | Optional | `{ mode: 'light' }`    | Sets global theme mode and optional token overrides.                                                               |
+| `locale`                    | `string \| Locale`          | Optional | `'en-US'`              | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.           |
+| `useEventDetailDialog`      | `boolean`                   | Optional | `false`                | Enables the default modal detail dialog instead of inline panels.                                                  |
+| `useCalendarHeader`         | `boolean \| Function`       | Optional | `true`                 | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                             |
+| `readOnly`                  | `boolean \| ReadOnlyConfig` | Optional | `false`                | Disables interactions. Can be a boolean or a config for fine-grained control (drag/view).                          |
+| `customMobileEventRenderer` | `MobileEventRenderer`       | Optional | —                      | Custom component to replace the default mobile event drawer/dialog.                                                |
+
+## Key Options
+
+### Views (required)
+
+- Each view is a `CalendarView` object `{ type, component, config }`.
+- DayFlow ships with factories (`createDayView`, `createWeekView`, etc.) that return ready-made definitions.
+- `defaultView` must match one of the registered view types; otherwise the app throws during initialization.
+
+### Events
+
+- The provided array becomes the in-memory `CalendarApp.state.events` list.
+- `useCalendarApp` watches app mutations, so calling `calendar.addEvent()` or `calendar.updateEvent()` automatically syncs application state.
+- Make sure events adhere to the `Event` interface (`start`/`end` accept `PlainDate`, `PlainDateTime`, or `ZonedDateTime`).
+
+### Plugins
+
+- A plugin has `{ name, install(app), config }` and is executed once during construction.
+- Use plugins to register drag handlers, keyboard shortcuts, analytics observers, or expose custom APIs via `app.getPlugin(name)`.
+
+### Callbacks
+
+`callbacks` keep state in sync with your backend or analytics layer:
+
+- `onViewChange(view)` fires after a successful view switch.
+- `onDateChange(date)` fires whenever the focused date changes (navigation or selection).
+- `onVisibleMonthChange(date)` helps prefetch data as the visible month shifts.
+- `onVisibleRangeChange(start, end, reason)` fires whenever visible date-range shifts. Helps in more precise fetches without additional calculations.
+- `onEventCreate(event)`, `onEventUpdate(event)`, `onEventDelete(id)` mirror CRUD operations—ideal for syncing APIs.
+- `onMoreEventsClick(date)` fires when the "+ X more" link is clicked in Month view.
+- `onCalendarCreate(calendar)`, `onCalendarUpdate(calendar)`, `onCalendarDelete(id)` mirror calendar CRUD operations.
+- `onCalendarMerge(sourceId, targetId)` fires when merging two calendars (e.g., merging "Work" into "Personal").
+- `onRender()` executes when the calendar finishes a render pass (useful for instrumentation).
+
+### defaultView & initialDate
+
+- `defaultView` sets the initial `state.currentView`. If omitted, DayFlow falls back to `ViewType.WEEK`, so explicitly set it for single-view calendars.
+- `initialDate` seeds both `state.currentDate` and the internal `visibleMonth`. Override it if you pull the date from routing or user settings.
+
+### switcherMode
+
+- `'buttons'`: renders a horizontal button group, great for desktop.
+- `'select'`: renders a dropdown, perfect when space is limited or you expose many view types.
+
+### calendars & defaultCalendar
+
+- `calendars` defines each calendar type (`id`, `name`, `colors`, visibility). The Calendar Registry automatically picks light/dark colors based on `theme.mode` (`'light' | 'dark' | 'auto'`).
+- `defaultCalendar` determines which calendar new events inherit; if omitted, the first visible calendar wins.
+
+### theme
+
+The `theme` configuration controls the visual appearance of the entire calendar:
+
+```tsx
+const calendar = useCalendarApp({
+  theme: {
+    mode: 'dark', // 'light' | 'dark' | 'auto'
+  },
+});
+```
+
+**Theme Modes:**
+
+- `'light'`: Light mode with light backgrounds and dark text (default)
+- `'dark'`: Dark mode with dark backgrounds and light text
+- `'auto'`: Automatically follows system theme preference
+
+**Programmatic Theme Changes:**
+
+```tsx
+// Get current theme
+const currentTheme = calendar.app.getTheme();
+
+// Set theme
+calendar.app.setTheme('dark');
+
+// Subscribe to theme changes
+calendar.app.subscribeThemeChange(theme => {
+  console.log('Theme changed to:', theme);
+});
+```
+
+**Custom Dark Mode Colors:**
+
+Define different colors for light and dark modes for each calendar type:
+
+```tsx
+const calendars = [
+  {
+    id: 'work',
+    name: 'Work',
+    colors: {
+      // Light mode colors
+      lineColor: '#0066cc',
+      eventColor: '#e6f2ff',
+      eventSelectedColor: '#cce4ff',
+      textColor: '#003d7a',
+    },
+    darkColors: {
+      // Dark mode colors
+      lineColor: '#4da6ff',
+      eventColor: '#1a3d5c',
+      eventSelectedColor: '#2a5a8a',
+      textColor: '#b3d9ff',
+    },
+  },
+];
+```
+
+See [Dark Mode](/docs/features/dark-mode) for comprehensive theming documentation.
+
+### locale
+
+The `locale` option sets the language and regional settings for the calendar.
+
+- **String:** Use a language code like `'en-US'`, `'ja'`, `'zh'`, `'de'`, `'fr'`, `'es'`, `'ko'`.
+- **Locale Object:** Pass an imported `Locale` object for type safety or a custom object for unsupported languages.
+
+```tsx
+// String code
+const calendar = useCalendarApp({
+  locale: 'ja',
+});
+
+// Built-in Locale object
+import { ja } from '@dayflow/core';
+const calendar = useCalendarApp({
+  locale: ja,
+});
+
+// Custom Locale object
+const customLocale = {
+  code: 'it',
+  messages: { today: 'Oggi', ... }
+};
+const calendar = useCalendarApp({
+  locale: customLocale,
+});
+```
+
+### useEventDetailDialog
+
+- `true` turns on the default modal dialog (`DefaultEventDetailDialog`).
+- Combine with `customDetailPanelContent` or `customEventDetailDialog` on `DayFlowCalendar` to swap the UI while keeping the core state machine.
+
+### useCalendarHeader
+
+- `true` (default): Renders the built-in calendar header.
+- `false`: Hides the header entirely.
+- `(props) => ReactNode`: Renders a custom header. See [Calendar Header](/docs/features/calendar-header) for details.
+
+### readOnly
+
+- `true`: Disables all modifications (dragging, creating, editing).
+- `ReadOnlyConfig`: Fine-grained control.
+  - `draggable`: Whether dragging is allowed.
+  - `viewable`: Whether opening event details is allowed.
+- See [Read-only Mode](/docs/features/read-only) for details.
+
+### customMobileEventRenderer
+
+- Allows replacing the default bottom-drawer for mobile event editing with your own component.
+- See [Sidebar Plugin](/docs/plugins/sidebar) for more on specific features.
+
+## Advanced Configuration Example
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  createWeekView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+import '@dayflow/core/dist/styles.css';
+
+const calendars = [
+  {
+    id: 'work',
+    name: 'Work',
+    colors: {
+      eventColor: '#2563eb',
+      eventSelectedColor: '#1d4ed8',
+      lineColor: '#1e40af',
+      textColor: '#ffffff',
+    },
+  },
+  {
+    id: 'personal',
+    name: 'Personal',
+    colors: {
+      eventColor: '#f97316',
+      eventSelectedColor: '#ea580c',
+      lineColor: '#c2410c',
+      textColor: '#ffffff',
+    },
+  },
+];
+
+export function AdvancedCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView(), createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date('2024-10-01'),
+    events: [],
+    calendars,
+    defaultCalendar: 'work',
+    switcherMode: 'select',
+    callbacks: {
+      onEventUpdate: event => api.events.update(event),
+      onVisibleMonthChange: month => preloadMonthData(month),
+    },
+    plugins: [
+      createSidebarPlugin({
+        width: 280,
+        initialCollapsed: false,
+      }),
+    ],
+    useEventDetailDialog: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+> Tip: The object returned by `useCalendarApp` exposes both state (`currentView`, `currentDate`, `events`) and actions. Share the same instance with `DayFlowCalendar`, your own toolbar, and side panels to keep everything synchronized.

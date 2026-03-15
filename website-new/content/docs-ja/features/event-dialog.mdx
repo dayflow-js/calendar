@@ -1,0 +1,26 @@
+import { EventDialogShowcase } from '@/components/showcase/FeatureShowcase';
+
+# イベントダイアログ
+
+DayFlow には、イベントの作成・編集・削除をまとめて行えるダイアログが標準で組み込まれています。モーダルはポータル経由で描画されるため、他の UI と干渉せずに使えます。
+
+<EventDialogShowcase />
+
+## 使い方
+
+`DayFlowCalendar` を描画すれば、イベントクリック時にダイアログが自動で開きます。
+新規作成は空きスロットのダブルクリックやドラッグ（ドラッグプラグイン有効時）から呼び出せます。
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/core';
+
+<DayFlowCalendar calendar={calendar} useEventDetailDialog={true} />;
+```
+
+## カスタマイズ
+
+標準ダイアログで足りない場合は、[カスタム詳細ダイアログ](/docs-ja/features/custom-detail-dialog) を利用して UI 全体を置き換えられます。
+
+```tsx
+<DayFlowCalendar calendar={calendar} customEventDetailDialog={YourDialog} />
+```

@@ -1,0 +1,11 @@
+{
+  "title": "Features",
+  "pages": [
+    "calendar-header",
+    "event-dialog",
+    "switcher-mode",
+    "read-only",
+    "content-slots",
+    "dark-mode"
+  ]
+}

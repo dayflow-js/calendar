@@ -1,0 +1,292 @@
+# Theme Customization Guide
+
+DayFlow Calendar's appearance is controlled by a set of namespaced CSS custom properties (`--df-color-*`). All tokens are defined inside `@layer df-theme`, so host applications can override them without `!important` — regardless of whether they use Tailwind or plain CSS.
+
+## Table of Contents
+
+- [Custom Calendar Type Colors](#custom-calendar-type-colors)
+- [CSS Variable Reference](#css-variable-reference)
+- [Override Methods](#override-methods)
+- [Tailwind v4 Integration](#tailwind-v4-integration)
+- [Creating a Custom Theme](#creating-a-custom-theme)
+
+## Custom Calendar Type Colors
+
+### Basic Custom Colors
+
+Define unique colors for each calendar type with separate light and dark variants:
+
+```tsx
+const calendar = useCalendarApp({
+  calendarTypes: [
+    {
+      id: 'personal',
+      name: 'Personal',
+      colors: {
+        lineColor: '#0891b2', // cyan-600
+        eventColor: '#cffafe', // cyan-100
+        eventSelectedColor: '#a5f3fc', // cyan-200
+        textColor: '#164e63', // cyan-900
+      },
+      darkColors: {
+        lineColor: '#22d3ee', // cyan-400
+        eventColor: '#164e63', // cyan-900
+        eventSelectedColor: '#083344', // cyan-950
+        textColor: '#cffafe', // cyan-100
+      },
+    },
+  ],
+});
+```
+
+### Color Properties Explained
+
+- **lineColor**: Border and accent color (left bar on events)
+- **eventColor**: Event background fill
+- **eventSelectedColor**: Background fill when an event is selected
+- **textColor**: Text color for event title and time
+
+### Brand Color Integration
+
+```tsx
+{
+  id: 'brand',
+  name: 'Brand Events',
+  colors: {
+    lineColor: '#6366f1',       // Brand indigo
+    eventColor: '#e0e7ff', // Indigo-100
+    eventSelectedColor: '#c7d2fe', // Indigo-200
+    textColor: '#312e81',       // Indigo-900
+  },
+  darkColors: {
+    lineColor: '#a5b4fc',       // Indigo-300
+    eventColor: '#312e81', // Indigo-900
+    eventSelectedColor: '#1e1b4b', // Indigo-950
+    textColor: '#e0e7ff',       // Indigo-100
+  },
+}
+```
+
+### Color Generation Helper
+
+```tsx
+// utils/colorGenerator.ts
+interface ColorSet {
+  lineColor: string;
+  eventColor: string;
+  eventSelectedColor: string;
+  textColor: string;
+}
+
+export function generateLightColors(baseColor: string): ColorSet {
+  return {
+    lineColor: baseColor,
+    eventColor: lighten(baseColor, 0.9),
+    eventSelectedColor: lighten(baseColor, 0.8),
+    textColor: darken(baseColor, 0.4),
+  };
+}
+
+export function generateDarkColors(baseColor: string): ColorSet {
+  return {
+    lineColor: lighten(baseColor, 0.3),
+    eventColor: darken(baseColor, 0.6),
+    eventSelectedColor: darken(baseColor, 0.7),
+    textColor: lighten(baseColor, 0.8),
+  };
+}
+```
+
+## CSS Variable Reference
+
+All DayFlow theme tokens use the `--df-color-` prefix to avoid collisions with any host application variables.
+
+| Variable                            | Purpose                                   |
+| ----------------------------------- | ----------------------------------------- |
+| `--df-color-background`             | Calendar background                       |
+| `--df-color-foreground`             | Primary text color                        |
+| `--df-color-hover`                  | Hover state background                    |
+| `--df-color-border`                 | Borders and dividers                      |
+| `--df-color-card`                   | Card / panel background                   |
+| `--df-color-card-foreground`        | Card text color                           |
+| `--df-color-muted`                  | Subtle background areas                   |
+| `--df-color-muted-foreground`       | Muted / secondary text                    |
+| `--df-color-primary`                | Primary accent (buttons, selected states) |
+| `--df-color-primary-foreground`     | Text on primary-colored backgrounds       |
+| `--df-color-secondary`              | Secondary accent                          |
+| `--df-color-secondary-foreground`   | Text on secondary-colored backgrounds     |
+| `--df-color-destructive`            | Destructive actions                       |
+| `--df-color-destructive-foreground` | Text on destructive backgrounds           |
+
+## Override Methods
+
+### Method 1 — Container-level override (works everywhere)
+
+Set variables directly on `.df-calendar-container`. Because this rule is outside any `@layer`, it always wins over the library's defaults regardless of Tailwind version or CSS setup.
+
+```css
+/* styles/globals.css */
+.df-calendar-container {
+  --df-color-primary: #6366f1;
+  --df-color-background: #f9fafb;
+  --df-color-border: #e0e7ff;
+}
+
+/* Dark mode — target the container when the .dark class is on an ancestor */
+.dark .df-calendar-container {
+  --df-color-primary: #a5b4fc;
+  --df-color-background: #1e1e2e;
+  --df-color-border: #312e81;
+}
+```
+
+This is the recommended approach for most projects. The variables are scoped to the calendar and do not affect anything outside it.
+
+## Tailwind v4 Integration
+
+Tailwind v4 is configured entirely through CSS — there is no `tailwind.config.js`. The library's CSS already includes the necessary `@source` directives to scan its own components.
+
+### Choosing the right CSS file
+
+DayFlow ships two CSS bundles:
+
+| File                    | Contents                                             | Use when               |
+| ----------------------- | ---------------------------------------------------- | ---------------------- |
+| `styles.css`            | Full bundle including Tailwind preflight (CSS reset) | Not using Tailwind     |
+| `styles.components.css` | Component styles only, **no CSS reset**              | Already using Tailwind |
+
+### Minimal setup
+
+```css
+/* app.css — for Tailwind projects */
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+```
+
+If your project does **not** use Tailwind, import the full bundle instead:
+
+```css
+/* app.css — for non-Tailwind projects */
+@import '@dayflow/core/dist/styles.css';
+```
+
+### Dark mode
+
+DayFlow respects the `.dark` class on any ancestor element (including `<html>`). Apply it with JavaScript:
+
+```ts
+document.documentElement.classList.toggle('dark', isDark);
+```
+
+System-preference dark mode (no explicit class) is also supported automatically.
+
+### Applying overrides with `@theme`
+
+```css
+@import '@dayflow/core/dist/styles.css' layer(dayflow);
+@import 'tailwindcss';
+
+@theme {
+  --df-color-primary: #6366f1;
+  --df-color-primary-foreground: #ffffff;
+  --df-color-secondary: #8b5cf6;
+  --df-color-secondary-foreground: #ffffff;
+}
+```
+
+### Wrapping the calendar with Tailwind utilities
+
+```tsx
+function ThemedCalendar({ calendar }) {
+  return (
+    <div className='rounded-2xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700'>
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## Creating a Custom Theme
+
+```tsx
+// themes/oceanTheme.ts
+export const oceanTheme = {
+  mode: 'light' as const,
+  calendarTypes: [
+    {
+      id: 'deep-ocean',
+      name: 'Deep Ocean',
+      colors: {
+        lineColor: '#0369a1',
+        eventColor: '#e0f2fe',
+        eventSelectedColor: '#bae6fd',
+        textColor: '#0c4a6e',
+      },
+      darkColors: {
+        lineColor: '#7dd3fc',
+        eventColor: '#0c4a6e',
+        eventSelectedColor: '#083344',
+        textColor: '#e0f2fe',
+      },
+    },
+    {
+      id: 'coral-reef',
+      name: 'Coral Reef',
+      colors: {
+        lineColor: '#ea580c',
+        eventColor: '#ffedd5',
+        eventSelectedColor: '#fed7aa',
+        textColor: '#7c2d12',
+      },
+      darkColors: {
+        lineColor: '#fb923c',
+        eventColor: '#7c2d12',
+        eventSelectedColor: '#431407',
+        textColor: '#ffedd5',
+      },
+    },
+  ],
+};
+```
+
+Pair it with CSS variable overrides for full visual consistency:
+
+```css
+/* Ocean theme CSS tokens */
+.df-calendar-container {
+  --df-color-primary: #0369a1;
+  --df-color-background: #f0f9ff;
+  --df-color-border: #bae6fd;
+}
+
+.dark .df-calendar-container {
+  --df-color-primary: #7dd3fc;
+  --df-color-background: #0c1220;
+  --df-color-border: #0c4a6e;
+}
+```
+
+## Resources
+
+### Tools
+
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) - Test color contrast
+- [Coolors](https://coolors.co/) - Generate color palettes
+- [Color Contrast Analyzer](https://www.tpgi.com/color-contrast-checker/) - Desktop tool
+
+### Libraries
+
+- [chroma-js](https://gka.github.io/chroma.js/) - Color manipulation
+- [tinycolor2](https://github.com/bgrins/TinyColor) - Color utilities
+- [color](https://github.com/Qix-/color) - Color conversion
+
+### Tailwind Resources
+
+- [Tailwind v4 Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide) - v3 → v4 migration
+- [Tailwind CSS Layers](https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer) - Layer documentation
+
+## Related Documentation
+
+- [Dark Mode](/docs/features/dark-mode) - Dark mode overview and API
+- [Calendar Types](/docs/introduction/events#calendar-types) - Event categorization
+- [Use Calendar App](/docs/introduction/use-calendar-app) - Core configuration

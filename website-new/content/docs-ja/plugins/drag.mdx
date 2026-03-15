@@ -1,0 +1,66 @@
+# ドラッグ＆ドロップ (Drag & Drop) プラグイン
+
+ドラッグ＆ドロッププラグインは、カレンダーグリッド上で直接イベントを移動、リサイズ、作成できるインタラクティブなイベント管理機能を提供します。
+
+## インストール
+
+お好みのパッケージマネージャーを使用してプラグインをインストールします：
+
+```bash
+npm install @dayflow/plugin-drag
+```
+
+```tsx
+import { createDragPlugin } from '@dayflow/plugin-drag';
+```
+
+## 使い方
+
+```tsx
+import { useCalendarApp, ViewType } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { createDragPlugin } from '@dayflow/plugin-drag';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+    onEventDrop: (updated, original) => {
+      console.log('Event moved:', updated);
+    },
+    onEventResize: (updated, original) => {
+      console.log('Event resized:', updated);
+    },
+  });
+
+  const calendar = useCalendarApp({
+    // ... ビューの設定
+    plugins: [dragPlugin],
+  });
+
+  // ...
+}
+```
+
+## 設定項目
+
+| プロパティ           | 型           | デフォルト値               | 説明                                                           |
+| :------------------- | :----------- | :------------------------- | :------------------------------------------------------------- |
+| `enableDrag`         | `boolean`    | `true`                     | ドラッグによるイベントの移動を許可するかどうか。               |
+| `enableResize`       | `boolean`    | `true`                     | ドラッグによるイベント期間の変更を許可するかどうか。           |
+| `enableCreate`       | `boolean`    | `true`                     | グリッドのダブルクリックによるイベント作成を許可するかどうか。 |
+| `enableAllDayCreate` | `boolean`    | `true`                     | 終日行でのドラッグによる終日イベントの作成を許可するかどうか。 |
+| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | ドラッグ機能が有効になるビューのリスト。                       |
+| `onEventDrop`        | `Function`   | -                          | イベントが移動（ドラッグ＆ドロップ）された時のコールバック。   |
+| `onEventResize`      | `Function`   | -                          | イベントがリサイズされた時のコールバック。                     |
+
+## プラグイン API
+
+ドラッグサービスにアクセスして、設定を動的に更新できます：
+
+```tsx
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// 動的にリサイズ機能を無効にする
+dragService.updateConfig({ enableResize: false });
+```

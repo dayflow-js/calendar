@@ -1,0 +1,66 @@
+# Drag & Drop Plugin
+
+The Drag & Drop plugin enables interactive event management, allowing users to move, resize, and create events directly on the calendar grid.
+
+## Installation
+
+Install the plugin using your preferred package manager:
+
+```bash
+npm install @dayflow/plugin-drag
+```
+
+```tsx
+import { createDragPlugin } from '@dayflow/plugin-drag';
+```
+
+## Usage
+
+```tsx
+import { useCalendarApp, ViewType } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+import { createDragPlugin } from '@dayflow/plugin-drag';
+
+function MyCalendar() {
+  const dragPlugin = createDragPlugin({
+    enableDrag: true,
+    enableResize: true,
+    enableCreate: true,
+    onEventDrop: (updated, original) => {
+      console.log('Event moved:', updated);
+    },
+    onEventResize: (updated, original) => {
+      console.log('Event resized:', updated);
+    },
+  });
+
+  const calendar = useCalendarApp({
+    // ... views
+    plugins: [dragPlugin],
+  });
+
+  // ...
+}
+```
+
+## Configuration
+
+| Property             | Type         | Default                    | Description                                                   |
+| :------------------- | :----------- | :------------------------- | :------------------------------------------------------------ |
+| `enableDrag`         | `boolean`    | `true`                     | Allow moving events by dragging.                              |
+| `enableResize`       | `boolean`    | `true`                     | Allow changing event duration by resizing.                    |
+| `enableCreate`       | `boolean`    | `true`                     | Allow creating events by double-clicking the grid.            |
+| `enableAllDayCreate` | `boolean`    | `true`                     | Allow creating all-day events by dragging in the all-day row. |
+| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | Views where drag functionality should be enabled.             |
+| `onEventDrop`        | `Function`   | -                          | Callback when an event is moved (drag-and-drop).              |
+| `onEventResize`      | `Function`   | -                          | Callback when an event is resized.                            |
+
+## Plugin API
+
+You can access the drag service to update configuration dynamically:
+
+```tsx
+const dragService = calendar.app.getPlugin<DragService>('drag');
+
+// Disable resizing dynamically
+dragService.updateConfig({ enableResize: false });
+```

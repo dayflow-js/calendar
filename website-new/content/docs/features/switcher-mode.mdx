@@ -1,0 +1,31 @@
+import { SwitcherModeShowcase } from '@/components/showcase/FeatureShowcase';
+
+# View Switcher Modes
+
+The `switcherMode` option controls how the header view switcher is rendered. The library ships with two modes tailored for different layouts:
+
+- **`buttons`** – the default desktop friendly layout with a centered button group.
+- **`select`** – condenses the switcher into a dropdown for mobile or compact toolbars.
+
+Use the interactive sample below to compare both modes with identical data and configuration.
+
+<SwitcherModeShowcase />
+
+## Quick Start
+
+```tsx {9}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+} from '@dayflow/core';
+
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  switcherMode: 'select', // default switcherMode: 'buttons'
+});
+
+<DayFlowCalendar calendar={calendar} />;
+```
+
+Flip `switcherMode` between `'buttons'` and `'select'` to preview the alternate experiences instantly.

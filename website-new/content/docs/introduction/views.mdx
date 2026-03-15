@@ -1,0 +1,241 @@
+---
+title: Views
+---
+
+# Calendar Views
+
+Day Flow supports four different view types, each optimized for different use cases and user needs. You can switch between views programmatically or provide a UI for users to switch views.
+
+## Available Views
+
+### Day View
+
+The day view focuses on a single day with detailed time slots, perfect for managing daily schedules.
+
+#### Configuration
+
+| Property              | Type             | Default     | Description                                            |
+| :-------------------- | :--------------- | :---------- | :----------------------------------------------------- |
+| `showAllDay`          | `boolean`        | `true`      | Whether to show the all-day events row.                |
+| `scrollToCurrentTime` | `boolean`        | `true`      | Whether to scroll to the current time on initial load. |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | The time format for the time axis.                     |
+| `secondaryTimeZone`   | `string`         | `undefined` | Secondary time zone to display.                        |
+
+```tsx {10}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createDayView()],
+    defaultView: ViewType.DAY,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Week View
+
+The week view displays a 7-day grid with time slots, showing events with their exact start and end times.
+
+#### Configuration
+
+| Property              | Type             | Default     | Description                                                   |
+| :-------------------- | :--------------- | :---------- | :------------------------------------------------------------ |
+| `showWeekends`        | `boolean`        | `true`      | Whether to show Saturday and Sunday.                          |
+| `showAllDay`          | `boolean`        | `true`      | Whether to show the all-day events row.                       |
+| `startOfWeek`         | `number`         | `1`         | The start day of the week (0 for Sunday, 1 for Monday, etc.). |
+| `scrollToCurrentTime` | `boolean`        | `true`      | Whether to scroll to the current time on initial load.        |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | The time format for the time axis.                            |
+| `secondaryTimeZone`   | `string`         | `undefined` | Secondary time zone to display.                               |
+
+```tsx {10}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createWeekView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createWeekView()],
+    defaultView: ViewType.WEEK,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Month View
+
+The month view displays a traditional calendar grid showing all days in a month.
+
+#### Configuration
+
+| Property             | Type                | Default | Description                                                                                     |
+| :------------------- | :------------------ | :------ | :---------------------------------------------------------------------------------------------- |
+| `showWeekNumbers`    | `boolean`           | `false` | Whether to show week numbers.                                                                   |
+| `showMonthIndicator` | `boolean`           | `true`  | Whether to show the month indicator title when scrolling.                                       |
+| `startOfWeek`        | `number`            | `1`     | The start day of the week (0 for Sunday, 1 for Monday, etc.).                                   |
+| `snapToMonth`        | `boolean`           | `false` | When enabled, the view snaps to the start of the dominant month after the user stops scrolling. |
+| `scroll`             | `MonthScrollConfig` | —       | Controls scroll locking and month-switch animation. See below.                                  |
+
+#### MonthScrollConfig
+
+| Property     | Type                    | Default     | Description                                                                                                                                                                                                                      |
+| :----------- | :---------------------- | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `disabled`   | `boolean`               | `false`     | Disables continuous scrolling. Months can only be changed via the Prev / Next navigation buttons.                                                                                                                                |
+| `transition` | `'fade'` \| `undefined` | `undefined` | Animation when switching months (only applies when `disabled: true`). `'fade'` fades the current month out with a horizontal slide and fades the next month in. When omitted, the original smooth-scroll animation is preserved. |
+
+```tsx
+createMonthView({
+  scroll: {
+    disabled: true, // lock to one month at a time, Prev/Next only
+    transition: 'fade', // optional fade animation (omit to keep smooth scroll)
+  },
+});
+```
+
+```tsx {10}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createMonthView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+### Year View
+
+The year view provides a comprehensive annual overview using a continuous grid layout. Unlike traditional year views that just show 12 small calendars, DayFlow's Year View renders a unified grid where you can visualize multi-day events spanning across days, weeks, and even months.
+
+#### Configuration
+
+| Property                    | Type                            | Default         | Description                                                                                   |
+| :-------------------------- | :------------------------------ | :-------------- | :-------------------------------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week'` | `'year-canvas'` | The display mode for the year view.                                                           |
+| `startOfWeek`               | `number`                        | `1`             | The start day of the week (0 for Sunday, 1 for Monday, etc.). Only used in `fixed-week` mode. |
+| `showTimedEventsInYearView` | `boolean`                       | `false`         | Whether to show timed events (dots/indicators) in the year view.                              |
+
+```tsx {10-14}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createYearView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createYearView({
+        showTimedEventsInYearView: true,
+      }),
+    ],
+    defaultView: ViewType.YEAR,
+    initialDate: new Date(),
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Using Multiple Views
+
+You can register multiple views and allow users to switch between them:
+
+```tsx {13-18}
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createDayView,
+  createWeekView,
+  createMonthView,
+  createYearView,
+  ViewType,
+} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+
+function MultiViewCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createDayView(),
+      createWeekView(),
+      createMonthView(),
+      createYearView(),
+    ],
+    defaultView: ViewType.MONTH,
+    initialDate: new Date(),
+    callbacks: {
+      onViewChange: view => {
+        console.log('View changed to:', view);
+      },
+    },
+  });
+
+  return (
+    <div className='h-screen'>
+      <DayFlowCalendar calendar={calendar} />
+    </div>
+  );
+}
+```
+
+## Programmatic View Control
+
+### Changing Views
+
+```tsx
+// Change to a specific view
+calendar.changeView(ViewType.WEEK);
+
+// Get current view
+const currentView = calendar.app.getCurrentView();
+console.log(currentView.type); // 'week'
+```
+
+### Navigation
+
+All views support the same navigation methods:
+
+```tsx
+// Go to today
+calendar.goToToday();
+
+// Go to previous period (day/week/month/year depending on current view)
+calendar.goToPrevious();
+
+// Go to next period
+calendar.goToNext();
+
+// Go to a specific date
+calendar.selectDate(new Date(2024, 9, 15));
+```
+
+## ViewType Enum
+
+```tsx
+enum ViewType {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+```
