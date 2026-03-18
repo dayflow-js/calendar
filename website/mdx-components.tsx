@@ -5,6 +5,8 @@ import { DefaultColorPalette } from '@/components/ColorPalette';
 import { FrameworkInstall, PackageTabs } from '@/components/FrameworkInstall';
 import { FrameworkTabs, Tab } from '@/components/FrameworkTabs';
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 function DocImg({
   src,
   alt,
@@ -18,7 +20,7 @@ function DocImg({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       {...(props as React.ImgHTMLAttributes<HTMLImageElement>)}
-      src={src}
+      src={`${BASE}${src}`}
       alt={alt || ''}
       style={{ maxWidth: '100%', height: 'auto' }}
     />
