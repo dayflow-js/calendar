@@ -265,7 +265,7 @@ export const QuickCreateEventPopup = ({
   return createPortal(
     <div
       ref={popupRef}
-      className={`fixed z-1000 flex w-85 flex-col rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800 ${isReady ? 'animate-in fade-in zoom-in-95 duration-100' : ''}`}
+      className={`fixed z-1000 flex w-85 flex-col rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800 ${isReady ? 'df-animate-in df-fade-in df-zoom-in-95 duration-100' : ''}`}
       style={{
         top: position.top,
         left: position.left,

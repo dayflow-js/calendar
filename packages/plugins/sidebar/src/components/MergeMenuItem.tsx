@@ -71,7 +71,7 @@ export const MergeMenuItem = ({
           <div
             ref={submenuRef}
             data-submenu-content='true'
-            className='animate-in fade-in-0 zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
+            className='df-animate-in df-fade-in df-zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}

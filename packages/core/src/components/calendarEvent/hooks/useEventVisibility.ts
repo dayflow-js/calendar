@@ -58,8 +58,9 @@ export const useEventVisibility = ({
     )
       return;
 
-    const calendarContent =
-      calendarRef.current.querySelector('.calendar-content');
+    const calendarContent = calendarRef.current.querySelector(
+      '.df-calendar-content'
+    );
     if (!calendarContent) return;
 
     const segmentStartHour = multiDaySegmentInfo
@@ -135,8 +136,9 @@ export const useEventVisibility = ({
   useEffect(() => {
     if (!isEventSelected || !showDetailPanel || isAllDay) return;
 
-    const calendarContent =
-      calendarRef.current?.querySelector('.calendar-content');
+    const calendarContent = calendarRef.current?.querySelector(
+      '.df-calendar-content'
+    );
     if (!calendarContent) return;
 
     const handleScroll = () => checkEventVisibility();

@@ -39,10 +39,12 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     viewType === ViewType.MONTH || viewType === ViewType.YEAR;
   const isDayView = viewType === ViewType.DAY;
 
-  // Measure offset from .calendar-content top to the first time grid row,
+  // Measure offset from .df-calendar-content top to the first time grid row,
   // accounting for boundary elements (e.g. top boundary) above the grid
   const getGridOffset = useCallback(() => {
-    const containerEl = calendarRef.current?.querySelector('.calendar-content');
+    const containerEl = calendarRef.current?.querySelector(
+      '.df-calendar-content'
+    );
     if (!containerEl) return 0;
     const firstGridRow = containerEl.querySelector('.df-time-grid-row');
     if (!firstGridRow) return 0;
@@ -152,7 +154,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         const targetContainer = drag.allDay
           ? allDayRowRef?.current
           : timeGridRef?.current ||
-            calendarRef.current?.querySelector('.calendar-content');
+            calendarRef.current?.querySelector('.df-calendar-content');
         const isInsideTimeGrid =
           !drag.allDay && targetContainer === timeGridRef?.current;
 
@@ -164,7 +166,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             containerRect = allDayRowRef?.current?.getBoundingClientRect();
           } else {
             containerRect = calendarRef.current
-              ?.querySelector('.calendar-content')
+              ?.querySelector('.df-calendar-content')
               ?.getBoundingClientRect();
           }
 
@@ -187,8 +189,9 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               indicator.style.height = `${sourceRect.height}px`;
             } else {
               const top = (drag.startHour - FIRST_HOUR) * HOUR_HEIGHT;
-              const containerEl =
-                calendarRef.current?.querySelector('.calendar-content');
+              const containerEl = calendarRef.current?.querySelector(
+                '.df-calendar-content'
+              );
               const scrollLeft = containerEl?.scrollLeft || 0;
               const gridOffset = isInsideTimeGrid ? 0 : getGridOffset();
 
@@ -359,7 +362,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         const targetContainer = isAllDay
           ? allDayRowRef?.current
           : timeGridRef?.current ||
-            calendarRef.current?.querySelector('.calendar-content');
+            calendarRef.current?.querySelector('.df-calendar-content');
 
         if (indicator.parentElement !== targetContainer) {
           targetContainer?.append(indicator);

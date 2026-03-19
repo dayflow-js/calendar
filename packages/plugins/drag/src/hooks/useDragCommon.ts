@@ -26,13 +26,14 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
   const pixelYToHour = useCallback(
     (y: number) => {
       if (isMonthView || !calendarRef.current) return FIRST_HOUR;
-      const calendarContent =
-        calendarRef.current.querySelector('.calendar-content');
+      const calendarContent = calendarRef.current.querySelector(
+        '.df-calendar-content'
+      );
       if (!calendarContent) return FIRST_HOUR;
 
       const contentRect = calendarContent.getBoundingClientRect();
       const scrollTop = calendarContent.scrollTop;
-      // Measure the actual offset from .calendar-content top to the first time grid row,
+      // Measure the actual offset from .df-calendar-content top to the first time grid row,
       // accounting for any boundary elements (top boundary) above the grid
       const firstGridRow = calendarContent.querySelector('.df-time-grid-row');
       const gridOffset = firstGridRow
@@ -53,7 +54,7 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
       const gridElement =
         options.timeGridRef?.current ||
         calendarRef.current.querySelector('.df-time-grid-row') ||
-        calendarRef.current.querySelector('.calendar-content');
+        calendarRef.current.querySelector('.df-calendar-content');
 
       if (!gridElement) return 0;
 
@@ -79,8 +80,9 @@ export const useDragCommon = (options: useDragProps): UseDragCommonReturn => {
   const handleDirectScroll = useCallback(
     (clientY: number) => {
       if (isMonthView || !calendarRef.current) return;
-      const calendarContent =
-        calendarRef.current.querySelector('.calendar-content');
+      const calendarContent = calendarRef.current.querySelector(
+        '.df-calendar-content'
+      );
       if (!calendarContent) return;
 
       const rect = calendarContent.getBoundingClientRect();

@@ -41,8 +41,9 @@ export const EventDetailPanelWithContent = ({
     let arrowStyle: JSX.CSSProperties = {};
 
     if (eventVisibility === 'sticky-top') {
-      const calendarContent =
-        calendarRef.current?.querySelector('.calendar-content');
+      const calendarContent = calendarRef.current?.querySelector(
+        '.df-calendar-content'
+      );
       if (calendarContent) {
         const contentRect = calendarContent.getBoundingClientRect();
         const stickyEventCenterY = contentRect.top + 3;
@@ -97,8 +98,9 @@ export const EventDetailPanelWithContent = ({
       if (position && selectedEventElementRef.current && calendarRef.current) {
         const eventRect =
           selectedEventElementRef.current.getBoundingClientRect();
-        const calendarContent =
-          calendarRef.current.querySelector('.calendar-content');
+        const calendarContent = calendarRef.current.querySelector(
+          '.df-calendar-content'
+        );
 
         if (calendarContent) {
           const viewportRect = calendarContent.getBoundingClientRect();

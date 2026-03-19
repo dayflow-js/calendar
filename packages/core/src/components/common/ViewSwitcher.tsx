@@ -66,7 +66,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
 
         {isOpen && (
           <div
-            className={`absolute top-full left-0 z-50 mt-1 w-full min-w-30 ${dropdownPanel} animate-in`}
+            className={`absolute top-full left-0 z-50 mt-1 w-full min-w-30 ${dropdownPanel} df-animate-in`}
           >
             <div className='p-1' role='listbox'>
               {registeredViews.map(viewType => (
@@ -105,7 +105,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
               transform: translateY(0);
             }
           }
-          .animate-in {
+          .df-animate-in {
             animation: slideIn 0.15s ease-out;
           }
         `}</style>

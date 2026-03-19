@@ -342,7 +342,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
           className='fixed inset-0 z-60 flex items-center justify-center bg-slate-950/60 px-4 py-6 backdrop-blur-md sm:py-10'
           data-event-detail-dialog='true'
         >
-          <div className='relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-slate-900'>
+          <div className='relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-gray-900'>
             <div
               className='absolute inset-x-0 top-0 h-40'
               style={{
@@ -352,7 +352,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
             <button
               type='button'
               onClick={onClose}
-              className='absolute top-4 right-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none sm:top-6 sm:right-6 dark:bg-slate-900/20 dark:text-white'
+              className='absolute top-4 right-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 transition hover:bg-white focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none sm:top-6 sm:right-6 dark:bg-gray-900/20 dark:text-white'
               aria-label='Close dialog'
             >
               <X className='h-5 w-5' />
@@ -373,7 +373,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                       onClick={handleToggleFavorite}
                       className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 transition focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none ${
                         isFavorite
-                          ? 'bg-white text-slate-900 backdrop-blur dark:bg-slate-900/20 dark:text-white'
+                          ? 'bg-white text-slate-900 backdrop-blur dark:bg-gray-900/20 dark:text-white'
                           : 'text-white hover:bg-white hover:text-slate-900 dark:hover:bg-slate-900/15 dark:hover:text-white'
                       }`}
                       aria-label={
@@ -398,7 +398,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     {headerChips.map(({ icon: Icon, label }) => (
                       <span
                         key={label}
-                        className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-900 shadow-sm backdrop-blur dark:bg-slate-900/10 dark:text-white'
+                        className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-900 shadow-sm backdrop-blur dark:bg-gray-900/10 dark:text-white'
                       >
                         <Icon className='h-4 w-4' />
                         {label}
@@ -412,7 +412,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
             <div className='relative flex-1 overflow-y-auto px-7 pb-7 sm:px-9 sm:pb-9'>
               <div className='grid gap-6 lg:grid-cols-[1.6fr,1fr]'>
                 <div className='space-y-5'>
-                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/60'>
+                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-gray-900/60'>
                     <h3 className='text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400'>
                       Schedule
                     </h3>
@@ -472,7 +472,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-gray-900'>
                     <h3 className='text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400'>
                       Logistics
                     </h3>
@@ -513,7 +513,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                         {participants.map(participant => (
                           <span
                             key={participant}
-                            className='inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                            className='inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-gray-900 dark:text-slate-200'
                           >
                             <span className='inline-block h-2 w-2 rounded-full bg-emerald-500' />
                             {participant}
@@ -525,7 +525,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                 </div>
 
                 <div className='space-y-5'>
-                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-gray-900'>
                     <h3 className='text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400'>
                       Personalize
                     </h3>
@@ -551,7 +551,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                  <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-gray-900'>
                     <h3 className='text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400'>
                       Quick actions
                     </h3>
@@ -562,7 +562,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
                         className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${
                           isFavorite
                             ? 'border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-900/30'
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-200'
                         }`}
                       >
                         <span>
@@ -596,7 +596,7 @@ export const CustomDetailDialogShowcase: React.FC = () => {
   );
 
   return (
-    <div className='not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900'>
+    <div className='not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-gray-900'>
       <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
     </div>
   );

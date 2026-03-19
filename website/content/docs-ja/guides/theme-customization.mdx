@@ -157,6 +157,26 @@ DayFlow は 2 種類の CSS バンドルを提供します。
 
 Tailwind を使用していない場合は、完全バンドルをインポートしてください。
 
+### ユーティリティクラスのスキャン（`@source`）
+
+DayFlow のコンポーネントは内部で Tailwind ユーティリティクラス（`flex`、`bg-white`、`text-gray-600` など）を使用しています。プロジェクトの Tailwind インスタンスが DayFlow のソースファイルをスキャンして、これらのクラスを生成する必要があります。
+
+**Vite + `@tailwindcss/vite`** — 追加設定は不要です。Vite プラグインがモジュールグラフを通じて DayFlow のファイルを自動的に検出します。
+
+**その他のバンドラー（webpack、Rspack、Turbopack など）+ `@tailwindcss/postcss`** — CSS エントリーファイルに `@source` ディレクティブを追加してください。
+
+```css
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+
+/* Vite 以外のバンドラーで必須 */
+@source '../node_modules/@dayflow/core/src';
+@source '../node_modules/@dayflow/plugin-drag/src'; /* ドラッグプラグイン使用時 */
+@source '../node_modules/@dayflow/plugin-sidebar/src'; /* サイドバープラグイン使用時 */
+```
+
+この設定がない場合、Tailwind は DayFlow コンポーネント内部で使用されるユーティリティクラスを生成できず、UI のスタイルが適用されません。
+
 ```css
 /* app.css — Tailwind を使わないプロジェクト向け */
 @import '@dayflow/core/dist/styles.css';
@@ -171,6 +191,22 @@ document.documentElement.classList.toggle('dark', isDark);
 ```
 
 クラスなしでもシステム設定のダークモードが自動的に適用されます。
+
+**Tailwind v4 で `theme.mode` を使う場合**
+
+Tailwind v4 はデフォルトで `dark:` ユーティリティクラスを `@media (prefers-color-scheme: dark)` としてコンパイルします。DayFlow の `theme.mode` は `<html>` に `.dark` クラスを付与することでテーマを切り替えますが、Tailwind がメディアクエリ方式を使っている場合、DayFlow コンポーネント内部の `dark:` ユーティリティはクラスの変化に反応しません。
+
+CSS エントリーファイルに以下を追加して、Tailwind をクラスベースのダークモードに切り替えてください：
+
+```css
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+
+/* theme.mode を正しく機能させるために必須：dark: ユーティリティを .dark クラスに反応させる */
+@variant dark (.dark &);
+```
+
+この設定がない場合、`theme.mode: 'dark'` は CSS カスタムプロパティ（`--df-color-*`）を正しく切り替えますが、DayFlow コンポーネント内の `dark:` ユーティリティクラスはシステムのダークモード設定が有効なときのみ適用されます。
 
 ### Tailwind ユーティリティでラップする
 

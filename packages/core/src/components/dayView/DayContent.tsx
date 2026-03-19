@@ -162,7 +162,7 @@ export const DayContent = ({
   const hasSecondaryTz = !!secondaryTimeSlots && secondaryTimeSlots.length > 0;
   // On mobile the time column is too narrow for dual labels — hide secondary TZ display
   const showSecondaryTz = hasSecondaryTz && !isMobile;
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -171,10 +171,10 @@ export const DayContent = ({
   } | null>(null);
   const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
 
-  // Measure offset from .calendar-content top to the first time grid row,
+  // Measure offset from .df-calendar-content top to the first time grid row,
   // accounting for boundary elements above the grid
   const getGridOffset = () => {
-    const content = calendarRef.current?.querySelector('.calendar-content');
+    const content = calendarRef.current?.querySelector('.df-calendar-content');
     if (!content) return 0;
     const firstRow = content.querySelector('.df-time-grid-row');
     if (!firstRow) return 0;
@@ -187,7 +187,7 @@ export const DayContent = ({
 
   /** Returns the fractional hour at the given clientY, or null if the ref is unavailable. */
   const getClickedHour = (clientY: number): number | null => {
-    const content = calendarRef.current?.querySelector('.calendar-content');
+    const content = calendarRef.current?.querySelector('.df-calendar-content');
     if (!content) return null;
     const rect = content.getBoundingClientRect();
     const scrollTop = (content as HTMLElement).scrollTop || 0;
@@ -207,13 +207,13 @@ export const DayContent = ({
       date.setHours(0, 0, 0, 0);
     } else {
       const rect = calendarRef.current
-        ?.querySelector('.calendar-content')
+        ?.querySelector('.df-calendar-content')
         ?.getBoundingClientRect();
       if (rect) {
         const scrollTop =
           (
             calendarRef.current?.querySelector(
-              '.calendar-content'
+              '.df-calendar-content'
             ) as HTMLElement
           )?.scrollTop || 0;
         const gridOffset = getGridOffset();
@@ -250,9 +250,6 @@ export const DayContent = ({
             calendar={app}
             viewType={ViewType.DAY}
             currentDate={currentDate}
-            customSubtitle={currentDate.toLocaleDateString(locale, {
-              weekday: 'long',
-            })}
           />
         </div>
         {/* All-day event area */}
@@ -368,12 +365,7 @@ export const DayContent = ({
             </div>
           </div>
         ) : (
-          <div
-            className={cn(
-              'border-b border-gray-200 dark:border-gray-700',
-              !isMobile && hasScrollbarSpace ? 'pr-2.75' : ''
-            )}
-          />
+          <div className={!isMobile && hasScrollbarSpace ? 'pr-2.75' : ''} />
         )}
 
         {/* Time grid and event area */}
@@ -530,13 +522,13 @@ export const DayContent = ({
                     onDragOver={handleDragOver}
                     onDrop={e => {
                       const rect = calendarRef.current
-                        ?.querySelector('.calendar-content')
+                        ?.querySelector('.df-calendar-content')
                         ?.getBoundingClientRect();
                       if (!rect) return;
                       const scrollTop =
                         (
                           calendarRef.current?.querySelector(
-                            '.calendar-content'
+                            '.df-calendar-content'
                           ) as HTMLElement
                         )?.scrollTop || 0;
                       const gridOffset = getGridOffset();

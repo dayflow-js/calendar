@@ -628,7 +628,7 @@ const DefaultCalendarSidebar = ({
                     },
                   }}
                   defaultContent={
-                    <div className='rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-gray-700 dark:bg-slate-900'>
+                    <div className='rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-gray-700 dark:bg-gray-900'>
                       <DefaultColorPicker
                         color={customColorPicker.currentColor}
                         onChange={(color, isPending) => {

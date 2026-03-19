@@ -92,7 +92,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     return createPortal(
       <div
         ref={setRefs}
-        className={`animate-in fade-in-0 zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
+        className={`df-animate-in df-fade-in df-zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
         style={style}
         onContextMenu={e => e.preventDefault()}
         data-context-menu-root='true'
@@ -253,7 +253,7 @@ export const ContextMenuSubContent = ({
   return (
     <div
       ref={ref}
-      className={`animate-in fade-in-0 zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
+      className={`df-animate-in df-fade-in df-zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
       style={{
         left: position === 'right' ? '100%' : 'auto',
         right: position === 'left' ? '100%' : 'auto',

@@ -290,7 +290,7 @@ export const MultiDayEvent = memo(
           />
           <div className='flex min-w-0 flex-1 items-center'>
             <span
-              className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'mobile-mask-fade' : 'truncate'} text-xs font-medium`}
+              className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'df-mobile-mask-fade' : 'truncate'} text-xs font-medium`}
             >
               {titleText}
             </span>

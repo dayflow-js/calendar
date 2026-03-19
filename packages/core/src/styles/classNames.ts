@@ -34,7 +34,7 @@ export const headerTitle =
 /**
  * Subtitle text style
  */
-export const headerSubtitle = 'mt-3 text-gray-600 dark:text-gray-400';
+export const headerSubtitle = 'mt-3 leading-6 text-gray-600 dark:text-gray-400';
 
 // ==================== Button Styles ====================
 
@@ -146,7 +146,7 @@ export const monthTitle =
 /**
  * Calendar content area (week/day view)
  */
-export const calendarContent = 'relative overflow-y-auto calendar-content';
+export const calendarContent = 'relative overflow-y-auto df-calendar-content';
 
 /**
  * Hide scrollbar
@@ -158,7 +158,7 @@ export const scrollbarHide = 'scrollbar-hide';
 /**
  * Time column container
  */
-export const timeColumn = 'df-time-column flex-shrink-0 border-r';
+export const timeColumn = 'df-time-column flex-shrink-0';
 
 /**
  * Time slot
@@ -205,7 +205,7 @@ export const currentTimeLineBar =
 /**
  * All-day event row container
  */
-export const allDayRow = 'df-all-day-row flex items-center border-b sticky';
+export const allDayRow = 'df-all-day-row flex items-center border-b';
 
 /**
  * All-day event label
@@ -382,14 +382,14 @@ export const miniCalendarSelected =
  * Used in TodayBox component for navigation
  */
 export const calendarNavButton =
-  'df-nav-button calendar-nav-button group relative inline-flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
+  'df-nav-button df-calendar-nav-button group relative inline-flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
 
 /**
  * Calendar today button
  * Used in TodayBox component for "Today" button
  */
 export const calendarTodayButton =
-  'df-today-button calendar-today-button inline-flex items-center justify-center px-4 h-7 text-sm font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
+  'df-today-button df-calendar-today-button inline-flex items-center justify-center px-4 h-7 text-sm font-medium rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 active:bg-gray-100 dark:active:bg-gray-600 transition-all duration-150 shadow-sm hover:shadow focus:outline-none';
 
 /**
  * Navigation button icon size
@@ -429,7 +429,7 @@ export const dropdownPanel =
  * Calendar picker dropdown (for selecting calendar for an event)
  */
 export const calendarPickerDropdown =
-  'bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 origin-top-right animate-in fade-in zoom-in-95';
+  'bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 origin-top-right df-animate-in df-fade-in df-zoom-in-95';
 
 // ==================== Time Grid Boundary Styles ====================
 
