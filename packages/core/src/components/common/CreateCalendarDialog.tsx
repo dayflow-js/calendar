@@ -171,7 +171,7 @@ export const CreateCalendarDialog = ({
   return createPortal(
     <div className='fixed inset-0 z-10000 flex items-center justify-center bg-black/50'>
       <div
-        className='animate-in fade-in zoom-in-95 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900'
+        className='df-animate-in df-fade-in df-zoom-in-95 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900'
         onClick={e => e.stopPropagation()}
       >
         <h2
@@ -237,7 +237,7 @@ export const CreateCalendarDialog = ({
                       onClick={handleCancel}
                     >
                       <div
-                        className='animate-in fade-in zoom-in-95 relative'
+                        className='df-animate-in df-fade-in df-zoom-in-95 relative'
                         onClick={e => e.stopPropagation()}
                       >
                         <ContentSlot
@@ -250,7 +250,7 @@ export const CreateCalendarDialog = ({
                             styles: pickerStyles,
                           }}
                           defaultContent={
-                            <div className='rounded-lg border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900'>
+                            <div className='rounded-lg border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-gray-900'>
                               <DefaultColorPicker
                                 color={customSelectedColor}
                                 onChange={handleColorChange}

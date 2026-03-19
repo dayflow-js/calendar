@@ -165,6 +165,26 @@ DayFlow 提供两个 CSS 产物：
 
 如果项目**不使用** Tailwind，改为导入完整包：
 
+### 工具类扫描（`@source`）
+
+DayFlow 的组件内部使用了 Tailwind 工具类（`flex`、`bg-white`、`text-gray-600` 等）。你的项目的 Tailwind 实例需要扫描 DayFlow 的源文件，才能生成这些类。
+
+**Vite + `@tailwindcss/vite`** — 无需额外配置。Vite 插件会通过模块依赖图自动扫描 DayFlow 的文件。
+
+**其他构建工具（webpack、Rspack、Turbopack 等）+ `@tailwindcss/postcss`** — 在你的 CSS 入口文件中添加 `@source` 指令：
+
+```css
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+
+/* 非 Vite 构建工具必须添加 */
+@source '../node_modules/@dayflow/core/src';
+@source '../node_modules/@dayflow/plugin-drag/src'; /* 使用拖拽插件时 */
+@source '../node_modules/@dayflow/plugin-sidebar/src'; /* 使用侧边栏插件时 */
+```
+
+如果缺少此配置，Tailwind 将无法生成 DayFlow 组件内部所使用的工具类，导致界面样式失效。
+
 ```css
 /* app.css — 非 Tailwind 项目 */
 @import '@dayflow/core/dist/styles.css';
@@ -179,6 +199,22 @@ document.documentElement.classList.toggle('dark', isDark);
 ```
 
 无需显式设置类名时，也会自动响应系统级深色模式偏好。
+
+**在 Tailwind v4 中使用 `theme.mode`**
+
+Tailwind v4 默认将 `dark:` 工具类编译为 `@media (prefers-color-scheme: dark)`。DayFlow 的 `theme.mode` 通过给 `<html>` 添加 `.dark` 类来切换主题——如果你的 Tailwind 使用媒体查询方式，DayFlow 组件内部的 `dark:` 工具类将无法响应类名切换。
+
+在你的 CSS 入口文件中添加以下内容，将 Tailwind 切换为基于类名的深色模式：
+
+```css
+@import '@dayflow/core/dist/styles.components.css';
+@import 'tailwindcss';
+
+/* theme.mode 正常工作所必需：让 dark: 工具类响应 .dark 类名 */
+@variant dark (.dark &);
+```
+
+如果缺少此配置，`theme.mode: 'dark'` 仍会正确更新 CSS 自定义属性（`--df-color-*`），但 DayFlow 组件内部的 `dark:` 工具类只会在系统偏好为深色时才生效。
 
 ### 使用 Tailwind 工具类包裹日历
 

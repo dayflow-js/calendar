@@ -295,7 +295,7 @@ export const MobileEventDrawer = ({
 
       {/* Drawer */}
       <div
-        className={`pointer-events-auto relative flex h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-gray-100 shadow-xl dark:bg-gray-800 ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}
+        className={`pointer-events-auto relative flex h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-gray-100 shadow-xl dark:bg-gray-800 ${isClosing ? 'df-animate-slide-down' : 'df-animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
         {/* Header Actions */}

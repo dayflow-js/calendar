@@ -41,7 +41,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   description,
   children,
 }) => (
-  <div className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+  <div className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-gray-900'>
     <div className='border-b border-slate-100 bg-slate-50 px-6 py-5 dark:border-slate-800 dark:bg-slate-800/60'>
       <h3 className='text-xl font-semibold text-slate-900 dark:text-slate-100'>
         {title}
@@ -50,7 +50,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         {description}
       </p>
     </div>
-    <div className='bg-white p-6 dark:bg-slate-900'>{children}</div>
+    <div className='bg-white p-6 dark:bg-gray-900'>{children}</div>
   </div>
 );
 
@@ -111,7 +111,7 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
 
   return (
-    <div className='not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900'>
+    <div className='not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-gray-900'>
       <DayFlowCalendar calendar={calendar} />
     </div>
   );

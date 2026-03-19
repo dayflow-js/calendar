@@ -687,7 +687,10 @@ const MonthView = ({
         <div
           ref={scrollElementRef}
           className={scrollContainer}
-          style={{ overflow: 'hidden' }}
+          style={{
+            overflow: 'hidden',
+            visibility: isWeekHeightInitialized ? 'visible' : 'hidden',
+          }}
         >
           <div style={fadeStyle}>
             {fadeWeeks.map((weekData, index) => {

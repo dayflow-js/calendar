@@ -11,9 +11,8 @@
 @variant dark (.dark &);
 
 /* Ensure that the base variables can be correctly parsed even without Tailwind */
-:root {
+.df-calendar-container {
   color-scheme: light dark;
-  font-family: Arial;
 }
 
 @layer df-theme {
@@ -41,19 +40,19 @@
 
   :where(.dark) {
     /* Dark mode colors */
-    --df-color-background: rgb(21 21 21);
-    --df-color-hover: rgb(28 28 28);
+    --df-color-background: rgb(16 24 40); /* #101828 */
+    --df-color-hover: rgb(30 41 59);
     --df-color-foreground: rgb(229 229 229);
-    --df-color-card: rgb(31 41 55);
+    --df-color-card: rgb(16 24 40);
     --df-color-card-foreground: rgb(229 229 229);
-    --df-color-border: rgb(56 56 56);
-    --df-color-muted: rgb(55 65 81);
-    --df-color-muted-foreground: rgb(156 163 175);
+    --df-color-border: rgb(51 65 85);
+    --df-color-muted: rgb(30 41 59);
+    --df-color-muted-foreground: rgb(148 163 184);
 
     --df-color-primary: rgb(229 229 229);
-    --df-color-primary-foreground: rgb(23 23 23);
-    --df-color-secondary: rgb(156 163 175);
-    --df-color-secondary-foreground: rgb(23 23 23);
+    --df-color-primary-foreground: rgb(15 23 42);
+    --df-color-secondary: rgb(148 163 184);
+    --df-color-secondary-foreground: rgb(15 23 42);
 
     /* Destructive */
     --df-color-destructive: rgb(147 70 69);
@@ -65,18 +64,18 @@
    * tokens fall back to their light-mode values from :where(:root). */
   @media (prefers-color-scheme: dark) {
     :root:not(.light):not(.dark) {
-      --df-color-background: rgb(21 21 21);
-      --df-color-hover: rgb(28 28 28);
+      --df-color-background: rgb(16 24 40);
+      --df-color-hover: rgb(30 41 59);
       --df-color-foreground: rgb(229 229 229);
-      --df-color-border: rgb(56 56 56);
-      --df-color-card: rgb(31 41 55);
+      --df-color-border: rgb(51 65 85);
+      --df-color-card: rgb(16 24 40);
       --df-color-card-foreground: rgb(229 229 229);
-      --df-color-muted: rgb(55 65 81);
-      --df-color-muted-foreground: rgb(156 163 175);
+      --df-color-muted: rgb(30 41 59);
+      --df-color-muted-foreground: rgb(148 163 184);
       --df-color-primary: rgb(229 229 229);
-      --df-color-primary-foreground: rgb(23 23 23);
-      --df-color-secondary: rgb(156 163 175);
-      --df-color-secondary-foreground: rgb(23 23 23);
+      --df-color-primary-foreground: rgb(15 23 42);
+      --df-color-secondary: rgb(148 163 184);
+      --df-color-secondary-foreground: rgb(15 23 42);
       --df-color-destructive: rgb(147 70 69);
       --df-color-destructive-foreground: rgb(254 242 242);
     }
@@ -118,6 +117,7 @@
     @apply relative flex flex-row bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700;
     --df-calendar-height: 800px;
     height: var(--df-calendar-height, 800px);
+    font-family: Arial;
   }
 
   @media (max-width: 768px) {
@@ -126,36 +126,39 @@
     }
   }
 
-  .calendar-time-column {
+  .df-calendar-time-column {
     @apply w-20 shrink-0 border-gray-200 dark:border-gray-700;
   }
 
-  .calendar-nav-button {
+  .df-calendar-nav-button {
     @apply p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors;
   }
 
-  .calendar-today-button {
+  .df-calendar-today-button {
     @apply px-4 py-1 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors;
   }
 
-  .calendar-checkbox {
+  .df-calendar-checkbox {
     @apply mr-2 h-4 w-4 inline-flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-sm cursor-pointer;
     appearance: none;
     background-color: transparent;
     position: relative;
   }
 
-  .calendar-checkbox:focus-visible {
+  .df-calendar-checkbox:focus-visible,
+  :focus-visible {
     outline: 2px solid var(--checkbox-color, #3b82f6);
     outline-offset: 2px;
   }
 
-  .calendar-checkbox:checked {
+  .df-calendar-checkbox:checked,
+  :checked {
     background-color: var(--checkbox-color, #3b82f6);
     border-color: var(--checkbox-color, #3b82f6);
   }
 
-  .calendar-checkbox:checked::after {
+  .df-calendar-checkbox:checked::after,
+  :checked::after {
     content: '';
     display: block;
     width: 0.25rem;
@@ -164,11 +167,157 @@
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
   }
+
+  .df-header {
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  .df-calendar {
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  .df-month-view {
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  .df-week-header-row,
+  .df-week-header {
+    @apply border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900;
+  }
+
+  .df-month-day-cell,
+  .df-time-grid-cell,
+  .df-all-day-cell {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+
+  .df-time-column {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+
+  .df-time-grid-row,
+  .df-all-day-row,
+  .df-mini-calendar {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+
+  .df-event-detail-panel,
+  .df-dialog-container {
+    @apply border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800;
+  }
+
+  .df-sidebar {
+    @apply border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900;
+  }
+
+  /* Year View Heatmap Intensity Colors */
+  .df-year-grid-month {
+    --heat-1: #ebf5ff;
+    --heat-2: #cfe8ff;
+    --heat-3: #91d5ff;
+    --heat-4: #60a5fa;
+    --heat-5: #3b82f6;
+  }
+
+  .dark .df-year-grid-month {
+    --heat-1: #1e3a5f;
+    --heat-2: #2563eb;
+    --heat-3: #1e40af;
+    --heat-4: #3b82f6;
+    --heat-5: #93c5fd;
+  }
+
+  /*
+   * Scrollbar styles scoped to the calendar container.
+   * Global * and ::-webkit-scrollbar selectors are intentionally avoided to
+   * prevent leaking into the host application's scrollable areas.
+   */
+  .df-calendar-container *::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+
+  .df-calendar-container *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .df-calendar-container *::-webkit-scrollbar-thumb {
+    background: #d1d5db; /* gray-300 */
+    border-radius: 1px;
+  }
+
+  .dark .df-calendar-container *::-webkit-scrollbar-thumb {
+    background: #4b5563; /* gray-600 */
+  }
+
+  .df-calendar-container *::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af; /* gray-400 */
+  }
+
+  .df-calendar-container * {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #d1d5db transparent; /* Firefox */
+  }
+
+  .dark .df-calendar-container * {
+    scrollbar-color: #4b5563 transparent; /* Firefox */
+  }
+
+  .df-calendar-container .df-header-left {
+    flex: 1;
+  }
+
+  .df-calendar-container .df-header-mid {
+    flex: 1;
+  }
+
+  .df-calendar-container .df-header-right {
+    flex: 1;
+  }
+
+  /* Drag & Resize Utilities */
+  .df-calendar-container.df-drag-active,
+  .df-calendar-container .df-drag-active {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .df-calendar-container.df-drag-active .calendar-event,
+  .df-calendar-container.df-drag-active .df-month-more-events,
+  .df-calendar-container.df-drag-active .df-month-title,
+  .df-calendar-container.df-drag-active .df-year-event-content {
+    pointer-events: none;
+  }
+
+  .df-calendar-container .df-cursor-ns-resize,
+  .df-calendar-container .df-cursor-ns-resize * {
+    cursor: ns-resize;
+  }
+
+  .df-calendar-container .df-cursor-ew-resize,
+  .df-calendar-container .df-cursor-ew-resize * {
+    cursor: ew-resize;
+  }
+
+  .df-calendar-container .df-cursor-grabbing,
+  .df-calendar-container .df-cursor-grabbing * {
+    cursor: grabbing;
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  .df-calendar-container .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .df-calendar-container .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
 /* ==================== Utilities ==================== */
 
-@keyframes fadeOut {
+@keyframes df-fade-out {
   from {
     opacity: 1;
   }
@@ -176,174 +325,4 @@
   to {
     opacity: 0;
   }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes df-event-pop-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.df-all-day-event-animate {
-  animation: df-event-pop-in 0.3s ease-out forwards;
-}
-
-@keyframes zoomIn {
-  from {
-    transform: scale(0.95);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.animate-in {
-  animation-duration: 200ms;
-  animation-fill-mode: forwards;
-  animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.zoom-in-95 {
-  animation-name: zoomIn;
-}
-
-.fade-in.zoom-in-95 {
-  animation-name: fadeIn, zoomIn;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(100%);
-  }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slide-down {
-  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@media (max-width: 767px) {
-  .mobile-mask-fade {
-    mask-image: linear-gradient(to right, black 70%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
-  }
-}
-
-/* Hide scrollbar but allow scrolling */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-/*
- * Scrollbar styles scoped to the calendar container.
- * Global * and ::-webkit-scrollbar selectors are intentionally avoided to
- * prevent leaking into the host application's scrollable areas.
- */
-.df-calendar-container *::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
-}
-
-.df-calendar-container *::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.df-calendar-container *::-webkit-scrollbar-thumb {
-  background: #d1d5db; /* gray-300 */
-  border-radius: 1px;
-}
-
-.dark .df-calendar-container *::-webkit-scrollbar-thumb {
-  background: #4b5563; /* gray-600 */
-}
-
-.df-calendar-container *::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af; /* gray-400 */
-}
-
-.df-calendar-container * {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #d1d5db transparent; /* Firefox */
-}
-
-.dark .df-calendar-container * {
-  scrollbar-color: #4b5563 transparent; /* Firefox */
-}
-
-.df-header-left {
-  flex: 1;
-}
-
-.df-header-mid {
-  flex: 1;
-}
-
-.df-header-right {
-  flex: 1;
-}
-
-/* Drag & Resize Utilities */
-.df-drag-active {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.df-drag-active .calendar-event,
-.df-drag-active .df-month-more-events,
-.df-drag-active .df-month-title,
-.df-drag-active .df-year-event-content {
-  pointer-events: none;
-}
-
-.df-cursor-ns-resize,
-.df-cursor-ns-resize * {
-  cursor: ns-resize;
-}
-
-.df-cursor-ew-resize,
-.df-cursor-ew-resize * {
-  cursor: ew-resize;
-}
-
-.df-cursor-grabbing,
-.df-cursor-grabbing * {
-  cursor: grabbing;
 }

@@ -236,7 +236,7 @@ export const CalendarList = ({
                 >
                   <input
                     type='checkbox'
-                    className='calendar-checkbox shrink-0 cursor-pointer'
+                    className='df-calendar-checkbox shrink-0 cursor-pointer'
                     style={
                       {
                         '--checkbox-color': calendarColor,

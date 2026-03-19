@@ -193,7 +193,7 @@ export const TimeGrid = ({
           vertically together natively — no JS transform sync needed. */}
       <div
         ref={scrollerRef}
-        className={`calendar-content relative flex-1 overflow-auto ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
+        className={`df-calendar-content relative flex-1 overflow-auto ${gridWidth === '300%' ? 'overflow-x-hidden' : 'snap-x snap-mandatory'}`}
         style={{ display: 'grid', gridTemplateColumns: 'auto 1fr' }}
         onScroll={handleScroll}
       >

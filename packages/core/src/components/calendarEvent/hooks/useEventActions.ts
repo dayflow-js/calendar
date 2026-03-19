@@ -70,8 +70,9 @@ export const useEventActions = ({
           resolve();
           return;
         }
-        const calendarContent =
-          calendarRef.current.querySelector('.calendar-content');
+        const calendarContent = calendarRef.current.querySelector(
+          '.df-calendar-content'
+        );
         if (!calendarContent) {
           resolve();
           return;

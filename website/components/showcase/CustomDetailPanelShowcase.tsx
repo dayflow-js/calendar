@@ -165,7 +165,7 @@ const DemoCalendar: React.FC<DemoCalendarProps> = ({
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
 
   return (
-    <div className='rounded-xl bg-white dark:border-slate-700 dark:bg-slate-900'>
+    <div className='rounded-xl bg-white dark:border-slate-700 dark:bg-gray-900'>
       <DayFlowCalendar
         calendar={calendar}
         eventDetailContent={customDetailPanelContent}

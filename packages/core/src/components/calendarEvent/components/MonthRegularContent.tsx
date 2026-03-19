@@ -40,7 +40,7 @@ const MonthRegularContent = ({
           className={monthEventColorBar}
         />
         <span
-          className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
+          className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'df-mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
         >
           {event.title}
         </span>

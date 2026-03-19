@@ -98,6 +98,7 @@ const DefaultCalendarExample: React.FC = () => {
         startOfWeek: 7,
       }),
     ],
+    theme: { mode: 'light' as const },
     events: events,
     calendars: getWebsiteCalendars(),
     defaultCalendar: 'work',
@@ -107,7 +108,6 @@ const DefaultCalendarExample: React.FC = () => {
     // locale: zh,
     defaultView: ViewType.MONTH,
     // useEventDetailDialog: true,
-    theme: { mode: 'auto' as const },
     // switcherMode: 'select' as const,
     // readOnly: {
     //   viewable: true,

@@ -216,8 +216,9 @@ export const useEventStyles = ({
           dayColumnWidth = overrideMetrics.width;
         }
 
-        let scrollContainer =
-          calendarRef.current?.querySelector('.calendar-content');
+        let scrollContainer = calendarRef.current?.querySelector(
+          '.df-calendar-content'
+        );
         if (!scrollContainer) {
           scrollContainer =
             calendarRef.current?.querySelector('.calendar-renderer');

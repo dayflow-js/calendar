@@ -150,7 +150,7 @@ export const CalendarPicker = ({
       <ul
         data-calendar-picker-dropdown='true'
         style={dropdownStyle}
-        className='animate-in fade-in zoom-in-95 origin-top-left overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg transition-all duration-200 dark:border-gray-600 dark:bg-gray-700 dark:shadow-gray-900/50'
+        className='df-animate-in df-fade-in df-zoom-in-95 origin-top-left overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg transition-all duration-200 dark:border-gray-600 dark:bg-gray-700 dark:shadow-gray-900/50'
       >
         {options.map(opt => (
           <li

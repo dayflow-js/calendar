@@ -177,8 +177,9 @@ const DayView = ({
         );
         if (event && !event.allDay) {
           const startHour = extractHourFromDate(event.start);
-          const scrollContainer =
-            calendarRef.current?.querySelector('.calendar-content');
+          const scrollContainer = calendarRef.current?.querySelector(
+            '.df-calendar-content'
+          );
           if (scrollContainer) {
             const top = (startHour - FIRST_HOUR) * HOUR_HEIGHT;
             requestAnimationFrame(() => {
@@ -337,12 +338,12 @@ const DayView = ({
 
     longPressTimerRef.current = setTimeout(() => {
       const rect = (calendarRef.current as HTMLElement)
-        ?.querySelector('.calendar-content')
+        ?.querySelector('.df-calendar-content')
         ?.getBoundingClientRect();
 
       if (!rect) return;
       const container = (calendarRef.current as HTMLElement)?.querySelector(
-        '.calendar-content'
+        '.df-calendar-content'
       );
       const scrollTop = container ? container.scrollTop : 0;
       const relativeY = clientY - rect.top + scrollTop;
@@ -454,8 +455,9 @@ const DayView = ({
   // Initial scroll to current time
   useLayoutEffect(() => {
     if (config.scrollToCurrentTime) {
-      const scrollContainer =
-        calendarRef.current?.querySelector('.calendar-content');
+      const scrollContainer = calendarRef.current?.querySelector(
+        '.df-calendar-content'
+      );
       if (scrollContainer) {
         const now = new Date();
         const hour = now.getHours() + now.getMinutes() / 60;
