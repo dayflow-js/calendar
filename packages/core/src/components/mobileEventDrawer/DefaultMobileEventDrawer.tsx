@@ -285,7 +285,7 @@ export const MobileEventDrawer = ({
   };
 
   return createPortal(
-    <div className='pointer-events-none fixed inset-0 z-10000 flex items-end'>
+    <div className='df-portal pointer-events-none fixed inset-0 z-10000 flex items-end'>
       {/* Backdrop */}
       <div
         className={`pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}

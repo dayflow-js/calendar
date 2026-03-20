@@ -123,7 +123,7 @@ export const ImportCalendarDialog = ({
   };
 
   return (
-    <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/50'>
+    <div className='df-portal fixed inset-0 z-100 flex items-center justify-center bg-black/50'>
       <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900'>
         <h2 className='mb-4 text-lg font-semibold text-gray-900 dark:text-white'>
           {t('addSchedule') || 'Add Schedule'}

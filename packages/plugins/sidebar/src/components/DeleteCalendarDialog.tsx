@@ -31,7 +31,7 @@ export const DeleteCalendarDialog = ({
   const { t } = useLocale();
 
   return createPortal(
-    <div className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
+    <div className='df-portal fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
       <div className='w-full max-w-md rounded-lg bg-background p-6 shadow-xl'>
         {step === 'initial' ? (
           <>

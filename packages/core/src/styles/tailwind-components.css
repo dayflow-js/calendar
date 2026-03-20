@@ -17,6 +17,14 @@
   color-scheme: light dark;
 }
 
+.df-calendar-container,
+.df-portal {
+  --color-primary: var(--df-color-primary);
+  --color-primary-foreground: var(--df-color-primary-foreground);
+  --color-destructive: var(--df-color-destructive);
+  --color-destructive-foreground: var(--df-color-destructive-foreground);
+}
+
 @layer df-theme {
   :where(:root) {
     /* Light mode colors */

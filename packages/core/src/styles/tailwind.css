@@ -15,6 +15,18 @@
   color-scheme: light dark;
 }
 
+/* Remap host Tailwind color tokens to DayFlow's own variables so that
+   bg-primary / text-primary / ring-primary etc. always resolve to DayFlow
+   colors inside the calendar container and DayFlow portal elements,
+   regardless of what the host application defines for --color-primary. */
+.df-calendar-container,
+.df-portal {
+  --color-primary: var(--df-color-primary);
+  --color-primary-foreground: var(--df-color-primary-foreground);
+  --color-destructive: var(--df-color-destructive);
+  --color-destructive-foreground: var(--df-color-destructive-foreground);
+}
+
 @layer df-theme {
   :where(:root) {
     /* Light mode colors */
@@ -145,20 +157,17 @@
     position: relative;
   }
 
-  .df-calendar-checkbox:focus-visible,
-  :focus-visible {
+  .df-calendar-checkbox:focus-visible {
     outline: 2px solid var(--checkbox-color, #3b82f6);
     outline-offset: 2px;
   }
 
-  .df-calendar-checkbox:checked,
-  :checked {
+  .df-calendar-checkbox:checked {
     background-color: var(--checkbox-color, #3b82f6);
     border-color: var(--checkbox-color, #3b82f6);
   }
 
-  .df-calendar-checkbox:checked::after,
-  :checked::after {
+  .df-calendar-checkbox:checked::after {
     content: '';
     display: block;
     width: 0.25rem;

@@ -92,7 +92,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     return createPortal(
       <div
         ref={setRefs}
-        className={`df-animate-in df-fade-in df-zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
+        className={`df-portal df-animate-in df-fade-in df-zoom-in-95 fixed z-50 min-w-32 overflow-visible rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50 ${className || ''}`}
         style={style}
         onContextMenu={e => e.preventDefault()}
         data-context-menu-root='true'
@@ -123,11 +123,11 @@ export const ContextMenuItem = ({
     className={`group relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none ${
       disabled
         ? 'pointer-events-none opacity-50'
-        : 'hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white'
+        : 'hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)] focus:bg-[var(--df-color-primary)] focus:text-[var(--df-color-primary-foreground)]'
     } ${
       danger
         ? 'text-destructive hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground'
-        : 'text-slate-900 dark:text-slate-50'
+        : 'text-[var(--df-color-foreground)]'
     }`}
     onClick={e => {
       e.stopPropagation();
@@ -212,7 +212,7 @@ export const ContextMenuSubTrigger = ({
   isOpen?: boolean;
 }) => (
   <div
-    className={`relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none hover:bg-primary hover:text-white focus:bg-primary focus:text-white dark:hover:bg-primary dark:hover:text-white dark:focus:bg-primary dark:focus:text-white ${isOpen ? 'bg-primary text-white' : ''}`}
+    className={`relative flex cursor-default items-center rounded-sm px-3 py-0.5 text-[12px] text-[var(--df-color-foreground)] transition-colors outline-none select-none hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)] focus:bg-[var(--df-color-primary)] focus:text-[var(--df-color-primary-foreground)] ${isOpen ? 'bg-[var(--df-color-primary)] text-[var(--df-color-primary-foreground)]' : ''}`}
   >
     {icon && <span className='mr-2 h-4 w-4'>{icon}</span>}
     <span className='grow text-left'>{children}</span>
@@ -253,7 +253,7 @@ export const ContextMenuSubContent = ({
   return (
     <div
       ref={ref}
-      className={`df-animate-in df-fade-in df-zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
+      className={`df-portal df-animate-in df-fade-in df-zoom-in-95 absolute top-0 z-50 min-w-32 overflow-hidden rounded-md border border-slate-200 bg-white p-1 whitespace-nowrap text-slate-950 shadow-md duration-100 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50`}
       style={{
         left: position === 'right' ? '100%' : 'auto',
         right: position === 'left' ? '100%' : 'auto',
@@ -310,7 +310,7 @@ export const ContextMenuColorPicker = ({
       </div>
       {onCustomColor && (
         <div
-          className='mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-slate-700 transition-colors hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white'
+          className='mt-1 flex cursor-pointer items-center rounded-sm px-3 py-0.5 text-[12px] text-[var(--df-color-foreground)] transition-colors hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)]'
           onClick={e => {
             e.stopPropagation();
             onCustomColor();

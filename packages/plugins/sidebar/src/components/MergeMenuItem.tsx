@@ -59,7 +59,7 @@ export const MergeMenuItem = ({
     <>
       <div
         ref={itemRef}
-        className='relative flex cursor-default items-center justify-between rounded-sm px-3 py-0.5 text-[12px] transition-colors outline-none select-none hover:bg-primary hover:text-white dark:text-slate-200 dark:hover:bg-primary dark:hover:text-white'
+        className='relative flex cursor-default items-center justify-between rounded-sm px-3 py-0.5 text-[12px] text-[var(--df-color-foreground)] transition-colors outline-none select-none hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)]'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -71,7 +71,7 @@ export const MergeMenuItem = ({
           <div
             ref={submenuRef}
             data-submenu-content='true'
-            className='df-animate-in df-fade-in df-zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
+            className='df-portal df-animate-in df-fade-in df-zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -80,7 +80,7 @@ export const MergeMenuItem = ({
             {availableCalendars.map(calendar => (
               <div
                 key={calendar.id}
-                className='flex cursor-pointer items-center rounded-sm px-3 py-1 text-[12px] text-slate-900 transition-colors hover:bg-primary hover:text-white dark:text-slate-50 dark:hover:bg-primary dark:hover:text-white'
+                className='flex cursor-pointer items-center rounded-sm px-3 py-1 text-[12px] text-[var(--df-color-foreground)] transition-colors hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)]'
                 onClick={e => {
                   e.stopPropagation();
                   onMergeSelect(calendar.id);

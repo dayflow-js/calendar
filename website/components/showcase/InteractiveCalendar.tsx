@@ -116,7 +116,7 @@ export function InteractiveCalendar() {
     ViewType.YEAR,
   ]);
   const [activeView, setActiveView] = useState<ViewType>(ViewType.MONTH);
-  const [yearMode, setYearMode] = useState<'fixed-week' | 'canvas'>(
+  const [yearMode, setYearMode] = useState<'fixed-week' | 'canvas' | 'grid'>(
     'fixed-week'
   );
 
@@ -229,6 +229,7 @@ export function InteractiveCalendar() {
                     onCheckedChange={checked =>
                       setShowSidebar(checked === true)
                     }
+                    className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
                   />
                   <Label
                     htmlFor='sidebar'
@@ -242,6 +243,7 @@ export function InteractiveCalendar() {
                     id='header'
                     checked={showHeader}
                     onCheckedChange={checked => setShowHeader(checked === true)}
+                    className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
                   />
                   <Label
                     htmlFor='header'
@@ -255,6 +257,7 @@ export function InteractiveCalendar() {
                     id='drag'
                     checked={enableDrag}
                     onCheckedChange={checked => setEnableDrag(checked === true)}
+                    className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
                   />
                   <Label
                     htmlFor='drag'
@@ -270,6 +273,7 @@ export function InteractiveCalendar() {
                     onCheckedChange={checked =>
                       setEnableShortcuts(checked === true)
                     }
+                    className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
                   />
                   <div className='flex items-center gap-1'>
                     <Label
@@ -377,8 +381,24 @@ export function InteractiveCalendar() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='fixed-week'>Fixed Week</SelectItem>
-                        <SelectItem value='canvas'>Canvas</SelectItem>
+                        <SelectItem
+                          value='fixed-week'
+                          className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                        >
+                          Fixed Week
+                        </SelectItem>
+                        <SelectItem
+                          value='canvas'
+                          className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                        >
+                          Canvas
+                        </SelectItem>
+                        <SelectItem
+                          value='grid'
+                          className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                        >
+                          Grid Year
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -397,7 +417,11 @@ export function InteractiveCalendar() {
                 </SelectTrigger>
                 <SelectContent>
                   {LOCALES_OPTIONS.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>
+                    <SelectItem
+                      key={opt.value}
+                      value={opt.value}
+                      className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                    >
                       {opt.label}
                     </SelectItem>
                   ))}

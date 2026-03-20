@@ -11,6 +11,11 @@ const inter = Inter({
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_PATH
+      ? `https://dayflow-js.github.io/calendar/`
+      : 'http://localhost:3000'
+  ),
   title: {
     template: '%s | DayFlow',
     default: 'DayFlow - Lightweight Calendar Component',

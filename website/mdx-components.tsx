@@ -1,8 +1,13 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
 
+import { CliPreview } from '@/components/CliPreview';
 import { DefaultColorPalette } from '@/components/ColorPalette';
-import { FrameworkInstall, PackageTabs } from '@/components/FrameworkInstall';
+import {
+  CreateDayflowTabs,
+  FrameworkInstall,
+  PackageTabs,
+} from '@/components/FrameworkInstall';
 import { FrameworkTabs, Tab } from '@/components/FrameworkTabs';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -33,6 +38,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     FrameworkTabs,
     FrameworkInstall,
     PackageTabs,
+    CreateDayflowTabs,
+    CliPreview,
     Tab,
     DefaultColorPalette,
     DocImg,

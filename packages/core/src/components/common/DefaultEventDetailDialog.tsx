@@ -153,7 +153,7 @@ const DefaultEventDetailDialog = ({
 
   const dialogContent = (
     <div
-      className='fixed inset-0 flex items-center justify-center'
+      className='df-portal fixed inset-0 flex items-center justify-center'
       style={{ pointerEvents: 'auto', zIndex: 9998 }}
       data-event-detail-dialog='true'
     >

@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/angular",
-  "version": "3.2.6",
+  "version": "3.3.0",
   "description": "Angular adapter for DayFlow calendar",
   "files": [
     "**/*.mjs",

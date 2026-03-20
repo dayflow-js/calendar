@@ -327,10 +327,6 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                     ? getIntensityStyle(eventCount, heatmapLevels)
                     : {};
                   const isToday = date.getTime() === today.getTime();
-                  const isPopupOpen =
-                    popup !== null &&
-                    popup.date.getTime() === date.getTime() &&
-                    popup.monthIndex === month.monthIndex;
 
                   return (
                     <div

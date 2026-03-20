@@ -169,7 +169,7 @@ export const CreateCalendarDialog = ({
   if (typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className='fixed inset-0 z-10000 flex items-center justify-center bg-black/50'>
+    <div className='df-portal fixed inset-0 z-10000 flex items-center justify-center bg-black/50'>
       <div
         className='df-animate-in df-fade-in df-zoom-in-95 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900'
         onClick={e => e.stopPropagation()}

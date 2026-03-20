@@ -220,7 +220,7 @@ export const CalendarList = ({
               onContextMenu={e => onContextMenu(e, calendar.id)}
             >
               {isDropTarget && dropTarget.position === 'top' && (
-                <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-primary' />
+                <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
               )}
               <div
                 draggable={isDraggable && !editingId}
@@ -282,7 +282,7 @@ export const CalendarList = ({
                 </div>
               </div>
               {isDropTarget && dropTarget.position === 'bottom' && (
-                <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-primary' />
+                <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
               )}
             </li>
           );

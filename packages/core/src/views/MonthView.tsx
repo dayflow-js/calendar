@@ -755,6 +755,7 @@ const MonthView = ({
           className={scrollContainer}
           style={{
             overflow: 'hidden auto',
+            overscrollBehavior: 'contain',
             visibility: isWeekHeightInitialized ? 'visible' : 'hidden',
           }}
           onScroll={handleScroll}

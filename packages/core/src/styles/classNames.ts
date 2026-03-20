@@ -106,7 +106,8 @@ export const dateNumber =
 /**
  * Virtual scroll container
  */
-export const scrollContainer = 'flex-1 overflow-auto will-change-scroll';
+export const scrollContainer =
+  'flex-1 overflow-auto will-change-scroll overscroll-contain';
 
 /**
  * Month view 6-row grid container - fixed 6-row equal height layout
@@ -473,7 +474,7 @@ export const sidebarHeaderTitle =
  * Mobile fullscreen overlay
  */
 export const mobileFullscreen =
-  'fixed inset-0 z-9999 bg-white dark:bg-gray-900 flex flex-col';
+  'df-portal fixed inset-0 z-9999 bg-white dark:bg-gray-900 flex flex-col';
 
 // ==================== Form Input Styles ====================
 

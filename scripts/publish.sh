@@ -14,10 +14,11 @@ NC='\033[0m'
 # ---------- Usage ----------
 usage() {
     echo -e "${BOLD}Usage:${NC}"
-    echo "  ./scripts/publish.sh all          Publish all packages (core, adapters, plugins)"
+    echo "  ./scripts/publish.sh all          Publish all packages (core, adapters, plugins, cli)"
     echo "  ./scripts/publish.sh main         Publish core + react + vue + svelte"
     echo "  ./scripts/publish.sh plugins      Publish all plugins"
     echo "  ./scripts/publish.sh angular      Publish angular only"
+    echo "  ./scripts/publish.sh cli          Publish create-dayflow CLI"
     echo ""
     echo "Options:"
     echo "  --dry-run      Run npm publish with --dry-run (no actual publish)"
@@ -35,6 +36,7 @@ for arg in "$@"; do
         main) MODE="main" ;;
         plugins) MODE="plugins" ;;
         angular) MODE="angular" ;;
+        cli) MODE="cli" ;;
         all) MODE="all" ;;
         --dry-run) DRY_RUN="--dry-run" ;;
         --skip-build) SKIP_BUILD=true ;;
@@ -86,7 +88,8 @@ case "$MODE" in
     main)    TOTAL=$(( ${#MAIN_PKGS[@]} * 2 )) ;;
     angular) TOTAL=2 ;;
     plugins) TOTAL=$(( ${#PLUGIN_DIRS[@]} * 2 )) ;;
-    all)     TOTAL=$(( ${#MAIN_PKGS[@]} * 2 + ${#PLUGIN_DIRS[@]} * 2 + 2 )) ;;
+    cli)     TOTAL=2 ;;
+    all)     TOTAL=$(( ${#MAIN_PKGS[@]} * 2 + ${#PLUGIN_DIRS[@]} * 2 + 2 + 2 )) ;;
 esac
 
 # ---------- Build Functions ----------
@@ -96,13 +99,13 @@ build_pkg() {
     local dir="$ROOT/$display_path"
 
     step "Building $display_path"
-    
+
     # Ensure LICENSE exists
     if [ ! -f "$dir/LICENSE" ]; then
         cp "$ROOT/LICENSE" "$dir/LICENSE"
     fi
 
-    # Do not overwrite README.md if it already exists, 
+    # Do not overwrite README.md if it already exists,
     # as they are manually managed and framework-specific.
     if [ ! -f "$dir/README.md" ]; then
         # Transform README.md: Replace relative image paths with absolute GitHub URLs
@@ -116,11 +119,38 @@ build_pkg() {
     ok "$display_path built"
 }
 
+publish_cli() {
+    local dir="$ROOT/packages/create-dayflow"
+    step "Building create-dayflow CLI"
+
+    if [ ! -f "$dir/LICENSE" ]; then
+        cp "$ROOT/LICENSE" "$dir/LICENSE"
+    fi
+    if ! (cd "$dir" && pnpm run build > /dev/null); then
+        err "Build failed for create-dayflow"
+    fi
+    ok "create-dayflow built"
+
+    step "Publishing create-dayflow"
+    local version=$(node -e "console.log(require('$dir/package.json').version)")
+    echo -e "  version: ${BOLD}$version${NC}"
+
+    if npm view "create-dayflow@$version" version &>/dev/null; then
+        warn "create-dayflow@$version already exists on npm — skipping"
+        return 0
+    fi
+
+    if ! (cd "$dir" && pnpm publish --access public --no-git-checks $DRY_RUN); then
+        err "Failed to publish create-dayflow"
+    fi
+    ok "create-dayflow published"
+}
+
 publish_pkg() {
     local name=$1 # This should be the @dayflow/ package name part
     local dir=$2
     step "Publishing @dayflow/$name"
-    
+
     local version=$(node -e "console.log(require('$dir/package.json').version)")
     echo -e "  version: ${BOLD}$version${NC}"
 
@@ -173,7 +203,15 @@ publish_pkg() {
 
 # ---------- Execution ----------
 
-# 1. Build Phase
+# 1. Build + Publish (cli handles its own build/publish together)
+if [[ "$MODE" == "cli" ]]; then
+    publish_cli
+    echo -e "\n${GREEN}${BOLD}Done!${NC}"
+    if [ -n "$DRY_RUN" ]; then warn "This was a dry run. No actual publish occurred."; fi
+    exit 0
+fi
+
+# 2. Build Phase
 if [ "$SKIP_BUILD" = false ]; then
     if [[ "$MODE" == "all" || "$MODE" == "main" ]]; then
         for pkg in "${MAIN_PKGS[@]}"; do build_pkg "$pkg" "packages/$pkg"; done
@@ -198,7 +236,7 @@ else
     esac
 fi
 
-# 2. Publish Phase
+# 3. Publish Phase
 if [[ "$MODE" == "all" || "$MODE" == "main" ]]; then
     for pkg in "${MAIN_PKGS[@]}"; do
         publish_pkg "$pkg" "$ROOT/packages/$pkg"
@@ -214,6 +252,10 @@ fi
 
 if [[ "$MODE" == "all" || "$MODE" == "angular" ]]; then
     publish_pkg "angular" "$ROOT/packages/angular/dist"
+fi
+
+if [[ "$MODE" == "all" ]]; then
+    publish_cli
 fi
 
 echo -e "\n${GREEN}${BOLD}Done!${NC}"

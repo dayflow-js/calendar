@@ -13,6 +13,7 @@
     "lint:fix": "oxlint . --fix",
     "prepare": "lefthook install",
     "publish:all": "./scripts/publish.sh all",
+    "publish:cli": "./scripts/publish.sh cli",
     "publish:dry": "./scripts/publish.sh all --dry-run",
     "publish:main": "./scripts/publish.sh main",
     "test": "turbo run test",

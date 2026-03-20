@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] - 2026-03-20
+
+### New Features & Enhancements
+
+- **Grid Year View**: Added a new `grid` mode for `createYearView`, providing a compact month-grid layout with heatmap intensity colors for event density visualization.
+- **`@create-dayflow` CLI**: Introduced the `npm create dayflow@latest` scaffolding tool. Interactively configures a new project with framework selection (React, Vue, Angular, Svelte), TypeScript support, and Tailwind CSS integration.
+- **`renderSidebarHeader`**: Added a `renderSidebarHeader` render prop to the sidebar plugin, allowing full customization of the sidebar header area (e.g. user avatar, collapse toggle).
+
+### Fixed
+
+- **Style Isolation**: Fixed `tailwind-components.css` overriding host application styles. DayFlow's component CSS no longer emits Tailwind utility classes or leaks bare pseudo-class selectors (`:focus-visible`, `:checked`) to the host app.
+- **`bg-primary` Pollution**: Resolved context menu, sidebar merge menu, and calendar list items using the host application's `--color-primary` instead of DayFlow's own color variables. All interactive elements now use `var(--df-color-*)` directly.
+- **Month View Scroll**: Clicking on cross-month dates (previous month's trailing dates in the first row, next month's leading dates in the last row) no longer triggers unwanted month navigation.
+- **Portal Color Scope**: Added `df-portal` class to all `createPortal` root elements so portaled components (context menus, dialogs, drawers) correctly inherit DayFlow's color token scope.
+
+### Style
+
+- Added `df-` prefix scoping to CSS class names in `tailwind-components.css` and `tailwind.css` to prevent conflicts with host application Tailwind instances.
+- Remapped `--color-primary` and related tokens within `.df-calendar-container` and `.df-portal` to always resolve to DayFlow's own `--df-color-*` variables, regardless of host app theme.
+
+### Documentation
+
+- Migrated website from Nextra to Fumadocs.
+- Updated installation guides to feature `@create-dayflow` CLI as the primary setup method.
+- Updated theme customization guide.
+- Added `renderSidebarHeader` API documentation.
+
 ## [3.2.0] - 2026-02-28
 
 ### New Features & Enhancements
