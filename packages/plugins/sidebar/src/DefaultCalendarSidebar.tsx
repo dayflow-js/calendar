@@ -411,12 +411,16 @@ const DefaultCalendarSidebar = ({
     }
   }, [contextMenu, calendars, app, handleCloseContextMenu]);
 
-  const sourceCalendarName = mergeState
-    ? calendars.find(c => c.id === mergeState.sourceId)?.name || 'Unknown'
-    : '';
-  const targetCalendarName = mergeState
-    ? calendars.find(c => c.id === mergeState.targetId)?.name || 'Unknown'
-    : '';
+  const sourceCalendar = mergeState
+    ? calendars.find(c => c.id === mergeState.sourceId)
+    : null;
+  const targetCalendar = mergeState
+    ? calendars.find(c => c.id === mergeState.targetId)
+    : null;
+  const sourceCalendarName = sourceCalendar?.name || 'Unknown';
+  const targetCalendarName = targetCalendar?.name || 'Unknown';
+  const sourceCalendarColor = sourceCalendar?.colors.lineColor || '#6b7280';
+  const targetCalendarColor = targetCalendar?.colors.lineColor || '#6b7280';
   const deleteCalendarName = deleteState
     ? calendars.find(c => c.id === deleteState.calendarId)?.name || 'Unknown'
     : '';
@@ -644,7 +648,9 @@ const DefaultCalendarSidebar = ({
         createPortal(
           <MergeCalendarDialog
             sourceName={sourceCalendarName}
+            sourceColor={sourceCalendarColor}
             targetName={targetCalendarName}
+            targetColor={targetCalendarColor}
             onConfirm={handleMergeConfirm}
             onCancel={() => setMergeState(null)}
           />,

@@ -6,6 +6,20 @@ import {
 } from '@dayflow/core';
 import { useState } from 'preact/hooks';
 
+import { CalendarChip } from './CalendarChip';
+
+const CAL_SENTINEL = '\u0001C\u0001';
+
+function renderWithChip(template: string, name: string, color: string) {
+  return template
+    .split(CAL_SENTINEL)
+    .flatMap((part, i) =>
+      i === 0
+        ? [part]
+        : [<CalendarChip key={i} name={name} color={color} />, part]
+    );
+}
+
 interface DeleteCalendarDialogProps {
   calendarId: string;
   calendarName: string;
@@ -29,6 +43,8 @@ export const DeleteCalendarDialog = ({
 }: DeleteCalendarDialogProps) => {
   const [showMergeDropdown, setShowMergeDropdown] = useState(false);
   const { t } = useLocale();
+  const calendarColor =
+    calendars.find(c => c.id === calendarId)?.colors.lineColor ?? '#6b7280';
 
   return createPortal(
     <div className='df-portal fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
@@ -38,8 +54,12 @@ export const DeleteCalendarDialog = ({
             <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
               {t('deleteCalendar', { calendarName })}
             </h2>
-            <p className='mt-3 text-sm text-gray-600 dark:text-gray-300'>
-              {t('deleteCalendarMessage', { calendarName })}
+            <p className='mt-3 flex flex-wrap items-center gap-y-0.5 text-sm text-gray-600 dark:text-gray-300'>
+              {renderWithChip(
+                t('deleteCalendarMessage', { calendarName: CAL_SENTINEL }),
+                calendarName,
+                calendarColor
+              )}
             </p>
             <div className='mt-6 flex items-center justify-between'>
               <div className='relative'>

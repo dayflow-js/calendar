@@ -27,17 +27,17 @@ const fr: Locale = {
     newAllDayCalendarEvent:
       'Nouvel événement toute la journée dans {calendarName}',
     save: 'Enregistrer',
-    deleteCalendar: 'Supprimer "{calendarName}" ?',
+    deleteCalendar: 'Supprimer {calendarName} ?',
     deleteCalendarMessage:
-      'Voulez-vous supprimer "{calendarName}" ou fusionner ses événements dans un autre calendrier existant ?',
+      'Voulez-vous supprimer {calendarName} ou fusionner ses événements dans un autre calendrier existant ?',
     merge: 'Fusionner',
     confirmDeleteTitle:
-      'Êtes-vous sûr de vouloir supprimer le calendrier "{calendarName}" ?',
+      'Êtes-vous sûr de vouloir supprimer le calendrier {calendarName} ?',
     confirmDeleteMessage:
       'Si vous supprimez ce calendrier, tous les événements associés seront également supprimés.',
-    mergeConfirmTitle: 'Fusionner "{sourceName}" avec "{targetName}" ?',
+    mergeConfirmTitle: 'Fusionner {sourceName} avec {targetName} ?',
     mergeConfirmMessage:
-      'Êtes-vous sûr de vouloir fusionner "{sourceName}" avec "{targetName}" ? Cela déplacera tous les événements de "{sourceName}" vers "{targetName}" et "{sourceName}" sera supprimé. Cette action est irréversible.',
+      'Êtes-vous sûr de vouloir fusionner {sourceName} avec {targetName} ?\nCela déplacera tous les événements de {sourceName} vers {targetName} et {sourceName} sera supprimé.\nCette action est irréversible.',
     expandSidebar: 'Développer la barre latérale',
     collapseSidebar: 'Réduire la barre latérale',
     calendars: 'Calendriers',

@@ -1,4 +1,4 @@
-import { CalendarType, AudioLines } from '@dayflow/core';
+import { CalendarType, AudioLines, ChevronDown } from '@dayflow/core';
 import { JSX } from 'preact';
 import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 
@@ -21,6 +21,150 @@ const getCalendarInitials = (calendar: CalendarType): string => {
   }
   const name = calendar.name || calendar.id;
   return name.charAt(0).toUpperCase();
+};
+
+interface CalendarItemProps {
+  calendar: CalendarType;
+  isDraggable: boolean;
+  isEditable: boolean;
+  editingId: string | null;
+  editingName: string;
+  setEditingName: (name: string) => void;
+  editInputRef: preact.RefObject<HTMLInputElement>;
+  isProcessedRef: preact.RefObject<boolean>;
+  draggedCalendarId: string | null;
+  dropTarget: { id: string; position: 'top' | 'bottom' } | null;
+  activeContextMenuCalendarId?: string | null;
+  onDragStart: (
+    calendar: CalendarType,
+    e: JSX.TargetedDragEvent<HTMLElement>
+  ) => void;
+  onDragEnd: () => void;
+  onDragOver: (e: JSX.TargetedDragEvent<HTMLElement>, targetId: string) => void;
+  onDragLeave: () => void;
+  onDrop: (targetCalendar: CalendarType) => void;
+  onContextMenu: (e: JSX.TargetedMouseEvent<HTMLElement>, id: string) => void;
+  onToggleVisibility: (id: string, visible: boolean) => void;
+  onRenameStart: (calendar: CalendarType) => void;
+  onRenameSave: () => void;
+  onRenameKeyDown: (e: JSX.TargetedKeyboardEvent<HTMLInputElement>) => void;
+  setEditingId: (id: string | null) => void;
+}
+
+const CalendarItem = ({
+  calendar,
+  isDraggable,
+  isEditable,
+  editingId,
+  editingName,
+  setEditingName,
+  editInputRef,
+  draggedCalendarId,
+  dropTarget,
+  activeContextMenuCalendarId,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onContextMenu,
+  onToggleVisibility,
+  onRenameStart,
+  onRenameSave,
+  onRenameKeyDown,
+}: CalendarItemProps) => {
+  const isVisible = calendar.isVisible !== false;
+  const calendarColor = calendar.colors?.lineColor || '#3b82f6';
+  const showIcon = Boolean(calendar.icon);
+  const isDropTarget = dropTarget?.id === calendar.id;
+  const isActive =
+    activeContextMenuCalendarId === calendar.id || editingId === calendar.id;
+
+  return (
+    <li
+      key={calendar.id}
+      className='df-calendar-list-item relative'
+      onDragOver={e => onDragOver(e, calendar.id)}
+      onDragLeave={onDragLeave}
+      onDrop={() => onDrop(calendar)}
+      onContextMenu={e => onContextMenu(e, calendar.id)}
+    >
+      {isDropTarget && dropTarget.position === 'top' && (
+        <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
+      )}
+      <div
+        draggable={isDraggable && !editingId}
+        onDragStart={e => onDragStart(calendar, e)}
+        onDragEnd={onDragEnd}
+        className={`rounded transition ${
+          draggedCalendarId === calendar.id ? 'opacity-50' : ''
+        } ${isDraggable ? 'cursor-grab' : 'cursor-default'}`}
+      >
+        <div
+          className={`group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800 ${isActive ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
+          title={calendar.name}
+        >
+          <input
+            type='checkbox'
+            className='df-calendar-checkbox shrink-0 cursor-pointer'
+            style={
+              {
+                '--checkbox-color': calendarColor,
+              } as Record<string, string | number>
+            }
+            checked={isVisible}
+            onChange={event =>
+              onToggleVisibility(
+                calendar.id,
+                (event.target as HTMLInputElement).checked
+              )
+            }
+          />
+          {showIcon && (
+            <span
+              className='ml-2 flex h-5 w-5 shrink-0 items-center justify-center text-xs font-semibold text-white'
+              aria-hidden='true'
+            >
+              {getCalendarInitials(calendar)}
+            </span>
+          )}
+          {editingId === calendar.id ? (
+            <input
+              ref={editInputRef}
+              type='text'
+              value={editingName}
+              onChange={e =>
+                setEditingName((e.target as HTMLInputElement).value)
+              }
+              onBlur={onRenameSave}
+              onKeyDown={onRenameKeyDown}
+              className='ml-2 h-5 min-w-0 flex-1 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
+              onClick={e => e.stopPropagation()}
+            />
+          ) : (
+            <>
+              <span
+                className='ml-2 flex-1 truncate pl-1 text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white'
+                onDblClick={() => onRenameStart(calendar)}
+              >
+                {calendar.name || calendar.id}
+              </span>
+              {calendar.subscribed && (
+                <AudioLines
+                  width={13}
+                  height={13}
+                  className='ml-1 shrink-0 text-gray-400 dark:text-gray-500'
+                />
+              )}
+            </>
+          )}
+        </div>
+      </div>
+      {isDropTarget && dropTarget.position === 'bottom' && (
+        <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
+      )}
+    </li>
+  );
 };
 
 export const CalendarList = ({
@@ -48,16 +192,19 @@ export const CalendarList = ({
     position: 'top' | 'bottom';
   } | null>(null);
 
+  // Collapsed sources state
+  const [collapsedSources, setCollapsedSources] = useState<
+    Record<string, boolean>
+  >({});
+
   const handleDragStart = useCallback(
     (calendar: CalendarType, e: JSX.TargetedDragEvent<HTMLElement>) => {
-      // Prevent dragging when editing or not draggable
       if (editingId || !isDraggable) {
         e.preventDefault();
         return;
       }
       setDraggedCalendarId(calendar.id);
 
-      // Store calendar data for drop handling
       const dragData = {
         calendarId: calendar.id,
         calendarName: calendar.name,
@@ -121,12 +268,10 @@ export const CalendarList = ({
       const fromIndex = calendars.findIndex(c => c.id === draggedCalendarId);
       let toIndex = calendars.findIndex(c => c.id === targetCalendar.id);
 
-      // Adjust target index based on position
       if (dropTarget.position === 'bottom') {
         toIndex += 1;
       }
 
-      // Adjust for removal of the item
       if (toIndex > fromIndex) {
         toIndex -= 1;
       }
@@ -198,105 +343,119 @@ export const CalendarList = ({
     }
   }, [editingId, calendars]);
 
+  const toggleSource = useCallback((source: string) => {
+    setCollapsedSources(prev => ({ ...prev, [source]: !prev[source] }));
+  }, []);
+
+  // Shared item props (excludes per-item fields)
+  const sharedItemProps = {
+    isDraggable,
+    isEditable,
+    editingId,
+    editingName,
+    setEditingName,
+    editInputRef,
+    isProcessedRef,
+    draggedCalendarId,
+    dropTarget,
+    activeContextMenuCalendarId,
+    onDragStart: handleDragStart,
+    onDragEnd: handleDragEnd,
+    onDragOver: handleDragOver,
+    onDragLeave: handleDragLeave,
+    onDrop: handleDrop,
+    onContextMenu,
+    onToggleVisibility,
+    onRenameStart: handleRenameStart,
+    onRenameSave: handleRenameSave,
+    onRenameKeyDown: handleRenameKeyDown,
+    setEditingId,
+  };
+
+  // Check if any calendar has a source
+  const hasSources = calendars.some(c => c.source);
+
+  if (!hasSources) {
+    // Flat list (original behaviour)
+    return (
+      <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
+        <ul className='relative space-y-1'>
+          {calendars.map(calendar => (
+            <CalendarItem
+              key={calendar.id}
+              calendar={calendar}
+              {...sharedItemProps}
+            />
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  // Group calendars by source; calendars without a source go into a null group
+  const groups = new Map<string | null, CalendarType[]>();
+  for (const calendar of calendars) {
+    const key = calendar.source ?? null;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(calendar);
+  }
+
   return (
     <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
-      <ul className='relative space-y-1'>
-        {calendars.map(calendar => {
-          const isVisible = calendar.isVisible !== false;
-          const calendarColor = calendar.colors?.lineColor || '#3b82f6';
-          const showIcon = Boolean(calendar.icon);
-          const isDropTarget = dropTarget?.id === calendar.id;
-          const isActive =
-            activeContextMenuCalendarId === calendar.id ||
-            editingId === calendar.id;
-
-          return (
-            <li
+      {/* Unsourced calendars first, no header */}
+      {groups.has(null) && (
+        <ul className='relative space-y-1'>
+          {groups.get(null)!.map(calendar => (
+            <CalendarItem
               key={calendar.id}
-              className='df-calendar-list-item relative'
-              onDragOver={e => handleDragOver(e, calendar.id)}
-              onDragLeave={handleDragLeave}
-              onDrop={() => handleDrop(calendar)}
-              onContextMenu={e => onContextMenu(e, calendar.id)}
-            >
-              {isDropTarget && dropTarget.position === 'top' && (
-                <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
-              )}
-              <div
-                draggable={isDraggable && !editingId}
-                onDragStart={e => handleDragStart(calendar, e)}
-                onDragEnd={handleDragEnd}
-                className={`rounded transition ${
-                  draggedCalendarId === calendar.id ? 'opacity-50' : ''
-                } ${isDraggable ? 'cursor-grab' : 'cursor-default'}`}
+              calendar={calendar}
+              {...sharedItemProps}
+            />
+          ))}
+        </ul>
+      )}
+
+      {/* Sourced calendar groups */}
+      {Array.from(groups.entries())
+        .filter(([source]) => source !== null)
+        .map(([source, groupCalendars]) => {
+          const isCollapsed = collapsedSources[source!] === true;
+          return (
+            <div key={source} className='mt-1'>
+              <button
+                type='button'
+                className='flex w-full items-center justify-between rounded px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-800'
+                onClick={() => toggleSource(source!)}
               >
-                <div
-                  className={`group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800 ${isActive ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
-                  title={calendar.name}
-                >
-                  <input
-                    type='checkbox'
-                    className='df-calendar-checkbox shrink-0 cursor-pointer'
-                    style={
-                      {
-                        '--checkbox-color': calendarColor,
-                      } as Record<string, string | number>
-                    }
-                    checked={isVisible}
-                    onChange={event =>
-                      onToggleVisibility(
-                        calendar.id,
-                        (event.target as HTMLInputElement).checked
-                      )
-                    }
-                  />
-                  {showIcon && (
-                    <span
-                      className='ml-2 flex h-5 w-5 shrink-0 items-center justify-center text-xs font-semibold text-white'
-                      aria-hidden='true'
-                    >
-                      {getCalendarInitials(calendar)}
-                    </span>
-                  )}
-                  {editingId === calendar.id ? (
-                    <input
-                      ref={editInputRef}
-                      type='text'
-                      value={editingName}
-                      onChange={e =>
-                        setEditingName((e.target as HTMLInputElement).value)
-                      }
-                      onBlur={handleRenameSave}
-                      onKeyDown={handleRenameKeyDown}
-                      className='ml-2 h-5 min-w-0 flex-1 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
-                      onClick={e => e.stopPropagation()}
-                    />
-                  ) : (
-                    <>
-                      <span
-                        className='ml-2 flex-1 truncate pl-1 text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white'
-                        onDblClick={() => handleRenameStart(calendar)}
-                      >
-                        {calendar.name || calendar.id}
-                      </span>
-                      {calendar.subscribed && (
-                        <AudioLines
-                          width={13}
-                          height={13}
-                          className='ml-1 shrink-0 text-gray-400 dark:text-gray-500'
-                        />
-                      )}
-                    </>
-                  )}
+                <span className='truncate'>{source}</span>
+                <ChevronDown
+                  width={13}
+                  height={13}
+                  className={`ml-1 shrink-0 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                />
+              </button>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateRows: isCollapsed ? '0fr' : '1fr',
+                  transition: 'grid-template-rows 200ms ease',
+                }}
+              >
+                <div style={{ overflow: 'hidden' }}>
+                  <ul className='relative space-y-1'>
+                    {groupCalendars.map(calendar => (
+                      <CalendarItem
+                        key={calendar.id}
+                        calendar={calendar}
+                        {...sharedItemProps}
+                      />
+                    ))}
+                  </ul>
                 </div>
               </div>
-              {isDropTarget && dropTarget.position === 'bottom' && (
-                <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
-              )}
-            </li>
+            </div>
           );
         })}
-      </ul>
     </div>
   );
 };

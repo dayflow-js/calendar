@@ -26,17 +26,17 @@ const es: Locale = {
     newCalendarEvent: 'Nuevo evento en {calendarName}',
     newAllDayCalendarEvent: 'Nuevo evento de todo el día en {calendarName}',
     save: 'Guardar',
-    deleteCalendar: '¿Eliminar "{calendarName}"?',
+    deleteCalendar: '¿Eliminar {calendarName}?',
     deleteCalendarMessage:
-      '¿Quieres eliminar "{calendarName}" o fusionar sus eventos en otro calendario existente?',
+      '¿Quieres eliminar {calendarName} o fusionar sus eventos en otro calendario existente?',
     merge: 'Fusionar',
     confirmDeleteTitle:
-      '¿Seguro que quieres eliminar el calendario "{calendarName}"?',
+      '¿Seguro que quieres eliminar el calendario {calendarName}?',
     confirmDeleteMessage:
       'Si eliminas este calendario, también se eliminarán todos los eventos asociados.',
-    mergeConfirmTitle: '¿Fusionar "{sourceName}" con "{targetName}"?',
+    mergeConfirmTitle: '¿Fusionar {sourceName} con {targetName}?',
     mergeConfirmMessage:
-      '¿Seguro que quieres fusionar "{sourceName}" con "{targetName}"? Esto moverá todos los eventos de "{sourceName}" a "{targetName}" y se eliminará "{sourceName}". Esta acción no se puede deshacer.',
+      '¿Seguro que quieres fusionar {sourceName} con {targetName}?\nEsto moverá todos los eventos de {sourceName} a {targetName} y se eliminará {sourceName}.\nEsta acción no se puede deshacer.',
     expandSidebar: 'Expandir barra lateral del calendario',
     collapseSidebar: 'Contraer barra lateral del calendario',
     calendars: 'Calendarios',

@@ -26,17 +26,17 @@ const ja: Locale = {
     newCalendarEvent: '新規 {calendarName} 予定',
     newAllDayCalendarEvent: '新規 {calendarName} 終日予定',
     save: '保存',
-    deleteCalendar: 'カレンダー "{calendarName}" を削除しますか？',
+    deleteCalendar: 'カレンダー {calendarName} を削除しますか？',
     deleteCalendarMessage:
-      'カレンダー "{calendarName}" を削除しますか？それともイベントを別の既存のカレンダーにマージしますか？',
+      'カレンダー {calendarName} を削除しますか？それともイベントを別の既存のカレンダーにマージしますか？',
     merge: 'マージ',
     confirmDeleteTitle:
-      'カレンダー "{calendarName}" を削除してもよろしいですか？',
+      'カレンダー {calendarName} を削除してもよろしいですか？',
     confirmDeleteMessage:
       'このカレンダーを削除すると、関連するすべてのイベントも削除されます。',
-    mergeConfirmTitle: '"{sourceName}" を "{targetName}" にマージしますか？',
+    mergeConfirmTitle: '{sourceName} を {targetName} にマージしますか？',
     mergeConfirmMessage:
-      '"{sourceName}" を "{targetName}" にマージしてもよろしいですか？これにより、"{sourceName}" のすべてのイベントが "{targetName}" に移動し、"{sourceName}" は削除されます。この操作は元に戻せません。',
+      '{sourceName} を {targetName} にマージしてもよろしいですか？\nこれにより、{sourceName} のすべてのイベントが {targetName} に移動し、{sourceName} は削除されます。\nこの操作は元に戻せません。',
     expandSidebar: 'カレンダーサイドバーを展開',
     collapseSidebar: 'カレンダーサイドバーを折りたたむ',
     calendars: 'カレンダー',

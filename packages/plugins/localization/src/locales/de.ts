@@ -26,17 +26,17 @@ const de: Locale = {
     newCalendarEvent: 'Neues Ereignis in {calendarName}',
     newAllDayCalendarEvent: 'Neues ganztägiges Ereignis in {calendarName}',
     save: 'Speichern',
-    deleteCalendar: '"{calendarName}" löschen?',
+    deleteCalendar: '{calendarName} löschen?',
     deleteCalendarMessage:
-      'Möchten Sie "{calendarName}" löschen oder dessen Ereignisse in einen anderen bestehenden Kalender zusammenführen?',
+      'Möchten Sie {calendarName} löschen oder dessen Ereignisse in einen anderen bestehenden Kalender zusammenführen?',
     merge: 'Zusammenführen',
     confirmDeleteTitle:
-      'Sind Sie sicher, dass Sie den Kalender "{calendarName}" löschen möchten?',
+      'Sind Sie sicher, dass Sie den Kalender {calendarName} löschen möchten?',
     confirmDeleteMessage:
       'Wenn Sie diesen Kalender löschen, werden auch alle damit verbundenen Ereignisse gelöscht.',
-    mergeConfirmTitle: '"{sourceName}" mit "{targetName}" zusammenführen?',
+    mergeConfirmTitle: '{sourceName} mit {targetName} zusammenführen?',
     mergeConfirmMessage:
-      'Sind Sie sicher, dass Sie "{sourceName}" mit "{targetName}" zusammenführen möchten? Dadurch werden alle Ereignisse von "{sourceName}" nach "{targetName}" verschoben und "{sourceName}" wird gelöscht. Dies kann nicht rückgängig gemacht werden.',
+      'Sind Sie sicher, dass Sie {sourceName} mit {targetName} zusammenführen möchten?\nDadurch werden alle Ereignisse von {sourceName} nach {targetName} verschoben und {sourceName} wird gelöscht.\nDies kann nicht rückgängig gemacht werden.',
     expandSidebar: 'Kalender-Seitenleiste erweitern',
     collapseSidebar: 'Kalender-Seitenleiste einklappen',
     calendars: 'Kalender',

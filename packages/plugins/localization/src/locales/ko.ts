@@ -26,16 +26,16 @@ const ko: Locale = {
     newCalendarEvent: '{calendarName}의 새 일정',
     newAllDayCalendarEvent: '{calendarName}의 새 종일 일정',
     save: '저장',
-    deleteCalendar: '"{calendarName}" 삭제?',
+    deleteCalendar: '{calendarName} 삭제?',
     deleteCalendarMessage:
-      '"{calendarName}"을(를) 삭제하시겠습니까, 아니면 이벤트를 다른 기존 캘린더로 병합하시겠습니까?',
+      '{calendarName}을(를) 삭제하시겠습니까, 아니면 이벤트를 다른 기존 캘린더로 병합하시겠습니까?',
     merge: '병합',
-    confirmDeleteTitle: '"{calendarName}" 캘린더를 삭제하시겠습니까?',
+    confirmDeleteTitle: '{calendarName} 캘린더를 삭제하시겠습니까?',
     confirmDeleteMessage:
       '이 캘린더를 삭제하면 연결된 모든 이벤트도 삭제됩니다.',
-    mergeConfirmTitle: '"{sourceName}"을(를) "{targetName}"(으)로 병합?',
+    mergeConfirmTitle: '{sourceName}을(를) {targetName}(으)로 병합?',
     mergeConfirmMessage:
-      '"{sourceName}"을(를) "{targetName}"(으)로 병합하시겠습니까? 이렇게 하면 "{sourceName}"의 모든 이벤트가 "{targetName}"(으)로 이동하고 "{sourceName}"은(는) 삭제됩니다. 이 작업은 취소할 수 없습니다.',
+      '{sourceName}을(를) {targetName}(으)로 병합하시겠습니까?\n이렇게 하면 {sourceName}의 모든 이벤트가 {targetName}(으)로 이동하고 {sourceName}은(는) 삭제됩니다.\n이 작업은 취소할 수 없습니다.',
     expandSidebar: '캘린더 사이드바 펼치기',
     collapseSidebar: '캘린더 사이드바 접기',
     calendars: '캘린더',

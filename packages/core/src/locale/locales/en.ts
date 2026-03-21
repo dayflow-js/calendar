@@ -26,17 +26,17 @@ const en: Locale = {
     newCalendarEvent: 'New {calendarName} Event',
     newAllDayCalendarEvent: 'New {calendarName} All-day Event',
     save: 'Save',
-    deleteCalendar: 'Delete "{calendarName}"?',
+    deleteCalendar: 'Delete {calendarName}?',
     deleteCalendarMessage:
-      'Do you want to delete "{calendarName}" or merge its events into another existing calendar?',
+      'Do you want to delete {calendarName} or merge its events into another existing calendar?',
     merge: 'Merge',
     confirmDeleteTitle:
-      'Are you sure you want to delete the calendar "{calendarName}"?',
+      'Are you sure you want to delete the calendar {calendarName}?',
     confirmDeleteMessage:
       'If you delete this calendar, all events associated with the calendar will also be deleted.',
-    mergeConfirmTitle: 'Merge "{sourceName}" with "{targetName}"?',
+    mergeConfirmTitle: 'Merge {sourceName} with {targetName}?',
     mergeConfirmMessage:
-      'Are you sure you want to merge "{sourceName}" with "{targetName}"? Doing so will move all the events from "{sourceName}" to "{targetName}" and "{sourceName}" will be deleted. This cannot be undone.',
+      'Are you sure you want to merge {sourceName} with {targetName}?\nDoing so will move all the events from {sourceName} to {targetName} and {sourceName} will be deleted.\nThis cannot be undone.',
     expandSidebar: 'Expand calendar sidebar',
     collapseSidebar: 'Collapse calendar sidebar',
     calendars: 'Calendars',
