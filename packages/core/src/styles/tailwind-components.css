@@ -6,6 +6,15 @@
  *
  */
 
+/* Establish the CSS cascade layer order explicitly so that DayFlow's
+ * component styles (border-color, background-color, etc.) always win over
+ * Tailwind's preflight reset (@layer base), regardless of whether the host
+ * app imports this file before or after `@import 'tailwindcss'`.
+ *
+ * Priority (highest → lowest): utilities > components > df-theme > base > theme
+ */
+@layer theme, base, df-theme, components, utilities;
+
 /* @tailwindcss/theme is imported here only to resolve @apply at build time.
  * It does not emit utility classes into the compiled output. */
 @import 'tailwindcss/theme' layer(theme);

@@ -2,6 +2,7 @@ import { h, createContext, ComponentChildren } from 'preact';
 import {
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   useCallback,
   useMemo,
@@ -115,8 +116,11 @@ export const ThemeProvider = ({
 
   /**
    * Apply theme to document root
+   * useLayoutEffect ensures the class is applied synchronously before the
+   * browser paints, preventing a flash of the wrong theme when the OS is in
+   * dark mode but the user has explicitly set mode: 'light'.
    */
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
