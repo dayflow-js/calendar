@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-sidebar",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Sidebar plugin for DayFlow calendar",
   "keywords": [
     "calendar",
