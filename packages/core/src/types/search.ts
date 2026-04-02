@@ -1,3 +1,5 @@
+import { ICalendarApp } from '@/types';
+
 import { Event } from './event';
 
 export type CalendarSearchEvent = Event & {
@@ -38,4 +40,15 @@ export interface CalendarSearchProps {
    * Empty result text
    */
   emptyText?: string | Record<string, string>;
+
+  /**
+   * Custom handler for search result clicks
+   */
+  onResultClick?: (params: {
+    event: CalendarSearchEvent;
+    app: ICalendarApp;
+    source: 'desktop' | 'mobile';
+    defaultAction: () => void;
+    closeSearch: () => void;
+  }) => void | Promise<void>;
 }

@@ -315,7 +315,9 @@ export const CalendarRoot = ({
                   loading={search.searchLoading}
                   results={search.searchResults}
                   keyword={search.searchKeyword}
-                  onResultClick={search.handleSearchResultClick}
+                  onResultClick={e =>
+                    search.handleSearchResultClick(e, 'desktop')
+                  }
                   emptyText={searchConfig?.emptyText}
                 />
               </div>
@@ -327,7 +329,7 @@ export const CalendarRoot = ({
                 onSearchChange={search.setSearchKeyword}
                 results={search.searchResults}
                 loading={search.searchLoading}
-                onResultClick={search.handleSearchResultClick}
+                onResultClick={e => search.handleSearchResultClick(e, 'mobile')}
                 emptyText={searchConfig?.emptyText}
               />
             </div>

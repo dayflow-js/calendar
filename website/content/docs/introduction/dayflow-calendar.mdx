@@ -69,12 +69,13 @@ The `search` prop allows you to customize the built-in search behavior. By defau
 
 ### Search Props
 
-| Option          | Description                                                      |
-| :-------------- | :--------------------------------------------------------------- |
-| `debounceDelay` | Time in milliseconds to wait before triggering a search.         |
-| `onSearch`      | Async function to fetch results based on a keyword.              |
-| `customSearch`  | Synchronous function to filter events locally with custom logic. |
-| `emptyText`     | Text to display when no results are found.                       |
+| Option          | Description                                                                                                                                                                                                                                                                                                                      |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `debounceDelay` | Time in milliseconds to wait before triggering a search.                                                                                                                                                                                                                                                                         |
+| `onSearch`      | Async function to fetch results based on a keyword.                                                                                                                                                                                                                                                                              |
+| `customSearch`  | Synchronous function to filter events locally with custom logic.                                                                                                                                                                                                                                                                 |
+| `onResultClick` | Optional callback triggered when a search result is clicked. Includes a `defaultAction` callback to invoke the built-in navigation logic (navigating to the event date, highlighting the event, and closing the search UI on mobile). If you don't call `defaultAction()`, you must handle the navigation and UI state yourself. |
+| `emptyText`     | Text to display when no results are found.                                                                                                                                                                                                                                                                                       |
 
 ## Customizing Container Styles
 
