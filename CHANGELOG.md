@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.0] - 2026-04-06
+
+### New Features & Enhancements
+
+- **Global Calendar Time Zone**: Added `timeZone` to `useCalendarApp` / `CalendarAppConfig` as the primary display and editing timezone for all views. Day, Week, Month, and Year views now share the same calendar timezone semantics.
+- **Secondary Timeline Refinement**: Kept `secondaryTimeZone` for Day and Week views as a dedicated secondary timeline display setting, independent from the calendar's primary timezone.
+- **Mini Calendar Event Dots**: Added richer mini calendar event dot support, including calendar-color-aware dots with up to four unique indicators per day.
+- **Interactive Demo Controls**: Updated the website interactive calendar controls to expose both the global timezone and the Day/Week secondary timezone with clearer guidance.
+
+### Fixed
+
+- **Timezone Consistency Across Views**:
+  - Unified event projection in Day/Week/Month/Year so view filtering, layout, and visible dates stay aligned with the configured calendar timezone.
+- **Canonical Callback Semantics**:
+  - Editing in a different calendar timezone now behaves: switching timezone only changes display, while `onEventUpdate`, `onEventDrop`, and `onEventResize` return canonical events after the edit is applied.
+  - Aligned timed event creation flows such as quick create, context-menu paste, sidebar calendar drop, Month view create, and keyboard paste with `app.timeZone`.
+
+### Documentation
+
+- Updated timezone documentation in English, Chinese, and Japanese to describe:
+  - the new app-level `timeZone`
+  - Day/Week-only `secondaryTimeZone`
+  - canonical callback semantics after drag/resize/edit operations
+- Refreshed the website interactive calendar help text and tooltips to match the new timezone model.
+
 ## [3.3.0] - 2026-03-20
 
 ### New Features & Enhancements

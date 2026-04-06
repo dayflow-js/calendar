@@ -37,7 +37,7 @@ export function LiveDemo() {
         </div>
       </section>
 
-      <section className='space-y-6 py-4'>
+      <section className='space-y-6'>
         <div className='overflow-hidden'>
           <InteractiveCalendarComponent />
         </div>

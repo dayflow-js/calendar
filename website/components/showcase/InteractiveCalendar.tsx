@@ -106,7 +106,9 @@ interface CalendarViewerProps {
  */
 function CalendarViewer({ config, calendarRef, version }: CalendarViewerProps) {
   const calendar = useCalendarApp(config, version);
-  calendarRef.current = calendar;
+  useEffect(() => {
+    calendarRef.current = calendar;
+  }, [calendar, calendarRef]);
 
   return <DayFlowCalendar calendar={calendar} />;
 }
@@ -325,7 +327,7 @@ export function InteractiveCalendar() {
         <Card
           className={`hidden border-slate-200 bg-slate-50/50 shadow-none lg:block dark:border-slate-800 dark:bg-gray-900/50 ${showControls ? 'block' : ''}`}
         >
-          <CardContent className='flex flex-col gap-6 p-4'>
+          <CardContent className='flex flex-col gap-3 px-4 py-2'>
             {/* Row 1: Features and Views */}
             <div className='flex items-start justify-between gap-8'>
               {/* Features Column */}
