@@ -13,36 +13,65 @@ const calendar = useCalendarApp({
 });
 ```
 
-## Custom Header Component
+## Custom Header
 
-You can provide a custom component function to render your own header while still having access to the calendar's state and methods.
+<Callout title='Breaking change from v3.4.1' type='warn'>
+  Passing a function to `useCalendarHeader` is no longer supported. Move your
+  custom header to the `calendarHeader` slot on `DayFlowCalendar` as shown
+  below.
+</Callout>
+
+You can replace the default header with your own component using the `calendarHeader` content slot. Your renderer receives the calendar's state and helper methods so you can drive navigation and search from your own UI.
+
+### React
+
+Pass a `calendarHeader` render prop to `DayFlowCalendar`:
 
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: props => {
-    const { calendar, switcherMode } = props;
-    return (
-      <div className='custom-header'>
-        <button onClick={() => calendar.goToToday()}>Today</button>
-        {/* Your custom UI here */}
-      </div>
-    );
-  },
 });
+
+<DayFlowCalendar
+  calendar={calendar}
+  calendarHeader={() => (
+    <div className='custom-header'>
+      <button onClick={() => calendar.goToPrevious()}>‹</button>
+      <button onClick={() => calendar.goToToday()}>Today</button>
+      <button onClick={() => calendar.goToNext()}>›</button>
+    </div>
+  )}
+/>;
 ```
 
-### Header Props
+### Vue
 
-The custom renderer receives the following props:
+Use the named `calendarHeader` slot:
 
-| Prop             | Description                                             |
-| :--------------- | :------------------------------------------------------ |
-| `calendar`       | The `CalendarApp` instance.                             |
-| `switcherMode`   | The current view switcher mode (`buttons` or `select`). |
-| `onAddCalendar`  | Handler for adding a new calendar.                      |
-| `onSearchChange` | Handler for updating the search query.                  |
-| `onSearchClick`  | Handler for when the search icon is clicked.            |
-| `searchValue`    | The current search string.                              |
-| `isSearchOpen`   | Whether the search UI is currently open.                |
-| `isEditable`     | Whether the calendar is currently in an editable state. |
+```vue
+<DayFlowCalendar :calendar="calendar">
+  <template #calendarHeader="{ calendar, switcherMode, onSearchChange }">
+    <div class="custom-header">
+      <button @click="calendar.goToPrevious()">‹</button>
+      <button @click="calendar.goToToday()">Today</button>
+      <button @click="calendar.goToNext()">›</button>
+    </div>
+  </template>
+</DayFlowCalendar>
+```
+
+### Slot Args
+
+The slot renderer receives the following arguments:
+
+| Arg              | Description                                                          |
+| :--------------- | :------------------------------------------------------------------- |
+| `calendar`       | The `CalendarApp` instance.                                          |
+| `switcherMode`   | The current view switcher mode (`buttons` or `select`).              |
+| `onAddCalendar`  | Handler for adding a new calendar.                                   |
+| `onSearchChange` | Handler for updating the search query.                               |
+| `onSearchClick`  | Handler for when the search icon is clicked.                         |
+| `searchValue`    | The current search string.                                           |
+| `isSearchOpen`   | Whether the search UI is currently open.                             |
+| `isEditable`     | Whether the calendar is currently in an editable state.              |
+| `safeAreaLeft`   | Left padding (px) to avoid overlapping traffic lights in macOS mode. |

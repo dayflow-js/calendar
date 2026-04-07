@@ -6,7 +6,6 @@ import {
   CalendarAppConfig,
   CalendarAppState,
   CalendarCallbacks,
-  CalendarHeaderProps,
   CalendarType,
   CalendarView,
   CalendarViewType,
@@ -15,7 +14,6 @@ import {
   MobileEventRenderer,
   RangeChangeReason,
   ReadOnlyConfig,
-  TNode,
   ViewType,
 } from '@/types';
 import { ThemeMode } from '@/types/calendarTypes';
@@ -44,7 +42,7 @@ export class CalendarApp implements ICalendarApp {
   private navigation: NavigationController;
   private pluginManager: PluginManager;
   private useEventDetailDialog: boolean;
-  private useCalendarHeader: boolean | ((props: CalendarHeaderProps) => TNode);
+  private useCalendarHeader: boolean;
   private customMobileEventRenderer?: MobileEventRenderer;
 
   constructor(config: CalendarAppConfig) {
@@ -351,9 +349,7 @@ export class CalendarApp implements ICalendarApp {
   getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
   getCustomMobileEventRenderer = (): MobileEventRenderer | undefined =>
     this.customMobileEventRenderer;
-  getCalendarHeaderConfig = ():
-    | boolean
-    | ((props: CalendarHeaderProps) => TNode) => this.useCalendarHeader;
+  getCalendarHeaderConfig = (): boolean => this.useCalendarHeader;
 
   get timeZone(): string {
     return this.state.timeZone;

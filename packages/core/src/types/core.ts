@@ -151,7 +151,7 @@ export interface CalendarAppConfig {
   defaultCalendar?: string;
   theme?: ThemeConfig;
   useEventDetailDialog?: boolean;
-  useCalendarHeader?: boolean | ((props: CalendarHeaderProps) => TNode);
+  useCalendarHeader?: boolean;
   customMobileEventRenderer?: MobileEventRenderer;
   locale?: string | Locale;
   readOnly?: boolean | ReadOnlyConfig;
@@ -279,9 +279,7 @@ export interface ICalendarApp {
   hasPlugin: (name: string) => boolean;
 
   // Calendar Header
-  getCalendarHeaderConfig: () =>
-    | boolean
-    | ((props: CalendarHeaderProps) => TNode);
+  getCalendarHeaderConfig: () => boolean;
 
   // Trigger render callback (internal use, notify subscribers)
   triggerRender: () => void;
