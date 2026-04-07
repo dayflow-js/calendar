@@ -13,36 +13,65 @@ const calendar = useCalendarApp({
 });
 ```
 
-## カスタムヘッダーコンポーネント
+## カスタムヘッダー
 
-カレンダーの状態やメソッドにアクセスしながら、独自のヘッダーをレンダリングするためのカスタムコンポーネント関数を提供できます。
+<Callout title='Breaking change from v3.4.1' type='warn'>
+  `useCalendarHeader`
+  への関数の渡しは非対応になりました。以下のように、カスタムヘッダーを
+  `DayFlowCalendar` の `calendarHeader` スロットに移行してください。
+</Callout>
+
+`calendarHeader` コンテンツスロットを使用して、デフォルトのヘッダーを独自のコンポーネントに置き換えることができます。レンダラーはカレンダーの状態とヘルパーメソッドを受け取るため、独自の UI からナビゲーションや検索を制御できます。
+
+### React
+
+`DayFlowCalendar` に `calendarHeader` レンダープロップを渡します：
 
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: props => {
-    const { calendar, switcherMode } = props;
-    return (
-      <div className='custom-header'>
-        <button onClick={() => calendar.goToToday()}>今日</button>
-        {/* カスタム UI をここに記述 */}
-      </div>
-    );
-  },
 });
+
+<DayFlowCalendar
+  calendar={calendar}
+  calendarHeader={() => (
+    <div className='custom-header'>
+      <button onClick={() => calendar.goToPrevious()}>‹</button>
+      <button onClick={() => calendar.goToToday()}>今日</button>
+      <button onClick={() => calendar.goToNext()}>›</button>
+    </div>
+  )}
+/>;
 ```
 
-### ヘッダーの Props
+### Vue
 
-カスタムレンダラーは以下の props を受け取ります：
+名前付きスロット `calendarHeader` を使用します：
 
-| Prop             | 説明                                                    |
-| :--------------- | :------------------------------------------------------ |
-| `calendar`       | `CalendarApp` インスタンス。                            |
-| `switcherMode`   | 現在の表示切り替えモード（`buttons` または `select`）。 |
-| `onAddCalendar`  | 新しいカレンダーを追加するためのハンドラー。            |
-| `onSearchChange` | 検索クエリを更新するためのハンドラー。                  |
-| `onSearchClick`  | 検索アイコンがクリックされた時のハンドラー。            |
-| `searchValue`    | 現在の検索文字列。                                      |
-| `isSearchOpen`   | 検索 UI が現在開いているかどうか。                      |
-| `isEditable`     | カレンダーが現在編集可能な状態かどうか。                |
+```vue
+<DayFlowCalendar :calendar="calendar">
+  <template #calendarHeader="{ calendar, switcherMode, onSearchChange }">
+    <div class="custom-header">
+      <button @click="calendar.goToPrevious()">‹</button>
+      <button @click="calendar.goToToday()">今日</button>
+      <button @click="calendar.goToNext()">›</button>
+    </div>
+  </template>
+</DayFlowCalendar>
+```
+
+### スロット引数
+
+スロットレンダラーは以下の引数を受け取ります：
+
+| 引数             | 説明                                                                   |
+| :--------------- | :--------------------------------------------------------------------- |
+| `calendar`       | `CalendarApp` インスタンス。                                           |
+| `switcherMode`   | 現在の表示切り替えモード（`buttons` または `select`）。                |
+| `onAddCalendar`  | 新しいカレンダーを追加するためのハンドラー。                           |
+| `onSearchChange` | 検索クエリを更新するためのハンドラー。                                 |
+| `onSearchClick`  | 検索アイコンがクリックされた時のハンドラー。                           |
+| `searchValue`    | 現在の検索文字列。                                                     |
+| `isSearchOpen`   | 検索 UI が現在開いているかどうか。                                     |
+| `isEditable`     | カレンダーが現在編集可能な状態かどうか。                               |
+| `safeAreaLeft`   | macOS モードでトラフィックライトボタンと重ならないための左余白（px）。 |

@@ -145,6 +145,14 @@ export interface DragPluginConfig {
     originalEvent: Event
   ) => void | Promise<void>;
 
+  /**
+   * Controls cursor position relative to the drag indicator when dragging all-day events
+   * in month/year views.
+   * - `true` (default): cursor anchors to the start (left edge) of the indicator
+   * - `false`: cursor anchors to the center of the indicator
+   */
+  allDayDragCursorAtStart?: boolean;
+
   // Allow additional properties
   [key: string]: unknown;
 }

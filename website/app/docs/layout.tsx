@@ -2,7 +2,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import React from 'react';
 
 import { DocsHeader } from '@/components/DocsHeader';
-import { baseOptions, gitConfig } from '@/lib/layout.shared';
+import { baseOptions, gitConfig, sidebarTabs } from '@/lib/layout.shared';
 import { source } from '@/lib/source';
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
@@ -18,7 +18,10 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
           />
         ),
       }}
-      sidebar={{ collapsible: false }}
+      sidebar={{
+        collapsible: false,
+        tabs: sidebarTabs,
+      }}
       containerProps={{
         style: {
           '--fd-banner-height': '56px',

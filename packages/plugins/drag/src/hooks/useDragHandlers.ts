@@ -1796,10 +1796,18 @@ export const useDragHandlers = (
         drag.eventDurationDays = eventDurationDays;
         drag.currentSegmentDays = currentSegmentDays;
 
-        // Calculate click offset within source element
+        // Calculate click offset within source element based on config
         const rect = sourceElement.getBoundingClientRect();
-        drag.dragOffset = clientX - rect.left;
-        drag.dragOffsetY = clientY - rect.top;
+        const dragConfig = app?.getPlugin<DragService>('drag')?.getConfig();
+        const cursorAtStart = dragConfig?.allDayDragCursorAtStart ?? true;
+        if (cursorAtStart) {
+          // Cursor aligns with the left edge of the event title (8px inset) and vertically centered
+          drag.dragOffset = 8;
+          drag.dragOffsetY = rect.height / 2;
+        } else {
+          drag.dragOffset = rect.width / 2;
+          drag.dragOffsetY = rect.height / 2;
+        }
 
         setDragState({
           active: true,

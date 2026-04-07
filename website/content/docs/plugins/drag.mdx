@@ -42,15 +42,16 @@ function MyCalendar() {
 
 ## Configuration
 
-| Property             | Type         | Default                    | Description                                                   |
-| :------------------- | :----------- | :------------------------- | :------------------------------------------------------------ |
-| `enableDrag`         | `boolean`    | `true`                     | Allow moving events by dragging.                              |
-| `enableResize`       | `boolean`    | `true`                     | Allow changing event duration by resizing.                    |
-| `enableCreate`       | `boolean`    | `true`                     | Allow creating events by double-clicking the grid.            |
-| `enableAllDayCreate` | `boolean`    | `true`                     | Allow creating all-day events by dragging in the all-day row. |
-| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | Views where drag functionality should be enabled.             |
-| `onEventDrop`        | `Function`   | -                          | Callback when an event is moved (drag-and-drop).              |
-| `onEventResize`      | `Function`   | -                          | Callback when an event is resized.                            |
+| Property                  | Type         | Default                    | Description                                                                                                                                                                             |
+| :------------------------ | :----------- | :------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enableDrag`              | `boolean`    | `true`                     | Allow moving events by dragging.                                                                                                                                                        |
+| `enableResize`            | `boolean`    | `true`                     | Allow changing event duration by resizing.                                                                                                                                              |
+| `enableCreate`            | `boolean`    | `true`                     | Allow creating events by double-clicking the grid.                                                                                                                                      |
+| `enableAllDayCreate`      | `boolean`    | `true`                     | Allow creating all-day events by dragging in the all-day row.                                                                                                                           |
+| `allDayDragCursorAtStart` | `boolean`    | `true`                     | Controls cursor position on the drag indicator for all-day events in month/year views. `true`: cursor anchors to the left edge of the indicator. `false`: cursor anchors to the center. |
+| `supportedViews`          | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | Views where drag functionality should be enabled.                                                                                                                                       |
+| `onEventDrop`             | `Function`   | -                          | Callback when an event is moved (drag-and-drop).                                                                                                                                        |
+| `onEventResize`           | `Function`   | -                          | Callback when an event is resized.                                                                                                                                                      |
 
 ## Plugin API
 

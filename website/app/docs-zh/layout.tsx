@@ -2,10 +2,14 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import React from 'react';
 
 import { DocsHeader } from '@/components/DocsHeader';
-import { baseOptions, gitConfig } from '@/lib/layout.shared';
+import { baseOptions, gitConfig, sidebarTabs } from '@/lib/layout.shared';
 import { sourceZh } from '@/lib/source';
 
 export default function Layout({ children }: LayoutProps<'/docs-zh'>) {
+  const tabs = sidebarTabs.map(tab =>
+    tab.title === 'Calendar' ? { ...tab, url: '/docs-zh/introduction' } : tab
+  );
+
   return (
     <DocsLayout
       tree={sourceZh.getPageTree()}
@@ -18,7 +22,10 @@ export default function Layout({ children }: LayoutProps<'/docs-zh'>) {
           />
         ),
       }}
-      sidebar={{ collapsible: false }}
+      sidebar={{
+        collapsible: false,
+        tabs,
+      }}
       containerProps={{
         style: {
           '--fd-banner-height': '56px',

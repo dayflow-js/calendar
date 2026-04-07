@@ -47,7 +47,7 @@ export function TeamCalendar() {
 | `theme`                     | `ThemeConfig`               | Optional | `{ mode: 'light' }`                                      | Sets global theme mode and optional token overrides.                                                                                  |
 | `locale`                    | `string \| Locale`          | Optional | `'en-US'`                                                | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.                              |
 | `useEventDetailDialog`      | `boolean`                   | Optional | `false`                                                  | Enables the default modal detail dialog instead of inline panels.                                                                     |
-| `useCalendarHeader`         | `boolean \| Function`       | Optional | `true`                                                   | Enables the default header, hides it (`false`), or lets you provide a custom renderer.                                                |
+| `useCalendarHeader`         | `boolean`                   | Optional | `true`                                                   | Enables the default header (`true`) or hides it (`false`). For a custom header, use the `calendarHeader` slot on `DayFlowCalendar`.   |
 | `readOnly`                  | `boolean \| ReadOnlyConfig` | Optional | `false`                                                  | Disables built-in mutation UI. Can be a boolean or a config for fine-grained control (drag/view). Programmatic event APIs still work. |
 | `customMobileEventRenderer` | `MobileEventRenderer`       | Optional | —                                                        | Custom component to replace the default mobile event drawer/dialog.                                                                   |
 | `allDaySortComparator`      | `AllDaySortComparator`      | Optional | Calendar-group order with multi-day all-day events first | Custom comparator controlling the row order of all-day events across all views. When provided, it fully overrides the default order.  |
@@ -233,7 +233,8 @@ const calendar = useCalendarApp({
 
 - `true` (default): Renders the built-in calendar header.
 - `false`: Hides the header entirely.
-- `(props) => ReactNode`: Renders a custom header. See [Calendar Header](/docs/features/calendar-header) for details.
+
+To render a custom header, use the `calendarHeader` slot on `DayFlowCalendar`. See [Calendar Header](/docs/features/calendar-header) for details.
 
 ### readOnly
 

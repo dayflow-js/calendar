@@ -49,6 +49,11 @@ ok() { echo -e "${GREEN} ✓ $1${NC}"; }
 err() { echo -e "${RED} ✗ $1${NC}"; exit 1; }
 warn() { echo -e "${YELLOW} ⚠ $1${NC}"; }
 
+# Publish tracking
+PUBLISHED_OK=0
+FAILED_PKGS=()
+PUBLISH_TOTAL=0
+
 # ---------- Pre-flight checks ----------
 echo -e "${BOLD}Pre-flight checks${NC}"
 
@@ -137,13 +142,17 @@ publish_cli() {
 
     if npm view "create-dayflow@$version" version &>/dev/null; then
         warn "create-dayflow@$version already exists on npm — skipping"
+        PUBLISHED_OK=$((PUBLISHED_OK + 1))
         return 0
     fi
 
     if ! (cd "$dir" && pnpm publish --access public --no-git-checks $DRY_RUN); then
-        err "Failed to publish create-dayflow"
+        echo -e "${RED} ✗ Failed to publish create-dayflow${NC}"
+        FAILED_PKGS+=("create-dayflow")
+        return 1
     fi
     ok "create-dayflow published"
+    PUBLISHED_OK=$((PUBLISHED_OK + 1))
 }
 
 publish_pkg() {
@@ -157,6 +166,7 @@ publish_pkg() {
     # Check if already published
     if npm view "@dayflow/$name@$version" version &>/dev/null; then
         warn "@dayflow/$name@$version already exists on npm — skipping"
+        PUBLISHED_OK=$((PUBLISHED_OK + 1))
         return 0
     fi
 
@@ -191,23 +201,52 @@ publish_pkg() {
 
         echo "  Detected Angular dist - using npm publish..."
         if ! (cd "$dir" && npm publish --access public $DRY_RUN); then
-            err "Failed to publish @dayflow/$name from $dir"
+            echo -e "${RED} ✗ Failed to publish @dayflow/$name${NC}"
+            FAILED_PKGS+=("@dayflow/$name")
+            return 1
         fi
     else
         if ! (cd "$dir" && pnpm publish --access public --no-git-checks $DRY_RUN); then
-            err "Failed to publish @dayflow/$name"
+            echo -e "${RED} ✗ Failed to publish @dayflow/$name${NC}"
+            FAILED_PKGS+=("@dayflow/$name")
+            return 1
         fi
     fi
     ok "@dayflow/$name published"
+    PUBLISHED_OK=$((PUBLISHED_OK + 1))
+}
+
+# ---------- Publish Total ----------
+case "$MODE" in
+    main)    PUBLISH_TOTAL=${#MAIN_PKGS[@]} ;;
+    angular) PUBLISH_TOTAL=1 ;;
+    plugins) PUBLISH_TOTAL=${#PLUGIN_DIRS[@]} ;;
+    cli)     PUBLISH_TOTAL=1 ;;
+    all)     PUBLISH_TOTAL=$(( ${#MAIN_PKGS[@]} + ${#PLUGIN_DIRS[@]} + 1 + 1 )) ;;
+esac
+
+# ---------- Summary ----------
+print_summary() {
+    echo ""
+    if [ ${#FAILED_PKGS[@]} -eq 0 ]; then
+        echo -e "${GREEN}${BOLD}publish finished：$PUBLISHED_OK/$PUBLISH_TOTAL${NC}"
+    else
+        echo -e "${YELLOW}${BOLD}publish finished：$PUBLISHED_OK/$PUBLISH_TOTAL${NC}"
+        echo -e "${RED}publish failed：${NC}"
+        for pkg in "${FAILED_PKGS[@]}"; do
+            echo -e "${RED}  ✗ $pkg${NC}"
+        done
+    fi
+    if [ -n "$DRY_RUN" ]; then warn "This was a dry run. No actual publish occurred."; fi
+    if [ ${#FAILED_PKGS[@]} -ne 0 ]; then exit 1; fi
 }
 
 # ---------- Execution ----------
 
 # 1. Build + Publish (cli handles its own build/publish together)
 if [[ "$MODE" == "cli" ]]; then
-    publish_cli
-    echo -e "\n${GREEN}${BOLD}Done!${NC}"
-    if [ -n "$DRY_RUN" ]; then warn "This was a dry run. No actual publish occurred."; fi
+    publish_cli || true
+    print_summary
     exit 0
 fi
 
@@ -239,26 +278,23 @@ fi
 # 3. Publish Phase
 if [[ "$MODE" == "all" || "$MODE" == "main" ]]; then
     for pkg in "${MAIN_PKGS[@]}"; do
-        publish_pkg "$pkg" "$ROOT/packages/$pkg"
+        publish_pkg "$pkg" "$ROOT/packages/$pkg" || true
     done
 fi
 
 if [[ "$MODE" == "all" || "$MODE" == "plugins" ]]; then
     for dir in "${PLUGIN_DIRS[@]}"; do
         pkg_name=$(get_plugin_package_name "$dir")
-        publish_pkg "$pkg_name" "$ROOT/packages/plugins/$dir"
+        publish_pkg "$pkg_name" "$ROOT/packages/plugins/$dir" || true
     done
 fi
 
 if [[ "$MODE" == "all" || "$MODE" == "angular" ]]; then
-    publish_pkg "angular" "$ROOT/packages/angular/dist"
+    publish_pkg "angular" "$ROOT/packages/angular/dist" || true
 fi
 
 if [[ "$MODE" == "all" ]]; then
-    publish_cli
+    publish_cli || true
 fi
 
-echo -e "\n${GREEN}${BOLD}Done!${NC}"
-if [ -n "$DRY_RUN" ]; then
-    warn "This was a dry run. No actual publish occurred."
-fi
+print_summary

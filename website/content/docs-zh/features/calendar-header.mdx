@@ -13,36 +13,64 @@ const calendar = useCalendarApp({
 });
 ```
 
-## 自定义页眉组件
+## 自定义页眉
 
-您可以提供一个自定义组件函数来渲染您自己的页眉，同时仍能访问日历的状态和方法。
+<Callout title='Breaking change from v3.4.1' type='warn'>
+  不再支持向 `useCalendarHeader` 传入函数。请将自定义页眉迁移到
+  `DayFlowCalendar` 的 `calendarHeader` 插槽，如下所示。
+</Callout>
+
+通过 `calendarHeader` 内容插槽，您可以用自己的组件替换默认页眉。渲染器接收日历的状态和辅助方法，让您可以从自己的 UI 控制导航和搜索。
+
+### React
+
+向 `DayFlowCalendar` 传递 `calendarHeader` 渲染属性：
 
 ```tsx
 const calendar = useCalendarApp({
   views: [createMonthView()],
-  useCalendarHeader: props => {
-    const { calendar, switcherMode } = props;
-    return (
-      <div className='custom-header'>
-        <button onClick={() => calendar.goToToday()}>今天</button>
-        {/* 此处为您自定义的 UI */}
-      </div>
-    );
-  },
 });
+
+<DayFlowCalendar
+  calendar={calendar}
+  calendarHeader={() => (
+    <div className='custom-header'>
+      <button onClick={() => calendar.goToPrevious()}>‹</button>
+      <button onClick={() => calendar.goToToday()}>今天</button>
+      <button onClick={() => calendar.goToNext()}>›</button>
+    </div>
+  )}
+/>;
 ```
 
-### 页眉 Props
+### Vue
 
-自定义渲染器接收以下 props：
+使用具名插槽 `calendarHeader`：
 
-| Prop             | 描述                                          |
-| :--------------- | :-------------------------------------------- |
-| `calendar`       | `CalendarApp` 实例。                          |
-| `switcherMode`   | 当前视图切换器模式（`buttons` 或 `select`）。 |
-| `onAddCalendar`  | 添加新日历的处理函数。                        |
-| `onSearchChange` | 更新搜索查询的处理函数。                      |
-| `onSearchClick`  | 点击搜索图标时的处理函数。                    |
-| `searchValue`    | 当前搜索字符串。                              |
-| `isSearchOpen`   | 搜索 UI 当前是否打开。                        |
-| `isEditable`     | 日历当前是否处于可编辑状态。                  |
+```vue
+<DayFlowCalendar :calendar="calendar">
+  <template #calendarHeader="{ calendar, switcherMode, onSearchChange }">
+    <div class="custom-header">
+      <button @click="calendar.goToPrevious()">‹</button>
+      <button @click="calendar.goToToday()">今天</button>
+      <button @click="calendar.goToNext()">›</button>
+    </div>
+  </template>
+</DayFlowCalendar>
+```
+
+### 插槽参数
+
+插槽渲染器接收以下参数：
+
+| 参数             | 描述                                                        |
+| :--------------- | :---------------------------------------------------------- |
+| `calendar`       | `CalendarApp` 实例。                                        |
+| `switcherMode`   | 当前视图切换器模式（`buttons` 或 `select`）。               |
+| `onAddCalendar`  | 添加新日历的处理函数。                                      |
+| `onSearchChange` | 更新搜索查询的处理函数。                                    |
+| `onSearchClick`  | 点击搜索图标时的处理函数。                                  |
+| `searchValue`    | 当前搜索字符串。                                            |
+| `isSearchOpen`   | 搜索 UI 当前是否打开。                                      |
+| `isEditable`     | 日历当前是否处于可编辑状态。                                |
+| `safeAreaLeft`   | 左侧内边距（px），用于在 macOS 模式下避免与交通灯按钮重叠。 |

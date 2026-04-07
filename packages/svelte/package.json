@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/svelte",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Svelte adapter for DayFlow calendar",
   "files": [
     "dist",

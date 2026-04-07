@@ -16,6 +16,7 @@
     "publish:cli": "./scripts/publish.sh cli",
     "publish:dry": "./scripts/publish.sh all --dry-run",
     "publish:main": "./scripts/publish.sh main",
+    "tag": "./scripts/git-tag.sh",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "version:update": "./scripts/update-versions.sh"

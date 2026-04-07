@@ -10,6 +10,7 @@ import type {
   TitleBarSlotProps,
   ColorPickerProps,
   CreateCalendarDialogColorPickerProps,
+  CalendarHeaderProps,
 } from '@dayflow/core';
 import { useRef, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 
@@ -54,6 +55,8 @@ export interface DayFlowCalendarProps {
   createCalendarDialogColorPicker?: (
     args: CreateCalendarDialogColorPickerProps
   ) => ReactNode;
+  /** Custom calendar header renderer (React) */
+  calendarHeader?: (args: CalendarHeaderProps) => ReactNode;
 }
 
 /** Compute active override names from props and installed plugins. */

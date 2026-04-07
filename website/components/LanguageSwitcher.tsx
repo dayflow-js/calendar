@@ -72,7 +72,7 @@ export function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div className='bg-fd-background absolute inset-e-0 top-full z-50 mt-1 w-36 rounded-lg border py-1 shadow-md'>
+        <div className='bg-fd-background absolute inset-e-0 top-full z-50 mt-1 w-36 rounded-lg border p-1 shadow-md'>
           {languages.map(language => (
             <button
               key={language.code}
@@ -81,7 +81,7 @@ export function LanguageSwitcher() {
                 setOpen(false);
                 switchTo(language.code, pathname);
               }}
-              className={`hover:bg-fd-accent hover:text-fd-accent-foreground flex w-full items-center justify-between px-1 py-1.5 text-sm transition-colors ${
+              className={`hover:bg-fd-accent hover:text-fd-accent-foreground flex w-full items-center justify-between rounded px-2 py-1 text-sm transition-colors ${
                 currentLocale === language.code
                   ? 'text-fd-primary font-medium'
                   : 'text-fd-muted-foreground'

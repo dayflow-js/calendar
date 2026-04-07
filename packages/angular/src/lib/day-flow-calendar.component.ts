@@ -23,6 +23,7 @@ import type {
   EventContentSlotArgs,
   ColorPickerProps,
   CreateCalendarDialogColorPickerProps,
+  CalendarHeaderProps,
 } from '@dayflow/core';
 import { CalendarRenderer, CalendarApp } from '@dayflow/core';
 
@@ -71,6 +72,7 @@ export class DayFlowCalendarComponent
   @Input() colorPicker?: TemplateRef<ColorPickerProps>;
   @Input()
   createCalendarDialogColorPicker?: TemplateRef<CreateCalendarDialogColorPickerProps>;
+  @Input() calendarHeader?: TemplateRef<CalendarHeaderProps>;
   @Input() collapsedSafeAreaLeft?: number;
 
   @ViewChild('container') container!: ElementRef<HTMLElement>;
@@ -137,6 +139,7 @@ export class DayFlowCalendarComponent
         'titleBarSlot',
         'colorPicker',
         'createCalendarDialogColorPicker',
+        'calendarHeader',
       ];
       if (slotKeys.some(key => changes[key])) {
         const activeOverrides = this.getActiveOverrides();
@@ -185,6 +188,7 @@ export class DayFlowCalendarComponent
       titleBarSlot: this.titleBarSlot,
       colorPicker: this.colorPicker,
       createCalendarDialogColorPicker: this.createCalendarDialogColorPicker,
+      calendarHeader: this.calendarHeader,
     };
     return Object.keys(templateInputs).filter(
       key => templateInputs[key] !== null && templateInputs[key] !== undefined
@@ -246,6 +250,9 @@ export class DayFlowCalendarComponent
       }
       case 'createCalendarDialogColorPicker': {
         return this.createCalendarDialogColorPicker ?? null;
+      }
+      case 'calendarHeader': {
+        return this.calendarHeader ?? null;
       }
       default: {
         return null;

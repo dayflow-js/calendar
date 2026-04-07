@@ -3,6 +3,35 @@ import Image from 'next/image';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+export const gitConfig = {
+  user: 'dayflow-js',
+  repo: 'dayflow',
+  branch: 'main',
+};
+
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+export const sidebarTabs = [
+  {
+    title: 'Calendar',
+    url: '/docs/introduction',
+    icon: (
+      <Image
+        src={`${BASE}/logo.png`}
+        alt='DayFlow logo'
+        width={16}
+        height={16}
+        className='size-4'
+      />
+    ),
+  },
+  {
+    title: 'Blossom Color Picker',
+    url: 'https://blossom.dayflow.studio/docs/introduction',
+    icon: <span className='flex size-4 items-center justify-center'>🌸</span>,
+  },
+];
+
 function DiscordIcon() {
   return (
     <svg
@@ -30,14 +59,6 @@ function GithubButton() {
     </svg>
   );
 }
-
-export const gitConfig = {
-  user: 'dayflow-js',
-  repo: 'dayflow',
-  branch: 'main',
-};
-
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const NavTitle = (
   <span className='flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white'>

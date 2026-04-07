@@ -42,15 +42,16 @@ function MyCalendar() {
 
 ## 配置项
 
-| 属性                 | 类型         | 默认值                     | 描述                                   |
-| :------------------- | :----------- | :------------------------- | :------------------------------------- |
-| `enableDrag`         | `boolean`    | `true`                     | 是否允许通过拖拽移动事件。             |
-| `enableResize`       | `boolean`    | `true`                     | 是否允许通过拖拽调整事件持续时间。     |
-| `enableCreate`       | `boolean`    | `true`                     | 是否允许通过双击网格创建事件。         |
-| `enableAllDayCreate` | `boolean`    | `true`                     | 是否允许在全天行通过拖拽创建全天事件。 |
-| `supportedViews`     | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | 启用拖拽功能的视图类型。               |
-| `onEventDrop`        | `Function`   | -                          | 事件移动（拖放）时的回调。             |
-| `onEventResize`      | `Function`   | -                          | 事件调整大小时的回调。                 |
+| 属性                      | 类型         | 默认值                     | 描述                                                                                                               |
+| :------------------------ | :----------- | :------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| `enableDrag`              | `boolean`    | `true`                     | 是否允许通过拖拽移动事件。                                                                                         |
+| `enableResize`            | `boolean`    | `true`                     | 是否允许通过拖拽调整事件持续时间。                                                                                 |
+| `enableCreate`            | `boolean`    | `true`                     | 是否允许通过双击网格创建事件。                                                                                     |
+| `enableAllDayCreate`      | `boolean`    | `true`                     | 是否允许在全天行通过拖拽创建全天事件。                                                                             |
+| `allDayDragCursorAtStart` | `boolean`    | `true`                     | 控制在月/年视图拖拽全天事件时，鼠标相对拖拽指示器的位置。`true`：鼠标锚定在指示器左边缘；`false`：鼠标锚定在中心。 |
+| `supportedViews`          | `ViewType[]` | `[DAY, WEEK, MONTH, YEAR]` | 启用拖拽功能的视图类型。                                                                                           |
+| `onEventDrop`             | `Function`   | -                          | 事件移动（拖放）时的回调。                                                                                         |
+| `onEventResize`           | `Function`   | -                          | 事件调整大小时的回调。                                                                                             |
 
 ## 插件 API
 

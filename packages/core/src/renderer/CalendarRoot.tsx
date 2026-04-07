@@ -225,8 +225,14 @@ export const CalendarRoot = ({
 
   const renderHeader = () => {
     if (headerConfig === false) return null;
-    if (typeof headerConfig === 'function') return headerConfig(headerProps);
-    return h(CalendarHeader, headerProps);
+    return (
+      <ContentSlot
+        store={customRenderingStore}
+        generatorName='calendarHeader'
+        generatorArgs={headerProps}
+        defaultContent={h(CalendarHeader, headerProps)}
+      />
+    );
   };
 
   // Only create the Preact fallback portal when the slot is NOT yet overridden
