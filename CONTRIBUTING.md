@@ -19,23 +19,72 @@ If you have forked the repository and want to run the examples locally, follow t
     pnpm install
     ```
 
-3.  **Start the development server:**
-    Go to the core package directory and start the Vite server to launch the example application.
-    ```bash
-    cd packages/core
-    pnpm run dev
-    ```
-    The application typically runs at `http://localhost:5529`.
+### 3. Start the development server
 
-`feat:` - for new features
+Navigate to the core package and start the dev server:
 
-`fix:` - for bug fixes
+```bash
+cd packages/core
+pnpm run dev
+```
 
-`docs:` - for documentation updates
+The application will typically be available at:
+http://localhost:5529
 
-`style:` - for code style changes (formatting, missing semi-colons, etc.)
+---
 
-`refactor:` - for code refactoring without adding features or fixing bugs
-`test:` - for adding or updating tests
+## Commit Message Convention
 
-`chore:` - for maintenance tasks (build process, dependencies, etc.)
+Please follow these prefixes when writing commit messages:
+
+- `feat:` — new features
+- `fix:` — bug fixes
+- `docs:` — documentation updates
+- `style:` — formatting, missing semicolons, etc. (no logic changes)
+- `refactor:` — code changes that neither fix a bug nor add a feature
+- `test:` — adding or updating tests
+- `chore:` — maintenance tasks (build, dependencies, etc.)
+
+Example:
+
+```bash
+feat: add drag-and-drop event support
+fix: resolve timezone offset issue in calendar view
+```
+
+---
+
+## Pull Request Guidelines
+
+To keep the project maintainable and easy to review:
+
+- Keep each pull request focused on **one feature, bug fix, or refactor**
+- Avoid mixing unrelated changes in a single PR
+- Provide a clear description of:
+  - What changed
+  - Why it was needed
+
+- Update documentation if necessary
+- Add or update tests when applicable
+- Ensure the project builds and runs correctly before submitting
+
+---
+
+## Development Tips
+
+- Keep changes minimal and focused
+- Follow existing code style and structure
+- When in doubt, open an issue first to discuss your idea
+
+---
+
+## License and Contribution Terms
+
+By submitting a contribution to this project, you represent that:
+
+- The contribution is your original work, or you have the legal right to submit it.
+- You grant DayFlow the right to use, modify, distribute, and relicense your contribution as part of both open source and commercial versions of the project.
+
+---
+
+Thanks again for contributing to **DayFlow**! 🚀

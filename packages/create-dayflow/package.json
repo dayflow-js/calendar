@@ -2,6 +2,28 @@
   "name": "create-dayflow",
   "version": "1.0.0",
   "description": "Interactive CLI to add DayFlow calendar to your project",
+  "keywords": [
+    "angular",
+    "calendar",
+    "cli",
+    "create-dayflow",
+    "dayflow",
+    "react",
+    "setup",
+    "svelte",
+    "vue"
+  ],
+  "homepage": "https://calendar.dayflow.studio",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/dayflow/issues"
+  },
+  "license": "MIT",
+  "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dayflow-js/dayflow.git",
+    "directory": "packages/create-dayflow"
+  },
   "bin": {
     "create-dayflow": "./dist/index.js"
   },

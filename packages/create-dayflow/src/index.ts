@@ -1,6 +1,12 @@
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  statSync,
+  existsSync,
+} from 'node:fs';
+import { resolve, relative, dirname, join } from 'node:path';
 
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
@@ -105,8 +111,20 @@ function getPluginImportName(plugin: Plugin): string {
   }
 }
 
-function buildNextSteps(framework: Framework, plugins: Plugin[]): string {
-  const imports: string[] = [`import '@dayflow/core/style'`];
+function buildNextSteps(
+  framework: Framework,
+  plugins: Plugin[],
+  isTailwind: boolean
+): string {
+  const imports: string[] = [];
+
+  if (isTailwind) {
+    imports.push(
+      `/* DayFlow styles are handled via your CSS file (Tailwind V4 integration) */`
+    );
+  } else {
+    imports.push(`import '@dayflow/core/dist/styles.css'`);
+  }
 
   switch (framework) {
     case 'react':
@@ -119,7 +137,7 @@ function buildNextSteps(framework: Framework, plugins: Plugin[]): string {
       imports.push(`import { DayFlowCalendar } from '@dayflow/svelte'`);
       break;
     case 'angular':
-      imports.push(`import { DayflowAngularModule } from '@dayflow/angular'`);
+      imports.push(`import { DayFlowCalendarModule } from '@dayflow/angular'`);
       break;
     default:
       break;
@@ -132,6 +150,51 @@ function buildNextSteps(framework: Framework, plugins: Plugin[]): string {
   }
 
   return imports.join('\n');
+}
+
+function findCssFile(dir: string): string | null {
+  const commonNames = [
+    'globals.css',
+    'global.css',
+    'index.css',
+    'app.css',
+    'main.css',
+    'style.css',
+  ];
+
+  // 1. Check top-level common directories
+  const commonDirs = ['src', 'app', 'styles'];
+  for (const d of commonDirs) {
+    const fullDir = resolve(dir, d);
+    if (existsSync(fullDir) && statSync(fullDir).isDirectory()) {
+      for (const name of commonNames) {
+        const file = resolve(fullDir, name);
+        if (existsSync(file)) return file;
+      }
+    }
+  }
+
+  // 2. Fallback: shallow search in src/ and app/ for ANY .css
+  for (const d of ['src', 'app']) {
+    const fullDir = resolve(dir, d);
+    if (existsSync(fullDir) && statSync(fullDir).isDirectory()) {
+      try {
+        const files = readdirSync(fullDir);
+        const css = files.find(f => f.endsWith('.css'));
+        if (css) return resolve(fullDir, css);
+      } catch {
+        // ignore errors
+      }
+    }
+  }
+
+  // 3. Fallback to current directory for any of the common names
+  for (const name of commonNames) {
+    const file = resolve(dir, name);
+    if (existsSync(file)) return file;
+  }
+
+  return null;
 }
 
 async function main() {
@@ -171,7 +234,18 @@ async function main() {
     process.exit(0);
   }
 
-  // Step 3: package manager
+  // Step 3: Tailwind CSS
+  const isTailwind = await p.confirm({
+    message: 'Are you using Tailwind CSS?',
+    initialValue: true,
+  });
+
+  if (p.isCancel(isTailwind)) {
+    p.cancel('Setup cancelled.');
+    process.exit(0);
+  }
+
+  // Step 4: package manager
   const detectedPm = detectPackageManager();
   const packageManager = await p.select<PackageManager>({
     message: 'Which package manager do you use?',
@@ -255,10 +329,86 @@ async function main() {
 
   spinner.stop('Packages installed successfully');
 
+  // Step 5: Configure CSS for Tailwind
+  if (isTailwind) {
+    const rootCss = findCssFile(process.cwd());
+    if (rootCss) {
+      try {
+        const content = readFileSync(rootCss, 'utf-8');
+        if (!content.includes('@dayflow/core/dist/styles.components.css')) {
+          const relativeToRoot = relative(dirname(rootCss), process.cwd());
+          const nmPath = join(relativeToRoot, 'node_modules').replaceAll(
+            '\\',
+            '/'
+          );
+
+          // Build source block
+          let sourceBlock =
+            '\n/* DayFlow: scan compiled JS so Tailwind generates utility classes used inside DayFlow components */';
+          sourceBlock += `\n@source '${nmPath}/@dayflow/core/dist/**/*.js';`;
+          if (selectedPlugins.includes('drag')) {
+            sourceBlock += `\n@source '${nmPath}/@dayflow/plugin-drag/dist/**/*.js';`;
+          }
+          if (selectedPlugins.includes('sidebar')) {
+            sourceBlock += `\n@source '${nmPath}/@dayflow/plugin-sidebar/dist/**/*.js';`;
+          }
+          sourceBlock +=
+            '\n\n/* DayFlow: class-based dark mode so theme.mode works correctly */\n@variant dark (.dark &);';
+          sourceBlock +=
+            '\n/* Tailwind V4 integration: https://calendar.dayflow.studio/docs/guides/theme-customization#tailwind-v4-integration */';
+
+          const lines = content.split('\n');
+          let lastImportIndex = -1;
+          let tailwindImportIndex = -1;
+
+          for (let i = 0; i < lines.length; i++) {
+            const trimmed = lines[i].trim();
+            if (trimmed.startsWith('@import')) {
+              lastImportIndex = i;
+              if (trimmed.includes('tailwindcss')) {
+                tailwindImportIndex = i;
+              }
+            }
+          }
+
+          const header =
+            "/* DayFlow Tailwind Setup */\n@import '@dayflow/core/dist/styles.components.css';";
+
+          let finalLines = [...lines];
+
+          if (tailwindImportIndex === -1) {
+            // No tailwind import, put both at the top
+            finalLines.unshift(header, "@import 'tailwindcss';");
+            lastImportIndex += 2;
+          } else {
+            // Insert DayFlow import before Tailwind import
+            finalLines.splice(tailwindImportIndex, 0, header);
+            lastImportIndex++; // Adjust for the new line
+          }
+
+          // Insert source block after the LAST consecutive import to keep CSS valid
+          finalLines.splice(lastImportIndex + 1, 0, sourceBlock);
+
+          writeFileSync(rootCss, finalLines.join('\n'));
+          p.log.success(
+            `${pc.green('✓')} Added DayFlow configuration to ${pc.cyan(relative(process.cwd(), rootCss))}`
+          );
+        }
+      } catch (err) {
+        p.log.warn(
+          `Could not update CSS file: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+    } else {
+      p.log.warn('Could not find a root CSS file to update automatically.');
+    }
+  }
+
   // Done
   const nextSteps = buildNextSteps(
     framework as Framework,
-    selectedPlugins as Plugin[]
+    selectedPlugins as Plugin[],
+    isTailwind as boolean
   );
   p.note(nextSteps, 'Next steps');
 

@@ -55,8 +55,6 @@ import { cn } from '@/lib/utils';
 import { getWebsiteCalendars } from '@/utils/palette';
 import { generateSampleEvents } from '@/utils/sampleData';
 
-import '@dayflow/core/dist/styles.components.css';
-
 const calendarTypes = getWebsiteCalendars();
 
 const LOCALES_OPTIONS = [
@@ -226,6 +224,7 @@ export function InteractiveCalendar() {
         createDayView({
           secondaryTimeZone: secondaryTimeZone as never,
           scrollToCurrentTime: true,
+          showEventDots,
         })
       );
     }
@@ -234,6 +233,7 @@ export function InteractiveCalendar() {
         createWeekView({
           secondaryTimeZone: secondaryTimeZone as never,
           scrollToCurrentTime: true,
+          showEventDots,
         })
       );
     }
@@ -241,6 +241,7 @@ export function InteractiveCalendar() {
       v.push(
         createMonthView({
           showMonthIndicator: false,
+          showEventDots,
         })
       );
     if (selectedViews.includes(ViewType.YEAR)) {
@@ -248,6 +249,7 @@ export function InteractiveCalendar() {
         createYearView({
           mode: yearMode as never,
           showTimedEventsInYearView: true,
+          showEventDots,
         })
       );
     }
@@ -271,7 +273,11 @@ export function InteractiveCalendar() {
         },
       },
       events,
-      timeZone,
+      timeZone:
+        timeZone ||
+        (mounted
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone
+          : undefined),
       locale: locale,
       calendars: showCalendarGroups ? calendarsWithGroups : calendarTypes,
       useCalendarHeader: showHeader,
@@ -288,19 +294,20 @@ export function InteractiveCalendar() {
     enableDrag,
     showSidebar,
     enableShortcuts,
-    locale,
-    timeZone,
-    secondaryTimeZone,
-    showHeader,
     selectedViews,
-    yearMode,
-    themeMode,
-    events,
-    activeView,
     showEventDots,
+    activeView,
+    events,
+    timeZone,
+    mounted,
+    locale,
     showCalendarGroups,
     calendarsWithGroups,
+    showHeader,
+    themeMode,
     readOnly,
+    secondaryTimeZone,
+    yearMode,
   ]);
 
   const toggleView = (view: string) => {
