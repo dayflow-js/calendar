@@ -30,23 +30,24 @@ function MyCalendar() {
 
 ## デフォルトのショートカット
 
-| 操作                          | キー (Mac)                 | キー (Windows/Linux)       |
-| :---------------------------- | :------------------------- | :------------------------- |
-| **今日に移動**                | `Cmd + T`                  | `Ctrl + T`                 |
-| **検索**                      | `Cmd + F`                  | `Ctrl + F`                 |
-| **新規イベント**              | `Cmd + N`                  | `Ctrl + N`                 |
-| **ナビゲーション**            | `ArrowLeft` / `ArrowRight` | `ArrowLeft` / `ArrowRight` |
-| **イベントのタブ移動**        | `Tab` / `Shift + Tab`      | `Tab` / `Shift + Tab`      |
-| **元に戻す**                  | `Cmd + Z`                  | `Ctrl + Z`                 |
-| **イベントをコピー**          | `Cmd + C`                  | `Ctrl + C`                 |
-| **イベントを切り取り**        | `Cmd + X`                  | `Ctrl + X`                 |
-| **イベントを貼り付け**        | `Cmd + V`                  | `Ctrl + V`                 |
-| **イベントを削除**            | `Backspace` / `Delete`     | `Backspace` / `Delete`     |
-| **ダイアログ/パネルを閉じる** | `Esc`                      | `Esc`                      |
+| 操作                          | キー (Mac)                    | キー (Windows/Linux)       |
+| :---------------------------- | :---------------------------- | :------------------------- |
+| **今日に移動**                | `Cmd + T`                     | `Ctrl + T`                 |
+| **検索**                      | `Cmd + F`                     | `Ctrl + F`                 |
+| **新規イベント**              | `Cmd + N`                     | `Ctrl + N`                 |
+| **ナビゲーション**            | `ArrowLeft` / `ArrowRight`    | `ArrowLeft` / `ArrowRight` |
+| **イベントのタブ移動**        | `Tab` / `Shift + Tab`         | `Tab` / `Shift + Tab`      |
+| **元に戻す**                  | `Cmd + Z`                     | `Ctrl + Z`                 |
+| **やり直し**                  | `Cmd + Shift + Z` / `Cmd + Y` | `Ctrl + Y`                 |
+| **イベントをコピー**          | `Cmd + C`                     | `Ctrl + C`                 |
+| **イベントを切り取り**        | `Cmd + X`                     | `Ctrl + X`                 |
+| **イベントを貼り付け**        | `Cmd + V`                     | `Ctrl + V`                 |
+| **イベントを削除**            | `Backspace` / `Delete`        | `Backspace` / `Delete`     |
+| **ダイアログ/パネルを閉じる** | `Esc`                         | `Esc`                      |
 
 ## 設定
 
-キーマッピングをカスタマイズできます：
+キーマッピングをカスタマイズしたり、各アクションにカスタムコールバックを提供したりできます：
 
 ```tsx
 createKeyboardShortcutsPlugin({
@@ -55,11 +56,38 @@ createKeyboardShortcutsPlugin({
     search: 'f',
     prev: 'ArrowLeft',
     next: 'ArrowRight',
+    undo: 'z',
+    redo: 'y',
     delete: 'Delete',
     newEvent: 'n',
   },
+  callbacks: {
+    undo: app => {
+      console.log('カスタムの元に戻すロジック');
+      app.undo();
+    },
+    redo: app => {
+      console.log('カスタムのやり直しロジック');
+      if ((app as any).redo) (app as any).redo();
+    },
+    delete: app => {
+      if (confirm('本当に削除しますか？')) {
+        const selectedId = app.state.selectedEventId;
+        if (selectedId) app.deleteEvent(selectedId);
+      }
+    },
+  },
 });
 ```
+
+### 利用可能なコールバック
+
+`callbacks` オブジェクトでは以下のコールバックがサポートされています：
+
+- `undo`, `redo`, `paste` (`app` を受け取ります)
+- `copy`, `cut`, `delete` (`app` と `event?: Event` を受け取ります)
+- `today`, `search`, `prev`, `next`, `newEvent`, `dismiss` (`app` を受け取ります)
+- `tab` (`app` と `reverse: boolean` を受け取ります)
 
 ## プラグイン API
 

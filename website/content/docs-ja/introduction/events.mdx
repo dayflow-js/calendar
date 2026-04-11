@@ -182,6 +182,10 @@ function MyCalendar() {
         setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
       onEventDelete: eventId =>
         setEvents(prev => prev.filter(e => e.id !== eventId)),
+      onEventDoubleClick: (event, e) => {
+        console.log('イベントがダブルクリックされました:', event);
+        // e.currentTarget をカスタムポップオーバーのアンカーとして使用
+      },
     },
   });
 

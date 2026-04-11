@@ -97,6 +97,7 @@ const calendar = useCalendarApp({
 - `onVisibleMonthChange(date)`：月份视窗滚动，用于预加载数据
 - `onVisibleRangeChange(start, end, reason)`：可见日期范围每次变化时触发，无需额外计算即可进行更精准的数据拉取
 - `onEventCreate/Update/Delete`：与服务端 CRUD 对接
+- `onEventDoubleClick(event, e)`：当事件被双击时触发，常用于自定义弹出层锚点；可使用 `e.currentTarget` 作为锚点，返回 `false` 可阻止 DayFlow 默认详情面板/对话框打开
 - `onMoreEventsClick(date)`：当月视图中的"+ X 更多"链接被点击时触发
 - `onCalendarCreate/onCalendarUpdate/onCalendarDelete`：日历增删改的回调，用于同步日历列表
 - `onCalendarMerge(sourceId, targetId)`：合并两个日历时触发（例如将"工作"合并到"个人"）

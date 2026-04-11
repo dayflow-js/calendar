@@ -262,6 +262,13 @@ export class EventManager {
     this.getCallbacks().onEventClick?.(event);
   }
 
+  onEventDoubleClick(
+    event: Event,
+    e: MouseEvent
+  ): boolean | undefined | Promise<boolean | undefined> {
+    return this.getCallbacks().onEventDoubleClick?.(event, e);
+  }
+
   onMoreEventsClick(date: Date): void {
     this.getCallbacks().onMoreEventsClick?.(date);
   }

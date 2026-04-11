@@ -202,6 +202,10 @@ const calendar = useCalendarApp({
       // Sync with backend
       api.deleteEvent(eventId);
     },
+    onEventDoubleClick: (event: Event, e: MouseEvent) => {
+      console.log('Event double-clicked:', event);
+      // Use e.currentTarget as an anchor for a custom popover
+    },
   },
 });
 ```

@@ -30,23 +30,24 @@ function MyCalendar() {
 
 ## 默认快捷键
 
-| 操作              | 快捷键 (Mac)           | 快捷键 (Windows/Linux) |
-| :---------------- | :--------------------- | :--------------------- |
-| **跳转到今天**    | `Cmd + T`              | `Ctrl + T`             |
-| **搜索**          | `Cmd + F`              | `Ctrl + F`             |
-| **新建事件**      | `Cmd + N`              | `Ctrl + N`             |
-| **视图导航**      | `左箭头` / `右箭头`    | `左箭头` / `右箭头`    |
-| **循环选择事件**  | `Tab` / `Shift + Tab`  | `Tab` / `Shift + Tab`  |
-| **撤销**          | `Cmd + Z`              | `Ctrl + Z`             |
-| **复制事件**      | `Cmd + C`              | `Ctrl + C`             |
-| **剪切事件**      | `Cmd + X`              | `Ctrl + X`             |
-| **粘贴事件**      | `Cmd + V`              | `Ctrl + V`             |
-| **删除事件**      | `Backspace` / `Delete` | `Backspace` / `Delete` |
-| **关闭弹窗/面板** | `Esc`                  | `Esc`                  |
+| 操作              | 快捷键 (Mac)                  | 快捷键 (Windows/Linux) |
+| :---------------- | :---------------------------- | :--------------------- |
+| **跳转到今天**    | `Cmd + T`                     | `Ctrl + T`             |
+| **搜索**          | `Cmd + F`                     | `Ctrl + F`             |
+| **新建事件**      | `Cmd + N`                     | `Ctrl + N`             |
+| **视图导航**      | `左箭头` / `右箭头`           | `左箭头` / `右箭头`    |
+| **循环选择事件**  | `Tab` / `Shift + Tab`         | `Tab` / `Shift + Tab`  |
+| **撤销**          | `Cmd + Z`                     | `Ctrl + Z`             |
+| **重做**          | `Cmd + Shift + Z` / `Cmd + Y` | `Ctrl + Y`             |
+| **复制事件**      | `Cmd + C`                     | `Ctrl + C`             |
+| **剪切事件**      | `Cmd + X`                     | `Ctrl + X`             |
+| **粘贴事件**      | `Cmd + V`                     | `Ctrl + V`             |
+| **删除事件**      | `Backspace` / `Delete`        | `Backspace` / `Delete` |
+| **关闭弹窗/面板** | `Esc`                         | `Esc`                  |
 
 ## 配置项
 
-您可以自定义按键映射：
+您可以自定义按键映射并为每个操作提供自定义回调函数：
 
 ```tsx
 createKeyboardShortcutsPlugin({
@@ -55,11 +56,38 @@ createKeyboardShortcutsPlugin({
     search: 'f',
     prev: 'ArrowLeft',
     next: 'ArrowRight',
+    undo: 'z',
+    redo: 'y',
     delete: 'Delete',
     newEvent: 'n',
   },
+  callbacks: {
+    undo: app => {
+      console.log('自定义撤销逻辑');
+      app.undo();
+    },
+    redo: app => {
+      console.log('自定义重放逻辑');
+      if ((app as any).redo) (app as any).redo();
+    },
+    delete: app => {
+      if (confirm('您确定要删除吗？')) {
+        const selectedId = app.state.selectedEventId;
+        if (selectedId) app.deleteEvent(selectedId);
+      }
+    },
+  },
 });
 ```
+
+### 可选回调函数
+
+`callbacks` 对象支持以下回调：
+
+- `undo`, `redo`, `paste` (接收 `app` 参数)
+- `copy`, `cut`, `delete` (接收 `app` 和 `event?: Event` 参数)
+- `today`, `search`, `prev`, `next`, `newEvent`, `dismiss` (接收 `app` 参数)
+- `tab` (接收 `app` 和 `reverse: boolean` 参数)
 
 ## 插件 API
 

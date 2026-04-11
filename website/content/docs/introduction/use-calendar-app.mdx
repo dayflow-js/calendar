@@ -80,6 +80,7 @@ export function TeamCalendar() {
 - `onVisibleMonthChange(date)` helps prefetch data as the visible month shifts.
 - `onVisibleRangeChange(start, end, reason)` fires whenever visible date-range shifts. Helps in more precise fetches without additional calculations.
 - `onEventCreate(event)`, `onEventUpdate(event)`, `onEventDelete(id)` mirror CRUD operations—ideal for syncing APIs.
+- `onEventDoubleClick(event, e)` fires when an event is double-clicked. Use `e.currentTarget` as an anchor for external popovers, and return `false` to suppress DayFlow's default detail panel/dialog.
 - `onMoreEventsClick(date)` fires when the "+ X more" link is clicked in Month view.
 - `onCalendarCreate(calendar)`, `onCalendarUpdate(calendar)`, `onCalendarDelete(id)` mirror calendar CRUD operations.
 - `onCalendarMerge(sourceId, targetId)` fires when merging two calendars (e.g., merging "Work" into "Personal").

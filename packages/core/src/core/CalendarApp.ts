@@ -205,6 +205,12 @@ export class CalendarApp implements ICalendarApp {
 
   onEventClick = (event: Event): void => this.eventManager.onEventClick(event);
 
+  onEventDoubleClick = (
+    event: Event,
+    e: MouseEvent
+  ): boolean | undefined | Promise<boolean | undefined> =>
+    this.eventManager.onEventDoubleClick(event, e);
+
   onMoreEventsClick = (date: Date): void =>
     this.eventManager.onMoreEventsClick(date);
 

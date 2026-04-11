@@ -11,7 +11,12 @@ import { Temporal } from 'temporal-polyfill';
 import { EventContextMenu } from '@/components/contextMenu';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
-import { Event, ViewType, ReadOnlyConfig } from '@/types';
+import {
+  Event,
+  ViewType,
+  ReadOnlyConfig,
+  EventDetailContentProps,
+} from '@/types';
 import {
   getSelectedBgColor,
   getEventBgColor,
@@ -322,18 +327,6 @@ const CalendarEvent = ({
     onDetailPanelToggle?.(null);
   }, [onEventSelect, onDetailPanelToggle, setIsSelected]);
 
-  // Memoized args for the eventDetailContent ContentSlot
-  const panelSlotArgs = useMemo(
-    () => ({
-      event,
-      isAllDay,
-      onEventUpdate,
-      onEventDelete,
-      onClose: handlePanelClose,
-    }),
-    [event, isAllDay, onEventUpdate, onEventDelete, handlePanelClose]
-  );
-
   // Memoized args for the eventContent ContentSlot
   const eventContentSlotArgs = useMemo(
     () => ({
@@ -358,16 +351,15 @@ const CalendarEvent = ({
     ]
   );
 
-  // Stable contentRenderer for EventDetailPanelWithContent
   const contentSlotRenderer = useCallback(
-    () => (
+    (contentProps: EventDetailContentProps) => (
       <ContentSlot
         store={customRenderingStore}
         generatorName='eventDetailContent'
-        generatorArgs={panelSlotArgs}
+        generatorArgs={contentProps}
       />
     ),
-    [customRenderingStore, panelSlotArgs]
+    [customRenderingStore]
   );
 
   // Highlight effect

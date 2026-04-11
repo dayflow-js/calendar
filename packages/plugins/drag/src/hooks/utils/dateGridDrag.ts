@@ -22,6 +22,7 @@ type DateGridDragLike = {
     | undefined;
   resizeDirection?: string | null;
   targetDate?: Date | null;
+  grabDayOffset?: number;
 };
 
 type DateGridPreviewRangeUpdate = {
@@ -72,6 +73,7 @@ type DateGridMoveStartDragUpdates = {
   currentSegmentDays: number;
   dragOffset: number;
   dragOffsetY: number;
+  grabDayOffset: number;
 };
 
 type BuildDateGridMoveStartDataParams = {
@@ -81,6 +83,7 @@ type BuildDateGridMoveStartDataParams = {
   eventDurationDays: number;
   eventEndDate: Date;
   eventStartDate: Date;
+  grabDayOffset?: number;
   isTouchLike: boolean;
   sourceElement: HTMLElement;
   sourceRect: DOMRect;
@@ -142,6 +145,7 @@ export const buildDateGridMoveStartData = ({
   eventDurationDays,
   eventEndDate,
   eventStartDate,
+  grabDayOffset = 0,
   isTouchLike,
   sourceElement,
   sourceRect,
@@ -172,6 +176,7 @@ export const buildDateGridMoveStartData = ({
     currentSegmentDays,
     dragOffset: sourceRect.width / 2,
     dragOffsetY: sourceRect.height / 2,
+    grabDayOffset,
   };
 
   return {
@@ -241,9 +246,15 @@ export const buildDateGridPreviewUpdate = ({
       const normalizedOriginalStart = new Date(drag.originalStartDate);
       normalizedOriginalStart.setHours(0, 0, 0, 0);
 
+      const grabOffsetDays = drag.grabDayOffset ?? 0;
+      const adjustedTargetDate =
+        grabOffsetDays > 0
+          ? addDaysToDate(targetDate, -grabOffsetDays)
+          : targetDate;
+
       const dragOffsetDays = daysDifference(
         normalizedOriginalStart,
-        targetDate
+        adjustedTargetDate
       );
       const newStartDate = addDaysToDate(
         drag.originalStartDate,

@@ -66,11 +66,11 @@ const MonthDragIndicatorComponent = ({
   const content = getDisplayContent();
 
   return (
-    <div className='flex items-center space-x-2 rounded-sm text-xs font-medium text-white'>
-      <div className='shrink-0'>{content.icon}</div>
+    <div className='flex h-full w-full min-w-0 items-center gap-2 overflow-hidden rounded-sm text-xs font-medium text-white'>
+      {content.icon ? <div className='shrink-0'>{content.icon}</div> : null}
       <div className='min-w-0 flex-1'>
         <div
-          className={`font-medium ${isMobile ? 'df-mobile-mask-fade' : 'truncate'}`}
+          className={`block w-full overflow-hidden font-medium whitespace-nowrap ${isMobile ? 'df-mobile-mask-fade' : 'truncate'}`}
           style={
             isMobile
               ? {

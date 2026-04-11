@@ -96,6 +96,10 @@ export interface CalendarCallbacks {
     targetId: string
   ) => void | Promise<void>;
   onEventClick?: (event: Event) => void | Promise<void>;
+  onEventDoubleClick?: (
+    event: Event,
+    e: MouseEvent
+  ) => boolean | undefined | Promise<boolean | undefined>;
   onMoreEventsClick?: (date: Date) => void | Promise<void>;
   onDismissUI?: () => void | Promise<void>;
 }
@@ -257,6 +261,10 @@ export interface ICalendarApp {
   getEvents: () => Event[];
   getAllEvents: () => Event[];
   onEventClick: (event: Event) => void;
+  onEventDoubleClick: (
+    event: Event,
+    e: MouseEvent
+  ) => boolean | undefined | Promise<boolean | undefined>;
   onMoreEventsClick: (date: Date) => void;
   highlightEvent: (eventId: string | null) => void;
   selectEvent: (eventId: string | null) => void;

@@ -192,8 +192,12 @@ const calendar = useCalendarApp({
     },
     onEventDelete: (eventId: string) => {
       console.log('事件已删除:', eventId);
-      // 与后端同步
+      // 同步后端
       api.deleteEvent(eventId);
+    },
+    onEventDoubleClick: (event: Event, e: MouseEvent) => {
+      console.log('事件被双击:', event);
+      // 使用 e.currentTarget 作为自定义弹出层的锚点
     },
   },
 });
