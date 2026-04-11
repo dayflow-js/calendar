@@ -7,6 +7,8 @@ import { Event, ViewType, ICalendarApp, EventDetailPosition } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils';
 import { logger } from '@/utils/logger';
 
+const SINGLE_CLICK_DELAY_MS = 180;
+
 interface UseEventActionsProps {
   event: Event;
   timingEvent?: Event;
@@ -273,7 +275,7 @@ export const useEventActions = ({
     [app, clearPendingClick, event.id, onEventSelect, setContextMenuPosition]
   );
 
-  const performSingleClick = useCallback(
+  const applySingleClickSelection = useCallback(
     (clientX: number) => {
       if (isMultiDay) {
         const clickedDay = getClickedDayIdx(clientX);
@@ -291,8 +293,6 @@ export const useEventActions = ({
         setActiveDayIndex(event.day ?? null);
       }
 
-      if (app) app.onEventClick(event);
-
       if (onEventSelect) {
         onEventSelect(event.id);
       } else if (canOpenDetail) {
@@ -308,13 +308,24 @@ export const useEventActions = ({
       multiDaySegmentInfo?.dayIndex,
       event,
       segment,
-      app,
       onEventSelect,
       canOpenDetail,
       setIsSelected,
       onDetailPanelToggle,
       setDetailPanelPosition,
     ]
+  );
+
+  const emitSingleClick = useCallback(() => {
+    app?.onEventClick(event);
+  }, [app, event]);
+
+  const performSingleClick = useCallback(
+    (clientX: number) => {
+      applySingleClickSelection(clientX);
+      emitSingleClick();
+    },
+    [applySingleClickSelection, emitSingleClick]
   );
 
   const handleDoubleClick = useCallback(
@@ -372,8 +383,6 @@ export const useEventActions = ({
         return;
       }
 
-      app.onEventClick(event);
-
       Promise.resolve(app.onEventDoubleClick?.(event, e))
         .then(result => {
           if (result === false) return;
@@ -413,14 +422,20 @@ export const useEventActions = ({
       e.preventDefault();
       e.stopPropagation();
       const clientX = e.clientX;
-      if ((isYearView || isResourceView) && !isMobile) {
+      if (!isMobile && canOpenDetail) {
         clearPendingClick();
+        if (!isYearView && !isResourceView) {
+          applySingleClickSelection(clientX);
+        }
         setHasPendingSelection(true);
         clickTimeoutRef.current = setTimeout(() => {
-          performSingleClick(clientX);
+          if (isYearView || isResourceView) {
+            applySingleClickSelection(clientX);
+          }
+          emitSingleClick();
           clickTimeoutRef.current = null;
           setHasPendingSelection(false);
-        }, 180);
+        }, SINGLE_CLICK_DELAY_MS);
         return;
       }
 
@@ -428,6 +443,9 @@ export const useEventActions = ({
     },
     [
       clearPendingClick,
+      canOpenDetail,
+      applySingleClickSelection,
+      emitSingleClick,
       isYearView,
       isResourceView,
       isMobile,

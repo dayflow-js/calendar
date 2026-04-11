@@ -172,6 +172,139 @@ describe('useEventActions', () => {
     expect(setIsSelected).toHaveBeenCalledWith(true);
   });
 
+  it('defers non-year click callbacks until the double-click window passes', () => {
+    const app = {
+      onEventClick: jest.fn(),
+    } as unknown as import('@/types').ICalendarApp;
+    const onEventSelect = jest.fn();
+    const onDetailPanelToggle = jest.fn();
+    const selectedEventElementRef = { current: null as HTMLElement | null };
+    const setIsSelected = jest.fn();
+
+    const DayHarness = () => {
+      const handlers = useEventActions({
+        event: baseEvent,
+        viewType: ViewType.DAY,
+        isAllDay: true,
+        isMultiDay: false,
+        app,
+        calendarRef: { current: document.createElement('div') },
+        firstHour: 0,
+        hourHeight: 56,
+        isMobile: false,
+        canOpenDetail: true,
+        detailPanelKey: 'event-1',
+        onEventSelect,
+        onDetailPanelToggle,
+        setIsSelected,
+        setDetailPanelPosition: jest.fn(),
+        setContextMenuPosition: jest.fn(),
+        setActiveDayIndex: jest.fn(),
+        getClickedDayIdx: jest.fn(),
+        updatePanelPosition: jest.fn(),
+        selectedEventElementRef,
+      });
+
+      return (
+        <button
+          type='button'
+          data-testid='day-click-event'
+          onClick={handlers.handleClick}
+        >
+          Event
+        </button>
+      );
+    };
+
+    const { getByTestId } = render(<DayHarness />);
+
+    fireEvent.click(getByTestId('day-click-event'), { clientX: 24 });
+
+    expect(onEventSelect).toHaveBeenCalledWith('event-1');
+    expect(onDetailPanelToggle).toHaveBeenCalledWith(null);
+    expect(app.onEventClick).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(179);
+    });
+    expect(app.onEventClick).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(app.onEventClick).toHaveBeenCalledWith(baseEvent);
+  });
+
+  it('suppresses click callbacks when a non-year event becomes a double click', async () => {
+    const app = {
+      onEventClick: jest.fn(),
+      onEventDoubleClick: jest.fn(),
+    } as unknown as import('@/types').ICalendarApp;
+    const onEventSelect = jest.fn();
+    const onDetailPanelToggle = jest.fn();
+    const selectedEventElementRef = { current: null as HTMLElement | null };
+    const setIsSelected = jest.fn();
+
+    const DayHarness = () => {
+      const handlers = useEventActions({
+        event: baseEvent,
+        viewType: ViewType.DAY,
+        isAllDay: true,
+        isMultiDay: false,
+        app,
+        calendarRef: { current: document.createElement('div') },
+        firstHour: 0,
+        hourHeight: 56,
+        isMobile: false,
+        canOpenDetail: true,
+        detailPanelKey: 'event-1',
+        onEventSelect,
+        onDetailPanelToggle,
+        setIsSelected,
+        setDetailPanelPosition: jest.fn(),
+        setContextMenuPosition: jest.fn(),
+        setActiveDayIndex: jest.fn(),
+        getClickedDayIdx: jest.fn(),
+        updatePanelPosition: jest.fn(),
+        selectedEventElementRef,
+      });
+
+      return (
+        <button
+          type='button'
+          data-testid='day-double-event'
+          onClick={handlers.handleClick}
+          onDblClick={handlers.handleDoubleClick}
+        >
+          Event
+        </button>
+      );
+    };
+
+    const { getByTestId } = render(<DayHarness />);
+    const eventButton = getByTestId('day-double-event');
+
+    fireEvent.click(eventButton, { clientX: 24 });
+    fireEvent.click(eventButton, { clientX: 24 });
+
+    await act(async () => {
+      fireEvent.dblClick(eventButton, { clientX: 24 });
+      await Promise.resolve();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(180);
+    });
+
+    expect(app.onEventClick).not.toHaveBeenCalled();
+    expect(app.onEventDoubleClick).toHaveBeenCalledWith(
+      baseEvent,
+      expect.any(MouseEvent)
+    );
+    expect(onEventSelect).toHaveBeenCalledWith('event-1');
+    expect(onDetailPanelToggle).toHaveBeenCalledWith('event-1');
+  });
+
   it('allows onEventDoubleClick to suppress the default detail panel', async () => {
     const app = {
       onEventClick: jest.fn(),
@@ -224,7 +357,7 @@ describe('useEventActions', () => {
       await Promise.resolve();
     });
 
-    expect(app.onEventClick).toHaveBeenCalledWith(baseEvent);
+    expect(app.onEventClick).not.toHaveBeenCalled();
     expect(app.onEventDoubleClick).toHaveBeenCalledWith(
       baseEvent,
       expect.any(MouseEvent)
@@ -350,7 +483,7 @@ describe('useEventActions', () => {
     });
 
     expect(scrollToMock).toHaveBeenCalled();
-    expect(app.onEventClick).toHaveBeenCalledWith(timedEvent);
+    expect(app.onEventClick).not.toHaveBeenCalled();
     expect(onEventSelect).toHaveBeenCalledWith('event-1');
     expect(setIsSelected).toHaveBeenCalledWith(true);
     expect(onDetailPanelToggle).not.toHaveBeenCalled();
@@ -476,7 +609,7 @@ describe('useEventActions', () => {
     });
 
     expect(scrollToMock).not.toHaveBeenCalled();
-    expect(app.onEventClick).toHaveBeenCalledWith(timedEvent);
+    expect(app.onEventClick).not.toHaveBeenCalled();
     expect(onEventSelect).toHaveBeenCalledWith('event-1');
     expect(setIsSelected).toHaveBeenCalledWith(true);
     expect(onDetailPanelToggle).toHaveBeenCalledWith('event-1::resource');
