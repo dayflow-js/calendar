@@ -1,0 +1,131 @@
+---
+title: Range Picker
+---
+
+# Range Picker
+
+A date/time range picker built on the Temporal API. Supports date-only and date+time modes, timezone awareness, keyboard input, and flexible popup placement.
+
+## Installation
+
+<PackageTabs pkg='@dayflow/ui-range-picker' />
+
+```tsx
+import { RangePicker } from '@dayflow/ui-range-picker';
+import '@dayflow/ui-range-picker/dist/styles.css';
+```
+
+## Basic Usage
+
+```tsx
+import { useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
+import { RangePicker } from '@dayflow/ui-range-picker';
+import type { ZonedRange } from '@dayflow/ui-range-picker';
+
+function MyComponent() {
+  const [range, setRange] = useState<ZonedRange>([
+    Temporal.Now.zonedDateTimeISO(),
+    Temporal.Now.zonedDateTimeISO().add({ hours: 1 }),
+  ]);
+
+  return <RangePicker value={range} onChange={value => setRange(value)} />;
+}
+```
+
+## Date-Only Mode
+
+Pass `showTime={false}` to hide the time selector.
+
+```tsx
+<RangePicker
+  value={range}
+  showTime={false}
+  format='YYYY-MM-DD'
+  onChange={value => setRange(value)}
+/>
+```
+
+## With Timezone
+
+```tsx
+<RangePicker
+  value={range}
+  timeZone='America/New_York'
+  onChange={(value, dateStrings) => {
+    console.log('range:', value);
+    console.log('formatted:', dateStrings); // ['2024-10-15 10:00', '2024-10-15 11:00']
+  }}
+/>
+```
+
+## Custom Time Format
+
+```tsx
+<RangePicker
+  value={range}
+  format='MM/DD/YYYY'
+  showTime={{ format: 'hh:mm A' }}
+  onChange={value => setRange(value)}
+  onOk={value => saveToBackend(value)}
+/>
+```
+
+## Popup Placement
+
+The popup defaults to `bottomLeft` and automatically adjusts to avoid viewport overflow.
+
+```tsx
+<RangePicker
+  value={range}
+  placement='topRight'
+  autoAdjustOverflow={true}
+  onChange={value => setRange(value)}
+/>
+```
+
+## Locale
+
+Pass a BCP 47 locale string to localize month names and weekday labels.
+
+```tsx
+<RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
+```
+
+## Match Trigger Width
+
+```tsx
+<RangePicker
+  value={range}
+  matchTriggerWidth
+  onChange={value => setRange(value)}
+/>
+```
+
+## API Reference
+
+### `RangePicker`
+
+| Prop                 | Type                                                            | Default        | Description                                                                |
+| :------------------- | :-------------------------------------------------------------- | :------------- | :------------------------------------------------------------------------- |
+| `value`              | `[Temporal.PlainDate \| PlainDateTime \| ZonedDateTime, ...]`   | —              | Controlled range value. Accepts any mix of Temporal types.                 |
+| `format`             | `string`                                                        | `"YYYY-MM-DD"` | Display and parse format for date part                                     |
+| `showTime`           | `boolean \| { format?: string }`                                | `true`         | Enable time selection. Pass an object to set a custom time format.         |
+| `showTimeFormat`     | `string`                                                        | `"HH:mm"`      | Default time format when `showTime` is `true`                              |
+| `onChange`           | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | Fires on every selection change                                            |
+| `onOk`               | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | Fires when the user confirms the selection with the OK button              |
+| `timeZone`           | `string`                                                        | —              | IANA timezone string (e.g. `"America/New_York"`). Defaults to system zone. |
+| `disabled`           | `boolean`                                                       | `false`        | Disables all interactions                                                  |
+| `placement`          | `'bottomLeft' \| 'bottomRight' \| 'topLeft' \| 'topRight'`      | `'bottomLeft'` | Preferred popup position                                                   |
+| `autoAdjustOverflow` | `boolean`                                                       | `true`         | Flip placement automatically when the popup would overflow the viewport    |
+| `getPopupContainer`  | `() => HTMLElement`                                             | —              | Mount the popup inside a custom container instead of `document.body`       |
+| `matchTriggerWidth`  | `boolean`                                                       | `false`        | Set the popup width to match the trigger input width                       |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 locale code for month/weekday labels                                |
+
+### `ZonedRange`
+
+```ts
+type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
+```
+
+The `onChange` and `onOk` callbacks always receive a `ZonedRange` regardless of the input value type, normalized to the active timezone.

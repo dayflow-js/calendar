@@ -7,6 +7,8 @@ import {
   UseDragManagerReturn,
   getSelectedBgColor,
   getEventTextColor,
+  getCalendarEventBgColors,
+  buildDiagonalPatternBackground,
   formatTime,
   useLocale,
   LocaleProvider,
@@ -85,6 +87,9 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
     ) => {
       removeDragIndicator();
 
+      // Tracks whether the indicator has a light background (used for text color in renderer)
+      let isLightIndicator = false;
+
       const indicator = document.createElement('div');
       indicator.style.position = isDateGridView ? 'fixed' : 'absolute';
       indicator.style.pointerEvents = 'none';
@@ -157,6 +162,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         );
       } else {
         // Week/Day view indicator
+        const isMultiCalendarIndicator =
+          !!drag.calendarIds && drag.calendarIds.length > 1;
         const targetContainer = drag.allDay
           ? drag.indicatorContainer || allDayRowRef?.current
           : timeGridRef?.current ||
@@ -251,7 +258,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
                 ? `${(layout.left / 100) * 100}%`
                 : `${TIME_COLUMN_WIDTH}px`;
               indicator.style.width = isInsideTimeGrid
-                ? `calc(100% * ${layout.width / 100} - 3px)`
+                ? `${layout.width}%`
                 : `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
               const dayWidth = `calc(${totalWidth} / ${daysToShow})`;
@@ -264,7 +271,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               ? '0px'
               : `${TIME_COLUMN_WIDTH}px`;
             indicator.style.width = isInsideTimeGrid
-              ? 'calc(100% - 3px)'
+              ? '100%'
               : `calc(100% - ${TIME_COLUMN_WIDTH}px - 3px)`;
           } else {
             const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
@@ -278,6 +285,9 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
         // Save props for subsequent updates
         dragPropsRef.current = { drag, color, title, layout };
+
+        // Determine if this will be a light-background indicator (multi-calendar)
+        isLightIndicator = isMultiCalendarIndicator;
 
         // Render Week/Day view content
         render(
@@ -295,6 +305,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               getDynamicPadding: getDynamicPadding || (() => '0px'),
               renderer,
               isMobile,
+              isLightBackground: isLightIndicator,
             })
           ),
           indicator
@@ -307,35 +318,64 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         // exactly matches the event, even when custom content handles the drag
         // start or the color comes from computed styles instead of inline styles.
         const computedStyle = window.getComputedStyle(sourceElement);
-        const resolvedBackgroundColor = isUsableIndicatorBackground(
-          sourceElement.style.backgroundColor
-        )
-          ? sourceElement.style.backgroundColor
-          : isUsableIndicatorBackground(computedStyle.backgroundColor)
-            ? computedStyle.backgroundColor
-            : color
-              ? getSelectedBgColor(color, app?.getCalendarRegistry())
-              : '';
-        const resolvedTextColor = sourceElement.style.color
-          ? sourceElement.style.color
-          : computedStyle.color || '#fff';
 
-        if (resolvedBackgroundColor) {
-          indicator.style.backgroundColor = resolvedBackgroundColor;
+        // Multi-calendar events use CSS `background` shorthand (gradient pattern).
+        // Check inline `background` first so we capture the diagonal stripe pattern.
+        const inlineBackground = sourceElement.style.background;
+        if (inlineBackground && inlineBackground !== '') {
+          indicator.style.background = inlineBackground;
+          // Source element text color is already set to the dark event text color.
+          const resolvedTextColor = sourceElement.style.color
+            ? sourceElement.style.color
+            : computedStyle.color || 'inherit';
           indicator.style.color = resolvedTextColor;
         } else {
-          indicator.className +=
-            ' df-tint-primary border border-dashed df-border-primary-soft';
+          const resolvedBackgroundColor = isUsableIndicatorBackground(
+            sourceElement.style.backgroundColor
+          )
+            ? sourceElement.style.backgroundColor
+            : isUsableIndicatorBackground(computedStyle.backgroundColor)
+              ? computedStyle.backgroundColor
+              : color
+                ? getSelectedBgColor(color, app?.getCalendarRegistry())
+                : '';
+          const resolvedTextColor = sourceElement.style.color
+            ? sourceElement.style.color
+            : computedStyle.color || '#fff';
+
+          if (resolvedBackgroundColor) {
+            indicator.style.backgroundColor = resolvedBackgroundColor;
+            indicator.style.color = resolvedTextColor;
+          } else {
+            indicator.className +=
+              ' df-tint-primary border border-dashed df-border-primary-soft';
+          }
         }
+      } else if (drag.calendarIds && drag.calendarIds.length > 1) {
+        // Day/Week view — multi-calendar event: light diagonal pattern background
+        const indicatorBgColors = getCalendarEventBgColors(
+          { calendarIds: drag.calendarIds },
+          app?.getCalendarRegistry()
+        );
+        indicator.style.background =
+          buildDiagonalPatternBackground(indicatorBgColors);
+        indicator.style.color = getEventTextColor(
+          drag.calendarIds[0],
+          app?.getCalendarRegistry()
+        );
+        isLightIndicator = true;
       } else if (color) {
         indicator.style.backgroundColor = getSelectedBgColor(
           color,
           app?.getCalendarRegistry()
         );
-        indicator.style.color = getEventTextColor(
-          color,
+        indicator.style.color = '#fff';
+      } else if (drag.calendarIds && drag.calendarIds.length > 0) {
+        indicator.style.backgroundColor = getSelectedBgColor(
+          drag.calendarIds[0],
           app?.getCalendarRegistry()
         );
+        indicator.style.color = '#fff';
       } else {
         indicator.className +=
           ' df-tint-primary border border-dashed df-border-primary-soft';
@@ -461,7 +501,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
                 ? `${(layout.left / 100) * 100}%`
                 : `calc(${TIME_COLUMN_WIDTH}px + ((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.left / 100}))`;
               indicator.style.width = isInsideTimeGrid
-                ? `calc(100% * ${layout.width / 100} - 3px)`
+                ? `${layout.width}%`
                 : `calc(((100% - ${TIME_COLUMN_WIDTH}px) * ${layout.width / 100}) - 3px)`;
             } else {
               const dayWidth = `calc(${totalWidth} / ${daysToShow})`;
@@ -474,7 +514,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
               ? '0px'
               : `${TIME_COLUMN_WIDTH}px`;
             indicator.style.width = isInsideTimeGrid
-              ? 'calc(100% - 3px)'
+              ? '100%'
               : `calc(100% - ${TIME_COLUMN_WIDTH}px - 3px)`;
           } else {
             const dayColumnWidth = `calc(${totalWidth} / ${daysToShow})`;
@@ -497,13 +537,18 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
 
           dragPropsRef.current.drag = updatedDrag;
 
+          const currentColor = dragPropsRef.current.color;
+          const rerenderDrag = dragPropsRef.current.drag;
+          const currentIsLight =
+            !!rerenderDrag.calendarIds && rerenderDrag.calendarIds.length > 1;
+
           render(
             h(
               LocaleProvider,
               { locale },
               h(DragIndicatorComponent, {
                 drag: updatedDrag,
-                color: dragPropsRef.current.color,
+                color: currentColor,
                 title: dragPropsRef.current.title,
                 layout: layout || dragPropsRef.current.layout,
                 allDay: isAllDay,
@@ -512,6 +557,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
                 getDynamicPadding: getDynamicPadding || (() => '0px'),
                 renderer,
                 isMobile,
+                isLightBackground: currentIsLight,
               })
             ),
             indicator

@@ -1,0 +1,174 @@
+---
+title: 右键菜单
+---
+
+# 右键菜单
+
+基于 Portal 的可组合右键菜单组件。支持嵌套子菜单、标签、分隔线和内置颜色选择器。点击外部、滚动、窗口缩放或按下 `Escape` 时自动关闭。
+
+## 安装
+
+<PackageTabs pkg='@dayflow/ui-context-menu' />
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuColorPicker,
+} from '@dayflow/ui-context-menu';
+import '@dayflow/ui-context-menu/dist/styles.css';
+```
+
+## 基础用法
+
+在 `contextmenu` 事件中捕获鼠标位置，将其传给 `ContextMenu`。
+
+```tsx
+import { useState } from 'react';
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from '@dayflow/ui-context-menu';
+
+function MyComponent() {
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  return (
+    <div onContextMenu={handleContextMenu}>
+      在此处右键单击
+      {menu && (
+        <ContextMenu x={menu.x} y={menu.y} onClose={() => setMenu(null)}>
+          <ContextMenuItem onClick={() => console.log('编辑')}>
+            编辑
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => console.log('复制')}>
+            复制
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={() => console.log('删除')} danger>
+            删除
+          </ContextMenuItem>
+        </ContextMenu>
+      )}
+    </div>
+  );
+}
+```
+
+## 标签与图标
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>操作</ContextMenuLabel>
+  <ContextMenuItem icon={<PencilIcon />} onClick={() => onEdit()}>
+    编辑事件
+  </ContextMenuItem>
+  <ContextMenuItem icon={<CopyIcon />} onClick={() => onDuplicate()}>
+    复制
+  </ContextMenuItem>
+  <ContextMenuSeparator />
+  <ContextMenuItem icon={<TrashIcon />} onClick={() => onDelete()} danger>
+    删除
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## 嵌套子菜单
+
+使用 `ContextMenuSub` 包裹菜单项以创建悬停触发的子菜单，子菜单会自动调整位置以避免超出视口。
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuItem onClick={() => onEdit()}>编辑</ContextMenuItem>
+  <ContextMenuSub>
+    <ContextMenuSubTrigger>移动到</ContextMenuSubTrigger>
+    <ContextMenuSubContent>
+      <ContextMenuItem onClick={() => onMove('work')}>工作</ContextMenuItem>
+      <ContextMenuItem onClick={() => onMove('personal')}>个人</ContextMenuItem>
+    </ContextMenuSubContent>
+  </ContextMenuSub>
+  <ContextMenuSeparator />
+  <ContextMenuItem danger onClick={() => onDelete()}>
+    删除
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## 颜色选择器
+
+`ContextMenuColorPicker` 渲染一排预设色块，并可选地提供"自定义颜色"操作。
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>日历颜色</ContextMenuLabel>
+  <ContextMenuColorPicker
+    selectedColor={currentColor}
+    onSelect={color => {
+      updateCalendarColor(color);
+      onClose();
+    }}
+    onCustomColor={() => openColorDialog()}
+    customColorLabel='自定义颜色...'
+  />
+</ContextMenu>
+```
+
+## 禁用菜单项
+
+```tsx
+<ContextMenuItem onClick={() => onPaste()} disabled={!hasClipboard}>
+  粘贴
+</ContextMenuItem>
+```
+
+## API 参考
+
+### `ContextMenu`
+
+| 属性        | 类型                | 说明                           |
+| :---------- | :------------------ | :----------------------------- |
+| `x`         | `number`            | 水平位置（如 `event.clientX`） |
+| `y`         | `number`            | 垂直位置（如 `event.clientY`） |
+| `onClose`   | `() => void`        | 菜单需要关闭时调用             |
+| `children`  | `ComponentChildren` | 菜单内容                       |
+| `className` | `string`            | 菜单容器的额外 CSS 类名        |
+
+### `ContextMenuItem`
+
+| 属性       | 类型                | 默认值  | 说明                 |
+| :--------- | :------------------ | :------ | :------------------- |
+| `onClick`  | `() => void`        | —       | 点击处理函数         |
+| `children` | `ComponentChildren` | —       | 菜单项文本           |
+| `icon`     | `ComponentChildren` | —       | 显示在文本左侧的图标 |
+| `danger`   | `boolean`           | `false` | 以危险红色样式渲染   |
+| `disabled` | `boolean`           | `false` | 禁用交互             |
+
+### `ContextMenuColorPicker`
+
+| 属性               | 类型                      | 默认值           | 说明                     |
+| :----------------- | :------------------------ | :--------------- | :----------------------- |
+| `selectedColor`    | `string`                  | —                | 当前选中颜色（十六进制） |
+| `onSelect`         | `(color: string) => void` | —                | 点击色块时调用           |
+| `onCustomColor`    | `() => void`              | —                | 点击自定义颜色行时调用   |
+| `customColorLabel` | `string`                  | `"Custom Color"` | 自定义颜色操作的文案     |
+
+### 其他导出
+
+| 组件                    | 说明                         |
+| :---------------------- | :--------------------------- |
+| `ContextMenuSeparator`  | 水平分隔线                   |
+| `ContextMenuLabel`      | 非交互式分组标题             |
+| `ContextMenuSub`        | 管理子菜单展开状态的包裹组件 |
+| `ContextMenuSubTrigger` | 悬停时展开子菜单的触发行     |
+| `ContextMenuSubContent` | 浮动子菜单面板               |

@@ -1,6 +1,6 @@
-import type { Locale } from '@dayflow/core';
+import type { DayflowLocale } from './types';
 
-const fr: Locale = {
+const fr: DayflowLocale = {
   code: 'fr-FR',
   messages: {
     allDay: 'Toute la journée',
@@ -83,6 +83,57 @@ const fr: Locale = {
     fetchingCalendar: 'Récupération du calendrier...',
     subscribeError:
       "Impossible de récupérer le calendrier. Vérifiez l'URL et réessayez.",
+  },
+  packages: {
+    scheduler: {
+      previousPeriod: 'Période précédente',
+      nextPeriod: 'Période suivante',
+      quarter: 'Trimestre',
+      days: 'Jours',
+      weeks: 'Semaines',
+      months: 'Mois',
+      quarters: 'Trimestres',
+      years: 'Années',
+      views: 'Vues',
+      resources: 'Ressources',
+      resizePanel: 'Redimensionner le panneau',
+      searchPlaceholder: 'Rechercher…',
+      noResults: 'Aucun événement trouvé',
+      typeToSearch: 'Tapez pour rechercher',
+      openSearch: 'Ouvrir la recherche',
+      closeSearch: 'Fermer la recherche',
+      clearSearch: 'Effacer la recherche',
+      close: 'Fermer',
+      title: 'Titre',
+      untitledEvent: 'Événement sans titre',
+      type: 'Type',
+      addNotePlaceholder: 'Ajouter une note',
+      milestone: 'Jalon',
+      typeFixedHint: 'Le type est fixé dans cet exemple de démonstration.',
+      progressFill: 'Remplissage de progression',
+      progressBar: 'Barre de progression',
+      sample: 'Exemple',
+      titleAbove: 'Titre au-dessus',
+      titleCenter: 'Titre centré',
+      titleBelow: 'Titre en dessous',
+      filled: 'Rempli',
+      bordered: 'Bordé',
+      outlined: 'Contour',
+      dashed: 'Pointillé',
+      line: 'Ligne',
+      dashedLine: 'Ligne pointillée',
+      indented: 'Indenté',
+      rounded: 'Arrondi',
+      gradient: 'Dégradé',
+      progress: 'Progression',
+      pattern: 'Motif',
+      flag: 'Drapeau',
+      diamond: 'Diamant',
+      mergeWith: 'Fusionner avec…',
+      moveEventsTo: 'Déplacer les événements vers…',
+      areYouSure: 'Êtes-vous sûr ?',
+      cannotBeUndone: 'Cette action est irréversible.',
+    },
   },
 };
 

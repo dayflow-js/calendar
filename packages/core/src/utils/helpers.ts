@@ -32,6 +32,12 @@ export {
   getEventTextColor,
   getSelectedBgColor,
   getLineColor,
+  getPrimaryCalendarId,
+  getCalendarLineColors,
+  buildColorBarGradient,
+  buildDiagonalColorBarGradient,
+  getCalendarEventBgColors,
+  buildDiagonalPatternBackground,
 } from './colorUtils';
 
 // Re-export Time utilities

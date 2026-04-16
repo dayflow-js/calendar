@@ -24,6 +24,10 @@ export interface Event {
 
   // Calendar type reference
   calendarId?: string;
+  /** Multi-calendar support: list of calendar IDs this event belongs to.
+   *  When present, takes precedence over calendarId for visibility and color rendering.
+   *  The event is visible as long as at least one listed calendar is visible. */
+  calendarIds?: string[];
 
   meta?: Record<string, unknown>;
 

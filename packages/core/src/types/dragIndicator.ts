@@ -36,6 +36,7 @@ export interface DragRef {
   lastClientY: number;
   allDay: boolean;
   eventDate?: Date;
+  calendarIds?: string[];
 }
 
 /**
@@ -61,6 +62,12 @@ export interface DragIndicatorProps {
   getDynamicPadding: (drag: DragRef) => string;
   locale?: string;
   isMobile?: boolean;
+  /** True when the indicator container has a light background (e.g. diagonal multi-calendar pattern).
+   *  Renderers should use dark text instead of white when this is set. */
+  isLightBackground?: boolean;
+  /** Pre-computed line colors for all calendars on this event.
+   *  Single-element array for single-calendar; multi-element for multi-calendar gradient bar. */
+  calendarLineColors?: string[];
 }
 
 export interface DragIndicatorRenderer {
@@ -97,6 +104,7 @@ export interface UnifiedDragRef extends DragRef {
   indicatorContainer?: HTMLElement | null;
   // Event properties needed for deferred indicator creation
   calendarId?: string;
+  calendarIds?: string[];
   title?: string;
 }
 

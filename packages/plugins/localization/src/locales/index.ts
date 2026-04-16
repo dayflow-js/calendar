@@ -5,6 +5,7 @@ import ja from './ja';
 import ko from './ko';
 import zh from './zh';
 
+export * from './types';
 export { zh, ja, ko, fr, de, es };
 
 export const LOCALES = {

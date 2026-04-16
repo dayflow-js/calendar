@@ -1,0 +1,131 @@
+---
+title: 日時範囲ピッカー
+---
+
+# 日時範囲ピッカー
+
+Temporal API をベースにした日付/時刻の範囲選択コンポーネント。日付のみ・日付+時刻の両モード、タイムゾーン対応、キーボード入力、柔軟なポップアップ配置をサポートします。
+
+## インストール
+
+<PackageTabs pkg='@dayflow/ui-range-picker' />
+
+```tsx
+import { RangePicker } from '@dayflow/ui-range-picker';
+import '@dayflow/ui-range-picker/dist/styles.css';
+```
+
+## 基本的な使い方
+
+```tsx
+import { useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
+import { RangePicker } from '@dayflow/ui-range-picker';
+import type { ZonedRange } from '@dayflow/ui-range-picker';
+
+function MyComponent() {
+  const [range, setRange] = useState<ZonedRange>([
+    Temporal.Now.zonedDateTimeISO(),
+    Temporal.Now.zonedDateTimeISO().add({ hours: 1 }),
+  ]);
+
+  return <RangePicker value={range} onChange={value => setRange(value)} />;
+}
+```
+
+## 日付のみモード
+
+`showTime={false}` を渡すと時刻セレクターを非表示にできます。
+
+```tsx
+<RangePicker
+  value={range}
+  showTime={false}
+  format='YYYY-MM-DD'
+  onChange={value => setRange(value)}
+/>
+```
+
+## タイムゾーン指定
+
+```tsx
+<RangePicker
+  value={range}
+  timeZone='Asia/Tokyo'
+  onChange={(value, dateStrings) => {
+    console.log('範囲:', value);
+    console.log('フォーマット済み:', dateStrings); // ['2024-10-15 10:00', '2024-10-15 11:00']
+  }}
+/>
+```
+
+## カスタム時刻フォーマット
+
+```tsx
+<RangePicker
+  value={range}
+  format='YYYY/MM/DD'
+  showTime={{ format: 'HH:mm' }}
+  onChange={value => setRange(value)}
+  onOk={value => saveToBackend(value)}
+/>
+```
+
+## ポップアップの配置
+
+ポップアップはデフォルトで左下に表示され、ビューポートからはみ出す場合は自動的に位置を調整します。
+
+```tsx
+<RangePicker
+  value={range}
+  placement='topRight'
+  autoAdjustOverflow={true}
+  onChange={value => setRange(value)}
+/>
+```
+
+## ロケール
+
+BCP 47 のロケールコードを渡すと月名・曜日名がローカライズされます。
+
+```tsx
+<RangePicker value={range} locale='ja-JP' onChange={value => setRange(value)} />
+```
+
+## トリガー幅に合わせる
+
+```tsx
+<RangePicker
+  value={range}
+  matchTriggerWidth
+  onChange={value => setRange(value)}
+/>
+```
+
+## API リファレンス
+
+### `RangePicker`
+
+| プロパティ           | 型                                                              | デフォルト     | 説明                                                                        |
+| :------------------- | :-------------------------------------------------------------- | :------------- | :-------------------------------------------------------------------------- |
+| `value`              | `[Temporal.PlainDate \| PlainDateTime \| ZonedDateTime, ...]`   | —              | 制御された範囲値。任意の Temporal 型の組み合わせを受け付ける                |
+| `format`             | `string`                                                        | `"YYYY-MM-DD"` | 日付部分の表示・パースフォーマット                                          |
+| `showTime`           | `boolean \| { format?: string }`                                | `true`         | 時刻選択を有効にする。オブジェクトで時刻フォーマットを指定できる            |
+| `showTimeFormat`     | `string`                                                        | `"HH:mm"`      | `showTime` が `true` のときのデフォルト時刻フォーマット                     |
+| `onChange`           | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 選択が変わるたびに発火                                                      |
+| `onOk`               | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | ユーザーが OK ボタンで確定したときに発火                                    |
+| `timeZone`           | `string`                                                        | —              | IANA タイムゾーン文字列（例：`"Asia/Tokyo"`）。省略時はシステムタイムゾーン |
+| `disabled`           | `boolean`                                                       | `false`        | すべての操作を無効にする                                                    |
+| `placement`          | `'bottomLeft' \| 'bottomRight' \| 'topLeft' \| 'topRight'`      | `'bottomLeft'` | ポップアップの優先表示位置                                                  |
+| `autoAdjustOverflow` | `boolean`                                                       | `true`         | ビューポートからはみ出す場合にポップアップ位置を自動反転する                |
+| `getPopupContainer`  | `() => HTMLElement`                                             | —              | `document.body` の代わりにカスタムコンテナにポップアップをマウントする      |
+| `matchTriggerWidth`  | `boolean`                                                       | `false`        | ポップアップの幅をトリガー入力欄の幅に合わせる                              |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | 月名・曜日名のローカライズに使用する BCP 47 ロケールコード                  |
+
+### `ZonedRange`
+
+```ts
+type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
+```
+
+`onChange` と `onOk` のコールバックは、入力値の型にかかわらず、常に現在のタイムゾーンに正規化された `ZonedRange` を返します。

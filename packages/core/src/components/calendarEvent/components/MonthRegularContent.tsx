@@ -4,7 +4,11 @@ import {
   textXs,
 } from '@/styles/classNames';
 import { Event, ICalendarApp } from '@/types';
-import { getLineColor, extractHourFromDate } from '@/utils';
+import {
+  getCalendarLineColors,
+  buildColorBarGradient,
+  extractHourFromDate,
+} from '@/utils';
 
 interface MonthRegularContentProps {
   event: Event;
@@ -27,18 +31,20 @@ const MonthRegularContent = ({
     .toString()
     .padStart(2, '0')}`;
 
+  const lineColors = getCalendarLineColors(event, app?.getCalendarRegistry());
+  const colorBarValue = buildColorBarGradient(lineColors);
+  const colorBarStyle =
+    lineColors.length > 1
+      ? { background: colorBarValue }
+      : { backgroundColor: colorBarValue };
+  const hideColorBar = isEventSelected && lineColors.length > 1;
+
   return (
     <div className={monthRegularContent}>
       <div className='flex min-w-0 flex-1 items-center'>
-        <div
-          style={{
-            backgroundColor: getLineColor(
-              event.calendarId || 'blue',
-              app?.getCalendarRegistry()
-            ),
-          }}
-          className={monthEventColorBar}
-        />
+        {!hideColorBar && (
+          <div style={colorBarStyle} className={monthEventColorBar} />
+        )}
         <span
           className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'df-mobile-mask-fade' : 'truncate'} ${isEventSelected ? 'text-white' : ''}`}
         >

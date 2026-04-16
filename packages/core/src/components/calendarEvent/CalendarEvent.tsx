@@ -21,6 +21,9 @@ import {
   getSelectedBgColor,
   getEventBgColor,
   getEventTextColor,
+  getPrimaryCalendarId,
+  getCalendarEventBgColors,
+  buildDiagonalPatternBackground,
   temporalToVisualTemporal,
 } from '@/utils';
 
@@ -408,8 +411,12 @@ const CalendarEvent = ({
   ]);
 
   // Final Render
-  const calendarId = event.calendarId || 'blue';
+  const calendarId = getPrimaryCalendarId(event);
   const calendarRegistry = app?.getCalendarRegistry();
+  const multiCalendarBgColors =
+    event.calendarIds && event.calendarIds.length > 1
+      ? getCalendarEventBgColors(event, calendarRegistry)
+      : null;
 
   return (
     <>
@@ -425,12 +432,25 @@ const CalendarEvent = ({
         )} ${isAllDay && newlyCreatedEventId === event.id ? 'df-all-day-event-animate' : ''} ${className ?? ''}`}
         style={{
           ...(disableDefaultStyle ? {} : calculateEventStyle()),
-          backgroundColor: isEventSelected
-            ? getSelectedBgColor(calendarId, calendarRegistry)
-            : getEventBgColor(calendarId, calendarRegistry),
-          color: isEventSelected
-            ? '#fff'
-            : getEventTextColor(calendarId, calendarRegistry),
+          ...(isEventSelected
+            ? {
+                background: getSelectedBgColor(calendarId, calendarRegistry),
+                color: '#fff',
+              }
+            : event.calendarIds && event.calendarIds.length > 1
+              ? {
+                  background: buildDiagonalPatternBackground(
+                    multiCalendarBgColors!
+                  ),
+                  color: getEventTextColor(calendarId, calendarRegistry),
+                }
+              : {
+                  backgroundColor: getEventBgColor(
+                    calendarId,
+                    calendarRegistry
+                  ),
+                  color: getEventTextColor(calendarId, calendarRegistry),
+                }),
           ...styleOverride,
         }}
         onClick={handleClick}

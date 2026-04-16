@@ -1,6 +1,6 @@
-import type { Locale } from '@dayflow/core';
+import type { DayflowLocale } from './types';
 
-const ja: Locale = {
+const ja: DayflowLocale = {
   code: 'ja-JP',
   messages: {
     allDay: '終日',
@@ -81,6 +81,57 @@ const ja: Locale = {
     fetchingCalendar: 'カレンダーを取得中...',
     subscribeError:
       'カレンダーの取得に失敗しました。URLを確認して再試行してください。',
+  },
+  packages: {
+    scheduler: {
+      previousPeriod: '前の期間',
+      nextPeriod: '次の期間',
+      quarter: '四半期',
+      days: '日',
+      weeks: '週',
+      months: '月',
+      quarters: '四半期',
+      years: '年',
+      views: 'ビュー',
+      resources: 'リソース',
+      resizePanel: 'パネルのサイズを変更',
+      searchPlaceholder: '検索…',
+      noResults: '予定が見つかりません',
+      typeToSearch: '入力して検索',
+      openSearch: '検索を開く',
+      closeSearch: '検索を閉じる',
+      clearSearch: '検索をクリア',
+      close: '閉じる',
+      title: 'タイトル',
+      untitledEvent: '無題の予定',
+      type: '種類',
+      addNotePlaceholder: 'メモを追加',
+      milestone: 'マイルストーン',
+      typeFixedHint: 'このショーケースサンプルでは種類が固定されています。',
+      progressFill: '進捗塗り',
+      progressBar: '進捗バー',
+      sample: 'サンプル',
+      titleAbove: 'タイトル上',
+      titleCenter: 'タイトル中央',
+      titleBelow: 'タイトル下',
+      filled: '塗りつぶし',
+      bordered: '枠線',
+      outlined: 'アウトライン',
+      dashed: '破線',
+      line: 'ライン',
+      dashedLine: '破線ライン',
+      indented: 'インデント',
+      rounded: '角丸',
+      gradient: 'グラデーション',
+      progress: '進捗',
+      pattern: 'パターン',
+      flag: 'フラッグ',
+      diamond: 'ダイヤ',
+      mergeWith: 'マージ先…',
+      moveEventsTo: '予定を移動…',
+      areYouSure: '本当によろしいですか？',
+      cannotBeUndone: 'この操作は元に戻せません。',
+    },
   },
 };
 

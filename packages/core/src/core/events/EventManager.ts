@@ -253,8 +253,10 @@ export class EventManager {
         .map(calendar => calendar.id)
     );
     return allEvents.filter(event => {
-      if (!event.calendarId) return false;
-      return visibleCalendars.has(event.calendarId);
+      const ids =
+        event.calendarIds ?? (event.calendarId ? [event.calendarId] : []);
+      if (ids.length === 0) return false;
+      return ids.some(id => visibleCalendars.has(id));
     });
   }
 

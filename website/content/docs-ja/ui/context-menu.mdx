@@ -1,0 +1,176 @@
+---
+title: コンテキストメニュー
+---
+
+# コンテキストメニュー
+
+Portal ベースの組み合わせ可能なコンテキストメニューコンポーネント。ネストされたサブメニュー、ラベル、セパレーター、内蔵カラーピッカーをサポート。外側クリック・スクロール・ウィンドウリサイズ・`Escape` キーで自動的に閉じます。
+
+## インストール
+
+<PackageTabs pkg='@dayflow/ui-context-menu' />
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuColorPicker,
+} from '@dayflow/ui-context-menu';
+import '@dayflow/ui-context-menu/dist/styles.css';
+```
+
+## 基本的な使い方
+
+`contextmenu` イベントからカーソル位置を取得して `ContextMenu` に渡します。
+
+```tsx
+import { useState } from 'react';
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from '@dayflow/ui-context-menu';
+
+function MyComponent() {
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  return (
+    <div onContextMenu={handleContextMenu}>
+      ここを右クリック
+      {menu && (
+        <ContextMenu x={menu.x} y={menu.y} onClose={() => setMenu(null)}>
+          <ContextMenuItem onClick={() => console.log('編集')}>
+            編集
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => console.log('コピー')}>
+            コピー
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={() => console.log('削除')} danger>
+            削除
+          </ContextMenuItem>
+        </ContextMenu>
+      )}
+    </div>
+  );
+}
+```
+
+## ラベルとアイコン
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>操作</ContextMenuLabel>
+  <ContextMenuItem icon={<PencilIcon />} onClick={() => onEdit()}>
+    イベントを編集
+  </ContextMenuItem>
+  <ContextMenuItem icon={<CopyIcon />} onClick={() => onDuplicate()}>
+    複製
+  </ContextMenuItem>
+  <ContextMenuSeparator />
+  <ContextMenuItem icon={<TrashIcon />} onClick={() => onDelete()} danger>
+    削除
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## ネストされたサブメニュー
+
+`ContextMenuSub` でアイテムをラップすると、ホバーで開くサブメニューを作成できます。サブメニューはビューポートからはみ出さないよう自動的に位置を調整します。
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuItem onClick={() => onEdit()}>編集</ContextMenuItem>
+  <ContextMenuSub>
+    <ContextMenuSubTrigger>移動先</ContextMenuSubTrigger>
+    <ContextMenuSubContent>
+      <ContextMenuItem onClick={() => onMove('work')}>仕事</ContextMenuItem>
+      <ContextMenuItem onClick={() => onMove('personal')}>
+        プライベート
+      </ContextMenuItem>
+    </ContextMenuSubContent>
+  </ContextMenuSub>
+  <ContextMenuSeparator />
+  <ContextMenuItem danger onClick={() => onDelete()}>
+    削除
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## カラーピッカー
+
+`ContextMenuColorPicker` はプリセットカラーのスウォッチ一覧と、オプションの「カスタムカラー」アクションを表示します。
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>カレンダーの色</ContextMenuLabel>
+  <ContextMenuColorPicker
+    selectedColor={currentColor}
+    onSelect={color => {
+      updateCalendarColor(color);
+      onClose();
+    }}
+    onCustomColor={() => openColorDialog()}
+    customColorLabel='カスタムカラー...'
+  />
+</ContextMenu>
+```
+
+## 無効なアイテム
+
+```tsx
+<ContextMenuItem onClick={() => onPaste()} disabled={!hasClipboard}>
+  貼り付け
+</ContextMenuItem>
+```
+
+## API リファレンス
+
+### `ContextMenu`
+
+| プロパティ  | 型                  | 説明                                  |
+| :---------- | :------------------ | :------------------------------------ |
+| `x`         | `number`            | 水平位置（例：`event.clientX`）       |
+| `y`         | `number`            | 垂直位置（例：`event.clientY`）       |
+| `onClose`   | `() => void`        | メニューを閉じるべきときに呼ばれる    |
+| `children`  | `ComponentChildren` | メニューの内容                        |
+| `className` | `string`            | メニューコンテナに追加する CSS クラス |
+
+### `ContextMenuItem`
+
+| プロパティ | 型                  | デフォルト | 説明                           |
+| :--------- | :------------------ | :--------- | :----------------------------- |
+| `onClick`  | `() => void`        | —          | クリックハンドラー             |
+| `children` | `ComponentChildren` | —          | アイテムのラベル               |
+| `icon`     | `ComponentChildren` | —          | ラベルの左に表示するアイコン   |
+| `danger`   | `boolean`           | `false`    | 削除系の赤いスタイルで表示する |
+| `disabled` | `boolean`           | `false`    | インタラクションを無効にする   |
+
+### `ContextMenuColorPicker`
+
+| プロパティ         | 型                        | デフォルト       | 説明                                         |
+| :----------------- | :------------------------ | :--------------- | :------------------------------------------- |
+| `selectedColor`    | `string`                  | —                | 現在選択中の色（hex）                        |
+| `onSelect`         | `(color: string) => void` | —                | スウォッチをクリックしたときに呼ばれる       |
+| `onCustomColor`    | `() => void`              | —                | カスタムカラー行をクリックしたときに呼ばれる |
+| `customColorLabel` | `string`                  | `"Custom Color"` | カスタムカラーアクションのラベル             |
+
+### その他のエクスポート
+
+| コンポーネント          | 説明                                     |
+| :---------------------- | :--------------------------------------- |
+| `ContextMenuSeparator`  | 水平の区切り線                           |
+| `ContextMenuLabel`      | インタラクションなしのセクション見出し   |
+| `ContextMenuSub`        | サブメニューの開閉状態を管理するラッパー |
+| `ContextMenuSubTrigger` | ホバーでサブメニューを開くトリガー行     |
+| `ContextMenuSubContent` | フローティングサブメニューパネル         |

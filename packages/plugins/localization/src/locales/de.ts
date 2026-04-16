@@ -1,6 +1,6 @@
-import type { Locale } from '@dayflow/core';
+import type { DayflowLocale } from './types';
 
-const de: Locale = {
+const de: DayflowLocale = {
   code: 'de-DE',
   messages: {
     allDay: 'Ganztägig',
@@ -82,6 +82,58 @@ const de: Locale = {
     fetchingCalendar: 'Kalender wird abgerufen...',
     subscribeError:
       'Kalender konnte nicht abgerufen werden. Bitte überprüfen Sie die URL und versuchen Sie es erneut.',
+  },
+  packages: {
+    scheduler: {
+      previousPeriod: 'Vorheriger Zeitraum',
+      nextPeriod: 'Nächster Zeitraum',
+      quarter: 'Quartal',
+      days: 'Tage',
+      weeks: 'Wochen',
+      months: 'Monate',
+      quarters: 'Quartale',
+      years: 'Jahre',
+      views: 'Ansichten',
+      resources: 'Ressourcen',
+      resizePanel: 'Größe des Panels ändern',
+      searchPlaceholder: 'Suchen…',
+      noResults: 'Keine Termine gefunden',
+      typeToSearch: 'Eingabe zum Suchen',
+      openSearch: 'Suche öffnen',
+      closeSearch: 'Suche schließen',
+      clearSearch: 'Suche leeren',
+      close: 'Schließen',
+      title: 'Titel',
+      untitledEvent: 'Unbenanntes Ereignis',
+      type: 'Typ',
+      addNotePlaceholder: 'Notiz hinzufügen',
+      timeRange: 'Zeitraum',
+      milestone: 'Meilenstein',
+      typeFixedHint: 'Der Typ ist in diesem Showcase-Beispiel festgelegt.',
+      progressFill: 'Fortschrittsfüllung',
+      progressBar: 'Fortschrittsbalken',
+      sample: 'Beispiel',
+      titleAbove: 'Titel oben',
+      titleCenter: 'Titel mittig',
+      titleBelow: 'Titel unten',
+      filled: 'Gefüllt',
+      bordered: 'Umrandet',
+      outlined: 'Konturiert',
+      dashed: 'Gestrichelt',
+      line: 'Linie',
+      dashedLine: 'Gestrichelte Linie',
+      indented: 'Eingerückt',
+      rounded: 'Abgerundet',
+      gradient: 'Verlauf',
+      progress: 'Fortschritt',
+      pattern: 'Muster',
+      flag: 'Flagge',
+      diamond: 'Diamant',
+      mergeWith: 'Zusammenführen mit…',
+      moveEventsTo: 'Termine verschieben nach…',
+      areYouSure: 'Sind Sie sicher?',
+      cannotBeUndone: 'Diese Aktion kann nicht rückgängig gemacht werden.',
+    },
   },
 };
 

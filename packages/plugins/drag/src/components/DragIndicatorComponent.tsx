@@ -21,12 +21,22 @@ const DragIndicatorComponent = ({
   getDynamicPadding,
   renderer = DefaultDragIndicatorRenderer,
   isMobile,
+  isLightBackground,
 }: DragIndicatorComponentProps) => {
   const { t } = useLocale();
   const eventTitle = title || (allDay ? t('newAllDayEvent') : t('newEvent'));
 
+  // Compute line colors for all calendars on this event
+  const calendarLineColors: string[] =
+    drag.calendarIds && drag.calendarIds.length > 0
+      ? drag.calendarIds.map(id => getLineColor(id))
+      : color
+        ? [getLineColor(color)]
+        : [];
+  const hasCalendarColors = calendarLineColors.length > 0;
+
   const renderContent = () => {
-    if (color) {
+    if (color || hasCalendarColors) {
       if (allDay) {
         return renderer.renderAllDayContent({
           drag,
@@ -38,6 +48,8 @@ const DragIndicatorComponent = ({
           getLineColor,
           getDynamicPadding,
           isMobile,
+          isLightBackground,
+          calendarLineColors,
         });
       }
       return renderer.renderRegularContent({
@@ -50,6 +62,8 @@ const DragIndicatorComponent = ({
         getLineColor,
         getDynamicPadding,
         isMobile,
+        isLightBackground,
+        calendarLineColors,
       });
     }
 
@@ -63,10 +77,16 @@ const DragIndicatorComponent = ({
       getLineColor,
       getDynamicPadding,
       isMobile,
+      isLightBackground,
+      calendarLineColors,
     });
   };
 
-  return <div className='drag-indicator-content'>{renderContent()}</div>;
+  return (
+    <div className='drag-indicator-content h-full w-full'>
+      {renderContent()}
+    </div>
+  );
 };
 
 export default DragIndicatorComponent;

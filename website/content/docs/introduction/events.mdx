@@ -19,17 +19,18 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
 ```
 
-| Property      | Type                                                                     | Description                                                                                                       | Required |
-| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------- |
-| `id`          | `string`                                                                 | Unique identifier for the event                                                                                   | Required |
-| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                             | Required |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware | Required |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                               | Required |
-| `description` | `string`                                                                 | Optional event description or notes                                                                               | Optional |
-| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                               | Optional |
-| `icon`        | `boolean \| Node`                                                        | Custom icon for the event. `true` (default): show default, `false`: hide, `Node`: custom icon                     | Optional |
-| `calendarId`  | `string`                                                                 | Calendar type reference for multi-calendar support                                                                | Optional |
-| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                             | Optional |
+| Property      | Type                                                                     | Description                                                                                                                                                                                           | Required |
+| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `id`          | `string`                                                                 | Unique identifier for the event                                                                                                                                                                       | Required |
+| `title`       | `string`                                                                 | Event title displayed in the calendar                                                                                                                                                                 | Required |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware                                                                                     | Required |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                                                                                                                   | Required |
+| `description` | `string`                                                                 | Optional event description or notes                                                                                                                                                                   | Optional |
+| `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                                                                                                                   | Optional |
+| `icon`        | `boolean \| Node`                                                        | Custom icon for the event. `true` (default): show default, `false`: hide, `Node`: custom icon                                                                                                         | Optional |
+| `calendarId`  | `string`                                                                 | Calendar type reference for single-calendar assignment                                                                                                                                                | Optional |
+| `calendarIds` | `string[]`                                                               | List of calendar IDs this event belongs to. When set, takes precedence over `calendarId`. Event is visible if **any** listed calendar is visible. Renders with a multi-color diagonal stripe pattern. | Optional |
+| `meta`        | `Record<string, any>`                                                    | Additional custom metadata (location, attendees, custom fields, etc.)                                                                                                                                 | Optional |
 
 ## Creating Events
 
@@ -347,6 +348,93 @@ const calendar = useCalendarApp({
 });
 ```
 
+## Multi-Calendar Events
+
+### How it works
+
+- `calendarIds` takes precedence over `calendarId` when both are set.
+- **Visibility**: the event is shown as long as at least one listed calendar is visible.
+- **Visual indicator**: events with multiple calendars render with a **diagonal stripe pattern** background (one stripe per calendar color) and a **multi-color gradient** left-side bar — making them visually distinct from single-calendar events.
+- **Selected state**: reverts to the primary calendar's solid color.
+
+### Example
+
+```tsx
+import { createEvent, useCalendarApp, createWeekView } from '@dayflow/core';
+
+// This event belongs to both "team" and "marketing" calendars
+const sharedEvent = createEvent({
+  id: 'shared-1',
+  title: 'Company All-Hands',
+  start: new Date(2024, 9, 15, 10, 0),
+  end: new Date(2024, 9, 15, 11, 30),
+  calendarIds: ['team', 'marketing'], // multi-calendar
+});
+
+// All-day event spanning three calendars
+const crossCalendarDay = {
+  id: 'shared-2',
+  title: 'Team Offsite',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+  calendarIds: ['team', 'personal', 'travel'],
+};
+
+const calendars = [
+  {
+    id: 'team',
+    name: 'Team',
+    colors: {
+      eventColor: '#3b82f6',
+      lineColor: '#3b82f6',
+      eventSelectedColor: '#2563eb',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'marketing',
+    name: 'Marketing',
+    colors: {
+      eventColor: '#f59e0b',
+      lineColor: '#f59e0b',
+      eventSelectedColor: '#d97706',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'personal',
+    name: 'Personal',
+    colors: {
+      eventColor: '#10b981',
+      lineColor: '#10b981',
+      eventSelectedColor: '#059669',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'travel',
+    name: 'Travel',
+    colors: {
+      eventColor: '#8b5cf6',
+      lineColor: '#8b5cf6',
+      eventSelectedColor: '#7c3aed',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+];
+
+const calendar = useCalendarApp({
+  views: [createWeekView()],
+  events: [sharedEvent, crossCalendarDay],
+  calendars,
+});
+```
+
 ## Multi-Day Events
 
 Events can span multiple days:
@@ -421,11 +509,10 @@ const event: Event = {
    - Use `PlainDateTime` for local events (meetings, appointments) **Recommended default**
    - Use `ZonedDateTime` only for timezone-aware events (international calls, flights)
 4. **Validate time values** - The helper functions validate hour (0-23) and minute (0-59) automatically
-5. **Use calendar types for styling** - Assign `calendarId` to categorize and style events consistently
+5. **Use calendar types for styling** - Assign `calendarId` to categorize and style events consistently; use `calendarIds` when an event spans multiple calendars
 6. **Leverage the `meta` field** - Store custom data without modifying the Event interface
 7. **Validate event data** - Ensure start < end for timed events
 8. **Optimize event updates** - Batch updates when possible
-9. **Handle errors gracefully** - Provide user feedback on failures
 
 ## Type Reference
 

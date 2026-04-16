@@ -1,0 +1,131 @@
+---
+title: 日期范围选择器
+---
+
+# 日期范围选择器
+
+基于 Temporal API 构建的日期/时间范围选择器。支持仅日期和日期+时间两种模式、时区感知、键盘输入以及灵活的弹出层定位。
+
+## 安装
+
+<PackageTabs pkg='@dayflow/ui-range-picker' />
+
+```tsx
+import { RangePicker } from '@dayflow/ui-range-picker';
+import '@dayflow/ui-range-picker/dist/styles.css';
+```
+
+## 基础用法
+
+```tsx
+import { useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
+import { RangePicker } from '@dayflow/ui-range-picker';
+import type { ZonedRange } from '@dayflow/ui-range-picker';
+
+function MyComponent() {
+  const [range, setRange] = useState<ZonedRange>([
+    Temporal.Now.zonedDateTimeISO(),
+    Temporal.Now.zonedDateTimeISO().add({ hours: 1 }),
+  ]);
+
+  return <RangePicker value={range} onChange={value => setRange(value)} />;
+}
+```
+
+## 仅日期模式
+
+传入 `showTime={false}` 可隐藏时间选择器。
+
+```tsx
+<RangePicker
+  value={range}
+  showTime={false}
+  format='YYYY-MM-DD'
+  onChange={value => setRange(value)}
+/>
+```
+
+## 指定时区
+
+```tsx
+<RangePicker
+  value={range}
+  timeZone='Asia/Shanghai'
+  onChange={(value, dateStrings) => {
+    console.log('范围:', value);
+    console.log('格式化:', dateStrings); // ['2024-10-15 10:00', '2024-10-15 11:00']
+  }}
+/>
+```
+
+## 自定义时间格式
+
+```tsx
+<RangePicker
+  value={range}
+  format='YYYY/MM/DD'
+  showTime={{ format: 'HH:mm' }}
+  onChange={value => setRange(value)}
+  onOk={value => saveToBackend(value)}
+/>
+```
+
+## 弹出层定位
+
+弹出层默认显示在左下方，并会自动调整以避免超出视口。
+
+```tsx
+<RangePicker
+  value={range}
+  placement='topRight'
+  autoAdjustOverflow={true}
+  onChange={value => setRange(value)}
+/>
+```
+
+## 国际化
+
+传入 BCP 47 语言标签以本地化月份和星期名称。
+
+```tsx
+<RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
+```
+
+## 与触发器同宽
+
+```tsx
+<RangePicker
+  value={range}
+  matchTriggerWidth
+  onChange={value => setRange(value)}
+/>
+```
+
+## API 参考
+
+### `RangePicker`
+
+| 属性                 | 类型                                                            | 默认值         | 说明                                                      |
+| :------------------- | :-------------------------------------------------------------- | :------------- | :-------------------------------------------------------- |
+| `value`              | `[Temporal.PlainDate \| PlainDateTime \| ZonedDateTime, ...]`   | —              | 受控的范围值，支持任意 Temporal 类型组合                  |
+| `format`             | `string`                                                        | `"YYYY-MM-DD"` | 日期部分的显示和解析格式                                  |
+| `showTime`           | `boolean \| { format?: string }`                                | `true`         | 启用时间选择。传入对象可自定义时间格式                    |
+| `showTimeFormat`     | `string`                                                        | `"HH:mm"`      | `showTime` 为 `true` 时的默认时间格式                     |
+| `onChange`           | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 每次选择变化时触发                                        |
+| `onOk`               | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 用户点击确认按钮时触发                                    |
+| `timeZone`           | `string`                                                        | —              | IANA 时区字符串（如 `"Asia/Shanghai"`），默认使用系统时区 |
+| `disabled`           | `boolean`                                                       | `false`        | 禁用所有交互                                              |
+| `placement`          | `'bottomLeft' \| 'bottomRight' \| 'topLeft' \| 'topRight'`      | `'bottomLeft'` | 弹出层的首选位置                                          |
+| `autoAdjustOverflow` | `boolean`                                                       | `true`         | 超出视口时自动翻转弹出层位置                              |
+| `getPopupContainer`  | `() => HTMLElement`                                             | —              | 将弹出层挂载到自定义容器，而非 `document.body`            |
+| `matchTriggerWidth`  | `boolean`                                                       | `false`        | 将弹出层宽度设置为与触发器输入框宽度一致                  |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 语言标签，用于本地化月份和星期名称                 |
+
+### `ZonedRange`
+
+```ts
+type ZonedRange = [Temporal.ZonedDateTime, Temporal.ZonedDateTime];
+```
+
+`onChange` 和 `onOk` 的回调始终返回 `ZonedRange`，无论输入值类型如何，都会被规范化为当前时区。

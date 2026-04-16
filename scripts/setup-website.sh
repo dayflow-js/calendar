@@ -62,13 +62,14 @@ choice=$(( choice_index + 1 ))
 echo "Selected choice: $choice"
 echo "------------------------------------------"
 
-BUILD_FILTER=""
 PACK_DIRS=()
+BUILD_FILTER_STAGE1="--filter @dayflow/ui-context-menu --filter @dayflow/ui-range-picker --filter @dayflow/core"
+BUILD_FILTER_STAGE2=""
 
 case $choice in
   1)
     echo "Selected: Core, React only"
-    BUILD_FILTER="--filter @dayflow/ui-context-menu --filter @dayflow/ui-range-picker --filter @dayflow/core --filter @dayflow/react"
+    BUILD_FILTER_STAGE2="--filter @dayflow/react"
     PACK_DIRS=(
       "packages/ui/context-menu"
       "packages/ui/range-picker"
@@ -78,7 +79,7 @@ case $choice in
     ;;
   2)
     echo "Selected: Install All"
-    BUILD_FILTER="-r"
+    BUILD_FILTER_STAGE2="--filter @dayflow/react --filter @dayflow/angular --filter @dayflow/svelte --filter @dayflow/vue --filter @dayflow/plugin-drag --filter @dayflow/plugin-keyboard-shortcuts --filter @dayflow/plugin-localization --filter @dayflow/plugin-sidebar"
     PACK_DIRS=(
       "packages/ui/context-menu"
       "packages/ui/range-picker"
@@ -99,8 +100,11 @@ case $choice in
     ;;
 esac
 
-echo "🚀 Starting build process for selected packages..."
-pnpm $BUILD_FILTER build
+echo "🚀 Stage 1: Building UI packages and core..."
+pnpm $BUILD_FILTER_STAGE1 build
+
+echo "🚀 Stage 2: Building framework adapters and plugins..."
+pnpm $BUILD_FILTER_STAGE2 build
 
 echo "📦 Packing selected packages..."
 for dir in "${PACK_DIRS[@]}"; do

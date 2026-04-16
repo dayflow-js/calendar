@@ -1,6 +1,6 @@
-import type { Locale } from '@dayflow/core';
+import type { DayflowLocale } from './types';
 
-const ko: Locale = {
+const ko: DayflowLocale = {
   code: 'ko-KR',
   messages: {
     allDay: '종일',
@@ -80,6 +80,57 @@ const ko: Locale = {
     fetchingCalendar: '캘린더를 가져오는 중...',
     subscribeError:
       '캘린더를 가져오지 못했습니다. URL을 확인하고 다시 시도하세요.',
+  },
+  packages: {
+    scheduler: {
+      previousPeriod: '이전 기간',
+      nextPeriod: '다음 기간',
+      quarter: '분기',
+      days: '일',
+      weeks: '주',
+      months: '월',
+      quarters: '분기',
+      years: '년',
+      views: '보기',
+      resources: '리소스',
+      resizePanel: '패널 크기 조절',
+      searchPlaceholder: '검색…',
+      noResults: '일정이 없습니다',
+      typeToSearch: '입력하여 검색',
+      openSearch: '검색 열기',
+      closeSearch: '검색 닫기',
+      clearSearch: '검색 지우기',
+      close: '닫기',
+      title: '제목',
+      untitledEvent: '제목 없는 일정',
+      type: '유형',
+      addNotePlaceholder: '메모 추가',
+      milestone: '마일스톤',
+      typeFixedHint: '이 쇼케이스 샘플에서는 유형이 고정되어 있습니다.',
+      progressFill: '진행 채우기',
+      progressBar: '진행 막대',
+      sample: '샘플',
+      titleAbove: '제목 위',
+      titleCenter: '제목 가운데',
+      titleBelow: '제목 아래',
+      filled: '채우기',
+      bordered: '테두리',
+      outlined: '외곽선',
+      dashed: '점선',
+      line: '라인',
+      dashedLine: '점선 라인',
+      indented: '들여쓰기',
+      rounded: '둥근 모서리',
+      gradient: '그라데이션',
+      progress: '진행률',
+      pattern: '패턴',
+      flag: '플래그',
+      diamond: '다이아몬드',
+      mergeWith: '병합 대상…',
+      moveEventsTo: '일정 이동…',
+      areYouSure: '정말 삭제하시겠습니까?',
+      cannotBeUndone: '이 작업은 취소할 수 없습니다.',
+    },
   },
 };
 

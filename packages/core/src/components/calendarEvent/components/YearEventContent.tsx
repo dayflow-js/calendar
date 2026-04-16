@@ -3,7 +3,12 @@ import { ComponentChildren } from 'preact';
 import { getEventIcon } from '@/components/monthView/util';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { Event } from '@/types';
-import { getLineColor } from '@/utils';
+import {
+  getLineColor,
+  getPrimaryCalendarId,
+  getCalendarLineColors,
+  buildColorBarGradient,
+} from '@/utils';
 
 interface YearEventContentProps {
   event: Event;
@@ -28,8 +33,14 @@ const YearEventContent = ({
   renderSlot,
 }: YearEventContentProps) => {
   const isAllDay = !!event.allDay;
-  const calendarId = event.calendarId || 'blue';
+  const calendarId = getPrimaryCalendarId(event);
   const lineColor = getLineColor(calendarId);
+  const lineColors = getCalendarLineColors(event);
+  const indicatorColorBarValue = buildColorBarGradient(lineColors);
+  const indicatorColorBarStyle =
+    lineColors.length > 1
+      ? { background: indicatorColorBarValue }
+      : { backgroundColor: indicatorColorBarValue };
   const icon = isAllDay ? getEventIcon(event) : null;
   const { isFirstSegment, isLastSegment } = segment;
 
@@ -132,7 +143,7 @@ const YearEventContent = ({
       >
         {!isAllDay && (
           <span
-            style={{ backgroundColor: lineColor }}
+            style={indicatorColorBarStyle}
             className='df-year-event-indicator inline-block h-3 w-0.75 shrink-0 rounded-full'
           ></span>
         )}

@@ -42,6 +42,7 @@ type MoveStartDragUpdates = {
   initialIndicatorHeight?: number;
   indicatorContainer: HTMLElement | null;
   calendarId?: string;
+  calendarIds?: string[];
   title?: string;
   hourOffset?: number;
   duration?: number;
@@ -230,6 +231,7 @@ export const buildWeekDayMoveStartData = ({
     initialIndicatorHeight: allDayContainerRect ? sourceRect.height : undefined,
     indicatorContainer,
     calendarId: event.calendarId,
+    calendarIds: event.calendarIds,
     title: event.title,
   };
 

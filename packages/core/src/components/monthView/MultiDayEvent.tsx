@@ -15,6 +15,11 @@ import {
   formatDateConsistent,
   getEventBgColor,
   getEventTextColor,
+  getPrimaryCalendarId,
+  getCalendarLineColors,
+  buildColorBarGradient,
+  getCalendarEventBgColors,
+  buildDiagonalPatternBackground,
   formatTime,
   extractHourFromDate,
   getEventEndHour,
@@ -220,13 +225,23 @@ export const MultiDayEvent = memo(
       );
     };
 
+    const calendarId = getPrimaryCalendarId(segment.event);
+    const isMultiCalendarEvent =
+      !!segment.event.calendarIds && segment.event.calendarIds.length > 1;
+    const multiCalendarBgColors = isMultiCalendarEvent
+      ? getCalendarEventBgColors(segment.event)
+      : null;
+    const isActive = isSelected || isDragging || isPressed;
+
     const renderEventContent = () => {
       const isAllDayEvent = visualEvent.allDay;
-      const calendarId = visualEvent.calendarId || 'blue';
+      const visualCalendarId = getPrimaryCalendarId(visualEvent);
       const startHour = extractHourFromDate(visualEvent.start);
       const endHour = getEventEndHour(visualEvent);
       const startTimeText = formatTime(startHour);
       const endTimeText = formatTime(endHour);
+      const lineColors = getCalendarLineColors(segment.event);
+      const hideColorBar = isActive && isMultiCalendarEvent;
 
       if (isAllDayEvent) {
         const getDisplayText = () => {
@@ -243,7 +258,7 @@ export const MultiDayEvent = memo(
                 <div
                   className='flex items-center justify-center rounded-full p-0.5 text-white'
                   style={{
-                    backgroundColor: getLineColor(calendarId),
+                    backgroundColor: getLineColor(visualCalendarId),
                     width: '12px',
                     height: '12px',
                   }}
@@ -287,10 +302,16 @@ export const MultiDayEvent = memo(
 
       return (
         <div className='pointer-events-auto relative flex w-full min-w-0 items-center'>
-          <div
-            className={monthEventColorBar}
-            style={{ backgroundColor: getLineColor(calendarId) }}
-          />
+          {!hideColorBar && (
+            <div
+              className={monthEventColorBar}
+              style={
+                lineColors.length > 1
+                  ? { background: buildColorBarGradient(lineColors) }
+                  : { backgroundColor: lineColors[0] }
+              }
+            />
+          )}
           <div className='flex min-w-0 flex-1 items-center'>
             <span
               className={`block overflow-hidden whitespace-nowrap ${isMobile ? 'df-mobile-mask-fade' : 'truncate'} text-xs font-medium`}
@@ -318,8 +339,6 @@ export const MultiDayEvent = memo(
       );
     };
 
-    const calendarId = segment.event.calendarId || 'blue';
-
     // Calculate the number of days occupied by the current segment
     const segmentDays = segment.endDayIndex - segment.startDayIndex + 1;
 
@@ -337,15 +356,22 @@ export const MultiDayEvent = memo(
           transform: isPopping ? 'scale(1.02)' : 'scale(1)',
           transition: POP_TRANSITION,
           willChange: 'transform',
-          ...(isSelected || isDragging || isPressed
+          ...(isActive
             ? {
                 backgroundColor: getSelectedBgColor(calendarId),
                 color: '#fff',
               }
-            : {
-                backgroundColor: getEventBgColor(calendarId),
-                color: getEventTextColor(calendarId),
-              }),
+            : isMultiCalendarEvent
+              ? {
+                  background: buildDiagonalPatternBackground(
+                    multiCalendarBgColors!
+                  ),
+                  color: getEventTextColor(calendarId),
+                }
+              : {
+                  backgroundColor: getEventBgColor(calendarId),
+                  color: getEventTextColor(calendarId),
+                }),
           cursor: isDraggable ? 'pointer' : viewable ? 'pointer' : 'default',
         }}
         data-segment-days={segmentDays}

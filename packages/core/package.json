@@ -71,11 +71,6 @@
     "tslib": "catalog:"
   },
   "devDependencies": {
-    "@dayflow/plugin-drag": "workspace:*",
-    "@dayflow/plugin-keyboard-shortcuts": "workspace:*",
-    "@dayflow/plugin-localization": "workspace:*",
-    "@dayflow/plugin-print": "workspace:*",
-    "@dayflow/plugin-sidebar": "workspace:*",
     "@preact/preset-vite": "catalog:",
     "@rollup/plugin-commonjs": "catalog:",
     "@rollup/plugin-node-resolve": "catalog:",

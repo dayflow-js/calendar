@@ -359,6 +359,7 @@ export const useDragHandlers = (
           drag.indicatorVisible = false;
           const event = events?.find(target => target.id === drag.eventId);
           // When switching regions, don't pass source element, use calculation method
+          drag.calendarIds = event?.calendarIds;
           createDragIndicator(drag, event?.calendarId, event?.title);
           drag.sourceElement = null;
           drag.indicatorVisible = true;
@@ -388,6 +389,7 @@ export const useDragHandlers = (
           drag.indicatorVisible = false;
           const event = events?.find(target => target.id === drag.eventId);
           // When switching regions, don't pass source element, use calculation method
+          drag.calendarIds = event?.calendarIds;
           createDragIndicator(drag, event?.calendarId, event?.title);
           drag.sourceElement = null;
           drag.indicatorVisible = true;

@@ -13,6 +13,9 @@ import { Event, ICalendarApp } from '@/types';
 import {
   formatEventTimeRange,
   getLineColor,
+  getCalendarLineColors,
+  buildDiagonalColorBarGradient,
+  getPrimaryCalendarId,
   extractHourFromDate,
   getEventEndHour,
   formatTime,
@@ -42,6 +45,9 @@ interface RegularEventContentProps {
   renderSlot?: (defaultContent: ComponentChildren) => ComponentChildren;
 }
 
+const colorBarClipPath =
+  'inset(0.25rem calc(100% - 0.25rem - 3px) 0.25rem 0.25rem round 9999px)';
+
 const RegularEventContent = ({
   event,
   app,
@@ -65,21 +71,28 @@ const RegularEventContent = ({
     ? multiDaySegmentInfo.isFirst
     : true;
   const isLastSegment = multiDaySegmentInfo ? multiDaySegmentInfo.isLast : true;
-  const calendarId = event.calendarId || 'blue';
+  const calendarId = getPrimaryCalendarId(event);
   const contentPaddingClass =
     !multiDaySegmentInfo && duration <= 0.25 ? 'px-1 py-0' : 'p-1';
 
+  const lineColors = getCalendarLineColors(event, app?.getCalendarRegistry());
+  const colorBarValue = buildDiagonalColorBarGradient(lineColors);
+  const hideColorBar = isEventSelected && lineColors.length > 1;
+  const colorBarContent = hideColorBar ? null : lineColors.length > 1 ? (
+    <div
+      className='df-event-color-bar pointer-events-none absolute inset-0'
+      style={{
+        background: colorBarValue,
+        clipPath: colorBarClipPath,
+      }}
+    />
+  ) : (
+    <div className={eventColorBar} style={{ backgroundColor: colorBarValue }} />
+  );
+
   const visualContent = (
     <>
-      <div
-        className={eventColorBar}
-        style={{
-          backgroundColor: getLineColor(
-            event.calendarId || 'blue',
-            app?.getCalendarRegistry()
-          ),
-        }}
-      />
+      {colorBarContent}
       <div
         className={`flex h-full flex-col overflow-hidden pl-3 ${contentPaddingClass}`}
       >

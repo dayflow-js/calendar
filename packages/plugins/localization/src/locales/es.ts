@@ -1,6 +1,6 @@
-import type { Locale } from '@dayflow/core';
+import type { DayflowLocale } from './types';
 
-const es: Locale = {
+const es: DayflowLocale = {
   code: 'es-ES',
   messages: {
     allDay: 'Todo el día',
@@ -82,6 +82,57 @@ const es: Locale = {
     fetchingCalendar: 'Obteniendo calendario...',
     subscribeError:
       'No se pudo obtener el calendario. Comprueba la URL e inténtalo de nuevo.',
+  },
+  packages: {
+    scheduler: {
+      previousPeriod: 'Periodo anterior',
+      nextPeriod: 'Siguiente periodo',
+      quarter: 'Trimestre',
+      days: 'Días',
+      weeks: 'Semanas',
+      months: 'Meses',
+      quarters: 'Trimestres',
+      years: 'Años',
+      views: 'Vistas',
+      resources: 'Recursos',
+      resizePanel: 'Cambiar tamaño del panel',
+      searchPlaceholder: 'Buscar…',
+      noResults: 'No se encontraron eventos',
+      typeToSearch: 'Escribe para buscar',
+      openSearch: 'Abrir búsqueda',
+      closeSearch: 'Cerrar búsqueda',
+      clearSearch: 'Borrar búsqueda',
+      close: 'Cerrar',
+      title: 'Título',
+      untitledEvent: 'Evento sin título',
+      type: 'Tipo',
+      addNotePlaceholder: 'Añadir una nota',
+      milestone: 'Hito',
+      typeFixedHint: 'El tipo está fijado en este ejemplo de muestra.',
+      progressFill: 'Relleno de progreso',
+      progressBar: 'Barra de progreso',
+      sample: 'Ejemplo',
+      titleAbove: 'Título arriba',
+      titleCenter: 'Título centrado',
+      titleBelow: 'Título abajo',
+      filled: 'Relleno',
+      bordered: 'Bordeado',
+      outlined: 'Contorno',
+      dashed: 'Discontinuo',
+      line: 'Línea',
+      dashedLine: 'Línea discontinua',
+      indented: 'Sangrado',
+      rounded: 'Redondeado',
+      gradient: 'Degradado',
+      progress: 'Progreso',
+      pattern: 'Patrón',
+      flag: 'Bandera',
+      diamond: 'Diamante',
+      mergeWith: 'Fusionar con…',
+      moveEventsTo: 'Mover eventos a…',
+      areYouSure: '¿Estás seguro?',
+      cannotBeUndone: 'Esta acción no se puede deshacer.',
+    },
   },
 };
 

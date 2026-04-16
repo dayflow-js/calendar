@@ -15,17 +15,18 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@dayflow/core';
 ```
 
-| 属性          | 类型                                                                     | 描述                                                                          | 必需 |
-| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ---- |
-| `id`          | `string`                                                                 | 事件的唯一标识符                                                              | 必填 |
-| `title`       | `string`                                                                 | 在日历中显示的事件标题                                                        | 必填 |
-| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件开始日期/时间。使用 `PlainDate` 表示全天，`PlainDateTime` 表示本地时间    | 必填 |
-| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                             | 必填 |
-| `description` | `string`                                                                 | 可选的事件描述或备注                                                          | 可选 |
-| `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                               | 可选 |
-| `icon`        | `boolean \| Node`                                                        | 事件的自定义图标。`true`（默认）：显示默认，`false`：隐藏，`Node`：自定义图标 | 可选 |
-| `calendarId`  | `string`                                                                 | 日历类型引用，用于多日历支持                                                  | 可选 |
-| `meta`        | `Record<string, any>`                                                    | 额外的自定义元数据（位置、参与者、自定义字段等）                              | 可选 |
+| 属性          | 类型                                                                     | 描述                                                                                                                    | 必需 |
+| ------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ---- |
+| `id`          | `string`                                                                 | 事件的唯一标识符                                                                                                        | 必填 |
+| `title`       | `string`                                                                 | 在日历中显示的事件标题                                                                                                  | 必填 |
+| `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件开始日期/时间。使用 `PlainDate` 表示全天，`PlainDateTime` 表示本地时间                                              | 必填 |
+| `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                                                                       | 必填 |
+| `description` | `string`                                                                 | 可选的事件描述或备注                                                                                                    | 可选 |
+| `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                                                                         | 可选 |
+| `icon`        | `boolean \| Node`                                                        | 事件的自定义图标。`true`（默认）：显示默认，`false`：隐藏，`Node`：自定义图标                                           | 可选 |
+| `calendarId`  | `string`                                                                 | 单日历归属的日历类型引用                                                                                                | 可选 |
+| `calendarIds` | `string[]`                                                               | 事件所属的日历 ID 列表。设置后优先于 `calendarId`。只要其中任意一个日历可见，事件就会显示。渲染时使用多色斜纹图案背景。 | 可选 |
+| `meta`        | `Record<string, any>`                                                    | 额外的自定义元数据（位置、参与者、自定义字段等）                                                                        | 可选 |
 
 ## **创建事件**
 
@@ -338,6 +339,93 @@ const calendar = useCalendarApp({
 });
 ```
 
+## **多日历事件**
+
+### 工作原理
+
+- `calendarIds` 设置后将优先于 `calendarId`。
+- **可见性**：只要列表中任意一个日历可见，事件就会显示。
+- **视觉区分**：多日历事件使用**45° 斜纹图案**背景（每种颜色对应一个日历），左侧色条显示**多色渐变**，与单日历事件一眼区分。
+- **选中状态**：回退为主日历（`calendarIds[0]`）的纯色背景。
+
+### 示例
+
+```tsx
+import { createEvent, useCalendarApp, createWeekView } from '@dayflow/core';
+
+// 同时归属于 "team" 和 "marketing" 两个日历
+const sharedEvent = createEvent({
+  id: 'shared-1',
+  title: '公司全员会议',
+  start: new Date(2024, 9, 15, 10, 0),
+  end: new Date(2024, 9, 15, 11, 30),
+  calendarIds: ['team', 'marketing'], // 多日历
+});
+
+// 跨三个日历的全天事件
+const crossCalendarDay = {
+  id: 'shared-2',
+  title: '团队外出',
+  start: Temporal.PlainDate.from('2024-10-20'),
+  end: Temporal.PlainDate.from('2024-10-22'),
+  allDay: true,
+  calendarIds: ['team', 'personal', 'travel'],
+};
+
+const calendars = [
+  {
+    id: 'team',
+    name: '团队',
+    colors: {
+      eventColor: '#3b82f6',
+      lineColor: '#3b82f6',
+      eventSelectedColor: '#2563eb',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'marketing',
+    name: '市场',
+    colors: {
+      eventColor: '#f59e0b',
+      lineColor: '#f59e0b',
+      eventSelectedColor: '#d97706',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'personal',
+    name: '个人',
+    colors: {
+      eventColor: '#10b981',
+      lineColor: '#10b981',
+      eventSelectedColor: '#059669',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+  {
+    id: 'travel',
+    name: '旅行',
+    colors: {
+      eventColor: '#8b5cf6',
+      lineColor: '#8b5cf6',
+      eventSelectedColor: '#7c3aed',
+      textColor: '#fff',
+    },
+    isVisible: true,
+  },
+];
+
+const calendar = useCalendarApp({
+  views: [createWeekView()],
+  events: [sharedEvent, crossCalendarDay],
+  calendars,
+});
+```
+
 ## **跨多天事件**
 
 事件可以跨越多个日期：
@@ -412,11 +500,10 @@ const event: Event = {
    - 本地事件（会议、预约）使用 `PlainDateTime` **推荐默认选项**
    - 仅时区敏感事件（国际电话、航班）使用 `ZonedDateTime`
 4. **验证时间值** - 辅助函数会自动验证小时（0-23）和分钟（0-59）
-5. **使用日历类型进行样式设置** - 分配 `calendarId` 来分类事件并保持样式一致性
+5. **使用日历类型进行样式设置** - 分配 `calendarId` 来分类事件并保持样式一致性；当事件跨多个日历时使用 `calendarIds`
 6. **善用 `meta` 字段** - 存储自定义数据而无需修改 Event 接口
 7. **验证事件数据** - 确保定时事件的开始时间早于结束时间
 8. **优化事件更新** - 尽可能批量更新
-9. **优雅处理错误** - 在失败时向用户提供反馈
 
 ## **类型参考**
 

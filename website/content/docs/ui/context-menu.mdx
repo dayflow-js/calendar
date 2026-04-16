@@ -1,0 +1,176 @@
+---
+title: Context Menu
+---
+
+# Context Menu
+
+A composable, portal-based context menu for DayFlow UI. Supports nested submenus, labels, separators, and a built-in color picker. Automatically closes on outside click, scroll, resize, or `Escape`.
+
+## Installation
+
+<PackageTabs pkg='@dayflow/ui-context-menu' />
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuColorPicker,
+} from '@dayflow/ui-context-menu';
+import '@dayflow/ui-context-menu/dist/styles.css';
+```
+
+## Basic Usage
+
+Render `ContextMenu` at the cursor position captured from a `contextmenu` event.
+
+```tsx
+import { useState } from 'react';
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from '@dayflow/ui-context-menu';
+
+function MyComponent() {
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  return (
+    <div onContextMenu={handleContextMenu}>
+      Right-click here
+      {menu && (
+        <ContextMenu x={menu.x} y={menu.y} onClose={() => setMenu(null)}>
+          <ContextMenuItem onClick={() => console.log('Edit')}>
+            Edit
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => console.log('Copy')}>
+            Copy
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={() => console.log('Delete')} danger>
+            Delete
+          </ContextMenuItem>
+        </ContextMenu>
+      )}
+    </div>
+  );
+}
+```
+
+## With Labels and Icons
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>Actions</ContextMenuLabel>
+  <ContextMenuItem icon={<PencilIcon />} onClick={() => onEdit()}>
+    Edit Event
+  </ContextMenuItem>
+  <ContextMenuItem icon={<CopyIcon />} onClick={() => onDuplicate()}>
+    Duplicate
+  </ContextMenuItem>
+  <ContextMenuSeparator />
+  <ContextMenuItem icon={<TrashIcon />} onClick={() => onDelete()} danger>
+    Delete
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## Nested Submenus
+
+Wrap items with `ContextMenuSub` to create hover-triggered submenus. The submenu automatically repositions itself to avoid viewport overflow.
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuItem onClick={() => onEdit()}>Edit</ContextMenuItem>
+  <ContextMenuSub>
+    <ContextMenuSubTrigger>Move to</ContextMenuSubTrigger>
+    <ContextMenuSubContent>
+      <ContextMenuItem onClick={() => onMove('work')}>Work</ContextMenuItem>
+      <ContextMenuItem onClick={() => onMove('personal')}>
+        Personal
+      </ContextMenuItem>
+    </ContextMenuSubContent>
+  </ContextMenuSub>
+  <ContextMenuSeparator />
+  <ContextMenuItem danger onClick={() => onDelete()}>
+    Delete
+  </ContextMenuItem>
+</ContextMenu>
+```
+
+## Color Picker
+
+`ContextMenuColorPicker` renders a row of preset swatches and an optional "Custom Color" action.
+
+```tsx
+<ContextMenu x={x} y={y} onClose={onClose}>
+  <ContextMenuLabel>Calendar Color</ContextMenuLabel>
+  <ContextMenuColorPicker
+    selectedColor={currentColor}
+    onSelect={color => {
+      updateCalendarColor(color);
+      onClose();
+    }}
+    onCustomColor={() => openColorDialog()}
+    customColorLabel='Custom color...'
+  />
+</ContextMenu>
+```
+
+## Disabled Items
+
+```tsx
+<ContextMenuItem onClick={() => onPaste()} disabled={!hasClipboard}>
+  Paste
+</ContextMenuItem>
+```
+
+## API Reference
+
+### `ContextMenu`
+
+| Prop        | Type                | Description                                |
+| :---------- | :------------------ | :----------------------------------------- |
+| `x`         | `number`            | Horizontal position (e.g. `event.clientX`) |
+| `y`         | `number`            | Vertical position (e.g. `event.clientY`)   |
+| `onClose`   | `() => void`        | Called when the menu should close          |
+| `children`  | `ComponentChildren` | Menu items                                 |
+| `className` | `string`            | Extra CSS classes for the menu container   |
+
+### `ContextMenuItem`
+
+| Prop       | Type                | Default | Description                            |
+| :--------- | :------------------ | :------ | :------------------------------------- |
+| `onClick`  | `() => void`        | —       | Click handler                          |
+| `children` | `ComponentChildren` | —       | Item label                             |
+| `icon`     | `ComponentChildren` | —       | Icon rendered to the left of the label |
+| `danger`   | `boolean`           | `false` | Renders the item in destructive red    |
+| `disabled` | `boolean`           | `false` | Makes the item non-interactive         |
+
+### `ContextMenuColorPicker`
+
+| Prop               | Type                      | Default          | Description                                 |
+| :----------------- | :------------------------ | :--------------- | :------------------------------------------ |
+| `selectedColor`    | `string`                  | —                | Currently active color (hex)                |
+| `onSelect`         | `(color: string) => void` | —                | Called when a swatch is clicked             |
+| `onCustomColor`    | `() => void`              | —                | Called when the custom color row is clicked |
+| `customColorLabel` | `string`                  | `"Custom Color"` | Label for the custom color action           |
+
+### Other exports
+
+| Component               | Description                                   |
+| :---------------------- | :-------------------------------------------- |
+| `ContextMenuSeparator`  | Horizontal divider line                       |
+| `ContextMenuLabel`      | Non-interactive section heading               |
+| `ContextMenuSub`        | Wrapper that manages open state for a submenu |
+| `ContextMenuSubTrigger` | Row that reveals the submenu on hover         |
+| `ContextMenuSubContent` | The floating submenu panel                    |
