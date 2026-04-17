@@ -1,6 +1,11 @@
 {
   "files.eol": "\n",
 
+  // Suppress CSS language-server warnings for Tailwind-specific at-rules
+  // (@apply, @variant, @theme, @source) that are valid PostCSS/Tailwind
+  // directives but unknown to the standard VS Code CSS validator.
+  "css.lint.unknownAtRules": "ignore",
+
   "prettier.enable": false,
   // "eslint.enable": false,
   "oxc.enable": true,

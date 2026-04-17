@@ -16,6 +16,10 @@
     "LICENSE"
   ],
   "type": "module",
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -24,10 +28,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
-    }
+    },
+    "./dist/styles.css": "./dist/styles.css",
+    "./dist/styles.components.css": "./dist/styles.components.css"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c && pnpm run build:css && pnpm run check:css",
+    "build:css": "node ./scripts/build-css.mjs",
+    "check:css": "pnpm run check:css:source && pnpm run check:css:dist",
+    "check:css:dist": "node ../../core/scripts/check-dist-styling.mjs --package-root .",
+    "check:css:source": "node ../../core/scripts/check-semantic-css.mjs",
     "clean": "rimraf dist node_modules",
     "typecheck": "tsc --noEmit"
   },
@@ -37,11 +47,17 @@
     "@rollup/plugin-commonjs": "catalog:",
     "@rollup/plugin-node-resolve": "catalog:",
     "@rollup/plugin-typescript": "catalog:",
+    "@tailwindcss/postcss": "catalog:",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "postcss-import": "catalog:",
     "preact": "catalog:",
     "rimraf": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-dts": "catalog:",
+    "tailwindcss": "catalog:",
     "temporal-polyfill": "catalog:",
+    "tsc-alias": "^1.8.16",
     "typescript": "catalog:"
   },
   "peerDependencies": {

@@ -1,7 +1,6 @@
 import {
   createPortal,
   CalendarType,
-  cancelButton,
   useLocale,
   LoadingButton,
 } from '@dayflow/core';
@@ -70,49 +69,49 @@ export const DeleteCalendarDialog = ({
   };
 
   return createPortal(
-    <div className='df-portal fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
-      <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
+    <div className='df-sidebar__overlay'>
+      <div className='df-sidebar__dialog'>
         {step === 'initial' ? (
           <>
-            <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
+            <h2 className='df-sidebar__dialog-title'>
               {t('deleteCalendar', { calendarName })}
             </h2>
-            <p className='mt-3 flex flex-wrap items-center gap-y-0.5 text-sm text-gray-600 dark:text-gray-300'>
+            <p className='df-sidebar__dialog-text df-sidebar__dialog-line'>
               {renderWithChip(
                 t('deleteCalendarMessage', { calendarName: CAL_SENTINEL }),
                 calendarName,
                 calendarColor
               )}
             </p>
-            <div className='mt-6 flex items-center justify-between'>
-              <div className='relative'>
+            <div className='df-sidebar__dialog-split-actions'>
+              <div className='df-sidebar__field'>
                 <button
                   type='button'
                   disabled={isLoading}
                   onClick={() => setShowMergeDropdown(!showMergeDropdown)}
-                  className='flex items-center gap-1 rounded-md border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-slate-700'
+                  className='df-sidebar__button df-sidebar__button--secondary'
                 >
                   {t('merge')}
                 </button>
                 {showMergeDropdown && (
-                  <div className='absolute top-full left-0 z-10 mt-1 max-h-60 w-max min-w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-slate-700 dark:bg-gray-800'>
+                  <div className='df-sidebar__dropdown'>
                     {calendars
                       .filter(c => c.id !== calendarId)
                       .map(calendar => (
                         <div
                           key={calendar.id}
-                          className='flex cursor-pointer items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-700'
+                          className='df-sidebar__dropdown-item'
                           onClick={() => {
                             handleMergeSelect(calendar.id);
                           }}
                         >
                           <div
-                            className='mr-2 h-3 w-3 shrink-0 rounded-sm'
+                            className='df-sidebar__swatch'
                             style={{
                               backgroundColor: calendar.colors.lineColor,
                             }}
                           />
-                          <span className='whitespace-nowrap'>
+                          <span className='df-sidebar__dropdown-label'>
                             {calendar.name || calendar.id}
                           </span>
                         </div>
@@ -120,12 +119,12 @@ export const DeleteCalendarDialog = ({
                   </div>
                 )}
               </div>
-              <div className='flex gap-3'>
+              <div className='df-sidebar__button-row'>
                 <button
                   type='button'
                   onClick={onCancel}
                   disabled={isLoading}
-                  className={`${cancelButton} disabled:opacity-50`}
+                  className='df-sidebar__button df-sidebar__button--secondary'
                 >
                   {t('cancel')}
                 </button>
@@ -133,7 +132,7 @@ export const DeleteCalendarDialog = ({
                   type='button'
                   onClick={() => onStepChange('confirm_delete')}
                   disabled={isLoading}
-                  className='df-fill-destructive df-hover-destructive rounded-md px-4 py-2 text-xs font-medium disabled:opacity-50'
+                  className='df-sidebar__button df-sidebar__button--destructive'
                 >
                   {t('delete')}
                 </button>
@@ -142,18 +141,18 @@ export const DeleteCalendarDialog = ({
           </>
         ) : (
           <>
-            <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
+            <h2 className='df-sidebar__dialog-title'>
               {t('confirmDeleteTitle', { calendarName })}
             </h2>
-            <p className='mt-3 text-sm text-gray-600 dark:text-gray-300'>
+            <p className='df-sidebar__dialog-text'>
               {t('confirmDeleteMessage')}
             </p>
-            <div className='mt-6 flex justify-end gap-3'>
+            <div className='df-sidebar__dialog-actions'>
               <button
                 type='button'
                 onClick={onCancel}
                 disabled={isLoading}
-                className='rounded-md border border-border bg-background px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 dark:text-gray-300 dark:hover:bg-slate-700'
+                className='df-sidebar__button df-sidebar__button--secondary'
               >
                 {t('cancel')}
               </button>
@@ -161,7 +160,7 @@ export const DeleteCalendarDialog = ({
                 type='button'
                 onClick={handleConfirmDelete}
                 loading={isLoading}
-                className='df-fill-destructive df-hover-destructive rounded-md px-3 py-2 text-xs font-medium'
+                className='df-sidebar__button df-sidebar__button--destructive'
               >
                 {t('delete')}
               </LoadingButton>

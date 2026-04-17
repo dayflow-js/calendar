@@ -1,4 +1,4 @@
-import { cancelButton, useLocale, LoadingButton } from '@dayflow/core';
+import { useLocale, LoadingButton } from '@dayflow/core';
 import { useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
@@ -61,24 +61,24 @@ export const MergeCalendarDialog = ({
   };
 
   return (
-    <div className='df-portal fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
-      <div className='rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
-        <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
+    <div className='df-sidebar__overlay'>
+      <div className='df-sidebar__dialog'>
+        <h2 className='df-sidebar__dialog-title'>
           {t('mergeConfirmTitle', { sourceName, targetName })}
         </h2>
-        <div className='mt-3 space-y-1 text-sm text-gray-600 dark:text-gray-300'>
+        <div className='df-sidebar__dialog-lines'>
           {messageLines.map((line, i) => (
-            <p key={i} className='flex flex-wrap items-center gap-y-0.5'>
+            <p key={i} className='df-sidebar__dialog-line'>
               {renderLine(line, source, target)}
             </p>
           ))}
         </div>
-        <div className='mt-6 flex justify-end gap-3'>
+        <div className='df-sidebar__dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={isLoading}
-            className={`${cancelButton} disabled:opacity-50`}
+            className='df-sidebar__button df-sidebar__button--secondary'
           >
             {t('cancel')}
           </button>
@@ -86,7 +86,7 @@ export const MergeCalendarDialog = ({
             type='button'
             onClick={handleConfirm}
             loading={isLoading}
-            className='df-fill-destructive df-hover-destructive rounded-md px-3 py-2 text-xs font-medium'
+            className='df-sidebar__button df-sidebar__button--destructive'
           >
             {t('merge')}
           </LoadingButton>

@@ -382,7 +382,7 @@ const DefaultEventDetailPanel = ({
   const panelContent = (
     <div
       ref={panelRef}
-      className={`${eventDetailPanel} p-4`}
+      className={`${eventDetailPanel} df-event-panel__content`}
       data-event-detail-panel='true'
       data-event-id={event.id}
       style={{
@@ -393,11 +393,9 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
-        {t('eventTitle')}
-      </span>
-      <div className='mb-3 flex items-center justify-between gap-3'>
-        <div className='flex-1'>
+      <span className='df-form-label'>{t('eventTitle')}</span>
+      <div className='df-form-row' style={{ marginBottom: '0.75rem' }}>
+        <div className='df-form-field'>
           <input
             id={`event-title-${draftEvent.id}`}
             name='title'
@@ -417,7 +415,7 @@ const DefaultEventDetailPanel = ({
                 title: (e.target as HTMLInputElement).value,
               })
             }
-            className='df-focus-ring w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:ring-2 focus:outline-none disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
+            className='df-form-input'
           />
         </div>
         {isEditable && (
@@ -437,10 +435,11 @@ const DefaultEventDetailPanel = ({
       </div>
 
       {isDraftAllDay ? (
-        <div className='mb-3'>
-          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
-            {t('dateRange')}
-          </div>
+        <div
+          className='df-event-dialog__time-row'
+          style={{ marginBottom: '0.75rem' }}
+        >
+          <div className='df-form-label'>{t('dateRange')}</div>
           <RangePicker
             value={[draftEvent.start, draftEvent.end]}
             format='YYYY-MM-DD'
@@ -453,10 +452,11 @@ const DefaultEventDetailPanel = ({
           />
         </div>
       ) : (
-        <div className='mb-3'>
-          <div className='mb-1 text-xs text-gray-600 dark:text-gray-300'>
-            {t('timeRange')}
-          </div>
+        <div
+          className='df-event-dialog__time-row'
+          style={{ marginBottom: '0.75rem' }}
+        >
+          <div className='df-form-label'>{t('timeRange')}</div>
           <RangePicker
             value={[draftEvent.start, draftEvent.end]}
             timeZone={eventTimeZone}
@@ -466,12 +466,7 @@ const DefaultEventDetailPanel = ({
             ) => {
               if (isLoading) return;
               const [start, end] = nextRange;
-
-              applyDraftEventUpdate({
-                ...draftEvent,
-                start,
-                end,
-              });
+              applyDraftEventUpdate({ ...draftEvent, start, end });
             }}
             locale={app?.state.locale}
           />
@@ -479,10 +474,11 @@ const DefaultEventDetailPanel = ({
       )}
 
       {shouldShowNotes && (
-        <div className='mb-3'>
-          <span className='mb-1 block text-xs text-gray-600 dark:text-gray-300'>
-            {t('note')}
-          </span>
+        <div
+          className='df-event-dialog__notes-row'
+          style={{ marginBottom: '0.75rem' }}
+        >
+          <span className='df-form-label'>{t('note')}</span>
           <textarea
             id={`event-note-${draftEvent.id}`}
             name='note'
@@ -502,18 +498,18 @@ const DefaultEventDetailPanel = ({
               })
             }
             rows={3}
-            className='df-focus-ring w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-gray-900 shadow-sm transition focus:ring-2 focus:outline-none disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
+            className='df-form-textarea'
             placeholder={t('addNotePlaceholder')}
           />
         </div>
       )}
 
       {isEditable && (
-        <div className='flex space-x-2'>
+        <div className='df-form-actions'>
           {isDraftAllDay ? (
             <LoadingButton
               type='button'
-              className='df-fill-primary df-hover-primary-solid rounded px-2 py-1 text-xs font-medium transition'
+              className='df-fill-primary df-hover-primary-solid df-btn-sm'
               onClick={convertToRegular}
               loading={isLoading}
             >
@@ -522,7 +518,7 @@ const DefaultEventDetailPanel = ({
           ) : (
             <LoadingButton
               type='button'
-              className='df-fill-primary df-hover-primary-solid rounded px-2 py-1 text-xs font-medium transition'
+              className='df-fill-primary df-hover-primary-solid df-btn-sm'
               onClick={convertToAllDay}
               loading={isLoading}
             >
@@ -532,7 +528,7 @@ const DefaultEventDetailPanel = ({
 
           <LoadingButton
             type='button'
-            className='df-fill-destructive df-hover-destructive rounded px-2 py-1 text-xs font-medium transition'
+            className='df-fill-destructive df-hover-destructive df-btn-sm'
             onClick={handleEventDelete}
             loading={isLoading}
           >

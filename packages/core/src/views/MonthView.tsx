@@ -818,7 +818,7 @@ const MonthView = ({
       />
 
       <div className={weekHeaderRow} onContextMenu={e => e.preventDefault()}>
-        <div className={`${weekGrid} px-2`}>
+        <div className={weekGrid}>
           {weekDaysLabels.map((day, i) => (
             <div key={`${day}-${i}`} className={dayLabel}>
               {day}

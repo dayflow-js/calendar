@@ -9,8 +9,7 @@
  * Calendar main container
  * Used for the root container of WeekView and DayView
  */
-export const calendarContainer =
-  'df-calendar relative flex flex-col w-full overflow-hidden h-full select-none';
+export const calendarContainer = 'df-calendar';
 
 /**
  * MonthView container
@@ -23,37 +22,34 @@ export const monthViewContainer =
 /**
  * Top navigation bar container
  */
-export const headerContainer = 'p-2 flex justify-between';
+export const headerContainer = 'df-view-header-container';
 
 /**
  * Title text style
  */
-export const headerTitle =
-  'text-2xl font-bold text-gray-900 dark:text-gray-100';
+export const headerTitle = 'df-view-header-title';
 
 /**
  * Subtitle text style
  */
-export const headerSubtitle = 'mt-3 leading-6 text-gray-600 dark:text-gray-400';
+export const headerSubtitle = 'df-view-header-subtitle';
 
 // ==================== Button Styles ====================
 
 /**
  * Navigation button container
  */
-export const buttonGroup = 'df-navigation flex items-center';
+export const buttonGroup = 'df-navigation';
 
 /**
  * Navigation button (forward/backward)
  */
-export const navButton =
-  'p-1 text-gray-600 dark:text-gray-300 df-hover-primary rounded transition-colors';
+export const navButton = 'df-calendar-nav-button';
 
 /**
  * Today button
  */
-export const todayButton =
-  'px-4 py-1 text-sm df-text-primary font-medium df-hover-primary rounded transition-colors';
+export const todayButton = 'df-today-button df-calendar-today-button';
 
 /**
  * Icon button size
@@ -63,74 +59,66 @@ export const iconSize = 'h-5 w-5';
 /**
  * Cancel button
  */
-export const cancelButton =
-  'rounded-md bg-background border border-border px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-(--hover)';
+export const cancelButton = 'df-btn-sm df-btn-sm--ghost';
 
 // ==================== Grid Styles ====================
 
 /**
  * 7-column grid container (weekday titles)
  */
-export const weekGrid = 'grid grid-cols-7';
+export const weekGrid = 'df-week-grid';
 
 /**
  * Week title row (MonthView)
  */
-export const weekHeaderRow = 'df-week-header-row sticky top-0 z-10 border-b';
+export const weekHeaderRow = 'df-week-header-row';
 
 /**
  * Weekday labels
  */
-export const dayLabel =
-  'text-right text-gray-500 dark:text-gray-400 text-sm py-2 pr-2 select-none';
+export const dayLabel = 'df-day-label';
 
 /**
  * WeekView week title
  */
-export const weekDayHeader = 'df-week-header flex border-b';
+export const weekDayHeader = 'df-week-header';
 
 /**
  * WeekView week title cell
  */
-export const weekDayCell =
-  'df-week-day-cell flex flex-1 justify-center items-center text-center text-gray-500 dark:text-gray-400 text-sm p-1 select-none';
+export const weekDayCell = 'df-week-day-cell';
 
 /**
  * Date number style
  */
-export const dateNumber =
-  'df-date-number inline-flex items-center justify-center h-6 w-6 rounded-full text-sm mt-1 select-none';
+export const dateNumber = 'df-date-number';
 
 // ==================== Scroll Area Styles ====================
 
 /**
  * Virtual scroll container
  */
-export const scrollContainer =
-  'flex-1 overflow-auto will-change-scroll overscroll-contain';
+export const scrollContainer = 'df-scroll-container';
 
 /**
  * Month view 6-row grid container - fixed 6-row equal height layout
  */
-export const monthGrid6Rows =
-  'df-month-grid grid grid-rows-6 h-full overflow-hidden';
+export const monthGrid6Rows = 'df-month-grid';
 
 /**
  * Month day cell
  */
-export const monthDayCell = 'df-month-day-cell relative flex flex-col border-r';
+export const monthDayCell = 'df-month-day-cell';
 
 /**
  * Month date number container
  */
-export const monthDateNumberContainer =
-  'df-month-date-number-container flex items-center justify-end text-right px-2 h-[33px] relative z-20';
+export const monthDateNumberContainer = 'df-month-date-number-container';
 
 /**
  * Month date number
  */
-export const monthDateNumber =
-  'df-month-date-number inline-flex items-center justify-center h-6 min-w-6 rounded-full text-sm font-medium whitespace-nowrap px-1';
+export const monthDateNumber = 'df-month-date-number';
 
 /**
  * Month more events indicator
@@ -480,19 +468,18 @@ export const mobileFullscreen =
 /**
  * Search input
  */
-export const searchInput =
-  'pl-9 pr-8 py-1 h-7 text-sm border border-slate-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 df-focus-ring transition resize-none';
+export const searchInput = 'df-search-group__input';
 
 /**
  * Icon button (square, no text)
  */
-export const iconButton =
-  'flex h-7 w-7 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors';
+export const iconButton = 'df-icon-btn';
 
 // ==================== Utility Styles ====================
 
 /**
  * Border styles
+ * @deprecated prefer df-* semantic classes; kept for gradual migration
  */
 export const borderGray = 'border-gray-200 dark:border-gray-700';
 export const borderBottom = 'border-b border-gray-200 dark:border-gray-700';
@@ -501,6 +488,7 @@ export const borderRight = 'border-r border-gray-200 dark:border-gray-700';
 
 /**
  * Text colors
+ * @deprecated prefer df-* semantic classes; kept for gradual migration
  */
 export const textGray500 = 'text-gray-500 dark:text-gray-400';
 export const textGray600 = 'text-gray-600 dark:text-gray-300';
@@ -510,6 +498,7 @@ export const textGray900 = 'text-gray-900 dark:text-white';
 
 /**
  * Text sizes
+ * @deprecated prefer semantic component classes
  */
 export const textXs = 'text-xs';
 export const textSm = 'text-sm';
@@ -520,6 +509,7 @@ export const text2xl = 'text-2xl';
 
 /**
  * Background colors
+ * @deprecated prefer df-* semantic classes; kept for gradual migration
  */
 export const bgWhite = 'bg-white dark:bg-gray-900';
 export const bgGray50 = 'bg-gray-50 dark:bg-gray-800';
@@ -527,6 +517,7 @@ export const bgGray100 = 'bg-gray-100 dark:bg-gray-800';
 
 /**
  * Flex layouts
+ * @deprecated prefer semantic component classes
  */
 export const flexRow = 'flex';
 export const flexCol = 'flex flex-col';
@@ -535,6 +526,7 @@ export const flexBetween = 'flex justify-between items-center';
 
 /**
  * Spacing
+ * @deprecated prefer semantic component classes
  */
 export const m1 = 'm-1';
 export const mr1 = 'mr-1';

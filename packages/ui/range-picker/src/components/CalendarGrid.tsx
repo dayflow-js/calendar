@@ -29,23 +29,16 @@ const CalendarGrid = ({
     const isInRange =
       compareDates(day, startDate) >= 0 && compareDates(day, endDate) <= 0;
 
-    const baseClasses =
-      'flex h-9 w-9 items-center justify-center rounded-md text-sm transition';
-
-    const stateClass = (() => {
-      if (isStart || isEnd) return 'df-fill-primary font-semibold';
-      if (isInRange) return 'df-tint-primary';
-      if (isOutsideMonth) return 'text-slate-300 dark:text-gray-600';
-      return 'text-slate-700 dark:text-gray-300 df-hover-primary';
-    })();
-
     return (
       <button
         key={day.toString()}
         type='button'
         disabled={disabled}
         onClick={() => onDaySelect(day)}
-        className={`${baseClasses} ${stateClass}`}
+        className='df-range-picker__day-cell'
+        data-outside={isOutsideMonth}
+        data-range-edge={isStart ? 'start' : isEnd ? 'end' : undefined}
+        data-in-range={isInRange && !isStart && !isEnd}
       >
         {day.day}
       </button>
@@ -54,12 +47,14 @@ const CalendarGrid = ({
 
   return (
     <>
-      <div className='grid grid-cols-7 gap-1 px-1 pt-2 pb-3 text-center text-[12px] tracking-wide text-slate-400 uppercase dark:text-gray-500'>
+      <div className='df-range-picker__weekday-row'>
         {weekDayLabels.map((day: string) => (
-          <span key={day}>{day}</span>
+          <span key={day} className='df-range-picker__weekday-label'>
+            {day}
+          </span>
         ))}
       </div>
-      <div className='grid grid-cols-7 gap-1 px-1'>
+      <div className='df-range-picker__day-grid'>
         {calendarDays.map(renderDayCell)}
       </div>
     </>

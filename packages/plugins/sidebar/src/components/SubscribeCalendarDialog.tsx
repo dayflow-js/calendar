@@ -1,4 +1,4 @@
-import { cancelButton, useLocale } from '@dayflow/core';
+import { useLocale } from '@dayflow/core';
 import { useState } from 'preact/hooks';
 
 interface SubscribeCalendarDialogProps {
@@ -41,15 +41,15 @@ export const SubscribeCalendarDialog = ({
   };
 
   return (
-    <div className='df-portal fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'>
-      <div className='w-full max-w-xl rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800'>
-        <h2 className='text-lg font-semibold text-gray-900 dark:text-white'>
+    <div className='df-sidebar__overlay'>
+      <div className='df-sidebar__dialog df-sidebar__dialog--wide'>
+        <h2 className='df-sidebar__dialog-title'>
           {t('subscribeCalendarTitle')}
         </h2>
 
-        <div className='mt-4'>
-          <div className='flex items-center gap-3'>
-            <label className='shrink-0 text-sm font-medium text-gray-700 dark:text-gray-300'>
+        <div>
+          <div className='df-sidebar__subscribe-row'>
+            <label className='df-sidebar__subscribe-label'>
               {t('calendarUrl')}
             </label>
             <input
@@ -60,22 +60,18 @@ export const SubscribeCalendarDialog = ({
               placeholder={t('calendarUrlPlaceholder')}
               disabled={loading}
               autoFocus
-              className='df-focus-ring flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400'
+              className='df-sidebar__subscribe-input'
             />
           </div>
-          {error && (
-            <p className='mt-2 text-xs text-red-500 dark:text-red-400'>
-              {error}
-            </p>
-          )}
+          {error && <p className='df-sidebar__error'>{error}</p>}
         </div>
 
-        <div className='mt-6 flex justify-end gap-3'>
+        <div className='df-sidebar__dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={loading}
-            className={cancelButton}
+            className='df-sidebar__button df-sidebar__button--secondary'
           >
             {t('cancel')}
           </button>
@@ -83,7 +79,7 @@ export const SubscribeCalendarDialog = ({
             type='button'
             onClick={handleSubmit}
             disabled={loading || !url.trim()}
-            className='df-fill-primary df-hover-primary-solid rounded-md px-4 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50'
+            className='df-sidebar__button df-sidebar__button--primary'
           >
             {loading ? t('fetchingCalendar') : t('subscribe')}
           </button>

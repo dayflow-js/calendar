@@ -88,14 +88,14 @@ const CalendarItem = ({
   return (
     <li
       key={calendar.id}
-      className='df-calendar-list-item relative'
+      className='df-sidebar__list-item'
       onDragOver={e => onDragOver(e, calendar.id)}
       onDragLeave={onDragLeave}
       onDrop={() => onDrop(calendar)}
       onContextMenu={e => onContextMenu(e, calendar.id)}
     >
       {isDropTarget && dropTarget.position === 'top' && (
-        <div className='pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
+        <div className='df-sidebar__drop-indicator' data-position='top' />
       )}
       <div
         draggable={
@@ -106,17 +106,18 @@ const CalendarItem = ({
         }
         onDragStart={e => onDragStart(calendar, e)}
         onDragEnd={onDragEnd}
-        className={`rounded transition ${
-          draggedCalendarId === calendar.id ? 'opacity-50' : ''
-        } ${isDraggable ? 'cursor-grab' : 'cursor-default'}`}
+        className='df-sidebar__drag-shell'
+        data-dragging={draggedCalendarId === calendar.id ? 'true' : undefined}
+        data-draggable={isDraggable ? 'true' : 'false'}
       >
         <div
-          className={`group flex items-center rounded px-2 py-2 transition hover:bg-gray-100 dark:hover:bg-slate-800 ${isActive ? 'bg-gray-100 dark:bg-slate-800' : ''}`}
+          className='df-sidebar__row'
+          data-active={isActive ? 'true' : undefined}
           title={calendar.name}
         >
           <input
             type='checkbox'
-            className='df-calendar-checkbox shrink-0 cursor-pointer'
+            className='df-calendar-checkbox df-sidebar__checkbox'
             style={
               {
                 '--checkbox-color': calendarColor,
@@ -132,7 +133,8 @@ const CalendarItem = ({
           />
           {showIcon && (
             <span
-              className='ml-2 flex h-5 w-5 shrink-0 items-center justify-center text-xs font-semibold text-white'
+              className='df-sidebar__icon-badge'
+              style={{ backgroundColor: calendarColor }}
               aria-hidden='true'
             >
               {getCalendarInitials(calendar)}
@@ -148,13 +150,13 @@ const CalendarItem = ({
               }
               onBlur={onRenameSave}
               onKeyDown={onRenameKeyDown}
-              className='ml-2 h-5 min-w-0 flex-1 rounded bg-white px-0 py-0 text-sm text-gray-900 focus:outline-none dark:bg-slate-700 dark:text-gray-100'
+              className='df-sidebar__rename-input'
               onClick={e => e.stopPropagation()}
             />
           ) : (
             <>
               <span
-                className='ml-2 flex-1 truncate pl-1 text-sm text-gray-700 group-hover:text-gray-900 dark:text-gray-200 dark:group-hover:text-white'
+                className='df-sidebar__name'
                 onDblClick={() => onRenameStart(calendar)}
               >
                 {calendar.name || calendar.id}
@@ -163,7 +165,7 @@ const CalendarItem = ({
                 <AlertCircle
                   width={13}
                   height={13}
-                  className='ml-1 shrink-0 text-red-500'
+                  className='df-sidebar__status-icon df-sidebar__status-icon--error'
                   title='Failed to load subscription'
                 />
               )}
@@ -172,7 +174,7 @@ const CalendarItem = ({
                   <AudioLines
                     width={13}
                     height={13}
-                    className='ml-1 shrink-0 text-gray-400 dark:text-gray-500'
+                    className='df-sidebar__status-icon df-sidebar__status-icon--subscription'
                   />
                 )}
             </>
@@ -180,7 +182,7 @@ const CalendarItem = ({
         </div>
       </div>
       {isDropTarget && dropTarget.position === 'bottom' && (
-        <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 bg-[var(--df-color-primary)]' />
+        <div className='df-sidebar__drop-indicator' data-position='bottom' />
       )}
     </li>
   );
@@ -397,8 +399,8 @@ export const CalendarList = ({
   if (!hasSources) {
     // Flat list (original behaviour)
     return (
-      <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
-        <ul className='relative space-y-1'>
+      <div className='df-sidebar__list-shell'>
+        <ul className='df-sidebar__list'>
           {calendars.map(calendar => (
             <CalendarItem
               key={calendar.id}
@@ -420,10 +422,10 @@ export const CalendarList = ({
   }
 
   return (
-    <div className='df-calendar-list flex-1 overflow-y-auto px-2 pb-3'>
+    <div className='df-sidebar__list-shell'>
       {/* Unsourced calendars first, no header */}
       {groups.has(null) && (
-        <ul className='relative space-y-1'>
+        <ul className='df-sidebar__list'>
           {groups.get(null)!.map(calendar => (
             <CalendarItem
               key={calendar.id}
@@ -440,28 +442,26 @@ export const CalendarList = ({
         .map(([source, groupCalendars]) => {
           const isCollapsed = collapsedSources[source!];
           return (
-            <div key={source} className='mt-1'>
+            <div key={source} className='df-sidebar__source-group'>
               <button
                 type='button'
-                className='flex w-full items-center justify-between rounded px-2 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-800'
+                className='df-sidebar__source-toggle'
                 onClick={() => toggleSource(source!)}
               >
-                <span className='truncate'>{source}</span>
+                <span className='df-sidebar__source-label'>{source}</span>
                 <ChevronDown
                   width={13}
                   height={13}
-                  className={`ml-1 shrink-0 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                  className='df-sidebar__source-chevron'
+                  data-collapsed={isCollapsed ? 'true' : 'false'}
                 />
               </button>
               <div
-                style={{
-                  display: 'grid',
-                  gridTemplateRows: isCollapsed ? '0fr' : '1fr',
-                  transition: 'grid-template-rows 200ms ease',
-                }}
+                className='df-sidebar__source-panel'
+                data-collapsed={isCollapsed ? 'true' : 'false'}
               >
-                <div style={{ overflow: 'hidden' }}>
-                  <ul className='relative space-y-1'>
+                <div className='df-sidebar__source-panel-inner'>
+                  <ul className='df-sidebar__list'>
                     {groupCalendars.map(calendar => (
                       <CalendarItem
                         key={calendar.id}

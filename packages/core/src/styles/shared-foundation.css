@@ -372,6 +372,10 @@
     color: var(--df-color-primary);
   }
 
+  .df-text-muted {
+    color: var(--df-color-muted-foreground);
+  }
+
   .df-text-primary-fg {
     color: var(--df-color-primary-foreground);
   }

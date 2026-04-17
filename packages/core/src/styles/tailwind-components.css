@@ -19,6 +19,11 @@
  * It does not emit utility classes into the compiled output. */
 @import 'tailwindcss/theme' layer(theme);
 @import '@dayflow/blossom-color-picker/styles.css';
+@import '../../../plugins/print/src/styles/print.css';
 @import './shared-foundation.css';
+@import './core-components.css';
+@import '../../../plugins/sidebar/src/styles/sidebar.css';
+@import '../../../ui/context-menu/src/styles/context-menu.css';
+@import '../../../ui/range-picker/src/styles/range-picker.css';
 
 @variant dark (.dark &);

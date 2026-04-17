@@ -2,7 +2,12 @@
 @import 'tailwindcss/theme' layer(theme);
 @import 'tailwindcss/utilities';
 @import '@dayflow/blossom-color-picker/styles.css';
+@import '../../../plugins/print/src/styles/print.css';
 @import './shared-foundation.css';
+@import './core-components.css';
+@import '../../../plugins/sidebar/src/styles/sidebar.css';
+@import '../../../ui/context-menu/src/styles/context-menu.css';
+@import '../../../ui/range-picker/src/styles/range-picker.css';
 
 /* Force scanning of all relevant source code files to extract utility classes */
 @source "../**/*.{ts,tsx}";

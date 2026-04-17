@@ -20,7 +20,8 @@ interface SearchResultsListProps {
 
 const SearchIconPlaceholder = () => (
   <svg
-    className='h-12 w-12 text-gray-300 dark:text-gray-600'
+    className='df-search-results__state-icon'
+    style={{ width: '3rem', height: '3rem' }}
     fill='none'
     viewBox='0 0 24 24'
     stroke='currentColor'
@@ -45,13 +46,11 @@ const SearchResultsList = ({
 
   const today = useMemo(() => normalizeDate(new Date()), []);
 
-  // Group events by date (sorted)
   const groupedEvents = useMemo(
     () => groupSearchResults(results, today),
     [results, today]
   );
 
-  // Helper to get time string
   const getTime = (d: unknown) => getDateObj(d);
 
   const getEmptyText = () => {
@@ -64,7 +63,7 @@ const SearchResultsList = ({
 
   if (loading) {
     return (
-      <div className='flex h-40 flex-col items-center justify-center text-gray-500'>
+      <div className='df-search-results__state'>
         <Loader2 className='mb-2 h-8 w-8 animate-spin' />
         <span>Loading...</span>
       </div>
@@ -73,15 +72,17 @@ const SearchResultsList = ({
 
   if (results.length === 0) {
     return keyword ? (
-      <div className='flex h-40 flex-col items-center justify-center text-gray-500'>
+      <div className='df-search-results__state'>
         <SearchIconPlaceholder />
-        <span className='mt-2 text-sm'>{getEmptyText()}</span>
+        <span style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
+          {getEmptyText()}
+        </span>
       </div>
     ) : null;
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='df-search-results'>
       {groupedEvents.map(group => {
         const { title, colorClass } = getSearchHeaderInfo(
           group.date,
@@ -91,13 +92,11 @@ const SearchResultsList = ({
         );
 
         return (
-          <div key={group.date.getTime()}>
-            <h3
-              className={`sticky top-0 z-10 mb-4 bg-white px-2 py-1 text-sm font-medium dark:bg-gray-900 ${colorClass} border-b border-gray-200 dark:border-gray-700`}
-            >
+          <div key={group.date.getTime()} className='df-search-results__group'>
+            <h3 className={`df-search-results__date-header ${colorClass}`}>
               {title}
             </h3>
-            <div className='flex flex-col'>
+            <div className='df-search-results__events'>
               {group.events.map(event => {
                 const start = getTime(event.start);
                 const end = getTime(event.end);
@@ -116,24 +115,22 @@ const SearchResultsList = ({
                 return (
                   <div key={event.id}>
                     <div
-                      className='group mx-2 mb-1 cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800'
+                      className='df-search-results__event'
                       onClick={() => onResultClick?.(event)}
                     >
-                      <div className='flex items-stretch gap-3'>
+                      <div className='df-search-results__event-inner'>
                         <div
-                          className='w-1 shrink-0 rounded-full'
+                          className='df-search-results__color-bar'
                           style={{ backgroundColor: event.color || '#3b82f6' }}
                         />
-                        <div className='flex min-w-0 flex-1 items-start justify-between'>
-                          <div className='truncate pr-2 text-sm font-medium text-black dark:text-white'>
+                        <div className='df-search-results__event-content'>
+                          <div className='df-search-results__event-title'>
                             {event.title}
                           </div>
-                          <div className='flex shrink-0 flex-col items-end text-xs leading-tight'>
-                            <div className='text-black dark:text-white'>
-                              {startTimeStr}
-                            </div>
+                          <div className='df-search-results__event-time'>
+                            <div>{startTimeStr}</div>
                             {endTimeStr && (
-                              <div className='text-gray-500 dark:text-gray-400'>
+                              <div className='df-search-results__end-time'>
                                 {endTimeStr}
                               </div>
                             )}
@@ -141,7 +138,7 @@ const SearchResultsList = ({
                         </div>
                       </div>
                     </div>
-                    <div className='mx-2 border-b border-gray-200 dark:border-gray-700' />
+                    <div className='df-search-results__divider' />
                   </div>
                 );
               })}

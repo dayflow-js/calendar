@@ -722,17 +722,13 @@ const RangePicker = ({
   };
 
   return (
-    <div className='df-range-picker relative w-full min-w-0' ref={containerRef}>
+    <div className='df-range-picker df-range-picker__root' ref={containerRef}>
       <div
-        className={`flex items-center gap-2 rounded-lg border text-sm shadow-sm transition ${
-          disabled
-            ? 'cursor-not-allowed border-slate-200 bg-white text-slate-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500'
-            : isOpen
-              ? 'df-border-primary bg-white shadow-md dark:bg-gray-700'
-              : 'border-slate-200 bg-white dark:border-gray-600 dark:bg-gray-700'
-        }`}
+        className='df-range-picker__trigger'
+        data-disabled={disabled}
+        data-open={isOpen}
       >
-        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+        <div className='df-range-picker__field-group'>
           <input
             type='text'
             name='range-start'
@@ -742,22 +738,18 @@ const RangePicker = ({
             onClick={() => openPanelForField('start')}
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
-              disabled
-                ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
-                : focusedField === 'start' && isOpen
-                  ? 'df-text-primary bg-white dark:bg-gray-700'
-                  : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
-            }`}
+            className='df-range-picker__input'
+            data-disabled={disabled}
+            data-focused={focusedField === 'start' && isOpen}
             placeholder={formatTemplate}
             autoComplete='off'
             disabled={disabled}
           />
         </div>
 
-        <MoveRight className='text-slate-400 dark:text-gray-500' />
+        <MoveRight className='df-range-picker__separator-icon' />
 
-        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+        <div className='df-range-picker__field-group'>
           <input
             type='text'
             name='range-end'
@@ -767,13 +759,9 @@ const RangePicker = ({
             onClick={() => openPanelForField('end')}
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
-            className={`w-full rounded-md border px-2 py-1.5 text-sm font-medium transition focus:ring-2 focus:outline-none ${
-              disabled
-                ? 'cursor-not-allowed border-transparent bg-transparent text-slate-400 dark:text-gray-500'
-                : focusedField === 'end' && isOpen
-                  ? 'df-text-primary bg-white dark:bg-gray-700'
-                  : 'border-transparent bg-transparent text-slate-700 dark:text-gray-300'
-            }`}
+            className='df-range-picker__input'
+            data-disabled={disabled}
+            data-focused={focusedField === 'end' && isOpen}
             placeholder={formatTemplate}
             autoComplete='off'
             disabled={disabled}

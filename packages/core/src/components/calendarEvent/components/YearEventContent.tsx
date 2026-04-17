@@ -34,7 +34,6 @@ const YearEventContent = ({
 }: YearEventContentProps) => {
   const isAllDay = !!event.allDay;
   const calendarId = getPrimaryCalendarId(event);
-  const lineColor = getLineColor(calendarId);
   const lineColors = getCalendarLineColors(event);
   const indicatorColorBarValue = buildColorBarGradient(lineColors);
   const indicatorColorBarStyle =

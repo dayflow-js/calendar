@@ -163,7 +163,7 @@ export const EventDetailPanelWithContent = ({
   const panelContent = (
     <div
       ref={panelRef}
-      className={`${eventDetailPanel} p-3`}
+      className={`${eventDetailPanel} df-event-panel__content`}
       data-event-detail-panel='true'
       data-event-id={event.id}
       style={{

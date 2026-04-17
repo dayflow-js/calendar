@@ -59,19 +59,19 @@ export const MergeMenuItem = ({
     <>
       <div
         ref={itemRef}
-        className='relative flex cursor-default items-center justify-between rounded-sm px-3 py-0.5 text-[12px] text-[var(--df-color-foreground)] transition-colors outline-none select-none hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)]'
+        className='df-sidebar__submenu-trigger'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <span>{t('merge')}</span>
-        <ChevronRight className='h-4 w-4' />
+        <ChevronRight className='df-sidebar__submenu-chevron' />
       </div>
       {isHovered &&
         createPortal(
           <div
             ref={submenuRef}
             data-submenu-content='true'
-            className='df-portal df-animate-in df-fade-in df-zoom-in-95 fixed z-60 min-w-48 overflow-hidden rounded-md border border-slate-200 bg-white p-1 shadow-md duration-100 dark:border-slate-800 dark:bg-slate-950'
+            className='df-portal df-sidebar__submenu-content df-context-menu__sub-content'
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -80,17 +80,19 @@ export const MergeMenuItem = ({
             {availableCalendars.map(calendar => (
               <div
                 key={calendar.id}
-                className='flex cursor-pointer items-center rounded-sm px-3 py-1 text-[12px] text-[var(--df-color-foreground)] transition-colors hover:bg-[var(--df-color-primary)] hover:text-[var(--df-color-primary-foreground)]'
+                className='df-sidebar__submenu-item'
                 onClick={e => {
                   e.stopPropagation();
                   onMergeSelect(calendar.id);
                 }}
               >
                 <div
-                  className='mr-2 h-3 w-3 shrink-0 rounded-sm'
+                  className='df-sidebar__swatch'
                   style={{ backgroundColor: calendar.colors.lineColor }}
                 />
-                <span className='truncate'>{calendar.name || calendar.id}</span>
+                <span className='df-sidebar__dropdown-label'>
+                  {calendar.name || calendar.id}
+                </span>
               </div>
             ))}
           </div>,

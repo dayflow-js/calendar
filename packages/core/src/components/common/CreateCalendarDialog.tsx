@@ -17,7 +17,6 @@ import { BlossomColorPicker } from './BlossomColorPicker';
 import { DefaultColorPicker } from './DefaultColorPicker';
 import { LoadingButton } from './LoadingButton';
 
-// Colors for default mode (react-color)
 const PICKER_DEFAULT_COLORS = [
   '#ea426b',
   '#f19a38',
@@ -38,12 +37,10 @@ export const CreateCalendarDialog = ({
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Detect if custom color picker slot is provided
   const hasCustomPicker = app.state.overrides.includes(
     'createCalendarDialogColorPicker'
   );
 
-  // State for custom mode
   const [customSelectedColor, setCustomSelectedColor] = useState(
     PICKER_DEFAULT_COLORS[
       Math.floor(Math.random() * PICKER_DEFAULT_COLORS.length)
@@ -52,27 +49,20 @@ export const CreateCalendarDialog = ({
   const [showPicker, setShowPicker] = useState(false);
   const [previousColor, setPreviousColor] = useState('');
 
-  // Pick a random initial color from all colors for blossom mode
   const initialColorData = useMemo(() => {
     const randomColor =
       DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
-
-    // Default to 'outer' as the simplified DEFAULT_COLORS might not have layer info
     const layer = (randomColor as { layer?: string }).layer || 'outer';
-
-    // Calculate slider position from the petal's lightness
     const sliderValue = lightnessToSliderValue(randomColor.l);
-
     return {
       hue: randomColor.h,
-      saturation: sliderValue, // This is now the slider position
+      saturation: sliderValue,
       lightness: randomColor.l,
       alpha: 100,
       layer: layer as 'inner' | 'outer',
     };
   }, []);
 
-  // State for blossom mode
   const [blossomSelectedColor, setBlossomSelectedColor] = useState<{
     hex: string;
     hue: number;
@@ -152,9 +142,7 @@ export const CreateCalendarDialog = ({
         borderBottom: isDark ? '1px solid #4b5563' : '1px solid #e5e7eb',
         boxShadow: 'none',
       },
-      body: {
-        background: isDark ? '#1e293b' : '#ffffff',
-      },
+      body: { background: isDark ? '#1e293b' : '#ffffff' },
       controls: {
         border: isDark ? '1px solid #4b5563' : '1px solid #e5e7eb',
       },
@@ -176,75 +164,72 @@ export const CreateCalendarDialog = ({
   if (typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className='df-portal fixed inset-0 z-10000 flex items-center justify-center bg-black/50'>
+    <div className='df-portal df-create-calendar-dialog__backdrop'>
       <div
-        className='df-animate-in df-fade-in df-zoom-in-95 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900'
+        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog__panel'
         onClick={e => e.stopPropagation()}
       >
         <h2
-          className={`text-lg font-semibold text-gray-900 dark:text-white ${hasCustomPicker ? 'mb-4' : 'mb-6'}`}
+          className={`df-create-calendar-dialog__title ${
+            hasCustomPicker ? 'df-create-calendar-dialog__title--compact' : ''
+          }`}
         >
           {t('createCalendar')}
         </h2>
 
         <form onSubmit={handleSubmit}>
           {hasCustomPicker ? (
-            // 3-line layout (Automatically triggered when createCalendarDialogColorPicker slot is provided)
             <>
-              <div className='mb-4'>
-                <div className='flex items-center gap-3'>
-                  <div
-                    className='h-9 w-9 rounded-md border border-gray-200 shadow-sm dark:border-gray-600'
-                    style={{ backgroundColor: customSelectedColor }}
-                  />
-                  <input
-                    id='custom-calendar-name'
-                    name='calendar-name'
-                    type='text'
-                    value={name}
-                    onChange={e =>
-                      setName((e.target as HTMLInputElement).value)
-                    }
-                    className='df-focus-ring w-full flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
-                    placeholder={t('calendarNamePlaceholder')}
-                    autoFocus
-                  />
-                </div>
+              <div className='df-create-calendar-dialog__color-row'>
+                <div
+                  className='df-create-calendar-dialog__color-preview'
+                  style={{ backgroundColor: customSelectedColor }}
+                />
+                <input
+                  id='custom-calendar-name'
+                  name='calendar-name'
+                  type='text'
+                  value={name}
+                  onChange={e => setName((e.target as HTMLInputElement).value)}
+                  className='df-form-input'
+                  style={{ flex: 1 }}
+                  placeholder={t('calendarNamePlaceholder')}
+                  autoFocus
+                />
               </div>
 
-              <div className='mb-6'>
-                <div className='mb-4 grid grid-cols-7 gap-4'>
+              <div className='df-create-calendar-dialog__color-section'>
+                <div className='df-create-calendar-dialog__color-grid'>
                   {PICKER_DEFAULT_COLORS.map(color => (
                     <button
                       key={color}
                       type='button'
-                      className={`df-focus-ring-only h-7 w-7 rounded-full border border-gray-200 transition-transform hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:focus:ring-offset-slate-800 ${
-                        customSelectedColor === color
-                          ? 'df-ring-primary-solid scale-110 ring-2 ring-offset-2 dark:ring-offset-slate-800'
-                          : ''
-                      }`}
+                      className='df-create-calendar-dialog__color-btn'
+                      data-selected={
+                        customSelectedColor === color ? 'true' : 'false'
+                      }
                       style={{ backgroundColor: color }}
                       onClick={() => setCustomSelectedColor(color)}
                     />
                   ))}
                 </div>
 
-                <div className='relative'>
+                <div style={{ position: 'relative' }}>
                   <button
                     type='button'
                     onClick={handleOpenPicker}
-                    className='flex w-full items-center gap-2 rounded-md border border-slate-200 px-2 py-1 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'
+                    className='df-create-calendar-dialog__custom-color-btn'
                   >
                     {t('customColor')}
                   </button>
 
                   {showPicker && (
                     <div
-                      className='fixed inset-0 z-10001 flex items-center justify-center bg-black/40 backdrop-blur-sm'
+                      className='df-create-calendar-dialog__picker-overlay'
                       onClick={handleCancel}
                     >
                       <div
-                        className='df-animate-in df-fade-in df-zoom-in-95 relative'
+                        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog__picker-inner'
                         onClick={e => e.stopPropagation()}
                       >
                         <ContentSlot
@@ -257,23 +242,23 @@ export const CreateCalendarDialog = ({
                             styles: pickerStyles,
                           }}
                           defaultContent={
-                            <div className='rounded-lg border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-gray-900'>
+                            <div className='df-create-calendar-dialog__picker-card'>
                               <DefaultColorPicker
                                 color={customSelectedColor}
                                 onChange={handleColorChange}
                               />
-                              <div className='mt-4 flex justify-end gap-2 border-t pt-3 dark:border-slate-700'>
+                              <div className='df-create-calendar-dialog__picker-actions'>
                                 <button
                                   type='button'
                                   onClick={handleCancel}
-                                  className='rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-gray-100 dark:border-gray-600 dark:text-slate-300 dark:hover:bg-gray-800'
+                                  className='df-btn-sm df-btn-sm--ghost'
                                 >
                                   {t('cancel')}
                                 </button>
                                 <button
                                   type='button'
                                   onClick={handleAccept}
-                                  className='df-fill-primary rounded-md px-3 py-1.5 text-xs font-medium shadow-sm hover:opacity-90'
+                                  className='df-fill-primary df-btn-sm'
                                 >
                                   OK
                                 </button>
@@ -288,23 +273,22 @@ export const CreateCalendarDialog = ({
               </div>
             </>
           ) : (
-            // Blossom mode UI (Default when no slot provided)
-            <div className='mb-8 flex items-center gap-4'>
-              <div className='flex-1'>
+            <div className='df-create-calendar-dialog__blossom-row'>
+              <div className='df-create-calendar-dialog__blossom-input-area'>
                 <input
                   id='blossom-calendar-name'
                   name='calendar-name'
                   type='text'
                   value={name}
                   onChange={e => setName((e.target as HTMLInputElement).value)}
-                  className='df-focus-ring w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
+                  className='df-form-input'
                   placeholder={t('calendarNamePlaceholder')}
                   autoFocus
                 />
               </div>
 
-              <div className='relative h-9 w-9 shrink-0'>
-                <div className='absolute inset-0 flex items-center justify-center'>
+              <div className='df-create-calendar-dialog__blossom-picker-wrap'>
+                <div className='df-create-calendar-dialog__blossom-picker-inner'>
                   <BlossomColorPicker
                     defaultValue={initialColorData}
                     coreSize={36}
@@ -319,12 +303,12 @@ export const CreateCalendarDialog = ({
             </div>
           )}
 
-          <div className='flex justify-end space-x-2'>
+          <div className='df-create-calendar-dialog__actions'>
             <button
               type='button'
               onClick={onClose}
               disabled={isLoading}
-              className='rounded border border-slate-200 px-2 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'
+              className='df-btn-sm df-btn-sm--ghost'
             >
               {t('cancel')}
             </button>
@@ -332,7 +316,7 @@ export const CreateCalendarDialog = ({
               type='submit'
               disabled={!name.trim()}
               loading={isLoading}
-              className='df-fill-primary df-hover-primary-solid rounded px-2 py-1 text-xs font-medium transition disabled:opacity-50'
+              className='df-fill-primary df-hover-primary-solid df-btn-sm'
             >
               {t('create')}
             </LoadingButton>

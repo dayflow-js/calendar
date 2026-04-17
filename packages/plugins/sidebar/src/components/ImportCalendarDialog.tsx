@@ -1,7 +1,6 @@
 import {
   createPortal,
   CalendarType,
-  cancelButton,
   useLocale,
   Check,
   ChevronsUpDown,
@@ -84,9 +83,7 @@ export const ImportCalendarDialog = ({
     return createPortal(
       <div
         ref={dropdownRef}
-        className={`df-portal fixed z-110 mt-1 max-h-60 origin-top overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg transition-all duration-200 dark:border-slate-700 dark:bg-slate-800 ${
-          isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-        }`}
+        className='df-sidebar__dropdown'
         style={{
           top: rect.bottom,
           left: rect.left,
@@ -94,40 +91,38 @@ export const ImportCalendarDialog = ({
           overscrollBehavior: 'none',
         }}
       >
-        <div className='py-1'>
+        <div>
           {calendars.map(calendar => (
             <div
               key={calendar.id}
-              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 ${selectedCalendarId === calendar.id ? 'df-tint-primary' : ''}`}
+              className='df-sidebar__dropdown-item'
+              data-selected={
+                selectedCalendarId === calendar.id ? 'true' : undefined
+              }
               onClick={() => handleSelect(calendar.id)}
             >
               <div
-                className='mr-3 h-3 w-3 shrink-0 rounded-sm'
+                className='df-sidebar__swatch'
                 style={{ backgroundColor: calendar.colors.lineColor }}
               />
-              <span
-                className={`flex-1 truncate text-sm ${selectedCalendarId === calendar.id ? 'df-text-primary font-medium' : 'text-gray-700 dark:text-gray-200'}`}
-              >
+              <span className='df-sidebar__dropdown-label'>
                 {calendar.name || calendar.id}
               </span>
               {selectedCalendarId === calendar.id && (
-                <Check className='df-text-primary ml-2 h-4 w-4 shrink-0' />
+                <Check className='df-sidebar__dropdown-check' />
               )}
             </div>
           ))}
-          <div className='my-1 border-t border-gray-100 dark:border-slate-700' />
+          <div className='df-sidebar__dropdown-divider' />
           <div
-            className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 ${isNewSelected ? 'df-tint-primary' : ''}`}
+            className='df-sidebar__dropdown-item'
+            data-selected={isNewSelected ? 'true' : undefined}
             onClick={() => handleSelect(NEW_CALENDAR_ID)}
           >
-            <span
-              className={`flex-1 truncate text-sm ${isNewSelected ? 'df-text-primary font-medium' : 'pl-6 text-gray-700 dark:text-gray-200'}`}
-            >
+            <span className='df-sidebar__dropdown-label'>
               {t('newCalendar') || 'New Calendar'}: {filename}
             </span>
-            {isNewSelected && (
-              <Check className='df-text-primary ml-2 h-4 w-4 shrink-0' />
-            )}
+            {isNewSelected && <Check className='df-sidebar__dropdown-check' />}
           </div>
         </div>
       </div>,
@@ -136,48 +131,46 @@ export const ImportCalendarDialog = ({
   };
 
   return (
-    <div className='df-portal fixed inset-0 z-100 flex items-center justify-center bg-black/50'>
-      <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900'>
-        <h2 className='mb-4 text-lg font-semibold text-gray-900 dark:text-white'>
+    <div className='df-sidebar__overlay'>
+      <div className='df-sidebar__dialog'>
+        <h2 className='df-sidebar__dialog-title'>
           {t('addSchedule') || 'Add Schedule'}
         </h2>
-        <p className='mb-4 text-sm text-gray-600 dark:text-gray-300'>
+        <p className='df-sidebar__dialog-text'>
           {t('importCalendarMessage') ||
             'This calendar contains new events. Please select a target calendar.'}
         </p>
 
-        <div className='relative'>
+        <div className='df-sidebar__field'>
           <button
             ref={triggerRef}
             type='button'
             disabled={isLoading}
-            className='flex w-full items-center rounded-md border border-gray-300 px-3 py-2 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-800'
+            className='df-sidebar__select-trigger'
             onClick={() => setIsOpen(!isOpen)}
           >
             {!isNewSelected && selectedCalendar && (
               <div
-                className='mr-3 h-3 w-3 shrink-0 rounded-sm'
+                className='df-sidebar__swatch'
                 style={{ backgroundColor: selectedCalendar.colors.lineColor }}
               />
             )}
-            <span
-              className={`flex-1 truncate text-left text-sm font-medium text-gray-700 dark:text-gray-200 ${isNewSelected ? 'pl-0' : ''}`}
-            >
+            <span className='df-sidebar__select-value'>
               {isNewSelected
                 ? `${t('newCalendar')}: ${filename}`
                 : selectedCalendar?.name || selectedCalendar?.id}
             </span>
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 text-gray-400' />
+            <ChevronsUpDown className='df-sidebar__select-icon' />
           </button>
           {renderDropdown()}
         </div>
 
-        <div className='mt-8 flex justify-end gap-3'>
+        <div className='df-sidebar__dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={isLoading}
-            className={`${cancelButton} disabled:opacity-50`}
+            className='df-sidebar__button df-sidebar__button--secondary'
           >
             {t('cancel') || 'Cancel'}
           </button>
@@ -185,7 +178,7 @@ export const ImportCalendarDialog = ({
             type='button'
             onClick={handleConfirm}
             loading={isLoading}
-            className='df-fill-primary df-hover-primary-solid rounded-md px-6 py-2 text-sm font-medium shadow-sm transition-colors'
+            className='df-sidebar__button df-sidebar__button--primary'
           >
             {t('ok') || 'OK'}
           </LoadingButton>

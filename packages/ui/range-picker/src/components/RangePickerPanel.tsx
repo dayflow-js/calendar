@@ -56,19 +56,19 @@ const RangePickerPanel = ({
   return (
     <div
       ref={popupRef}
-      className='df-range-picker'
+      className='df-range-picker df-range-picker__popup'
       style={getPopupStyle()}
       data-range-picker-popup='true'
     >
       <div
-        className='space-y-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-800'
+        className='df-range-picker__panel'
         style={{
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           width: matchTriggerWidth ? '100%' : undefined,
         }}
       >
-        <div className='flex gap-1'>
-          <div className='w-full flex-3 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800'>
+        <div className='df-range-picker__panel-body'>
+          <div className='df-range-picker__calendar-pane'>
             <CalendarHeader
               visibleMonth={visibleMonth}
               monthLabels={monthLabels}
@@ -88,7 +88,7 @@ const RangePickerPanel = ({
           </div>
 
           {isTimeEnabled && (
-            <div className='flex flex-1 justify-end sm:w-32'>
+            <div className='df-range-picker__time-pane'>
               <TimeSelector
                 focusedField={focusedField}
                 draftRange={draftRange}
@@ -101,12 +101,12 @@ const RangePickerPanel = ({
           )}
         </div>
 
-        <div className='flex justify-end'>
+        <div className='df-range-picker__footer'>
           <button
             type='button'
             onClick={onOk}
             disabled={disabled}
-            className='df-fill-primary df-hover-primary-solid inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50'
+            className='df-range-picker__confirm-button'
           >
             OK
           </button>

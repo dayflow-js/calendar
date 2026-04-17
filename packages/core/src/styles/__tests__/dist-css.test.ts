@@ -150,6 +150,11 @@ describe('CSS dist output integrity', () => {
 
       expect(violations).toEqual([]);
     });
+
+    it('does not ship unresolved @source directives', () => {
+      expect(componentsCss).not.toMatch(/@source\s+/);
+      expect(fullCss).not.toMatch(/@source\s+/);
+    });
   });
 
   // ── Guard #2: All color token mappings present in the scoped root block ──

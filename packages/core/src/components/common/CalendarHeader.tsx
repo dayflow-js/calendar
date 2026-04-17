@@ -3,7 +3,7 @@ import { useCallback } from 'preact/hooks';
 
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale/useLocale';
-import { iconButton, searchInput, textGray500 } from '@/styles/classNames';
+import { iconButton } from '@/styles/classNames';
 import { ViewType, CalendarHeaderProps } from '@/types';
 
 import { Plus, Search } from './Icons';
@@ -40,13 +40,12 @@ const CalendarHeader = ({
     onSearchChange?.('');
   };
 
+  const isBordered = isDayView || isSearchOpen;
+
   return (
     <div
-      className={`df-header flex shrink-0 items-center justify-between border-b py-1 pr-2 transition-colors duration-200 ${
-        isDayView || isSearchOpen
-          ? 'border-gray-200 dark:border-gray-700'
-          : 'border-transparent'
-      }`}
+      className='df-header'
+      data-bordered={isBordered ? 'true' : 'false'}
       style={{
         paddingLeft: safeAreaLeft || 8,
         transition: 'padding-left 160ms ease-in-out',
@@ -54,7 +53,7 @@ const CalendarHeader = ({
       onContextMenu={e => e.preventDefault()}
     >
       {/* Left Section: Add Calendar Button Only */}
-      <div className='df-header-left flex items-center'>
+      <div className='df-header-left'>
         {onAddCalendar && isEditable && (
           <button
             type='button'
@@ -67,71 +66,72 @@ const CalendarHeader = ({
                 : t('createCalendar') || 'Add Calendar'
             }
           >
-            <Plus className={`h-4 w-4 ${textGray500}`} />
+            <Plus className='h-4 w-4' />
           </button>
         )}
       </div>
 
       {/* Middle Section: ViewSwitcher (if mode is buttons) */}
-      <div className='df-header-mid flex flex-1 items-center justify-center'>
+      <div className='df-header-mid'>
         {isSwitcherCentered && (
           <ViewSwitcher mode={switcherMode} calendar={calendar} />
         )}
       </div>
 
       {/* Right Section: Search, ViewSwitcher (if select) */}
-      <div className='df-header-right flex items-center justify-end gap-3'>
+      <div className='df-header-right'>
         {!isSwitcherCentered && (
           <ViewSwitcher mode={switcherMode} calendar={calendar} />
         )}
 
-        {/* Mobile Search Icon */}
-        <button
-          type='button'
-          onClick={onSearchClick}
-          className={`md:hidden ${iconButton}`}
-          title={t('search') || 'Search'}
-        >
-          <Search width={16} height={16} />
-        </button>
-
-        {/* Desktop Search Bar */}
-        <div className='df-search-group group relative hidden md:block'>
-          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-            <span className='df-search-focus-within-primary text-gray-400 transition-colors'>
+        {isMobile ? (
+          /* Mobile: search icon only */
+          <button
+            type='button'
+            onClick={onSearchClick}
+            className={iconButton}
+            title={t('search') || 'Search'}
+          >
+            <Search width={16} height={16} />
+          </button>
+        ) : (
+          /* Desktop: inline search bar */
+          <div className='df-search-group'>
+            <div className='df-search-group__icon'>
               <Search width={16} height={16} />
-            </span>
-          </div>
-          <input
-            id='dayflow-search-input'
-            type='text'
-            placeholder={t('search') || 'Search'}
-            value={searchValue}
-            onChange={handleSearchChange}
-            className={`${searchInput} w-48`}
-          />
-          {searchValue && (
-            <button
-              type='button'
-              onClick={handleClearSearch}
-              className='absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
-            >
-              <svg
-                width='14'
-                height='14'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
+            </div>
+            <input
+              id='dayflow-search-input'
+              type='text'
+              placeholder={t('search') || 'Search'}
+              value={searchValue}
+              onChange={handleSearchChange}
+              className='df-search-group__input'
+              style={{ width: '12rem' }}
+            />
+            {searchValue && (
+              <button
+                type='button'
+                onClick={handleClearSearch}
+                className='df-search-group__clear'
               >
-                <line x1='18' y1='6' x2='6' y2='18'></line>
-                <line x1='6' y1='6' x2='18' y2='18'></line>
-              </svg>
-            </button>
-          )}
-        </div>
+                <svg
+                  width='14'
+                  height='14'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                >
+                  <line x1='18' y1='6' x2='6' y2='18'></line>
+                  <line x1='6' y1='6' x2='18' y2='18'></line>
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

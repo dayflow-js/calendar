@@ -33,8 +33,11 @@
     "./dist/styles.components.css": "./dist/styles.components.css"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c && pnpm run build:css",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c && pnpm run build:css && pnpm run check:css",
     "build:css": "node ./scripts/build-css.mjs",
+    "check:css": "pnpm run check:css:source && pnpm run check:css:dist",
+    "check:css:dist": "node ../../core/scripts/check-dist-styling.mjs --package-root .",
+    "check:css:source": "node ../../core/scripts/check-semantic-css.mjs",
     "clean": "rimraf dist node_modules",
     "postbuild": "rimraf dist/build dist/types",
     "prebuild": "rimraf dist",

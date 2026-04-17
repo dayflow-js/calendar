@@ -6,7 +6,7 @@ export interface CalendarChipProps {
 
 export const CalendarChip = ({ name, color }: CalendarChipProps) => (
   <span
-    className='mx-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium'
+    className='df-sidebar__chip'
     style={{ backgroundColor: `${color}26`, color }}
   >
     {name}

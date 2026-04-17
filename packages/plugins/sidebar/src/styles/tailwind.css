@@ -1,0 +1,9 @@
+/* styles.css — standalone DayFlow sidebar plugin styles
+ *
+ * This file ships semantic plugin CSS only and avoids emitting atomic
+ * utility classes into downstream applications.
+ */
+@layer theme, base, df-theme, components, utilities;
+
+@import 'tailwindcss/theme' layer(theme);
+@import './sidebar.css';

@@ -16,7 +16,6 @@ import {
   DefaultColorPicker,
   MiniCalendar,
   useLocale,
-  sidebarContainer,
   importICSFile,
   downloadICS,
   generateUniKey,
@@ -464,7 +463,7 @@ const DefaultCalendarSidebar = ({
 
   return (
     <div
-      className={sidebarContainer}
+      className='df-sidebar'
       onContextMenu={isEditable ? handleSidebarContextMenu : undefined}
     >
       <ContentSlot
@@ -552,7 +551,7 @@ const DefaultCalendarSidebar = ({
             isEditable={isEditable}
           />
 
-          <div className='border-t border-gray-200 dark:border-slate-800'>
+          <div className='df-sidebar__mini-calendar'>
             <MiniCalendar
               visibleMonth={app.getVisibleMonth()}
               currentDate={app.getCurrentDate()}
@@ -577,7 +576,7 @@ const DefaultCalendarSidebar = ({
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={handleCloseContextMenu}
-          className='w-64 p-2'
+          className='df-sidebar__context-menu df-sidebar__context-menu--calendar'
         >
           <ContentSlot
             generatorName='calendarContextMenu'
@@ -628,7 +627,7 @@ const DefaultCalendarSidebar = ({
             x={sidebarContextMenu.x}
             y={sidebarContextMenu.y}
             onClose={handleCloseSidebarContextMenu}
-            className='w-max p-2'
+            className='df-sidebar__context-menu df-sidebar__context-menu--sidebar'
           >
             <ContextMenuItem
               onClick={() => {
@@ -723,14 +722,14 @@ const DefaultCalendarSidebar = ({
         customColorPicker &&
         createPortal(
           <div
-            className='fixed inset-0 z-50'
+            className='df-sidebar__color-picker-layer'
             onMouseDown={() => {
               app.updateCalendar(customColorPicker.calendarId, {});
               setCustomColorPicker(null);
             }}
           >
             <div
-              className='absolute'
+              className='df-sidebar__color-picker-anchor'
               style={{
                 top: customColorPicker.y,
                 left: customColorPicker.x,
@@ -771,7 +770,7 @@ const DefaultCalendarSidebar = ({
                     },
                   }}
                   defaultContent={
-                    <div className='rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-gray-700 dark:bg-gray-900'>
+                    <div className='df-sidebar__color-picker-card'>
                       <DefaultColorPicker
                         color={customColorPicker.currentColor}
                         onChange={(color, isPending) => {

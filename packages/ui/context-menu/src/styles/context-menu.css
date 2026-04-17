@@ -3,6 +3,8 @@
 /* CSS custom properties (same defaults as @dayflow/core shared-foundation) */
 @layer df-theme {
   :where(:root) {
+    --df-color-background: rgb(255 255 255);
+    --df-color-border: rgb(226 232 240);
     --df-color-foreground: rgb(46 46 46);
     --df-color-primary: rgb(46 46 46);
     --df-color-primary-foreground: rgb(255 255 255);
@@ -11,6 +13,8 @@
   }
 
   :where(.dark) {
+    --df-color-background: rgb(2 6 23);
+    --df-color-border: rgb(30 41 59);
     --df-color-foreground: rgb(229 229 229);
     --df-color-primary: rgb(229 229 229);
     --df-color-primary-foreground: rgb(15 23 42);
@@ -20,6 +24,8 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not(.light):not(.dark) {
+      --df-color-background: rgb(2 6 23);
+      --df-color-border: rgb(30 41 59);
       --df-color-foreground: rgb(229 229 229);
       --df-color-primary: rgb(229 229 229);
       --df-color-primary-foreground: rgb(23 23 23);
@@ -30,72 +36,214 @@
 }
 
 @layer components {
-  /* Bridge df-color-* → local color-* so Tailwind @apply and inline styles work */
   .df-portal,
   .df-context-menu {
     --color-primary: var(--df-color-primary);
     --color-primary-foreground: var(--df-color-primary-foreground);
+    --color-background: var(--df-color-background);
+    --color-border: var(--df-color-border);
     --color-foreground: var(--df-color-foreground);
     --color-destructive: var(--df-color-destructive);
     --color-destructive-foreground: var(--df-color-destructive-foreground);
   }
 
-  .df-fill-primary {
+  .df-context-menu__content,
+  .df-context-menu__sub-content {
+    min-width: 8rem;
+    padding: 0.25rem;
+    border: 1px solid var(--df-color-border);
+    border-radius: 0.375rem;
+    background-color: var(--df-color-background);
+    color: var(--df-color-foreground);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    animation:
+      df-context-menu-fade-in 120ms cubic-bezier(0, 0, 0.2, 1) forwards,
+      df-context-menu-zoom-in 120ms cubic-bezier(0, 0, 0.2, 1) forwards;
+  }
+
+  .df-context-menu__content {
+    position: fixed;
+    z-index: 50;
+    overflow: visible;
+  }
+
+  .df-context-menu__sub {
+    position: relative;
+  }
+
+  .df-context-menu__sub-content {
+    position: absolute;
+    top: 0;
+    z-index: 50;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .df-context-menu__sub-content[data-position='right'] {
+    left: calc(100% + 0.25rem);
+  }
+
+  .df-context-menu__sub-content[data-position='left'] {
+    right: calc(100% + 0.25rem);
+  }
+
+  .df-context-menu__item,
+  .df-context-menu__sub-trigger,
+  .df-context-menu__custom-color {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    padding: 0.125rem 0.75rem;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--df-color-foreground);
+    text-align: left;
+    transition:
+      background-color 120ms ease,
+      color 120ms ease,
+      opacity 120ms ease,
+      transform 120ms ease;
+    outline: none;
+    user-select: none;
+  }
+
+  .df-context-menu__item,
+  .df-context-menu__sub-trigger {
+    cursor: default;
+  }
+
+  .df-context-menu__custom-color {
+    cursor: pointer;
+    margin-top: 0.25rem;
+  }
+
+  .df-context-menu__item:is(:hover, :focus-visible):not([data-disabled='true']),
+  .df-context-menu__sub-trigger:is(:hover, :focus-visible),
+  .df-context-menu__custom-color:is(:hover, :focus-visible),
+  .df-context-menu__sub-trigger[data-open='true'] {
     background-color: var(--df-color-primary);
     color: var(--df-color-primary-foreground);
   }
 
-  .df-hover-primary:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--df-color-primary) 10%,
-      transparent
-    );
-    color: var(--df-color-primary);
-  }
-
-  .df-hover-fill-destructive:hover {
-    background-color: var(--df-color-destructive);
-    color: var(--df-color-destructive-foreground);
-  }
-
-  .df-focus-fill-destructive:focus {
-    background-color: var(--df-color-destructive);
-    color: var(--df-color-destructive-foreground);
-  }
-
-  .df-text-destructive {
+  .df-context-menu__item[data-danger='true'] {
     color: var(--df-color-destructive);
   }
 
-  .df-ring-primary-solid {
-    --tw-ring-color: var(--df-color-primary);
+  .df-context-menu__item[data-danger='true']:is(:hover, :focus-visible):not(
+      [data-disabled='true']
+    ) {
+    background-color: var(--df-color-destructive);
+    color: var(--df-color-destructive-foreground);
   }
 
-  .df-focus-ring-only:focus {
-    --tw-ring-color: var(--df-color-primary);
+  .df-context-menu__item[data-disabled='true'] {
+    pointer-events: none;
+    opacity: 0.5;
   }
 
-  .df-animate-in {
-    animation-duration: 200ms;
-    animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  .df-context-menu__item-icon,
+  .df-context-menu__sub-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
   }
 
-  .df-fade-in {
-    animation-name: df-fade-in;
+  .df-context-menu__sub-label {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
   }
 
-  .df-zoom-in-95 {
-    animation-name: df-zoom-in;
+  .df-context-menu__sub-chevron {
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    opacity: 0.6;
+    transition:
+      opacity 120ms ease,
+      color 120ms ease;
   }
 
-  .df-fade-in.df-zoom-in-95 {
-    animation-name: df-fade-in, df-zoom-in;
+  .df-context-menu__sub-trigger[data-open='true']
+    .df-context-menu__sub-chevron {
+    opacity: 1;
+  }
+
+  .df-context-menu__separator {
+    height: 1px;
+    margin: 0.25rem -0.25rem;
+    background-color: var(--df-color-border);
+  }
+
+  .df-context-menu__label {
+    padding: 0.125rem 0.75rem;
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 600;
+    color: inherit;
+  }
+
+  .df-context-menu__color-picker {
+    width: 100%;
+  }
+
+  .df-context-menu__color-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+  }
+
+  .df-context-menu__color-swatch {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 1px solid rgb(229 231 235);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition:
+      transform 120ms ease,
+      box-shadow 120ms ease,
+      border-color 120ms ease;
+    outline: none;
+  }
+
+  .dark .df-context-menu__color-swatch {
+    border-color: rgb(75 85 99);
+  }
+
+  .df-context-menu__color-swatch:is(:hover, :focus-visible) {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+  }
+
+  .dark .df-context-menu__color-swatch:is(:hover, :focus-visible) {
+    box-shadow: 0 0 0 2px rgb(15 23 42 / 0.9);
+  }
+
+  .df-context-menu__color-swatch[data-selected='true'] {
+    border-color: var(--df-color-primary);
+    box-shadow:
+      0 0 0 1px var(--df-color-primary),
+      0 0 0 3px rgb(255 255 255 / 0.9);
+  }
+
+  .dark .df-context-menu__color-swatch[data-selected='true'] {
+    box-shadow:
+      0 0 0 1px var(--df-color-primary),
+      0 0 0 3px rgb(15 23 42 / 0.9);
   }
 }
 
-@keyframes df-fade-in {
+@keyframes df-context-menu-fade-in {
   from {
     opacity: 0;
   }
@@ -104,7 +252,7 @@
   }
 }
 
-@keyframes df-zoom-in {
+@keyframes df-context-menu-zoom-in {
   from {
     transform: scale(0.95);
   }

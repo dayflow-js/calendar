@@ -1,68 +1,68 @@
-import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const CORE_SCAN_DIRS = [
-  'src/components',
-  'src/views',
-  'src/renderer',
-  'src/utils',
-];
-const CORE_SCAN_FILES = ['src/styles/classNames.ts'];
+import {
+  diffAgainstBaseline,
+  loadBaseline,
+  parseArgs,
+  scanSourceViolations,
+  summarizeViolationsByFile,
+  writeBaseline,
+} from './atomic-css-guard-utils.mjs';
 
-const LEGACY_SEMANTIC_PATTERN =
-  /(?<![\w-])((?:group-[\w-]+|hover|focus|active|dark):)?(?:bg|text|border|ring|shadow|outline)-(primary|secondary|destructive|muted|card)(?:-(foreground))?(?:\/(\d+))?\b/g;
+const args = parseArgs(process.argv.slice(2));
+const shouldWriteBaseline = Boolean(args.get('--write-baseline'));
 
-function collectFiles(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    return [];
-  }
+const violations = scanSourceViolations();
+const summary = summarizeViolationsByFile(violations);
+const baseline = loadBaseline();
 
-  return fs.readdirSync(dirPath, { withFileTypes: true }).flatMap(entry => {
-    const entryPath = path.join(dirPath, entry.name);
-    if (entry.isDirectory()) {
-      return collectFiles(entryPath);
-    }
-
-    return /\.(ts|tsx)$/.test(entry.name) ? [entryPath] : [];
+if (shouldWriteBaseline) {
+  writeBaseline({
+    ...baseline,
+    source: summary,
   });
+  console.log(
+    `[check-semantic-css] Updated source baseline with ${Object.keys(summary).length} files.`
+  );
+  process.exit(0);
 }
 
-function scanLegacySemanticClasses(coreRoot, workspaceRoot) {
-  const files = [
-    ...CORE_SCAN_DIRS.flatMap(dir => collectFiles(path.join(coreRoot, dir))),
-    ...CORE_SCAN_FILES.map(file => path.join(coreRoot, file)).filter(file =>
-      fs.existsSync(file)
-    ),
-    ...collectFiles(path.join(workspaceRoot, 'packages/plugins')),
-  ];
+const regressions = diffAgainstBaseline(summary, baseline.source ?? {});
 
-  const matches = [];
+if (regressions.length > 0) {
+  console.error(
+    '[check-semantic-css] Atomic CSS regressions detected in source files.'
+  );
+  console.error(
+    'The guard allows existing baseline debt, but blocks any new internal atomic utility usage.'
+  );
+  console.error(
+    'Allowed pass-through values such as `className={className}` are ignored; only literal internal class strings are counted.'
+  );
 
-  for (const file of files) {
-    const content = fs.readFileSync(file, 'utf8');
-    for (const match of content.matchAll(LEGACY_SEMANTIC_PATTERN)) {
-      matches.push({ file, className: match[0] });
+  for (const regression of regressions) {
+    console.error(
+      `  - ${regression.file}: ${regression.count} violations (baseline ${regression.baseline})`
+    );
+
+    const details = violations
+      .filter(violation => violation.file === regression.file)
+      .slice(0, regression.count - regression.baseline + 3);
+
+    for (const detail of details) {
+      console.error(
+        `      line ${detail.line}: ${detail.token}  <- ${detail.snippet}`
+      );
     }
   }
 
-  return matches;
-}
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const workspaceRoot = path.resolve(root, '..', '..');
-const matches = scanLegacySemanticClasses(root, workspaceRoot);
-
-if (matches.length > 0) {
+  console.error();
   console.error(
-    '[check-semantic-css] Legacy semantic Tailwind classes were reintroduced. Use df-* semantic classes instead.'
+    `If the increase is intentional during migration, update ${path.relative(process.cwd(), new URL('./atomic-css-baseline.json', import.meta.url).pathname)} after review.`
   );
-  for (const match of matches) {
-    console.error(
-      `  - ${path.relative(root, match.file)} -> ${match.className}`
-    );
-  }
   process.exit(1);
 }
 
-console.log('No legacy semantic Tailwind classes found.');
+console.log(
+  `[check-semantic-css] Source atomic CSS baseline respected (${violations.length} tracked matches across ${Object.keys(summary).length} files).`
+);

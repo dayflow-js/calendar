@@ -24,7 +24,6 @@ import { defaultDragConfig } from '@/core/config';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useDragForView } from '@/plugins/dragBridge';
-import { bgGray50 } from '@/styles/classNames';
 import {
   Event,
   DayViewProps,
@@ -490,7 +489,7 @@ const DayView = ({
   }, [appTimeZone]);
 
   return (
-    <div className={`df-day-view flex h-full ${bgGray50}`}>
+    <div className='df-day-view'>
       <DayContent
         app={app}
         currentDate={currentDate}

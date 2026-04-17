@@ -34,18 +34,18 @@ const TimeSelector = ({
     : [...MINUTES, currentMinute].toSorted((a, b) => a - b);
 
   return (
-    <div className='flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm sm:w-28 dark:border-gray-600 dark:bg-gray-800'>
-      <div className='flex justify-center border-b border-slate-100 dark:border-gray-600'>
-        <div className='py-1.5 text-base text-slate-700 dark:text-gray-300'>
+    <div className='df-range-picker__time-selector'>
+      <div className='df-range-picker__time-selector-header'>
+        <div className='df-range-picker__time-selector-value'>
           {current.hour.toString().padStart(2, '0')}:
           {current.minute.toString().padStart(2, '0')}
         </div>
       </div>
 
-      <div className='flex p-1'>
-        <div className='w-14'>
+      <div className='df-range-picker__time-selector-body'>
+        <div className='df-range-picker__time-selector-column'>
           <div
-            className={`h-72 overflow-y-auto ${scrollbarHide} rounded-md border border-slate-100 bg-white dark:border-gray-600 dark:bg-gray-700`}
+            className={`df-range-picker__time-list ${scrollbarHide}`}
             role='listbox'
             aria-label='Hour'
             ref={element => {
@@ -64,11 +64,7 @@ const TimeSelector = ({
                   aria-selected={isActive}
                   disabled={disabled}
                   onClick={() => onHourSelect(field, hour)}
-                  className={`flex h-8 w-full items-center justify-center text-sm transition ${
-                    isActive
-                      ? 'df-fill-primary font-semibold'
-                      : 'df-hover-primary text-slate-600 dark:text-gray-300'
-                  }`}
+                  className='df-range-picker__time-option'
                   data-active={isActive ? 'true' : undefined}
                 >
                   {pad(hour)}
@@ -77,9 +73,9 @@ const TimeSelector = ({
             })}
           </div>
         </div>
-        <div className='w-14'>
+        <div className='df-range-picker__time-selector-column'>
           <div
-            className={`h-72 overflow-y-auto ${scrollbarHide} rounded-md border border-slate-100 bg-white dark:border-gray-600 dark:bg-gray-700`}
+            className={`df-range-picker__time-list ${scrollbarHide}`}
             role='listbox'
             aria-label='Minute'
             ref={element => {
@@ -98,11 +94,7 @@ const TimeSelector = ({
                   aria-selected={isActive}
                   disabled={disabled}
                   onClick={() => onMinuteSelect(field, minute)}
-                  className={`flex h-8 w-full items-center justify-center text-sm transition ${
-                    isActive
-                      ? 'df-fill-primary font-semibold'
-                      : 'df-hover-primary text-slate-600 dark:text-gray-300'
-                  }`}
+                  className='df-range-picker__time-option'
                   data-active={isActive ? 'true' : undefined}
                 >
                   {pad(minute)}

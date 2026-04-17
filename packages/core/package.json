@@ -51,7 +51,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs && pnpm run build:css && pnpm run check:css",
     "build:css": "node ./scripts/build-css.mjs",
-    "check:css": "node ./scripts/check-semantic-css.mjs",
+    "check:css": "pnpm run check:css:source && pnpm run check:css:dist",
+    "check:css:dist": "node ./scripts/check-dist-styling.mjs --package-root .",
+    "check:css:source": "node ./scripts/check-semantic-css.mjs",
     "clean": "rimraf dist node_modules",
     "dev": "vite --port 5529 --host",
     "postbuild": "rimraf dist/types",

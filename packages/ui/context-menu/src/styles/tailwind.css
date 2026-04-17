@@ -1,5 +1,10 @@
-@import 'tailwindcss/preflight' layer(base);
+/* styles.css — standalone DayFlow context-menu styles
+ *
+ * This file now ships semantic component CSS only.
+ * It intentionally avoids emitting atomic utility classes.
+ */
+@layer theme, base, df-theme, components, utilities;
+
 @import 'tailwindcss/theme' layer(theme);
-@import 'tailwindcss/utilities';
 
 @import './context-menu.css';

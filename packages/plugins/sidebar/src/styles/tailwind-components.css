@@ -1,0 +1,5 @@
+/* styles.components.css — DayFlow sidebar plugin component styles only. */
+@layer theme, base, df-theme, components, utilities;
+
+@import 'tailwindcss/theme' layer(theme);
+@import './sidebar.css';

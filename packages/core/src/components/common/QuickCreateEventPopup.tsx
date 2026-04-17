@@ -30,7 +30,6 @@ interface SuggestionItem {
   end: Date;
 }
 
-// Format time for display (e.g., 10:00 - 11:00)
 const formatTime = (d: Date) =>
   d.toLocaleTimeString([], {
     hour: '2-digit',
@@ -54,24 +53,18 @@ export const QuickCreateEventPopup = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
-  // Reset state when closed
   useEffect(() => {
-    if (!isOpen) {
-      setIsReady(false);
-    }
+    if (!isOpen) setIsReady(false);
   }, [isOpen]);
 
-  // Focus input on open
   useEffect(() => {
     if (isOpen) {
-      // Small delay to ensure render
       setTimeout(() => inputRef.current?.focus(), 50);
       setInputValue('');
       setSelectedIndex(0);
     }
   }, [isOpen]);
 
-  // Click outside to close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -89,18 +82,15 @@ export const QuickCreateEventPopup = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose, anchorRef]);
 
-  // Calculate Position
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [placement, setPlacement] = useState<'top' | 'bottom'>('top');
   const [arrowLeft, setArrowLeft] = useState(0);
 
-  // Time Calculation
   const nextHourRange = useMemo(
     () => getNextHourRangeInTimeZone(app.timeZone),
     [app.timeZone, isOpen]
-  ); // Recalculate on open/timezone change
+  );
 
-  // Generate Suggestions
   const suggestions: SuggestionItem[] = useMemo(() => {
     if (!inputValue.trim()) return [];
 
@@ -109,20 +99,17 @@ export const QuickCreateEventPopup = ({
     const allEvents = app.getAllEvents();
     const lowerInput = inputValue.toLowerCase();
 
-    // Try to find if this title exists in history to pick calendar
     const historyEvent = allEvents.find(
       e => e.title.toLowerCase() === lowerInput
     );
     let targetCalendarId = historyEvent?.calendarId;
 
     if (!targetCalendarId) {
-      // Use the default writable calendar (respects per-calendar readOnly)
       targetCalendarId = app
         .getCalendarRegistry()
         .getDefaultWritableCalendar()?.id;
     }
 
-    // If the resolved calendar is read-only, redirect to the default writable one
     if (targetCalendarId) {
       const resolved = app.getCalendarRegistry().get(targetCalendarId);
       if (resolved?.readOnly || resolved?.subscription) {
@@ -144,10 +131,7 @@ export const QuickCreateEventPopup = ({
       end: nextHourRange.end,
     });
 
-    // History Suggestions
-    // Filter events that match input (fuzzy-ish: simple includes)
-    // Deduplicate by title
-    const seenTitles = new Set<string>([inputValue.toLowerCase()]); // Don't show exact match again in history if it's same as input
+    const seenTitles = new Set<string>([inputValue.toLowerCase()]);
 
     const matchedEvents = allEvents.filter(e => {
       if (!e.title.toLowerCase().includes(lowerInput)) return false;
@@ -176,31 +160,20 @@ export const QuickCreateEventPopup = ({
     if (isOpen && anchorRef.current && popupRef.current) {
       const rect = anchorRef.current.getBoundingClientRect();
       const popupHeight = popupRef.current.offsetHeight;
-      const popupWidth = 340; // Fixed width
+      const popupWidth = 340;
 
-      // Calculate initial left (centered)
       let left = rect.left + rect.width / 2 - popupWidth / 2;
-
-      // Horizontal Boundary Check
       const padding = 12;
       const windowWidth = window.innerWidth;
 
-      if (left < padding) {
-        left = padding;
-      } else if (left + popupWidth > windowWidth - padding) {
+      if (left < padding) left = padding;
+      else if (left + popupWidth > windowWidth - padding)
         left = windowWidth - popupWidth - padding;
-      }
 
-      // Calculate arrow offset relative to popup
-      // Button Center X = rect.left + rect.width / 2
-      // Arrow Offset = Button Center X - Popup Left
       const buttonCenterX = rect.left + rect.width / 2;
-      const calculatedArrowLeft = buttonCenterX - left;
-      setArrowLeft(calculatedArrowLeft);
+      setArrowLeft(buttonCenterX - left);
 
-      // Check space above using actual height
       const spaceAbove = rect.top;
-      // Add some buffer for the browser chrome/safe area
       const requiredSpace = popupHeight + 20;
 
       let newTop = 0;
@@ -239,7 +212,6 @@ export const QuickCreateEventPopup = ({
     onClose();
   };
 
-  // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
@@ -269,22 +241,22 @@ export const QuickCreateEventPopup = ({
   return createPortal(
     <div
       ref={popupRef}
-      className={`df-portal fixed z-1000 flex w-85 flex-col rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800 ${isReady ? 'df-animate-in df-fade-in df-zoom-in-95 duration-100' : ''}`}
+      className={`df-portal df-quick-create ${isReady ? 'df-animate-in df-fade-in df-zoom-in-95' : ''}`}
       style={{
         top: position.top,
         left: position.left,
         visibility: isReady ? 'visible' : 'hidden',
       }}
     >
-      <div className='p-4 pb-2'>
-        <div className='mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400'>
+      <div className='df-quick-create__header'>
+        <div className='df-quick-create__title'>
           {t('quickCreateEvent') || 'Quick Create Event'}
         </div>
-        <div className='relative'>
+        <div style={{ position: 'relative' }}>
           <input
             ref={inputRef}
             type='text'
-            className='df-focus-ring w-full rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-gray-900 shadow-sm transition focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100'
+            className='df-form-input'
             placeholder={
               t('quickCreatePlaceholder') || 'Enter title (e.g. Code review)'
             }
@@ -294,9 +266,9 @@ export const QuickCreateEventPopup = ({
         </div>
       </div>
 
-      <div className='max-h-75 flex-1 overflow-y-auto px-2 py-1'>
+      <div className='df-quick-create__list'>
         {suggestions.length === 0 && inputValue && (
-          <div className='px-4 py-3 text-center text-sm text-gray-400'>
+          <div className='df-quick-create__empty'>
             {t('noSuggestions') || 'Type to create'}
           </div>
         )}
@@ -304,28 +276,23 @@ export const QuickCreateEventPopup = ({
         {suggestions.map((item, index) => (
           <div
             key={`${item.type}-${index}`}
-            className={`flex cursor-pointer items-center rounded-lg px-4 py-2 transition-colors ${
-              index === selectedIndex
-                ? 'df-tint-primary df-dark-tint-primary-md df-ring-primary ring-1 ring-inset'
-                : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
-            }`}
+            className='df-quick-create__item'
+            data-selected={index === selectedIndex ? 'true' : 'false'}
             onClick={() => handleCreate(item)}
             onMouseEnter={() => setSelectedIndex(index)}
           >
             <div
-              className='mr-3 h-8 w-1 shrink-0 rounded-full'
+              className='df-quick-create__color-bar'
               style={{ backgroundColor: item.color }}
             />
-            <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
-              <div className='truncate text-sm font-medium text-gray-900 dark:text-gray-100'>
-                {item.title}
-              </div>
-              <div className='flex'>
-                <span className='rounded bg-gray-100 px-1 text-[10px] font-semibold text-gray-500 dark:bg-slate-700 dark:text-gray-400'>
+            <div className='df-quick-create__item-content'>
+              <div className='df-quick-create__item-title'>{item.title}</div>
+              <div>
+                <span className='df-quick-create__item-badge'>
                   {item.type === 'new' ? t('today') : t('tomorrow')}
                 </span>
               </div>
-              <div className='text-xs text-gray-500 dark:text-gray-400'>
+              <div className='df-quick-create__item-time'>
                 {formatTimeRange(item.start, item.end)}
               </div>
             </div>
@@ -335,14 +302,12 @@ export const QuickCreateEventPopup = ({
 
       {/* Triangle Arrow */}
       <div
-        className={`absolute h-3 w-3 -translate-x-1/2 rotate-45 border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800 ${
+        className={`df-quick-create__arrow ${
           placement === 'top'
-            ? '-bottom-1.5 border-r border-b'
-            : '-top-1.5 border-t border-l'
+            ? 'df-quick-create__arrow--bottom'
+            : 'df-quick-create__arrow--top'
         }`}
-        style={{
-          left: arrowLeft,
-        }}
+        style={{ left: arrowLeft }}
       />
     </div>,
     document.body
