@@ -14,8 +14,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "declaration": true,
-    "declarationMap": true,
-    "baseUrl": "."
+    "declarationMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

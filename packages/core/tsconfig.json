@@ -15,7 +15,6 @@
     "jsxImportSource": "preact",
     "declaration": true,
     "declarationMap": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "react": ["../../node_modules/preact/compat"],

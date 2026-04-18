@@ -13,7 +13,6 @@
     "jsx": "react-jsx",
     "noEmit": false,
     "ignoreDeprecations": "5.0",
-    "baseUrl": ".",
     "paths": {
       "@ui-range-picker/*": ["./src/*"]
     }

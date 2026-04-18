@@ -33,6 +33,7 @@ DayFlow が配布する CSS は self-contained です。DayFlow のために `@s
 - [ナビゲーションクラス](#ナビゲーション)
 - [イベント詳細クラス](#イベント詳細)
 - [コンテンツスロットクラス](#content-slots)
+- [イベント状態属性](#イベント状態属性)
 
 ---
 
@@ -226,6 +227,47 @@ DayFlow が配布する CSS は self-contained です。DayFlow のために `@s
 
 ---
 
+## イベント状態属性
+
+すべてのカレンダーイベント要素には、現在の状態を反映する `data-*` 属性が付与されています。クラスを追加しなくても、CSS の属性セレクターで直接ターゲットにできます。
+
+| 属性                 | 値                                    | 説明                                   |
+| -------------------- | ------------------------------------- | -------------------------------------- |
+| `data-view`          | `"day"` `"week"` `"month"` `"year"`   | そのイベントを表示している現在のビュー |
+| `data-all-day`       | `"true"` `"false"`                    | 終日イベントかどうか                   |
+| `data-selected`      | `"true"` `"false"`                    | イベントが選択中かどうか               |
+| `data-dragging`      | `"true"` `"false"`                    | イベントがドラッグ中かどうか           |
+| `data-resizing`      | `"true"` `"false"`                    | イベントがリサイズ中かどうか           |
+| `data-multi-day`     | `"true"` `"false"`                    | 複数日にまたがるイベントかどうか       |
+| `data-editable`      | `"true"` `"false"`                    | イベントが編集可能かどうか             |
+| `data-segment-shape` | `"full"` `"start"` `"middle"` `"end"` | 複数セグメントイベントの角丸の形状     |
+
+### 例
+
+```css
+/* 選択中のイベント */
+.df-event[data-selected='true'] {
+  outline: 2px solid var(--df-color-primary);
+}
+
+/* ドラッグ中のイベント */
+.df-event[data-dragging='true'] {
+  opacity: 0.6;
+}
+
+/* 月ビューのイベントのみ */
+.df-event[data-view='month'] {
+  font-size: 11px;
+}
+
+/* 終日イベントのみ */
+.df-event[data-all-day='true'] {
+  font-weight: 600;
+}
+```
+
+---
+
 ## カスタマイズ方法
 
 外観をカスタマイズするには、これらのクラスや `--df-color-*` 変数をグローバル CSS から上書きします。ほとんどのテーマ調整では `!important` は不要で、高い詳細度の局所ルールを意図的に上書きしたい場合だけ使ってください。
@@ -308,13 +350,23 @@ DayFlow が配布する CSS は self-contained です。DayFlow のために `@s
    }
    ```
 
-4. **CSS 変数**: DayFlow は色に CSS カスタムプロパティを使用しています。グローバルな色の変更にはこれらを上書きします：
+4. **CSS 変数**: DayFlow は `--df-color-*` カスタムプロパティで色を管理しています。`.df-calendar-container`（フローティング UI には `.df-portal` も）で上書きすると、スコープを絞った色変更ができます：
    ```css
-   :root {
-     --primary: #3b82f6;
-     --primary-foreground: #ffffff;
+   .df-calendar-container,
+   .df-portal {
+     --df-color-primary: #3b82f6;
+     --df-color-primary-foreground: #ffffff;
    }
    ```
+
+## 旧バージョンからのアップグレード
+
+<Callout title="破壊的変更：calendar-event クラスの削除" type="warn">
+  イベント要素から `calendar-event` クラスが削除されました。スタイルシートで `.calendar-event { ... }` を使用している場合は、`.df-event { ... }` に変更してください。
+
+以前 DayFlow の DOM 要素に付いていた Tailwind utility クラス（`flex`、`rounded-md`、`shadow-sm` など）もすべて削除されました。これらはパブリック API の一部ではありませんでした。すべての CSS カスタマイズには、ドキュメントに記載された `df-*` クラスと `data-*` 属性を使用してください。
+
+</Callout>
 
 ## 関連ドキュメント
 

@@ -33,6 +33,7 @@ For theme overrides, prefer `--df-color-*` variables or the stable `df-*` semant
 - [Navigation Classes](#navigation)
 - [Event Detail Classes](#event-detail)
 - [Content Slot Classes](#content-slots)
+- [Event State Attributes](#event-state-attributes)
 
 ---
 
@@ -229,6 +230,47 @@ CSS classes used for the Content Slot rendering system.
 
 ---
 
+## Event State Attributes
+
+Every calendar event element exposes a set of `data-*` attributes that reflect its current state. You can target these directly in CSS without adding extra classes.
+
+| Attribute            | Values                                | Description                                   |
+| -------------------- | ------------------------------------- | --------------------------------------------- |
+| `data-view`          | `"day"` `"week"` `"month"` `"year"`   | Which view is currently rendering the event   |
+| `data-all-day`       | `"true"` `"false"`                    | Whether the event is an all-day event         |
+| `data-selected`      | `"true"` `"false"`                    | Whether the event is currently selected       |
+| `data-dragging`      | `"true"` `"false"`                    | Whether the event is being dragged            |
+| `data-resizing`      | `"true"` `"false"`                    | Whether the event is being resized            |
+| `data-multi-day`     | `"true"` `"false"`                    | Whether the event spans multiple days         |
+| `data-editable`      | `"true"` `"false"`                    | Whether the event can be edited               |
+| `data-segment-shape` | `"full"` `"start"` `"middle"` `"end"` | Rounded-corner shape for multi-segment events |
+
+### Example
+
+```css
+/* Selected events */
+.df-event[data-selected='true'] {
+  outline: 2px solid var(--df-color-primary);
+}
+
+/* Events while being dragged */
+.df-event[data-dragging='true'] {
+  opacity: 0.6;
+}
+
+/* Only target month-view events */
+.df-event[data-view='month'] {
+  font-size: 11px;
+}
+
+/* All-day events only */
+.df-event[data-all-day='true'] {
+  font-weight: 600;
+}
+```
+
+---
+
 ## How to Customize
 
 To customize the appearance, target these classes or override the `--df-color-*` variables in your global CSS. Most theme-level changes should not need `!important`; use it only when you intentionally want to beat a highly specific local rule.
@@ -311,13 +353,23 @@ To customize the appearance, target these classes or override the `--df-color-*`
    }
    ```
 
-4. **CSS Variables**: DayFlow uses CSS custom properties for colors. Override them for global color changes:
+4. **CSS Variables**: DayFlow uses `--df-color-*` custom properties for colors. Override them on `.df-calendar-container` (and `.df-portal` for floating overlays) for scoped color changes:
    ```css
-   :root {
-     --primary: #3b82f6;
-     --primary-foreground: #ffffff;
+   .df-calendar-container,
+   .df-portal {
+     --df-color-primary: #3b82f6;
+     --df-color-primary-foreground: #ffffff;
    }
    ```
+
+## Upgrading from Earlier Versions
+
+<Callout title="Breaking change: calendar-event class removed" type="warn">
+  The `calendar-event` class has been removed from event elements. If your stylesheet targets `.calendar-event { ... }`, update it to `.df-event { ... }`.
+
+Internal Tailwind utility classes (`flex`, `rounded-md`, `shadow-sm`, etc.) that were previously present on DayFlow DOM elements have also been removed. These were never part of the public API. Use the documented `df-*` classes and `data-*` attributes for all CSS customization.
+
+</Callout>
 
 ## Related Documentation
 

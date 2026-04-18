@@ -9,7 +9,6 @@
     "emitDeclarationOnly": true,
     "noEmit": false,
     "outDir": "dist",
-    "baseUrl": ".",
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "verbatimModuleSyntax": true,

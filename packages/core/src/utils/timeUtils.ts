@@ -9,6 +9,12 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Event, TimeZoneValue } from '@/types';
 
+// Temporal polyfill implementations expose the timezone in different shapes.
+interface TemporalZoneShape {
+  timeZoneId?: string;
+  timeZone?: string | { id?: string };
+}
+
 import { extractHourFromDate } from './dateTimeUtils';
 import { temporalToDate } from './temporal';
 import {
@@ -260,16 +266,10 @@ export const getNextHourRangeInTimeZone = (
 };
 
 const getTemporalZoneId = (temporal: Temporal.ZonedDateTime): string => {
-  const asAny = temporal as unknown as {
-    timeZoneId?: string;
-    timeZone?: string | { id?: string };
-  };
-
+  const v = temporal as unknown as TemporalZoneShape;
   return (
-    asAny.timeZoneId ||
-    (typeof asAny.timeZone === 'string'
-      ? asAny.timeZone
-      : asAny.timeZone?.id) ||
+    v.timeZoneId ||
+    (typeof v.timeZone === 'string' ? v.timeZone : v.timeZone?.id) ||
     Temporal.Now.timeZoneId()
   );
 };

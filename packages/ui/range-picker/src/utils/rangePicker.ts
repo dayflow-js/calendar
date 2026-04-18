@@ -1,7 +1,26 @@
-// oxlint-disable typescript/no-explicit-any
 import { Temporal } from 'temporal-polyfill';
 
 import { isPlainDate } from './temporal';
+
+// Temporal polyfill implementations expose the timezone in different shapes.
+// These interfaces describe the properties we probe at runtime.
+interface TemporalZoneShape {
+  timeZoneId?: string;
+  timeZone?: string | { id?: string };
+}
+
+interface TemporalLike extends TemporalZoneShape {
+  year?: number;
+  month?: number;
+  day?: number;
+  hour?: number;
+  minute?: number;
+  second?: number;
+  millisecond?: number;
+  microsecond?: number;
+  nanosecond?: number;
+  toZonedDateTime?: (zone: string) => Temporal.ZonedDateTime;
+}
 
 const TOKEN_REGEX = /(YYYY|YY|MM|DD|HH|mm)/g;
 
@@ -88,12 +107,11 @@ export const parseTemporalString = (
 };
 
 export const getZoneId = (value: Temporal.ZonedDateTime): string => {
-  const asAny = value;
-  if (asAny.timeZoneId && typeof asAny.timeZoneId === 'string')
-    return asAny.timeZoneId;
-  if (asAny.timeZone && typeof asAny.timeZone.id === 'string')
-    return asAny.timeZone.id;
-  if (typeof asAny.timeZone === 'string') return asAny.timeZone;
+  const v = value as unknown as TemporalZoneShape;
+  if (typeof v.timeZoneId === 'string') return v.timeZoneId;
+  if (typeof v.timeZone === 'string') return v.timeZone;
+  if (typeof (v.timeZone as { id?: string } | undefined)?.id === 'string')
+    return (v.timeZone as { id: string }).id;
   return Temporal.Now.timeZoneId();
 };
 
@@ -117,28 +135,28 @@ export const normalizeToZoned = (
     return Temporal.ZonedDateTime.from(isoString);
   }
 
-  const asAny = input;
+  const candidate = input as unknown as TemporalLike;
 
-  if ('hour' in asAny && !('timeZoneId' in asAny)) {
+  if ('hour' in candidate && !('timeZoneId' in candidate)) {
     const zoneId = fallbackZone ?? Temporal.Now.timeZoneId();
-    if (typeof asAny.toZonedDateTime === 'function') {
+    if (typeof candidate.toZonedDateTime === 'function') {
       try {
-        return (input as Temporal.PlainDateTime).toZonedDateTime(zoneId);
+        return candidate.toZonedDateTime(zoneId);
       } catch {
         // fall through
       }
     }
     return Temporal.ZonedDateTime.from({
       timeZone: zoneId,
-      year: asAny.year as number,
-      month: asAny.month as number,
-      day: asAny.day as number,
-      hour: asAny.hour as number,
-      minute: asAny.minute as number,
-      second: (asAny.second as number) ?? 0,
-      millisecond: (asAny.millisecond as number) ?? 0,
-      microsecond: (asAny.microsecond as number) ?? 0,
-      nanosecond: (asAny.nanosecond as number) ?? 0,
+      year: candidate.year as number,
+      month: candidate.month as number,
+      day: candidate.day as number,
+      hour: candidate.hour as number,
+      minute: candidate.minute as number,
+      second: candidate.second ?? 0,
+      millisecond: candidate.millisecond ?? 0,
+      microsecond: candidate.microsecond ?? 0,
+      nanosecond: candidate.nanosecond ?? 0,
     });
   }
 
@@ -147,19 +165,18 @@ export const normalizeToZoned = (
       input as string | Temporal.ZonedDateTimeLike
     );
   } catch {
-    const candidate = asAny;
     const resolvedZone =
-      (typeof candidate?.timeZone === 'string'
+      (typeof candidate.timeZone === 'string'
         ? candidate.timeZone
-        : candidate?.timeZone?.id) ??
-      candidate?.timeZoneId ??
+        : candidate.timeZone?.id) ??
+      candidate.timeZoneId ??
       fallbackZone ??
       (fallbackTemporal ? getZoneId(fallbackTemporal) : undefined) ??
       Temporal.Now.timeZoneId();
 
-    if (typeof candidate?.toZonedDateTime === 'function') {
+    if (typeof candidate.toZonedDateTime === 'function') {
       try {
-        return candidate.toZonedDateTime({ timeZone: resolvedZone });
+        return candidate.toZonedDateTime(resolvedZone);
       } catch {
         // fall through
       }
@@ -170,15 +187,15 @@ export const normalizeToZoned = (
 
     return Temporal.ZonedDateTime.from({
       timeZone: resolvedZone,
-      year: candidate?.year ?? reference.year,
-      month: candidate?.month ?? reference.month,
-      day: candidate?.day ?? reference.day,
-      hour: candidate?.hour ?? fallbackTemporal?.hour ?? 0,
-      minute: candidate?.minute ?? fallbackTemporal?.minute ?? 0,
-      second: candidate?.second ?? fallbackTemporal?.second ?? 0,
-      millisecond: candidate?.millisecond ?? fallbackTemporal?.millisecond ?? 0,
-      microsecond: candidate?.microsecond ?? fallbackTemporal?.microsecond ?? 0,
-      nanosecond: candidate?.nanosecond ?? fallbackTemporal?.nanosecond ?? 0,
+      year: candidate.year ?? reference.year,
+      month: candidate.month ?? reference.month,
+      day: candidate.day ?? reference.day,
+      hour: candidate.hour ?? fallbackTemporal?.hour ?? 0,
+      minute: candidate.minute ?? fallbackTemporal?.minute ?? 0,
+      second: candidate.second ?? fallbackTemporal?.second ?? 0,
+      millisecond: candidate.millisecond ?? fallbackTemporal?.millisecond ?? 0,
+      microsecond: candidate.microsecond ?? fallbackTemporal?.microsecond ?? 0,
+      nanosecond: candidate.nanosecond ?? fallbackTemporal?.nanosecond ?? 0,
     });
   }
 };
