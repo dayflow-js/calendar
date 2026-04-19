@@ -551,7 +551,7 @@ const DefaultCalendarSidebar = ({
             isEditable={isEditable}
           />
 
-          <div className='df-sidebar__mini-calendar'>
+          <div className='df-sidebar-mini-calendar'>
             <MiniCalendar
               visibleMonth={app.getVisibleMonth()}
               currentDate={app.getCurrentDate()}
@@ -576,7 +576,7 @@ const DefaultCalendarSidebar = ({
           x={contextMenu.x}
           y={contextMenu.y}
           onClose={handleCloseContextMenu}
-          className='df-sidebar__context-menu df-sidebar__context-menu--calendar'
+          className='df-sidebar-context-menu df-sidebar-context-menu-calendar'
         >
           <ContentSlot
             generatorName='calendarContextMenu'
@@ -627,7 +627,7 @@ const DefaultCalendarSidebar = ({
             x={sidebarContextMenu.x}
             y={sidebarContextMenu.y}
             onClose={handleCloseSidebarContextMenu}
-            className='df-sidebar__context-menu df-sidebar__context-menu--sidebar'
+            className='df-sidebar-context-menu df-sidebar-context-menu-sidebar'
           >
             <ContextMenuItem
               onClick={() => {
@@ -722,14 +722,14 @@ const DefaultCalendarSidebar = ({
         customColorPicker &&
         createPortal(
           <div
-            className='df-sidebar__color-picker-layer'
+            className='df-sidebar-color-picker-layer'
             onMouseDown={() => {
               app.updateCalendar(customColorPicker.calendarId, {});
               setCustomColorPicker(null);
             }}
           >
             <div
-              className='df-sidebar__color-picker-anchor'
+              className='df-sidebar-color-picker-anchor'
               style={{
                 top: customColorPicker.y,
                 left: customColorPicker.x,
@@ -770,7 +770,7 @@ const DefaultCalendarSidebar = ({
                     },
                   }}
                   defaultContent={
-                    <div className='df-sidebar__color-picker-card'>
+                    <div className='df-sidebar-color-picker-card'>
                       <DefaultColorPicker
                         color={customColorPicker.currentColor}
                         onChange={(color, isPending) => {

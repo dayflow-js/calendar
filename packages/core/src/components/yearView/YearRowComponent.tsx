@@ -379,7 +379,7 @@ export const YearRowComponent = memo(
           );
         })}
         <div
-          className='df-year-row__event-layer'
+          className='df-year-row-event-layer'
           style={{
             top: HEADER_HEIGHT,
             bottom: 0,
@@ -388,7 +388,7 @@ export const YearRowComponent = memo(
           }}
           onContextMenu={e => e.preventDefault()}
         >
-          <div className='df-year-row__event-layer-inner'>
+          <div className='df-year-row-event-layer-inner'>
             {(isMovePreviewActive && dragState.eventId
               ? renderedSegments.filter(
                   segment =>
@@ -398,7 +398,7 @@ export const YearRowComponent = memo(
                 )
               : visibleSegments
             ).map(segment => (
-              <div key={segment.id} className='df-year-row__event-hitbox'>
+              <div key={segment.id} className='df-year-row-event-hitbox'>
                 <CalendarEvent
                   event={segment.event}
                   isAllDay={!!segment.event.allDay}

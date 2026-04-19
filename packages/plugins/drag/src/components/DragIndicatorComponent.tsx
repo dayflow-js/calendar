@@ -82,7 +82,7 @@ const DragIndicatorComponent = ({
     });
   };
 
-  return <div className='df-drag-indicator__content'>{renderContent()}</div>;
+  return <div className='df-drag-indicator-content'>{renderContent()}</div>;
 };
 
 export default DragIndicatorComponent;

@@ -289,7 +289,7 @@ const WeekDayCell = ({
   return (
     <div
       key={`day-${day.date.getTime()}`}
-      className={cn(monthDayCell, 'df-month-day-cell__surface')}
+      className={cn(monthDayCell, 'df-month-day-cell-surface')}
       style={{ height: weekHeightPx }}
       data-other-month={belongsToCurrentMonth ? 'false' : 'true'}
       data-trailing-border={
@@ -354,10 +354,10 @@ const WeekDayCell = ({
         </span>
       </div>
 
-      <div className='df-month-day-cell__content'>
+      <div className='df-month-day-cell-content'>
         {maskHiddenOverlayRows && (
           <div
-            className='df-month-day-cell__overlay-mask'
+            className='df-month-day-cell-overlay-mask'
             style={{
               top: `${displaySlotLimit * ROW_SPACING}px`,
               height: `${hiddenOverlayHeight}px`,
@@ -368,7 +368,7 @@ const WeekDayCell = ({
 
         {hasMoreEvents && (
           <div
-            className={cn(monthMoreEvents, 'df-month-day-cell__more-events')}
+            className={cn(monthMoreEvents, 'df-month-day-cell-more-events')}
             data-layout={screenSize === 'desktop' ? 'desktop' : 'mobile'}
             onClick={event => {
               event.stopPropagation();

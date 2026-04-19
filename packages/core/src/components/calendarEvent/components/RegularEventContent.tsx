@@ -80,7 +80,7 @@ const RegularEventContent = ({
   const hideColorBar = isEventSelected && lineColors.length > 1;
   const colorBarContent = hideColorBar ? null : lineColors.length > 1 ? (
     <div
-      className='df-event__color-bar-overlay'
+      className='df-event-color-bar-overlay'
       style={{
         background: colorBarValue,
         clipPath: colorBarClipPath,
@@ -94,11 +94,11 @@ const RegularEventContent = ({
     <>
       {colorBarContent}
       <div
-        className='df-event__timed-content'
+        className='df-event-timed-content'
         data-density={contentPaddingClass}
       >
         <div
-          className={`${eventTitleSmall} ${duration <= 0.25 ? 'df-event__title--tight' : ''}`}
+          className={`${eventTitleSmall} ${duration <= 0.25 ? 'df-event-title-tight' : ''}`}
         >
           {event.title}
         </div>
@@ -161,7 +161,7 @@ const RegularEventContent = ({
           <>
             {/* Top-Right Indicator (Start Time) */}
             <div
-              className='df-event__touch-resize-indicator'
+              className='df-event-touch-resize-indicator'
               data-axis='vertical'
               data-position='top'
               style={{
@@ -177,7 +177,7 @@ const RegularEventContent = ({
             />
             {/* Bottom-Left Indicator (End Time) */}
             <div
-              className='df-event__touch-resize-indicator'
+              className='df-event-touch-resize-indicator'
               data-axis='vertical'
               data-position='bottom'
               style={{

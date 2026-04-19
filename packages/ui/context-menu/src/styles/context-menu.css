@@ -59,8 +59,8 @@
     }
   }
 
-  .df-context-menu__content,
-  .df-context-menu__sub-content {
+  .df-context-menu-content,
+  .df-context-menu-sub-content {
     min-width: 8rem;
     padding: 0.25rem;
     border: 1px solid var(--df-color-border);
@@ -75,17 +75,17 @@
       df-context-menu-zoom-in 120ms cubic-bezier(0, 0, 0.2, 1) forwards;
   }
 
-  .df-context-menu__content {
+  .df-context-menu-content {
     position: fixed;
     z-index: 50;
     overflow: visible;
   }
 
-  .df-context-menu__sub {
+  .df-context-menu-sub {
     position: relative;
   }
 
-  .df-context-menu__sub-content {
+  .df-context-menu-sub-content {
     position: absolute;
     top: 0;
     z-index: 50;
@@ -93,17 +93,17 @@
     white-space: nowrap;
   }
 
-  .df-context-menu__sub-content[data-position='right'] {
+  .df-context-menu-sub-content[data-position='right'] {
     left: calc(100% + 0.25rem);
   }
 
-  .df-context-menu__sub-content[data-position='left'] {
+  .df-context-menu-sub-content[data-position='left'] {
     right: calc(100% + 0.25rem);
   }
 
-  .df-context-menu__item,
-  .df-context-menu__sub-trigger,
-  .df-context-menu__custom-color {
+  .df-context-menu-item,
+  .df-context-menu-sub-trigger,
+  .df-context-menu-custom-color {
     display: flex;
     align-items: center;
     width: 100%;
@@ -124,42 +124,42 @@
     user-select: none;
   }
 
-  .df-context-menu__item,
-  .df-context-menu__sub-trigger {
+  .df-context-menu-item,
+  .df-context-menu-sub-trigger {
     cursor: default;
   }
 
-  .df-context-menu__custom-color {
+  .df-context-menu-custom-color {
     cursor: pointer;
     margin-top: 0.25rem;
   }
 
-  .df-context-menu__item:is(:hover, :focus-visible):not([data-disabled='true']),
-  .df-context-menu__sub-trigger:is(:hover, :focus-visible),
-  .df-context-menu__custom-color:is(:hover, :focus-visible),
-  .df-context-menu__sub-trigger[data-open='true'] {
+  .df-context-menu-item:is(:hover, :focus-visible):not([data-disabled='true']),
+  .df-context-menu-sub-trigger:is(:hover, :focus-visible),
+  .df-context-menu-custom-color:is(:hover, :focus-visible),
+  .df-context-menu-sub-trigger[data-open='true'] {
     background-color: var(--df-color-primary);
     color: var(--df-color-primary-foreground);
   }
 
-  .df-context-menu__item[data-danger='true'] {
+  .df-context-menu-item[data-danger='true'] {
     color: var(--df-color-destructive);
   }
 
-  .df-context-menu__item[data-danger='true']:is(:hover, :focus-visible):not(
+  .df-context-menu-item[data-danger='true']:is(:hover, :focus-visible):not(
       [data-disabled='true']
     ) {
     background-color: var(--df-color-destructive);
     color: var(--df-color-destructive-foreground);
   }
 
-  .df-context-menu__item[data-disabled='true'] {
+  .df-context-menu-item[data-disabled='true'] {
     pointer-events: none;
     opacity: 0.5;
   }
 
-  .df-context-menu__item-icon,
-  .df-context-menu__sub-icon {
+  .df-context-menu-item-icon,
+  .df-context-menu-sub-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -169,13 +169,13 @@
     flex-shrink: 0;
   }
 
-  .df-context-menu__sub-label {
+  .df-context-menu-sub-label {
     flex: 1;
     min-width: 0;
     text-align: left;
   }
 
-  .df-context-menu__sub-chevron {
+  .df-context-menu-sub-chevron {
     width: 1rem;
     height: 1rem;
     margin-left: auto;
@@ -185,18 +185,17 @@
       color 120ms ease;
   }
 
-  .df-context-menu__sub-trigger[data-open='true']
-    .df-context-menu__sub-chevron {
+  .df-context-menu-sub-trigger[data-open='true'] .df-context-menu-sub-chevron {
     opacity: 1;
   }
 
-  .df-context-menu__separator {
+  .df-context-menu-separator {
     height: 1px;
     margin: 0.25rem -0.25rem;
     background-color: var(--df-color-border);
   }
 
-  .df-context-menu__label {
+  .df-context-menu-label {
     padding: 0.125rem 0.75rem;
     font-size: 12px;
     line-height: 1.35;
@@ -204,58 +203,58 @@
     color: inherit;
   }
 
-  .df-context-menu__calendar-item {
+  .df-context-menu-calendar-item {
     display: flex;
     width: 100%;
     align-items: center;
   }
 
-  .df-context-menu__calendar-check-wrap {
+  .df-context-menu-calendar-check-wrap {
     width: 1rem;
     flex-shrink: 0;
   }
 
-  .df-context-menu__calendar-check {
+  .df-context-menu-calendar-check {
     height: 0.75rem;
     width: 0.75rem;
   }
 
-  .df-context-menu__calendar-info {
+  .df-context-menu-calendar-info {
     display: flex;
     min-width: 0;
     align-items: center;
     gap: 0.375rem;
   }
 
-  .df-context-menu__calendar-dot {
+  .df-context-menu-calendar-dot {
     height: 0.75rem;
     width: 0.75rem;
     flex-shrink: 0;
     border-radius: 0.125rem;
   }
 
-  .df-context-menu__calendar-label {
+  .df-context-menu-calendar-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .df-context-menu__calendar-label[data-selected='true'] {
+  .df-context-menu-calendar-label[data-selected='true'] {
     font-weight: 600;
   }
 
-  .df-context-menu__color-picker {
+  .df-context-menu-color-picker {
     width: 100%;
   }
 
-  .df-context-menu__color-grid {
+  .df-context-menu-color-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 0.5rem;
     padding: 0.25rem 0.75rem;
   }
 
-  .df-context-menu__color-swatch {
+  .df-context-menu-color-swatch {
     width: 1.25rem;
     height: 1.25rem;
     border: 1px solid var(--df-context-menu-swatch-border);
@@ -267,12 +266,12 @@
       border-color 120ms ease;
     outline: none;
   }
-  .df-context-menu__color-swatch:is(:hover, :focus-visible) {
+  .df-context-menu-color-swatch:is(:hover, :focus-visible) {
     transform: scale(1.08);
     box-shadow: 0 0 0 2px var(--df-context-menu-swatch-ring);
   }
 
-  .df-context-menu__color-swatch[data-selected='true'] {
+  .df-context-menu-color-swatch[data-selected='true'] {
     border-color: var(--df-color-primary);
     box-shadow:
       0 0 0 1px var(--df-color-primary),

@@ -600,7 +600,7 @@ export function InteractiveCalendar() {
                         </TooltipTrigger>
                         <TooltipContent
                           side='top'
-                          className='w-72 overflow-hidden border-slate-200 p-0 shadow-xl dark:border-slate-800'
+                          className='w-80 overflow-hidden border-slate-200 p-0 shadow-xl dark:border-slate-800'
                         >
                           <div className='border-b border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900'>
                             <p className='mb-1 text-sm font-semibold'>
@@ -665,12 +665,20 @@ export function InteractiveCalendar() {
                                       13
                                     </span>
                                     <div
-                                      className='mt-0.5 flex h-3 items-center overflow-hidden rounded-[2px] border-l-2 border-blue-500 px-1'
+                                      className='relative mt-0.5 flex h-3 items-center overflow-hidden rounded-[2px] px-1 pl-2'
                                       style={{
                                         background:
                                           'repeating-linear-gradient(-45deg, rgba(37, 99, 235, 0.1) 0px, rgba(37, 99, 235, 0.1) 6px, rgba(236, 72, 153, 0.1) 6px, rgba(236, 72, 153, 0.1) 12px, rgba(20, 184, 166, 0.1) 12px, rgba(20, 184, 166, 0.1) 18px)',
                                       }}
                                     >
+                                      {/* Vertical segmented color bar */}
+                                      <div
+                                        className='absolute top-0 bottom-0 left-0.5 w-[3px] rounded'
+                                        style={{
+                                          background:
+                                            'linear-gradient(to bottom, #2563eb 0%, #2563eb 33.33%, #ec4899 33.33%, #ec4899 66.66%, #14b8a6 66.66%, #14b8a6 100%)',
+                                        }}
+                                      />
                                       <span className='truncate text-[8px] font-medium'>
                                         Company Off-site
                                       </span>

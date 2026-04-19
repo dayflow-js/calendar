@@ -464,10 +464,10 @@ export const DefaultYearView = ({
 
       <div
         ref={scrollElementRef}
-        className={`df-year-default__scroll ${scrollContainer} ${scrollbarHide}`}
+        className={`df-year-default-scroll ${scrollContainer} ${scrollbarHide}`}
       >
         <div
-          className='df-year-default__rows'
+          className='df-year-default-rows'
           style={{
             opacity: isLayoutReady ? 1 : 0,
             transition: 'opacity 0.2s ease',

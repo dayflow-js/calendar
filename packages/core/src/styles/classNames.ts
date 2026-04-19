@@ -38,7 +38,7 @@ export const headerSubtitle = 'df-view-header-subtitle';
 /**
  * Cancel button
  */
-export const cancelButton = 'df-btn-sm df-btn-sm--ghost';
+export const cancelButton = 'df-btn-sm df-btn-sm-ghost';
 
 // ==================== Grid Styles ====================
 
@@ -188,37 +188,37 @@ export const baseEvent = 'df-event';
 /**
  * MonthView all-day event content
  */
-export const monthAllDayContent = 'df-event__month-all-day';
+export const monthAllDayContent = 'df-event-month-all-day';
 
 /**
  * MonthView regular event content
  */
-export const monthRegularContent = 'df-event__month-regular';
+export const monthRegularContent = 'df-event-month-regular';
 
 /**
  * Event title (small)
  */
-export const eventTitleSmall = 'df-event__title';
+export const eventTitleSmall = 'df-event-title';
 
 /**
  * Event time text
  */
-export const eventTime = 'df-event__time';
+export const eventTime = 'df-event-time';
 
 /**
  * Event color bar (Day/Week view timed events)
  */
-export const eventColorBar = 'df-event__color-bar';
+export const eventColorBar = 'df-event-color-bar';
 
 /**
  * Event color bar (Month view regular events)
  */
-export const monthEventColorBar = 'df-event__month-color-bar';
+export const monthEventColorBar = 'df-event-month-color-bar';
 
 /**
  * Event icon
  */
-export const eventIcon = 'df-event__icon-svg';
+export const eventIcon = 'df-event-icon-svg';
 
 // ==================== Resize Handles ====================
 
@@ -226,25 +226,25 @@ export const eventIcon = 'df-event__icon-svg';
  * Resize handle (top)
  */
 export const resizeHandleTop =
-  'df-event__resize-handle df-event__resize-handle--top';
+  'df-event-resize-handle df-event-resize-handle-top';
 
 /**
  * Resize handle (bottom)
  */
 export const resizeHandleBottom =
-  'df-event__resize-handle df-event__resize-handle--bottom';
+  'df-event-resize-handle df-event-resize-handle-bottom';
 
 /**
  * Resize handle (left)
  */
 export const resizeHandleLeft =
-  'df-event__resize-handle df-event__resize-handle--left df-resize-handle';
+  'df-event-resize-handle df-event-resize-handle-left df-resize-handle';
 
 /**
  * Resize handle (right)
  */
 export const resizeHandleRight =
-  'df-event__resize-handle df-event__resize-handle--right df-resize-handle';
+  'df-event-resize-handle df-event-resize-handle-right df-resize-handle';
 
 // ==================== Mini Calendar Styles (DayView) ====================
 
@@ -299,7 +299,7 @@ export const dialogContainer = 'df-dialog-container';
  * Calendar picker dropdown (for selecting calendar for an event)
  */
 export const calendarPickerDropdown =
-  'df-portal df-calendar-picker__dropdown df-animate-in df-fade-in df-zoom-in-95';
+  'df-portal df-calendar-picker-dropdown df-animate-in df-fade-in df-zoom-in-95';
 
 // ==================== Time Grid Boundary Styles ====================
 
@@ -324,17 +324,17 @@ export const sidebarContainer = 'df-sidebar';
 /**
  * Sidebar header
  */
-export const sidebarHeader = 'df-sidebar__header';
+export const sidebarHeader = 'df-sidebar-header';
 
 /**
  * Sidebar header toggle button
  */
-export const sidebarHeaderToggle = 'df-sidebar__toggle';
+export const sidebarHeaderToggle = 'df-sidebar-toggle';
 
 /**
  * Sidebar header title
  */
-export const sidebarHeaderTitle = 'df-sidebar__header-title';
+export const sidebarHeaderTitle = 'df-sidebar-header-title';
 
 /**
  * Mobile fullscreen overlay

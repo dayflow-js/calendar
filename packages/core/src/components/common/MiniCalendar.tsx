@@ -151,21 +151,21 @@ export const MiniCalendar = ({
   }, [visibleMonth, currentDateKey, todayKey]);
 
   return (
-    <div className='df-mini-calendar__body'>
+    <div className='df-mini-calendar-body'>
       {showHeader ? (
-        <div className='df-mini-calendar__header-nav'>
+        <div className='df-mini-calendar-header-nav'>
           <button
             type='button'
-            className='df-mini-calendar__nav-btn'
+            className='df-mini-calendar-nav-btn'
             onClick={() => onMonthChange(-1)}
             aria-label='Previous month'
           >
             <ChevronLeft />
           </button>
-          <span className='df-mini-calendar__month-label'>{monthLabel}</span>
+          <span className='df-mini-calendar-month-label'>{monthLabel}</span>
           <button
             type='button'
-            className='df-mini-calendar__nav-btn'
+            className='df-mini-calendar-nav-btn'
             onClick={() => onMonthChange(1)}
             aria-label='Next month'
           >
@@ -185,7 +185,7 @@ export const MiniCalendar = ({
             <button
               type='button'
               key={day.fullDate.getTime()}
-              className={`${miniCalendarDay} df-mini-calendar__day-cell`}
+              className={`${miniCalendarDay} df-mini-calendar-day-cell`}
               data-today={day.isToday ? 'true' : undefined}
               data-selected={
                 !day.isToday && day.isSelected ? 'true' : undefined
@@ -193,14 +193,14 @@ export const MiniCalendar = ({
               data-other-month={day.isCurrentMonth ? undefined : 'true'}
               onClick={() => onDateSelect(day.fullDate)}
             >
-              <span className='df-mini-calendar__day-number'>{day.date}</span>
+              <span className='df-mini-calendar-day-number'>{day.date}</span>
               {showEventDots && dots.length > 0 && (
-                <div className='df-mini-calendar__dots'>
+                <div className='df-mini-calendar-dots'>
                   {dots.slice(0, MAX_EVENT_DOTS).map((color, index) => (
                     <div
                       key={`${color}-${index}`}
                       data-mini-calendar-dot='true'
-                      className='df-mini-calendar__dot'
+                      className='df-mini-calendar-dot'
                       style={{ backgroundColor: color }}
                     />
                   ))}

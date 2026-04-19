@@ -35,7 +35,7 @@ const CalendarGrid = ({
         type='button'
         disabled={disabled}
         onClick={() => onDaySelect(day)}
-        className='df-range-picker__day-cell'
+        className='df-range-picker-day-cell'
         data-outside={isOutsideMonth}
         data-range-edge={isStart ? 'start' : isEnd ? 'end' : undefined}
         data-in-range={isInRange && !isStart && !isEnd}
@@ -47,14 +47,14 @@ const CalendarGrid = ({
 
   return (
     <>
-      <div className='df-range-picker__weekday-row'>
+      <div className='df-range-picker-weekday-row'>
         {weekDayLabels.map((day: string) => (
-          <span key={day} className='df-range-picker__weekday-label'>
+          <span key={day} className='df-range-picker-weekday-label'>
             {day}
           </span>
         ))}
       </div>
-      <div className='df-range-picker__day-grid'>
+      <div className='df-range-picker-day-grid'>
         {calendarDays.map(renderDayCell)}
       </div>
     </>

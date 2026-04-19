@@ -46,12 +46,12 @@ export const YearDayCell = memo(
         }}
         data-date={dateString}
       >
-        <div className='df-year-day-cell__header'>
+        <div className='df-year-day-cell-header'>
           {isFirstDay && (
-            <span className='df-year-day-cell__month-pill'>{monthLabel}</span>
+            <span className='df-year-day-cell-month-pill'>{monthLabel}</span>
           )}
           <span
-            className='df-year-day-cell__date'
+            className='df-year-day-cell-date'
             data-today={isToday ? 'true' : 'false'}
           >
             {day}
@@ -59,9 +59,9 @@ export const YearDayCell = memo(
         </div>
 
         {moreCount > 0 && (
-          <div className='df-year-day-cell__more-wrap'>
+          <div className='df-year-day-cell-more-wrap'>
             <span
-              className='df-year-day-cell__more'
+              className='df-year-day-cell-more'
               onClick={e => {
                 e.stopPropagation();
                 onMoreEventsClick?.(date);

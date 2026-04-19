@@ -56,19 +56,19 @@ const RangePickerPanel = ({
   return (
     <div
       ref={popupRef}
-      className='df-range-picker df-range-picker__popup'
+      className='df-range-picker df-range-picker-popup'
       style={getPopupStyle()}
       data-range-picker-popup='true'
     >
       <div
-        className='df-range-picker__panel'
+        className='df-range-picker-panel'
         style={{
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
           width: matchTriggerWidth ? '100%' : undefined,
         }}
       >
-        <div className='df-range-picker__panel-body'>
-          <div className='df-range-picker__calendar-pane'>
+        <div className='df-range-picker-panel-body'>
+          <div className='df-range-picker-calendar-pane'>
             <CalendarHeader
               visibleMonth={visibleMonth}
               monthLabels={monthLabels}
@@ -88,7 +88,7 @@ const RangePickerPanel = ({
           </div>
 
           {isTimeEnabled && (
-            <div className='df-range-picker__time-pane'>
+            <div className='df-range-picker-time-pane'>
               <TimeSelector
                 focusedField={focusedField}
                 draftRange={draftRange}
@@ -101,12 +101,12 @@ const RangePickerPanel = ({
           )}
         </div>
 
-        <div className='df-range-picker__footer'>
+        <div className='df-range-picker-footer'>
           <button
             type='button'
             onClick={onOk}
             disabled={disabled}
-            className='df-range-picker__confirm-button'
+            className='df-range-picker-confirm-button'
           >
             OK
           </button>

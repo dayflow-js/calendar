@@ -37,7 +37,7 @@ describe('EventContent', () => {
     );
 
     const title = screen.getByText('All Day in Month');
-    expect(title.className).toContain('df-event__month-title');
+    expect(title.className).toContain('df-event-month-title');
   });
 
   it('uses mask fade for month all-day titles on mobile', () => {

@@ -21,13 +21,13 @@ const CalendarHeader = ({
   onMonthChange,
   onYearChange,
 }: CalendarHeaderProps) => (
-  <div className='df-range-picker__calendar-header'>
-    <div className='df-range-picker__calendar-nav-group'>
+  <div className='df-range-picker-calendar-header'>
+    <div className='df-range-picker-calendar-nav-group'>
       <button
         type='button'
         disabled={disabled}
         onClick={() => onYearChange(-1)}
-        className='df-range-picker__calendar-nav-button'
+        className='df-range-picker-calendar-nav-button'
       >
         <ChevronsLeft width={14} height={12} />
       </button>
@@ -35,20 +35,20 @@ const CalendarHeader = ({
         type='button'
         disabled={disabled}
         onClick={() => onMonthChange(-1)}
-        className='df-range-picker__calendar-nav-button'
+        className='df-range-picker-calendar-nav-button'
       >
         <ChevronLeft width={14} height={12} />
       </button>
     </div>
-    <div className='df-range-picker__calendar-title'>
+    <div className='df-range-picker-calendar-title'>
       {monthLabels[visibleMonth.month - 1]} {visibleMonth.year}
     </div>
-    <div className='df-range-picker__calendar-nav-group'>
+    <div className='df-range-picker-calendar-nav-group'>
       <button
         type='button'
         disabled={disabled}
         onClick={() => onMonthChange(1)}
-        className='df-range-picker__calendar-nav-button'
+        className='df-range-picker-calendar-nav-button'
       >
         <ChevronRight width={14} height={12} />
       </button>
@@ -56,7 +56,7 @@ const CalendarHeader = ({
         type='button'
         disabled={disabled}
         onClick={() => onYearChange(1)}
-        className='df-range-picker__calendar-nav-button'
+        className='df-range-picker-calendar-nav-button'
       >
         <ChevronsRight width={14} height={12} />
       </button>

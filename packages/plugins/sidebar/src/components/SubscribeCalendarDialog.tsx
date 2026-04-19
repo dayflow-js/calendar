@@ -41,15 +41,15 @@ export const SubscribeCalendarDialog = ({
   };
 
   return (
-    <div className='df-sidebar__overlay'>
-      <div className='df-sidebar__dialog df-sidebar__dialog--wide'>
-        <h2 className='df-sidebar__dialog-title'>
+    <div className='df-sidebar-overlay'>
+      <div className='df-sidebar-dialog df-sidebar-dialog-wide'>
+        <h2 className='df-sidebar-dialog-title'>
           {t('subscribeCalendarTitle')}
         </h2>
 
         <div>
-          <div className='df-sidebar__subscribe-row'>
-            <label className='df-sidebar__subscribe-label'>
+          <div className='df-sidebar-subscribe-row'>
+            <label className='df-sidebar-subscribe-label'>
               {t('calendarUrl')}
             </label>
             <input
@@ -60,18 +60,18 @@ export const SubscribeCalendarDialog = ({
               placeholder={t('calendarUrlPlaceholder')}
               disabled={loading}
               autoFocus
-              className='df-sidebar__subscribe-input'
+              className='df-sidebar-subscribe-input'
             />
           </div>
-          {error && <p className='df-sidebar__error'>{error}</p>}
+          {error && <p className='df-sidebar-error'>{error}</p>}
         </div>
 
-        <div className='df-sidebar__dialog-actions'>
+        <div className='df-sidebar-dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={loading}
-            className='df-sidebar__button df-sidebar__button--secondary'
+            className='df-sidebar-button df-sidebar-button-secondary'
           >
             {t('cancel')}
           </button>
@@ -79,7 +79,7 @@ export const SubscribeCalendarDialog = ({
             type='button'
             onClick={handleSubmit}
             disabled={loading || !url.trim()}
-            className='df-sidebar__button df-sidebar__button--primary'
+            className='df-sidebar-button df-sidebar-button-primary'
           >
             {loading ? t('fetchingCalendar') : t('subscribe')}
           </button>

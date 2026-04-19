@@ -19,32 +19,32 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",
     "paths": {
-      "@dayflow/core": ["packages/core/src/index.ts"],
-      "@dayflow/react": ["packages/react/src/index.ts"],
-      "@dayflow/vue": ["packages/vue/src/index.ts"],
-      "@dayflow/angular": ["packages/angular/src/public-api.ts"],
-      "@dayflow/svelte": ["packages/svelte/src/index.ts"],
+      "@dayflow/core": ["./packages/core/src/index.ts"],
+      "@dayflow/react": ["./packages/react/src/index.ts"],
+      "@dayflow/vue": ["./packages/vue/src/index.ts"],
+      "@dayflow/angular": ["./packages/angular/src/public-api.ts"],
+      "@dayflow/svelte": ["./packages/svelte/src/index.ts"],
       "@dayflow/plugin-localization": [
-        "packages/plugins/localization/src/index.ts"
+        "./packages/plugins/localization/src/index.ts"
       ],
       "@dayflow/plugin-keyboard-shortcuts": [
-        "packages/plugins/keyboard-shortcuts/src/index.ts"
+        "./packages/plugins/keyboard-shortcuts/src/index.ts"
       ],
-      "@dayflow/plugin-sidebar": ["packages/plugins/sidebar/src/index.ts"],
-      "@dayflow/plugin-drag": ["packages/plugins/drag/src/index.ts"],
-      "@dayflow/plugin-print": ["packages/plugins/print/src/index.ts"],
-      "@dayflow/ui-range-picker": ["packages/ui/range-picker/src/index.ts"],
-      "@drag/*": ["packages/plugins/drag/src/*"],
-      "@sidebar/*": ["packages/plugins/sidebar/src/*"],
-      "@keyboard-shortcuts/*": ["packages/plugins/keyboard-shortcuts/src/*"],
-      "@localization/*": ["packages/plugins/localization/src/*"],
-      "@print/*": ["packages/plugins/print/src/*"],
-      "@ui-range-picker/*": ["packages/ui/range-picker/src/*"],
-      "@examples/*": ["examples/*"],
-      "@website/*": ["website/*"],
-      "@/*": ["packages/core/src/*"]
+      "@dayflow/plugin-sidebar": ["./packages/plugins/sidebar/src/index.ts"],
+      "@dayflow/plugin-drag": ["./packages/plugins/drag/src/index.ts"],
+      "@dayflow/plugin-print": ["./packages/plugins/print/src/index.ts"],
+      "@dayflow/ui-range-picker": ["./packages/ui/range-picker/src/index.ts"],
+      "@dayflow/resource-grid": ["./packages/resource-grid/src/index.ts"],
+      "@drag/*": ["./packages/plugins/drag/src/*"],
+      "@sidebar/*": ["./packages/plugins/sidebar/src/*"],
+      "@keyboard-shortcuts/*": ["./packages/plugins/keyboard-shortcuts/src/*"],
+      "@localization/*": ["./packages/plugins/localization/src/*"],
+      "@print/*": ["./packages/plugins/print/src/*"],
+      "@ui-range-picker/*": ["./packages/ui/range-picker/src/*"],
+      "@examples/*": ["./examples/*"],
+      "@website/*": ["./website/*"],
+      "@/*": ["./packages/core/src/*"]
     }
   },
   "include": ["packages/*/src", "examples", "website"],

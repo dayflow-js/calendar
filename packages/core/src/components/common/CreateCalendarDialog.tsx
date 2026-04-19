@@ -164,14 +164,14 @@ export const CreateCalendarDialog = ({
   if (typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className='df-portal df-create-calendar-dialog__backdrop'>
+    <div className='df-portal df-create-calendar-dialog-backdrop'>
       <div
-        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog__panel'
+        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog-panel'
         onClick={e => e.stopPropagation()}
       >
         <h2
-          className={`df-create-calendar-dialog__title ${
-            hasCustomPicker ? 'df-create-calendar-dialog__title--compact' : ''
+          className={`df-create-calendar-dialog-title ${
+            hasCustomPicker ? 'df-create-calendar-dialog-title-compact' : ''
           }`}
         >
           {t('createCalendar')}
@@ -180,9 +180,9 @@ export const CreateCalendarDialog = ({
         <form onSubmit={handleSubmit}>
           {hasCustomPicker ? (
             <>
-              <div className='df-create-calendar-dialog__color-row'>
+              <div className='df-create-calendar-dialog-color-row'>
                 <div
-                  className='df-create-calendar-dialog__color-preview'
+                  className='df-create-calendar-dialog-color-preview'
                   style={{ backgroundColor: customSelectedColor }}
                 />
                 <input
@@ -198,13 +198,13 @@ export const CreateCalendarDialog = ({
                 />
               </div>
 
-              <div className='df-create-calendar-dialog__color-section'>
-                <div className='df-create-calendar-dialog__color-grid'>
+              <div className='df-create-calendar-dialog-color-section'>
+                <div className='df-create-calendar-dialog-color-grid'>
                   {PICKER_DEFAULT_COLORS.map(color => (
                     <button
                       key={color}
                       type='button'
-                      className='df-create-calendar-dialog__color-btn'
+                      className='df-create-calendar-dialog-color-btn'
                       data-selected={
                         customSelectedColor === color ? 'true' : 'false'
                       }
@@ -218,18 +218,18 @@ export const CreateCalendarDialog = ({
                   <button
                     type='button'
                     onClick={handleOpenPicker}
-                    className='df-create-calendar-dialog__custom-color-btn'
+                    className='df-create-calendar-dialog-custom-color-btn'
                   >
                     {t('customColor')}
                   </button>
 
                   {showPicker && (
                     <div
-                      className='df-create-calendar-dialog__picker-overlay'
+                      className='df-create-calendar-dialog-picker-overlay'
                       onClick={handleCancel}
                     >
                       <div
-                        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog__picker-inner'
+                        className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog-picker-inner'
                         onClick={e => e.stopPropagation()}
                       >
                         <ContentSlot
@@ -242,16 +242,16 @@ export const CreateCalendarDialog = ({
                             styles: pickerStyles,
                           }}
                           defaultContent={
-                            <div className='df-create-calendar-dialog__picker-card'>
+                            <div className='df-create-calendar-dialog-picker-card'>
                               <DefaultColorPicker
                                 color={customSelectedColor}
                                 onChange={handleColorChange}
                               />
-                              <div className='df-create-calendar-dialog__picker-actions'>
+                              <div className='df-create-calendar-dialog-picker-actions'>
                                 <button
                                   type='button'
                                   onClick={handleCancel}
-                                  className='df-btn-sm df-btn-sm--ghost'
+                                  className='df-btn-sm df-btn-sm-ghost'
                                 >
                                   {t('cancel')}
                                 </button>
@@ -273,8 +273,8 @@ export const CreateCalendarDialog = ({
               </div>
             </>
           ) : (
-            <div className='df-create-calendar-dialog__blossom-row'>
-              <div className='df-create-calendar-dialog__blossom-input-area'>
+            <div className='df-create-calendar-dialog-blossom-row'>
+              <div className='df-create-calendar-dialog-blossom-input-area'>
                 <input
                   id='blossom-calendar-name'
                   name='calendar-name'
@@ -287,8 +287,8 @@ export const CreateCalendarDialog = ({
                 />
               </div>
 
-              <div className='df-create-calendar-dialog__blossom-picker-wrap'>
-                <div className='df-create-calendar-dialog__blossom-picker-inner'>
+              <div className='df-create-calendar-dialog-blossom-picker-wrap'>
+                <div className='df-create-calendar-dialog-blossom-picker-inner'>
                   <BlossomColorPicker
                     defaultValue={initialColorData}
                     coreSize={36}
@@ -296,19 +296,19 @@ export const CreateCalendarDialog = ({
                     openOnHover={false}
                     onChange={color => setBlossomSelectedColor(color)}
                     onCollapse={color => setBlossomSelectedColor(color)}
-                    className='df-create-calendar-dialog__blossom-picker'
+                    className='df-create-calendar-dialog-blossom-picker'
                   />
                 </div>
               </div>
             </div>
           )}
 
-          <div className='df-create-calendar-dialog__actions'>
+          <div className='df-create-calendar-dialog-actions'>
             <button
               type='button'
               onClick={onClose}
               disabled={isLoading}
-              className='df-btn-sm df-btn-sm--ghost'
+              className='df-btn-sm df-btn-sm-ghost'
             >
               {t('cancel')}
             </button>

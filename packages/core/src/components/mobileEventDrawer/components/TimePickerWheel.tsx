@@ -127,17 +127,17 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
     <div className='df-time-wheel'>
       <div
         ref={hourRef}
-        className='df-time-wheel__column'
+        className='df-time-wheel-column'
         onScroll={e => onScroll(e, 'hour')}
       >
         <div
-          className='df-time-wheel__spacer'
+          className='df-time-wheel-spacer'
           style={{ height: spacerHeight }}
         ></div>
         {hours.map((h, i) => (
           <div
             key={`h-${i}-${h}`}
-            className='df-time-wheel__option df-time-wheel__option--hour'
+            className='df-time-wheel-option df-time-wheel-option-hour'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setHours(h);
@@ -149,7 +149,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
             }}
           >
             <div
-              className='df-time-wheel__value'
+              className='df-time-wheel-value'
               data-selected={String(h === currentHour)}
               style={getItemStyle(i, scrollTopHour)}
             >
@@ -158,23 +158,23 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
           </div>
         ))}
         <div
-          className='df-time-wheel__spacer'
+          className='df-time-wheel-spacer'
           style={{ height: spacerHeight }}
         ></div>
       </div>
       <div
         ref={minRef}
-        className='df-time-wheel__column'
+        className='df-time-wheel-column'
         onScroll={e => onScroll(e, 'minute')}
       >
         <div
-          className='df-time-wheel__spacer'
+          className='df-time-wheel-spacer'
           style={{ height: spacerHeight }}
         ></div>
         {minutes.map((m, i) => (
           <div
             key={`m-${i}-${m}`}
-            className='df-time-wheel__option df-time-wheel__option--minute'
+            className='df-time-wheel-option df-time-wheel-option-minute'
             onClick={() => {
               const newDate = new Date(date);
               newDate.setMinutes(m);
@@ -186,7 +186,7 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
             }}
           >
             <div
-              className='df-time-wheel__value'
+              className='df-time-wheel-value'
               data-selected={String(m === currentMinute)}
               style={getItemStyle(i, scrollTopMin)}
             >
@@ -195,11 +195,11 @@ export const TimePickerWheel = ({ date, onChange }: TimePickerWheelProps) => {
           </div>
         ))}
         <div
-          className='df-time-wheel__spacer'
+          className='df-time-wheel-spacer'
           style={{ height: spacerHeight }}
         ></div>
       </div>
-      <div className='df-time-wheel__selection'></div>
+      <div className='df-time-wheel-selection'></div>
     </div>
   );
 };

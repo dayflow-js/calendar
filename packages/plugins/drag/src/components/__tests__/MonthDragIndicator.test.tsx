@@ -37,14 +37,10 @@ describe('MonthDragIndicatorComponent', () => {
       ) as HTMLElement | undefined;
 
     expect(root).not.toBeNull();
-    expect(root?.className).toContain('w-full');
-    expect(root?.className).toContain('min-w-0');
-    expect(root?.className).toContain('overflow-hidden');
-    expect(root?.className).toContain('text-white');
+    expect(root?.className).toContain('df-drag-indicator-month');
     expect(title).toBeDefined();
-    expect(title?.className).toContain('df-drag-indicator__title-mask');
-    expect(title?.className).toContain('overflow-hidden');
-    expect(title?.className).toContain('whitespace-nowrap');
+    expect(title?.className).toContain('df-drag-indicator-title-mask');
+    expect(title?.className).toContain('df-drag-indicator-month-title');
 
     render(null, container);
     container.remove();

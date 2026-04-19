@@ -167,7 +167,7 @@ const DefaultEventDetailDialog = ({
 
   const dialogContent = (
     <div
-      className='df-portal df-event-dialog__overlay'
+      className='df-portal df-event-dialog-overlay'
       style={{
         zIndex: 9998,
       }}
@@ -175,7 +175,7 @@ const DefaultEventDetailDialog = ({
     >
       {/* Backdrop */}
       <div
-        className='df-event-dialog__backdrop'
+        className='df-event-dialog-backdrop'
         style={{ position: 'absolute', inset: 0 }}
         onClick={handleBackdropClick}
       />
@@ -186,7 +186,7 @@ const DefaultEventDetailDialog = ({
           type='button'
           onClick={onClose}
           disabled={isPending}
-          className='df-event-dialog__close'
+          className='df-event-dialog-close'
           aria-label='Close'
         >
           <svg fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -233,7 +233,7 @@ const DefaultEventDetailDialog = ({
           </div>
 
           {editedEvent.allDay ? (
-            <div className='df-event-dialog__time-row'>
+            <div className='df-event-dialog-time-row'>
               <div className='df-form-label'>{t('dateRange')}</div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
@@ -248,7 +248,7 @@ const DefaultEventDetailDialog = ({
               />
             </div>
           ) : (
-            <div className='df-event-dialog__time-row'>
+            <div className='df-event-dialog-time-row'>
               <div className='df-form-label'>{t('timeRange')}</div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
@@ -272,7 +272,7 @@ const DefaultEventDetailDialog = ({
           )}
 
           {shouldShowNotes && (
-            <div className='df-event-dialog__notes-row'>
+            <div className='df-event-dialog-notes-row'>
               <span className='df-form-label'>{t('note')}</span>
               <textarea
                 id={`event-dialog-note-${editedEvent.id}`}
@@ -299,7 +299,7 @@ const DefaultEventDetailDialog = ({
                 <button
                   type='button'
                   disabled={isPending}
-                  className='df-tint-primary df-hover-primary-md df-btn-md'
+                  className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToRegular}
                 >
                   {t('setAsTimed')}
@@ -308,7 +308,7 @@ const DefaultEventDetailDialog = ({
                 <button
                   type='button'
                   disabled={isPending}
-                  className='df-tint-primary df-hover-primary-md df-btn-md'
+                  className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToAllDay}
                 >
                   {t('setAsAllDay')}
@@ -318,7 +318,7 @@ const DefaultEventDetailDialog = ({
               <LoadingButton
                 type='button'
                 disabled={isPending}
-                className='df-fill-destructive df-hover-destructive df-btn-md'
+                className='df-fill-destructive df-hover-destructive df-btn-sm'
                 onClick={handleDelete}
                 loading={isDeleting}
               >
@@ -327,7 +327,7 @@ const DefaultEventDetailDialog = ({
 
               <LoadingButton
                 type='button'
-                className={`df-fill-primary df-btn-md ${
+                className={`df-fill-primary df-btn-sm ${
                   hasChanges ? 'df-shadow-primary df-hover-primary-solid' : ''
                 }`}
                 style={{ marginLeft: 'auto' }}

@@ -35,11 +35,11 @@ export const CompactHeader = ({
 }: CompactHeaderProps) => (
   <div className='df-compact-header'>
     {/* Weekday labels row */}
-    <div className='df-compact-header__labels'>
+    <div className='df-compact-header-labels'>
       {fullWeekDates.map((day, index) => (
-        <div key={`label-${index}`} className='df-compact-header__label-cell'>
+        <div key={`label-${index}`} className='df-compact-header-label-cell'>
           <span
-            className='df-compact-header__label'
+            className='df-compact-header-label'
             data-today={day.isToday ? 'true' : 'false'}
           >
             {formatLabel(day.dayName)}
@@ -49,7 +49,7 @@ export const CompactHeader = ({
     </div>
 
     {/* Dates row with capsule */}
-    <div className='df-compact-header__dates'>
+    <div className='df-compact-header-dates'>
       {(() => {
         if (!mobilePageStart) return null;
 
@@ -69,7 +69,7 @@ export const CompactHeader = ({
         return (
           <>
             <div
-              className='df-compact-header__capsule'
+              className='df-compact-header-capsule'
               style={{
                 left: capsuleLeft,
                 top: 0,
@@ -86,7 +86,7 @@ export const CompactHeader = ({
               return (
                 <div
                   key={`date-${index}`}
-                  className='df-compact-header__date-button'
+                  className='df-compact-header-date-button'
                   style={{ height: '32px' }}
                   onClick={() => {
                     app.setCurrentDate(day.fullDate);
@@ -94,14 +94,14 @@ export const CompactHeader = ({
                   }}
                 >
                   <div
-                    className='df-compact-header__date-pill'
+                    className='df-compact-header-date-pill'
                     data-selected={isSelected ? 'true' : 'false'}
                     data-today={day.isToday ? 'true' : 'false'}
                     data-inside-pill={isInsidePill ? 'true' : 'false'}
                   >
                     {day.date}
                     {day.isToday && !isSelected && (
-                      <div className='df-compact-header__today-dot' />
+                      <div className='df-compact-header-today-dot' />
                     )}
                   </div>
                 </div>

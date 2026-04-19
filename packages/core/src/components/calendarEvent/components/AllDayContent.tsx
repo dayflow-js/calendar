@@ -60,23 +60,23 @@ const AllDayContent = ({
   })();
 
   const innerContent = (
-    <div className='df-event__content-row'>
+    <div className='df-event-content-row'>
       {showIcon &&
         (customIcon ? (
-          <div className='df-event__icon-slot'>{customIcon}</div>
+          <div className='df-event-icon-slot'>{customIcon}</div>
         ) : (
-          <span className='df-event__icon-slot'>
+          <span className='df-event-icon-slot'>
             <CalendarDays className={eventIcon} />
           </span>
         ))}
-      <div className={`${eventTitleSmall} df-event__title--tight`}>
+      <div className={`${eventTitleSmall} df-event-title-tight`}>
         {event.title}
       </div>
     </div>
   );
 
   return (
-    <div className='df-event__all-day-shell' style={titleOffsetStyle}>
+    <div className='df-event-all-day-shell' style={titleOffsetStyle}>
       {renderSlot ? renderSlot(innerContent) : innerContent}
 
       {/* Left/Right resize handles — absolute positioned, always rendered outside the slot */}

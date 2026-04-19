@@ -415,7 +415,7 @@ export const FixedWeekYearView = ({
   return (
     <div className='df-year-fixed' onContextMenu={e => e.preventDefault()}>
       {/* Year Header */}
-      <div className='df-year-fixed__header-span'>
+      <div className='df-year-fixed-header-span'>
         <ViewHeader
           calendar={app}
           viewType={ViewType.YEAR}
@@ -438,16 +438,16 @@ export const FixedWeekYearView = ({
       </div>
 
       {/* Corner - Fixed */}
-      <div className='df-year-fixed__corner' />
+      <div className='df-year-fixed-corner' />
 
       {/* Week Labels Header */}
-      <div ref={weekLabelsRef} className='df-year-fixed__week-header'>
+      <div ref={weekLabelsRef} className='df-year-fixed-week-header'>
         <div
-          className='df-year-fixed__week-header-inner'
+          className='df-year-fixed-week-header-inner'
           style={{ minWidth: `calc(1352px + ${scrollbarWidth}px)` }}
         >
           <div
-            className='df-year-fixed__week-grid'
+            className='df-year-fixed-week-grid'
             style={{
               gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
               minWidth: '1352px',
@@ -459,7 +459,7 @@ export const FixedWeekYearView = ({
               return (
                 <div
                   key={`label-${i}`}
-                  className='df-year-fixed__week-label'
+                  className='df-year-fixed-week-label'
                   data-weekend={isWeekend ? 'true' : 'false'}
                 >
                   {label}
@@ -470,7 +470,7 @@ export const FixedWeekYearView = ({
           {/* Spacer to compensate for vertical scrollbar in content area */}
           {scrollbarWidth > 0 && (
             <div
-              className='df-year-fixed__week-spacer'
+              className='df-year-fixed-week-spacer'
               style={{ width: `${scrollbarWidth}px` }}
             />
           )}
@@ -478,12 +478,12 @@ export const FixedWeekYearView = ({
       </div>
 
       {/* Month Labels Sidebar */}
-      <div ref={monthLabelsRef} className='df-year-fixed__month-sidebar'>
-        <div className='df-year-fixed__month-sidebar-inner'>
+      <div ref={monthLabelsRef} className='df-year-fixed-month-sidebar'>
+        <div className='df-year-fixed-month-sidebar-inner'>
           {effectiveMonthsData.map(month => (
             <div
               key={month.monthIndex}
-              className='df-year-fixed__month-label'
+              className='df-year-fixed-month-label'
               style={{
                 minHeight: `${month.minHeight}px`,
                 transition: 'min-height 180ms cubic-bezier(0.22, 1, 0.36, 1)',
@@ -495,7 +495,7 @@ export const FixedWeekYearView = ({
           {/* Spacer to compensate for horizontal scrollbar in content area */}
           {scrollbarHeight > 0 && (
             <div
-              className='df-year-fixed__month-spacer'
+              className='df-year-fixed-month-spacer'
               style={{ height: `${scrollbarHeight}px` }}
             />
           )}
@@ -505,11 +505,11 @@ export const FixedWeekYearView = ({
       {/* Days Grid Content - Scrollable */}
       <div
         ref={contentRef}
-        className={`df-year-fixed__content ${scrollbarHide}`}
+        className={`df-year-fixed-content ${scrollbarHide}`}
         onScroll={handleContentScroll}
       >
         <div
-          className='df-year-fixed__content-inner'
+          className='df-year-fixed-content-inner'
           style={{ minWidth: '1352px' }}
         >
           {effectiveMonthsData.map(effectiveMonthData => {
@@ -535,7 +535,7 @@ export const FixedWeekYearView = ({
             return (
               <div
                 key={effectiveMonthData.monthIndex}
-                className='df-year-fixed__month-row'
+                className='df-year-fixed-month-row'
                 style={{
                   minHeight: `${effectiveMonthData.minHeight}px`,
                   transition: 'min-height 180ms cubic-bezier(0.22, 1, 0.36, 1)',
@@ -543,7 +543,7 @@ export const FixedWeekYearView = ({
               >
                 {/* Background grid cells */}
                 <div
-                  className='df-year-fixed__background-grid'
+                  className='df-year-fixed-background-grid'
                   style={{
                     gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
                   }}
@@ -556,7 +556,7 @@ export const FixedWeekYearView = ({
                       return (
                         <div
                           key={`empty-${effectiveMonthData.monthIndex}-${dayIndex}`}
-                          className='df-year-fixed__empty-cell'
+                          className='df-year-fixed-empty-cell'
                           data-weekend={isWeekend ? 'true' : 'false'}
                         />
                       );
@@ -571,7 +571,7 @@ export const FixedWeekYearView = ({
                       <div
                         key={date.getTime()}
                         data-date={dateString}
-                        className='df-year-fixed__day-cell'
+                        className='df-year-fixed-day-cell'
                         data-dragging={isDragging ? 'true' : 'false'}
                         data-weekend={isWeekend ? 'true' : 'false'}
                         onClick={() => app.selectDate(date)}
@@ -579,7 +579,7 @@ export const FixedWeekYearView = ({
                         onContextMenu={e => handleContextMenu(e, date)}
                       >
                         <span
-                          className='df-year-fixed__day-number'
+                          className='df-year-fixed-day-number'
                           data-today={isToday ? 'true' : 'false'}
                         >
                           {date.getDate()}
@@ -592,14 +592,14 @@ export const FixedWeekYearView = ({
                 {/* Event segments overlay */}
                 {renderedSegments.length > 0 && (
                   <div
-                    className='df-year-fixed__event-layer'
+                    className='df-year-fixed-event-layer'
                     style={{ top: 20 }}
                   >
-                    <div className='df-year-fixed__event-layer-inner'>
+                    <div className='df-year-fixed-event-layer-inner'>
                       {renderedSegments.map(segment => (
                         <div
                           key={segment.id}
-                          className='df-year-fixed__event-hitbox'
+                          className='df-year-fixed-event-hitbox'
                         >
                           <CalendarEvent
                             event={segment.event}

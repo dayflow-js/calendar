@@ -61,24 +61,24 @@ export const MergeCalendarDialog = ({
   };
 
   return (
-    <div className='df-sidebar__overlay'>
-      <div className='df-sidebar__dialog'>
-        <h2 className='df-sidebar__dialog-title'>
+    <div className='df-sidebar-overlay'>
+      <div className='df-sidebar-dialog'>
+        <h2 className='df-sidebar-dialog-title'>
           {t('mergeConfirmTitle', { sourceName, targetName })}
         </h2>
-        <div className='df-sidebar__dialog-lines'>
+        <div className='df-sidebar-dialog-lines'>
           {messageLines.map((line, i) => (
-            <p key={i} className='df-sidebar__dialog-line'>
+            <p key={i} className='df-sidebar-dialog-line'>
               {renderLine(line, source, target)}
             </p>
           ))}
         </div>
-        <div className='df-sidebar__dialog-actions'>
+        <div className='df-sidebar-dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={isLoading}
-            className='df-sidebar__button df-sidebar__button--secondary'
+            className='df-sidebar-button df-sidebar-button-secondary'
           >
             {t('cancel')}
           </button>
@@ -86,7 +86,7 @@ export const MergeCalendarDialog = ({
             type='button'
             onClick={handleConfirm}
             loading={isLoading}
-            className='df-sidebar__button df-sidebar__button--destructive'
+            className='df-sidebar-button df-sidebar-button-destructive'
           >
             {t('merge')}
           </LoadingButton>

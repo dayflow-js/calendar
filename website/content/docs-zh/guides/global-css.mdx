@@ -22,6 +22,7 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 - [通用类](#通用)
 - [语义辅助类](#语义辅助类)
+- [布局与动效辅助类](#布局与动效辅助类)
 - [日视图类](#日视图)
 - [周视图类](#周视图)
 - [月视图类](#月视图)
@@ -39,30 +40,34 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 所有日历视图中使用的通用 CSS 类。
 
-| 类名                       | 描述                                                                                   |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `df-calendar-container`    | 包裹侧边栏和日历的最外层根容器。支持通过 `--df-calendar-height` CSS 变量设置组件高度。 |
-| `df-calendar`              | 日历主容器（包含头部和视图内容）                                                       |
-| `df-header`                | 日历头部区域（包含标题、今天按钮和视图切换器）                                         |
-| `df-header-left`           | 头部左侧区域（标题和导航按钮）                                                         |
-| `df-header-mid`            | 头部中间区域（当前日期范围标题）                                                       |
-| `df-header-right`          | 头部右侧区域（视图切换器和搜索）                                                       |
-| `df-navigation`            | 导航控件容器                                                                           |
-| `df-event`                 | 所有事件的基础类                                                                       |
-| `df-event-title`           | 事件标题文本                                                                           |
-| `df-event-time`            | 事件时间文本                                                                           |
-| `df-event-color-bar`       | 事件左侧的颜色条（日/周视图）                                                          |
-| `df-month-event-color-bar` | 普通事件的颜色指示器（月视图）                                                         |
-| `df-all-day-row`           | 全天事件行容器                                                                         |
-| `df-all-day-label`         | 全天标签文本                                                                           |
-| `df-all-day-content`       | 全天事件内容区域                                                                       |
-| `df-all-day-cell`          | 单个全天事件单元格                                                                     |
-| `df-date-number`           | 日期数字显示                                                                           |
-| `df-current-time-line`     | 当前时间指示线容器                                                                     |
-| `df-current-time-label`    | 当前时间标签文本                                                                       |
-| `df-current-time-bar`      | 当前时间水平线                                                                         |
-| `df-portal`                | 通过 portal 渲染的浮层根作用域类                                                       |
-| `df-range-picker`          | Range Picker 触发器与弹层共用的根作用域类                                              |
+| 类名                       | 描述                                                          |
+| -------------------------- | ------------------------------------------------------------- |
+| `df-calendar-container`    | 包裹侧边栏和日历的最外层根容器，支持 `--df-calendar-height`。 |
+| `df-calendar`              | 日历主容器（包含头部和视图内容）                              |
+| `df-header`                | 日历头部区域（包含标题、今天按钮和视图切换器）                |
+| `df-header-left`           | 头部左侧区域（标题和导航按钮）                                |
+| `df-header-mid`            | 头部中间区域（当前日期范围标题）                              |
+| `df-header-right`          | 头部右侧区域（视图切换器和搜索）                              |
+| `df-navigation`            | 导航控件容器                                                  |
+| `df-view-header-container` | 次级视图头部区域的共享容器                                    |
+| `df-view-header-title`     | 视图级标题文本的共享类                                        |
+| `df-view-header-subtitle`  | 视图级副标题文本的共享类                                      |
+| `df-event`                 | 所有事件的基础类                                              |
+| `df-event-title`           | 事件标题文本                                                  |
+| `df-event-time`            | 事件时间文本                                                  |
+| `df-event-color-bar`       | 事件左侧的颜色条（日/周视图）                                 |
+| `df-month-event-color-bar` | 普通事件的颜色指示器（月视图）                                |
+| `df-all-day-row`           | 全天事件行容器                                                |
+| `df-all-day-label`         | 全天标签文本                                                  |
+| `df-all-day-content`       | 全天事件内容区域                                              |
+| `df-all-day-cell`          | 单个全天事件单元格                                            |
+| `df-date-number`           | 日期数字显示                                                  |
+| `df-current-time-line`     | 当前时间指示线容器                                            |
+| `df-current-time-label`    | 当前时间标签文本                                              |
+| `df-current-time-bar`      | 当前时间水平线                                                |
+| `df-calendar-checkbox`     | 日历列表及相关控件中复用的共享复选框样式                      |
+| `df-portal`                | 通过 portal 渲染的浮层根作用域类                              |
+| `df-range-picker`          | Range Picker 触发器与弹层共用的根作用域类                     |
 
 ---
 
@@ -70,26 +75,62 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 这次样式重构后，DayFlow 对外公开了一组稳定的 `df-*` 语义类，用来表达按钮填充态、选中态、危险操作态、焦点环等主题语义。它们定义在共享基础样式中，适合在自定义 slot、插件 UI 或包裹层里复用。
 
-| 类名                     | 用途                               |
-| ------------------------ | ---------------------------------- |
-| `df-fill-primary`        | 主色填充背景 + 自动前景文字        |
-| `df-fill-secondary`      | 次色填充背景 + 自动前景文字        |
-| `df-fill-destructive`    | 危险态填充背景 + 自动前景文字      |
-| `df-tint-primary`        | 主色 10% 轻染背景                  |
-| `df-tint-primary-md`     | 主色 20% 轻染背景                  |
-| `df-tint-primary-lg`     | 主色 30% 轻染背景                  |
-| `df-hover-primary`       | 主色语义悬停态                     |
-| `df-hover-primary-solid` | 主色实心按钮的悬停态               |
-| `df-hover-destructive`   | 危险态悬停效果                     |
-| `df-text-primary`        | 主色文字                           |
-| `df-text-primary-fg`     | 主色填充背景上的文字               |
-| `df-text-destructive`    | 危险态文字                         |
-| `df-border-primary`      | 主色边框                           |
-| `df-ring-primary`        | 主色 ring 颜色 token               |
-| `df-shadow-primary`      | 主色阴影 token                     |
-| `df-focus-ring`          | `:focus` 时同时设置主色边框与 ring |
+| 类名                      | 用途                                    |
+| ------------------------- | --------------------------------------- |
+| `df-fill-primary`         | 主色填充背景 + 自动前景文字             |
+| `df-fill-secondary`       | 次色填充背景 + 自动前景文字             |
+| `df-fill-destructive`     | 危险态填充背景 + 自动前景文字           |
+| `df-tint-primary`         | 主色 10% 轻染背景                       |
+| `df-tint-primary-md`      | 主色 20% 轻染背景                       |
+| `df-tint-primary-lg`      | 主色 30% 轻染背景                       |
+| `df-hover-primary`        | 主色语义悬停态                          |
+| `df-hover-primary-md`     | 更明显的主色悬停态                      |
+| `df-hover-primary-solid`  | 主色实心按钮的悬停态                    |
+| `df-hover-base`           | 使用 DayFlow hover token 的默认悬停背景 |
+| `df-hover-muted`          | muted 风格悬停背景                      |
+| `df-hover-destructive`    | 危险态悬停效果                          |
+| `df-text-primary`         | 主色文字                                |
+| `df-text-muted`           | 弱化文字                                |
+| `df-text-primary-fg`      | 主色填充背景上的文字                    |
+| `df-text-secondary-fg`    | 次色填充背景上的文字                    |
+| `df-text-destructive`     | 危险态文字                              |
+| `df-text-destructive-fg`  | 危险态填充背景上的文字                  |
+| `df-bg-base`              | 基础表面背景                            |
+| `df-bg-card`              | 卡片背景                                |
+| `df-bg-sidebar`           | 侧边栏风格的 muted 背景                 |
+| `df-bg-secondary`         | 次级 muted 背景                         |
+| `df-bg-tertiary`          | 第三级背景 / 分隔面                     |
+| `df-border-base`          | 基础边框                                |
+| `df-border-light`         | 更轻的柔和边框                          |
+| `df-border-strong`        | 使用主色 token 的强调边框               |
+| `df-border-primary`       | 主色边框                                |
+| `df-border-primary-soft`  | 柔和主色边框                            |
+| `df-ring-primary`         | 主色 ring 颜色 token                    |
+| `df-ring-primary-solid`   | 纯主色 ring 颜色                        |
+| `df-shadow-sm`            | 小层级阴影                              |
+| `df-shadow-md`            | 中层级阴影                              |
+| `df-shadow-primary`       | 主色阴影 token                          |
+| `df-focus-ring`           | `:focus` 时同时设置主色边框与 ring      |
+| `df-focus-ring-only`      | `:focus` 时仅应用主色 ring              |
+| `df-focus-border-primary` | `:focus` 时仅应用主色边框               |
 
 推荐优先使用这些 `df-*` 类或 `--df-color-*` 变量来做主题定制，不要再依赖 `bg-primary`、`text-primary`、`hover:bg-primary/90` 这类旧的内部 Tailwind 语义类名。
+
+---
+
+## 布局与动效辅助类
+
+这些类适合在自定义 slot 内容或插件 UI 中复用 DayFlow 现有的布局和入场动画行为。
+
+| 类名                      | 用途                             |
+| ------------------------- | -------------------------------- |
+| `df-content-slot-stacked` | 让内容插槽纵向堆叠并填满可用高度 |
+| `df-scrollbar-hide`       | 隐藏滚动条但保留滚动行为         |
+| `df-animate-in`           | 入场动画的基础时间参数类         |
+| `df-fade-in`              | 淡入动画辅助类                   |
+| `df-zoom-in-95`           | 轻微缩放进入动画辅助类           |
+| `df-animate-slide-up`     | 向上滑入动画                     |
+| `df-animate-slide-down`   | 向下滑出动画                     |
 
 ---
 
@@ -150,15 +191,15 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 年视图特有的 CSS 类。这些类特别适用于自定义年度概览中的事件外观。
 
-| 类名                          | 描述                                       |
-| ----------------------------- | ------------------------------------------ |
-| `df-year-event`               | 事件外层容器 - 包裹整个事件元素            |
-| `df-year-event-content`       | 事件内容容器 - 包含图标、标题和其他内容    |
-| `df-year-event-title`         | 事件标题文本 - 用于自定义标题对齐、字体等  |
-| `df-year-event-icon`          | 事件图标容器 - 用于全天事件图标            |
-| `df-year-event-indicator`     | 定时事件颜色指示器 - 定时事件的颜色点/条   |
-| `df-year-view-weekend-header` | 固定周布局中的周末头部（周六/周日）        |
-| `df-year-view-weekend-cell`   | 固定周布局中的周末网格单元格（空白或日期） |
+| 类名                      | 描述                                            |
+| ------------------------- | ----------------------------------------------- |
+| `df-year-event`           | 事件外层容器 - 包裹整个事件元素                 |
+| `df-event-year-content`   | 年视图事件内容容器 - 包含图标、标题和其他内容   |
+| `df-event-year-title`     | 年视图事件标题文本 - 用于自定义标题对齐、字体等 |
+| `df-event-icon-svg`       | 事件渲染中通用的 SVG 图标类，年视图也会复用     |
+| `df-event-year-indicator` | 年视图定时事件颜色指示器 - 颜色点/条            |
+| `df-year-grid-month`      | Grid Year View 中的月份卡片容器                 |
+| `df-year-fixed-day-cell`  | Fixed Week Year View 中的日期单元格             |
 
 ---
 
@@ -166,12 +207,20 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 迷你日历组件（通常位于侧边栏或日视图）的 CSS 类。
 
-| 类名                      | 描述                              |
-| ------------------------- | --------------------------------- |
-| `df-mini-calendar`        | 迷你日历容器                      |
-| `df-mini-calendar-grid`   | 日期网格容器                      |
-| `df-mini-calendar-header` | 星期标题单元格（例如 "一", "二"） |
-| `df-mini-calendar-day`    | 单个日期单元格                    |
+| 类名                           | 描述                              |
+| ------------------------------ | --------------------------------- |
+| `df-mini-calendar`             | 迷你日历容器                      |
+| `df-mini-calendar-body`        | 迷你日历主体包裹层                |
+| `df-mini-calendar-header-nav`  | 月份导航行                        |
+| `df-mini-calendar-nav-btn`     | 上一月 / 下一月按钮               |
+| `df-mini-calendar-month-label` | 当前月份标签                      |
+| `df-mini-calendar-grid`        | 日期网格容器                      |
+| `df-mini-calendar-header`      | 星期标题单元格（例如 "一", "二"） |
+| `df-mini-calendar-day`         | 迷你日历日期按钮的基础类          |
+| `df-mini-calendar-day-cell`    | 日期单元格的视觉表面              |
+| `df-mini-calendar-day-number`  | 日期数字标签                      |
+| `df-mini-calendar-dots`        | 日期单元格中的事件圆点容器        |
+| `df-mini-calendar-dot`         | 单个事件圆点                      |
 
 ---
 
@@ -179,14 +228,19 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 侧边栏组件的 CSS 类。
 
-| 类名                       | 描述                     |
-| -------------------------- | ------------------------ |
-| `df-sidebar`               | 侧边栏容器               |
-| `df-sidebar-header`        | 侧边栏头部容器           |
-| `df-sidebar-header-toggle` | 侧边栏折叠/展开切换按钮  |
-| `df-sidebar-header-title`  | 侧边栏头部标题（"日历"） |
-| `df-calendar-list`         | 日历列表容器             |
-| `df-calendar-list-item`    | 列表中的单个日历项       |
+| 类名                      | 描述                      |
+| ------------------------- | ------------------------- |
+| `df-sidebar`              | 侧边栏容器                |
+| `df-sidebar-header`       | 侧边栏头部容器            |
+| `df-sidebar-toggle`       | 侧边栏折叠/展开切换按钮   |
+| `df-sidebar-header-title` | 侧边栏头部标题（"日历"）  |
+| `df-sidebar-list-shell`   | 侧边栏列表的可滚动包裹层  |
+| `df-sidebar-list`         | 日历列表容器              |
+| `df-sidebar-list-item`    | 列表中的单个日历项        |
+| `df-sidebar-row`          | 每个列表项里的交互行      |
+| `df-sidebar-chip`         | 小型标签 / chip           |
+| `df-sidebar-dialog`       | 侧边栏模态框 / 对话框容器 |
+| `df-sidebar-button`       | 侧边栏按钮的共享类        |
 
 ---
 
@@ -194,10 +248,12 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 导航按钮的 CSS 类。
 
-| 类名              | 描述                          |
-| ----------------- | ----------------------------- |
-| `df-nav-button`   | 导航箭头按钮（上一个/下一个） |
-| `df-today-button` | "今天" 按钮                   |
+| 类名                       | 描述                                  |
+| -------------------------- | ------------------------------------- |
+| `df-nav-button`            | 导航箭头按钮的基础类（上一个/下一个） |
+| `df-calendar-nav-button`   | 日历导航箭头按钮的样式类              |
+| `df-today-button`          | “今天”按钮的基础类                    |
+| `df-calendar-today-button` | 日历“今天”按钮的样式类                |
 
 ---
 
@@ -205,12 +261,14 @@ DayFlow 提供了一组带有 `df-` 前缀的 CSS 类，允许您自定义日历
 
 事件详情面板和对话框的 CSS 类。
 
-| 类名                    | 描述             |
-| ----------------------- | ---------------- |
-| `df-event-detail-panel` | 浮动事件详情面板 |
-| `df-dialog-overlay`     | 对话框背景遮罩   |
-| `df-dialog-container`   | 对话框内容容器   |
-| `df-portal`             | 浮层根节点作用域 |
+| 类名                       | 描述                            |
+| -------------------------- | ------------------------------- |
+| `df-event-detail-panel`    | 浮动事件详情面板                |
+| `df-event-dialog-overlay`  | 事件详情对话框的 overlay 根节点 |
+| `df-event-dialog-backdrop` | 事件详情对话框的背景遮罩        |
+| `df-dialog-container`      | 对话框内容容器                  |
+| `df-event-dialog-close`    | 事件详情对话框的关闭按钮        |
+| `df-portal`                | 浮层根节点作用域                |
 
 ---
 

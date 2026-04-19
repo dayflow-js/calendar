@@ -39,13 +39,13 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
     isMobile,
     isLightBackground,
   }) => (
-    <div className='df-drag-indicator__all-day'>
+    <div className='df-drag-indicator-all-day'>
       <CalendarDaysIcon
-        className='df-drag-indicator__icon'
+        className='df-drag-indicator-icon'
         data-light={isLightBackground}
       />
       <div
-        className='df-drag-indicator__text'
+        className='df-drag-indicator-text'
         data-light={isLightBackground}
         data-mobile={isMobile}
         style={
@@ -82,7 +82,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
     const colorBarContent =
       lineColors.length > 1 ? (
         <div
-          className='df-event__color-bar-overlay'
+          className='df-event-color-bar-overlay'
           style={{
             background: colorBarValue,
             clipPath: colorBarClipPath,
@@ -90,7 +90,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
         />
       ) : (
         <div
-          className='df-event__color-bar'
+          className='df-event-color-bar'
           style={{
             backgroundColor: colorBarValue,
           }}
@@ -98,14 +98,14 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
       );
 
     return (
-      <div className='df-drag-indicator__regular-wrapper'>
+      <div className='df-drag-indicator-regular-wrapper'>
         {colorBarContent}
         <div
-          className={`df-event__timed-content ${getDynamicPadding(drag)}`}
+          className={`df-event-timed-content ${getDynamicPadding(drag)}`}
           data-light={isLightBackground}
         >
           <div
-            className='df-drag-indicator__text'
+            className='df-drag-indicator-text'
             data-light={isLightBackground}
             data-mobile={isMobile}
             style={{
@@ -117,7 +117,7 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
           </div>
           {!drag.allDay && drag.endHour - drag.startHour > 0.5 && (
             <div
-              className='df-drag-indicator__time'
+              className='df-drag-indicator-time'
               data-light={isLightBackground}
             >
               {formatTime(drag.startHour)} - {formatTime(drag.endHour)}
@@ -127,13 +127,13 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
         {isMobile && (
           <>
             <div
-              className='df-event__touch-resize-indicator'
+              className='df-event-touch-resize-indicator'
               data-axis='vertical'
               data-position='top'
               style={{ color: lineColors[0] || getLineColor('blue') }}
             />
             <div
-              className='df-event__touch-resize-indicator'
+              className='df-event-touch-resize-indicator'
               data-axis='vertical'
               data-position='bottom'
               style={{ color: lineColors[0] || getLineColor('blue') }}
@@ -147,10 +147,10 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
   renderDefaultContent: ({ drag: _drag, title, allDay, isMobile }) => {
     if (allDay) {
       return (
-        <div className='df-drag-indicator__all-day'>
-          <CalendarDaysIcon className='df-drag-indicator__icon' />
+        <div className='df-drag-indicator-all-day'>
+          <CalendarDaysIcon className='df-drag-indicator-icon' />
           <div
-            className='df-drag-indicator__text'
+            className='df-drag-indicator-text'
             data-mobile={isMobile}
             style={{
               lineHeight: 1.2,
@@ -163,11 +163,11 @@ export const DefaultDragIndicatorRenderer: DragIndicatorRenderer = {
     }
 
     return (
-      <div className='df-drag-indicator__regular-wrapper'>
-        <div className='df-fill-primary df-event__color-bar' />
-        <div className='df-event__timed-content df-p-standard'>
+      <div className='df-drag-indicator-regular-wrapper'>
+        <div className='df-fill-primary df-event-color-bar' />
+        <div className='df-event-timed-content df-p-standard'>
           <div
-            className='df-text-primary df-drag-indicator__text'
+            className='df-text-primary df-drag-indicator-text'
             data-mobile={isMobile}
           >
             {title}

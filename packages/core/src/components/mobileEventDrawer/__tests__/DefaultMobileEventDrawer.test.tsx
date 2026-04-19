@@ -67,7 +67,7 @@ describe('MobileEventDrawer', () => {
     fireEvent.click(startDateButton);
 
     const expandedCalendar = document.querySelector(
-      '.df-mobile-event-drawer__expander[data-kind="calendar"][data-expanded="true"]'
+      '.df-mobile-event-drawer-expander[data-kind="calendar"][data-expanded="true"]'
     );
 
     expect(expandedCalendar).not.toBeNull();

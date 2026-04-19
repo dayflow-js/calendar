@@ -43,7 +43,7 @@ const MonthDragIndicatorComponent = ({
     if (isCreating) {
       return {
         title: t('newEvent'),
-        icon: <CalendarIcon className='df-drag-indicator__icon' />,
+        icon: <CalendarIcon className='df-drag-indicator-icon' />,
         showDateRange: false,
       };
     }
@@ -66,12 +66,12 @@ const MonthDragIndicatorComponent = ({
   const content = getDisplayContent();
 
   return (
-    <div className='df-drag-indicator__month'>
+    <div className='df-drag-indicator-month'>
       {content.icon ? (
-        <div className='df-drag-indicator__month-icon-wrap'>{content.icon}</div>
+        <div className='df-drag-indicator-month-icon-wrap'>{content.icon}</div>
       ) : null}
-      <div className='df-drag-indicator__month-content'>
-        <div className='df-drag-indicator__title-mask df-drag-indicator__month-title'>
+      <div className='df-drag-indicator-month-content'>
+        <div className='df-drag-indicator-title-mask df-drag-indicator-month-title'>
           {content.title}
         </div>
       </div>

@@ -15,6 +15,6 @@ export const Switch = ({ checked, onChange, disabled }: SwitchProps) => (
     className='df-mobile-switch'
     onClick={() => !disabled && onChange(!checked)}
   >
-    <span className='df-mobile-switch__thumb' />
+    <span className='df-mobile-switch-thumb' />
   </button>
 );

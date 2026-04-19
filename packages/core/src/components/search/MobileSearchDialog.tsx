@@ -52,15 +52,15 @@ const MobileSearchDialog = ({
   return createPortal(
     <div className={mobileFullscreen}>
       {/* Header with Back button and Search Input */}
-      <div className='df-search-dialog__header'>
+      <div className='df-search-dialog-header'>
         <button
           type='button'
           onClick={onClose}
-          className='df-search-dialog__back-btn'
+          className='df-search-dialog-back-btn'
         >
-          <ArrowLeft className='df-search-dialog__back-icon' />
+          <ArrowLeft className='df-search-dialog-back-icon' />
         </button>
-        <div className='df-search-dialog__input-wrap'>
+        <div className='df-search-dialog-input-wrap'>
           <input
             ref={inputRef}
             type='text'
@@ -70,7 +70,7 @@ const MobileSearchDialog = ({
               const val = (e.target as HTMLInputElement).value;
               if (val !== keyword) onSearchChange(val);
             }}
-            className='df-search-dialog__input'
+            className='df-search-dialog-input'
           />
           {keyword && (
             <button
@@ -78,16 +78,16 @@ const MobileSearchDialog = ({
               onClick={() => {
                 if (keyword !== '') onSearchChange('');
               }}
-              className='df-search-dialog__input-clear'
+              className='df-search-dialog-input-clear'
             >
-              <X className='df-search-dialog__clear-icon' />
+              <X className='df-search-dialog-clear-icon' />
             </button>
           )}
         </div>
       </div>
 
       {/* Results List */}
-      <div className='df-search-dialog__results'>
+      <div className='df-search-dialog-results'>
         <SearchResultsList
           loading={loading}
           results={results}

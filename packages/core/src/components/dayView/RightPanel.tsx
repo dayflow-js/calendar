@@ -55,12 +55,12 @@ export const RightPanel = ({
       data-switcher-mode={switcherMode}
       onContextMenu={e => e.preventDefault()}
     >
-      <div className='df-right-panel__layout'>
+      <div className='df-right-panel-layout'>
         {/* Mini calendar */}
         <div className={miniCalendarContainer}>
-          <div className='df-right-panel__calendar-shell'>
-            <div className='df-right-panel__calendar-header'>
-              <div className='df-right-panel__header-spacer' aria-hidden='true'>
+          <div className='df-right-panel-calendar-shell'>
+            <div className='df-right-panel-calendar-header'>
+              <div className='df-right-panel-header-spacer' aria-hidden='true'>
                 &nbsp;
               </div>
               <TodayBox
@@ -84,9 +84,9 @@ export const RightPanel = ({
         </div>
 
         {/* Event details area */}
-        <div className='df-right-panel__events'>
-          <div className='df-right-panel__events-inner'>
-            <h3 className='df-right-panel__date-heading'>
+        <div className='df-right-panel-events'>
+          <div className='df-right-panel-events-inner'>
+            <h3 className='df-right-panel-date-heading'>
               {currentDate.toLocaleDateString(locale, {
                 weekday: 'long',
                 month: 'long',
@@ -95,13 +95,13 @@ export const RightPanel = ({
             </h3>
 
             {sortedEvents.length === 0 ? (
-              <p className='df-right-panel__empty'>{t('noEvents')}</p>
+              <p className='df-right-panel-empty'>{t('noEvents')}</p>
             ) : (
-              <div className='df-right-panel__list'>
+              <div className='df-right-panel-list'>
                 {sortedEvents.map((event: Event) => (
                   <div
                     key={event.id}
-                    className='df-right-panel__event-card'
+                    className='df-right-panel-event-card'
                     data-selected={
                       selectedEvent?.id === event.id ? 'true' : 'false'
                     }
@@ -120,11 +120,11 @@ export const RightPanel = ({
                       app.onEventClick(event);
                     }}
                   >
-                    <div className='df-right-panel__event-title'>
+                    <div className='df-right-panel-event-title'>
                       {event.title}
                     </div>
                     {!event.allDay && (
-                      <div className='df-right-panel__event-time'>
+                      <div className='df-right-panel-event-time'>
                         {formatTime(
                           appTimeZone
                             ? extractHourFromDate(
@@ -150,7 +150,7 @@ export const RightPanel = ({
                       </div>
                     )}
                     {event.allDay && (
-                      <div className='df-right-panel__event-time'>
+                      <div className='df-right-panel-event-time'>
                         {t('allDay')}
                       </div>
                     )}

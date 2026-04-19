@@ -254,11 +254,11 @@ export const QuickCreateEventPopup = ({
         visibility: isReady ? 'visible' : 'hidden',
       }}
     >
-      <div className='df-quick-create__header'>
-        <div className='df-quick-create__title'>
+      <div className='df-quick-create-header'>
+        <div className='df-quick-create-title'>
           {t('quickCreateEvent') || 'Quick Create Event'}
         </div>
-        <div className='df-quick-create__input-wrap'>
+        <div className='df-quick-create-input-wrap'>
           <input
             ref={inputRef}
             type='text'
@@ -272,9 +272,9 @@ export const QuickCreateEventPopup = ({
         </div>
       </div>
 
-      <div className='df-quick-create__list'>
+      <div className='df-quick-create-list'>
         {suggestions.length === 0 && inputValue && (
-          <div className='df-quick-create__empty'>
+          <div className='df-quick-create-empty'>
             {t('noSuggestions') || 'Type to create'}
           </div>
         )}
@@ -282,23 +282,23 @@ export const QuickCreateEventPopup = ({
         {suggestions.map((item, index) => (
           <div
             key={`${item.type}-${index}`}
-            className='df-quick-create__item'
+            className='df-quick-create-item'
             data-selected={index === selectedIndex ? 'true' : 'false'}
             onClick={() => handleCreate(item)}
             onMouseEnter={() => setSelectedIndex(index)}
           >
             <div
-              className='df-quick-create__color-bar'
+              className='df-quick-create-color-bar'
               style={{ backgroundColor: item.color }}
             />
-            <div className='df-quick-create__item-content'>
-              <div className='df-quick-create__item-title'>{item.title}</div>
+            <div className='df-quick-create-item-content'>
+              <div className='df-quick-create-item-title'>{item.title}</div>
               <div>
-                <span className='df-quick-create__item-badge'>
+                <span className='df-quick-create-item-badge'>
                   {item.type === 'new' ? t('today') : t('tomorrow')}
                 </span>
               </div>
-              <div className='df-quick-create__item-time'>
+              <div className='df-quick-create-item-time'>
                 {formatTimeRange(item.start, item.end)}
               </div>
             </div>
@@ -308,7 +308,7 @@ export const QuickCreateEventPopup = ({
 
       {/* Triangle Arrow */}
       <div
-        className='df-quick-create__arrow'
+        className='df-quick-create-arrow'
         data-placement={placement === 'top' ? 'bottom' : 'top'}
         style={{ left: arrowLeft }}
       />

@@ -66,12 +66,12 @@ export const GridDayPopup = ({
 
   const defaultContent = (
     <>
-      <div className='df-year-popup__header'>
-        <div className='df-year-popup__title'>{dateLabel}</div>
+      <div className='df-year-popup-header'>
+        <div className='df-year-popup-title'>{dateLabel}</div>
       </div>
-      <div className='df-year-popup__body'>
+      <div className='df-year-popup-body'>
         {events.length === 0 ? (
-          <div className='df-year-popup__empty'>No events</div>
+          <div className='df-year-popup-empty'>No events</div>
         ) : (
           events.map(event => {
             const cal = event.calendarId
@@ -98,22 +98,20 @@ export const GridDayPopup = ({
             }
 
             return (
-              <div key={event.id} className='df-year-popup__event'>
+              <div key={event.id} className='df-year-popup-event'>
                 <div
-                  className='df-year-popup__dot'
+                  className='df-year-popup-dot'
                   style={{ backgroundColor: color }}
                 />
-                <div className='df-year-popup__event-main'>
-                  <div className='df-year-popup__event-title'>
-                    {event.title}
-                  </div>
+                <div className='df-year-popup-event-main'>
+                  <div className='df-year-popup-event-title'>{event.title}</div>
                   {event.allDay && (
-                    <div className='df-year-popup__event-meta'>
+                    <div className='df-year-popup-event-meta'>
                       {t('allDay')}
                     </div>
                   )}
                   {timeStr && (
-                    <div className='df-year-popup__event-meta'>{timeStr}</div>
+                    <div className='df-year-popup-event-meta'>{timeStr}</div>
                   )}
                 </div>
               </div>

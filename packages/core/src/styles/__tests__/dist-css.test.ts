@@ -315,4 +315,10 @@ describe('CSS dist output integrity', () => {
       expect(componentsCss).toMatch(/\.df-portal/);
     });
   });
+
+  describe('styles.css — host reset compatibility', () => {
+    it('does not ship cascade layers that can lose to host unlayered resets', () => {
+      expect(fullCss).not.toMatch(/@layer\s+/);
+    });
+  });
 });

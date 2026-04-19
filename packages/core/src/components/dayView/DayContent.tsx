@@ -246,10 +246,10 @@ export const DayContent = ({
       data-switcher-mode={switcherMode}
       onContextMenu={e => e.preventDefault()}
     >
-      <div className='df-day-content__layout'>
+      <div className='df-day-content-layout'>
         {/* Fixed navigation bar */}
         <div
-          className='df-day-content__header-wrap'
+          className='df-day-content-header-wrap'
           onContextMenu={e => e.preventDefault()}
           style={{
             paddingRight: isMobile || !hasScrollbarSpace ? '0px' : '15px',
@@ -264,7 +264,7 @@ export const DayContent = ({
         {/* All-day event area */}
         {showAllDay ? (
           <div
-            className={cn(allDayRow, 'df-day-content__all-day-row')}
+            className={cn(allDayRow, 'df-day-content-all-day-row')}
             ref={allDayRowRef}
             data-scrollbar-space={
               !isMobile && hasScrollbarSpace ? 'true' : 'false'
@@ -276,19 +276,19 @@ export const DayContent = ({
             onContextMenu={e => handleContextMenu(e, true)}
           >
             <div
-              className={cn(allDayLabel, 'df-day-content__all-day-label')}
+              className={cn(allDayLabel, 'df-day-content-all-day-label')}
               onContextMenu={e => e.preventDefault()}
             >
               {t('allDay')}
             </div>
             <div
-              className='df-day-content__all-day-grid'
+              className='df-day-content-all-day-grid'
               data-scrollbar-space={
                 !isMobile && hasScrollbarSpace ? 'true' : 'false'
               }
             >
               <div
-                className='df-day-content__all-day-lane'
+                className='df-day-content-all-day-lane'
                 style={{ minHeight: `${allDayAreaHeight}px` }}
                 onClick={() => onDateChange?.(currentDate)}
                 onMouseDown={e => {
@@ -374,7 +374,7 @@ export const DayContent = ({
           </div>
         ) : (
           <div
-            className='df-day-content__all-day-spacer'
+            className='df-day-content-all-day-spacer'
             data-scrollbar-space={
               !isMobile && hasScrollbarSpace ? 'true' : 'false'
             }
@@ -383,10 +383,10 @@ export const DayContent = ({
 
         {/* Time grid and event area */}
         <div
-          className={cn(calendarContent, 'df-day-content__grid')}
+          className={cn(calendarContent, 'df-day-content-grid')}
           style={{ scrollbarGutter: 'stable' }}
         >
-          <div className='df-day-content__grid-inner'>
+          <div className='df-day-content-grid-inner'>
             {/* Current time line */}
             {isToday &&
               currentTime &&
@@ -408,14 +408,14 @@ export const DayContent = ({
                       marginTop: showSecondaryTz ? '2rem' : '0.75rem',
                     }}
                   >
-                    <div className='df-day-content__current-time-side'>
-                      <div className='df-day-content__current-time-side-inner' />
+                    <div className='df-day-content-current-time-side'>
+                      <div className='df-day-content-current-time-side-inner' />
                       <div className={currentTimeLabel}>
                         {formatTime(hours, 0, timeFormat, false)}
                       </div>
                     </div>
 
-                    <div className='df-day-content__current-time-rail'>
+                    <div className='df-day-content-current-time-rail'>
                       <div className={currentTimeLineBar} />
                     </div>
                   </div>
@@ -430,16 +430,16 @@ export const DayContent = ({
             >
               {/* Top boundary spacer — expands to include timezone header when active */}
               <div
-                className='df-time-column__spacer'
+                className='df-time-column-spacer'
                 data-secondary-tz={showSecondaryTz ? 'true' : 'false'}
               >
                 {showSecondaryTz && (
                   /* Timezone header: secondary LEFT, primary RIGHT */
-                  <div className='df-time-column__tz-header'>
-                    <span className='df-time-column__tz-label'>
+                  <div className='df-time-column-tz-header'>
+                    <span className='df-time-column-tz-label'>
                       {secondaryTzLabel}
                     </span>
-                    <span className='df-time-column__tz-label'>
+                    <span className='df-time-column-tz-label'>
                       {primaryTzLabel}
                     </span>
                   </div>
@@ -448,13 +448,13 @@ export const DayContent = ({
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
                   {showSecondaryTz ? (
-                    <div className='df-time-column__tz-row'>
-                      <span className='df-time-column__tz-value'>
+                    <div className='df-time-column-tz-row'>
+                      <span className='df-time-column-tz-value'>
                         {showStartOfDayLabel && slotIndex === 0
                           ? ''
                           : (secondaryTimeSlots?.[slotIndex] ?? '')}
                       </span>
-                      <span className='df-time-column__tz-value'>
+                      <span className='df-time-column-tz-value'>
                         {showStartOfDayLabel && slotIndex === 0
                           ? ''
                           : slot.label}
@@ -470,13 +470,13 @@ export const DayContent = ({
             </div>
 
             {/* Time grid */}
-            <div className='df-day-content__grid-column'>
+            <div className='df-day-content-grid-column'>
               {/* Top boundary — height must match time column spacer */}
               <div
                 className={cn(
                   timeGridBoundary,
-                  'df-time-grid-boundary--top',
-                  'df-day-content__grid-boundary'
+                  'df-time-grid-boundary-top',
+                  'df-day-content-grid-boundary'
                 )}
                 data-scrollbar-space={
                   !isMobile && hasScrollbarSpace ? 'true' : 'false'
@@ -484,7 +484,7 @@ export const DayContent = ({
                 style={showSecondaryTz ? { height: '2rem' } : undefined}
               >
                 <div
-                  className={cn(midnightLabel, 'df-midnight-label--offset')}
+                  className={cn(midnightLabel, 'df-midnight-label-offset')}
                   style={{ top: 'auto', bottom: '-0.625rem' }}
                 >
                   {showStartOfDayLabel
@@ -493,7 +493,7 @@ export const DayContent = ({
                 </div>
               </div>
               <div
-                className='df-day-content__grid-rows'
+                className='df-day-content-grid-rows'
                 style={{ WebkitTouchCallout: 'none' }}
                 ref={timeGridRef}
               >
@@ -567,7 +567,7 @@ export const DayContent = ({
                 <div
                   className={cn(
                     timeGridBoundary,
-                    'df-day-content__grid-boundary'
+                    'df-day-content-grid-boundary-bottom'
                   )}
                   data-scrollbar-space={
                     !isMobile && hasScrollbarSpace ? 'true' : 'false'
@@ -575,7 +575,7 @@ export const DayContent = ({
                 >
                   {showSecondaryTz ? (
                     <div
-                      className='df-time-column__tz-row df-day-content__bottom-tz-row'
+                      className='df-time-column-tz-row df-day-content-bottom-tz-row'
                       style={{
                         left: isMobile ? '-5rem' : '-5.5rem',
                         width: isMobile ? '5rem' : '5.5rem',
@@ -586,7 +586,7 @@ export const DayContent = ({
                     </div>
                   ) : (
                     <div
-                      className={cn(midnightLabel, 'df-midnight-label--offset')}
+                      className={cn(midnightLabel, 'df-midnight-label-offset')}
                     >
                       {formatTime(0, 0, timeFormat)}
                     </div>
@@ -594,7 +594,7 @@ export const DayContent = ({
                 </div>
 
                 {/* Event layer */}
-                <div className='df-day-content__event-layer'>
+                <div className='df-day-content-event-layer'>
                   {currentDayEvents
                     .filter(event => !event.allDay)
                     .map(event => {

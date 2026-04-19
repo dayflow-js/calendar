@@ -35,7 +35,7 @@ describe('RegularEventContent', () => {
     );
 
     const content = container.querySelector(
-      '.df-event__timed-content'
+      '.df-event-timed-content'
     ) as HTMLElement | null;
 
     expect(content).not.toBeNull();

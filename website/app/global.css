@@ -193,3 +193,8 @@
     display: none !important;
   }
 }
+
+.df-calendar-container {
+  --df-calendar-height: 750px !important;
+  height: var(--df-calendar-height, 750px) !important;
+}

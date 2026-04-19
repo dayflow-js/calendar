@@ -47,19 +47,19 @@ const MonthRegularContent = ({
 
   return (
     <div className={monthRegularContent} data-mobile={String(!!isMobile)}>
-      <div className='df-event__month-main'>
+      <div className='df-event-month-main'>
         {!hideColorBar && (
           <div style={colorBarStyle} className={monthEventColorBar} />
         )}
         <span
-          className={`df-event__month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
+          className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
           style={isMobile ? mobileFadeStyle : undefined}
         >
           {event.title}
         </span>
       </div>
       {!hideTime && !isMobile && (
-        <span className='df-event__month-time' style={{ opacity: 0.8 }}>
+        <span className='df-event-month-time' style={{ opacity: 0.8 }}>
           {startTime}
         </span>
       )}

@@ -69,49 +69,49 @@ export const DeleteCalendarDialog = ({
   };
 
   return createPortal(
-    <div className='df-sidebar__overlay'>
-      <div className='df-sidebar__dialog'>
+    <div className='df-sidebar-overlay'>
+      <div className='df-sidebar-dialog'>
         {step === 'initial' ? (
           <>
-            <h2 className='df-sidebar__dialog-title'>
+            <h2 className='df-sidebar-dialog-title'>
               {t('deleteCalendar', { calendarName })}
             </h2>
-            <p className='df-sidebar__dialog-text df-sidebar__dialog-line'>
+            <p className='df-sidebar-dialog-text df-sidebar-dialog-line'>
               {renderWithChip(
                 t('deleteCalendarMessage', { calendarName: CAL_SENTINEL }),
                 calendarName,
                 calendarColor
               )}
             </p>
-            <div className='df-sidebar__dialog-split-actions'>
-              <div className='df-sidebar__field'>
+            <div className='df-sidebar-dialog-split-actions'>
+              <div className='df-sidebar-field'>
                 <button
                   type='button'
                   disabled={isLoading}
                   onClick={() => setShowMergeDropdown(!showMergeDropdown)}
-                  className='df-sidebar__button df-sidebar__button--secondary'
+                  className='df-sidebar-button df-sidebar-button-secondary'
                 >
                   {t('merge')}
                 </button>
                 {showMergeDropdown && (
-                  <div className='df-sidebar__dropdown'>
+                  <div className='df-sidebar-dropdown'>
                     {calendars
                       .filter(c => c.id !== calendarId)
                       .map(calendar => (
                         <div
                           key={calendar.id}
-                          className='df-sidebar__dropdown-item'
+                          className='df-sidebar-dropdown-item'
                           onClick={() => {
                             handleMergeSelect(calendar.id);
                           }}
                         >
                           <div
-                            className='df-sidebar__swatch'
+                            className='df-sidebar-swatch'
                             style={{
                               backgroundColor: calendar.colors.lineColor,
                             }}
                           />
-                          <span className='df-sidebar__dropdown-label'>
+                          <span className='df-sidebar-dropdown-label'>
                             {calendar.name || calendar.id}
                           </span>
                         </div>
@@ -119,12 +119,12 @@ export const DeleteCalendarDialog = ({
                   </div>
                 )}
               </div>
-              <div className='df-sidebar__button-row'>
+              <div className='df-sidebar-button-row'>
                 <button
                   type='button'
                   onClick={onCancel}
                   disabled={isLoading}
-                  className='df-sidebar__button df-sidebar__button--secondary'
+                  className='df-sidebar-button df-sidebar-button-secondary'
                 >
                   {t('cancel')}
                 </button>
@@ -132,7 +132,7 @@ export const DeleteCalendarDialog = ({
                   type='button'
                   onClick={() => onStepChange('confirm_delete')}
                   disabled={isLoading}
-                  className='df-sidebar__button df-sidebar__button--destructive'
+                  className='df-sidebar-button df-sidebar-button-destructive'
                 >
                   {t('delete')}
                 </button>
@@ -141,18 +141,18 @@ export const DeleteCalendarDialog = ({
           </>
         ) : (
           <>
-            <h2 className='df-sidebar__dialog-title'>
+            <h2 className='df-sidebar-dialog-title'>
               {t('confirmDeleteTitle', { calendarName })}
             </h2>
-            <p className='df-sidebar__dialog-text'>
+            <p className='df-sidebar-dialog-text'>
               {t('confirmDeleteMessage')}
             </p>
-            <div className='df-sidebar__dialog-actions'>
+            <div className='df-sidebar-dialog-actions'>
               <button
                 type='button'
                 onClick={onCancel}
                 disabled={isLoading}
-                className='df-sidebar__button df-sidebar__button--secondary'
+                className='df-sidebar-button df-sidebar-button-secondary'
               >
                 {t('cancel')}
               </button>
@@ -160,7 +160,7 @@ export const DeleteCalendarDialog = ({
                 type='button'
                 onClick={handleConfirmDelete}
                 loading={isLoading}
-                className='df-sidebar__button df-sidebar__button--destructive'
+                className='df-sidebar-button df-sidebar-button-destructive'
               >
                 {t('delete')}
               </LoadingButton>

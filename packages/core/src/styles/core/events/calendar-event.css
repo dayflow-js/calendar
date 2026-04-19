@@ -118,7 +118,7 @@
    * Shared event internals
    * =================================================================== */
 
-  .df-event__all-day-shell {
+  .df-event-all-day-shell {
     position: absolute;
     inset: 0;
     display: flex;
@@ -128,11 +128,11 @@
     padding-left: 0.75rem;
   }
 
-  .df-event__all-day-shell .df-event__icon-slot {
+  .df-event-all-day-shell .df-event-icon-slot {
     margin-right: 0.5rem;
   }
 
-  .df-event__content-row {
+  .df-event-content-row {
     display: flex;
     min-width: 0;
     flex: 1;
@@ -140,7 +140,7 @@
     overflow: hidden;
   }
 
-  .df-event__timed-content {
+  .df-event-timed-content {
     display: flex;
     height: 100%;
     flex-direction: column;
@@ -149,11 +149,11 @@
     padding-left: 0.75rem;
   }
 
-  .df-event__timed-content[data-density='compact'] {
+  .df-event-timed-content[data-density='compact'] {
     padding-block: 0;
   }
 
-  .df-event__icon-slot {
+  .df-event-icon-slot {
     margin-right: 0.375rem;
     display: inline-flex;
     flex-shrink: 0;
@@ -161,14 +161,14 @@
     justify-content: center;
   }
 
-  .df-event__icon-svg {
+  .df-event-icon-svg {
     display: block;
     height: 0.75rem;
     width: 0.75rem;
     flex-shrink: 0;
   }
 
-  .df-event__title {
+  .df-event-title {
     overflow: hidden;
     padding-right: 0.25rem;
     font-size: 0.75rem;
@@ -178,11 +178,11 @@
     text-overflow: ellipsis;
   }
 
-  .df-event__title--tight {
+  .df-event-title-tight {
     line-height: 1.2;
   }
 
-  .df-event__time {
+  .df-event-time {
     overflow: hidden;
     font-size: 0.75rem;
     line-height: 1rem;
@@ -191,7 +191,7 @@
     opacity: 0.8;
   }
 
-  .df-event__color-bar {
+  .df-event-color-bar {
     position: absolute;
     top: 0.25rem;
     bottom: 0.25rem;
@@ -200,20 +200,20 @@
     border-radius: 9999px;
   }
 
-  .df-event__color-bar-overlay {
+  .df-event-color-bar-overlay {
     position: absolute;
     inset: 0;
     pointer-events: none;
   }
 
-  .df-event__resize-handle {
+  .df-event-resize-handle {
     position: absolute;
     z-index: 20;
     transition: opacity 150ms;
   }
 
-  .df-event__resize-handle--top,
-  .df-event__resize-handle--bottom {
+  .df-event-resize-handle-top,
+  .df-event-resize-handle-bottom {
     left: 0;
     width: 100%;
     height: 0.375rem;
@@ -221,18 +221,18 @@
     cursor: ns-resize;
   }
 
-  .df-event__resize-handle--top {
+  .df-event-resize-handle-top {
     top: 0;
     border-radius: 0.25rem 0.25rem 0 0;
   }
 
-  .df-event__resize-handle--bottom {
+  .df-event-resize-handle-bottom {
     bottom: 0;
     border-radius: 0 0 0.25rem 0.25rem;
   }
 
-  .df-event__resize-handle--left,
-  .df-event__resize-handle--right {
+  .df-event-resize-handle-left,
+  .df-event-resize-handle-right {
     top: 0;
     bottom: 0;
     width: 0.25rem;
@@ -240,27 +240,26 @@
     opacity: 0;
   }
 
-  .df-event__resize-handle--left {
+  .df-event-resize-handle-left {
     left: 0;
   }
 
-  .df-event__resize-handle--right {
+  .df-event-resize-handle-right {
     right: 0;
   }
 
-  .df-event:hover .df-event__resize-handle--left,
-  .df-event:hover .df-event__resize-handle--right,
-  .df-event[data-selected='true'] .df-event__resize-handle--left,
-  .df-event[data-selected='true'] .df-event__resize-handle--right,
-  .df-month-segment-event:hover .df-event__resize-handle--left,
-  .df-month-segment-event:hover .df-event__resize-handle--right,
-  .df-month-segment-event[data-selected='true'] .df-event__resize-handle--left,
-  .df-month-segment-event[data-selected='true']
-    .df-event__resize-handle--right {
+  .df-event:hover .df-event-resize-handle-left,
+  .df-event:hover .df-event-resize-handle-right,
+  .df-event[data-selected='true'] .df-event-resize-handle-left,
+  .df-event[data-selected='true'] .df-event-resize-handle-right,
+  .df-month-segment-event:hover .df-event-resize-handle-left,
+  .df-month-segment-event:hover .df-event-resize-handle-right,
+  .df-month-segment-event[data-selected='true'] .df-event-resize-handle-left,
+  .df-month-segment-event[data-selected='true'] .df-event-resize-handle-right {
     opacity: 1;
   }
 
-  .df-event__touch-resize-indicator {
+  .df-event-touch-resize-indicator {
     position: absolute;
     z-index: 50;
     box-sizing: border-box;
@@ -272,26 +271,26 @@
     pointer-events: auto;
   }
 
-  .df-event__touch-resize-indicator[data-axis='vertical'][data-position='top'] {
+  .df-event-touch-resize-indicator[data-axis='vertical'][data-position='top'] {
     top: -0.375rem;
     right: 1.25rem;
   }
 
-  .df-event__touch-resize-indicator[data-axis='vertical'][data-position='bottom'] {
+  .df-event-touch-resize-indicator[data-axis='vertical'][data-position='bottom'] {
     bottom: -0.375rem;
     left: 1.25rem;
   }
 
-  .df-event__touch-resize-indicator[data-axis='horizontal'] {
+  .df-event-touch-resize-indicator[data-axis='horizontal'] {
     top: 50%;
     transform: translateY(-50%);
   }
 
-  .df-event__touch-resize-indicator[data-axis='horizontal'][data-position='left'] {
+  .df-event-touch-resize-indicator[data-axis='horizontal'][data-position='left'] {
     left: 1.25rem;
   }
 
-  .df-event__touch-resize-indicator[data-axis='horizontal'][data-position='right'] {
+  .df-event-touch-resize-indicator[data-axis='horizontal'][data-position='right'] {
     right: 1.25rem;
   }
 
@@ -299,8 +298,8 @@
    * Month event variants
    * =================================================================== */
 
-  .df-event__month-all-day,
-  .df-event__month-regular {
+  .df-event-month-all-day,
+  .df-event-month-regular {
     display: flex;
     min-width: 0;
     align-items: center;
@@ -309,28 +308,28 @@
     cursor: pointer;
   }
 
-  .df-event__month-all-day {
+  .df-event-month-all-day {
     padding-inline: 0.25rem;
     min-width: 0;
     overflow: hidden;
     border-radius: 0.25rem;
   }
 
-  .df-event__month-regular {
+  .df-event-month-regular {
     height: 1rem;
     justify-content: space-between;
     padding-inline: 0.125rem;
   }
 
-  .df-event__month-main {
+  .df-event-month-main {
     display: flex;
     min-width: 0;
     flex: 1;
     align-items: center;
   }
 
-  .df-event__month-color-bar,
-  .df-event__year-indicator {
+  .df-event-month-color-bar,
+  .df-event-year-indicator {
     display: inline-block;
     height: 0.75rem;
     width: 0.1875rem;
@@ -338,11 +337,11 @@
     border-radius: 9999px;
   }
 
-  .df-event__month-color-bar {
+  .df-event-month-color-bar {
     margin-right: 0.25rem;
   }
 
-  .df-event__month-title {
+  .df-event-month-title {
     display: block;
     min-width: 0;
     flex: 1;
@@ -351,38 +350,38 @@
     text-overflow: ellipsis;
   }
 
-  .df-event__month-title.df-mobile-mask-fade {
+  .df-event-month-title.df-mobile-mask-fade {
     text-overflow: clip;
   }
 
-  .df-event__month-all-day .df-event__icon-slot,
-  .df-event__month-all-day .df-event__icon-svg {
+  .df-event-month-all-day .df-event-icon-slot,
+  .df-event-month-all-day .df-event-icon-svg {
     margin-right: 0.25rem;
   }
 
-  .df-event__month-time {
+  .df-event-month-time {
     margin-left: 0.25rem;
     flex-shrink: 0;
     font-size: 0.75rem;
     line-height: 1rem;
   }
 
-  .df-event__holiday-icon {
+  .df-event-holiday-icon {
     display: inline-block;
     margin-right: 0.25rem;
     flex-shrink: 0;
     color: rgb(202 138 4);
   }
 
-  .df-event[data-selected='true'] .df-event__month-title,
-  .df-event[data-selected='true'] .df-event__month-time,
-  .df-event[data-selected='true'] .df-event__month-all-day .df-event__icon-svg,
-  .df-month-segment-event[data-selected='true'] .df-event__month-title,
-  .df-month-segment-event[data-selected='true'] .df-event__month-time {
+  .df-event[data-selected='true'] .df-event-month-title,
+  .df-event[data-selected='true'] .df-event-month-time,
+  .df-event[data-selected='true'] .df-event-month-all-day .df-event-icon-svg,
+  .df-month-segment-event[data-selected='true'] .df-event-month-title,
+  .df-month-segment-event[data-selected='true'] .df-event-month-time {
     color: #fff;
   }
 
-  .df-event[data-selected='true'] .df-event__holiday-icon {
+  .df-event[data-selected='true'] .df-event-holiday-icon {
     color: rgb(254 240 138);
   }
 
@@ -390,7 +389,7 @@
    * Year event variants
    * =================================================================== */
 
-  .df-event__year-content {
+  .df-event-year-content {
     display: flex;
     height: 100%;
     width: 100%;
@@ -400,11 +399,11 @@
     pointer-events: auto;
   }
 
-  .df-event__year-content--timed {
+  .df-event-year-content-timed {
     gap: 0.25rem;
   }
 
-  .df-event__year-icon-badge {
+  .df-event-year-icon-badge {
     display: inline-flex;
     height: 12px;
     width: 12px;
@@ -416,18 +415,18 @@
     color: #fff;
   }
 
-  .df-event__year-icon-badge .df-event__icon-svg {
+  .df-event-year-icon-badge .df-event-icon-svg {
     margin-right: 0;
     height: 0.5rem;
     width: 0.5rem;
   }
 
-  .df-event__year-main {
+  .df-event-year-main {
     min-width: 0;
     flex: 1;
   }
 
-  .df-event__year-title {
+  .df-event-year-title {
     display: block;
     overflow: hidden;
     font-size: 12px;
@@ -436,28 +435,28 @@
     text-overflow: ellipsis;
   }
 
-  .df-event__year-title--strong {
+  .df-event-year-title-strong {
     font-weight: 500;
   }
 
-  .df-event__year-tail {
+  .df-event-year-tail {
     margin-left: 0.25rem;
     flex-shrink: 0;
     color: rgb(255 255 255 / 0.8);
   }
 
-  .dark .df-event__year-tail {
+  .dark .df-event-year-tail {
     color: rgb(255 255 255 / 0.9);
   }
 
-  .df-event__year-tail-dot {
+  .df-event-year-tail-dot {
     height: 0.375rem;
     width: 0.375rem;
     border-radius: 9999px;
     background-color: rgb(255 255 255 / 0.6);
   }
 
-  .dark .df-event__year-tail-dot {
+  .dark .df-event-year-tail-dot {
     background-color: rgb(255 255 255 / 0.8);
   }
 
@@ -486,12 +485,12 @@
       0 4px 6px -4px rgb(0 0 0 / 0.3);
   }
 
-  .df-month-segment-event__body {
+  .df-month-segment-event-body {
     min-width: 0;
     flex: 1;
   }
 
-  .df-month-segment-event__all-day {
+  .df-month-segment-event-all-day {
     display: flex;
     min-width: 0;
     width: 100%;
@@ -499,12 +498,12 @@
     overflow: hidden;
   }
 
-  .df-month-segment-event__all-day-main {
+  .df-month-segment-event-all-day-main {
     min-width: 0;
     flex: 1;
   }
 
-  .df-month-segment-event__all-day-title {
+  .df-month-segment-event-all-day-title {
     display: block;
     overflow: hidden;
     font-size: 0.75rem;
@@ -513,22 +512,22 @@
     text-overflow: ellipsis;
   }
 
-  .df-month-segment-event__time {
+  .df-month-segment-event-time {
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1rem;
     white-space: nowrap;
   }
 
-  .df-month-segment-event__time--spaced {
+  .df-month-segment-event-time-spaced {
     margin-left: 0.5rem;
   }
 
-  .df-month-segment-event__time--overlay {
+  .df-month-segment-event-time-overlay {
     position: absolute;
   }
 
-  .df-month-segment-event__tail-time {
+  .df-month-segment-event-tail-time {
     margin-left: auto;
     font-size: 0.75rem;
     font-weight: 500;
@@ -536,24 +535,24 @@
     white-space: nowrap;
   }
 
-  .df-month-segment-event__tail {
+  .df-month-segment-event-tail {
     margin-left: 0.25rem;
     flex-shrink: 0;
     color: rgb(255 255 255 / 0.8);
   }
 
-  .dark .df-month-segment-event__tail {
+  .dark .df-month-segment-event-tail {
     color: rgb(255 255 255 / 0.9);
   }
 
-  .df-month-segment-event__tail-dot {
+  .df-month-segment-event-tail-dot {
     height: 0.375rem;
     width: 0.375rem;
     border-radius: 9999px;
     background-color: rgb(255 255 255 / 0.6);
   }
 
-  .dark .df-month-segment-event__tail-dot {
+  .dark .df-month-segment-event-tail-dot {
     background-color: rgb(255 255 255 / 0.8);
   }
 }

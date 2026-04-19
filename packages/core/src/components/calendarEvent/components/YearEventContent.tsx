@@ -80,7 +80,7 @@ const YearEventContent = ({
 
       return (
         <div
-          className='df-event__year-content'
+          className='df-event-year-content'
           onMouseDown={e => {
             if (onMoveStart) {
               e.stopPropagation();
@@ -89,9 +89,9 @@ const YearEventContent = ({
           }}
         >
           {segment.isFirstSegment && getEventIcon(event) && (
-            <div className='df-event__icon-slot'>
+            <div className='df-event-icon-slot'>
               <div
-                className='df-event__year-icon-badge'
+                className='df-event-year-icon-badge'
                 style={{
                   backgroundColor: getLineColor(calendarId),
                 }}
@@ -101,14 +101,14 @@ const YearEventContent = ({
             </div>
           )}
 
-          <div className='df-event__year-main'>
-            <div className='df-event__year-title'>{getDisplayText()}</div>
+          <div className='df-event-year-main'>
+            <div className='df-event-year-title'>{getDisplayText()}</div>
           </div>
 
           {/* Add small indicator for continuation if needed, similar to MultiDayEvent */}
           {segment.isLastSegment && !segment.isFirstSegment && (
-            <div className='df-event__year-tail'>
-              <div className='df-event__year-tail-dot'></div>
+            <div className='df-event-year-tail'>
+              <div className='df-event-year-tail-dot'></div>
             </div>
           )}
         </div>
@@ -120,7 +120,7 @@ const YearEventContent = ({
 
     return (
       <div
-        className='df-event__year-content df-event__year-content--timed'
+        className='df-event-year-content df-event-year-content-timed'
         onMouseDown={e => {
           if (onMoveStart) {
             e.stopPropagation();
@@ -131,10 +131,10 @@ const YearEventContent = ({
         {!isAllDay && (
           <span
             style={indicatorColorBarStyle}
-            className='df-event__year-indicator'
+            className='df-event-year-indicator'
           ></span>
         )}
-        <span className='df-event__year-title df-event__year-title--strong'>
+        <span className='df-event-year-title df-event-year-title-strong'>
           {titleText}
         </span>
       </div>

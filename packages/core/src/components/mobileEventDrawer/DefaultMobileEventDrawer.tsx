@@ -315,24 +315,24 @@ export const MobileEventDrawer = ({
   return createPortal(
     <div className='df-portal df-mobile-event-drawer'>
       <div
-        className='df-mobile-event-drawer__backdrop'
+        className='df-mobile-event-drawer-backdrop'
         data-closing={String(isClosing)}
         onClick={onClose}
       />
 
       <div
-        className={`df-mobile-event-drawer__panel ${isClosing ? 'df-animate-slide-down' : 'df-animate-slide-up'}`}
+        className={`df-mobile-event-drawer-panel ${isClosing ? 'df-animate-slide-down' : 'df-animate-slide-up'}`}
         onClick={e => e.stopPropagation()}
       >
-        <div className='df-mobile-event-drawer__header'>
+        <div className='df-mobile-event-drawer-header'>
           <button
             type='button'
             onClick={onClose}
-            className='df-mobile-event-drawer__header-action'
+            className='df-mobile-event-drawer-header-action'
           >
             {t('cancel')}
           </button>
-          <span className='df-mobile-event-drawer__title'>
+          <span className='df-mobile-event-drawer-title'>
             {!isEditable && isEditing
               ? t('viewEvent')
               : isEditing
@@ -344,18 +344,18 @@ export const MobileEventDrawer = ({
               type='button'
               onClick={handleSave}
               disabled={!hasChanges}
-              className={`df-mobile-event-drawer__header-action df-mobile-event-drawer__header-action--primary ${hasChanges ? '' : 'df-mobile-event-drawer__header-action--disabled'}`}
+              className={`df-mobile-event-drawer-header-action df-mobile-event-drawer-header-action-primary ${hasChanges ? '' : 'df-mobile-event-drawer-header-action-disabled'}`}
             >
               {isEditing ? t('done') : t('create')}
             </button>
           )}
           {!isEditable && (
-            <span className='df-mobile-event-drawer__header-spacer' />
+            <span className='df-mobile-event-drawer-header-spacer' />
           )}
         </div>
 
-        <div className='df-mobile-event-drawer__body'>
-          <div className='df-mobile-event-drawer__section df-mobile-event-drawer__section--framed'>
+        <div className='df-mobile-event-drawer-body'>
+          <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
             <input
               type='text'
               placeholder={t('titlePlaceholder')}
@@ -364,15 +364,15 @@ export const MobileEventDrawer = ({
                 e: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>
               ) => isEditable && setTitle(e.currentTarget.value)}
               readOnly={!isEditable}
-              className='df-mobile-event-drawer__title-input'
+              className='df-mobile-event-drawer-title-input'
               autoFocus={isEditable}
             />
           </div>
 
           {calendars.length > 0 && (
-            <div className='df-mobile-event-drawer__section df-mobile-event-drawer__section--framed'>
-              <div className='df-mobile-event-drawer__row'>
-                <span className='df-mobile-event-drawer__label'>
+            <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
+              <div className='df-mobile-event-drawer-row'>
+                <span className='df-mobile-event-drawer-label'>
                   {t('calendar')}
                 </span>
                 <CalendarPicker
@@ -393,9 +393,9 @@ export const MobileEventDrawer = ({
             </div>
           )}
 
-          <div className='df-mobile-event-drawer__section df-mobile-event-drawer__section--framed'>
-            <div className='df-mobile-event-drawer__row'>
-              <span className='df-mobile-event-drawer__label'>
+          <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
+            <div className='df-mobile-event-drawer-row'>
+              <span className='df-mobile-event-drawer-label'>
                 {t('allDay')}
               </span>
               <Switch
@@ -412,15 +412,15 @@ export const MobileEventDrawer = ({
             </div>
           </div>
 
-          <div className='df-mobile-event-drawer__section'>
-            <div className='df-mobile-event-drawer__row df-mobile-event-drawer__row--padded'>
-              <span className='df-mobile-event-drawer__label'>
+          <div className='df-mobile-event-drawer-section'>
+            <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
+              <span className='df-mobile-event-drawer-label'>
                 {t('starts')}
               </span>
-              <div className='df-mobile-event-drawer__controls'>
+              <div className='df-mobile-event-drawer-controls'>
                 <button
                   type='button'
-                  className='df-mobile-event-drawer__picker-trigger'
+                  className='df-mobile-event-drawer-picker-trigger'
                   data-active={String(expandedPicker === 'start-date')}
                   onClick={() => isEditable && toggleExpand('start-date')}
                   disabled={!isEditable}
@@ -431,7 +431,7 @@ export const MobileEventDrawer = ({
                 {!isAllDay && (
                   <button
                     type='button'
-                    className='df-mobile-event-drawer__picker-trigger'
+                    className='df-mobile-event-drawer-picker-trigger'
                     data-active={String(expandedPicker === 'start-time')}
                     onClick={() => isEditable && toggleExpand('start-time')}
                     disabled={!isEditable}
@@ -448,11 +448,11 @@ export const MobileEventDrawer = ({
             </div>
 
             <div
-              className='df-mobile-event-drawer__expander'
+              className='df-mobile-event-drawer-expander'
               data-kind='calendar'
               data-expanded={String(expandedPicker === 'start-date')}
             >
-              <div className='df-mobile-event-drawer__expander-content'>
+              <div className='df-mobile-event-drawer-expander-content'>
                 <MiniCalendar
                   currentDate={startDate}
                   visibleMonth={startVisibleMonth}
@@ -466,11 +466,11 @@ export const MobileEventDrawer = ({
               </div>
             </div>
             <div
-              className='df-mobile-event-drawer__expander'
+              className='df-mobile-event-drawer-expander'
               data-kind='time'
               data-expanded={String(expandedPicker === 'start-time')}
             >
-              <div className='df-mobile-event-drawer__expander-content'>
+              <div className='df-mobile-event-drawer-expander-content'>
                 <TimePickerWheel
                   date={startDate}
                   onChange={handleStartTimeChange}
@@ -480,13 +480,13 @@ export const MobileEventDrawer = ({
             </div>
           </div>
 
-          <div className='df-mobile-event-drawer__section'>
-            <div className='df-mobile-event-drawer__row df-mobile-event-drawer__row--padded'>
-              <span className='df-mobile-event-drawer__label'>{t('ends')}</span>
-              <div className='df-mobile-event-drawer__controls'>
+          <div className='df-mobile-event-drawer-section'>
+            <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
+              <span className='df-mobile-event-drawer-label'>{t('ends')}</span>
+              <div className='df-mobile-event-drawer-controls'>
                 <button
                   type='button'
-                  className='df-mobile-event-drawer__picker-trigger'
+                  className='df-mobile-event-drawer-picker-trigger'
                   data-active={String(expandedPicker === 'end-date')}
                   onClick={() => isEditable && toggleExpand('end-date')}
                   disabled={!isEditable}
@@ -497,7 +497,7 @@ export const MobileEventDrawer = ({
                 {!isAllDay && (
                   <button
                     type='button'
-                    className='df-mobile-event-drawer__picker-trigger'
+                    className='df-mobile-event-drawer-picker-trigger'
                     data-active={String(expandedPicker === 'end-time')}
                     onClick={() => isEditable && toggleExpand('end-time')}
                     disabled={!isEditable}
@@ -514,11 +514,11 @@ export const MobileEventDrawer = ({
             </div>
 
             <div
-              className='df-mobile-event-drawer__expander'
+              className='df-mobile-event-drawer-expander'
               data-kind='calendar'
               data-expanded={String(expandedPicker === 'end-date')}
             >
-              <div className='df-mobile-event-drawer__expander-content'>
+              <div className='df-mobile-event-drawer-expander-content'>
                 <MiniCalendar
                   currentDate={endDate}
                   visibleMonth={endVisibleMonth}
@@ -532,11 +532,11 @@ export const MobileEventDrawer = ({
               </div>
             </div>
             <div
-              className='df-mobile-event-drawer__expander'
+              className='df-mobile-event-drawer-expander'
               data-kind='time'
               data-expanded={String(expandedPicker === 'end-time')}
             >
-              <div className='df-mobile-event-drawer__expander-content'>
+              <div className='df-mobile-event-drawer-expander-content'>
                 <TimePickerWheel
                   date={endDate}
                   onChange={handleEndTimeChange}
@@ -547,7 +547,7 @@ export const MobileEventDrawer = ({
           </div>
 
           {shouldShowNotes && (
-            <div className='df-mobile-event-drawer__section df-mobile-event-drawer__section--framed'>
+            <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
               <textarea
                 placeholder={t('notesPlaceholder')}
                 value={notes}
@@ -555,17 +555,17 @@ export const MobileEventDrawer = ({
                   e: JSX.TargetedEvent<HTMLTextAreaElement, globalThis.Event>
                 ) => isEditable && setNotes(e.currentTarget.value)}
                 readOnly={!isEditable}
-                className='df-mobile-event-drawer__notes'
+                className='df-mobile-event-drawer-notes'
               />
             </div>
           )}
 
           {isEditable && isEditing && onEventDelete && draftEvent && (
-            <div className='df-mobile-event-drawer__section df-mobile-event-drawer__section--danger'>
+            <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-danger'>
               <button
                 type='button'
                 onClick={() => onEventDelete(draftEvent.id)}
-                className='df-mobile-event-drawer__delete-button'
+                className='df-mobile-event-drawer-delete-button'
               >
                 {t('delete')}
               </button>

@@ -302,15 +302,15 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
         {monthsData.map(month => (
           <div
             key={month.monthIndex}
-            className='df-year-grid-month df-year-grid__month'
+            className='df-year-grid-month df-year-grid-month'
           >
             {/* Month name */}
-            <div className='df-year-grid__month-title'>{month.monthName}</div>
+            <div className='df-year-grid-month-title'>{month.monthName}</div>
 
             {/* Container for labels and cells to ensure alignment and fit */}
-            <div className='df-year-grid__month-body'>
+            <div className='df-year-grid-month-body'>
               <div
-                className='df-year-grid__calendar'
+                className='df-year-grid-calendar'
                 style={{
                   gridTemplateColumns: 'repeat(7, 1fr)',
                   gridTemplateRows: 'repeat(7, 1fr)',
@@ -318,7 +318,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
               >
                 {/* Day-of-week headers */}
                 {weekDayLabels.map((label, i) => (
-                  <div key={i} className='df-year-grid__weekday'>
+                  <div key={i} className='df-year-grid-weekday'>
                     {label}
                   </div>
                 ))}
@@ -338,15 +338,15 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                     <div
                       key={`${month.monthIndex}-${i}`}
                       data-grid-day-cell
-                      className='df-year-grid__day'
+                      className='df-year-grid-day'
                       data-current-month={isCurrentMonth ? 'true' : 'false'}
                       style={intensityStyle}
                       onClick={e => handleDateClick(e, date, month.monthIndex)}
                       onDblClick={() => handleDateDoubleClick(date)}
                     >
-                      <div className='df-year-grid__day-inner'>
+                      <div className='df-year-grid-day-inner'>
                         <span
-                          className='df-year-grid__day-number'
+                          className='df-year-grid-day-number'
                           data-today={isToday ? 'true' : 'false'}
                           data-current-month={isCurrentMonth ? 'true' : 'false'}
                           data-has-events={eventCount > 0 ? 'true' : 'false'}

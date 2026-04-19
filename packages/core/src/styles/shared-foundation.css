@@ -198,7 +198,7 @@
     padding: 0.25rem;
     border: 1px solid var(--df-color-border);
     background-color: var(--df-color-background);
-    color: color-mix(in srgb, var(--df-color-foreground) 78%, transparent);
+    color: rgb(55 65 81);
     border-radius: 0.375rem;
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
     transition-property:
@@ -216,8 +216,12 @@
       0 1px 3px rgb(0 0 0 / 0.08);
   }
 
+  .dark .df-calendar-nav-button {
+    color: rgb(209 213 219);
+  }
+
   .dark .df-calendar-nav-button:hover {
-    background-color: var(--df-color-hover);
+    background-color: rgb(55 65 81);
   }
 
   .df-calendar-today-button {
@@ -231,7 +235,7 @@
     font-weight: 500;
     border: 1px solid var(--df-color-border);
     background-color: var(--df-color-background);
-    color: var(--df-color-foreground);
+    color: rgb(55 65 81);
     border-radius: 0.375rem;
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
     transition-property:
@@ -239,6 +243,10 @@
       fill, stroke;
     transition-duration: 150ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .df-calendar-today-button {
+    color: rgb(229 231 235);
   }
 
   .df-calendar-today-button:hover {
@@ -250,7 +258,7 @@
   }
 
   .dark .df-calendar-today-button:hover {
-    background-color: var(--df-color-hover);
+    background-color: rgb(55 65 81);
   }
 
   .df-calendar-checkbox {
@@ -309,28 +317,11 @@
     color: var(--df-color-primary-foreground);
   }
 
-  .df-today-button {
-    color: var(--df-color-primary);
-  }
-
-  .df-content-slot--stacked {
+  .df-content-slot-stacked {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     height: 100%;
-  }
-
-  .df-today-button:hover,
-  .df-nav-button:hover {
-    background-color: color-mix(
-      in srgb,
-      var(--df-color-primary) 10%,
-      transparent
-    );
-  }
-
-  .df-nav-button:hover {
-    color: var(--df-color-primary);
   }
 
   .df-search-group:focus-within .df-search-focus-within-primary {
@@ -632,7 +623,7 @@
     }
   }
 
-  .df-drag-indicator__title-mask {
+  .df-drag-indicator-title-mask {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: clip;

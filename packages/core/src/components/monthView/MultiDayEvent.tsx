@@ -251,11 +251,11 @@ export const MultiDayEvent = memo(
         };
 
         return (
-          <div className='df-month-segment-event__all-day'>
+          <div className='df-month-segment-event-all-day'>
             {segment.isFirstSegment && getEventIcon(visualEvent) && (
-              <div className='df-event__icon-slot'>
+              <div className='df-event-icon-slot'>
                 <div
-                  className='df-event__year-icon-badge'
+                  className='df-event-year-icon-badge'
                   style={{
                     backgroundColor: getLineColor(visualCalendarId),
                   }}
@@ -265,9 +265,9 @@ export const MultiDayEvent = memo(
               </div>
             )}
 
-            <div className='df-month-segment-event__all-day-main'>
+            <div className='df-month-segment-event-all-day-main'>
               <div
-                className={`df-month-segment-event__all-day-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
+                className={`df-month-segment-event-all-day-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
                 style={isMobile ? mobileFadeStyle : undefined}
               >
                 {getDisplayText()}
@@ -275,8 +275,8 @@ export const MultiDayEvent = memo(
             </div>
 
             {segment.isLastSegment && segment.segmentType !== 'single' && (
-              <div className='df-month-segment-event__tail'>
-                <div className='df-month-segment-event__tail-dot'></div>
+              <div className='df-month-segment-event-tail'>
+                <div className='df-month-segment-event-tail-dot'></div>
               </div>
             )}
           </div>
@@ -301,7 +301,7 @@ export const MultiDayEvent = memo(
           : undefined;
 
       return (
-        <div className='df-event__month-main'>
+        <div className='df-event-month-main'>
           {!hideColorBar && (
             <div
               className={monthEventColorBar}
@@ -312,9 +312,9 @@ export const MultiDayEvent = memo(
               }
             />
           )}
-          <div className='df-event__month-main'>
+          <div className='df-event-month-main'>
             <span
-              className={`df-event__month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
+              className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
               style={isMobile ? mobileFadeStyle : undefined}
             >
               {titleText}
@@ -322,7 +322,7 @@ export const MultiDayEvent = memo(
           </div>
           {segment.isFirstSegment && !isMobile && (
             <span
-              className={`df-month-segment-event__time ${segmentDays === 1 ? 'df-month-segment-event__time--spaced' : 'df-month-segment-event__time--overlay'}`}
+              className={`df-month-segment-event-time ${segmentDays === 1 ? 'df-month-segment-event-time-spaced' : 'df-month-segment-event-time-overlay'}`}
               style={startTimeStyle}
             >
               {startTimeText}
@@ -332,7 +332,7 @@ export const MultiDayEvent = memo(
             !visualEvent.allDay &&
             endHour !== 24 &&
             !isMobile && (
-              <span className='df-month-segment-event__tail-time'>
+              <span className='df-month-segment-event-tail-time'>
                 {`ends ${endTimeText}`}
               </span>
             )}
@@ -393,7 +393,7 @@ export const MultiDayEvent = memo(
           <>
             {segment.isFirstSegment && (
               <div
-                className='df-event__touch-resize-indicator'
+                className='df-event-touch-resize-indicator'
                 data-axis='horizontal'
                 data-position='left'
                 style={{ borderColor: getLineColor(calendarId) }}
@@ -405,7 +405,7 @@ export const MultiDayEvent = memo(
             )}
             {segment.isLastSegment && (
               <div
-                className='df-event__touch-resize-indicator'
+                className='df-event-touch-resize-indicator'
                 data-axis='horizontal'
                 data-position='right'
                 style={{ borderColor: getLineColor(calendarId) }}
@@ -419,7 +419,7 @@ export const MultiDayEvent = memo(
         )}
         {renderResizeHandle('left')}
         <div
-          className='df-month-segment-event__body'
+          className='df-month-segment-event-body'
           style={{
             cursor: isResizing ? 'ew-resize' : 'pointer',
           }}

@@ -22,6 +22,7 @@ For theme overrides, prefer `--df-color-*` variables or the stable `df-*` semant
 
 - [Common Classes](#common)
 - [Semantic Utility Classes](#semantic-utility-classes)
+- [Layout & Motion Helpers](#layout--motion-helpers)
 - [Day View Classes](#day-view)
 - [Week View Classes](#week-view)
 - [Month View Classes](#month-view)
@@ -39,30 +40,34 @@ For theme overrides, prefer `--df-color-*` variables or the stable `df-*` semant
 
 Common CSS classes used across all calendar views.
 
-| Class Name                 | Description                                                                                                                                          |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `df-calendar-container`    | The outer root container that wraps both the Sidebar and the Calendar. Supports the `--df-calendar-height` CSS variable to set the component height. |
-| `df-calendar`              | Main calendar container (includes header and view content)                                                                                           |
-| `df-header`                | Calendar header section (includes title, today button, and view switcher)                                                                            |
-| `df-header-left`           | Left section of the header (title and navigation buttons)                                                                                            |
-| `df-header-mid`            | Middle section of the header (current date range title)                                                                                              |
-| `df-header-right`          | Right section of the header (view switcher and search)                                                                                               |
-| `df-navigation`            | Navigation controls container                                                                                                                        |
-| `df-event`                 | Base class for all events                                                                                                                            |
-| `df-event-title`           | Event title text                                                                                                                                     |
-| `df-event-time`            | Event time text                                                                                                                                      |
-| `df-event-color-bar`       | Colored bar on the left side of events (Day/Week view)                                                                                               |
-| `df-month-event-color-bar` | Colored indicator for regular events (Month view)                                                                                                    |
-| `df-all-day-row`           | All-day event row container                                                                                                                          |
-| `df-all-day-label`         | All-day label text                                                                                                                                   |
-| `df-all-day-content`       | All-day event content area                                                                                                                           |
-| `df-all-day-cell`          | Individual all-day event cell                                                                                                                        |
-| `df-date-number`           | Date number display                                                                                                                                  |
-| `df-current-time-line`     | Current time indicator line container                                                                                                                |
-| `df-current-time-label`    | Current time label text                                                                                                                              |
-| `df-current-time-bar`      | Current time horizontal line                                                                                                                         |
-| `df-portal`                | Root scope class used by floating overlays rendered with portals                                                                                     |
-| `df-range-picker`          | Root scope class used by the range picker popup and trigger wrapper                                                                                  |
+| Class Name                 | Description                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| `df-calendar-container`    | Outer root container for the Sidebar and Calendar; supports `--df-calendar-height`. |
+| `df-calendar`              | Main calendar container (includes header and view content)                          |
+| `df-header`                | Calendar header section (includes title, today button, and view switcher)           |
+| `df-header-left`           | Left section of the header (title and navigation buttons)                           |
+| `df-header-mid`            | Middle section of the header (current date range title)                             |
+| `df-header-right`          | Right section of the header (view switcher and search)                              |
+| `df-navigation`            | Navigation controls container                                                       |
+| `df-view-header-container` | Shared container used by the secondary view header area                             |
+| `df-view-header-title`     | Shared title text class used in view-level headers                                  |
+| `df-view-header-subtitle`  | Shared subtitle text class used in view-level headers                               |
+| `df-event`                 | Base class for all events                                                           |
+| `df-event-title`           | Event title text                                                                    |
+| `df-event-time`            | Event time text                                                                     |
+| `df-event-color-bar`       | Colored bar on the left side of events (Day/Week view)                              |
+| `df-month-event-color-bar` | Colored indicator for regular events (Month view)                                   |
+| `df-all-day-row`           | All-day event row container                                                         |
+| `df-all-day-label`         | All-day label text                                                                  |
+| `df-all-day-content`       | All-day event content area                                                          |
+| `df-all-day-cell`          | Individual all-day event cell                                                       |
+| `df-date-number`           | Date number display                                                                 |
+| `df-current-time-line`     | Current time indicator line container                                               |
+| `df-current-time-label`    | Current time label text                                                             |
+| `df-current-time-bar`      | Current time horizontal line                                                        |
+| `df-calendar-checkbox`     | Shared checkbox style used by calendar lists and related controls                   |
+| `df-portal`                | Root scope class used by floating overlays rendered with portals                    |
+| `df-range-picker`          | Root scope class used by the range picker popup and trigger wrapper                 |
 
 ---
 
@@ -72,27 +77,62 @@ DayFlow now exposes a stable set of `df-*` semantic classes for internal states 
 
 Use these classes when you want to align custom content, plugin UI, or content-slot output with DayFlow's theme tokens:
 
-| Class Name               | Purpose                                                        |
-| ------------------------ | -------------------------------------------------------------- |
-| `df-fill-primary`        | Primary filled background + matching foreground text           |
-| `df-fill-secondary`      | Secondary filled background + matching foreground text         |
-| `df-fill-destructive`    | Destructive filled background + matching foreground text       |
-| `df-tint-primary`        | Primary 10% tint + primary text                                |
-| `df-tint-primary-md`     | Primary 20% tint + primary text                                |
-| `df-tint-primary-lg`     | Primary 30% tint + primary text                                |
-| `df-hover-primary`       | Primary-tinted hover state                                     |
-| `df-hover-primary-solid` | Solid primary hover state for filled buttons                   |
-| `df-hover-destructive`   | Destructive hover state                                        |
-| `df-text-primary`        | Primary text color                                             |
-| `df-text-primary-fg`     | Text color for primary-filled backgrounds                      |
-| `df-text-destructive`    | Destructive text color                                         |
-| `df-border-primary`      | Primary border color                                           |
-| `df-ring-primary`        | Primary focus/selection ring color                             |
-| `df-shadow-primary`      | Primary shadow color token                                     |
-| `df-focus-ring`          | Combined primary `border-color` + `ring-color` on `:focus`     |
-| `df-focus-ring-only`     | Primary `ring-color` on `:focus` without changing border color |
+| Class Name                | Purpose                                                        |
+| ------------------------- | -------------------------------------------------------------- |
+| `df-fill-primary`         | Primary filled background + matching foreground text           |
+| `df-fill-secondary`       | Secondary filled background + matching foreground text         |
+| `df-fill-destructive`     | Destructive filled background + matching foreground text       |
+| `df-tint-primary`         | Primary 10% tint + primary text                                |
+| `df-tint-primary-md`      | Primary 20% tint + primary text                                |
+| `df-tint-primary-lg`      | Primary 30% tint + primary text                                |
+| `df-hover-primary`        | Primary-tinted hover state                                     |
+| `df-hover-primary-md`     | Stronger primary-tinted hover state                            |
+| `df-hover-primary-solid`  | Solid primary hover state for filled buttons                   |
+| `df-hover-base`           | Default hover background using DayFlow's hover token           |
+| `df-hover-muted`          | Muted hover background                                         |
+| `df-hover-destructive`    | Destructive hover state                                        |
+| `df-text-primary`         | Primary text color                                             |
+| `df-text-muted`           | Muted text color                                               |
+| `df-text-primary-fg`      | Text color for primary-filled backgrounds                      |
+| `df-text-secondary-fg`    | Text color for secondary-filled backgrounds                    |
+| `df-text-destructive`     | Destructive text color                                         |
+| `df-text-destructive-fg`  | Text color for destructive-filled backgrounds                  |
+| `df-bg-base`              | Base surface background                                        |
+| `df-bg-card`              | Card surface background                                        |
+| `df-bg-sidebar`           | Sidebar-style muted background                                 |
+| `df-bg-secondary`         | Secondary muted background                                     |
+| `df-bg-tertiary`          | Tertiary background / divider surface                          |
+| `df-border-base`          | Base border                                                    |
+| `df-border-light`         | Lighter / softer border                                        |
+| `df-border-strong`        | Strong border using the primary token                          |
+| `df-border-primary`       | Primary border color                                           |
+| `df-border-primary-soft`  | Softer primary border color                                    |
+| `df-ring-primary`         | Primary focus/selection ring color                             |
+| `df-ring-primary-solid`   | Solid primary ring color                                       |
+| `df-shadow-sm`            | Small elevation shadow                                         |
+| `df-shadow-md`            | Medium elevation shadow                                        |
+| `df-shadow-primary`       | Primary shadow color token                                     |
+| `df-focus-ring`           | Combined primary `border-color` + `ring-color` on `:focus`     |
+| `df-focus-ring-only`      | Primary `ring-color` on `:focus` without changing border color |
+| `df-focus-border-primary` | Primary `border-color` on `:focus` only                        |
 
 Prefer these classes or the `--df-color-*` variables for theming. Avoid targeting old internal combinations such as `bg-primary`, `text-primary`, or `hover:bg-primary/90` on DayFlow internals, because those Tailwind semantic names are no longer part of the public styling contract.
+
+---
+
+## Layout & Motion Helpers
+
+These classes are useful when you want custom slot content or plugin UI to inherit DayFlow's layout and animation behavior.
+
+| Class Name                | Purpose                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `df-content-slot-stacked` | Makes a content slot fill available height and stack vertically |
+| `df-scrollbar-hide`       | Hides scrollbars while preserving scroll behavior               |
+| `df-animate-in`           | Base animation timing helper for entry transitions              |
+| `df-fade-in`              | Fade-in animation helper                                        |
+| `df-zoom-in-95`           | Slight zoom-in animation helper                                 |
+| `df-animate-slide-up`     | Slide-up entry animation                                        |
+| `df-animate-slide-down`   | Slide-down exit animation                                       |
 
 ---
 
@@ -153,15 +193,15 @@ CSS classes specific to the Month View.
 
 CSS classes specific to the Year View. These are particularly useful for customizing event appearance in the year overview.
 
-| Class Name                    | Description                                                          |
-| ----------------------------- | -------------------------------------------------------------------- |
-| `df-year-event`               | Event outer container - wraps the entire event element               |
-| `df-year-event-content`       | Event content container - contains icon, title, and other content    |
-| `df-year-event-title`         | Event title text - use this to customize title alignment, font, etc. |
-| `df-year-event-icon`          | Event icon container - for all-day event icons                       |
-| `df-year-event-indicator`     | Timed event color indicator - the colored dot/bar for timed events   |
-| `df-year-view-weekend-header` | Weekend day headers (Saturday/Sunday) in Fixed Week layout           |
-| `df-year-view-weekend-cell`   | Weekend grid cells (empty or date) in Fixed Week layout              |
+| Class Name                | Description                                                          |
+| ------------------------- | -------------------------------------------------------------------- |
+| `df-year-event`           | Event outer container - wraps the entire event element               |
+| `df-event-year-content`   | Event content container - contains icon, title, and other content    |
+| `df-event-year-title`     | Event title text - use this to customize title alignment, font, etc. |
+| `df-event-icon-svg`       | Event icon SVG used across event renderers, including Year view      |
+| `df-event-year-indicator` | Timed event color indicator - the colored dot/bar for timed events   |
+| `df-year-grid-month`      | Month card container in grid-based Year view                         |
+| `df-year-fixed-day-cell`  | Day cell in fixed-week Year view                                     |
 
 ---
 
@@ -169,12 +209,20 @@ CSS classes specific to the Year View. These are particularly useful for customi
 
 CSS classes for the Mini Calendar component (usually found in the sidebar or day view).
 
-| Class Name                | Description                            |
-| ------------------------- | -------------------------------------- |
-| `df-mini-calendar`        | Mini calendar container                |
-| `df-mini-calendar-grid`   | The grid container for days            |
-| `df-mini-calendar-header` | Weekday header cell (e.g., "Mo", "Tu") |
-| `df-mini-calendar-day`    | Individual date cell                   |
+| Class Name                     | Description                                |
+| ------------------------------ | ------------------------------------------ |
+| `df-mini-calendar`             | Mini calendar container                    |
+| `df-mini-calendar-body`        | Mini calendar body wrapper                 |
+| `df-mini-calendar-header-nav`  | Month navigation row                       |
+| `df-mini-calendar-nav-btn`     | Previous / next month button               |
+| `df-mini-calendar-month-label` | Current month label                        |
+| `df-mini-calendar-grid`        | The grid container for days                |
+| `df-mini-calendar-header`      | Weekday header cell (e.g., "Mo", "Tu")     |
+| `df-mini-calendar-day`         | Base class for a mini calendar date button |
+| `df-mini-calendar-day-cell`    | Styled date cell surface                   |
+| `df-mini-calendar-day-number`  | Numeric day label                          |
+| `df-mini-calendar-dots`        | Event-dot container inside a day cell      |
+| `df-mini-calendar-dot`         | Individual event dot                       |
 
 ---
 
@@ -182,14 +230,19 @@ CSS classes for the Mini Calendar component (usually found in the sidebar or day
 
 CSS classes for the sidebar component.
 
-| Class Name                 | Description                           |
-| -------------------------- | ------------------------------------- |
-| `df-sidebar`               | Sidebar container                     |
-| `df-sidebar-header`        | Sidebar header container              |
-| `df-sidebar-header-toggle` | Sidebar collapse/expand toggle button |
-| `df-sidebar-header-title`  | Sidebar header title ("Calendars")    |
-| `df-calendar-list`         | Calendar list container               |
-| `df-calendar-list-item`    | Individual calendar item in list      |
+| Class Name                | Description                             |
+| ------------------------- | --------------------------------------- |
+| `df-sidebar`              | Sidebar container                       |
+| `df-sidebar-header`       | Sidebar header container                |
+| `df-sidebar-toggle`       | Sidebar collapse/expand toggle button   |
+| `df-sidebar-header-title` | Sidebar header title ("Calendars")      |
+| `df-sidebar-list-shell`   | Scrollable wrapper around sidebar lists |
+| `df-sidebar-list`         | Calendar list container                 |
+| `df-sidebar-list-item`    | Individual calendar item in list        |
+| `df-sidebar-row`          | Interactive row inside each list item   |
+| `df-sidebar-chip`         | Small sidebar label / chip              |
+| `df-sidebar-dialog`       | Sidebar modal/dialog container          |
+| `df-sidebar-button`       | Shared sidebar button class             |
 
 ---
 
@@ -197,10 +250,12 @@ CSS classes for the sidebar component.
 
 CSS classes for navigation buttons.
 
-| Class Name        | Description                          |
-| ----------------- | ------------------------------------ |
-| `df-nav-button`   | Navigation arrow buttons (prev/next) |
-| `df-today-button` | "Today" button                       |
+| Class Name                 | Description                                    |
+| -------------------------- | ---------------------------------------------- |
+| `df-nav-button`            | Base navigation arrow button class (prev/next) |
+| `df-calendar-nav-button`   | Styled calendar navigation arrow button        |
+| `df-today-button`          | Base "Today" button class                      |
+| `df-calendar-today-button` | Styled calendar "Today" button                 |
 
 ---
 
@@ -208,12 +263,14 @@ CSS classes for navigation buttons.
 
 CSS classes for event detail panels and dialogs.
 
-| Class Name              | Description                 |
-| ----------------------- | --------------------------- |
-| `df-event-detail-panel` | Floating event detail panel |
-| `df-dialog-overlay`     | Dialog background overlay   |
-| `df-dialog-container`   | Dialog content container    |
-| `df-portal`             | Shared portal root class    |
+| Class Name                 | Description                      |
+| -------------------------- | -------------------------------- |
+| `df-event-detail-panel`    | Floating event detail panel      |
+| `df-event-dialog-overlay`  | Event detail dialog overlay root |
+| `df-event-dialog-backdrop` | Event detail dialog backdrop     |
+| `df-dialog-container`      | Dialog content container         |
+| `df-event-dialog-close`    | Event detail dialog close button |
+| `df-portal`                | Shared portal root class         |
 
 ---
 

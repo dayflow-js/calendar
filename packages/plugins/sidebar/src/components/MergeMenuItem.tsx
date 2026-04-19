@@ -59,19 +59,19 @@ export const MergeMenuItem = ({
     <>
       <div
         ref={itemRef}
-        className='df-sidebar__submenu-trigger'
+        className='df-sidebar-submenu-trigger'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <span>{t('merge')}</span>
-        <ChevronRight className='df-sidebar__submenu-chevron' />
+        <ChevronRight className='df-sidebar-submenu-chevron' />
       </div>
       {isHovered &&
         createPortal(
           <div
             ref={submenuRef}
             data-submenu-content='true'
-            className='df-portal df-sidebar__submenu-content df-context-menu__sub-content'
+            className='df-portal df-sidebar-submenu-content df-context-menu-sub-content'
             style={{ top: position.y, left: position.x }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -80,17 +80,17 @@ export const MergeMenuItem = ({
             {availableCalendars.map(calendar => (
               <div
                 key={calendar.id}
-                className='df-sidebar__submenu-item'
+                className='df-sidebar-submenu-item'
                 onClick={e => {
                   e.stopPropagation();
                   onMergeSelect(calendar.id);
                 }}
               >
                 <div
-                  className='df-sidebar__swatch'
+                  className='df-sidebar-swatch'
                   style={{ backgroundColor: calendar.colors.lineColor }}
                 />
-                <span className='df-sidebar__dropdown-label'>
+                <span className='df-sidebar-dropdown-label'>
                   {calendar.name || calendar.id}
                 </span>
               </div>

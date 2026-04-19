@@ -83,7 +83,7 @@ export const ImportCalendarDialog = ({
     return createPortal(
       <div
         ref={dropdownRef}
-        className='df-sidebar__dropdown'
+        className='df-sidebar-dropdown'
         style={{
           top: rect.bottom,
           left: rect.left,
@@ -95,34 +95,34 @@ export const ImportCalendarDialog = ({
           {calendars.map(calendar => (
             <div
               key={calendar.id}
-              className='df-sidebar__dropdown-item'
+              className='df-sidebar-dropdown-item'
               data-selected={
                 selectedCalendarId === calendar.id ? 'true' : undefined
               }
               onClick={() => handleSelect(calendar.id)}
             >
               <div
-                className='df-sidebar__swatch'
+                className='df-sidebar-swatch'
                 style={{ backgroundColor: calendar.colors.lineColor }}
               />
-              <span className='df-sidebar__dropdown-label'>
+              <span className='df-sidebar-dropdown-label'>
                 {calendar.name || calendar.id}
               </span>
               {selectedCalendarId === calendar.id && (
-                <Check className='df-sidebar__dropdown-check' />
+                <Check className='df-sidebar-dropdown-check' />
               )}
             </div>
           ))}
-          <div className='df-sidebar__dropdown-divider' />
+          <div className='df-sidebar-dropdown-divider' />
           <div
-            className='df-sidebar__dropdown-item'
+            className='df-sidebar-dropdown-item'
             data-selected={isNewSelected ? 'true' : undefined}
             onClick={() => handleSelect(NEW_CALENDAR_ID)}
           >
-            <span className='df-sidebar__dropdown-label'>
+            <span className='df-sidebar-dropdown-label'>
               {t('newCalendar') || 'New Calendar'}: {filename}
             </span>
-            {isNewSelected && <Check className='df-sidebar__dropdown-check' />}
+            {isNewSelected && <Check className='df-sidebar-dropdown-check' />}
           </div>
         </div>
       </div>,
@@ -131,46 +131,46 @@ export const ImportCalendarDialog = ({
   };
 
   return (
-    <div className='df-sidebar__overlay'>
-      <div className='df-sidebar__dialog'>
-        <h2 className='df-sidebar__dialog-title'>
+    <div className='df-sidebar-overlay'>
+      <div className='df-sidebar-dialog'>
+        <h2 className='df-sidebar-dialog-title'>
           {t('addSchedule') || 'Add Schedule'}
         </h2>
-        <p className='df-sidebar__dialog-text'>
+        <p className='df-sidebar-dialog-text'>
           {t('importCalendarMessage') ||
             'This calendar contains new events. Please select a target calendar.'}
         </p>
 
-        <div className='df-sidebar__field'>
+        <div className='df-sidebar-field'>
           <button
             ref={triggerRef}
             type='button'
             disabled={isLoading}
-            className='df-sidebar__select-trigger'
+            className='df-sidebar-select-trigger'
             onClick={() => setIsOpen(!isOpen)}
           >
             {!isNewSelected && selectedCalendar && (
               <div
-                className='df-sidebar__swatch'
+                className='df-sidebar-swatch'
                 style={{ backgroundColor: selectedCalendar.colors.lineColor }}
               />
             )}
-            <span className='df-sidebar__select-value'>
+            <span className='df-sidebar-select-value'>
               {isNewSelected
                 ? `${t('newCalendar')}: ${filename}`
                 : selectedCalendar?.name || selectedCalendar?.id}
             </span>
-            <ChevronsUpDown className='df-sidebar__select-icon' />
+            <ChevronsUpDown className='df-sidebar-select-icon' />
           </button>
           {renderDropdown()}
         </div>
 
-        <div className='df-sidebar__dialog-actions'>
+        <div className='df-sidebar-dialog-actions'>
           <button
             type='button'
             onClick={onCancel}
             disabled={isLoading}
-            className='df-sidebar__button df-sidebar__button--secondary'
+            className='df-sidebar-button df-sidebar-button-secondary'
           >
             {t('cancel') || 'Cancel'}
           </button>
@@ -178,7 +178,7 @@ export const ImportCalendarDialog = ({
             type='button'
             onClick={handleConfirm}
             loading={isLoading}
-            className='df-sidebar__button df-sidebar__button--primary'
+            className='df-sidebar-button df-sidebar-button-primary'
           >
             {t('ok') || 'OK'}
           </LoadingButton>

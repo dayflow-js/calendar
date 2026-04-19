@@ -110,11 +110,11 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             ? Math.round(dayCellEl.getBoundingClientRect().width)
             : Math.min(sourceRect.width, 120);
           indicatorHeight = sourceRect.height;
-          indicator.className = `df-drag-indicator__month-pill ${sourceElement.className}`;
+          indicator.className = `df-drag-indicator-month-pill ${sourceElement.className}`;
         } else {
           indicatorWidth = 120;
           indicatorHeight = 22;
-          indicator.className = 'df-drag-indicator__manual-pill';
+          indicator.className = 'df-drag-indicator-manual-pill';
         }
 
         indicator.style.width = `${indicatorWidth}px`;
@@ -223,7 +223,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           indicator.style.top = '2px';
           indicator.style.height = `${ALL_DAY_HEIGHT - 4}px`;
           indicator.style.marginBottom = '3px';
-          indicator.className = 'df-drag-indicator__all-day-pill';
+          indicator.className = 'df-drag-indicator-all-day-pill';
           indicator.style.borderRadius = '0.75rem';
           indicator.style.boxShadow = '0 1px 2px rgb(0 0 0 / 0.12)';
 
@@ -248,7 +248,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             : `${top + 3 + gridOffset}px`;
           indicator.style.height = `${height - 4}px`;
           indicator.style.color = '#fff';
-          indicator.className = 'df-drag-indicator__regular-pill';
+          indicator.className = 'df-drag-indicator-regular-pill';
           indicator.style.borderRadius = '0.25rem';
           indicator.style.boxShadow = '0 1px 2px rgb(0 0 0 / 0.12)';
 
@@ -353,7 +353,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
             indicator.style.color = resolvedTextColor;
           } else {
             indicator.className +=
-              ' df-tint-primary df-drag-indicator__ghost df-border-primary-soft';
+              ' df-tint-primary df-drag-indicator-ghost df-border-primary-soft';
           }
         }
       } else if (drag.calendarIds && drag.calendarIds.length > 1) {
@@ -383,7 +383,7 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
         indicator.style.color = '#fff';
       } else {
         indicator.className +=
-          ' df-tint-primary df-drag-indicator__ghost df-border-primary-soft';
+          ' df-tint-primary df-drag-indicator-ghost df-border-primary-soft';
       }
 
       dragIndicatorRef.current = indicator;
@@ -478,8 +478,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           }
           indicator.style.marginBottom = '3px';
           indicator.className = indicator.className.replace(
-            'df-drag-indicator__regular-pill',
-            'df-drag-indicator__all-day-pill'
+            'df-drag-indicator-regular-pill',
+            'df-drag-indicator-all-day-pill'
           );
           indicator.style.borderRadius = '0.75rem';
         } else {
@@ -492,8 +492,8 @@ export const useDragManager = (options: useDragProps): UseDragManagerReturn => {
           indicator.style.height = `${height - 4}px`;
           indicator.style.marginBottom = '0';
           indicator.className = indicator.className.replace(
-            'df-drag-indicator__all-day-pill',
-            'df-drag-indicator__regular-pill'
+            'df-drag-indicator-all-day-pill',
+            'df-drag-indicator-regular-pill'
           );
           indicator.style.borderRadius = '0.25rem';
 

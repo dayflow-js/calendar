@@ -2,10 +2,7 @@ import { cloneElement, isValidElement, ComponentChildren } from 'preact';
 import { createPortal, forwardRef } from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-// ---------------------------------------------------------------------------
 // Inline icon
-// ---------------------------------------------------------------------------
-
 interface IconProps {
   className?: string;
   width?: number;
@@ -29,10 +26,7 @@ const ChevronRight = ({ className, width = 24, height = 24 }: IconProps) => (
   </svg>
 );
 
-// ---------------------------------------------------------------------------
 // ContextMenu
-// ---------------------------------------------------------------------------
-
 interface ContextMenuProps {
   x: number;
   y: number;
@@ -104,7 +98,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     return createPortal(
       <div
         ref={setRefs}
-        className={`df-portal df-context-menu df-context-menu__content${className ? ` ${className}` : ''}`}
+        className={`df-portal df-context-menu df-context-menu-content${className ? ` ${className}` : ''}`}
         style={style}
         onContextMenu={e => e.preventDefault()}
         data-context-menu-root='true'
@@ -119,10 +113,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
 ContextMenu.displayName = 'ContextMenu';
 
-// ---------------------------------------------------------------------------
 // ContextMenuItem
-// ---------------------------------------------------------------------------
-
 export const ContextMenuItem = ({
   onClick,
   children,
@@ -137,7 +128,7 @@ export const ContextMenuItem = ({
   disabled?: boolean;
 }) => (
   <div
-    className='df-context-menu__item'
+    className='df-context-menu-item'
     onClick={e => {
       e.stopPropagation();
       if (!disabled) onClick();
@@ -147,33 +138,24 @@ export const ContextMenuItem = ({
     role='menuitem'
     tabIndex={disabled ? -1 : 0}
   >
-    {icon && <span className='df-context-menu__item-icon'>{icon}</span>}
+    {icon && <span className='df-context-menu-item-icon'>{icon}</span>}
     {children}
   </div>
 );
 
-// ---------------------------------------------------------------------------
 // ContextMenuSeparator
-// ---------------------------------------------------------------------------
-
 export const ContextMenuSeparator = () => (
-  <div className='df-context-menu__separator' role='separator' />
+  <div className='df-context-menu-separator' role='separator' />
 );
 
-// ---------------------------------------------------------------------------
 // ContextMenuLabel
-// ---------------------------------------------------------------------------
-
 export const ContextMenuLabel = ({
   children,
 }: {
   children: ComponentChildren;
-}) => <div className='df-context-menu__label'>{children}</div>;
+}) => <div className='df-context-menu-label'>{children}</div>;
 
-// ---------------------------------------------------------------------------
 // ContextMenuSub
-// ---------------------------------------------------------------------------
-
 export const ContextMenuSub = ({
   children,
 }: {
@@ -203,7 +185,7 @@ export const ContextMenuSub = ({
 
   return (
     <div
-      className='df-context-menu__sub'
+      className='df-context-menu-sub'
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -215,9 +197,7 @@ export const ContextMenuSub = ({
   );
 };
 
-// ---------------------------------------------------------------------------
 // ContextMenuSubTrigger
-// ---------------------------------------------------------------------------
 
 export const ContextMenuSubTrigger = ({
   children,
@@ -229,20 +209,18 @@ export const ContextMenuSubTrigger = ({
   isOpen?: boolean;
 }) => (
   <div
-    className='df-context-menu__sub-trigger'
+    className='df-context-menu-sub-trigger'
     data-open={isOpen}
     role='menuitem'
     tabIndex={0}
   >
-    {icon && <span className='df-context-menu__sub-icon'>{icon}</span>}
-    <span className='df-context-menu__sub-label'>{children}</span>
-    <ChevronRight className='df-context-menu__sub-chevron' />
+    {icon && <span className='df-context-menu-sub-icon'>{icon}</span>}
+    <span className='df-context-menu-sub-label'>{children}</span>
+    <ChevronRight className='df-context-menu-sub-chevron' />
   </div>
 );
 
-// ---------------------------------------------------------------------------
 // ContextMenuSubContent
-// ---------------------------------------------------------------------------
 
 export const ContextMenuSubContent = ({
   children,
@@ -271,7 +249,7 @@ export const ContextMenuSubContent = ({
   return (
     <div
       ref={ref}
-      className='df-portal df-context-menu df-context-menu__sub-content'
+      className='df-portal df-context-menu df-context-menu-sub-content'
       data-position={position}
       data-submenu-content='true'
       role='menu'
@@ -281,9 +259,7 @@ export const ContextMenuSubContent = ({
   );
 };
 
-// ---------------------------------------------------------------------------
 // ContextMenuColorPicker
-// ---------------------------------------------------------------------------
 
 const COLORS = [
   '#ea426b',
@@ -306,13 +282,13 @@ export const ContextMenuColorPicker = ({
   onCustomColor?: () => void;
   customColorLabel?: string;
 }) => (
-  <div className='df-context-menu__color-picker'>
-    <div className='df-context-menu__color-grid'>
+  <div className='df-context-menu-color-picker'>
+    <div className='df-context-menu-color-grid'>
       {COLORS.map(color => (
         <button
           key={color}
           type='button'
-          className='df-context-menu__color-swatch'
+          className='df-context-menu-color-swatch'
           data-selected={
             selectedColor?.toLowerCase() === color.toLowerCase()
               ? 'true'
@@ -330,7 +306,7 @@ export const ContextMenuColorPicker = ({
     {onCustomColor && (
       <button
         type='button'
-        className='df-context-menu__custom-color'
+        className='df-context-menu-custom-color'
         onClick={e => {
           e.stopPropagation();
           onCustomColor();

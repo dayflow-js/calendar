@@ -21,7 +21,7 @@ const SearchDrawer = ({
   emptyText,
 }: SearchDrawerProps) => (
   <div className='df-search-drawer' data-open={isOpen ? 'true' : 'false'}>
-    <div className='df-search-drawer__content'>
+    <div className='df-search-drawer-content'>
       <SearchResultsList
         loading={loading}
         results={results}

@@ -20,7 +20,7 @@ interface SearchResultsListProps {
 
 const SearchIconPlaceholder = () => (
   <svg
-    className='df-search-results__state-icon'
+    className='df-search-results-state-icon'
     fill='none'
     viewBox='0 0 24 24'
     stroke='currentColor'
@@ -62,8 +62,8 @@ const SearchResultsList = ({
 
   if (loading) {
     return (
-      <div className='df-search-results__state'>
-        <Loader2 className='df-search-results__loader' />
+      <div className='df-search-results-state'>
+        <Loader2 className='df-search-results-loader' />
         <span>Loading...</span>
       </div>
     );
@@ -71,7 +71,7 @@ const SearchResultsList = ({
 
   if (results.length === 0) {
     return keyword ? (
-      <div className='df-search-results__state'>
+      <div className='df-search-results-state'>
         <SearchIconPlaceholder />
         <span style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
           {getEmptyText()}
@@ -91,11 +91,11 @@ const SearchResultsList = ({
         );
 
         return (
-          <div key={group.date.getTime()} className='df-search-results__group'>
-            <h3 className='df-search-results__date-header' data-tone={tone}>
+          <div key={group.date.getTime()} className='df-search-results-group'>
+            <h3 className='df-search-results-date-header' data-tone={tone}>
               {title}
             </h3>
-            <div className='df-search-results__events'>
+            <div className='df-search-results-events'>
               {group.events.map(event => {
                 const start = getTime(event.start);
                 const end = getTime(event.end);
@@ -114,22 +114,22 @@ const SearchResultsList = ({
                 return (
                   <div key={event.id}>
                     <div
-                      className='df-search-results__event'
+                      className='df-search-results-event'
                       onClick={() => onResultClick?.(event)}
                     >
-                      <div className='df-search-results__event-inner'>
+                      <div className='df-search-results-event-inner'>
                         <div
-                          className='df-search-results__color-bar'
+                          className='df-search-results-color-bar'
                           style={{ backgroundColor: event.color || '#3b82f6' }}
                         />
-                        <div className='df-search-results__event-content'>
-                          <div className='df-search-results__event-title'>
+                        <div className='df-search-results-event-content'>
+                          <div className='df-search-results-event-title'>
                             {event.title}
                           </div>
-                          <div className='df-search-results__event-time'>
+                          <div className='df-search-results-event-time'>
                             <div>{startTimeStr}</div>
                             {endTimeStr && (
-                              <div className='df-search-results__end-time'>
+                              <div className='df-search-results-end-time'>
                                 {endTimeStr}
                               </div>
                             )}
@@ -137,7 +137,7 @@ const SearchResultsList = ({
                         </div>
                       </div>
                     </div>
-                    <div className='df-search-results__divider' />
+                    <div className='df-search-results-divider' />
                   </div>
                 );
               })}

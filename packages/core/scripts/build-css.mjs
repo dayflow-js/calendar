@@ -4,10 +4,25 @@ import { fileURLToPath } from 'node:url';
 
 import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
-import postcss from 'postcss';
+import postcss, { parse } from 'postcss';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
+
+function stripCascadeLayers(css) {
+  const rootNode = parse(css);
+
+  rootNode.walkAtRules('layer', atRule => {
+    if (!atRule.nodes?.length) {
+      atRule.remove();
+      return;
+    }
+
+    atRule.replaceWith(...atRule.nodes);
+  });
+
+  return rootNode.toString();
+}
 
 async function buildCss(inputFile, outputFile) {
   const input = path.join(root, inputFile);
@@ -20,7 +35,12 @@ async function buildCss(inputFile, outputFile) {
     to: output,
   });
 
-  await fs.writeFile(output, result.css);
+  const builtCss =
+    outputFile === 'dist/styles.css'
+      ? stripCascadeLayers(result.css)
+      : result.css;
+
+  await fs.writeFile(output, builtCss);
 
   if (result.map) {
     await fs.writeFile(`${output}.map`, result.map.toString());

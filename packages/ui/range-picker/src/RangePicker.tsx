@@ -722,13 +722,13 @@ const RangePicker = ({
   };
 
   return (
-    <div className='df-range-picker df-range-picker__root' ref={containerRef}>
+    <div className='df-range-picker df-range-picker-root' ref={containerRef}>
       <div
-        className='df-range-picker__trigger'
+        className='df-range-picker-trigger'
         data-disabled={disabled}
         data-open={isOpen}
       >
-        <div className='df-range-picker__field-group'>
+        <div className='df-range-picker-field-group'>
           <input
             type='text'
             name='range-start'
@@ -738,7 +738,7 @@ const RangePicker = ({
             onClick={() => openPanelForField('start')}
             onBlur={handleInputBlur('start')}
             onKeyDown={handleInputKeyDown('start')}
-            className='df-range-picker__input'
+            className='df-range-picker-input'
             data-disabled={disabled}
             data-focused={focusedField === 'start' && isOpen}
             placeholder={formatTemplate}
@@ -747,9 +747,9 @@ const RangePicker = ({
           />
         </div>
 
-        <MoveRight className='df-range-picker__separator-icon' />
+        <MoveRight className='df-range-picker-separator-icon' />
 
-        <div className='df-range-picker__field-group'>
+        <div className='df-range-picker-field-group'>
           <input
             type='text'
             name='range-end'
@@ -759,7 +759,7 @@ const RangePicker = ({
             onClick={() => openPanelForField('end')}
             onBlur={handleInputBlur('end')}
             onKeyDown={handleInputKeyDown('end')}
-            className='df-range-picker__input'
+            className='df-range-picker-input'
             data-disabled={disabled}
             data-focused={focusedField === 'end' && isOpen}
             placeholder={formatTemplate}

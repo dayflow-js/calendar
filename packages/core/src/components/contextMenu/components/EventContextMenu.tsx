@@ -83,19 +83,19 @@ const EventContextMenu = ({
                 key={cal.id}
                 onClick={() => handleMoveToCalendar(cal.id)}
               >
-                <div className='df-context-menu__calendar-item'>
-                  <div className='df-context-menu__calendar-check-wrap'>
+                <div className='df-context-menu-calendar-item'>
+                  <div className='df-context-menu-calendar-check-wrap'>
                     {isSelected && (
-                      <Check className='df-text-primary df-context-menu__calendar-check' />
+                      <Check className='df-text-primary df-context-menu-calendar-check' />
                     )}
                   </div>
-                  <div className='df-context-menu__calendar-info'>
+                  <div className='df-context-menu-calendar-info'>
                     <div
-                      className='df-context-menu__calendar-dot'
+                      className='df-context-menu-calendar-dot'
                       style={{ backgroundColor: cal.colors.lineColor }}
                     />
                     <span
-                      className='df-context-menu__calendar-label'
+                      className='df-context-menu-calendar-label'
                       data-selected={isSelected}
                     >
                       {cal.name}

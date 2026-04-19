@@ -30,17 +30,17 @@ const MonthAllDayContent = ({
     <div className={monthAllDayContent}>
       {showIcon &&
         (customIcon ? (
-          <div className='df-event__icon-slot'>{customIcon}</div>
+          <div className='df-event-icon-slot'>{customIcon}</div>
         ) : event.title.toLowerCase().includes('easter') ||
           event.title.toLowerCase().includes('holiday') ? (
-          <span className='df-event__holiday-icon'>⭐</span>
+          <span className='df-event-holiday-icon'>⭐</span>
         ) : (
-          <span className='df-event__icon-slot'>
+          <span className='df-event-icon-slot'>
             <CalendarDays className={eventIcon} />
           </span>
         ))}
       <span
-        className={`df-event__month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
+        className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
         style={isMobile ? mobileFadeStyle : undefined}
       >
         {event.title}

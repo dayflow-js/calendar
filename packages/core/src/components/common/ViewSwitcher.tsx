@@ -69,13 +69,13 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
         <button
           type='button'
           onClick={() => setIsOpen(!isOpen)}
-          className='df-view-switcher-select__trigger'
+          className='df-view-switcher-select-trigger'
           aria-expanded={isOpen}
           aria-haspopup='listbox'
         >
           <span>{getViewLabel(currentView, calendar, t)}</span>
           <span
-            className='df-view-switcher-select__chevron'
+            className='df-view-switcher-select-chevron'
             data-open={isOpen ? 'true' : 'false'}
           >
             <ChevronDown width={16} height={16} />
@@ -83,8 +83,8 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
         </button>
 
         {isOpen && (
-          <div className='df-view-switcher-select__dropdown df-animate-in df-fade-in df-zoom-in-95'>
-            <div className='df-view-switcher-select__list' role='listbox'>
+          <div className='df-view-switcher-select-dropdown df-animate-in df-fade-in df-zoom-in-95'>
+            <div className='df-view-switcher-select-list' role='listbox'>
               {registeredViews.map(viewType => (
                 <button
                   type='button'
@@ -94,7 +94,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
                     setIsOpen(false);
                     calendar.triggerRender();
                   }}
-                  className='df-view-switcher-select__option'
+                  className='df-view-switcher-select-option'
                   data-active={currentView === viewType ? 'true' : 'false'}
                   role='option'
                   aria-selected={currentView === viewType}
@@ -115,7 +115,7 @@ const ViewSwitcher = ({ calendar, mode = 'buttons' }: ViewSwitcherProps) => {
         <button
           type='button'
           key={viewType}
-          className='df-view-switcher__btn'
+          className='df-view-switcher-btn'
           data-active={currentView === viewType ? 'true' : 'false'}
           onClick={() => {
             calendar.changeView(viewType);

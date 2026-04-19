@@ -97,7 +97,7 @@ const CalendarHeader = ({
         ) : (
           /* Desktop: inline search bar */
           <div className='df-search-group'>
-            <div className='df-search-group__icon'>
+            <div className='df-search-group-icon'>
               <Search width={16} height={16} />
             </div>
             <input
@@ -106,14 +106,14 @@ const CalendarHeader = ({
               placeholder={t('search') || 'Search'}
               value={searchValue}
               onChange={handleSearchChange}
-              className='df-search-group__input'
+              className='df-search-group-input'
               style={{ width: '12rem' }}
             />
             {searchValue && (
               <button
                 type='button'
                 onClick={handleClearSearch}
-                className='df-search-group__clear'
+                className='df-search-group-clear'
               >
                 <svg
                   width='14'

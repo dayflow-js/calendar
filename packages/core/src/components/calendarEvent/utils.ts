@@ -154,13 +154,13 @@ export const getEventClasses = (
   } else if (viewType === ViewType.MONTH) {
     classes.push('df-month-event');
     if (!isMultiDay) {
-      classes.push('df-month-event--stacked');
+      classes.push('df-month-event-stacked');
     }
   } else if (viewType === ViewType.YEAR) {
     classes.push('df-year-event');
   }
 
-  classes.push(isAllDay ? 'df-event--all-day' : 'df-event--timed');
+  classes.push(isAllDay ? 'df-event-all-day' : 'df-event-timed');
 
   return classes.join(' ');
 };

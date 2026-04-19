@@ -451,14 +451,14 @@ const WeekComponent = memo(
             }}
             onContextMenu={e => e.preventDefault()}
           >
-            <span className='df-month-title__label'>{localizedMonthYear}</span>
+            <span className='df-month-title-label'>{localizedMonthYear}</span>
           </div>
         )}
 
-        <div className='df-month-week__inner'>
-          <div className='df-month-week__grid-shell'>
+        <div className='df-month-week-inner'>
+          <div className='df-month-week-grid-shell'>
             {/* Date grid */}
-            <div className='df-month-week__grid'>
+            <div className='df-month-week-grid'>
               {weekData.days.map((day, index) => (
                 <WeekDayCell
                   key={`day-${day.date.getTime()}`}
@@ -509,7 +509,7 @@ const WeekComponent = memo(
             {/* Multi-day event overlay layer */}
             {organizedMultiDaySegments.length > 0 && (
               <div
-                className='df-month-week__event-layer'
+                className='df-month-week-event-layer'
                 style={{
                   top: `${MULTI_DAY_TOP_OFFSET}px`,
                   height: `${multiDayAreaHeight}px`,
@@ -520,7 +520,7 @@ const WeekComponent = memo(
                   .map((layer, layerIndex) => (
                     <div
                       key={`layer-${layerIndex}`}
-                      className='df-month-week__event-layer-row'
+                      className='df-month-week-event-layer-row'
                     >
                       {layer
                         .filter(

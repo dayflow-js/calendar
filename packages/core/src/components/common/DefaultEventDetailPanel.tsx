@@ -382,7 +382,7 @@ const DefaultEventDetailPanel = ({
   const panelContent = (
     <div
       ref={panelRef}
-      className={`${eventDetailPanel} df-event-panel__content`}
+      className={`${eventDetailPanel} df-event-panel-content`}
       data-event-detail-panel='true'
       data-event-id={event.id}
       style={{
@@ -436,7 +436,7 @@ const DefaultEventDetailPanel = ({
 
       {isDraftAllDay ? (
         <div
-          className='df-event-dialog__time-row'
+          className='df-event-dialog-time-row'
           style={{ marginBottom: '0.75rem' }}
         >
           <div className='df-form-label'>{t('dateRange')}</div>
@@ -453,7 +453,7 @@ const DefaultEventDetailPanel = ({
         </div>
       ) : (
         <div
-          className='df-event-dialog__time-row'
+          className='df-event-dialog-time-row'
           style={{ marginBottom: '0.75rem' }}
         >
           <div className='df-form-label'>{t('timeRange')}</div>
@@ -475,7 +475,7 @@ const DefaultEventDetailPanel = ({
 
       {shouldShowNotes && (
         <div
-          className='df-event-dialog__notes-row'
+          className='df-event-dialog-notes-row'
           style={{ marginBottom: '0.75rem' }}
         >
           <span className='df-form-label'>{t('note')}</span>

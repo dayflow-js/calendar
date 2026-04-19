@@ -91,11 +91,11 @@ const ViewHeader = ({
       className='df-view-header-container'
       onContextMenu={e => e.preventDefault()}
     >
-      <div className='df-view-header__title-area'>
+      <div className='df-view-header-title-area'>
         {viewType === 'year' && stickyYear ? (
-          <div className='df-view-header__year-stack'>
+          <div className='df-view-header-year-stack'>
             <h1
-              className={`${headerTitle} df-view-header__year-title`}
+              className={`${headerTitle} df-view-header-year-title`}
               style={{
                 transform: `translateY(-${stickyYearOffset}px)`,
               }}
@@ -104,7 +104,7 @@ const ViewHeader = ({
             </h1>
             {nextYear && (
               <h1
-                className={`${headerTitle} df-view-header__year-title`}
+                className={`${headerTitle} df-view-header-year-title`}
                 style={{
                   transform: `translateY(${nextYearOffset}px)`,
                 }}
@@ -122,7 +122,7 @@ const ViewHeader = ({
       </div>
 
       {shouldShowTodayBox && onPrevious && onNext && onToday && (
-        <div className='df-view-header__nav'>
+        <div className='df-view-header-nav'>
           <TodayBox
             handlePreviousMonth={onPrevious}
             handleNextMonth={onNext}

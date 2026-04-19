@@ -11,22 +11,22 @@ export const SidebarHeader = ({
 }: SidebarHeaderProps) => {
   const { t } = useLocale();
   return (
-    <div className='df-sidebar__header'>
+    <div className='df-sidebar-header'>
       <button
         type='button'
         aria-label={isCollapsed ? t('expandSidebar') : t('collapseSidebar')}
-        className='df-sidebar__toggle'
+        className='df-sidebar-toggle'
         onClick={onCollapseToggle}
       >
         {isCollapsed ? (
-          <PanelRightClose className='df-sidebar__toggle-icon' />
+          <PanelRightClose className='df-sidebar-toggle-icon' />
         ) : (
-          <PanelRightOpen className='df-sidebar__toggle-icon' />
+          <PanelRightOpen className='df-sidebar-toggle-icon' />
         )}
       </button>
       {!isCollapsed && (
-        <div className='df-sidebar__header-main'>
-          <span className='df-sidebar__header-title'>{t('calendars')}</span>
+        <div className='df-sidebar-header-main'>
+          <span className='df-sidebar-header-title'>{t('calendars')}</span>
         </div>
       )}
     </div>
