@@ -2,9 +2,11 @@
   "title": "機能",
   "pages": [
     "calendar-header",
+    "content-slots",
+    "dark-mode",
     "event-dialog",
-    "switcher-mode",
+    "multi-calendar-event",
     "read-only",
-    "content-slots"
+    "switcher-mode"
   ]
 }

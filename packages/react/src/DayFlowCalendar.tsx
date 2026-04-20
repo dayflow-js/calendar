@@ -13,6 +13,7 @@ import type {
   ColorPickerProps,
   CreateCalendarDialogColorPickerProps,
   CalendarHeaderProps,
+  CalendarSearchProps,
 } from '@dayflow/core';
 import { useRef, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 

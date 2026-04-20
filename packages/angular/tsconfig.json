@@ -4,7 +4,11 @@
     "outDir": "./dist/out-tsc",
     "types": [],
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "baseUrl": ".",
+    "paths": {
+      "@dayflow/core": ["../../packages/core/dist/index.d.ts"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

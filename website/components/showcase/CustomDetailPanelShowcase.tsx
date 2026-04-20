@@ -264,7 +264,10 @@ export const CustomDetailPanelShowcase: React.FC = () => {
 
   return (
     <div className='not-prose p-1'>
-      <DemoCalendar customDetailPanelContent={detailPanel} className='h-130' />
+      <DemoCalendar
+        customDetailPanelContent={detailPanel}
+        className='h-[750px]'
+      />
     </div>
   );
 };

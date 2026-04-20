@@ -13,6 +13,15 @@ import {
 import { useTheme } from 'next-themes';
 import React, { useMemo } from 'react';
 
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { getWebsiteCalendars } from '@/utils/palette';
 import { generateMinimalSampleEvents } from '@/utils/sampleData';
 
@@ -107,29 +116,77 @@ const useDemoCalendar = ({
 const DemoCalendar: React.FC<DemoCalendarProps> = ({
   switcherMode,
   useEventDetailDialog = false,
+  className,
 }) => {
   const calendar = useDemoCalendar({ switcherMode, useEventDetailDialog });
 
   return (
-    <div className='not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-gray-900'>
+    <div
+      className={`not-prose rounded-xl bg-white dark:border-slate-700 dark:bg-gray-900 ${className ?? ''}`}
+    >
       <DayFlowCalendar calendar={calendar} />
     </div>
   );
 };
 
-export const SwitcherModeShowcase: React.FC = () => (
-  <div className='flex flex-col gap-10'>
-    <div>
-      <DemoCalendar switcherMode='buttons' className='h-120' />
-    </div>
-    <div>
-      <DemoCalendar switcherMode='select' className='h-120' />
-    </div>
-  </div>
-);
+export const SwitcherModeShowcase: React.FC = () => {
+  const [mode, setMode] = React.useState<SwitcherMode>('buttons');
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className='calendar-wrapper w-full' style={{ minHeight: '600px' }} />
+    );
+  }
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <div className='flex w-full flex-col gap-6'>
+        <Card className='border-slate-200 bg-slate-50/50 shadow-none dark:border-slate-800 dark:bg-gray-900/50'>
+          <CardContent className='flex flex-col gap-3 px-4 py-2'>
+            <div className='flex items-start justify-between gap-8'>
+              <div className='space-y-1'>
+                <h3 className='text-xs font-semibold tracking-tight text-slate-900 uppercase dark:text-slate-100'>
+                  Switcher Mode
+                </h3>
+                <Select
+                  value={mode}
+                  onValueChange={value => setMode(value as SwitcherMode)}
+                >
+                  <SelectTrigger className='h-7 w-35 text-xs'>
+                    <SelectValue placeholder='Select mode' />
+                  </SelectTrigger>
+                  <SelectContent className='max-h-80 w-35 overflow-hidden p-0'>
+                    <SelectItem
+                      value='buttons'
+                      className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                    >
+                      Button
+                    </SelectItem>
+                    <SelectItem
+                      value='select'
+                      className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                    >
+                      Select
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <DemoCalendar switcherMode={mode} className='h-[750px]' />
+      </div>
+    </TooltipProvider>
+  );
+};
 
 export const EventDialogShowcase: React.FC = () => (
-  <DemoCalendar className='h-130' useEventDetailDialog={true} />
+  <DemoCalendar className='h-[750px]' useEventDetailDialog={true} />
 );
 
 export const FeatureShowcase: React.FC = () => (

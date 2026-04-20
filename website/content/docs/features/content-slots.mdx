@@ -10,6 +10,16 @@ DayFlow uses a slot-based architecture that allows you to inject custom UI compo
 
 This is powered by the `ContentSlot` mechanism. While the core engine provides default implementations for most UI elements (using Preact), you can override them to match your application's design or to use specific libraries.
 
+## Table of Contents
+
+- [How it Works](#how-it-works)
+- [Available Slots](#available-slots)
+- [Event Content](#event-content)
+- [Event Detail Content](#event-detail-content)
+- [Event Detail Dialog](#event-detail-dialog)
+- [Injecting a Custom Color Picker](#example-injecting-a-custom-color-picker)
+- [Context Menu](#context-menu-slots)
+
 ## How it Works
 
 1. **Core Defines a Slot**: Inside `@dayflow/core`, certain UI areas are wrapped in a `ContentSlot`. Each slot has a `generatorName` and `generatorArgs`.

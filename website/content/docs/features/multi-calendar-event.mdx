@@ -1,0 +1,40 @@
+import { MultiCalendarEventShowcase } from '@/components/showcase/MultiCalendarEventShowcase';
+
+# Multi-calendar Event
+
+DayFlow supports multi-calendar events, which allow a single event to be associated with multiple calendars. This is particularly useful for cross-team meetings, shared family events, or any situation where an event belongs to more than one category.
+
+## Configuration
+
+To create a multi-calendar event, you need to provide an array of calendar IDs in the `calendarIds` property of the event object.
+
+```tsx
+const events = [
+  {
+    id: 'multi-cal-1',
+    title: 'Cross-team Planning',
+    start: '2026-04-20T10:00:00',
+    end: '2026-04-20T11:30:00',
+    // The primary calendar ID (used for default styling if needed)
+    calendarId: 'team-a',
+    // Associating the event with multiple calendars
+    calendarIds: ['team-a', 'team-b', 'marketing'],
+  },
+];
+```
+
+When an event has multiple `calendarIds`, DayFlow renders it with a distinctive diagonal stripe pattern background, using the colors assigned to each associated calendar.
+
+## Showcase
+
+The following showcase demonstrates how multi-calendar events are rendered in the calendar.
+
+<MultiCalendarEventShowcase />
+
+<Callout title='Recommendation'>
+  By default, the built-in `eventDetailPanel`/`Dialog` doesn’t support selecting
+  multiple calendars. Since this requirement is not very common, I recommend
+  customizing the implementation of `eventDetailContent` or `eventDetailDialog`
+  instead. You can find more details in the documentation: [Content
+  Slots](./content-slots).
+</Callout>

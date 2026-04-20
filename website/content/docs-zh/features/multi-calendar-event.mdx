@@ -1,0 +1,39 @@
+import { MultiCalendarEventShowcase } from '@/components/showcase/MultiCalendarEventShowcase';
+
+# 多日历事件
+
+DayFlow 支持多日历事件，允许单个事件与多个日历相关联。这对于跨团队会议、共享家庭活动或任何事件属于多个类别的场景特别有用。
+
+## 配置
+
+要创建多日历事件，您需要在事件对象的 `calendarIds` 属性中提供一个日历 ID 数组。
+
+```tsx
+const events = [
+  {
+    id: 'multi-cal-1',
+    title: '跨团队规划',
+    start: '2026-04-20T10:00:00',
+    end: '2026-04-20T11:30:00',
+    // 主日历 ID（在需要时用于默认样式）
+    calendarId: 'team-a',
+    // 将事件与多个日历关联
+    calendarIds: ['team-a', 'team-b', 'marketing'],
+  },
+];
+```
+
+当事件具有多个 `calendarIds` 时，DayFlow 会使用分配给每个关联日历的颜色，以独特的对角条纹图案背景进行渲染。
+
+## 展示
+
+以下展示了多日历事件在日历中的渲染效果。
+
+<MultiCalendarEventShowcase />
+
+<Callout title='建议'>
+  默认情况下，内置的 `eventDetailPanel`/`Dialog`
+  不支持选择多个日历。由于此需求并不常见，建议您通过自定义 `eventDetailContent`
+  或 `eventDetailDialog`
+  的实现来满足此类需求。更多详情请参阅文档：[内容插槽](./content-slots)。
+</Callout>

@@ -188,7 +188,6 @@
     line-height: 1rem;
     white-space: nowrap;
     text-overflow: ellipsis;
-    opacity: 0.8;
   }
 
   .df-event-color-bar {
@@ -310,7 +309,6 @@
 
   .df-event-month-all-day {
     padding-inline: 0.25rem;
-    min-width: 0;
     overflow: hidden;
     border-radius: 0.25rem;
   }

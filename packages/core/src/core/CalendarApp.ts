@@ -214,6 +214,9 @@ export class CalendarApp implements ICalendarApp {
   onMoreEventsClick = (date: Date): void =>
     this.eventManager.onMoreEventsClick(date);
 
+  onEventDetailToggle = (eventId: string | null): void =>
+    this.eventManager.onEventDetailToggle(eventId);
+
   highlightEvent = (eventId: string | null): void =>
     this.eventManager.highlightEvent(eventId);
 

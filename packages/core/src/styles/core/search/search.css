@@ -80,7 +80,6 @@
     height: 100%;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid var(--df-color-border);
     background-color: var(--df-color-background);
     transition: width 300ms ease-in-out;
     user-select: none;
@@ -95,11 +94,11 @@
 
   .df-search-drawer[data-open='true'] {
     width: 16rem;
+    border-left: 1px solid var(--df-color-border);
   }
 
   .df-search-drawer[data-open='false'] {
     width: 0;
-    border-left-color: transparent;
   }
 
   .df-search-drawer-content {
@@ -219,7 +218,7 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     background-color: var(--df-color-background);
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;

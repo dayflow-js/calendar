@@ -192,7 +192,10 @@ const DayView = ({
             });
           }
         }
-      } else {
+      } else if (
+        prevHighlightedEventId.current &&
+        selectedEventId === prevHighlightedEventId.current
+      ) {
         setSelectedEventId(null);
       }
     }
@@ -576,6 +579,7 @@ const DayView = ({
         timeFormat={timeFormat}
         showEventDots={showEventDots}
         appTimeZone={appTimeZone}
+        calendarRef={calendarRef}
       />
       <MobileEventDrawerComponent
         isOpen={isDrawerOpen}

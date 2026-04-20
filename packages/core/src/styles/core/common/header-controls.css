@@ -24,7 +24,6 @@
   .df-calendar-container .df-header-left {
     display: flex;
     align-items: center;
-    flex: 1;
   }
 
   #dayflow-add-event-btn {
@@ -33,24 +32,22 @@
 
   .df-calendar-container .df-header-mid {
     display: flex;
-    flex: 1;
     align-items: center;
     justify-content: center;
   }
 
   .df-calendar-container .df-header-right {
     display: flex;
-    flex: 1;
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
   }
 
   /* ===================================================================
-   * ViewHeader  (.df-view-header)
+   * ViewHeader  (.df-view-header-container)
    * =================================================================== */
 
-  .df-view-header {
+  .df-view-header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -72,6 +69,26 @@
   .df-view-header-subtitle {
     margin-top: 0.75rem;
     line-height: 1.5rem;
+    color: var(--df-color-muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .df-view-header-subtitle-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .df-view-header-subtitle-row .df-view-header-subtitle {
+    margin-top: 0;
+  }
+
+  .df-view-header-subtitle-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
     color: var(--df-color-muted-foreground);
   }
 
@@ -213,7 +230,7 @@
   .df-view-switcher-select-option {
     width: 100%;
     border-radius: 0.25rem;
-    padding: 0.125rem 0.75rem;
+    padding: 0.25rem 0.75rem;
     text-align: left;
     font-size: 0.875rem;
     transition: background-color 150ms;

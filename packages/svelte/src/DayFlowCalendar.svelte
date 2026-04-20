@@ -159,10 +159,10 @@
 
   {#if mounted}
     {#each customRenderings as rendering (rendering.id)}
-      {@const Component = renderProps[rendering.generatorName]}
-      {#if Component && rendering.containerEl}
+      {@const DynamicComponent = renderProps[rendering.generatorName] as any}
+      {#if DynamicComponent && rendering.containerEl}
         <div use:portal={rendering.containerEl}>
-          <Component {...rendering.generatorArgs} />
+          <DynamicComponent {...(rendering.generatorArgs as any)} />
         </div>
       {/if}
     {/each}

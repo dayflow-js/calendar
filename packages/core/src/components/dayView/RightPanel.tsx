@@ -1,15 +1,11 @@
+import { RefObject } from 'preact';
+
+import { CalendarEvent } from '@/components/calendarEvent';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import TodayBox from '@/components/common/TodayBox';
 import { useLocale } from '@/locale';
 import { miniCalendarContainer } from '@/styles/classNames';
-import { ICalendarApp, Event } from '@/types';
-import {
-  formatTime,
-  extractHourFromDate,
-  getCalendarLineColors,
-  buildColorBarGradient,
-  getEventEndHour,
-} from '@/utils';
+import { ICalendarApp, Event, ViewType } from '@/types';
 import { temporalToVisualDate } from '@/utils/temporalTypeGuards';
 
 interface RightPanelProps {
@@ -25,6 +21,7 @@ interface RightPanelProps {
   timeFormat?: '12h' | '24h';
   showEventDots?: boolean;
   appTimeZone?: string;
+  calendarRef: RefObject<HTMLDivElement>;
 }
 
 export const RightPanel = ({
@@ -40,12 +37,18 @@ export const RightPanel = ({
   timeFormat = '24h',
   showEventDots = true,
   appTimeZone,
+  calendarRef,
 }: RightPanelProps) => {
   const { t, locale } = useLocale();
 
   const sortedEvents = [...currentDayEvents].toSorted((a, b) => {
     if (a.allDay && !b.allDay) return -1;
     if (!a.allDay && b.allDay) return 1;
+    if (!a.allDay && !b.allDay) {
+      const timeA = temporalToVisualDate(a.start, appTimeZone).getTime();
+      const timeB = temporalToVisualDate(b.start, appTimeZone).getTime();
+      return timeA - timeB;
+    }
     return 0;
   });
 
@@ -99,61 +102,33 @@ export const RightPanel = ({
             ) : (
               <div className='df-right-panel-list'>
                 {sortedEvents.map((event: Event) => (
-                  <div
-                    key={event.id}
-                    className='df-right-panel-event-card'
-                    data-selected={
-                      selectedEvent?.id === event.id ? 'true' : 'false'
-                    }
-                    style={(() => {
-                      const lc = getCalendarLineColors(event);
-                      return {
-                        borderLeftColor: lc.length > 1 ? undefined : lc[0],
-                        borderLeftImage:
-                          lc.length > 1
-                            ? `${buildColorBarGradient(lc)} 1`
-                            : undefined,
-                      };
-                    })()}
-                    onClick={() => {
-                      setSelectedEvent(event);
-                      app.onEventClick(event);
-                    }}
-                  >
-                    <div className='df-right-panel-event-title'>
-                      {event.title}
-                    </div>
-                    {!event.allDay && (
-                      <div className='df-right-panel-event-time'>
-                        {formatTime(
-                          appTimeZone
-                            ? extractHourFromDate(
-                                temporalToVisualDate(event.start, appTimeZone)
-                              )
-                            : extractHourFromDate(event.start),
-                          0,
-                          timeFormat
-                        )}{' '}
-                        -{' '}
-                        {formatTime(
-                          appTimeZone
-                            ? extractHourFromDate(
-                                temporalToVisualDate(
-                                  event.end ?? event.start,
-                                  appTimeZone
-                                )
-                              )
-                            : getEventEndHour(event),
-                          0,
-                          timeFormat
-                        )}
-                      </div>
-                    )}
-                    {event.allDay && (
-                      <div className='df-right-panel-event-time'>
-                        {t('allDay')}
-                      </div>
-                    )}
+                  <div key={event.id} className='df-right-panel-event-item'>
+                    <CalendarEvent
+                      event={event}
+                      isAllDay={event.allDay}
+                      viewType={ViewType.DAY}
+                      calendarRef={calendarRef}
+                      onEventUpdate={updated =>
+                        app.updateEvent(updated.id, updated)
+                      }
+                      onEventDelete={id => app.deleteEvent(id)}
+                      onEventSelect={id => {
+                        if (!id) {
+                          setSelectedEvent(null);
+                          return;
+                        }
+                        const found = app.getEvents().find(e => e.id === id);
+                        setSelectedEvent(found || null);
+                      }}
+                      selectedEventId={selectedEvent?.id}
+                      app={app}
+                      timeFormat={timeFormat}
+                      appTimeZone={appTimeZone}
+                      hourHeight={0}
+                      firstHour={0}
+                      disableDefaultStyle={true}
+                      className='df-right-panel-event-card'
+                    />
                   </div>
                 ))}
               </div>

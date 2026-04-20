@@ -220,7 +220,7 @@ export const TimeGrid = ({
         >
           {/* Top boundary spacer — expands to include timezone header when active */}
           <div
-            className='df-time-column-spacer'
+            className='df-time-column-spacer df-time-week-column-spacer'
             data-secondary-tz={showSecondaryTz ? 'true' : 'false'}
           >
             {showSecondaryTz ? (

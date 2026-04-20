@@ -41,3 +41,6 @@ export * from './timezone';
 
 // Calendar types and Theme types
 export * from './calendarTypes';
+
+// Search types
+export * from './search';

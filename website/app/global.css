@@ -86,6 +86,8 @@
   left: 0;
   right: 0;
   width: 100%;
+  /* Fix: compensate for scrollbar removal by Radix/Shadcn */
+  padding-right: var(--removed-body-scroll-bar-size, 0);
 }
 
 /* Override fumadocs' xl:pt-14 (3.5rem) — the grid "banner" row already

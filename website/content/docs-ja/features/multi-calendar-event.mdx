@@ -1,0 +1,40 @@
+import { MultiCalendarEventShowcase } from '@/components/showcase/MultiCalendarEventShowcase';
+
+# マルチカレンダーイベント
+
+DayFlow はマルチカレンダーイベントをサポートしており、1つのイベントを複数のカレンダーに関連付けることができます。これは、チームをまたぐ会議や共有の家族イベント、またはイベントが複数のカテゴリに属するあらゆる状況で特に便利です。
+
+## 設定
+
+マルチカレンダーイベントを作成するには、イベントオブジェクトの `calendarIds` プロパティにカレンダー ID の配列を指定します。
+
+```tsx
+const events = [
+  {
+    id: 'multi-cal-1',
+    title: 'チーム横断プランニング',
+    start: '2026-04-20T10:00:00',
+    end: '2026-04-20T11:30:00',
+    // プライバリのカレンダー ID（必要に応じてデフォルトのスタイリングに使用されます）
+    calendarId: 'team-a',
+    // イベントを複数のカレンダーに関連付けます
+    calendarIds: ['team-a', 'team-b', 'marketing'],
+  },
+];
+```
+
+イベントに複数の `calendarIds` がある場合、DayFlow は関連付けられた各カレンダーに割り当てられた色を使用して、特徴的な斜めストライプの背景パターンでレンダリングします。
+
+## 展示
+
+以下の展示は、マルチカレンダーイベントがカレンダー内でどのようにレンダリングされるかを示しています。
+
+<MultiCalendarEventShowcase />
+
+<Callout title='推奨事項'>
+  デフォルトでは、組み込みの `eventDetailPanel`/`Dialog`
+  は複数カレンダーの選択をサポートしていません。この要件はあまり一般的ではないため、代わりに
+  `eventDetailContent` または `eventDetailDialog`
+  の実装をカスタマイズすることをお勧めします。詳細はドキュメント：[コンテンツスロット](./content-slots)
+  を参照してください。
+</Callout>

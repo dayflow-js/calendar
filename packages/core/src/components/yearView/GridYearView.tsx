@@ -23,6 +23,11 @@ function getIntensityStyle(
   return { backgroundColor: `var(--heat-${step})` };
 }
 
+function getHeatLevel(count: number, levels: number): number {
+  if (count === 0) return 0;
+  return Math.min(count, levels);
+}
+
 /** Build a map from 'YYYY-MM-DD' → Event[] for events in the year */
 function buildDayEventMap(
   events: Event[],
@@ -329,11 +334,11 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                   const eventCount = isCurrentMonth
                     ? (heatmapEventMap.get(key)?.length ?? 0)
                     : 0;
+                  const heatLevel = getHeatLevel(eventCount, heatmapLevels);
                   const intensityStyle = isCurrentMonth
                     ? getIntensityStyle(eventCount, heatmapLevels)
                     : {};
                   const isToday = date.getTime() === today.getTime();
-
                   return (
                     <div
                       key={`${month.monthIndex}-${i}`}
@@ -350,9 +355,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                           data-today={isToday ? 'true' : 'false'}
                           data-current-month={isCurrentMonth ? 'true' : 'false'}
                           data-has-events={eventCount > 0 ? 'true' : 'false'}
-                          data-strong-contrast={
-                            eventCount >= 4 ? 'true' : 'false'
-                          }
+                          data-heat-level={String(heatLevel)}
                         >
                           {date.getDate()}
                         </span>

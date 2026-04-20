@@ -10,6 +10,16 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 
 这是通过 `ContentSlot` 机制实现的。虽然核心引擎为大多数 UI 元素提供了默认实现（使用 Preact），但您可以覆盖它们以符合您的应用设计或使用特定的第三方库。
 
+## Table of Contents
+
+- [工作原理](#工作原理)
+- [可用插槽](#可用插槽)
+- [事件内容](#事件内容)
+- [事件详情内容](#事件详情内容)
+- [事件详情对话框](#事件详情对话框)
+- [注入自定义颜色选择器](#注入自定义颜色选择器)
+- [右键菜单](#右键菜单)
+
 ## 工作原理
 
 1. **核心定义插槽**：在 `@dayflow/core` 内部，某些 UI 区域被包装 in a `ContentSlot` 中。每个插槽都有一个 `generatorName`（生成器名称）和 `generatorArgs`（生成器参数）。
@@ -159,7 +169,7 @@ export const CustomDetailDialogShowcase = () => {
 
 </details>
 
-## 示例：注入自定义颜色选择器
+## 注入自定义颜色选择器
 
 默认情况下，DayFlow 使用内置的 `BlossomColorPicker`。如果您更喜欢使用 `react-color` 或 `vue-color` 等库，可以使用 `colorPicker` 插槽进行注入。
 

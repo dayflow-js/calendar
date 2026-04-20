@@ -26,6 +26,7 @@ import {
 import {
   getTodayInTimeZone,
   hasEventChanged,
+  scrollbarTakesSpace,
   temporalToVisualDate,
 } from '@/utils';
 
@@ -87,6 +88,8 @@ export const FixedWeekYearView = ({
   const [internalDetailPanelEventId, setInternalDetailPanelEventId] = useState<
     string | null
   >(null);
+
+  const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
 
   const selectedEventId =
     propSelectedEventId === undefined
@@ -471,6 +474,7 @@ export const FixedWeekYearView = ({
           {scrollbarWidth > 0 && (
             <div
               className='df-year-fixed-week-spacer'
+              data-scrollbar-space={hasScrollbarSpace ? 'true' : 'false'}
               style={{ width: `${scrollbarWidth}px` }}
             />
           )}
@@ -496,6 +500,7 @@ export const FixedWeekYearView = ({
           {scrollbarHeight > 0 && (
             <div
               className='df-year-fixed-month-spacer'
+              data-scrollbar-space={hasScrollbarSpace ? 'true' : 'false'}
               style={{ height: `${scrollbarHeight}px` }}
             />
           )}
@@ -505,7 +510,7 @@ export const FixedWeekYearView = ({
       {/* Days Grid Content - Scrollable */}
       <div
         ref={contentRef}
-        className={`df-year-fixed-content ${scrollbarHide}`}
+        className='df-year-fixed-content'
         onScroll={handleContentScroll}
       >
         <div

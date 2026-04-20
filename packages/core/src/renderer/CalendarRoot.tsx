@@ -124,9 +124,15 @@ export const CalendarRoot = ({
   // UI layer (detail panel or mobile drawer) and chains the previous handler.
   useEffect(() => {
     const callbacks = (
-      app as unknown as { callbacks: { onDismissUI?: () => void } }
+      app as unknown as {
+        callbacks: {
+          onDismissUI?: () => void;
+          onEventDetailToggle?: (id: string | null) => void;
+        };
+      }
     ).callbacks;
     const prevDismiss = callbacks.onDismissUI;
+    const prevDetailToggle = callbacks.onEventDetailToggle;
 
     callbacks.onDismissUI = () => {
       if (eventDialog.detailPanelEventId) {
@@ -138,8 +144,14 @@ export const CalendarRoot = ({
       prevDismiss?.();
     };
 
+    callbacks.onEventDetailToggle = (id: string | null) => {
+      eventDialog.setDetailPanelEventId(id);
+      prevDetailToggle?.(id);
+    };
+
     return () => {
       callbacks.onDismissUI = prevDismiss;
+      callbacks.onEventDetailToggle = prevDetailToggle;
     };
   }, [app, eventDialog, quickCreate]);
 
@@ -302,9 +314,9 @@ export const CalendarRoot = ({
             data-sidebar-collapsed={sidebar.isCollapsed}
             style={{
               marginLeft: sidebar.enabled
-                ? sidebar.isCollapsed
-                  ? miniSidebarWidth
-                  : sidebar.width
+                ? `calc(${
+                    sidebar.isCollapsed ? miniSidebarWidth : sidebar.width
+                  } - 1px)`
                 : 0,
             }}
           >

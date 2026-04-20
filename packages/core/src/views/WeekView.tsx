@@ -230,7 +230,10 @@ const WeekView = ({
             });
           }
         }
-      } else {
+      } else if (
+        prevHighlightedEventId.current &&
+        selectedEventId === prevHighlightedEventId.current
+      ) {
         setSelectedEventId(null);
       }
     }

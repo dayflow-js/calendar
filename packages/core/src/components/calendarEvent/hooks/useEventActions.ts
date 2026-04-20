@@ -125,7 +125,13 @@ export const useEventActions = ({
   const scrollEventToCenter = useCallback(
     (): Promise<void> =>
       new Promise(resolve => {
-        if (!calendarRef.current || isAllDay || isMonthView || isYearView) {
+        if (
+          !calendarRef.current ||
+          isAllDay ||
+          isMonthView ||
+          isYearView ||
+          hourHeight <= 0
+        ) {
           resolve();
           return;
         }

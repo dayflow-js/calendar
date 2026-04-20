@@ -10,7 +10,7 @@
   }
 
   .df-drag-indicator-icon {
-    margin-right: 0.25rem;
+    margin-right: 0.5rem;
     height: 0.75rem;
     width: 0.75rem;
   }
@@ -36,6 +36,14 @@
 
   .df-drag-indicator-text[data-light='false'] {
     color: white;
+  }
+
+  .df-drag-indicator-all-day {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding-left: 0.75rem;
+    overflow: hidden;
   }
 
   .df-drag-indicator-icon[data-light='false'] {

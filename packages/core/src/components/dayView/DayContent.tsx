@@ -171,6 +171,18 @@ export const DayContent = ({
     date: Date;
   } | null>(null);
   const hasScrollbarSpace = useMemo(() => scrollbarTakesSpace(), []);
+  const headerSubtitleMeta = useMemo(() => {
+    if (!showSecondaryTz || !secondaryTzLabel || !primaryTzLabel) {
+      return null;
+    }
+
+    return (
+      <>
+        <span className='df-time-column-tz-label'>{secondaryTzLabel}</span>
+        <span className='df-time-column-tz-label'>{primaryTzLabel}</span>
+      </>
+    );
+  }, [showSecondaryTz, secondaryTzLabel, primaryTzLabel]);
 
   // Measure offset from .df-calendar-content top to the first time grid row,
   // accounting for boundary elements above the grid
@@ -259,6 +271,7 @@ export const DayContent = ({
             calendar={app}
             viewType={ViewType.DAY}
             currentDate={currentDate}
+            subtitleMeta={headerSubtitleMeta}
           />
         </div>
         {/* All-day event area */}
@@ -405,7 +418,7 @@ export const DayContent = ({
                       top: `${topPx}px`,
                       height: 0,
                       zIndex: 20,
-                      marginTop: showSecondaryTz ? '2rem' : '0.75rem',
+                      marginTop: '0.75rem',
                     }}
                   >
                     <div className='df-day-content-current-time-side'>
@@ -430,21 +443,9 @@ export const DayContent = ({
             >
               {/* Top boundary spacer — expands to include timezone header when active */}
               <div
-                className='df-time-column-spacer'
+                className='df-time-column-spacer df-time-day-column-spacer'
                 data-secondary-tz={showSecondaryTz ? 'true' : 'false'}
-              >
-                {showSecondaryTz && (
-                  /* Timezone header: secondary LEFT, primary RIGHT */
-                  <div className='df-time-column-tz-header'>
-                    <span className='df-time-column-tz-label'>
-                      {secondaryTzLabel}
-                    </span>
-                    <span className='df-time-column-tz-label'>
-                      {primaryTzLabel}
-                    </span>
-                  </div>
-                )}
-              </div>
+              />
               {timeSlots.map((slot, slotIndex) => (
                 <div key={slotIndex} className={timeSlot}>
                   {showSecondaryTz ? (
@@ -481,7 +482,6 @@ export const DayContent = ({
                 data-scrollbar-space={
                   !isMobile && hasScrollbarSpace ? 'true' : 'false'
                 }
-                style={showSecondaryTz ? { height: '2rem' } : undefined}
               >
                 <div
                   className={cn(midnightLabel, 'df-midnight-label-offset')}
@@ -496,6 +496,9 @@ export const DayContent = ({
                 className='df-day-content-grid-rows'
                 style={{ WebkitTouchCallout: 'none' }}
                 ref={timeGridRef}
+                data-scrollbar-space={
+                  !isMobile && hasScrollbarSpace ? 'true' : 'false'
+                }
               >
                 {timeSlots.map((_slot, slotIndex) => (
                   <div

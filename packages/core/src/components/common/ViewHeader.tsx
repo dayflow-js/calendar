@@ -1,3 +1,5 @@
+import type { ComponentChild } from 'preact';
+
 import { useLocale } from '@/locale';
 import { headerTitle, headerSubtitle } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
@@ -23,6 +25,8 @@ interface ViewHeaderProps {
   customTitle?: string;
   /** Custom subtitle (optional, only for Day view) */
   customSubtitle?: string;
+  /** Extra content rendered beside the subtitle row */
+  subtitleMeta?: ComponentChild;
   /** Whether to show TodayBox (default determined by viewType: day=false, week/month=true) */
   showTodayBox?: boolean;
   /** Sticky year for Year view (optional, only for Year view) */
@@ -43,6 +47,7 @@ const ViewHeader = ({
   onToday,
   customTitle,
   customSubtitle,
+  subtitleMeta,
   showTodayBox,
   stickyYear,
   stickyYearOffset = 0,
@@ -116,7 +121,17 @@ const ViewHeader = ({
         ) : (
           <div>
             <div className={headerTitle}>{title}</div>
+
             {subtitle && <div className={headerSubtitle}>{subtitle}</div>}
+            {subtitleMeta && (
+              <div className='df-view-header-subtitle-row'>
+                {subtitleMeta && (
+                  <div className='df-view-header-subtitle-meta'>
+                    {subtitleMeta}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

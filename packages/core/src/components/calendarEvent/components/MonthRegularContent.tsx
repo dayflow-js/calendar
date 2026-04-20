@@ -59,9 +59,7 @@ const MonthRegularContent = ({
         </span>
       </div>
       {!hideTime && !isMobile && (
-        <span className='df-event-month-time' style={{ opacity: 0.8 }}>
-          {startTime}
-        </span>
+        <span className='df-event-month-time'>{startTime}</span>
       )}
     </div>
   );

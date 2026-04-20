@@ -2,10 +2,11 @@
   "title": "Features",
   "pages": [
     "calendar-header",
-    "event-dialog",
-    "switcher-mode",
-    "read-only",
     "content-slots",
-    "dark-mode"
+    "dark-mode",
+    "event-dialog",
+    "multi-calendar-event",
+    "read-only",
+    "switcher-mode"
   ]
 }

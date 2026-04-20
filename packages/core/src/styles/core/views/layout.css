@@ -22,12 +22,9 @@
   .df-calendar-shell {
     position: relative;
     z-index: 10;
-    display: flex;
-    height: 100%;
     flex: 1 1 0%;
-    flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid transparent;
+    border-left: 1px solid var(--df-color-border);
     background-color: var(--df-color-background);
     transition:
       margin-left 200ms ease-in-out,
@@ -41,32 +38,6 @@
     box-shadow:
       0 20px 25px -5px rgb(0 0 0 / 0.1),
       0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
-
-  .df-view-header-container {
-    padding: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-  }
-
-  .df-view-header-title {
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 700;
-    color: var(--df-color-foreground);
-  }
-
-  .df-view-header-subtitle {
-    margin-top: 0.75rem;
-    line-height: 1.5rem;
-    color: var(--df-color-muted-foreground);
-  }
-
-  .df-navigation {
-    display: flex;
-    align-items: center;
   }
 
   .df-icon-btn {
@@ -196,6 +167,7 @@
     text-align: right;
     color: var(--df-color-muted-foreground);
     font-size: 0.875rem;
+    line-height: 1.25rem;
     padding: 0.5rem 0.5rem 0.5rem 0;
     user-select: none;
   }
@@ -290,8 +262,6 @@
   .df-current-time-label {
     margin-left: 0.5rem;
     border-radius: 0.25rem;
-    background-color: var(--df-color-primary);
-    color: var(--df-color-primary-foreground);
     padding: 0 0.375rem;
     font-size: 0.75rem;
     font-weight: 700;
@@ -302,7 +272,6 @@
     height: 0.125rem;
     width: 100%;
     border-radius: 0.25rem;
-    background-color: var(--df-color-primary);
   }
 
   .df-all-day-row {
@@ -387,8 +356,9 @@
     height: 0.75rem;
   }
 
-  .df-time-column-spacer[data-secondary-tz='true'] {
-    height: 2rem;
+  .df-time-day-column-spacer[data-secondary-tz='true'],
+  .df-time-week-column-spacer[data-secondary-tz='true'] {
+    height: 0.75rem;
   }
 
   .df-time-column-tz-header,
@@ -525,8 +495,16 @@
     border-right: 1px solid var(--df-color-border);
   }
 
+  .df-day-content-grid-boundary-bottom[data-scrollbar-space='true'] {
+    border-right: 1px solid var(--df-color-border);
+  }
+
   .df-day-content-grid-rows {
     position: relative;
+  }
+
+  .df-day-content-grid-rows[data-scrollbar-space='true'] {
+    border-right: 1px solid var(--df-color-border);
   }
 
   .df-day-content-bottom-tz-row {
@@ -603,40 +581,19 @@
   .df-right-panel-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.2rem;
   }
 
   .df-right-panel-event-card {
     cursor: pointer;
-    border-radius: 0.25rem;
-    border-left: 4px solid var(--df-color-border);
-    background-color: var(--df-color-muted);
-    padding: 0.5rem;
     transition: background-color 150ms;
+    min-height: 2.75rem;
+    display: flex;
+    flex-direction: column;
   }
 
-  .df-right-panel-event-card:hover {
-    background-color: var(--df-color-hover);
-  }
-
-  .df-right-panel-event-card[data-selected='true'] {
-    border-left-color: var(--df-color-primary);
-    background-color: color-mix(
-      in srgb,
-      var(--df-color-primary) 10%,
-      var(--df-color-background)
-    );
-  }
-
-  .df-right-panel-event-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--df-color-foreground);
-  }
-
-  .df-right-panel-event-time {
-    font-size: 0.75rem;
-    color: color-mix(in srgb, var(--df-color-foreground) 72%, transparent);
+  .df-right-panel-event-item {
+    margin-bottom: 0.5rem;
   }
 
   .df-week-time-grid {
@@ -1344,19 +1301,56 @@
     border-radius: 9999px;
     font-size: 9px;
     font-weight: 500;
-    color: color-mix(in srgb, var(--df-color-muted-foreground) 90%, white 10%);
+    color: #6b7280;
   }
 
   .df-year-grid-day-number[data-current-month='false'] {
-    color: color-mix(in srgb, var(--df-color-muted-foreground) 50%, white 50%);
+    color: #d1d5db;
   }
 
   .df-year-grid-day-number[data-current-month='true'][data-has-events='true'] {
-    color: color-mix(in srgb, var(--df-color-foreground) 88%, transparent);
+    color: #1f2937;
   }
 
-  .df-year-grid-day-number[data-strong-contrast='true'] {
-    color: white;
+  .df-year-grid-day-number[data-current-month='true'][data-has-events='true'][data-heat-level='4'],
+  .df-year-grid-day-number[data-current-month='true'][data-has-events='true'][data-heat-level='5'] {
+    color: #fff;
+  }
+
+  .dark .df-year-grid-day-number {
+    color: #9ca3af;
+  }
+
+  .dark .df-year-grid-day-number[data-current-month='false'] {
+    color: #4b5563;
+  }
+
+  .dark
+    .df-year-grid-day-number[data-current-month='true'][data-has-events='true'] {
+    color: #f3f4f6;
+  }
+
+  .dark
+    .df-year-grid-day-number[data-current-month='true'][data-has-events='true'][data-heat-level='5'] {
+    color: #1f2937;
+  }
+
+  [data-df-theme='dark'] .df-year-grid-day-number {
+    color: #9ca3af;
+  }
+
+  [data-df-theme='dark'] .df-year-grid-day-number[data-current-month='false'] {
+    color: #4b5563;
+  }
+
+  [data-df-theme='dark']
+    .df-year-grid-day-number[data-current-month='true'][data-has-events='true'] {
+    color: #f3f4f6;
+  }
+
+  [data-df-theme='dark']
+    .df-year-grid-day-number[data-current-month='true'][data-has-events='true'][data-heat-level='5'] {
+    color: #1f2937;
   }
 
   .df-year-grid-day-number[data-today='true'] {
@@ -1434,6 +1428,7 @@
 
   .df-year-fixed-week-spacer {
     flex-shrink: 0;
+    border-left: 1px solid var(--df-color-border);
     background-color: color-mix(
       in srgb,
       var(--df-color-muted) 70%,
@@ -1468,6 +1463,7 @@
 
   .df-year-fixed-month-spacer {
     flex-shrink: 0;
+    border-top: 1px solid var(--df-color-border);
     background-color: var(--df-color-background);
   }
 
@@ -1534,6 +1530,11 @@
   .dark .df-year-fixed-week-spacer,
   .dark .df-year-fixed-week-label {
     background-color: #101828;
+  }
+
+  .df-year-fixed-month-spacer[data-scrollbar-space='true'],
+  .df-year-fixed-week-spacer[data-scrollbar-space='true'] {
+    border: 0;
   }
 
   .dark .df-year-fixed-week-label {
@@ -1616,9 +1617,12 @@
 
     .df-current-time-line[data-secondary-tz='true']
       .df-day-content-current-time-side,
-    .df-time-column[data-secondary-tz='true'],
-    .df-week-time-grid-time-column[data-secondary-tz='true'] {
+    .df-time-column[data-secondary-tz='true'] {
       width: 5.5rem;
+    }
+
+    .df-week-time-grid-time-column[data-secondary-tz='true'] {
+      width: 5rem;
     }
 
     .df-time-label,
@@ -1640,7 +1644,7 @@
     }
 
     .df-day-content[data-switcher-mode='select'] {
-      width: 60%;
+      width: 70%;
     }
   }
 }

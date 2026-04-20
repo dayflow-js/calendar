@@ -16,7 +16,14 @@ export interface AppSubscriptionResult {
  */
 export function useAppSubscription(app: ICalendarApp): AppSubscriptionResult {
   const [tick, setTick] = useState(0);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(
+    app.state.selectedEventId ?? null
+  );
+
+  useEffect(() => {
+    setTick(0);
+    setSelectedEventId(app.state.selectedEventId ?? null);
+  }, [app]);
 
   useEffect(
     () =>

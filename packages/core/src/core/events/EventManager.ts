@@ -275,6 +275,11 @@ export class EventManager {
     this.getCallbacks().onMoreEventsClick?.(date);
   }
 
+  onEventDetailToggle(eventId: string | null): void {
+    this.getCallbacks().onEventDetailToggle?.(eventId);
+    this.notify();
+  }
+
   highlightEvent(eventId: string | null): void {
     if (this.state.highlightedEventId === eventId) return;
     this.state.highlightedEventId = eventId;

@@ -32,6 +32,7 @@ export interface KeyboardShortcutsConfig {
     paste?: string;
     delete?: string;
     newEvent?: string;
+    edit?: string;
   };
 }
 
@@ -390,6 +391,26 @@ export function createKeyboardShortcutsPlugin(
           if (selectedIdD) {
             app.deleteEvent(selectedIdD);
             app.selectEvent(null);
+          }
+        }
+
+        // 8. Edit (Enter)
+        const editKey = keyMap.edit || 'Enter';
+        if (e.key === editKey) {
+          if (isTyping) {
+            console.log('[DayFlow Keyboard] Enter ignored: user is typing');
+            return;
+          }
+
+          const selectedIdE = app.state.selectedEventId;
+          console.log(
+            '[DayFlow Keyboard] Enter pressed, selectedId:',
+            selectedIdE
+          );
+          if (selectedIdE) {
+            e.preventDefault();
+            e.stopPropagation();
+            app.onEventDetailToggle(selectedIdE);
           }
         }
       };

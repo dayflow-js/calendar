@@ -27,7 +27,7 @@ export const sidebarTabs = [
   },
   {
     title: 'Blossom Color Picker',
-    url: 'https://blossom.dayflow.studio/docs/introduction',
+    url: 'https://blossom.dayflow.studio/',
     icon: <span className='flex size-4 items-center justify-center'>🌸</span>,
   },
 ];
