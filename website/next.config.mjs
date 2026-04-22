@@ -30,6 +30,8 @@ const config = {
     '@dayflow/plugin-keyboard-shortcuts',
     '@dayflow/plugin-localization',
     '@dayflow/plugin-sidebar',
+    '@dayflow/blossom-color-picker',
+    '@dayflow/blossom-color-picker-react',
   ],
 };
 

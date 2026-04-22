@@ -51,6 +51,7 @@ const DefaultCalendarSidebar = ({
   onCreateCalendar,
   onSubscribeCalendar,
   onLoadSubscription,
+  onReorder,
 }: CalendarSidebarRenderProps) => {
   const { t } = useLocale();
 
@@ -430,6 +431,16 @@ const DefaultCalendarSidebar = ({
     }
   }, [contextMenu, calendars, app, handleCloseContextMenu]);
 
+  const handleReorder = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      app.reorderCalendars(fromIndex, toIndex);
+      if (onReorder) {
+        onReorder(app.getCalendars());
+      }
+    },
+    [app, onReorder]
+  );
+
   const sourceCalendar = mergeState
     ? calendars.find(c => c.id === mergeState.sourceId)
     : null;
@@ -493,7 +504,7 @@ const DefaultCalendarSidebar = ({
           onToggleVisibility={toggleCalendarVisibility}
           onReorder={
             isDraggable
-              ? app.reorderCalendars
+              ? handleReorder
               : () => {
                   /* noop */
                 }
@@ -525,7 +536,7 @@ const DefaultCalendarSidebar = ({
             onToggleVisibility={toggleCalendarVisibility}
             onReorder={
               isDraggable
-                ? app.reorderCalendars
+                ? handleReorder
                 : () => {
                     /* noop */
                   }

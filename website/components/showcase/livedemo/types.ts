@@ -1,5 +1,7 @@
 import { ViewType } from '@dayflow/react';
 
+export const DEFAULT_THEME_COLOR = '#2e2e2e';
+
 export type YearMode = 'fixed-week' | 'canvas' | 'grid';
 export type SwitcherMode = 'buttons' | 'select';
 
@@ -22,4 +24,5 @@ export interface CalendarSelections {
   activeView: ViewType;
   yearMode: YearMode;
   switcherMode: SwitcherMode;
+  themeColor?: string;
 }

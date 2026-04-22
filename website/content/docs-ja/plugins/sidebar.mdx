@@ -35,19 +35,20 @@ function MyCalendar() {
 
 ## 設定リファレンス
 
-| プロパティ                   | 型                                             | デフォルト  | 説明                                                   |
-| :--------------------------- | :--------------------------------------------- | :---------- | :----------------------------------------------------- |
-| `width`                      | `number \| string`                             | `'240px'`   | サイドバーの幅（例: `280` または `'20rem'`）           |
-| `miniWidth`                  | `string`                                       | `'50px'`    | 折りたたみ時のサイドバーの幅                           |
-| `initialCollapsed`           | `boolean`                                      | `false`     | サイドバーを折りたたんだ状態で開始するかどうか         |
-| `createCalendarMode`         | `'inline' \| 'modal'`                          | `'inline'`  | カレンダー作成フォームの表示方法                       |
-| `colorPickerMode`            | `'blossom' \| 'default'`                       | `'default'` | 使用するカラーピッカーコンポーネント                   |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`          | `undefined` | 新しい購読が追加された後のコールバック                 |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                  | `undefined` | 既存の購読用のカスタムローダー                         |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode` | `undefined` | サイドバー UI を完全にオーバーライドします             |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`       | `undefined` | カスタムサイドバーヘッダーレンダラー                   |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                 | `undefined` | カレンダー項目のカスタムコンテキストメニューレンダラー |
-| `renderCreateCalendarDialog` | `(props) => TNode`                             | `undefined` | カスタムカレンダー作成ダイアログレンダラー             |
+| プロパティ                   | 型                                                     | デフォルト  | 説明                                                   |
+| :--------------------------- | :----------------------------------------------------- | :---------- | :----------------------------------------------------- |
+| `width`                      | `number \| string`                                     | `'240px'`   | サイドバーの幅（例: `280` または `'20rem'`）           |
+| `miniWidth`                  | `string`                                               | `'50px'`    | 折りたたみ時のサイドバーの幅                           |
+| `initialCollapsed`           | `boolean`                                              | `false`     | サイドバーを折りたたんだ状態で開始するかどうか         |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`  | カレンダー作成フォームの表示方法                       |
+| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'` | 使用するカラーピッカーコンポーネント                   |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined` | 新しい購読が追加された後のコールバック                 |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined` | 既存の購読用のカスタムローダー                         |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined` | カレンダーの並べ替え後のコールバック                   |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined` | サイドバー UI を完全にオーバーライドします             |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined` | カスタムサイドバーヘッダーレンダラー                   |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined` | カレンダー項目のカスタムコンテキストメニューレンダラー |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined` | カスタムカレンダー作成ダイアログレンダラー             |
 
 ## 機能
 
@@ -59,6 +60,7 @@ function MyCalendar() {
 - **カレンダーリスト** - 色分けされたチェックボックスで個々のカレンダーの表示を切替
 - **カレンダー作成** - カスタム名と色で新しいカレンダーを追加
 - **名前変更 / 色変更** - カレンダーを右クリックして名前や色を変更
+- **カレンダーの並べ替え** - リスト内でカレンダーをドラッグ＆ドロップして並べ替えることができます。`onReorder` コールバックを使用して、新しい順序をバックエンドに保存できます。
 - **カレンダー統合** - あるカレンダーの全イベントを別のカレンダーに移動
 - **カレンダー削除** - 確認ステップ付きでカレンダーを削除（事前に統合も可能）
 - **インポート / エクスポート** - `.ics` ファイルのインポートまたはカレンダーを `.ics` にエクスポート

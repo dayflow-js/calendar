@@ -2,7 +2,7 @@
 
 import { TimeZone, ViewType } from '@dayflow/react';
 import { CircleAlert } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,9 +22,13 @@ import {
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
+import { MiniDotsFeature } from './MiniDotsFeature';
+import { MultiCalFeature } from './MultiCalFeature';
+import { ThemeColorColumn } from './ThemeColorColumn';
 import {
   CalendarFeatures,
   CalendarSelections,
+  DEFAULT_THEME_COLOR,
   YearMode,
   SwitcherMode,
 } from './types';
@@ -34,6 +38,7 @@ interface ControlPanelProps {
   selections: CalendarSelections;
   onUpdateFeatures: (updates: Partial<CalendarFeatures>) => void;
   onUpdateSelections: (updates: Partial<CalendarSelections>) => void;
+  onPreviewThemeColor: (color: string) => void;
   localesOptions: Array<{ label: string; value: string }>;
   showControls: boolean;
 }
@@ -89,6 +94,7 @@ export function ControlPanel({
   selections,
   onUpdateFeatures,
   onUpdateSelections,
+  onPreviewThemeColor,
   localesOptions,
   showControls,
 }: ControlPanelProps) {
@@ -115,6 +121,7 @@ export function ControlPanel({
     () => filterTimeZones(searchSecondaryTz),
     [searchSecondaryTz]
   );
+  const themeColor = selections.themeColor || DEFAULT_THEME_COLOR;
 
   const toggleView = (view: string) => {
     const next = selections.selectedViews.includes(view)
@@ -126,11 +133,11 @@ export function ControlPanel({
   return (
     <Card
       className={cn(
-        'hidden border-slate-200 bg-slate-50/50 shadow-none lg:block dark:border-slate-800 dark:bg-gray-900/50',
-        showControls && 'block'
+        'relative z-30 border-slate-200 bg-slate-50/50 shadow-none dark:border-slate-800 dark:bg-gray-900/50',
+        showControls ? 'block' : 'hidden'
       )}
     >
-      <CardContent className='flex flex-col gap-3 px-4 py-2'>
+      <CardContent className='flex flex-col gap-3 overflow-visible p-4 pt-4'>
         {/* Row 1: Features and Views */}
         <div className='flex items-start justify-between gap-8'>
           {/* Features Column */}
@@ -234,94 +241,10 @@ export function ControlPanel({
                 </div>
               </div>
 
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='event-dots'
-                  checked={features.showEventDots}
-                  onCheckedChange={checked =>
-                    onUpdateFeatures({ showEventDots: checked === true })
-                  }
-                  className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
-                />
-                <div className='flex items-center gap-1'>
-                  <Label
-                    htmlFor='event-dots'
-                    className='cursor-pointer text-xs font-normal text-slate-600 dark:text-slate-400'
-                  >
-                    Mini Dots
-                  </Label>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className='inline-flex cursor-help items-center'>
-                        <CircleAlert className='h-3 w-3 text-slate-400' />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side='top'
-                      className='w-80 overflow-hidden border-slate-200 p-0 shadow-xl dark:border-slate-800'
-                    >
-                      <div className='border-b border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900'>
-                        <p className='mb-1 text-sm font-semibold'>
-                          Mini Calendar Dots
-                        </p>
-                        <p className='text-[11px] leading-relaxed text-slate-500 dark:text-slate-400'>
-                          Shows colored dots below dates in the sidebar mini
-                          calendar. Each dot represents a unique calendar color
-                          with events on that day.
-                        </p>
-                      </div>
-                      <div className='bg-white p-3 dark:bg-slate-950'>
-                        <div className='space-y-1.5'>
-                          <p className='text-[10px] font-bold tracking-wider text-slate-400 uppercase'>
-                            Mini Calendar Preview
-                          </p>
-                          <div className='relative h-14 w-full rounded-md border border-slate-100 bg-slate-50/50 p-1 dark:border-slate-800 dark:bg-slate-900/50'>
-                            <div className='grid h-full grid-cols-4 border border-slate-200/50 dark:border-slate-800/50'>
-                              {/* Day 1 */}
-                              <div className='relative flex flex-col items-center border-r border-slate-200/50 p-1 dark:border-slate-800/50'>
-                                <span className='text-[10px] font-medium opacity-60'>
-                                  14
-                                </span>
-                                <div className='mt-0.5 flex gap-0.5'>
-                                  <div className='h-1 w-1 rounded-full bg-blue-500' />
-                                </div>
-                              </div>
-                              {/* Day 2 (Today) */}
-                              <div className='relative flex flex-col items-center border-r border-slate-200/50 bg-white p-1 dark:border-slate-800/50 dark:bg-slate-950'>
-                                <span className='flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white'>
-                                  15
-                                </span>
-                                <div className='mt-0.5 flex gap-0.5'>
-                                  <div className='h-1 w-1 rounded-full bg-blue-500' />
-                                  <div className='h-1 w-1 rounded-full bg-emerald-500' />
-                                  <div className='h-1 w-1 rounded-full bg-rose-500' />
-                                </div>
-                              </div>
-                              {/* Day 3 */}
-                              <div className='relative flex flex-col items-center border-r border-slate-200/50 p-1 dark:border-slate-800/50'>
-                                <span className='text-[10px] font-medium opacity-60'>
-                                  16
-                                </span>
-                                <div className='mt-0.5 flex gap-0.5'>
-                                  <div className='h-1 w-1 rounded-full bg-amber-500' />
-                                  <div className='h-1 w-1 rounded-full bg-purple-500' />
-                                </div>
-                              </div>
-                              {/* Day 4 */}
-                              <div className='relative flex flex-col items-center p-1'>
-                                <span className='text-[10px] font-medium opacity-60'>
-                                  17
-                                </span>
-                                <div className='mt-0.5 flex gap-0.5'></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
+              <MiniDotsFeature
+                checked={features.showEventDots}
+                onUpdateFeatures={onUpdateFeatures}
+              />
 
               <div className='flex items-center space-x-2'>
                 <Checkbox
@@ -367,123 +290,10 @@ export function ControlPanel({
                 }
               />
 
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='multi-calendar'
-                  checked={features.showMultiCalendar}
-                  onCheckedChange={checked =>
-                    onUpdateFeatures({ showMultiCalendar: checked === true })
-                  }
-                  className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
-                />
-                <div className='flex items-center gap-1'>
-                  <Label
-                    htmlFor='multi-calendar'
-                    className='cursor-pointer text-xs font-normal text-slate-600 dark:text-slate-400'
-                  >
-                    Multi Cal
-                  </Label>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className='inline-flex cursor-help items-center'>
-                        <CircleAlert className='h-3 w-3 text-slate-400' />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side='top'
-                      className='w-80 overflow-hidden border-slate-200 p-0 shadow-xl dark:border-slate-800'
-                    >
-                      <div className='border-b border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900'>
-                        <p className='mb-1 text-sm font-semibold'>
-                          Multi-calendar Events
-                        </p>
-                        <p className='text-[11px] leading-relaxed text-slate-500 dark:text-slate-400'>
-                          Display a single event across multiple calendars.
-                          Perfect for shared team activities or cross-functional
-                          blocks.
-                        </p>
-                      </div>
-                      <div className='space-y-4 bg-white p-3 dark:bg-slate-950'>
-                        <div className='space-y-1.5'>
-                          <p className='text-[10px] font-bold tracking-wider text-slate-400 uppercase'>
-                            Week View Preview (Personal, Wellness)
-                          </p>
-                          <div
-                            className='relative flex h-10 w-full flex-col justify-center rounded-md border border-slate-100 bg-slate-50/50 p-1.5 dark:border-slate-800 dark:bg-slate-900/50'
-                            style={{
-                              background:
-                                'repeating-linear-gradient(-45deg, rgba(37, 99, 235, 0.08) 0px, rgba(37, 99, 235, 0.08) 6px, rgba(16, 185, 129, 0.08) 6px, rgba(16, 185, 129, 0.08) 12px)',
-                            }}
-                          >
-                            <div className='flex h-full items-center gap-2'>
-                              <div
-                                className='pointer-events-none absolute inset-0'
-                                style={{
-                                  background:
-                                    'repeating-linear-gradient(-45deg, #2563eb 0px, #2563eb 6px, #10b981 6px, #10b981 12px)',
-                                  clipPath:
-                                    'inset(4px calc(100% - 4px - 3px) 4px 4px round 9999px)',
-                                }}
-                              />
-                              <div className='flex min-w-0 flex-col gap-0.5 pl-3'>
-                                <div className='truncate text-[10px] font-bold'>
-                                  Team Sync & Wellness
-                                </div>
-                                <div className='text-[8px] text-slate-400'>
-                                  10:00 - 11:30
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Month View Preview */}
-                        <div className='space-y-1.5'>
-                          <p className='text-[10px] font-bold tracking-wider text-slate-400 uppercase'>
-                            Month View Preview (Team, Travel, Learning)
-                          </p>
-                          <div className='relative h-14 w-full rounded-md border border-slate-100 bg-slate-50/50 p-1 dark:border-slate-800 dark:bg-slate-900/50'>
-                            <div className='grid h-full grid-cols-3 border border-slate-200/50 dark:border-slate-800/50'>
-                              <div className='border-r border-slate-200/50 p-0.5 dark:border-slate-800/50'>
-                                <span className='text-[8px] opacity-30'>
-                                  12
-                                </span>
-                              </div>
-                              <div className='border-r border-slate-200/50 bg-white p-0.5 dark:border-slate-800/50 dark:bg-slate-950'>
-                                <span className='text-[8px] font-bold'>13</span>
-                                <div
-                                  className='relative mt-0.5 flex h-3 items-center overflow-hidden rounded-[2px] px-1 pl-2'
-                                  style={{
-                                    background:
-                                      'repeating-linear-gradient(-45deg, rgba(37, 99, 235, 0.1) 0px, rgba(37, 99, 235, 0.1) 6px, rgba(236, 72, 153, 0.1) 6px, rgba(236, 72, 153, 0.1) 12px, rgba(20, 184, 166, 0.1) 12px, rgba(20, 184, 166, 0.1) 18px)',
-                                  }}
-                                >
-                                  {/* Vertical segmented color bar */}
-                                  <div
-                                    className='absolute top-0 bottom-0 left-0.5 w-[3px] rounded'
-                                    style={{
-                                      background:
-                                        'linear-gradient(to bottom, #2563eb 0%, #2563eb 33.33%, #ec4899 33.33%, #ec4899 66.66%, #14b8a6 66.66%, #14b8a6 100%)',
-                                    }}
-                                  />
-                                  <span className='truncate text-[8px] font-medium'>
-                                    Company Off-site
-                                  </span>
-                                </div>
-                              </div>
-                              <div className='p-0.5'>
-                                <span className='text-[8px] opacity-30'>
-                                  14
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
+              <MultiCalFeature
+                checked={features.showMultiCalendar}
+                onUpdateFeatures={onUpdateFeatures}
+              />
             </div>
           </div>
 
@@ -771,6 +581,12 @@ export function ControlPanel({
               </SelectContent>
             </Select>
           </div>
+
+          <ThemeColorColumn
+            themeColor={themeColor}
+            onPreviewThemeColor={onPreviewThemeColor}
+            onUpdateSelections={onUpdateSelections}
+          />
         </div>
       </CardContent>
     </Card>

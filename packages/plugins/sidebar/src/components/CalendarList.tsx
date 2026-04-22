@@ -10,7 +10,7 @@ import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
 interface CalendarListProps {
   calendars: CalendarType[];
   onToggleVisibility: (id: string, visible: boolean) => void;
-  onReorder: (fromIndex: number, toIndex: number) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void | Promise<void>;
   onRename: (id: string, newName: string) => void;
   onContextMenu: (e: JSX.TargetedMouseEvent<HTMLElement>, id: string) => void;
   editingId: string | null;

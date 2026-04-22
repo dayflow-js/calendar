@@ -1,5 +1,6 @@
 /* DayFlow Tailwind Setup */
 @import '@dayflow/core/dist/styles.components.css';
+@import '@dayflow/blossom-color-picker/styles.css';
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';

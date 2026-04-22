@@ -12,6 +12,7 @@
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@dayflow/blossom-color-picker-react": "^1.2.0",
     "@dayflow/core": "latest",
     "@dayflow/plugin-drag": "latest",
     "@dayflow/plugin-keyboard-shortcuts": "latest",

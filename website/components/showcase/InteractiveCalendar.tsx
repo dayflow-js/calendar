@@ -19,7 +19,11 @@ import {
   ViewType,
   createYearView,
   UseCalendarAppReturn,
+  Event,
 } from '@dayflow/react';
+import { createResourceGridView } from '@dayflow/resource-grid';
+
+import '@dayflow/resource-grid/dist/styles.components.css';
 import { useTheme } from 'next-themes';
 import React, {
   useMemo,
@@ -27,15 +31,24 @@ import React, {
   useEffect,
   useRef,
   useTransition,
+  useCallback,
 } from 'react';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getWebsiteCalendars } from '@/utils/palette';
-import { generateSampleEvents } from '@/utils/sampleData';
+import {
+  generateSampleEvents,
+  generateSampleResources,
+  Resource,
+} from '@/utils/sampleData';
 
 import { CalendarViewer } from './livedemo/CalendarViewer';
 import { ControlPanel } from './livedemo/ControlPanel';
-import { CalendarFeatures, CalendarSelections } from './livedemo/types';
+import {
+  CalendarFeatures,
+  CalendarSelections,
+  DEFAULT_THEME_COLOR,
+} from './livedemo/types';
 
 const calendarTypes = getWebsiteCalendars();
 
@@ -49,6 +62,16 @@ const LOCALES_OPTIONS = [
   { label: 'Spanish', value: 'es', data: es },
 ];
 
+const mergeChangedState = <T extends object>(
+  prev: T,
+  updates: Partial<T>
+): T => {
+  const keys = Object.keys(updates) as Array<keyof T>;
+  if (keys.every(key => prev[key] === updates[key])) return prev;
+
+  return { ...prev, ...updates };
+};
+
 export function InteractiveCalendar() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -56,6 +79,7 @@ export function InteractiveCalendar() {
 
   const [showControls, setShowControls] = useState(false);
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
+  const calendarWrapperRef = useRef<HTMLDivElement>(null);
 
   // Consolidated State
   const [features, setFeatures] = useState<CalendarFeatures>({
@@ -77,6 +101,9 @@ export function InteractiveCalendar() {
     switcherMode: 'buttons',
   });
 
+  const [resources] = useState<Resource[]>(generateSampleResources());
+  const getResourceId = useCallback((event: Event) => event.calendarId, []);
+
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
@@ -85,17 +112,27 @@ export function InteractiveCalendar() {
     }
   }, []);
 
-  const updateFeatures = (updates: Partial<CalendarFeatures>) => {
-    startTransition(() => {
-      setFeatures(prev => ({ ...prev, ...updates }));
-    });
-  };
+  const updateFeatures = useCallback(
+    (updates: Partial<CalendarFeatures>) => {
+      startTransition(() => {
+        setFeatures(prev => mergeChangedState(prev, updates));
+      });
+    },
+    [startTransition]
+  );
 
-  const updateSelections = (updates: Partial<CalendarSelections>) => {
-    startTransition(() => {
-      setSelections(prev => ({ ...prev, ...updates }));
-    });
-  };
+  const updateSelections = useCallback(
+    (updates: Partial<CalendarSelections>) => {
+      startTransition(() => {
+        setSelections(prev => mergeChangedState(prev, updates));
+      });
+    },
+    [startTransition]
+  );
+
+  const previewThemeColor = useCallback((color: string) => {
+    calendarWrapperRef.current?.style.setProperty('--df-color-primary', color);
+  }, []);
 
   const allEvents = useMemo(() => generateSampleEvents(), []);
   const events = useMemo(() => {
@@ -179,6 +216,15 @@ export function InteractiveCalendar() {
       );
     }
 
+    v.push(
+      createResourceGridView({
+        mode: 'resourceView',
+        resources,
+        visibleDays: 5,
+        getResourceId,
+      })
+    );
+
     const currentView = selections.selectedViews.includes(selections.activeView)
       ? selections.activeView
       : selections.selectedViews.includes(ViewType.MONTH)
@@ -218,7 +264,29 @@ export function InteractiveCalendar() {
           }
         : false,
     };
-  }, [features, selections, events, mounted, calendarsWithGroups, themeMode]);
+  }, [
+    features.enableDrag,
+    features.showSidebar,
+    features.enableShortcuts,
+    features.showCalendarGroups,
+    features.showHeader,
+    features.readOnly,
+    features.showEventDots,
+    selections.selectedViews,
+    selections.activeView,
+    selections.timeZone,
+    selections.locale,
+    selections.switcherMode,
+    selections.secondaryTimeZone,
+    selections.yearMode,
+    resources,
+    getResourceId,
+    events,
+    mounted,
+    calendarsWithGroups,
+    themeMode,
+    updateSelections,
+  ]);
 
   if (!mounted) {
     return (
@@ -234,11 +302,22 @@ export function InteractiveCalendar() {
           selections={selections}
           onUpdateFeatures={updateFeatures}
           onUpdateSelections={updateSelections}
+          onPreviewThemeColor={previewThemeColor}
           localesOptions={LOCALES_OPTIONS}
           showControls={showControls}
         />
 
-        <div className='calendar-wrapper w-full'>
+        <div
+          ref={calendarWrapperRef}
+          className='calendar-wrapper w-full'
+          style={
+            {
+              '--df-color-primary':
+                selections.themeColor || DEFAULT_THEME_COLOR,
+              '--df-color-primary-foreground': '#ffffff',
+            } as React.CSSProperties
+          }
+        >
           <CalendarViewer
             key={`${selections.locale}-${selections.selectedViews.join(',')}-${selections.yearMode}-${selections.switcherMode}`}
             version={`${features.showSidebar}-${features.enableDrag}-${features.enableShortcuts}-${features.showEventDots}-${features.showMultiCalendar}`}

@@ -27,12 +27,20 @@ export interface KeyboardShortcutsConfig {
     prev?: string;
     next?: string;
     undo?: string;
+    redo?: string;
     copy?: string;
     cut?: string;
     paste?: string;
     delete?: string;
     newEvent?: string;
     edit?: string;
+    print?: string;
+  };
+  callbacks?: {
+    undo?: (app: ICalendarApp) => void | Promise<void>;
+    redo?: (app: ICalendarApp) => void | Promise<void>;
+    delete?: (app: ICalendarApp, event?: Event) => void | Promise<void>;
+    print?: (app: ICalendarApp) => void | Promise<void>;
   };
 }
 
@@ -240,7 +248,7 @@ async function handlePaste(app: ICalendarApp) {
 export function createKeyboardShortcutsPlugin(
   config: KeyboardShortcutsConfig = {}
 ): CalendarPlugin {
-  const { enabled = true, keyMap = {} } = config;
+  const { enabled = true, keyMap = {}, callbacks = {} } = config;
 
   return {
     name: 'keyboard-shortcuts',
@@ -273,7 +281,20 @@ export function createKeyboardShortcutsPlugin(
           return;
         }
 
-        // 2. Today (Cmd/Ctrl + T)
+        // 2. Print (Cmd/Ctrl + P) — only intercept when a custom callback is provided;
+        // otherwise the print plugin handles its own Cmd+P listener
+        const printKey = keyMap.print || 'p';
+        if (
+          callbacks.print &&
+          (e.metaKey || e.ctrlKey) &&
+          e.key.toLowerCase() === printKey
+        ) {
+          e.preventDefault();
+          await callbacks.print(app);
+          return;
+        }
+
+        // 3. Today (Cmd/Ctrl + T)
         const todayKey = keyMap.today || 't';
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === todayKey) {
           e.preventDefault();
@@ -324,17 +345,42 @@ export function createKeyboardShortcutsPlugin(
           return;
         }
 
-        // 6. Clipboard & Undo Operations (Cmd/Ctrl + C/X/V/Z)
+        // 6. Clipboard & Undo/Redo Operations (Cmd/Ctrl + C/X/V/Z/Y)
         if ((e.metaKey || e.ctrlKey) && !isTyping) {
           const undoKey = keyMap.undo || 'z';
+          const redoKey = keyMap.redo || 'y';
           const copyKey = keyMap.copy || 'c';
           const cutKey = keyMap.cut || 'x';
           const pasteKey = keyMap.paste || 'v';
 
           switch (e.key.toLowerCase()) {
             case undoKey: {
+              if (e.shiftKey) {
+                // Cmd/Ctrl + Shift + Z → redo
+                e.preventDefault();
+                if (callbacks.redo) {
+                  await callbacks.redo(app);
+                } else {
+                  (app as ICalendarApp & { redo?: () => void }).redo?.();
+                }
+                break;
+              }
               e.preventDefault();
-              app.undo();
+              if (callbacks.undo) {
+                await callbacks.undo(app);
+              } else {
+                app.undo();
+              }
+              break;
+            }
+            case redoKey: {
+              // Cmd/Ctrl + Y → redo
+              e.preventDefault();
+              if (callbacks.redo) {
+                await callbacks.redo(app);
+              } else {
+                (app as ICalendarApp & { redo?: () => void }).redo?.();
+              }
               break;
             }
             case copyKey: {
@@ -389,8 +435,13 @@ export function createKeyboardShortcutsPlugin(
 
           const selectedIdD = app.state.selectedEventId;
           if (selectedIdD) {
-            app.deleteEvent(selectedIdD);
-            app.selectEvent(null);
+            if (callbacks.delete) {
+              const event = app.getEvents().find(ev => ev.id === selectedIdD);
+              await callbacks.delete(app, event);
+            } else {
+              app.deleteEvent(selectedIdD);
+              app.selectEvent(null);
+            }
           }
         }
 

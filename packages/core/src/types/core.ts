@@ -91,6 +91,10 @@ export interface CalendarCallbacks {
     sourceId: string,
     targetId: string
   ) => void | Promise<void>;
+  onCalendarReorder?: (
+    fromIndex: number,
+    toIndex: number
+  ) => void | Promise<void>;
   onEventClick?: (event: Event) => void | Promise<void>;
   onEventDoubleClick?: (
     event: Event,

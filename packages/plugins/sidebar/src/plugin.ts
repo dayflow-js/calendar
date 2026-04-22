@@ -57,6 +57,7 @@ export interface CalendarSidebarRenderProps {
     events: Event[]
   ) => Promise<void>;
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
+  onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
 }
 export interface SidebarPluginConfig {
   width?: number | string;
@@ -76,6 +77,7 @@ export interface SidebarPluginConfig {
     events: Event[]
   ) => Promise<void>;
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
+  onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
 }
 
 export function createSidebarPlugin(
@@ -191,6 +193,7 @@ export function createSidebarPlugin(
               onCreateCalendar: handleCreateCalendar,
               onSubscribeCalendar: config.onSubscribeCalendar,
               onLoadSubscription: config.onLoadSubscription,
+              onReorder: config.onReorder,
             }),
             [
               app,
@@ -200,7 +203,14 @@ export function createSidebarPlugin(
               isCollapsed,
               handleCreateCalendar,
               editingCalendarId,
-              config,
+              config.showEventDots,
+              config.renderCalendarContextMenu,
+              config.renderSidebarHeader,
+              config.createCalendarMode,
+              config.renderCreateCalendarDialog,
+              config.onSubscribeCalendar,
+              config.onLoadSubscription,
+              config.onReorder,
             ]
           );
 

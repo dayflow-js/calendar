@@ -35,19 +35,20 @@ function MyCalendar() {
 
 ## Configuration
 
-| Property                     | Type                                           | Default     | Description                                     |
-| :--------------------------- | :--------------------------------------------- | :---------- | :---------------------------------------------- |
-| `width`                      | `number \| string`                             | `'240px'`   | Width of the sidebar (e.g. `280` or `'20rem'`)  |
-| `miniWidth`                  | `string`                                       | `'50px'`    | Width of the sidebar when collapsed             |
-| `initialCollapsed`           | `boolean`                                      | `false`     | Whether the sidebar starts collapsed            |
-| `createCalendarMode`         | `'inline' \| 'modal'`                          | `'inline'`  | How the "create calendar" form is displayed     |
-| `colorPickerMode`            | `'blossom' \| 'default'`                       | `'default'` | Which color picker component to use             |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`          | `undefined` | Callback triggered after a new subscription     |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                  | `undefined` | Custom loader for existing subscriptions        |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode` | `undefined` | Full override for the sidebar UI                |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`       | `undefined` | Custom sidebar header renderer                  |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                 | `undefined` | Custom context menu renderer for calendar items |
-| `renderCreateCalendarDialog` | `(props) => TNode`                             | `undefined` | Custom create-calendar dialog renderer          |
+| Property                     | Type                                                   | Default     | Description                                     |
+| :--------------------------- | :----------------------------------------------------- | :---------- | :---------------------------------------------- |
+| `width`                      | `number \| string`                                     | `'240px'`   | Width of the sidebar (e.g. `280` or `'20rem'`)  |
+| `miniWidth`                  | `string`                                               | `'50px'`    | Width of the sidebar when collapsed             |
+| `initialCollapsed`           | `boolean`                                              | `false`     | Whether the sidebar starts collapsed            |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`  | How the "create calendar" form is displayed     |
+| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'` | Which color picker component to use             |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined` | Callback triggered after a new subscription     |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined` | Custom loader for existing subscriptions        |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined` | Callback triggered after calendar reordering    |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined` | Full override for the sidebar UI                |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined` | Custom sidebar header renderer                  |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined` | Custom context menu renderer for calendar items |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined` | Custom create-calendar dialog renderer          |
 
 ## Features
 
@@ -59,6 +60,7 @@ Built-in features include:
 - **Calendar List** - Toggle visibility of individual calendars with color-coded checkboxes
 - **Create Calendar** - Add new calendars with custom name and color
 - **Rename / Recolor** - Right-click a calendar to rename or change its color
+- **Calendar Reordering** - Drag and drop calendars in the list to reorder them. Use the `onReorder` callback to persist the new order to your backend.
 - **Merge Calendars** - Move all events from one calendar into another
 - **Delete Calendar** - Remove a calendar with a confirmation step (or merge first)
 - **Import / Export** - Import `.ics` files or export calendars to `.ics`

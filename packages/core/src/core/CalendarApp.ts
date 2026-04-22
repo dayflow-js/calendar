@@ -249,6 +249,7 @@ export class CalendarApp implements ICalendarApp {
 
   reorderCalendars = (fromIndex: number, toIndex: number): void => {
     this.calendarRegistry.reorder(fromIndex, toIndex);
+    this.callbacks.onCalendarReorder?.(fromIndex, toIndex);
     this.triggerRender();
   };
 
