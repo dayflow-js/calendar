@@ -44,6 +44,7 @@ export interface BaseViewProps<TConfig = unknown> {
   // Customization
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   calendarRef: RefObject<HTMLDivElement>;
   switcherMode?: ViewSwitcherMode;
   meta?: Record<string, unknown>;

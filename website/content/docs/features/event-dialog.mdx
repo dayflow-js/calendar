@@ -18,11 +18,34 @@ import { DayFlowCalendar } from '@dayflow/core';
 
 ## Customization
 
-While the default dialog covers most use cases, you can completely replace it with your own implementation using the `customEventDetailDialog` prop. See the [Custom Event Detail Dialog](/features/custom-detail-dialog) page for details.
+### Replace the dialog UI
 
-```tsx {3}
+Use the `eventDetailDialog` slot to swap in your own dialog component while keeping DayFlow's open/close state management. This requires `useEventDetailDialog: true` in your `useCalendarApp` config.
+
+```tsx
+// 1. Enable dialog mode in the calendar config
+const calendar = useCalendarApp({
+  views: [...],
+  useEventDetailDialog: true,
+});
+
+// 2. Provide your own dialog via the slot
 <DayFlowCalendar
   calendar={calendar}
-  customEventDetailDialog={YourCustomDialog}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
 />
 ```
+
+### Opt out of the built-in panel
+
+If your application manages event detail in its own modals (driven by callbacks or global state), you can suppress the built-in floating panel entirely without providing a replacement:
+
+```tsx
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+This works across React, Vue, Svelte, and Angular adapters.

@@ -56,6 +56,7 @@ const WeekView = ({
   config,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   calendarRef,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
@@ -670,6 +671,7 @@ const WeekView = ({
         handleDrop={handleDrop}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
+        useEventDetailPanel={useEventDetailPanel}
       />
 
       <TimeGrid
@@ -720,6 +722,7 @@ const WeekView = ({
         setDetailPanelEventId={setDetailPanelEventId}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
+        useEventDetailPanel={useEventDetailPanel}
         isCurrentWeek={isCurrentWeek}
         currentTime={currentTime}
         HOUR_HEIGHT={HOUR_HEIGHT}

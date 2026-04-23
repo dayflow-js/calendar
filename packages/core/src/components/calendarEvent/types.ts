@@ -46,6 +46,8 @@ export interface CalendarEventProps {
   customDetailPanelContent?: EventDetailContentRenderer;
   /** Custom event detail dialog component (Dialog mode) */
   customEventDetailDialog?: EventDetailDialogRenderer;
+  /** When false, suppresses the floating event detail panel entirely */
+  useEventDetailPanel?: boolean;
   /** Multi-day regular event segment information */
   multiDaySegmentInfo?: {
     startHour: number;

@@ -27,17 +27,17 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 
 ## Available Slots
 
-| Generator Name                    | Description                                                      | Arguments                                                                 |
-| :-------------------------------- | :--------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| `colorPicker`                     | A small color picker used for event colors.                      | `{ color, onChange, onChangeComplete }`                                   |
-| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                    | `{ color, onChange, onAccept, onCancel, styles }`                         |
-| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
-| `eventContextMenu`                | Custom right-click context menu for events.                      | `{ event, onClose }`                                                      |
-| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked. | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
-| `eventDetailDialog`               | Custom dialog shown when an event is clicked.                    | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
-| `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.         | `{ date, viewType, onClose }`                                             |
-| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.          | `{ color, onChange, onChangeComplete }`                                   |
-| `titleBarSlot`                    | Extra content in the sidebar title bar.                          | `{ isCollapsed, toggleCollapsed }`                                        |
+| Generator Name                    | Description                                                                                              | Arguments                                                                 |
+| :-------------------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `colorPicker`                     | A small color picker used for event colors.                                                              | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                                                            | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).                                               | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventContextMenu`                | Custom right-click context menu for events.                                                              | `{ event, onClose }`                                                      |
+| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked.                                         | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | Custom dialog shown when an event is clicked. Requires `useEventDetailDialog: true` in `useCalendarApp`. | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.                                                 | `{ date, viewType, onClose }`                                             |
+| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.                                                  | `{ color, onChange, onChangeComplete }`                                   |
+| `titleBarSlot`                    | Extra content in the sidebar title bar.                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## Event Content
 
@@ -136,6 +136,10 @@ export const CustomDetailPanelShowcase = () => {
 ## Event Detail Dialog
 
 If you prefer a modal/dialog interface for viewing and editing event details, you can use the `eventDetailDialog` slot. This is particularly useful for mobile-first applications or when you need more space for complex event data.
+
+> **Prerequisite**: set `useEventDetailDialog: true` in `useCalendarApp` to activate dialog mode. Without it the slot is never triggered.
+
+> **Opt out instead**: if you want to suppress the built-in floating panel without replacing it with your own dialog, pass `useEventDetailPanel={false}` on `DayFlowCalendar` instead of using a slot.
 
 <CustomDetailDialogShowcase />
 

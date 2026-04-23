@@ -35,15 +35,12 @@ export function CalendarDemo() {
 
 ## Props
 
-| Prop                       | 型                           | 必須 | 説明                                                                     |
-| -------------------------- | ---------------------------- | ---- | ------------------------------------------------------------------------ |
-| `calendar`                 | `UseCalendarAppReturn`       | 必須 | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。              |
-| `className`                | `string`                     | 任意 | ルートコンテナに追加するクラス名。標準クラスは `df-calendar-container`。 |
-| `style`                    | `React.CSSProperties`        | 任意 | インラインスタイル。デフォルト高さ 800px を上書きしたい場合に利用。      |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | 任意 | 組み込み詳細パネルの中身だけを置き換える。                               |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 任意 | モーダル UI 全体をカスタム実装に差し替える。                             |
-| `meta`                     | `Record<string, any>`        | 任意 | すべてのビューへ受け渡したい任意の追加データ。                           |
-| `search`                   | `CalendarSearchProps`        | 任意 | 組み込み検索機能の設定。                                                 |
+| Prop                    | 型                     | 必須 | 説明                                                                                   |
+| ----------------------- | ---------------------- | ---- | -------------------------------------------------------------------------------------- |
+| `calendar`              | `UseCalendarAppReturn` | 必須 | `useCalendarApp` の戻り値。状態やビュー、アクションを内包。                            |
+| `collapsedSafeAreaLeft` | `number`               | 任意 | サイドバー折りたたみ時の左パディング（px）。Mac のトラフィックライト領域の考慮に使用。 |
+| `useEventDetailPanel`   | `boolean`              | 任意 | `false` を渡すと組み込みのイベント詳細フローティングパネルを非表示にします。           |
+| `search`                | `CalendarSearchProps`  | 任意 | 組み込み検索機能の設定。                                                               |
 
 ## 検索設定
 
@@ -73,16 +70,6 @@ export function CalendarDemo() {
 | `onResultClick` | 検索結果をクリックした際の設定可能なコールバック。組み込みの遷移ロジック（イベントの日付への移動、イベントのハイライト、モバイル版での検索UIのクローズ）を実行するための `defaultAction` コールバックが含まれます。`defaultAction()` を呼び出さない場合は、遷移やUIの状態管理を独自に実装する必要があります。 |
 | `emptyText`     | 結果が見つからない場合に表示されるテキスト。                                                                                                                                                                                                                                                                  |
 
-## コンテナスタイルを調整する
-
-月ビューでのバーチャルスクロールのためデフォルト高さは 800px です。`style` または `className` で自由に変更できます。
-
-```tsx
-<DayFlowCalendar calendar={calendar} style={{ height: 600 }} />
-<DayFlowCalendar calendar={calendar} style={{ height: '100vh' }} />
-<DayFlowCalendar calendar={calendar} className="my-calendar shadow-lg" />
-```
-
 ## サイドバー連携
 
 サイドバーを表示するには、`@dayflow/plugin-sidebar` プラグインをインストールして `plugins` に追加します。
@@ -109,31 +96,41 @@ return <DayFlowCalendar calendar={calendar} />;
 
 ## イベント詳細 UI
 
-DayFlow には 2 つの表示モードがあります。
+DayFlow には 3 つのイベント詳細表示オプションがあります。
 
-1. **パネルモード**：ビュー内に詳細パネルを表示。`customDetailPanelContent` で中身だけ差し替え可能。
-2. **ダイアログモード**：`useEventDetailDialog: true` を指定するとモーダル表示に切り替わり、`customEventDetailDialog` で UI 全体を置き換えできます。
+1. **デフォルトパネルモード** — `useEventDetailDialog` が `false`（デフォルト）の場合、イベントをクリックすると組み込みのフローティングパネル `DefaultEventDetailPanel` が開きます。`eventDetailContent` スロットを使用すると、パネルの外枠を維持しながら中身だけを置き換えられます。
+2. **ダイアログモード** — `useCalendarApp` で `useEventDetailDialog: true` を設定すると組み込みのモーダルが有効になります。`eventDetailDialog` スロットで独自のダイアログ UI に置き換えられます。
+3. **完全に無効化** — アプリ側のコールバックで独自のモーダルを管理している場合は、`DayFlowCalendar` に `useEventDetailPanel={false}` を渡すとフローティングパネルを完全に非表示にできます。
 
 ```tsx
+// 組み込みパネルを非表示にする — 別の場所でモーダルを管理
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+```tsx
+// カスタムパネルコンテンツ（デフォルトのパネル外枠を維持）
 <DayFlowCalendar
   calendar={calendar}
-  customEventDetailDialog={({ event, close }) => (
-    <MyDialog open={!!event} onClose={close}>
-      <EventForm event={event} onSubmit={handleSave} />
-    </MyDialog>
+  eventDetailContent={({ event, onClose }) => (
+    <div className='p-4'>
+      <h2>{event.title}</h2>
+      <button onClick={onClose}>閉じる</button>
+    </div>
   )}
 />
 ```
 
-## メタデータの共有
-
-`meta` prop は登録済みの各ビューへそのまま渡されます。フラグや A/B テスト用の値を共有したいときに便利です。
-
 ```tsx
-<DayFlowCalendar calendar={calendar} meta={{ featureFlags: ['split-pane'] }} />
+// カスタムダイアログ（useCalendarApp で useEventDetailDialog: true が必要）
+<DayFlowCalendar
+  calendar={calendar}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
+/>
 ```
-
-カスタムビューを実装している場合は `props.meta` から値を参照できます。
 
 ---
 

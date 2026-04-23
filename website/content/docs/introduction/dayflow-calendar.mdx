@@ -39,15 +39,14 @@ The component receives the `calendar` object from `useCalendarApp`, reads the ac
 
 ## Props
 
-| Prop                       | Type                         | Required | Description                                                                                         |
-| -------------------------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `calendar`                 | `UseCalendarAppReturn`       | Required | Result of `useCalendarApp`. Provides state, registered views, sidebar config, and calendar actions. |
-| `className`                | `string`                     | Optional | Additional class names appended to the root container (base class: `df-calendar-container`).        |
-| `style`                    | `React.CSSProperties`        | Optional | Inline styles for the root container. Default height is `800px`, which can be overridden.           |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | Optional | Replaces the default detail panel body when the built-in panel is used.                             |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | Optional | Full override for the event detail dialog UI. Takes precedence over `useEventDetailDialog`.         |
-| `meta`                     | `Record<string, any>`        | Optional | Arbitrary metadata forwarded to every view component (helpful for feature flags or layout hints).   |
-| `search`                   | `CalendarSearchProps`        | Optional | Configuration for the built-in search functionality.                                                |
+| Prop                    | Type                   | Required | Description                                                                                         |
+| ----------------------- | ---------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `calendar`              | `UseCalendarAppReturn` | Required | Result of `useCalendarApp`. Provides state, registered views, sidebar config, and calendar actions. |
+| `collapsedSafeAreaLeft` | `number`               | Optional | Left padding (px) when the sidebar is collapsed, e.g. to account for a Mac traffic-light area.      |
+| `useEventDetailPanel`   | `boolean`              | Optional | Set to `false` to suppress the built-in floating event detail panel entirely.                       |
+| `search`                | `CalendarSearchProps`  | Optional | Configuration for the built-in search functionality.                                                |
+
+> **Slot-based customisation** (event content, detail panel content, detail dialog, color picker, etc.) is handled through framework-native slots rather than props. See [Content Slots](/docs/features/content-slots) for the full list.
 
 ## Search Configuration
 
@@ -77,36 +76,6 @@ The `search` prop allows you to customize the built-in search behavior. By defau
 | `onResultClick` | Optional callback triggered when a search result is clicked. Includes a `defaultAction` callback to invoke the built-in navigation logic (navigating to the event date, highlighting the event, and closing the search UI on mobile). If you don't call `defaultAction()`, you must handle the navigation and UI state yourself. |
 | `emptyText`     | Text to display when no results are found.                                                                                                                                                                                                                                                                                       |
 
-## Customizing Container Styles
-
-The root container has a default height of `800px` to ensure proper functioning of virtual scrolling in month view. You can customize this using the `style` prop:
-
-```tsx
-// Custom height
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: 600 }}
-/>
-
-// Full viewport height
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: '100vh' }}
-/>
-
-// Additional styles
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: 1000, backgroundColor: '#f5f5f5' }}
-/>
-```
-
-You can also add custom CSS classes via `className`, which will be appended to the base `df-calendar-container` class:
-
-```tsx
-<DayFlowCalendar calendar={calendar} className='my-custom-calendar shadow-lg' />
-```
-
 ## Sidebar Behavior
 
 The sidebar is added by installing the `@dayflow/plugin-sidebar` plugin:
@@ -133,31 +102,41 @@ return <DayFlowCalendar calendar={calendar} />;
 
 ## Event Detail Experiences
 
-DayFlow ships with two options for event details:
+DayFlow ships with three options for event details:
 
-1. **Default panel mode** – when `useEventDetailDialog` is `false`, each view may render `DefaultEventDetailPanel`. Pass `customDetailPanelContent` to replace the panel body while keeping the default chrome.
-2. **Dialog mode** – set `useEventDetailDialog: true` in `useCalendarApp` to enable the built-in modal (`DefaultEventDetailDialog`). You can fully replace it by passing `customEventDetailDialog`. The hook will still manage open/close state and scroll locking; you just render the dialog.
+1. **Default panel mode** – when `useEventDetailDialog` is `false` (the default), clicking an event opens the built-in floating `DefaultEventDetailPanel`. Use the `eventDetailContent` slot to replace the panel body while keeping the default chrome.
+2. **Dialog mode** – set `useEventDetailDialog: true` in `useCalendarApp` to enable the built-in centered modal. Use the `eventDetailDialog` slot to replace it with your own dialog UI.
+3. **Opt out entirely** – set `useEventDetailPanel={false}` on `DayFlowCalendar` to suppress the floating panel when you have your own event modals driven by app callbacks.
 
 ```tsx
+// Suppress the built-in panel — use your own modal triggered elsewhere
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+```tsx
+// Custom panel content (keeps the default panel chrome)
 <DayFlowCalendar
   calendar={calendar}
-  customEventDetailDialog={({ event, close }) => (
-    <MyDialog isOpen={!!event} onClose={close}>
-      <EventForm event={event} onSubmit={handleSave} />
-    </MyDialog>
+  eventDetailContent={({ event, onClose }) => (
+    <div className='p-4'>
+      <h2>{event.title}</h2>
+      <button onClick={onClose}>Close</button>
+    </div>
   )}
 />
 ```
 
-## Passing Metadata to Views
-
-Some teams need to share contextual data with every registered view (e.g., feature flags, analytics handlers, or layout hints). Use the `meta` prop and read it inside your custom view components:
-
 ```tsx
-<DayFlowCalendar calendar={calendar} meta={{ featureFlags: ['split-pane'] }} />
+// Custom dialog (requires useEventDetailDialog: true in useCalendarApp)
+<DayFlowCalendar
+  calendar={calendar}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
+/>
 ```
-
-Inside a view component, the metadata is available through `props.meta` and can be forwarded to child components as needed.
 
 ---
 

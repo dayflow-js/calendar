@@ -45,6 +45,7 @@ const DayView = ({
   config,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   calendarRef,
   switcherMode = 'buttons',
   selectedEventId: propSelectedEventId,
@@ -546,6 +547,7 @@ const DayView = ({
         onDateChange={onDateChange}
         customDetailPanelContent={customDetailPanelContent}
         customEventDetailDialog={customEventDetailDialog}
+        useEventDetailPanel={useEventDetailPanel}
         calendarRef={calendarRef}
         allDayRowRef={allDayRowRef}
         timeGridRef={timeGridRef}

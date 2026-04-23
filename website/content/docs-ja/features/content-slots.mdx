@@ -27,17 +27,17 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 
 ## 利用可能なスロット
 
-| ジェネレーター名                  | 説明                                                                  | 引数                                                                      |
-| :-------------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| `colorPicker`                     | イベントの色に使用される小さなカラーピッカー。                        | `{ color, onChange, onChangeComplete }`                                   |
-| `createCalendarDialogColorPicker` | ダイアログで使用されるフル機能のカラーピッカー。                      | `{ color, onChange, onAccept, onCancel, styles }`                         |
-| `eventContent*`                   | イベントカードのカスタムレンダリング（例：`eventContentDay`）。       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
-| `eventContextMenu`                | イベントの右クリックコンテキストメニューのカスタム実装。              | `{ event, onClose }`                                                      |
-| `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
-| `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。          | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
-| `gridContextMenu`                 | カレンダーのセル/グリッドの右クリックメニューのカスタム実装。         | `{ date, viewType, onClose }`                                             |
-| `sidebarCalendarColorPicker`      | サイドバーのカレンダーの色に使用されるカラーピッカー。                | `{ color, onChange, onChangeComplete }`                                   |
-| `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                          | `{ isCollapsed, toggleCollapsed }`                                        |
+| ジェネレーター名                  | 説明                                                                                                                  | 引数                                                                      |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| `colorPicker`                     | イベントの色に使用される小さなカラーピッカー。                                                                        | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | ダイアログで使用されるフル機能のカラーピッカー。                                                                      | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `eventContent*`                   | イベントカードのカスタムレンダリング（例：`eventContentDay`）。                                                       | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventContextMenu`                | イベントの右クリックコンテキストメニューのカスタム実装。                                                              | `{ event, onClose }`                                                      |
+| `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。                                                 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。`useCalendarApp` で `useEventDetailDialog: true` が必要。 | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `gridContextMenu`                 | カレンダーのセル/グリッドの右クリックメニューのカスタム実装。                                                         | `{ date, viewType, onClose }`                                             |
+| `sidebarCalendarColorPicker`      | サイドバーのカレンダーの色に使用されるカラーピッカー。                                                                | `{ color, onChange, onChangeComplete }`                                   |
+| `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                                                                          | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## イベントコンテンツ
 
@@ -136,6 +136,10 @@ export const CustomDetailPanelShowcase = () => {
 ## イベント詳細ダイアログ
 
 イベント詳細の表示や編集にモーダル/ダイアログインターフェースを使用したい場合は、`eventDetailDialog` スロットを使用できます。これはモバイルファーストのアプリケーションや、複雑なイベントデータのために広いスペースが必要な場合に特に便利です。
+
+> **前提条件**：ダイアログモードを有効にするには、`useCalendarApp` で `useEventDetailDialog: true` を設定してください。この設定がなければスロットは呼び出されません。
+
+> **代わりに無効化する場合**：独自のダイアログを提供せずに組み込みのフローティングパネルを非表示にしたい場合は、スロットを使用するのではなく、`DayFlowCalendar` に `useEventDetailPanel={false}` を渡してください。
 
 <CustomDetailDialogShowcase />
 

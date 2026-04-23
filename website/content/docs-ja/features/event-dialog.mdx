@@ -19,8 +19,34 @@ import { DayFlowCalendar } from '@dayflow/core';
 
 ## カスタマイズ
 
-標準ダイアログで足りない場合は、[カスタム詳細ダイアログ](/docs-ja/features/custom-detail-dialog) を利用して UI 全体を置き換えられます。
+### ダイアログ UI を置き換える
+
+`eventDetailDialog` スロットを使用すると、DayFlow の開閉状態管理はそのままに、独自のダイアログコンポーネントに差し替えられます。この機能を使用するには、`useCalendarApp` の設定で `useEventDetailDialog: true` を設定する必要があります。
 
 ```tsx
-<DayFlowCalendar calendar={calendar} customEventDetailDialog={YourDialog} />
+// 1. カレンダー設定でダイアログモードを有効にする
+const calendar = useCalendarApp({
+  views: [...],
+  useEventDetailDialog: true,
+});
+
+// 2. スロット経由で独自のダイアログを提供する
+<DayFlowCalendar
+  calendar={calendar}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
+/>
 ```
+
+### 組み込みパネルを無効にする
+
+アプリケーション側でコールバックやグローバルな状態からイベント詳細を管理している場合は、代替コンポーネントを提供せずに組み込みのフローティングパネルを完全に非表示にできます。
+
+```tsx
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+React、Vue、Svelte、Angular の各アダプターで利用できます。

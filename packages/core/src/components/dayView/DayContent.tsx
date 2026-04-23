@@ -85,6 +85,7 @@ interface DayContentProps {
   onDateChange?: (date: Date) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   calendarRef: RefObject<HTMLDivElement>;
   allDayRowRef: RefObject<HTMLDivElement>;
   timeGridRef: RefObject<HTMLDivElement>;
@@ -140,6 +141,7 @@ export const DayContent = ({
   onDateChange,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   calendarRef,
   allDayRowRef,
   timeGridRef,
@@ -376,6 +378,7 @@ export const DayContent = ({
                     }}
                     customDetailPanelContent={customDetailPanelContent}
                     customEventDetailDialog={customEventDetailDialog}
+                    useEventDetailPanel={useEventDetailPanel}
                     app={app}
                     isMobile={isMobile}
                     enableTouch={isTouch}

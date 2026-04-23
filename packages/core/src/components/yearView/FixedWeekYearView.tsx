@@ -44,6 +44,7 @@ interface FixedWeekYearViewProps {
   calendarRef: RefObject<HTMLDivElement>;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   config?: YearViewConfig;
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
@@ -56,6 +57,7 @@ export const FixedWeekYearView = ({
   calendarRef,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   config,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
@@ -629,6 +631,7 @@ export const FixedWeekYearView = ({
                             detailPanelEventId={detailPanelEventId}
                             customDetailPanelContent={customDetailPanelContent}
                             customEventDetailDialog={customEventDetailDialog}
+                            useEventDetailPanel={useEventDetailPanel}
                             firstHour={0}
                             hourHeight={0}
                             onEventUpdate={updated =>

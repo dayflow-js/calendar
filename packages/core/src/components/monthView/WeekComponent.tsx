@@ -60,6 +60,7 @@ interface WeekComponentProps {
   onDetailPanelToggle?: (eventId: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   onCalendarDrop?: (
     e: DragEvent,
     dropDate: Date,
@@ -109,6 +110,7 @@ const WeekComponent = memo(
     onDetailPanelToggle,
     customDetailPanelContent,
     customEventDetailDialog,
+    useEventDetailPanel,
     onCalendarDrop,
     onCalendarDragOver,
     app,
@@ -469,6 +471,7 @@ const WeekComponent = memo(
                   currentYear={currentYear}
                   customDetailPanelContent={customDetailPanelContent}
                   customEventDetailDialog={customEventDetailDialog}
+                  useEventDetailPanel={useEventDetailPanel}
                   day={day}
                   dayIndex={index}
                   dayLayout={dayLayoutData[index]}
@@ -630,6 +633,7 @@ const WeekComponent = memo(
     prevProps.onDetailPanelToggle === nextProps.onDetailPanelToggle &&
     prevProps.customDetailPanelContent === nextProps.customDetailPanelContent &&
     prevProps.customEventDetailDialog === nextProps.customEventDetailDialog &&
+    prevProps.useEventDetailPanel === nextProps.useEventDetailPanel &&
     prevProps.onCalendarDrop === nextProps.onCalendarDrop &&
     prevProps.onCalendarDragOver === nextProps.onCalendarDragOver &&
     prevProps.app === nextProps.app &&

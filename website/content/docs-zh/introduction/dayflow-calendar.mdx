@@ -35,15 +35,12 @@ export function CalendarDemo() {
 
 ## **属性说明**
 
-| **属性名**                 | **类型**                     | **说明**                                                              | **必填** |
-| -------------------------- | ---------------------------- | --------------------------------------------------------------------- | -------- |
-| `calendar`                 | `UseCalendarAppReturn`       | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | 必填     |
-| `className`                | `string`                     | 根容器的附加类名（基础类名为 `df-calendar-container`）                | 可选     |
-| `style`                    | `React.CSSProperties`        | 根容器的内联样式。默认高度为 `800px`，可覆盖此设置                    | 可选     |
-| `customDetailPanelContent` | `EventDetailContentRenderer` | 替换内置详情面板的内容区域，同时保留默认面板框架                      | 可选     |
-| `customEventDetailDialog`  | `EventDetailDialogRenderer`  | 完全自定义事件详情弹窗 UI，优先级高于 `useEventDetailDialog`          | 可选     |
-| `meta`                     | `Record<string, any>`        | 传递给所有视图组件的元数据（适用于特性开关或布局提示等场景）          | 可选     |
-| `search`                   | `CalendarSearchProps`        | 内置搜索功能的配置项                                                  | 可选     |
+| **属性名**              | **类型**               | **说明**                                                              | **必填** |
+| ----------------------- | ---------------------- | --------------------------------------------------------------------- | -------- |
+| `calendar`              | `UseCalendarAppReturn` | `useCalendarApp` 的返回结果，提供状态管理、视图注册、侧边栏配置等能力 | 必填     |
+| `collapsedSafeAreaLeft` | `number`               | 侧边栏折叠时的左内边距（px），用于兼容 Mac 红绿灯按钮区域             | 可选     |
+| `useEventDetailPanel`   | `boolean`              | 设为 `false` 可完全隐藏内置的浮动事件详情面板                         | 可选     |
+| `search`                | `CalendarSearchProps`  | 内置搜索功能的配置项                                                  | 可选     |
 
 ## 搜索配置
 
@@ -73,34 +70,6 @@ export function CalendarDemo() {
 | `onResultClick` | 点击搜索结果时的回调。包含一个 `defaultAction` 回调用于触发内置的跳转逻辑（跳转到事件日期、高亮该事件并在移动端自动关闭搜索界面）。如果不调用 `defaultAction()`，则需要自行处理所有的跳转和 UI 状态切换。 |
 | `emptyText`     | 未找到结果时显示的文本。                                                                                                                                                                                  |
 
-## **自定义容器样式**
-
-```tsx
-// 自定义高度
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: 600 }}
-/>
-
-// 满屏高度
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: '100vh' }}
-/>
-
-// 附加样式
-<DayFlowCalendar
-  calendar={calendar}
-  style={{ height: 1000, backgroundColor: '#f5f5f5' }}
-/>
-```
-
-也可以通过 `className` 添加自定义 CSS 类名，这些类名会附加在基础类 `df-calendar-container` 之后：
-
-```tsx
-<DayFlowCalendar calendar={calendar} className='my-custom-calendar shadow-lg' />
-```
-
 ## **侧边栏配置**
 
 侧边栏通过安装并添加 `@dayflow/plugin-sidebar` 插件来启用：
@@ -127,31 +96,41 @@ return <DayFlowCalendar calendar={calendar} />;
 
 ## **事件详情展示**
 
-DayFlow 提供两种事件详情展示方式：
+DayFlow 提供三种事件详情展示方式：
 
-1. **默认面板模式** - 当 `useEventDetailDialog` 为 `false` 时，各视图会渲染 `DefaultEventDetailPanel`。通过 `customDetailPanelContent` 可替换面板内容区域，同时保留默认框架
-2. **弹窗模式** - 在 `useCalendarApp` 中设置 `useEventDetailDialog: true` 可启用内置弹窗（`DefaultEventDetailDialog`）。通过 `customEventDetailDialog` 可完全替换弹窗 UI，底层 Hook 仍会管理打开/关闭状态和滚动锁定，您只需负责渲染内容
+1. **默认面板模式** — `useEventDetailDialog` 为 `false`（默认值）时，点击事件会打开内置的浮动面板 `DefaultEventDetailPanel`。使用 `eventDetailContent` 插槽可在保留默认面板框架的同时替换面板内容。
+2. **弹窗模式** — 在 `useCalendarApp` 中设置 `useEventDetailDialog: true` 可启用内置居中模态框。使用 `eventDetailDialog` 插槽可替换为您自定义的弹窗 UI。
+3. **完全关闭** — 若您的应用通过回调或全局状态管理事件详情，可在 `DayFlowCalendar` 上传入 `useEventDetailPanel={false}` 来完全隐藏浮动面板。
 
 ```tsx
+// 隐藏内置面板 — 在其他地方使用自定义模态框
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+```tsx
+// 自定义面板内容（保留默认面板框架）
 <DayFlowCalendar
   calendar={calendar}
-  customEventDetailDialog={({ event, close }) => (
-    <MyDialog isOpen={!!event} onClose={close}>
-      <EventForm event={event} onSubmit={handleSave} />
-    </MyDialog>
+  eventDetailContent={({ event, onClose }) => (
+    <div className='p-4'>
+      <h2>{event.title}</h2>
+      <button onClick={onClose}>关闭</button>
+    </div>
   )}
 />
 ```
 
-## **向视图传递元数据**
-
-某些场景下需要向所有注册的视图共享上下文数据（如特性开关、数据分析处理器或布局提示）。使用 `meta` 属性即可在自定义视图组件中访问这些数据：
-
 ```tsx
-<DayFlowCalendar calendar={calendar} meta={{ featureFlags: ['split-pane'] }} />
+// 自定义弹窗（需要在 useCalendarApp 中设置 useEventDetailDialog: true）
+<DayFlowCalendar
+  calendar={calendar}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
+/>
 ```
-
-在视图组件内部，可通过 `props.meta` 访问元数据，并可按需传递给子组件。
 
 ---
 

@@ -41,6 +41,7 @@ interface YearRowComponentProps {
   onDetailPanelToggle: (eventId: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   onContextMenu: (menu: { x: number; y: number; date: Date } | null) => void;
   appTimeZone?: string;
   dragPreviewEvent?: Event | null;
@@ -179,6 +180,7 @@ export const YearRowComponent = memo(
     onDetailPanelToggle,
     customDetailPanelContent,
     customEventDetailDialog,
+    useEventDetailPanel,
     onContextMenu,
     appTimeZone,
     dragPreviewEvent,
@@ -420,6 +422,7 @@ export const YearRowComponent = memo(
                   detailPanelEventId={detailPanelEventId}
                   customDetailPanelContent={customDetailPanelContent}
                   customEventDetailDialog={customEventDetailDialog}
+                  useEventDetailPanel={useEventDetailPanel}
                   // Required props for CalendarEvent
                   firstHour={0}
                   hourHeight={0}

@@ -94,6 +94,7 @@ interface AllDayRowProps {
   ) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
 }
 
 export const AllDayRow = ({
@@ -141,6 +142,7 @@ export const AllDayRow = ({
   handleDrop,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
 }: AllDayRowProps) => {
   const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
   const [contextMenu, setContextMenu] = useState<{
@@ -380,6 +382,7 @@ export const AllDayRow = ({
                         }
                         customDetailPanelContent={customDetailPanelContent}
                         customEventDetailDialog={customEventDetailDialog}
+                        useEventDetailPanel={useEventDetailPanel}
                         app={app}
                         isMobile={isMobile}
                         isSlidingView={isSlidingView}

@@ -18,11 +18,34 @@ import { DayFlowCalendar } from '@dayflow/core';
 
 ## 自定义
 
-若默认对话框不足以满足需求，可以通过 `customEventDetailDialog` 将其整体替换，UI 与交互完全由你掌控。参考 [自定义事件详情对话框](/docs-zh/features/custom-detail-dialog) 了解更多。
+### 替换对话框 UI
+
+使用 `eventDetailDialog` 插槽，可以在保留 DayFlow 开关状态管理的同时，换入您自定义的对话框组件。需要在 `useCalendarApp` 配置中设置 `useEventDetailDialog: true` 才能激活此功能。
 
 ```tsx
+// 1. 在日历配置中启用对话框模式
+const calendar = useCalendarApp({
+  views: [...],
+  useEventDetailDialog: true,
+});
+
+// 2. 通过插槽提供您自己的对话框
 <DayFlowCalendar
   calendar={calendar}
-  customEventDetailDialog={YourCustomDialog}
+  eventDetailDialog={({ event, isOpen, onClose }) => (
+    <MyDialog isOpen={isOpen} onClose={onClose}>
+      <EventForm event={event} />
+    </MyDialog>
+  )}
 />
 ```
+
+### 完全关闭内置面板
+
+如果您的应用通过回调或全局状态管理事件详情，可以完全隐藏内置浮动面板，无需提供替代组件：
+
+```tsx
+<DayFlowCalendar calendar={calendar} useEventDetailPanel={false} />
+```
+
+适用于 React、Vue、Svelte 和 Angular 适配器。

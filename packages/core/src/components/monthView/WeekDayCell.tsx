@@ -35,6 +35,7 @@ interface WeekDayCellProps {
   currentYear: number;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   day: DayData;
   dayIndex: number;
   dayLayout: MonthDayLayoutData;
@@ -89,6 +90,7 @@ const WeekDayCell = ({
   currentYear,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   day,
   dayIndex,
   dayLayout,
@@ -276,6 +278,7 @@ const WeekDayCell = ({
           onDetailPanelToggle={onDetailPanelToggle}
           customDetailPanelContent={customDetailPanelContent}
           customEventDetailDialog={customEventDetailDialog}
+          useEventDetailPanel={useEventDetailPanel}
           app={app}
           isMobile={screenSize !== 'desktop'}
           enableTouch={enableTouch}

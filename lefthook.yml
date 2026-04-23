@@ -16,3 +16,6 @@ pre-commit:
         - '*.css'
         - '*.md'
       stage_fixed: true
+
+    - glob: 'website/**/*'
+      run: pnpm --dir website run build

@@ -82,6 +82,7 @@ interface TimeGridProps {
   setDetailPanelEventId: (id: string | null) => void;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   isSlidingView?: boolean;
   isCurrentWeek: boolean;
   currentTime: Date | null;
@@ -132,6 +133,7 @@ export const TimeGrid = ({
   setDetailPanelEventId,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   isSlidingView,
   isCurrentWeek,
   currentTime,
@@ -589,6 +591,7 @@ export const TimeGrid = ({
                           }
                           customDetailPanelContent={customDetailPanelContent}
                           customEventDetailDialog={customEventDetailDialog}
+                          useEventDetailPanel={useEventDetailPanel}
                           multiDaySegmentInfo={segmentInfo}
                           app={app}
                           isMobile={isMobile}

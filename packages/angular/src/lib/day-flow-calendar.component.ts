@@ -27,6 +27,7 @@ import type {
   CalendarHeaderProps,
   EventContextMenuSlotArgs,
   GridContextMenuSlotArgs,
+  CalendarSearchProps,
 } from '@dayflow/core';
 import {
   CalendarRenderer,
@@ -85,6 +86,8 @@ export class DayFlowCalendarComponent
   @Input() eventContextMenu?: TemplateRef<EventContextMenuSlotArgs>;
   @Input() gridContextMenu?: TemplateRef<GridContextMenuSlotArgs>;
   @Input() collapsedSafeAreaLeft?: number;
+  @Input() useEventDetailPanel?: boolean;
+  @Input() search?: CalendarSearchProps;
 
   @ViewChild('container') container!: ElementRef<HTMLElement>;
 
@@ -132,10 +135,12 @@ export class DayFlowCalendarComponent
         this.initCalendar();
       }
     } else if (this.renderer) {
-      if (changes['collapsedSafeAreaLeft']) {
-        this.renderer.setProps({
-          collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
-        });
+      if (
+        changes['collapsedSafeAreaLeft'] ||
+        changes['useEventDetailPanel'] ||
+        changes['search']
+      ) {
+        this.renderer.setProps(this.getRendererProps());
       }
       const slotKeys = [
         'eventContentDay',
@@ -168,6 +173,14 @@ export class DayFlowCalendarComponent
     this.destroyCalendar();
   }
 
+  private getRendererProps(): Record<string, unknown> {
+    return {
+      collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
+      useEventDetailPanel: this.useEventDetailPanel,
+      search: this.search,
+    };
+  }
+
   private initCalendar() {
     if (!this.container || !this.calendar) {
       return;
@@ -175,9 +188,7 @@ export class DayFlowCalendarComponent
 
     const activeOverrides = this.getActiveOverrides();
     this.renderer = new CalendarRenderer(this.app, activeOverrides);
-    this.renderer.setProps({
-      collapsedSafeAreaLeft: this.collapsedSafeAreaLeft,
-    });
+    this.renderer.setProps(this.getRendererProps());
     this.renderer.mount(this.container.nativeElement);
     this.app.setOverrides(activeOverrides);
 

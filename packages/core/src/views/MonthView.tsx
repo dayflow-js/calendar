@@ -126,6 +126,7 @@ const MonthView = ({
   config,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   calendarRef,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
@@ -878,6 +879,7 @@ const MonthView = ({
                   onDetailPanelToggle={setDetailPanelEventId}
                   customDetailPanelContent={customDetailPanelContent}
                   customEventDetailDialog={customEventDetailDialog}
+                  useEventDetailPanel={useEventDetailPanel}
                   onCalendarDrop={handleDrop}
                   onCalendarDragOver={handleDragOver}
                   calendarSignature={calendarSignature}

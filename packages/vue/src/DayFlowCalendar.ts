@@ -2,6 +2,7 @@ import type {
   ICalendarApp,
   CustomRendering,
   UseCalendarAppReturn,
+  CalendarSearchProps,
 } from '@dayflow/core';
 import { CalendarRenderer } from '@dayflow/core';
 import type { PropType } from 'vue';
@@ -28,6 +29,16 @@ export const DayFlowCalendar = defineComponent({
       type: Number as PropType<number>,
       default: undefined,
     },
+    useEventDetailPanel: {
+      // Avoid Vue's Boolean-casting: absent prop stays undefined (panel enabled),
+      // explicit false disables the panel.
+      type: null as unknown as PropType<boolean>,
+      default: undefined,
+    },
+    search: {
+      type: Object as PropType<CalendarSearchProps>,
+      default: undefined,
+    },
   },
   setup(props, { slots }) {
     const container = ref<HTMLElement | null>(null);
@@ -44,6 +55,13 @@ export const DayFlowCalendar = defineComponent({
         (props.calendar as ICalendarApp)
     );
 
+    // All renderer-level props in one object so a single watcher handles them all.
+    const extraProps = computed(() => ({
+      collapsedSafeAreaLeft: props.collapsedSafeAreaLeft,
+      useEventDetailPanel: props.useEventDetailPanel,
+      search: props.search,
+    }));
+
     function initRenderer(appInstance: ICalendarApp) {
       if (!container.value) {
         return;
@@ -55,7 +73,7 @@ export const DayFlowCalendar = defineComponent({
 
       const r = new CalendarRenderer(appInstance, Object.keys(slots));
       renderer.value = r;
-      r.setProps({ collapsedSafeAreaLeft: props.collapsedSafeAreaLeft });
+      r.setProps(extraProps.value);
       r.mount(container.value);
 
       storeUnsubscribe = r.getCustomRenderingStore().subscribe(renderings => {
@@ -64,10 +82,11 @@ export const DayFlowCalendar = defineComponent({
     }
 
     watch(
-      () => props.collapsedSafeAreaLeft,
+      extraProps,
       val => {
-        renderer.value?.setProps({ collapsedSafeAreaLeft: val });
-      }
+        renderer.value?.setProps(val);
+      },
+      { deep: true }
     );
 
     // Recreate the renderer when the calendar prop is replaced (e.g. after

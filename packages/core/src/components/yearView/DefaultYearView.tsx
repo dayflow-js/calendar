@@ -41,6 +41,7 @@ export interface YearViewProps {
   calendarRef: RefObject<HTMLDivElement>;
   customDetailPanelContent?: EventDetailContentRenderer;
   customEventDetailDialog?: EventDetailDialogRenderer;
+  useEventDetailPanel?: boolean;
   config?: YearViewConfig;
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
@@ -53,6 +54,7 @@ export const DefaultYearView = ({
   calendarRef,
   customDetailPanelContent,
   customEventDetailDialog,
+  useEventDetailPanel,
   config,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
@@ -497,6 +499,7 @@ export const DefaultYearView = ({
               onDetailPanelToggle={setDetailPanelEventId}
               customDetailPanelContent={customDetailPanelContent}
               customEventDetailDialog={customEventDetailDialog}
+              useEventDetailPanel={useEventDetailPanel}
               onContextMenu={menu => {
                 if (!isEditable) return;
                 setContextMenu(menu);
