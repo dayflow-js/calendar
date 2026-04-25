@@ -216,6 +216,15 @@ export class CalendarRegistry {
         });
       });
     }
+
+    // Enforce "at least one visible" rule on initialization
+    if (this.calendars.size > 0 && this.getVisible().length === 0) {
+      const firstId = this.calendars.keys().next().value;
+      if (firstId) {
+        const first = this.calendars.get(firstId)!;
+        this.calendars.set(firstId, { ...first, isVisible: true });
+      }
+    }
   }
 
   /**
@@ -229,7 +238,20 @@ export class CalendarRegistry {
    * Unregister a calendar type
    */
   unregister(calendarId: string): boolean {
-    return this.calendars.delete(calendarId);
+    const calendar = this.calendars.get(calendarId);
+    const wasVisible = calendar?.isVisible !== false;
+    const deleted = this.calendars.delete(calendarId);
+
+    if (deleted && wasVisible) {
+      const remainingVisible = this.getVisible();
+      if (remainingVisible.length === 0) {
+        const firstRemaining = this.getAll()[0];
+        if (firstRemaining) {
+          this.setVisibility(firstRemaining.id, true);
+        }
+      }
+    }
+    return deleted;
   }
 
   /**
@@ -292,6 +314,13 @@ export class CalendarRegistry {
     const calendar = this.calendars.get(calendarId);
     if (!calendar) return;
 
+    if (!visible) {
+      const visibleCount = this.getVisible().length;
+      if (visibleCount <= 1 && calendar.isVisible !== false) {
+        return; // Prevent hiding the last visible one
+      }
+    }
+
     this.calendars.set(calendarId, {
       ...calendar,
       isVisible: visible,
@@ -308,6 +337,15 @@ export class CalendarRegistry {
         isVisible: visible,
       });
     });
+
+    if (!visible && this.calendars.size > 0) {
+      // Force first one to be visible to ensure "at least one" rule
+      const firstId = this.calendars.keys().next().value;
+      if (firstId) {
+        const first = this.calendars.get(firstId)!;
+        this.calendars.set(firstId, { ...first, isVisible: true });
+      }
+    }
   }
 
   /**

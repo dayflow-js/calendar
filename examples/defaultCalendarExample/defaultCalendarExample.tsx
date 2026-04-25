@@ -8,7 +8,6 @@ import {
 } from '@dayflow/core';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import { createLocalizationPlugin, zh } from '@dayflow/plugin-localization';
-import { createPrintPlugin } from '@dayflow/plugin-print';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -18,25 +17,12 @@ import {
   createYearView,
   UseCalendarAppReturn,
 } from '@dayflow/react';
-import { createResourceGridView } from '@dayflow/resource-grid';
 import { getWebsiteCalendars } from '@examples/utils/palette';
-
-import '@dayflow/resource-grid/dist/styles.components.css';
-import {
-  generateSampleEvents,
-  generateSampleResources,
-  Resource,
-} from '@examples/utils/sampleData';
+import { generateSampleEvents } from '@examples/utils/sampleData';
 import { createKeyboardShortcutsPlugin } from '@keyboard-shortcuts/plugin';
 import { createSidebarPlugin } from '@sidebar/plugin';
 import { Sun, Moon, Globe, Clock } from 'lucide-react';
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 const TZ_OPTIONS = Object.entries(TimeZone).map(([key, value]) => ({
   label: `${key.replaceAll('_', ' ')} (${value})`,
@@ -71,7 +57,6 @@ const DefaultCalendarExample: React.FC<{
   themeMode: ExampleThemeMode;
 }> = ({ themeMode }) => {
   const [events] = useState<Event[]>(generateSampleEvents());
-  const [resources] = useState<Resource[]>(generateSampleResources());
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
   const [readOnly] = useState<boolean | ReadOnlyConfig>(false);
   // Global calendar timezone — affects all views' event bucketing and editing
@@ -87,8 +72,6 @@ const DefaultCalendarExample: React.FC<{
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  const getResourceId = useCallback((event: Event) => event.calendarId, []);
 
   const plugins = useMemo(
     () =>
@@ -109,7 +92,6 @@ const DefaultCalendarExample: React.FC<{
         createLocalizationPlugin({
           locales: [zh],
         }),
-        createPrintPlugin(),
         createKeyboardShortcutsPlugin({
           callbacks: {
             redo: app => {
@@ -173,18 +155,6 @@ const DefaultCalendarExample: React.FC<{
         // showMonthIndicator: false,
         showEventDots: true,
       }),
-      createResourceGridView({
-        mode: 'resourcesByDate',
-        resources,
-        visibleDays: 5,
-        getResourceId,
-      }),
-      // createResourceGridView({
-      //   mode: 'resourceView',
-      //   resources,
-      //   visibleDays: 5,
-      //   getResourceId,
-      // }),
       createYearView({
         mode: 'fixed-week',
         showTimedEventsInYearView: true,
@@ -192,7 +162,7 @@ const DefaultCalendarExample: React.FC<{
         showEventDots: true,
       }),
     ],
-    [getResourceId, resources, secondaryTz]
+    [secondaryTz]
   );
 
   const calendars = useMemo(() => getWebsiteCalendars(), []);
@@ -211,7 +181,7 @@ const DefaultCalendarExample: React.FC<{
       onEventDoubleClick: (event: Event) => {
         console.log('double click event:', event);
         // You could use the event element as an anchor for a custom popover here
-        // return false;
+        return false;
       },
       onEventUpdate: async (event: Event) => {
         await new Promise(resolve => {
@@ -285,7 +255,7 @@ const DefaultCalendarExample: React.FC<{
     <div>
       <div className='mb-4 flex flex-wrap items-center gap-3 px-4'>
         {/* Global calendar timezone */}
-        <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-[22rem] dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
+        <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-88 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
           <Globe size={16} className='text-gray-400' />
           <div className='flex min-w-0 flex-1 flex-col'>
             <span className='text-[10px] leading-none text-gray-400 dark:text-gray-500'>
@@ -307,7 +277,7 @@ const DefaultCalendarExample: React.FC<{
         </div>
 
         {/* Secondary timeline for Day/Week */}
-        <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-[22rem] dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
+        <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-88 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
           <Clock size={16} className='text-gray-400' />
           <div className='flex min-w-0 flex-1 flex-col'>
             <span className='text-[10px] leading-none text-gray-400 dark:text-gray-500'>
