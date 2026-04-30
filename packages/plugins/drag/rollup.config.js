@@ -9,12 +9,6 @@ export default [
     output: [
       {
         file: 'dist/index.js',
-        format: 'cjs',
-        sourcemap: false,
-        exports: 'named',
-      },
-      {
-        file: 'dist/index.esm.js',
         format: 'esm',
         sourcemap: false,
         exports: 'named',

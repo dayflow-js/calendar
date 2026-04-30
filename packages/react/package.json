@@ -9,11 +9,17 @@
   ],
   "type": "module",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "rollup -c",
     "clean": "rimraf dist node_modules",
+    "prebuild": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

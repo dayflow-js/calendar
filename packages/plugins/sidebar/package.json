@@ -21,13 +21,11 @@
     "**/*.css"
   ],
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./dist/styles.css": "./dist/styles.css",
     "./dist/styles.components.css": "./dist/styles.components.css"
@@ -39,6 +37,8 @@
     "check:css:dist": "node ../../core/scripts/check-dist-styling.mjs --package-root .",
     "check:css:source": "node ../../core/scripts/check-semantic-css.mjs",
     "clean": "rimraf dist node_modules",
+    "postbuild": "rimraf dist/types",
+    "prebuild": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
