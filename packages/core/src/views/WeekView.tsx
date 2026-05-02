@@ -28,7 +28,7 @@ import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
 import { calendarContainer } from '@/styles/classNames';
 import {
-  Event,
+  Event as CalendarEvent,
   ViewType,
   WeekViewProps,
   ViewType as DragViewType,
@@ -161,7 +161,7 @@ const WeekView = ({
   );
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [draftEvent, setDraftEvent] = useState<Event | null>(null);
+  const [draftEvent, setDraftEvent] = useState<CalendarEvent | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // References
@@ -193,7 +193,7 @@ const WeekView = ({
 
   const appTimeZone = app.timeZone;
 
-  // Events for the current week (or custom range)
+  //CalendarEvents for the current week (or custom range)
   const currentWeekEvents = useMemo(
     () => filterWeekEvents(events, displayStart, displayDays, appTimeZone),
     [events, displayStart, displayDays, appTimeZone]
@@ -289,7 +289,7 @@ const WeekView = ({
 
   const handleEventsUpdate = useCallback(
     (
-      updateFunc: (events: Event[]) => Event[],
+      updateFunc: (events: CalendarEvent[]) => CalendarEvent[],
       isResizing?: boolean,
       source?: 'drag' | 'resize'
     ) => {
@@ -326,7 +326,7 @@ const WeekView = ({
   );
 
   const handleEventCreate = useCallback(
-    (event: Event) => {
+    (event: CalendarEvent) => {
       if (isMobile) {
         setDraftEvent(event);
         setIsDrawerOpen(true);
@@ -358,7 +358,7 @@ const WeekView = ({
 
   const handleCalculateDragLayout = useCallback(
     (
-      draggedEvent: Event,
+      draggedEvent: CalendarEvent,
       targetDay: number,
       targetStartHour: number,
       targetEndHour: number
@@ -463,7 +463,7 @@ const WeekView = ({
   // Use calendar drop functionality
   const { handleDrop, handleDragOver } = useCalendarDrop({
     app,
-    onEventCreated: (event: Event) => {
+    onEventCreated: (event: CalendarEvent) => {
       setNewlyCreatedEventId(event.id);
     },
   });
@@ -548,8 +548,8 @@ const WeekView = ({
     [appTimeZone, currentDate, locale, standardWeekStart]
   );
 
-  // Event handling functions
-  const handleEventUpdate = (updatedEvent: Event) =>
+  //CalendarEvent handling functions
+  const handleEventUpdate = (updatedEvent: CalendarEvent) =>
     app.updateEvent(updatedEvent.id, updatedEvent);
 
   const handleEventDelete = (eventId: string) => app.deleteEvent(eventId);
@@ -592,6 +592,46 @@ const WeekView = ({
     return () => clearInterval(timer);
   }, [appTimeZone]);
 
+  const handleGridDateClick = useCallback(
+    (date: Date, dayEvents: CalendarEvent[]) => {
+      const clickAction = config?.gridDateClick;
+      if (!clickAction) {
+        onDateChange?.(date);
+        return;
+      }
+
+      if (typeof clickAction === 'function') {
+        clickAction(date, dayEvents);
+        return;
+      }
+
+      if (clickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+      }
+      // 'none' → do nothing
+    },
+    [config.gridDateClick, app, onDateChange]
+  );
+
+  const handleGridDateDoubleClick = useCallback(
+    (date: Date, dayEvents: CalendarEvent[]) => {
+      const dblClickAction = config?.gridDateDoubleClick ?? 'day-view';
+
+      if (typeof dblClickAction === 'function') {
+        dblClickAction(date, dayEvents);
+        return;
+      }
+
+      if (dblClickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+      }
+      // 'none' → do nothing
+    },
+    [config.gridDateDoubleClick, app]
+  );
+
   return (
     <div className={`${calendarContainer} df-week-view`}>
       {/* Header navigation */}
@@ -621,6 +661,7 @@ const WeekView = ({
         isSlidingView={isSlidingView}
         mobilePageStart={mobilePageStart}
         currentWeekStart={displayStart}
+        currentWeekEvents={currentWeekEvents}
         gridWidth={gridWidth}
         allDayAreaHeight={allDayAreaHeight}
         organizedAllDaySegments={organizedAllDaySegments}
@@ -640,20 +681,25 @@ const WeekView = ({
         primaryTzLabel={primaryTzLabel}
         secondaryTzLabel={secondaryTzLabel}
         handleMoveStart={
-          handleMoveStart as (e: MouseEvent | TouchEvent, event: Event) => void
+          handleMoveStart as (
+            e: MouseEvent | TouchEvent,
+            event: CalendarEvent
+          ) => void
         }
         handleResizeStart={
           handleResizeStart as (
             e: MouseEvent | TouchEvent,
-            event: Event,
+            event: CalendarEvent,
             direction: string
           ) => void
         }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
-        setDraftEvent={setDraftEvent}
+        setDraftEvent={e => setDraftEvent(e)}
         setIsDrawerOpen={setIsDrawerOpen}
         onDateChange={onDateChange}
+        onGridDateClick={handleGridDateClick}
+        onGridDateDoubleClick={handleGridDateDoubleClick}
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         selectedEventId={selectedEventId}
@@ -692,20 +738,25 @@ const WeekView = ({
         dragState={dragState as WeekDayDragState | null}
         isDragging={isDragging}
         handleMoveStart={
-          handleMoveStart as (e: MouseEvent | TouchEvent, event: Event) => void
+          handleMoveStart as (
+            e: MouseEvent | TouchEvent,
+            event: CalendarEvent
+          ) => void
         }
         handleResizeStart={
           handleResizeStart as (
             e: MouseEvent | TouchEvent,
-            event: Event,
+            event: CalendarEvent,
             direction: string
           ) => void
         }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
-        setDraftEvent={setDraftEvent}
+        setDraftEvent={e => setDraftEvent(e)}
         setIsDrawerOpen={setIsDrawerOpen}
         onDateChange={onDateChange}
+        onGridDateClick={handleGridDateClick}
+        onGridDateDoubleClick={handleGridDateDoubleClick}
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         selectedEventId={selectedEventId}
@@ -730,7 +781,7 @@ const WeekView = ({
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
-        onSave={(updatedEvent: Event) => {
+        onSave={(updatedEvent: CalendarEvent) => {
           if (events.some(e => e.id === updatedEvent.id)) {
             app.updateEvent(updatedEvent.id, updatedEvent);
           } else {
@@ -739,7 +790,7 @@ const WeekView = ({
           setIsDrawerOpen(false);
           setDraftEvent(null);
         }}
-        draftEvent={draftEvent}
+        draftEvent={draftEvent as CalendarEvent | null}
         app={app}
         timeFormat={timeFormat}
       />

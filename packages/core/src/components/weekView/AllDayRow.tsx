@@ -14,7 +14,11 @@ import {
   dateNumber,
 } from '@/styles/classNames';
 import { Event, WeekDayDragState, ViewType, ICalendarApp } from '@/types';
-import { scrollbarTakesSpace } from '@/utils';
+import {
+  getEventsForDay,
+  getAllDayEventsForDay,
+  scrollbarTakesSpace,
+} from '@/utils';
 
 import { CompactHeader } from './CompactHeader';
 
@@ -39,6 +43,7 @@ interface AllDayRowProps {
   isSlidingView?: boolean;
   mobilePageStart?: Date;
   currentWeekStart: Date;
+  currentWeekEvents: Event[];
   gridWidth: string;
   allDayAreaHeight: number;
   organizedAllDaySegments: Array<MultiDayEventSegment & { row: number }>;
@@ -68,6 +73,8 @@ interface AllDayRowProps {
   setDraftEvent: (event: Event | null) => void;
   setIsDrawerOpen: (isOpen: boolean) => void;
   onDateChange?: (date: Date) => void;
+  onGridDateClick?: (date: Date, events: Event[]) => void;
+  onGridDateDoubleClick?: (date: Date, events: Event[]) => void;
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
   selectedEventId: string | null;
@@ -98,6 +105,7 @@ export const AllDayRow = (props: AllDayRowProps) => {
     isSlidingView,
     mobilePageStart,
     currentWeekStart,
+    currentWeekEvents,
     gridWidth,
     allDayAreaHeight,
     organizedAllDaySegments,
@@ -123,6 +131,8 @@ export const AllDayRow = (props: AllDayRowProps) => {
     setDraftEvent,
     setIsDrawerOpen,
     onDateChange,
+    onGridDateClick,
+    onGridDateDoubleClick,
     newlyCreatedEventId,
     setNewlyCreatedEventId,
     selectedEventId,
@@ -305,10 +315,47 @@ export const AllDayRow = (props: AllDayRowProps) => {
                           minHeight: `${allDayAreaHeight}px`,
                           ...columnStyle,
                         }}
+                        onClick={() => {
+                          const clickedDate = new Date(currentWeekStart);
+                          clickedDate.setDate(
+                            currentWeekStart.getDate() + dayIndex
+                          );
+                          if (onGridDateClick) {
+                            const dayEvents = [
+                              ...getEventsForDay(dayIndex, currentWeekEvents),
+                              ...getAllDayEventsForDay(
+                                dayIndex,
+                                currentWeekEvents,
+                                currentWeekStart
+                              ),
+                            ];
+                            onGridDateClick(clickedDate, dayEvents);
+                          } else {
+                            onDateChange?.(clickedDate);
+                          }
+                        }}
                         onMouseDown={e =>
                           handleCreateAllDayEvent?.(e, dayIndex)
                         }
-                        onDblClick={e => handleCreateAllDayEvent?.(e, dayIndex)}
+                        onDblClick={e => {
+                          const clickedDate = new Date(currentWeekStart);
+                          clickedDate.setDate(
+                            currentWeekStart.getDate() + dayIndex
+                          );
+                          if (onGridDateDoubleClick) {
+                            const dayEvents = [
+                              ...getEventsForDay(dayIndex, currentWeekEvents),
+                              ...getAllDayEventsForDay(
+                                dayIndex,
+                                currentWeekEvents,
+                                currentWeekStart
+                              ),
+                            ];
+                            onGridDateDoubleClick(clickedDate, dayEvents);
+                          } else {
+                            handleCreateAllDayEvent?.(e, dayIndex);
+                          }
+                        }}
                         onDragOver={handleDragOver}
                         onDrop={e => {
                           handleDrop(e, dropDate, undefined, true);

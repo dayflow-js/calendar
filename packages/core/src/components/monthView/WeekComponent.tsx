@@ -46,6 +46,12 @@ interface WeekComponentProps {
   onMoreEventsClick?: (date: Date) => void;
   onChangeView?: (view: ViewType) => void;
   onSelectDate?: (date: Date) => void;
+  onGridDateClick?: (date: Date, events: Event[]) => void;
+  onGridDateDoubleClick?: (
+    e: MouseEvent | TouchEvent,
+    date: Date,
+    events: Event[]
+  ) => void;
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
   onEventLongPress?: (eventId: string) => void;
@@ -94,6 +100,8 @@ const WeekComponent = memo(
     onMoreEventsClick,
     onChangeView,
     onSelectDate,
+    onGridDateClick,
+    onGridDateDoubleClick,
     selectedEventId,
     onEventSelect,
     onEventLongPress,
@@ -485,6 +493,8 @@ const WeekComponent = memo(
                   onMoveStart={onMoveStart}
                   onResizeStart={onResizeStart}
                   onSelectDate={onSelectDate}
+                  onGridDateClick={onGridDateClick}
+                  onGridDateDoubleClick={onGridDateDoubleClick}
                   organizedMultiDaySegments={organizedMultiDaySegments}
                   overlayVisibleLayerCount={overlayVisibleLayerCount}
                   screenSize={screenSize}
@@ -612,6 +622,8 @@ const WeekComponent = memo(
     prevProps.onMoreEventsClick === nextProps.onMoreEventsClick &&
     prevProps.onChangeView === nextProps.onChangeView &&
     prevProps.onSelectDate === nextProps.onSelectDate &&
+    prevProps.onGridDateClick === nextProps.onGridDateClick &&
+    prevProps.onGridDateDoubleClick === nextProps.onGridDateDoubleClick &&
     prevProps.selectedEventId === nextProps.selectedEventId &&
     prevProps.onEventSelect === nextProps.onEventSelect &&
     prevProps.onEventLongPress === nextProps.onEventLongPress &&

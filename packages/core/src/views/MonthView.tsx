@@ -790,6 +790,52 @@ const MonthView = ({
       : `${currentMonth} ${currentYear}`;
   };
 
+  const handleGridDateClick = useCallback(
+    (date: Date, dayEvents: Event[]) => {
+      const clickAction = config?.gridDateClick;
+      if (!clickAction) {
+        app.selectDate(date);
+        return;
+      }
+
+      if (typeof clickAction === 'function') {
+        clickAction(date, dayEvents);
+        return;
+      }
+
+      if (clickAction === 'week-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.WEEK);
+      } else if (clickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+      }
+      // 'none' → do nothing
+    },
+    [config.gridDateClick, app]
+  );
+
+  const handleGridDateDoubleClick = useCallback(
+    (e: MouseEvent | TouchEvent, date: Date, dayEvents: Event[]) => {
+      const dblClickAction = config?.gridDateDoubleClick ?? 'week-view';
+
+      if (typeof dblClickAction === 'function') {
+        dblClickAction(date, dayEvents);
+        return;
+      }
+
+      if (dblClickAction === 'week-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.WEEK);
+      } else if (dblClickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+      }
+      // 'none' → do nothing
+    },
+    [config.gridDateDoubleClick, app]
+  );
+
   return (
     <div className={monthViewContainer}>
       <ViewHeader
@@ -865,6 +911,8 @@ const MonthView = ({
                   onMoreEventsClick={app.onMoreEventsClick}
                   onChangeView={handleChangeView}
                   onSelectDate={app.selectDate}
+                  onGridDateClick={handleGridDateClick}
+                  onGridDateDoubleClick={handleGridDateDoubleClick}
                   selectedEventId={selectedEventId}
                   onEventSelect={handleWeekEventSelect}
                   onEventLongPress={handleWeekEventLongPress}
@@ -932,6 +980,8 @@ const MonthView = ({
                 onMoreEventsClick={app.onMoreEventsClick}
                 onChangeView={handleChangeView}
                 onSelectDate={app.selectDate}
+                onGridDateClick={handleGridDateClick}
+                onGridDateDoubleClick={handleGridDateDoubleClick}
                 selectedEventId={selectedEventId}
                 onEventSelect={handleWeekEventSelect}
                 onEventLongPress={handleWeekEventLongPress}

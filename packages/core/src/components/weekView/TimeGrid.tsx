@@ -26,7 +26,12 @@ import {
   ViewType,
   ICalendarApp,
 } from '@/types';
-import { formatTime, getEventsForDay, scrollbarTakesSpace } from '@/utils';
+import {
+  formatTime,
+  getEventsForDay,
+  getAllDayEventsForDay,
+  scrollbarTakesSpace,
+} from '@/utils';
 import {
   startPendingCreate,
   finalizeCreateOnDblClick,
@@ -79,6 +84,8 @@ interface TimeGridProps {
   setIsDrawerOpen: (isOpen: boolean) => void;
 
   onDateChange?: (date: Date) => void;
+  onGridDateClick?: (date: Date, events: CalendarEvent[]) => void;
+  onGridDateDoubleClick?: (date: Date, events: CalendarEvent[]) => void;
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
   selectedEventId: string | null;
@@ -128,6 +135,8 @@ export const TimeGrid = ({
   setDraftEvent,
   setIsDrawerOpen,
   onDateChange,
+  onGridDateClick,
+  onGridDateDoubleClick,
   newlyCreatedEventId,
   setNewlyCreatedEventId,
   selectedEventId,
@@ -516,7 +525,19 @@ export const TimeGrid = ({
                           clickedDate.setDate(
                             currentWeekStart.getDate() + dayIndex
                           );
-                          onDateChange?.(clickedDate);
+                          if (onGridDateClick) {
+                            const dayEvents = [
+                              ...getEventsForDay(dayIndex, currentWeekEvents),
+                              ...getAllDayEventsForDay(
+                                dayIndex,
+                                currentWeekEvents,
+                                currentWeekStart
+                              ),
+                            ];
+                            onGridDateClick(clickedDate, dayEvents);
+                          } else {
+                            onDateChange?.(clickedDate);
+                          }
                         }}
                         onMouseDown={e => {
                           startPendingCreate(
@@ -528,12 +549,28 @@ export const TimeGrid = ({
                           );
                         }}
                         onDblClick={e => {
-                          handleCreateStart?.(
-                            e,
-                            dayIndex,
-                            getGridHour(e.clientY)
+                          const clickedDate = new Date(currentWeekStart);
+                          clickedDate.setDate(
+                            currentWeekStart.getDate() + dayIndex
                           );
-                          finalizeCreateOnDblClick();
+                          if (onGridDateDoubleClick) {
+                            const dayEvents = [
+                              ...getEventsForDay(dayIndex, currentWeekEvents),
+                              ...getAllDayEventsForDay(
+                                dayIndex,
+                                currentWeekEvents,
+                                currentWeekStart
+                              ),
+                            ];
+                            onGridDateDoubleClick(clickedDate, dayEvents);
+                          } else {
+                            handleCreateStart?.(
+                              e,
+                              dayIndex,
+                              getGridHour(e.clientY)
+                            );
+                            finalizeCreateOnDblClick();
+                          }
                         }}
                         onTouchStart={e =>
                           handleTouchStart(e, dayIndex, slot.hour)

@@ -42,14 +42,16 @@ function MyCalendar() {
 
 #### 設定
 
-| プロパティ            | 型               | デフォルト  | 説明                                               |
-| :-------------------- | :--------------- | :---------- | :------------------------------------------------- |
-| `showWeekends`        | `boolean`        | `true`      | 土日を表示するかどうか。                           |
-| `showAllDay`          | `boolean`        | `true`      | 終日イベント行を表示するかどうか。                 |
-| `startOfWeek`         | `number`         | `1`         | 週の開始日（0 は日曜日、1 は月曜日など）。         |
-| `scrollToCurrentTime` | `boolean`        | `true`      | 初回ロード時に現在時刻までスクロールするかどうか。 |
-| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 時間軸の時間形式。                                 |
-| `secondaryTimeZone`   | `string`         | `undefined` | 週ビューだけに表示される補助タイムライン。         |
+| プロパティ            | 型                                 | デフォルト   | 説明                                               |
+| :-------------------- | :--------------------------------- | :----------- | :------------------------------------------------- |
+| `showWeekends`        | `boolean`                          | `true`       | 土日を表示するかどうか。                           |
+| `showAllDay`          | `boolean`                          | `true`       | 終日イベント行を表示するかどうか。                 |
+| `startOfWeek`         | `number`                           | `1`          | 週の開始日（0 は日曜日、1 は月曜日など）。         |
+| `scrollToCurrentTime` | `boolean`                          | `true`       | 初回ロード時に現在時刻までスクロールするかどうか。 |
+| `timeFormat`          | `'12h' \| '24h'`                   | `'24h'`      | 時間軸の時間形式。                                 |
+| `secondaryTimeZone`   | `string`                           | `undefined`  | 週ビューだけに表示される補助タイムライン。         |
+| `gridDateClick`       | `'day-view' \| 'none' \| function` | `undefined`  | 日付セルをクリックした際のアクション。             |
+| `gridDateDoubleClick` | `'day-view' \| 'none' \| function` | `'day-view'` | 日付セルをダブルクリックした際のアクション。       |
 
 ```tsx {10}
 import {
@@ -76,13 +78,15 @@ function MyCalendar() {
 
 #### 設定
 
-| プロパティ           | 型                  | デフォルト | 説明                                                                                   |
-| :------------------- | :------------------ | :--------- | :------------------------------------------------------------------------------------- |
-| `showWeekNumbers`    | `boolean`           | `false`    | 週番号を表示するかどうか。                                                             |
-| `showMonthIndicator` | `boolean`           | `true`     | スクロール時に月を示すタイトルを表示するかどうか。                                     |
-| `startOfWeek`        | `number`            | `1`        | 週の開始曜日（0 は日曜日、1 は月曜日など）。                                           |
-| `snapToMonth`        | `boolean`           | `false`    | 有効にすると、スクロールが止まった後、表示中のメイン月の先頭に自動的にスナップします。 |
-| `scroll`             | `MonthScrollConfig` | —          | スクロールのロックと月切替アニメーションを制御します。以下を参照してください。         |
+| プロパティ            | 型                                                | デフォルト    | 説明                                                                                   |
+| :-------------------- | :------------------------------------------------ | :------------ | :------------------------------------------------------------------------------------- |
+| `showWeekNumbers`     | `boolean`                                         | `false`       | 週番号を表示するかどうか。                                                             |
+| `showMonthIndicator`  | `boolean`                                         | `true`        | スクロール時に月を示すタイトルを表示するかどうか。                                     |
+| `startOfWeek`         | `number`                                          | `1`           | 週の開始曜日（0 は日曜日、1 は月曜日など）。                                           |
+| `snapToMonth`         | `boolean`                                         | `false`       | 有効にすると、スクロールが止まった後、表示中のメイン月の先頭に自動的にスナップします。 |
+| `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function` | `undefined`   | 日付セルをクリックした際のアクション。                                                 |
+| `gridDateDoubleClick` | `'week-view' \| 'day-view' \| 'none' \| function` | `'week-view'` | 日付セルをダブルクリックした際のアクション。                                           |
+| `scroll`              | `MonthScrollConfig`                               | —             | スクロールのロックと月切替アニメーションを制御します。以下を参照してください。         |
 
 #### MonthScrollConfig
 

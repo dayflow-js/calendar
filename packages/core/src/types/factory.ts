@@ -97,6 +97,20 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   scrollToCurrentTime?: boolean;
   secondaryTimeZone?: TimeZoneValue;
   showEventDots?: boolean;
+  /**
+   * Action when a date cell is clicked.
+   */
+  gridDateClick?: 'day-view' | 'none' | ((date: Date, events: Event[]) => void);
+  /**
+   * Action when a date cell is double-clicked.
+   * - 'day-view' (default): navigate to the Day View
+   * - 'none': no action
+   * - function: custom handler
+   */
+  gridDateDoubleClick?:
+    | 'day-view'
+    | 'none'
+    | ((date: Date, events: Event[]) => void);
 }
 
 /**
@@ -124,6 +138,25 @@ export interface MonthViewConfig extends ViewFactoryConfig {
   /** Scroll / navigation behavior for the month view */
   scroll?: MonthScrollConfig;
   showEventDots?: boolean;
+  /**
+   * Action when a date cell is clicked.
+   */
+  gridDateClick?:
+    | 'week-view'
+    | 'day-view'
+    | 'none'
+    | ((date: Date, events: Event[]) => void);
+  /**
+   * Action when a date cell is double-clicked.
+   * - 'week-view' (default): navigate to the Week View
+   * - 'none': no action
+   * - function: custom handler
+   */
+  gridDateDoubleClick?:
+    | 'week-view'
+    | 'day-view'
+    | 'none'
+    | ((date: Date, events: Event[]) => void);
 }
 
 /**
