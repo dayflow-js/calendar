@@ -126,11 +126,13 @@ export const CalendarRoot = ({
         callbacks: {
           onDismissUI?: () => void;
           onEventDetailToggle?: (id: string | null) => void;
+          onMobileEventDetailToggle?: (event: CalendarEvent | null) => void;
         };
       }
     ).callbacks;
     const prevDismiss = callbacks.onDismissUI;
     const prevDetailToggle = callbacks.onEventDetailToggle;
+    const prevMobileDetailToggle = callbacks.onMobileEventDetailToggle;
 
     callbacks.onDismissUI = () => {
       if (eventDialog.detailPanelEventId) {
@@ -147,9 +149,16 @@ export const CalendarRoot = ({
       prevDetailToggle?.(id);
     };
 
+    callbacks.onMobileEventDetailToggle = (event: CalendarEvent | null) => {
+      quickCreate.setMobileDraftEvent(event);
+      quickCreate.setIsMobileDrawerOpen(Boolean(event));
+      prevMobileDetailToggle?.(event);
+    };
+
     return () => {
       callbacks.onDismissUI = prevDismiss;
       callbacks.onEventDetailToggle = prevDetailToggle;
+      callbacks.onMobileEventDetailToggle = prevMobileDetailToggle;
     };
   }, [app, eventDialog, quickCreate]);
 

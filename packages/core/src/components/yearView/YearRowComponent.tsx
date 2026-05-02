@@ -24,6 +24,7 @@ interface YearRowComponentProps {
     event: Event,
     direction: string
   ) => void;
+  onSelectDate: (date: Date) => void;
   onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
   selectedEventId: string | null;
   onEventSelect: (eventId: string | null) => void;
@@ -134,6 +135,7 @@ export const YearRowComponent = memo(
     dragState,
     onMoveStart,
     onResizeStart,
+    onSelectDate,
     onCreateStart,
     selectedEventId,
     onEventSelect,
@@ -162,13 +164,6 @@ export const YearRowComponent = memo(
         onContextMenu({ x: e.clientX, y: e.clientY, date });
       },
       [onContextMenu]
-    );
-
-    const handleSelectDate = useCallback(
-      (d: Date) => {
-        app.selectDate(d);
-      },
-      [app]
     );
 
     const handleEventUpdate = useCallback(
@@ -343,7 +338,7 @@ export const YearRowComponent = memo(
               date={date}
               isToday={isToday}
               locale={locale}
-              onSelectDate={handleSelectDate}
+              onSelectDate={onSelectDate}
               onCreateStart={onCreateStart}
               onMoreEventsClick={onMoreEventsClick}
               moreCount={moreCounts[index]}
@@ -438,6 +433,7 @@ export const YearRowComponent = memo(
       prevProps.locale === nextProps.locale &&
       prevProps.onMoveStart === nextProps.onMoveStart &&
       prevProps.onResizeStart === nextProps.onResizeStart &&
+      prevProps.onSelectDate === nextProps.onSelectDate &&
       prevProps.onCreateStart === nextProps.onCreateStart &&
       prevProps.selectedEventId === nextProps.selectedEventId &&
       prevProps.onEventSelect === nextProps.onEventSelect &&

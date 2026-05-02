@@ -9,7 +9,6 @@ import {
 } from 'preact/hooks';
 
 import ViewHeader from '@/components/common/ViewHeader';
-import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { AllDayRow } from '@/components/weekView/AllDayRow';
 import { TimeGrid } from '@/components/weekView/TimeGrid';
 import {
@@ -105,8 +104,6 @@ const WeekView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent = MobileEventDrawer;
-
   const isMobileView = screenSize !== 'desktop';
   const columnsPerPage = isMobileView ? 2 : 7;
   const isSlidingView = isMobileView;
@@ -160,8 +157,6 @@ const WeekView = ({
     null
   );
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [draftEvent, setDraftEvent] = useState<CalendarEvent | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // References
@@ -328,8 +323,7 @@ const WeekView = ({
   const handleEventCreate = useCallback(
     (event: CalendarEvent) => {
       if (isMobile) {
-        setDraftEvent(event);
-        setIsDrawerOpen(true);
+        app.onMobileEventDetailToggle(event);
       } else {
         app.addEvent(event);
         setNewlyCreatedEventId(event.id);
@@ -695,8 +689,10 @@ const WeekView = ({
         }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
-        setDraftEvent={e => setDraftEvent(e)}
-        setIsDrawerOpen={setIsDrawerOpen}
+        setDraftEvent={event => app.onMobileEventDetailToggle(event)}
+        setIsDrawerOpen={isOpen => {
+          if (!isOpen) app.onMobileEventDetailToggle(null);
+        }}
         onDateChange={onDateChange}
         onGridDateClick={handleGridDateClick}
         onGridDateDoubleClick={handleGridDateDoubleClick}
@@ -752,8 +748,10 @@ const WeekView = ({
         }
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
-        setDraftEvent={e => setDraftEvent(e)}
-        setIsDrawerOpen={setIsDrawerOpen}
+        setDraftEvent={event => app.onMobileEventDetailToggle(event)}
+        setIsDrawerOpen={isOpen => {
+          if (!isOpen) app.onMobileEventDetailToggle(null);
+        }}
         onDateChange={onDateChange}
         onGridDateClick={handleGridDateClick}
         onGridDateDoubleClick={handleGridDateDoubleClick}
@@ -773,26 +771,6 @@ const WeekView = ({
         timeFormat={timeFormat}
         secondaryTimeSlots={secondaryTimeSlots}
         appTimeZone={appTimeZone}
-      />
-
-      <MobileEventDrawerComponent
-        isOpen={isDrawerOpen}
-        onClose={() => {
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        onSave={(updatedEvent: CalendarEvent) => {
-          if (events.some(e => e.id === updatedEvent.id)) {
-            app.updateEvent(updatedEvent.id, updatedEvent);
-          } else {
-            app.addEvent(updatedEvent);
-          }
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        draftEvent={draftEvent as CalendarEvent | null}
-        app={app}
-        timeFormat={timeFormat}
       />
     </div>
   );

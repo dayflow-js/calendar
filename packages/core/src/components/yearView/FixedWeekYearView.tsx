@@ -28,6 +28,7 @@ import {
   createFixedWeekDragPreviewEvent,
   FixedWeekMonthData,
   getEventDayRange,
+  getEventsForYearDate,
   getFixedWeekLabels,
   getFixedWeekTotalColumns,
 } from './utils';
@@ -293,9 +294,56 @@ export const FixedWeekYearView = ({
   // Get config value
   const showTimedEvents = config?.showTimedEventsInYearView ?? false;
 
-  // Handle double click on cell - create all-day or timed event based on config
+  const getDayEvents = useCallback(
+    (date: Date) => getEventsForYearDate(rawEvents, date, appTimeZone),
+    [rawEvents, appTimeZone]
+  );
+
+  const handleCellClick = useCallback(
+    (date: Date) => {
+      const clickAction = config?.gridDateClick;
+
+      if (typeof clickAction === 'function') {
+        clickAction(date, getDayEvents(date));
+        return;
+      }
+
+      if (clickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+        return;
+      }
+
+      if (clickAction === 'none') {
+        return;
+      }
+
+      app.selectDate(date);
+    },
+    [config?.gridDateClick, getDayEvents, app]
+  );
+
+  // Handle double click on cell - route to custom config when provided,
+  // otherwise preserve the existing create-event behavior.
   const handleCellDoubleClick = useCallback(
     (e: unknown, date: Date) => {
+      const dblClickAction = config?.gridDateDoubleClick;
+
+      if (typeof dblClickAction === 'function') {
+        dblClickAction(date, getDayEvents(date));
+        return;
+      }
+
+      if (dblClickAction === 'day-view') {
+        app.setCurrentDate(date);
+        app.changeView(ViewType.DAY);
+        return;
+      }
+
+      if (dblClickAction === 'none') {
+        return;
+      }
+
       if (showTimedEvents) {
         // Use default drag behavior for timed events
         handleCreateStart?.(e, date);
@@ -317,7 +365,14 @@ export const FixedWeekYearView = ({
         setNewlyCreatedEventId(newEvent.id);
       }
     },
-    [showTimedEvents, handleCreateStart, app, t]
+    [
+      config?.gridDateDoubleClick,
+      getDayEvents,
+      showTimedEvents,
+      handleCreateStart,
+      app,
+      t,
+    ]
   );
 
   // Generate week header labels
@@ -546,6 +601,7 @@ export const FixedWeekYearView = ({
               selectedEventId={selectedEventId}
               onMoveStart={handleMoveStart}
               onResizeStart={handleResizeStart}
+              onSelectDate={handleCellClick}
               onCreateStart={handleCellDoubleClick}
               onEventSelect={setSelectedEventId}
               newlyCreatedEventId={newlyCreatedEventId}

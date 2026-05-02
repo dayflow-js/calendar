@@ -3,6 +3,7 @@ import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPan
 import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
 import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
 import { ContextMenuShowcase } from '@/components/showcase/ContextMenuShowcase';
+import { MobileEventDetailShowcase } from '@/components/showcase/MobileEventDetailShowcase';
 
 # Content Slots
 
@@ -17,6 +18,7 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 - [Event Content](#event-content)
 - [Event Detail Content](#event-detail-content)
 - [Event Detail Dialog](#event-detail-dialog)
+- [Mobile Event Detail](#mobile-event-detail)
 - [Injecting a Custom Color Picker](#example-injecting-a-custom-color-picker)
 - [Context Menu](#context-menu-slots)
 
@@ -168,6 +170,55 @@ export const CustomDetailDialogShowcase = () => {
 
   return (
     <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## Mobile Event Detail
+
+When DayFlow is viewed on mobile devices (or small screens), it uses a dedicated `mobileEventDetail` slot to handle event creation and editing. By default, this is a full-screen drawer.
+
+<MobileEventDetailShowcase />
+
+<details>
+<summary>View Source Code</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react';
+import { useCallback } from 'react';
+
+export const MobileEventDetailShowcase = () => {
+  const customMobileDrawer = useCallback(
+    ({ isOpen, onClose, onSave, onEventDelete, draftEvent }) => {
+      if (!isOpen || !draftEvent) return null;
+
+      return (
+        <div className='fixed inset-0 z-50 flex flex-col bg-white'>
+          <header className='flex items-center justify-between p-4 border-b'>
+            <button onClick={onClose}>Back</button>
+            <h2>{draftEvent.id ? 'Edit' : 'New'} Event</h2>
+            <button onClick={() => onSave(draftEvent)}>Save</button>
+          </header>
+          <div className='p-4'>
+            <input
+              defaultValue={draftEvent.title}
+              onChange={e => (draftEvent.title = e.target.value)}
+            />
+            {/* ... build your mobile-optimized UI */}
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      mobileEventDetail={customMobileDrawer}
+    />
   );
 };
 ```

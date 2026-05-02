@@ -68,6 +68,33 @@ export const getEventDayRange = (
   return result;
 };
 
+export const getEventsForYearDate = (
+  events: Event[],
+  date: Date,
+  appTimeZone?: string
+): Event[] => {
+  const targetStartMs = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  ).getTime();
+  const targetEndMs = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    23,
+    59,
+    59,
+    999
+  ).getTime();
+
+  return events.filter(event => {
+    if (!event.start) return false;
+    const range = getEventDayRange(event, appTimeZone);
+    return range.startMs <= targetEndMs && range.endMsEod >= targetStartMs;
+  });
+};
+
 export interface YearMultiDaySegment {
   id: string;
   event: Event;

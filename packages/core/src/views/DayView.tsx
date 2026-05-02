@@ -18,7 +18,6 @@ import {
   calculateDragLayout,
 } from '@/components/dayView/util';
 import { EventLayoutCalculator } from '@/components/eventLayout';
-import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import { getWeekStart } from '@/components/weekView/util';
 import { defaultDragConfig } from '@/core/config';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
@@ -80,8 +79,6 @@ const DayView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent = MobileEventDrawer;
-
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
     null
@@ -127,8 +124,6 @@ const DayView = ({
     null
   );
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [draftEvent, setDraftEvent] = useState<Event | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentDate = app.getCurrentDate();
@@ -292,8 +287,7 @@ const DayView = ({
     },
     onEventCreate: (event: Event) => {
       if (isMobile) {
-        setDraftEvent(event);
-        setIsDrawerOpen(true);
+        app.onMobileEventDetailToggle(event);
       } else {
         app.addEvent(event);
         setNewlyCreatedEventId(event.id);
@@ -542,8 +536,10 @@ const DayView = ({
         switcherMode={switcherMode}
         isMobile={isMobile}
         isTouch={isTouch}
-        setDraftEvent={setDraftEvent}
-        setIsDrawerOpen={setIsDrawerOpen}
+        setDraftEvent={event => app.onMobileEventDetailToggle(event)}
+        setIsDrawerOpen={isOpen => {
+          if (!isOpen) app.onMobileEventDetailToggle(null);
+        }}
         ALL_DAY_HEIGHT={ALL_DAY_HEIGHT}
         HOUR_HEIGHT={HOUR_HEIGHT}
         FIRST_HOUR={FIRST_HOUR}
@@ -570,25 +566,6 @@ const DayView = ({
         showEventDots={showEventDots}
         appTimeZone={appTimeZone}
         calendarRef={calendarRef}
-      />
-      <MobileEventDrawerComponent
-        isOpen={isDrawerOpen}
-        onClose={() => {
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        onSave={(updatedEvent: Event) => {
-          if (events.some(e => e.id === updatedEvent.id)) {
-            app.updateEvent(updatedEvent.id, updatedEvent);
-          } else {
-            app.addEvent(updatedEvent);
-          }
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        draftEvent={draftEvent}
-        app={app}
-        timeFormat={timeFormat}
       />
     </div>
   );

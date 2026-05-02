@@ -66,6 +66,12 @@ const sortByCalendarId = (
   b: { calendarId?: string }
 ) => a.calendarId!.localeCompare(b.calendarId!);
 
+const createRequiredWeekProps = () => ({
+  detailPanelEventId: null,
+  onDetailPanelToggle: jest.fn(),
+  onCalendarDrop: jest.fn(() => null),
+});
+
 describe('WeekComponent', () => {
   it('renders month multi-day timed event times in app timezone', () => {
     const event = createZonedTimedEvent(
@@ -128,6 +134,7 @@ describe('WeekComponent', () => {
         onEventUpdate={jest.fn()}
         onEventDelete={jest.fn()}
         onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
         app={app}
         appTimeZone='Australia/Sydney'
       />
@@ -207,6 +214,7 @@ describe('WeekComponent', () => {
         onEventUpdate={onEventUpdate}
         onEventDelete={onEventDelete}
         onDetailPanelOpen={onDetailPanelOpen}
+        {...createRequiredWeekProps()}
         app={app}
       />
     );
@@ -291,6 +299,7 @@ describe('WeekComponent', () => {
         onEventUpdate={jest.fn()}
         onEventDelete={jest.fn()}
         onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
         app={app}
       />
     );
@@ -370,6 +379,7 @@ describe('WeekComponent', () => {
         onEventUpdate={jest.fn()}
         onEventDelete={jest.fn()}
         onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
         app={app}
       />
     );
@@ -465,6 +475,7 @@ describe('WeekComponent', () => {
         onEventUpdate={jest.fn()}
         onEventDelete={jest.fn()}
         onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
         app={app}
       />
     );
@@ -540,6 +551,7 @@ describe('WeekComponent', () => {
         onEventUpdate={jest.fn()}
         onEventDelete={jest.fn()}
         onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
         app={app}
       />
     );

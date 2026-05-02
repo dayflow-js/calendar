@@ -280,6 +280,11 @@ export class EventManager {
     this.notify();
   }
 
+  onMobileEventDetailToggle(event: Event | null): void {
+    this.getCallbacks().onMobileEventDetailToggle?.(event);
+    this.notify();
+  }
+
   highlightEvent(eventId: string | null): void {
     if (this.state.highlightedEventId === eventId) return;
     this.state.highlightedEventId = eventId;

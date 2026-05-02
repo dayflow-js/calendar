@@ -34,6 +34,7 @@ export const useWeekViewSwipe = ({
   const touchStartPos = useRef({ x: 0, y: 0 });
   const isHorizontalSwipe = useRef(false);
   const liveSwipeOffsetRef = useRef(0);
+  const activePointerIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isSlidingView) return;
@@ -77,21 +78,25 @@ export const useWeekViewSwipe = ({
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
-    const handleScrollerTouchStart = (e: TouchEvent) => {
+    const startSwipe = (clientX: number, clientY: number) => {
       touchStartPos.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
+        x: clientX,
+        y: clientY,
       };
       isHorizontalSwipe.current = false;
       liveSwipeOffsetRef.current = 0;
       setIsTransitioning(false);
     };
 
-    const handleScrollerTouchMove = (e: TouchEvent) => {
+    const moveSwipe = (
+      clientX: number,
+      clientY: number,
+      preventDefault?: () => void
+    ) => {
       if (isTransitioning) return;
 
-      const deltaX = e.touches[0].clientX - touchStartPos.current.x;
-      const deltaY = e.touches[0].clientY - touchStartPos.current.y;
+      const deltaX = clientX - touchStartPos.current.x;
+      const deltaY = clientY - touchStartPos.current.y;
 
       if (
         !isHorizontalSwipe.current &&
@@ -101,29 +106,29 @@ export const useWeekViewSwipe = ({
         isHorizontalSwipe.current = true;
       }
 
-      if (isHorizontalSwipe.current) {
-        if (e.cancelable) e.preventDefault();
+      if (!isHorizontalSwipe.current) return;
 
-        const containerWidth = scroller.clientWidth;
-        const maxOffset = containerWidth / 2;
-        const offset = Math.max(-maxOffset, Math.min(maxOffset, deltaX));
-        const transform = `translateX(calc(-100% / 3 + ${offset}px))`;
+      preventDefault?.();
 
-        if (topFrozenContentRef.current) {
-          topFrozenContentRef.current.style.transition = 'none';
-          topFrozenContentRef.current.style.transform = transform;
-        }
+      const containerWidth = scroller.clientWidth;
+      const maxOffset = containerWidth / 2;
+      const offset = Math.max(-maxOffset, Math.min(maxOffset, deltaX));
+      const transform = `translateX(calc(-100% / 3 + ${offset}px))`;
 
-        if (swipeContentRef.current) {
-          swipeContentRef.current.style.transition = 'none';
-          swipeContentRef.current.style.transform = transform;
-        }
-
-        liveSwipeOffsetRef.current = offset;
+      if (topFrozenContentRef.current) {
+        topFrozenContentRef.current.style.transition = 'none';
+        topFrozenContentRef.current.style.transform = transform;
       }
+
+      if (swipeContentRef.current) {
+        swipeContentRef.current.style.transition = 'none';
+        swipeContentRef.current.style.transform = transform;
+      }
+
+      liveSwipeOffsetRef.current = offset;
     };
 
-    const handleScrollerTouchEnd = () => {
+    const endSwipe = () => {
       if (!isHorizontalSwipe.current) {
         liveSwipeOffsetRef.current = 0;
         return;
@@ -167,6 +172,46 @@ export const useWeekViewSwipe = ({
           setIsTransitioning(false);
         }, 300);
       }
+
+      isHorizontalSwipe.current = false;
+    };
+
+    const handleScrollerTouchStart = (e: TouchEvent) => {
+      startSwipe(e.touches[0].clientX, e.touches[0].clientY);
+    };
+
+    const handleScrollerTouchMove = (e: TouchEvent) => {
+      moveSwipe(e.touches[0].clientX, e.touches[0].clientY, () => {
+        if (e.cancelable) e.preventDefault();
+      });
+    };
+
+    const handleScrollerTouchEnd = () => {
+      endSwipe();
+    };
+
+    const handleScrollerPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' || e.button !== 0) return;
+
+      activePointerIdRef.current = e.pointerId;
+      scroller.setPointerCapture?.(e.pointerId);
+      startSwipe(e.clientX, e.clientY);
+    };
+
+    const handleScrollerPointerMove = (e: PointerEvent) => {
+      if (activePointerIdRef.current !== e.pointerId) return;
+
+      moveSwipe(e.clientX, e.clientY, () => {
+        if (e.cancelable) e.preventDefault();
+      });
+    };
+
+    const handleScrollerPointerEnd = (e: PointerEvent) => {
+      if (activePointerIdRef.current !== e.pointerId) return;
+
+      scroller.releasePointerCapture?.(e.pointerId);
+      activePointerIdRef.current = null;
+      endSwipe();
     };
 
     scroller.addEventListener('touchstart', handleScrollerTouchStart, {
@@ -178,11 +223,19 @@ export const useWeekViewSwipe = ({
     scroller.addEventListener('touchend', handleScrollerTouchEnd, {
       passive: true,
     });
+    scroller.addEventListener('pointerdown', handleScrollerPointerDown);
+    scroller.addEventListener('pointermove', handleScrollerPointerMove);
+    scroller.addEventListener('pointerup', handleScrollerPointerEnd);
+    scroller.addEventListener('pointercancel', handleScrollerPointerEnd);
 
     return () => {
       scroller.removeEventListener('touchstart', handleScrollerTouchStart);
       scroller.removeEventListener('touchmove', handleScrollerTouchMove);
       scroller.removeEventListener('touchend', handleScrollerTouchEnd);
+      scroller.removeEventListener('pointerdown', handleScrollerPointerDown);
+      scroller.removeEventListener('pointermove', handleScrollerPointerMove);
+      scroller.removeEventListener('pointerup', handleScrollerPointerEnd);
+      scroller.removeEventListener('pointercancel', handleScrollerPointerEnd);
     };
   }, [
     app,

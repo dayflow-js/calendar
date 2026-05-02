@@ -216,6 +216,9 @@ export class CalendarApp implements ICalendarApp {
   onEventDetailToggle = (eventId: string | null): void =>
     this.eventManager.onEventDetailToggle(eventId);
 
+  onMobileEventDetailToggle = (event: Event | null): void =>
+    this.eventManager.onMobileEventDetailToggle(event);
+
   highlightEvent = (eventId: string | null): void =>
     this.eventManager.highlightEvent(eventId);
 

@@ -3,6 +3,7 @@ import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPan
 import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
 import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
 import { ContextMenuShowcase } from '@/components/showcase/ContextMenuShowcase';
+import { MobileEventDetailShowcase } from '@/components/showcase/MobileEventDetailShowcase';
 
 # 内容插槽
 
@@ -17,6 +18,7 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 - [事件内容](#事件内容)
 - [事件详情内容](#事件详情内容)
 - [事件详情对话框](#事件详情对话框)
+- [移动端事件详情](#移动端事件详情)
 - [注入自定义颜色选择器](#注入自定义颜色选择器)
 - [右键菜单](#右键菜单)
 
@@ -168,6 +170,55 @@ export const CustomDetailDialogShowcase = () => {
 
   return (
     <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## 移动端事件详情
+
+当在移动设备（或小屏幕）上查看 DayFlow 时，它使用专门的 `mobileEventDetail` 插槽来处理事件的创建和编辑。默认情况下，这是一个全屏抽屉。
+
+<MobileEventDetailShowcase />
+
+<details>
+<summary>查看源代码</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react';
+import { useCallback } from 'react';
+
+export const MobileEventDetailShowcase = () => {
+  const customMobileDrawer = useCallback(
+    ({ isOpen, onClose, onSave, onEventDelete, draftEvent }) => {
+      if (!isOpen || !draftEvent) return null;
+
+      return (
+        <div className='fixed inset-0 z-50 flex flex-col bg-white'>
+          <header className='flex items-center justify-between p-4 border-b'>
+            <button onClick={onClose}>返回</button>
+            <h2>{draftEvent.id ? '编辑' : '新建'}事件</h2>
+            <button onClick={() => onSave(draftEvent)}>保存</button>
+          </header>
+          <div className='p-4'>
+            <input
+              defaultValue={draftEvent.title}
+              onChange={e => (draftEvent.title = e.target.value)}
+            />
+            {/* ... 构建您的移动端优化 UI */}
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      mobileEventDetail={customMobileDrawer}
+    />
   );
 };
 ```

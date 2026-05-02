@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/ui-context-menu",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Standalone context menu primitives from the DayFlow UI ecosystem",
   "keywords": [
     "context-menu",

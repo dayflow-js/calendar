@@ -3,6 +3,7 @@ import { CustomDetailPanelShowcase } from '@/components/showcase/CustomDetailPan
 import { ColorPickerShowcase } from '@/components/showcase/ColorPickerShowcase';
 import { CustomDetailDialogShowcase } from '@/components/showcase/CustomDetailDialogShowcase';
 import { ContextMenuShowcase } from '@/components/showcase/ContextMenuShowcase';
+import { MobileEventDetailShowcase } from '@/components/showcase/MobileEventDetailShowcase';
 
 # コンテンツスロット
 
@@ -17,7 +18,8 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 - [イベントコンテンツ](#イベントコンテンツ)
 - [イベント詳細コンテンツ](#イベント詳細コンテンツ)
 - [イベント詳細ダイアログ](#イベント詳細ダイアログ)
-- [カスタムカラーピッカーの注入](#カスタムカラーピッカーの注入)
+- [モバイルイベント詳細](#モバイルイベント詳細)
+- [カスタムカラーピッカーの注入](#カスタムカラーピッカー의-注入)
 - [コンテキストメニュー](#コンテキストメニュー)
 
 ## 仕組み
@@ -168,6 +170,55 @@ export const CustomDetailDialogShowcase = () => {
 
   return (
     <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+  );
+};
+```
+
+</details>
+
+## モバイルイベント詳細
+
+モバイルデバイス（または小さな画面）で DayFlow を表示する場合、イベントの作成と編集を処理するために専用の `mobileEventDetail` スロットを使用します。デフォルトでは、これはフルスクリーンのドロワーです。
+
+<MobileEventDetailShowcase />
+
+<details>
+<summary>ソースコードを表示</summary>
+
+```tsx
+import { DayFlowCalendar } from '@dayflow/react';
+import { useCallback } from 'react';
+
+export const MobileEventDetailShowcase = () => {
+  const customMobileDrawer = useCallback(
+    ({ isOpen, onClose, onSave, onEventDelete, draftEvent }) => {
+      if (!isOpen || !draftEvent) return null;
+
+      return (
+        <div className='fixed inset-0 z-50 flex flex-col bg-white'>
+          <header className='flex items-center justify-between p-4 border-b'>
+            <button onClick={onClose}>戻る</button>
+            <h2>{draftEvent.id ? '編集' : '新規'}イベント</h2>
+            <button onClick={() => onSave(draftEvent)}>保存</button>
+          </header>
+          <div className='p-4'>
+            <input
+              defaultValue={draftEvent.title}
+              onChange={e => (draftEvent.title = e.target.value)}
+            />
+            {/* ... モバイルに最適化された UI を構築 */}
+          </div>
+        </div>
+      );
+    },
+    []
+  );
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      mobileEventDetail={customMobileDrawer}
+    />
   );
 };
 ```

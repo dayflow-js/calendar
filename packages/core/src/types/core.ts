@@ -102,6 +102,11 @@ export interface CalendarCallbacks {
    * If eventId is null, closes the detail UI.
    */
   onEventDetailToggle?: (eventId: string | null) => void;
+  /**
+   * Toggle the mobile event detail drawer.
+   * Pass an event to open it, or null to close it.
+   */
+  onMobileEventDetailToggle?: (event: Event | null) => void;
 }
 
 export interface CalendarHeaderProps {
@@ -267,6 +272,7 @@ export interface ICalendarApp {
   ) => boolean | undefined | Promise<boolean | undefined>;
   onMoreEventsClick: (date: Date) => void;
   onEventDetailToggle: (eventId: string | null) => void;
+  onMobileEventDetailToggle: (event: Event | null) => void;
   highlightEvent: (eventId: string | null) => void;
   selectEvent: (eventId: string | null) => void;
   getCalendars: () => CalendarType[];

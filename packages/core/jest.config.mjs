@@ -15,6 +15,9 @@ export default {
       '<rootDir>/node_modules/preact/test-utils/dist/testUtils.js',
     '^@testing-library/preact$':
       '<rootDir>/node_modules/@testing-library/preact/dist/cjs/index.js',
+    '^@dayflow/ui-context-menu$': '<rootDir>/../ui/context-menu/src/index.ts',
+    '^@dayflow/ui-range-picker$': '<rootDir>/../ui/range-picker/src/index.ts',
+    '^@ui-range-picker/(.*)$': '<rootDir>/../ui/range-picker/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/index.ts'],

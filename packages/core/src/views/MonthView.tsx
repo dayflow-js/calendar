@@ -9,7 +9,6 @@ import {
 } from 'preact/hooks';
 
 import ViewHeader from '@/components/common/ViewHeader';
-import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -296,8 +295,6 @@ const MonthView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent = MobileEventDrawer;
-
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
   const [weekHeight, setWeekHeight] = useState(() => {
@@ -317,9 +314,6 @@ const MonthView = ({
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
   );
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [draftEvent, setDraftEvent] = useState<Event | null>(null);
 
   // Selected event ID, used for cross-week MultiDayEvent selected state synchronization
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
@@ -427,8 +421,7 @@ const MonthView = ({
       if (screenSize === 'desktop') {
         app.addEvent(event);
       } else {
-        setDraftEvent(event);
-        setIsDrawerOpen(true);
+        app.onMobileEventDetailToggle(event);
       }
     },
     onEventEdit: (event: Event) => {
@@ -758,8 +751,7 @@ const MonthView = ({
       if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
         const evt = events.find(e => e.id === eventId);
         if (evt) {
-          setDraftEvent(evt);
-          setIsDrawerOpen(true);
+          app.onMobileEventDetailToggle(evt);
           return;
         }
       }
@@ -1000,24 +992,6 @@ const MonthView = ({
           <div style={{ height: bottomSpacerHeight }} />
         </div>
       )}
-      <MobileEventDrawerComponent
-        isOpen={isDrawerOpen}
-        onClose={() => {
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        onSave={(updatedEvent: Event) => {
-          if (events.some(e => e.id === updatedEvent.id)) {
-            app.updateEvent(updatedEvent.id, updatedEvent);
-          } else {
-            app.addEvent(updatedEvent);
-          }
-          setIsDrawerOpen(false);
-          setDraftEvent(null);
-        }}
-        draftEvent={draftEvent}
-        app={app}
-      />
     </div>
   );
 };
