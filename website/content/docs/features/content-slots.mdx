@@ -36,6 +36,7 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 | `eventDetailContent`              | The content shown in the popover/panel when an event is clicked.                                         | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | Custom dialog shown when an event is clicked. Requires `useEventDetailDialog: true` in `useCalendarApp`. | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
 | `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.                                                 | `{ date, viewType, onClose }`                                             |
+| `mobileEventDetail`               | Custom mobile event detail drawer/dialog.                                                                | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
 | `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.                                                  | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | Extra content in the sidebar title bar.                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
 

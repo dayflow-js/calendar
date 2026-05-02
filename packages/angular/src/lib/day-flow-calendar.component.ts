@@ -28,6 +28,7 @@ import type {
   EventContextMenuSlotArgs,
   GridContextMenuSlotArgs,
   CalendarSearchProps,
+  MobileEventProps,
 } from '@dayflow/core';
 import {
   CalendarRenderer,
@@ -85,6 +86,7 @@ export class DayFlowCalendarComponent
   @Input() calendarHeader?: TemplateRef<CalendarHeaderProps>;
   @Input() eventContextMenu?: TemplateRef<EventContextMenuSlotArgs>;
   @Input() gridContextMenu?: TemplateRef<GridContextMenuSlotArgs>;
+  @Input() mobileEventDetail?: TemplateRef<MobileEventProps>;
   @Input() collapsedSafeAreaLeft?: number;
   @Input() search?: CalendarSearchProps;
 
@@ -155,6 +157,7 @@ export class DayFlowCalendarComponent
         'calendarHeader',
         'eventContextMenu',
         'gridContextMenu',
+        'mobileEventDetail',
       ];
       if (slotKeys.some(key => changes[key])) {
         const activeOverrides = this.getActiveOverrides();
@@ -213,6 +216,7 @@ export class DayFlowCalendarComponent
       calendarHeader: this.calendarHeader,
       eventContextMenu: this.eventContextMenu,
       gridContextMenu: this.gridContextMenu,
+      mobileEventDetail: this.mobileEventDetail,
     };
     return Object.keys(templateInputs).filter(
       key => templateInputs[key] !== null && templateInputs[key] !== undefined
@@ -341,6 +345,9 @@ export class DayFlowCalendarComponent
       }
       case 'gridContextMenu': {
         return this.gridContextMenu ?? null;
+      }
+      case 'mobileEventDetail': {
+        return this.mobileEventDetail ?? null;
       }
       default: {
         return null;

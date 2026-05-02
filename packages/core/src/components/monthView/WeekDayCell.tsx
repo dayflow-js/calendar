@@ -9,14 +9,7 @@ import {
   monthMoreEvents,
   cn,
 } from '@/styles/classNames';
-import {
-  Event,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ICalendarApp,
-  MonthEventDragState,
-  ViewType,
-} from '@/types';
+import { Event, ICalendarApp, MonthEventDragState, ViewType } from '@/types';
 import { DayData } from '@/types/calendar';
 import { getWeekNumber } from '@/utils';
 import { extractHourFromDate } from '@/utils/helpers';
@@ -33,8 +26,6 @@ interface WeekDayCellProps {
   calendarRef: RefObject<HTMLDivElement>;
   currentMonth: string;
   currentYear: number;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   day: DayData;
   dayIndex: number;
@@ -88,8 +79,6 @@ const WeekDayCell = ({
   calendarRef,
   currentMonth,
   currentYear,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   day,
   dayIndex,
@@ -276,8 +265,6 @@ const WeekDayCell = ({
           selectedEventId={selectedEventId}
           detailPanelEventId={detailPanelEventId}
           onDetailPanelToggle={onDetailPanelToggle}
-          customDetailPanelContent={customDetailPanelContent}
-          customEventDetailDialog={customEventDetailDialog}
           useEventDetailPanel={useEventDetailPanel}
           app={app}
           isMobile={screenSize !== 'desktop'}

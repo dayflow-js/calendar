@@ -43,8 +43,6 @@ import {
 const DayView = ({
   app,
   config,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   calendarRef,
   switcherMode = 'buttons',
@@ -82,8 +80,7 @@ const DayView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent =
-    app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent = MobileEventDrawer;
 
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
@@ -538,8 +535,6 @@ const DayView = ({
         handleEventUpdate={handleEventUpdate}
         handleEventDelete={handleEventDelete}
         onDateChange={onDateChange}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
         useEventDetailPanel={useEventDetailPanel}
         calendarRef={calendarRef}
         allDayRowRef={allDayRowRef}

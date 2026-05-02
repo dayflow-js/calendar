@@ -54,13 +54,11 @@ import {
 const WeekView = ({
   app,
   config,
-  customDetailPanelContent,
-  customEventDetailDialog,
+  onDateChange,
   useEventDetailPanel,
   calendarRef,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
-  onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: WeekViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
@@ -107,8 +105,7 @@ const WeekView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent =
-    app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent = MobileEventDrawer;
 
   const isMobileView = screenSize !== 'desktop';
   const columnsPerPage = isMobileView ? 2 : 7;
@@ -666,8 +663,6 @@ const WeekView = ({
         handleCreateAllDayEvent={handleCreateAllDayEvent}
         handleDragOver={handleDragOver}
         handleDrop={handleDrop}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
         useEventDetailPanel={useEventDetailPanel}
       />
 
@@ -717,8 +712,6 @@ const WeekView = ({
         setSelectedEventId={setSelectedEventId}
         detailPanelEventId={detailPanelEventId}
         setDetailPanelEventId={setDetailPanelEventId}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
         useEventDetailPanel={useEventDetailPanel}
         isCurrentWeek={isCurrentWeek}
         currentTime={currentTime}

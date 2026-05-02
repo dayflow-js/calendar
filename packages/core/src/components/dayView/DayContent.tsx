@@ -23,11 +23,9 @@ import {
 import {
   Event,
   EventLayout,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
   WeekDayDragState,
-  ViewType,
   ICalendarApp,
+  ViewType,
 } from '@/types';
 import { formatTime, scrollbarTakesSpace } from '@/utils';
 import {
@@ -83,8 +81,6 @@ interface DayContentProps {
   handleEventUpdate: (event: Event) => void;
   handleEventDelete: (id: string) => void;
   onDateChange?: (date: Date) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   calendarRef: RefObject<HTMLDivElement>;
   allDayRowRef: RefObject<HTMLDivElement>;
@@ -139,8 +135,6 @@ export const DayContent = ({
   handleEventUpdate,
   handleEventDelete,
   onDateChange,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   calendarRef,
   allDayRowRef,
@@ -376,8 +370,6 @@ export const DayContent = ({
                         setSelectedEventId(eventId);
                       }
                     }}
-                    customDetailPanelContent={customDetailPanelContent}
-                    customEventDetailDialog={customEventDetailDialog}
                     useEventDetailPanel={useEventDetailPanel}
                     app={app}
                     isMobile={isMobile}
@@ -650,8 +642,6 @@ export const DayContent = ({
                               setSelectedEventId(eventId);
                             }
                           }}
-                          customDetailPanelContent={customDetailPanelContent}
-                          customEventDetailDialog={customEventDetailDialog}
                           useEventDetailPanel={useEventDetailPanel}
                           app={app}
                           isMobile={isMobile}

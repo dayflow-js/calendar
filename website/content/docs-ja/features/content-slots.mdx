@@ -35,8 +35,9 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 | `eventContextMenu`                | イベントの右クリックコンテキストメニューのカスタム実装。                                                              | `{ event, onClose }`                                                      |
 | `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。                                                 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。`useCalendarApp` で `useEventDetailDialog: true` が必要。 | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
-| `gridContextMenu`                 | カレンダーのセル/グリッドの右クリックメニューのカスタム実装。                                                         | `{ date, viewType, onClose }`                                             |
-| `sidebarCalendarColorPicker`      | サイドバーのカレンダーの色に使用されるカラーピッカー。                                                                | `{ color, onChange, onChangeComplete }`                                   |
+| `gridContextMenu`                 | カレンダーのセル / グリッドのカスタム右クリックコンテキストメニュー。                                                 | `{ date, viewType, onClose }`                                             |
+| `mobileEventDetail`               | モバイル用のカスタムイベント詳細ドロワー / ダイアログ。                                                               | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
+| `sidebarCalendarColorPicker`      | サイドバーのカレンダー色用のカラーピッカー。                                                                          | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                                                                          | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## イベントコンテンツ

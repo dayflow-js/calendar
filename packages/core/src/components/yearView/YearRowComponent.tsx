@@ -3,14 +3,7 @@ import { memo } from 'preact/compat';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { CalendarEvent } from '@/components/calendarEvent';
-import {
-  Event,
-  MonthEventDragState,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ICalendarApp,
-  ViewType,
-} from '@/types';
+import { Event, MonthEventDragState, ICalendarApp, ViewType } from '@/types';
 import { getTodayInTimeZone } from '@/utils';
 
 import { analyzeMultiDayEventsForRow, getEventDayRange } from './utils';
@@ -39,8 +32,6 @@ interface YearRowComponentProps {
   onDetailPanelOpen?: () => void;
   detailPanelEventId: string | null;
   onDetailPanelToggle: (eventId: string | null) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   onContextMenu: (menu: { x: number; y: number; date: Date } | null) => void;
   appTimeZone?: string;
@@ -151,8 +142,6 @@ export const YearRowComponent = memo(
     onDetailPanelOpen,
     detailPanelEventId,
     onDetailPanelToggle,
-    customDetailPanelContent,
-    customEventDetailDialog,
     useEventDetailPanel,
     onContextMenu,
     appTimeZone,
@@ -402,8 +391,6 @@ export const YearRowComponent = memo(
                   calendarRef={calendarRef}
                   app={app}
                   detailPanelEventId={detailPanelEventId}
-                  customDetailPanelContent={customDetailPanelContent}
-                  customEventDetailDialog={customEventDetailDialog}
                   useEventDetailPanel={useEventDetailPanel}
                   // Required props for CalendarEvent
                   firstHour={0}
@@ -459,9 +446,6 @@ export const YearRowComponent = memo(
       prevProps.onDetailPanelOpen === nextProps.onDetailPanelOpen &&
       prevProps.detailPanelEventId === nextProps.detailPanelEventId &&
       prevProps.onDetailPanelToggle === nextProps.onDetailPanelToggle &&
-      prevProps.customDetailPanelContent ===
-        nextProps.customDetailPanelContent &&
-      prevProps.customEventDetailDialog === nextProps.customEventDetailDialog &&
       prevProps.useEventDetailPanel === nextProps.useEventDetailPanel &&
       prevProps.onContextMenu === nextProps.onContextMenu &&
       prevProps.appTimeZone === nextProps.appTimeZone

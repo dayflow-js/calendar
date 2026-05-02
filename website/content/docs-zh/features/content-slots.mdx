@@ -35,8 +35,9 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 | `eventContextMenu`                | 自定义事件右键菜单。                                                                        | `{ event, onClose }`                                                      |
 | `eventDetailContent`              | 点击事件时在弹出框/面板中显示的内容。                                                       | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | 点击事件时显示的自定义对话框。需要在 `useCalendarApp` 中设置 `useEventDetailDialog: true`。 | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
-| `gridContextMenu`                 | 自定义日历格子/网格的右键菜单。                                                             | `{ date, viewType, onClose }`                                             |
-| `sidebarCalendarColorPicker`      | 用于侧边栏日历颜色的颜色选择器。                                                            | `{ color, onChange, onChangeComplete }`                                   |
+| `gridContextMenu`                 | 日历单元格 / 网格的自定义右键上下文菜单。                                                   | `{ date, viewType, onClose }`                                             |
+| `mobileEventDetail`               | 自定义移动端事件详情抽屉 / 对话框。                                                         | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
+| `sidebarCalendarColorPicker`      | 侧边栏中用于日历颜色的颜色选择器。                                                          | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | 侧边栏标题栏中的额外内容。                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## 事件内容

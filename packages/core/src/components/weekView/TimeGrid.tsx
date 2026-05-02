@@ -22,8 +22,6 @@ import {
 import {
   EventLayout,
   Event as CalendarEvent,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
   WeekDayDragState,
   ViewType,
   ICalendarApp,
@@ -43,6 +41,7 @@ interface TimeGridProps {
   eventLayouts: Map<number, Map<string, EventLayout>>;
   gridWidth: string;
   isMobile: boolean;
+  isSlidingView: boolean;
   isTouch: boolean;
   scrollerRef: RefObject<HTMLDivElement>;
   timeGridRef: RefObject<HTMLDivElement>;
@@ -83,13 +82,10 @@ interface TimeGridProps {
   newlyCreatedEventId: string | null;
   setNewlyCreatedEventId: (id: string | null) => void;
   selectedEventId: string | null;
-  setSelectedEventId: (id: string | null) => void;
+  setSelectedEventId: (eventId: string | null) => void;
   detailPanelEventId: string | null;
-  setDetailPanelEventId: (id: string | null) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
+  setDetailPanelEventId: (eventId: string | null) => void;
   useEventDetailPanel?: boolean;
-  isSlidingView?: boolean;
   isCurrentWeek: boolean;
   currentTime: Date | null;
   HOUR_HEIGHT: number;
@@ -109,6 +105,7 @@ export const TimeGrid = ({
   eventLayouts,
   gridWidth,
   isMobile,
+  isSlidingView,
   isTouch,
   scrollerRef,
   timeGridRef,
@@ -137,10 +134,7 @@ export const TimeGrid = ({
   setSelectedEventId,
   detailPanelEventId,
   setDetailPanelEventId,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
-  isSlidingView,
   isCurrentWeek,
   currentTime,
   HOUR_HEIGHT,
@@ -626,8 +620,6 @@ export const TimeGrid = ({
                           onEventSelect={stableOnEventSelect}
                           onEventLongPress={stableOnEventLongPress}
                           onDetailPanelToggle={stableOnDetailPanelToggle}
-                          customDetailPanelContent={customDetailPanelContent}
-                          customEventDetailDialog={customEventDetailDialog}
                           useEventDetailPanel={useEventDetailPanel}
                           multiDaySegmentInfo={segmentInfo}
                           app={app}

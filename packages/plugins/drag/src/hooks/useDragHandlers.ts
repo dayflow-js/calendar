@@ -194,7 +194,7 @@ export const useDragHandlers = (
 
   const cancelScheduledDateGridPreview = useCallback(() => {
     if (dateGridPreviewFrameRef.current !== null) {
-      clearTimeout(dateGridPreviewFrameRef.current);
+      cancelAnimationFrame(dateGridPreviewFrameRef.current);
       dateGridPreviewFrameRef.current = null;
     }
     latestDateGridPointerRef.current = null;
@@ -219,7 +219,25 @@ export const useDragHandlers = (
       if (!previewUpdate) return;
 
       if (previewUpdate.kind === 'target-only') {
+        if (drag.targetDate?.getTime() === previewUpdate.targetDate.getTime()) {
+          return;
+        }
         drag.targetDate = previewUpdate.targetDate;
+        return;
+      }
+
+      const nextTargetMs = previewUpdate.targetDate.getTime();
+      const nextStartMs = previewUpdate.startDate.getTime();
+      const nextEndMs = previewUpdate.endDate.getTime();
+      const currentTargetMs = drag.targetDate?.getTime();
+      const currentStartMs = drag.originalStartDate?.getTime();
+      const currentEndMs = drag.originalEndDate?.getTime();
+
+      if (
+        currentTargetMs === nextTargetMs &&
+        currentStartMs === nextStartMs &&
+        currentEndMs === nextEndMs
+      ) {
         return;
       }
 
@@ -611,12 +629,12 @@ export const useDragHandlers = (
 
         latestDateGridPointerRef.current = { clientX, clientY };
         if (dateGridPreviewFrameRef.current === null) {
-          dateGridPreviewFrameRef.current = setTimeout(() => {
+          dateGridPreviewFrameRef.current = requestAnimationFrame(() => {
             dateGridPreviewFrameRef.current = null;
             const latestPointer = latestDateGridPointerRef.current;
             if (!latestPointer) return;
             applyDateGridPreview(latestPointer.clientX, latestPointer.clientY);
-          }, 0) as unknown as number;
+          });
         }
 
         return;

@@ -8,7 +8,6 @@ import {
 } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
-import { CalendarEvent } from '@/components/calendarEvent';
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
@@ -17,22 +16,16 @@ import {
   Event,
   MonthEventDragState,
   ViewType,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
   ICalendarApp,
   YearViewConfig,
 } from '@/types';
-import {
-  getTodayInTimeZone,
-  hasEventChanged,
-  scrollbarTakesSpace,
-} from '@/utils';
+import { hasEventChanged, scrollbarTakesSpace } from '@/utils';
 
+import { FixedWeekMonthRow } from './FixedWeekMonthRow';
 import {
   buildEffectiveFixedWeekMonthsData,
   buildFixedWeekMonthsData,
   createFixedWeekDragPreviewEvent,
-  createPreviewMonthSegment,
   FixedWeekMonthData,
   getEventDayRange,
   getFixedWeekLabels,
@@ -42,8 +35,6 @@ import {
 interface FixedWeekYearViewProps {
   app: ICalendarApp;
   calendarRef: RefObject<HTMLDivElement>;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   config?: YearViewConfig;
   selectedEventId?: string | null;
@@ -55,8 +46,6 @@ interface FixedWeekYearViewProps {
 export const FixedWeekYearView = ({
   app,
   calendarRef,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   config,
   selectedEventId: propSelectedEventId,
@@ -69,8 +58,6 @@ export const FixedWeekYearView = ({
   const currentYear = currentDate.getFullYear();
   const rawEvents = app.getEvents();
   const appTimeZone = app.timeZone;
-  const today = getTodayInTimeZone(appTimeZone);
-  today.setHours(0, 0, 0, 0);
   const startOfWeek = config?.startOfWeek ?? 1;
 
   // Refs for synchronized scrolling
@@ -101,21 +88,27 @@ export const FixedWeekYearView = ({
       ? internalDetailPanelEventId
       : propDetailPanelEventId;
 
-  const setSelectedEventId = (id: string | null) => {
-    if (propOnEventSelect) {
-      propOnEventSelect(id);
-    } else {
-      setInternalSelectedId(id);
-    }
-  };
+  const setSelectedEventId = useCallback(
+    (id: string | null) => {
+      if (propOnEventSelect) {
+        propOnEventSelect(id);
+      } else {
+        setInternalSelectedId(id);
+      }
+    },
+    [propOnEventSelect]
+  );
 
-  const setDetailPanelEventId = (id: string | null) => {
-    if (propOnDetailPanelToggle) {
-      propOnDetailPanelToggle(id);
-    } else {
-      setInternalDetailPanelEventId(id);
-    }
-  };
+  const setDetailPanelEventId = useCallback(
+    (id: string | null) => {
+      if (propOnDetailPanelToggle) {
+        propOnDetailPanelToggle(id);
+      } else {
+        setInternalDetailPanelEventId(id);
+      }
+    },
+    [propOnDetailPanelToggle]
+  );
 
   const [newlyCreatedEventId, setNewlyCreatedEventId] = useState<string | null>(
     null
@@ -125,14 +118,6 @@ export const FixedWeekYearView = ({
     () => setNewlyCreatedEventId(null),
     []
   );
-  const handleEventUpdate = useCallback(
-    (updated: Event) => app.updateEvent(updated.id, updated),
-    [app]
-  );
-  const handleEventDelete = useCallback(
-    (id: string) => app.deleteEvent(id),
-    [app]
-  );
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -141,12 +126,15 @@ export const FixedWeekYearView = ({
   } | null>(null);
   const isEditable = app.canMutateFromUI();
 
-  const handleContextMenu = (e: MouseEvent, date: Date) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isEditable) return;
-    setContextMenu({ x: e.clientX, y: e.clientY, date });
-  };
+  const handleContextMenu = useCallback(
+    (e: MouseEvent, date: Date) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isEditable) return;
+      setContextMenu({ x: e.clientX, y: e.clientY, date });
+    },
+    [isEditable]
+  );
 
   useEffect(() => {
     if (isEditable) return;
@@ -183,6 +171,32 @@ export const FixedWeekYearView = ({
 
   // Sync highlighted event from app state — scroll to it and select it
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
+
+  const measureScrollbars = useCallback(() => {
+    if (contentRef.current) {
+      const el = contentRef.current;
+      const hScrollbar = el.offsetHeight - el.clientHeight;
+      const vScrollbar = el.offsetWidth - el.clientWidth;
+
+      setScrollbarHeight(prev => (prev === hScrollbar ? prev : hScrollbar));
+      setScrollbarWidth(prev => (prev === vScrollbar ? prev : vScrollbar));
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    measureScrollbars();
+    const observer = new ResizeObserver(() => {
+      measureScrollbars();
+    });
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, [measureScrollbars]);
 
   useEffect(() => {
     if (app.state.highlightedEventId) {
@@ -318,9 +332,6 @@ export const FixedWeekYearView = ({
     [locale, totalColumns, startOfWeek, getWeekDaysLabels]
   );
 
-  // Helper to check if a date is today
-  const isDateToday = (date: Date) => date.getTime() === today.getTime();
-
   // Filter events for the current year (uses per-event cache via getEventDayRange)
   const yearEvents = useMemo(() => {
     const yearStartMs = new Date(currentYear, 0, 1).getTime();
@@ -390,6 +401,15 @@ export const FixedWeekYearView = ({
     ]
   );
 
+  const monthHeightSignature = useMemo(
+    () => effectiveMonthsData.map(month => month.minHeight).join(','),
+    [effectiveMonthsData]
+  );
+
+  useEffect(() => {
+    measureScrollbars();
+  }, [measureScrollbars, monthHeightSignature]);
+
   // Handle scroll synchronization
   const handleContentScroll = useCallback(
     (e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>) => {
@@ -403,35 +423,6 @@ export const FixedWeekYearView = ({
     },
     []
   );
-
-  // Measure scrollbar dimensions to sync the sidebar/header padding
-  useEffect(() => {
-    const measureScrollbars = () => {
-      if (contentRef.current) {
-        const el = contentRef.current;
-        // Horizontal scrollbar height = offsetHeight - clientHeight
-        const hScrollbar = el.offsetHeight - el.clientHeight;
-        // Vertical scrollbar width = offsetWidth - clientWidth
-        const vScrollbar = el.offsetWidth - el.clientWidth;
-
-        setScrollbarHeight(prev => (prev === hScrollbar ? prev : hScrollbar));
-        setScrollbarWidth(prev => (prev === vScrollbar ? prev : vScrollbar));
-      }
-    };
-
-    const el = contentRef.current;
-    if (!el) return;
-    // Initial measure
-    measureScrollbars();
-    const observer = new ResizeObserver(() => {
-      measureScrollbars();
-    });
-
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-    };
-  }, [effectiveMonthsData]); // Re-measure when content changes
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
@@ -540,132 +531,32 @@ export const FixedWeekYearView = ({
           className='df-year-fixed-content-inner'
           style={{ minWidth: '1352px' }}
         >
-          {effectiveMonthsData.map(effectiveMonthData => {
-            const dragPreviewSegment =
-              isMovePreviewActive && dragPreviewEvent
-                ? createPreviewMonthSegment(
-                    dragPreviewEvent,
-                    effectiveMonthData.monthIndex,
-                    currentYear,
-                    startOfWeek,
-                    appTimeZone
-                  )
-                : null;
-            const renderedSegments =
-              isMovePreviewActive && yearDragState.eventId
-                ? [
-                    ...effectiveMonthData.eventSegments.filter(
-                      segment => segment.event.id !== yearDragState.eventId
-                    ),
-                    ...(dragPreviewSegment ? [dragPreviewSegment] : []),
-                  ]
-                : effectiveMonthData.eventSegments;
-            return (
-              <div
-                key={effectiveMonthData.monthIndex}
-                className='df-year-fixed-month-row'
-                style={{
-                  minHeight: `${effectiveMonthData.minHeight}px`,
-                  transition: 'min-height 180ms cubic-bezier(0.22, 1, 0.36, 1)',
-                }}
-              >
-                {/* Background grid cells */}
-                <div
-                  className='df-year-fixed-background-grid'
-                  style={{
-                    gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
-                  }}
-                >
-                  {effectiveMonthData.days.map((date, dayIndex) => {
-                    const dayOfWeek = (dayIndex + startOfWeek) % 7;
-                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-                    if (!date) {
-                      return (
-                        <div
-                          key={`empty-${effectiveMonthData.monthIndex}-${dayIndex}`}
-                          className='df-year-fixed-empty-cell'
-                          data-weekend={isWeekend ? 'true' : 'false'}
-                        />
-                      );
-                    }
-
-                    const isToday = isDateToday(date);
-
-                    // Format date for data attribute (YYYY-MM-DD)
-                    const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-
-                    return (
-                      <div
-                        key={date.getTime()}
-                        data-date={dateString}
-                        className='df-year-fixed-day-cell'
-                        data-dragging={isDragging ? 'true' : 'false'}
-                        data-weekend={isWeekend ? 'true' : 'false'}
-                        onClick={() => app.selectDate(date)}
-                        onDblClick={e => handleCellDoubleClick(e, date)}
-                        onContextMenu={e => handleContextMenu(e, date)}
-                      >
-                        <span
-                          className='df-year-fixed-day-number'
-                          data-today={isToday ? 'true' : 'false'}
-                        >
-                          {date.getDate()}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Event segments overlay */}
-                {renderedSegments.length > 0 && (
-                  <div
-                    className='df-year-fixed-event-layer'
-                    style={{ top: 20 }}
-                  >
-                    <div className='df-year-fixed-event-layer-inner'>
-                      {renderedSegments.map(segment => (
-                        <div
-                          key={segment.id}
-                          className='df-year-fixed-event-hitbox'
-                        >
-                          <CalendarEvent
-                            event={segment.event}
-                            isAllDay={!!segment.event.allDay}
-                            viewType={ViewType.YEAR}
-                            yearSegment={segment}
-                            columnsPerRow={totalColumns}
-                            isBeingDragged={
-                              isDragging &&
-                              yearDragState.eventId === segment.event.id
-                            }
-                            selectedEventId={selectedEventId}
-                            onMoveStart={handleMoveStart}
-                            onResizeStart={handleResizeStart}
-                            onEventSelect={setSelectedEventId}
-                            onDetailPanelToggle={setDetailPanelEventId}
-                            newlyCreatedEventId={newlyCreatedEventId}
-                            onDetailPanelOpen={handleDetailPanelOpen}
-                            calendarRef={calendarRef}
-                            app={app}
-                            detailPanelEventId={detailPanelEventId}
-                            customDetailPanelContent={customDetailPanelContent}
-                            customEventDetailDialog={customEventDetailDialog}
-                            useEventDetailPanel={useEventDetailPanel}
-                            firstHour={0}
-                            hourHeight={0}
-                            onEventUpdate={handleEventUpdate}
-                            onEventDelete={handleEventDelete}
-                            appTimeZone={appTimeZone}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {effectiveMonthsData.map(monthData => (
+            <FixedWeekMonthRow
+              key={monthData.monthIndex}
+              monthData={monthData}
+              currentYear={currentYear}
+              startOfWeek={startOfWeek}
+              totalColumns={totalColumns}
+              app={app}
+              calendarRef={calendarRef}
+              isDragging={isDragging}
+              dragState={yearDragState}
+              dragPreviewEvent={dragPreviewEvent}
+              selectedEventId={selectedEventId}
+              onMoveStart={handleMoveStart}
+              onResizeStart={handleResizeStart}
+              onCreateStart={handleCellDoubleClick}
+              onEventSelect={setSelectedEventId}
+              newlyCreatedEventId={newlyCreatedEventId}
+              onDetailPanelOpen={handleDetailPanelOpen}
+              detailPanelEventId={detailPanelEventId}
+              onDetailPanelToggle={setDetailPanelEventId}
+              useEventDetailPanel={useEventDetailPanel}
+              onContextMenu={handleContextMenu}
+              appTimeZone={appTimeZone}
+            />
+          ))}
         </div>
       </div>
       {isEditable && contextMenu && (

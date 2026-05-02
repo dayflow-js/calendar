@@ -16,7 +16,8 @@ type InternalDragRef = UnifiedDragRef & { pendingMove?: boolean };
 export const useDragState = (options: useDragProps): UseDragStateReturn => {
   const { viewType, onEventsUpdate } = options;
 
-  const isMonthView = viewType === ViewType.MONTH;
+  const isDateGridView =
+    viewType === ViewType.MONTH || viewType === ViewType.YEAR;
 
   // Drag reference
   const dragRef = useRef<UnifiedDragRef>({
@@ -59,7 +60,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
   // Initial drag state
   const initialDragState = useMemo(
     () =>
-      isMonthView
+      isDateGridView
         ? ({
             active: false,
             mode: null,
@@ -77,7 +78,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
             endHour: 0,
             allDay: false,
           } as WeekDayDragState),
-    [isMonthView]
+    [isDateGridView]
   );
 
   const [dragState, setDragState] = useState<MonthDragState | WeekDayDragState>(
@@ -94,7 +95,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
         wait
       );
 
-    if (isMonthView) {
+    if (isDateGridView) {
       const shared = createThrottledUpdater(16);
       return {
         default: shared,
@@ -112,7 +113,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
       // lower update frequency keeps DevTools-open interactions responsive.
       resize: createThrottledUpdater(24),
     };
-  }, [isMonthView, onEventsUpdate]);
+  }, [isDateGridView, onEventsUpdate]);
 
   const throttledSetEvents = useCallback(
     (
@@ -135,7 +136,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
     throttledSetEventsByMode.resize.cancel();
     throttledSetEventsByMode.create.cancel();
 
-    if (isMonthView) {
+    if (isDateGridView) {
       setDragState({
         active: false,
         mode: null,
@@ -194,7 +195,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
       initialIndicatorHeight: undefined,
       indicatorContainer: null,
     } as InternalDragRef;
-  }, [isMonthView, throttledSetEventsByMode]);
+  }, [isDateGridView, throttledSetEventsByMode]);
 
   return {
     dragRef,

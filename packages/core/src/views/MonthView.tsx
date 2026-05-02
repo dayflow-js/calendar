@@ -124,8 +124,7 @@ const EMPTY_WEEK_EVENTS: Event[] = [];
 const MonthView = ({
   app,
   config,
-  customDetailPanelContent,
-  customEventDetailDialog,
+  onDateChange: _,
   useEventDetailPanel,
   calendarRef,
   selectedEventId: propSelectedEventId,
@@ -297,8 +296,7 @@ const MonthView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent =
-    app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent = MobileEventDrawer;
 
   // Fixed weekHeight to prevent fluctuations during scrolling
   // Initialize with estimated value based on window height to minimize initial adjustment
@@ -872,8 +870,6 @@ const MonthView = ({
                   onEventLongPress={handleWeekEventLongPress}
                   detailPanelEventId={detailPanelEventId}
                   onDetailPanelToggle={setDetailPanelEventId}
-                  customDetailPanelContent={customDetailPanelContent}
-                  customEventDetailDialog={customEventDetailDialog}
                   useEventDetailPanel={useEventDetailPanel}
                   onCalendarDrop={handleDrop}
                   onCalendarDragOver={handleDragOver}
@@ -941,8 +937,6 @@ const MonthView = ({
                 onEventLongPress={handleWeekEventLongPress}
                 detailPanelEventId={detailPanelEventId}
                 onDetailPanelToggle={setDetailPanelEventId}
-                customDetailPanelContent={customDetailPanelContent}
-                customEventDetailDialog={customEventDetailDialog}
                 useEventDetailPanel={useEventDetailPanel}
                 onCalendarDrop={handleDrop}
                 onCalendarDragOver={handleDragOver}

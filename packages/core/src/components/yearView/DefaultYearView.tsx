@@ -27,8 +27,6 @@ import {
   Event,
   ViewType,
   MonthEventDragState,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
   ICalendarApp,
   YearViewConfig,
 } from '@/types';
@@ -37,8 +35,6 @@ import { dateToPlainDate, dateToZonedDateTime, hasEventChanged } from '@/utils';
 export interface YearViewProps {
   app: ICalendarApp;
   calendarRef: RefObject<HTMLDivElement>;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   config?: YearViewConfig;
   selectedEventId?: string | null;
@@ -50,8 +46,6 @@ export interface YearViewProps {
 export const DefaultYearView = ({
   app,
   calendarRef,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   config,
   selectedEventId: propSelectedEventId,
@@ -65,6 +59,9 @@ export const DefaultYearView = ({
   const rawEvents = app.getEvents();
   const appTimeZone = app.timeZone;
   const scrollElementRef = useRef<HTMLDivElement>(null);
+  // Stable bucket refs: reused when element refs are identical so YearRowComponent
+  // memo comparator can bail out on rows whose events didn't change.
+  const stableBucketsRef = useRef<Event[][]>([]);
   const MIN_YEAR_CELL_WIDTH = 80;
 
   const [columnsPerRow, setColumnsPerRow] = useState(7);
@@ -388,7 +385,7 @@ export const DefaultYearView = ({
       };
     });
 
-    const buckets: Event[][] = rows.map(() => []);
+    const newBuckets: Event[][] = rows.map(() => []);
 
     for (let i = 0; i < yearEvents.length; i++) {
       const event = yearEvents[i];
@@ -398,10 +395,27 @@ export const DefaultYearView = ({
         if (!b) continue;
         if (range.startMs > b.rowEndMs) continue;
         if (range.endMsEod < b.rowStartMs) break;
-        buckets[r].push(event);
+        newBuckets[r].push(event);
       }
     }
-    return buckets;
+
+    // Stabilize: reuse previous bucket array ref when element refs are identical.
+    // This lets YearRowComponent's memo comparator (which checks events===) bail
+    // out for rows whose events didn't change during drag.
+    const prev = stableBucketsRef.current;
+    const stable = newBuckets.map((bucket, i) => {
+      const prevBucket = prev[i];
+      if (
+        prevBucket &&
+        prevBucket.length === bucket.length &&
+        bucket.every((e, j) => e === prevBucket[j])
+      ) {
+        return prevBucket;
+      }
+      return bucket;
+    });
+    stableBucketsRef.current = stable;
+    return stable;
   }, [rows, yearEvents, appTimeZone]);
 
   const dragPreviewEvent = useMemo(() => {
@@ -499,8 +513,6 @@ export const DefaultYearView = ({
               onDetailPanelOpen={handleDetailPanelOpen}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}
-              customDetailPanelContent={customDetailPanelContent}
-              customEventDetailDialog={customEventDetailDialog}
               useEventDetailPanel={useEventDetailPanel}
               onContextMenu={handleRowContextMenu}
               appTimeZone={appTimeZone}

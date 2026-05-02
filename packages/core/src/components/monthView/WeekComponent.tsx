@@ -6,14 +6,7 @@ import CalendarEvent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
 import { monthTitle } from '@/styles/classNames';
-import {
-  MonthEventDragState,
-  Event,
-  ViewType,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ICalendarApp,
-} from '@/types';
+import { MonthEventDragState, Event, ViewType, ICalendarApp } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { scrollbarTakesSpace, temporalToVisualDate } from '@/utils';
 
@@ -56,12 +49,10 @@ interface WeekComponentProps {
   selectedEventId?: string | null;
   onEventSelect?: (eventId: string | null) => void;
   onEventLongPress?: (eventId: string) => void;
-  detailPanelEventId?: string | null;
-  onDetailPanelToggle?: (eventId: string | null) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
+  detailPanelEventId: string | null;
+  onDetailPanelToggle: (eventId: string | null) => void;
   useEventDetailPanel?: boolean;
-  onCalendarDrop?: (
+  onCalendarDrop: (
     e: DragEvent,
     dropDate: Date,
     dropHour?: number,
@@ -108,8 +99,6 @@ const WeekComponent = memo(
     onEventLongPress,
     detailPanelEventId,
     onDetailPanelToggle,
-    customDetailPanelContent,
-    customEventDetailDialog,
     useEventDetailPanel,
     onCalendarDrop,
     onCalendarDragOver,
@@ -469,8 +458,6 @@ const WeekComponent = memo(
                   calendarRef={calendarRef}
                   currentMonth={currentMonth}
                   currentYear={currentYear}
-                  customDetailPanelContent={customDetailPanelContent}
-                  customEventDetailDialog={customEventDetailDialog}
                   useEventDetailPanel={useEventDetailPanel}
                   day={day}
                   dayIndex={index}
@@ -563,8 +550,6 @@ const WeekComponent = memo(
                             onEventLongPress={onEventLongPress}
                             detailPanelEventId={detailPanelEventId}
                             onDetailPanelToggle={onDetailPanelToggle}
-                            customDetailPanelContent={customDetailPanelContent}
-                            customEventDetailDialog={customEventDetailDialog}
                             useEventDetailPanel={useEventDetailPanel}
                             app={app}
                             isMobile={screenSize !== 'desktop'}
@@ -632,8 +617,6 @@ const WeekComponent = memo(
     prevProps.onEventLongPress === nextProps.onEventLongPress &&
     prevProps.detailPanelEventId === nextProps.detailPanelEventId &&
     prevProps.onDetailPanelToggle === nextProps.onDetailPanelToggle &&
-    prevProps.customDetailPanelContent === nextProps.customDetailPanelContent &&
-    prevProps.customEventDetailDialog === nextProps.customEventDetailDialog &&
     prevProps.useEventDetailPanel === nextProps.useEventDetailPanel &&
     prevProps.onCalendarDrop === nextProps.onCalendarDrop &&
     prevProps.onCalendarDragOver === nextProps.onCalendarDragOver &&

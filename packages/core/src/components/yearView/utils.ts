@@ -511,6 +511,29 @@ export function analyzeEventsForMonth(
   return { segments, maxVisualRow };
 }
 
+// Per-month segment cache. Keyed by (year|startOfWeek|totalColumns|tz).
+// For each month, we store the source event refs that fed analyzeEventsForMonth.
+// If the refs are identical (element-wise), the cached segment objects are
+// reused, so CalendarEvent's memo() can bail out — the yearSegment prop keeps
+// the same reference across drag ticks for all unaffected months.
+type MonthSegmentCacheEntry = {
+  contextKey: string;
+  perMonth: Map<
+    number,
+    {
+      sources: Event[];
+      result: { segments: MonthEventSegment[]; maxVisualRow: number };
+    }
+  >;
+};
+let monthSegmentCache: MonthSegmentCacheEntry | null = null;
+
+const sameEventRefs = (a: Event[], b: Event[]): boolean => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+};
+
 export const buildFixedWeekMonthsData = ({
   currentYear,
   locale,
@@ -526,6 +549,12 @@ export const buildFixedWeekMonthsData = ({
   startOfWeek: number;
   appTimeZone?: string;
 }): FixedWeekMonthData[] => {
+  const contextKey = `${currentYear}|${startOfWeek}|${totalColumns}|${appTimeZone ?? ''}`;
+  if (!monthSegmentCache || monthSegmentCache.contextKey !== contextKey) {
+    monthSegmentCache = { contextKey, perMonth: new Map() };
+  }
+  const segCache = monthSegmentCache.perMonth;
+
   // Pre-compute month boundaries once instead of 12 times inside loops
   const monthStartMs: number[] = Array.from({ length: 12 });
   const monthEndMs: number[] = Array.from({ length: 12 });
@@ -579,13 +608,24 @@ export const buildFixedWeekMonthsData = ({
       rawMonthName.slice(1).toLowerCase();
 
     const monthEvents = monthEventsByIndex[month];
-    const { segments: eventSegments, maxVisualRow } = analyzeEventsForMonth(
-      monthEvents,
-      month,
-      currentYear,
-      startOfWeek,
-      appTimeZone
-    );
+
+    // Cache lookup: if this month's event refs are unchanged, reuse cached
+    // segment objects so downstream CalendarEvent memo() can bail out.
+    let analysisResult: { segments: MonthEventSegment[]; maxVisualRow: number };
+    const cachedMonth = segCache.get(month);
+    if (cachedMonth && sameEventRefs(cachedMonth.sources, monthEvents)) {
+      analysisResult = cachedMonth.result;
+    } else {
+      analysisResult = analyzeEventsForMonth(
+        monthEvents,
+        month,
+        currentYear,
+        startOfWeek,
+        appTimeZone
+      );
+      segCache.set(month, { sources: monthEvents, result: analysisResult });
+    }
+    const { segments: eventSegments, maxVisualRow } = analysisResult;
 
     const eventRows = maxVisualRow + 1;
     const minHeight = Math.max(

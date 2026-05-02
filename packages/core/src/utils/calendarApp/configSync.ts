@@ -5,7 +5,6 @@ export type SyncableCalendarAppConfig = Pick<
   CalendarAppConfig,
   | 'allDaySortComparator'
   | 'calendars'
-  | 'customMobileEventRenderer'
   | 'locale'
   | 'readOnly'
   | 'switcherMode'
@@ -32,7 +31,6 @@ export function pickSyncableConfig(
   return {
     allDaySortComparator: config.allDaySortComparator,
     calendars: config.calendars,
-    customMobileEventRenderer: config.customMobileEventRenderer,
     locale: config.locale,
     readOnly: config.readOnly,
     switcherMode: config.switcherMode,
@@ -84,9 +82,6 @@ export function getSyncConfigUpdates(
   }
   if (previous.useCalendarHeader !== next.useCalendarHeader) {
     updates.useCalendarHeader = next.useCalendarHeader;
-  }
-  if (previous.customMobileEventRenderer !== next.customMobileEventRenderer) {
-    updates.customMobileEventRenderer = next.customMobileEventRenderer;
   }
   if (previous.switcherMode !== next.switcherMode) {
     updates.switcherMode = next.switcherMode;

@@ -22,12 +22,12 @@ import { LocaleCode, Locale, LocaleMessages } from '@/locale/types';
 import { useLocale } from '@/locale/useLocale';
 import { useSidebarBridge } from '@/plugins/sidebarBridge';
 import {
-  EventDetailContentRenderer,
   EventDetailDialogRenderer,
   ICalendarApp,
   TNode,
   Event as CalendarEvent,
   TitleBarSlotProps,
+  MobileEventProps,
 } from '@/types';
 import { ThemeMode } from '@/types/calendarTypes';
 import { CalendarSearchProps } from '@/types/search';
@@ -42,8 +42,6 @@ import { useSearchController } from './hooks/useSearchController';
 
 interface CalendarRootProps {
   app: ICalendarApp;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   meta?: Record<string, unknown>;
   customMessages?: LocaleMessages;
   search?: CalendarSearchProps;
@@ -78,8 +76,6 @@ const CalendarInternalLocaleProvider = ({
 
 export const CalendarRoot = ({
   app,
-  customDetailPanelContent,
-  customEventDetailDialog,
   meta,
   customMessages,
   search: searchConfig,
@@ -95,8 +91,7 @@ export const CalendarRoot = ({
   const search = useSearchController(app, searchConfig);
   // Event detail dialog / panel
   const effectiveEventDetailDialog: EventDetailDialogRenderer | undefined =
-    customEventDetailDialog ||
-    (app.getUseEventDetailDialog() ? DefaultEventDetailDialog : undefined);
+    app.getUseEventDetailDialog() ? DefaultEventDetailDialog : undefined;
 
   const eventDialog = useEventDialogController(
     app,
@@ -194,8 +189,6 @@ export const CalendarRoot = ({
   const viewProps = {
     app,
     config: app.getCurrentView().config || {},
-    customDetailPanelContent,
-    customEventDetailDialog: effectiveEventDetailDialog,
     useEventDetailPanel,
     switcherMode: app.state.switcherMode,
     calendarRef,
@@ -283,8 +276,34 @@ export const CalendarRoot = ({
   };
 
   const ViewComponent = app.getCurrentView().component;
-  const MobileEventDrawerComponent =
-    app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent = MobileEventDrawer;
+
+  const mobileEventDetailArgs: MobileEventProps = {
+    isOpen: quickCreate.isMobileDrawerOpen,
+    onClose: () => {
+      quickCreate.setIsMobileDrawerOpen(false);
+      quickCreate.setMobileDraftEvent(null);
+    },
+    onSave: (event: CalendarEvent) => {
+      const exists = app
+        .getEvents()
+        .some((e: CalendarEvent) => e.id === event.id);
+      if (exists) {
+        app.updateEvent(event.id, event);
+      } else {
+        app.addEvent(event);
+      }
+      quickCreate.setIsMobileDrawerOpen(false);
+      quickCreate.setMobileDraftEvent(null);
+    },
+    onEventDelete: (id: string) => {
+      app.deleteEvent(id);
+      quickCreate.setIsMobileDrawerOpen(false);
+      quickCreate.setMobileDraftEvent(null);
+    },
+    draftEvent: quickCreate.mobileDraftEvent,
+    app: app,
+  };
 
   return (
     <ThemeProvider initialTheme={theme} onThemeChange={handleThemeChange}>
@@ -366,31 +385,13 @@ export const CalendarRoot = ({
             onClose={() => quickCreate.setIsQuickCreateOpen(false)}
           />
 
-          <MobileEventDrawerComponent
-            isOpen={quickCreate.isMobileDrawerOpen}
-            onClose={() => {
-              quickCreate.setIsMobileDrawerOpen(false);
-              quickCreate.setMobileDraftEvent(null);
-            }}
-            onSave={(event: CalendarEvent) => {
-              const exists = app
-                .getEvents()
-                .some((e: CalendarEvent) => e.id === event.id);
-              if (exists) {
-                app.updateEvent(event.id, event);
-              } else {
-                app.addEvent(event);
-              }
-              quickCreate.setIsMobileDrawerOpen(false);
-              quickCreate.setMobileDraftEvent(null);
-            }}
-            onEventDelete={(id: string) => {
-              app.deleteEvent(id);
-              quickCreate.setIsMobileDrawerOpen(false);
-              quickCreate.setMobileDraftEvent(null);
-            }}
-            draftEvent={quickCreate.mobileDraftEvent}
-            app={app}
+          <ContentSlot
+            store={customRenderingStore}
+            generatorName='mobileEventDetail'
+            generatorArgs={mobileEventDetailArgs}
+            defaultContent={
+              <MobileEventDrawerComponent {...mobileEventDetailArgs} />
+            }
           />
 
           {sidebar.extraContent}
