@@ -13,14 +13,7 @@ import {
   weekDayCell,
   dateNumber,
 } from '@/styles/classNames';
-import {
-  Event,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  WeekDayDragState,
-  ViewType,
-  ICalendarApp,
-} from '@/types';
+import { Event, WeekDayDragState, ViewType, ICalendarApp } from '@/types';
 import {
   getEventsForDay,
   getAllDayEventsForDay,
@@ -99,61 +92,58 @@ interface AllDayRowProps {
     hour?: number,
     allDay?: boolean
   ) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
 }
 
-export const AllDayRow = ({
-  app,
-  weekDaysLabels,
-  mobileWeekDaysLabels,
-  weekDates,
-  fullWeekDates,
-  isSlidingView,
-  mobilePageStart,
-  currentWeekStart,
-  currentWeekEvents,
-  gridWidth,
-  allDayAreaHeight,
-  organizedAllDaySegments,
-  allDayLabelText,
-  isMobile,
-  isTouch,
-  showAllDay = true,
-  calendarRef,
-  allDayRowRef,
-  topFrozenContentRef,
-  ALL_DAY_HEIGHT,
-  HOUR_HEIGHT,
-  FIRST_HOUR,
-  dragState,
-  isDragging,
-  primaryTzLabel,
-  secondaryTzLabel,
-  secondaryTimeSlots,
-  handleMoveStart,
-  handleResizeStart,
-  handleEventUpdate,
-  handleEventDelete,
-  setDraftEvent,
-  setIsDrawerOpen,
-  onDateChange,
-  onGridDateClick,
-  onGridDateDoubleClick,
-  newlyCreatedEventId,
-  setNewlyCreatedEventId,
-  selectedEventId,
-  setSelectedEventId,
-  detailPanelEventId,
-  setDetailPanelEventId,
-  handleCreateAllDayEvent,
-  handleDragOver,
-  handleDrop,
-  customDetailPanelContent,
-  customEventDetailDialog,
-  useEventDetailPanel,
-}: AllDayRowProps) => {
+export const AllDayRow = (props: AllDayRowProps) => {
+  const {
+    app,
+    weekDaysLabels,
+    mobileWeekDaysLabels,
+    weekDates,
+    fullWeekDates,
+    isSlidingView,
+    mobilePageStart,
+    currentWeekStart,
+    currentWeekEvents,
+    gridWidth,
+    allDayAreaHeight,
+    organizedAllDaySegments,
+    allDayLabelText,
+    isMobile,
+    isTouch,
+    showAllDay = true,
+    calendarRef,
+    allDayRowRef,
+    topFrozenContentRef,
+    ALL_DAY_HEIGHT,
+    HOUR_HEIGHT,
+    FIRST_HOUR,
+    dragState,
+    isDragging,
+    primaryTzLabel,
+    secondaryTzLabel,
+    secondaryTimeSlots,
+    handleMoveStart,
+    handleResizeStart,
+    handleEventUpdate,
+    handleEventDelete,
+    setDraftEvent,
+    setIsDrawerOpen,
+    onDateChange,
+    onGridDateClick,
+    onGridDateDoubleClick,
+    newlyCreatedEventId,
+    setNewlyCreatedEventId,
+    selectedEventId,
+    setSelectedEventId,
+    detailPanelEventId,
+    setDetailPanelEventId,
+    handleCreateAllDayEvent,
+    handleDragOver,
+    handleDrop,
+    useEventDetailPanel,
+  } = props;
   const columnStyle: JSX.CSSProperties = { flexShrink: 0 };
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -427,8 +417,6 @@ export const AllDayRow = ({
                         onDetailPanelToggle={(eventId: string | null) =>
                           setDetailPanelEventId(eventId)
                         }
-                        customDetailPanelContent={customDetailPanelContent}
-                        customEventDetailDialog={customEventDetailDialog}
                         useEventDetailPanel={useEventDetailPanel}
                         app={app}
                         isMobile={isMobile}

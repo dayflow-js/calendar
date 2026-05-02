@@ -88,6 +88,15 @@ export const getEventIcon = (event: Event) => {
   return <CalendarDays className={eventIcon} />;
 };
 
+// Per-event cache for analyzeMultiDayEventsForWeek. Keyed by event reference,
+// inner key encodes the week context. During drag/resize 99%+ of events keep
+// their references so this turns the per-tick scan from O(N) date math into
+// nearly free Map lookups.
+const weekEventSegmentsCache = new WeakMap<
+  Event,
+  Map<string, MultiDayEventSegment[]>
+>();
+
 // Analyze multi-day events and generate segments for the current week (supports all-day events and multi-day regular events)
 export const analyzeMultiDayEventsForWeek = (
   events: Event[],
@@ -97,12 +106,36 @@ export const analyzeMultiDayEventsForWeek = (
 ): MultiDayEventSegment[] => {
   const segments: MultiDayEventSegment[] = [];
 
+  const weekStartMs = weekStart.getTime();
+  const contextKey = `${weekStartMs}|${daysInWeek}|${secondaryTimeZone ?? ''}`;
+
   // Get the date range of the current week
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + (daysInWeek - 1));
   weekEnd.setHours(23, 59, 59, 999);
 
   events.forEach(event => {
+    // Cache lookup — unchanged refs reuse computed segments
+    let perEvent = weekEventSegmentsCache.get(event);
+    if (perEvent) {
+      const cached = perEvent.get(contextKey);
+      if (cached) {
+        for (let i = 0; i < cached.length; i++) segments.push(cached[i]);
+        return;
+      }
+    }
+    const eventOutput: MultiDayEventSegment[] = [];
+    const pushSegment = (seg: MultiDayEventSegment) => {
+      eventOutput.push(seg);
+      segments.push(seg);
+    };
+    const finishEvent = () => {
+      if (!perEvent) {
+        perEvent = new Map();
+        weekEventSegmentsCache.set(event, perEvent);
+      }
+      perEvent.set(contextKey, eventOutput);
+    };
     // Use start and end as the event's start and end times
     const eventStartFull = temporalToVisualDate(event.start, secondaryTimeZone);
     const eventEndFull = event.end
@@ -142,6 +175,7 @@ export const analyzeMultiDayEventsForWeek = (
     if (!isMultiDay && event.allDay) {
       // Check if event is within the current week
       if (eventStartDate < weekStart || eventStartDate > weekEnd) {
+        finishEvent();
         return;
       }
 
@@ -151,7 +185,7 @@ export const analyzeMultiDayEventsForWeek = (
       );
 
       if (dayIndex >= 0 && dayIndex <= daysInWeek - 1) {
-        segments.push({
+        pushSegment({
           id: `${event.id}-week-${weekStart.getTime()}`,
           originalEventId: event.id,
           event,
@@ -164,11 +198,13 @@ export const analyzeMultiDayEventsForWeek = (
           isLastSegment: true,
         });
       }
+      finishEvent();
       return;
     }
 
     // Only process multi-day events (all-day or regular)
     if (!isMultiDay) {
+      finishEvent();
       return;
     }
 
@@ -199,6 +235,7 @@ export const analyzeMultiDayEventsForWeek = (
 
     // Check if event intersects with the current week
     if (eventEnd < weekStart || eventStart > weekEnd) {
+      finishEvent();
       return;
     }
 
@@ -244,7 +281,7 @@ export const analyzeMultiDayEventsForWeek = (
 
     const totalDays = daysDifference(eventStart, eventEnd) + 1;
 
-    segments.push({
+    pushSegment({
       id: `${event.id}-week-${weekStart.getTime()}`,
       originalEventId: event.id,
       event,
@@ -256,6 +293,7 @@ export const analyzeMultiDayEventsForWeek = (
       isFirstSegment,
       isLastSegment,
     });
+    finishEvent();
   });
 
   return segments;
@@ -474,20 +512,37 @@ export const createDateString = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
+type RegularEventSegment = {
+  dayIndex: number;
+  startHour: number;
+  endHour: number;
+  isFirst: boolean;
+  isLast: boolean;
+};
+
+// Per-event cache: keys combine (weekStart, daysInWeek, tz) so identical event
+// references reuse results across calls within the same and subsequent renders.
+// WeakMap lets entries get GC'd when events are replaced (immutable updates).
+const regularSegmentsCache = new WeakMap<
+  Event,
+  Map<string, RegularEventSegment[]>
+>();
+
 // Check if a regular event spans multiple days and return time segment information for each day
 export const analyzeMultiDayRegularEvent = (
   event: Event,
   weekStart: Date,
   daysInWeek: number = 7,
   secondaryTimeZone?: string
-): {
-  dayIndex: number;
-  startHour: number;
-  endHour: number;
-  isFirst: boolean;
-  isLast: boolean;
-}[] => {
+): RegularEventSegment[] => {
   if (event.allDay) return [];
+
+  const cacheKey = `${weekStart.getTime()}|${daysInWeek}|${secondaryTimeZone ?? ''}`;
+  let perEvent = regularSegmentsCache.get(event);
+  if (perEvent) {
+    const cached = perEvent.get(cacheKey);
+    if (cached) return cached;
+  }
 
   const eventStart = temporalToVisualDate(event.start, secondaryTimeZone);
   const eventEnd = event.end
@@ -500,9 +555,18 @@ export const analyzeMultiDayRegularEvent = (
   const endDate = new Date(eventEnd);
   endDate.setHours(0, 0, 0, 0);
 
+  const cacheResult = (value: RegularEventSegment[]) => {
+    if (!perEvent) {
+      perEvent = new Map();
+      regularSegmentsCache.set(event, perEvent);
+    }
+    perEvent.set(cacheKey, value);
+    return value;
+  };
+
   // Check if it spans multiple days
   const daySpan = daysDifference(startDate, endDate);
-  if (daySpan === 0) return [];
+  if (daySpan === 0) return cacheResult([]);
 
   const endHasExplicitTime =
     eventEnd.getHours() !== 0 ||
@@ -519,19 +583,13 @@ export const analyzeMultiDayRegularEvent = (
     !endHasExplicitTime &&
     durationMs < DAY_IN_MS
   ) {
-    return [];
+    return cacheResult([]);
   }
 
   const lastDayOffset = endHasExplicitTime ? daySpan : Math.max(0, daySpan - 1);
 
   // Generate segments for each day
-  const segments: {
-    dayIndex: number;
-    startHour: number;
-    endHour: number;
-    isFirst: boolean;
-    isLast: boolean;
-  }[] = [];
+  const segments: RegularEventSegment[] = [];
 
   for (let i = 0; i <= lastDayOffset; i++) {
     const currentDate = new Date(startDate);
@@ -567,5 +625,5 @@ export const analyzeMultiDayRegularEvent = (
     });
   }
 
-  return segments;
+  return cacheResult(segments);
 };

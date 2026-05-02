@@ -11,7 +11,6 @@ import {
   CalendarViewType,
   Event,
   ICalendarApp,
-  MobileEventRenderer,
   RangeChangeReason,
   ReadOnlyConfig,
   ViewType,
@@ -45,7 +44,6 @@ export class CalendarApp implements ICalendarApp {
   private useEventDetailDialog: boolean;
   private useEventDetailPanel: boolean;
   private useCalendarHeader: boolean;
-  private customMobileEventRenderer?: MobileEventRenderer;
 
   constructor(config: CalendarAppConfig) {
     const resolvedTimeZone =
@@ -103,7 +101,6 @@ export class CalendarApp implements ICalendarApp {
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
     this.useEventDetailPanel = config.useEventDetailPanel ?? true;
     this.useCalendarHeader = config.useCalendarHeader ?? true;
-    this.customMobileEventRenderer = config.customMobileEventRenderer;
 
     config.views.forEach(view => this.state.views.set(view.type, view));
     config.plugins?.forEach(plugin => this.pluginManager.install(plugin, this));
@@ -361,8 +358,6 @@ export class CalendarApp implements ICalendarApp {
   getCalendarRegistry = (): CalendarRegistry => this.calendarRegistry;
   getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
   getUseEventDetailPanel = (): boolean => this.useEventDetailPanel;
-  getCustomMobileEventRenderer = (): MobileEventRenderer | undefined =>
-    this.customMobileEventRenderer;
   getCalendarHeaderConfig = (): boolean => this.useCalendarHeader;
 
   get timeZone(): string {
@@ -377,13 +372,6 @@ export class CalendarApp implements ICalendarApp {
   updateConfig = (config: Partial<CalendarAppConfig>): void => {
     let hasChanged = false;
 
-    if (
-      config.customMobileEventRenderer !== undefined &&
-      config.customMobileEventRenderer !== this.customMobileEventRenderer
-    ) {
-      this.customMobileEventRenderer = config.customMobileEventRenderer;
-      hasChanged = true;
-    }
     if (
       config.useEventDetailDialog !== undefined &&
       config.useEventDetailDialog !== this.useEventDetailDialog

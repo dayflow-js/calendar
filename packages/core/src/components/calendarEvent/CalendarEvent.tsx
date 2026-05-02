@@ -1,3 +1,4 @@
+import { memo } from 'preact/compat';
 import {
   useRef,
   useState,
@@ -74,8 +75,6 @@ const CalendarEvent = ({
   onEventSelect,
   onEventLongPress,
   onDetailPanelToggle,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   multiDaySegmentInfo,
   app,
@@ -129,8 +128,7 @@ const CalendarEvent = ({
 
   const showDetailPanel = detailPanelEventId === detailPanelKey;
   const panelEnabled = useEventDetailPanel !== false;
-  const showDetailPanelForClickOutside =
-    showDetailPanel && !customEventDetailDialog && panelEnabled;
+  const showDetailPanelForClickOutside = showDetailPanel && panelEnabled;
 
   const readOnlyConfig = app?.getReadOnlyConfig(event.id) as ReadOnlyConfig;
   const isEditable = app?.canMutateFromUI(event.id) ?? false;
@@ -313,15 +311,12 @@ const CalendarEvent = ({
     setEventVisibility,
   });
 
-  // When a custom dialog is open, disable ALL click-outside handling
-  const isDialogOpen = showDetailPanel && !!customEventDetailDialog;
-
   // Click Outside Hook
   useClickOutside({
     eventRef,
     detailPanelRef,
     eventId: event.id,
-    isEventSelected: isDialogOpen ? false : isEventSelected,
+    isEventSelected: isEventSelected,
     showDetailPanel: showDetailPanelForClickOutside,
     onEventSelect,
     onDetailPanelToggle,
@@ -555,7 +550,7 @@ const CalendarEvent = ({
         />
       </div>
 
-      {showDetailPanel && !customEventDetailDialog && panelEnabled && (
+      {showDetailPanel && panelEnabled && (
         <div
           style={{
             position: 'fixed',
@@ -571,7 +566,6 @@ const CalendarEvent = ({
 
       <EventDetailPanel
         showDetailPanel={showDetailPanel && panelEnabled}
-        customEventDetailDialog={customEventDetailDialog}
         detailPanelPosition={detailPanelPosition}
         event={event}
         detailPanelRef={detailPanelRef}
@@ -584,7 +578,6 @@ const CalendarEvent = ({
         handlePanelClose={handlePanelClose}
         customRenderingStore={customRenderingStore}
         contentSlotRenderer={contentSlotRenderer}
-        customDetailPanelContent={customDetailPanelContent}
         app={app}
       />
 
@@ -603,4 +596,4 @@ const CalendarEvent = ({
   );
 };
 
-export default CalendarEvent;
+export default memo(CalendarEvent);

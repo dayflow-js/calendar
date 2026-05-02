@@ -14,6 +14,7 @@ import type {
   CreateCalendarDialogColorPickerProps,
   CalendarHeaderProps,
   CalendarSearchProps,
+  MobileEventProps,
 } from '@dayflow/core';
 import { useRef, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 
@@ -64,6 +65,8 @@ export interface DayFlowCalendarProps {
   eventContextMenu?: (args: EventContextMenuSlotArgs) => ReactNode;
   /** Custom grid/cell right-click context menu renderer (React) */
   gridContextMenu?: (args: GridContextMenuSlotArgs) => ReactNode;
+  /** Custom mobile event detail drawer (React) */
+  mobileEventDetail?: (args: MobileEventProps) => ReactNode;
   /** Search configuration */
   search?: CalendarSearchProps;
 }

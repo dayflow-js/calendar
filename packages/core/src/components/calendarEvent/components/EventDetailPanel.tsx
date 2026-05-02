@@ -8,12 +8,10 @@ import {
   ICalendarApp,
   EventDetailPosition,
   EventDetailContentRenderer,
-  EventDetailDialogRenderer,
 } from '@/types';
 
 interface EventDetailPanelProps {
   showDetailPanel: boolean;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   detailPanelPosition: EventDetailPosition | null;
   event: Event;
   detailPanelRef: RefObject<HTMLDivElement>;
@@ -31,13 +29,11 @@ interface EventDetailPanelProps {
   handlePanelClose: () => void;
   customRenderingStore: CustomRenderingStore | null;
   contentSlotRenderer: EventDetailContentRenderer;
-  customDetailPanelContent?: EventDetailContentRenderer;
   app?: ICalendarApp;
 }
 
 export const EventDetailPanel = ({
   showDetailPanel,
-  customEventDetailDialog,
   detailPanelPosition,
   event,
   detailPanelRef,
@@ -50,15 +46,9 @@ export const EventDetailPanel = ({
   handlePanelClose,
   customRenderingStore,
   contentSlotRenderer,
-  customDetailPanelContent,
   app,
 }: EventDetailPanelProps) => {
   if (!showDetailPanel) return null;
-
-  if (customEventDetailDialog) {
-    // Dialog rendering is handled at CalendarRoot level
-    return null;
-  }
 
   if (!detailPanelPosition) return null;
 
@@ -80,15 +70,6 @@ export const EventDetailPanel = ({
       <EventDetailPanelWithContent
         {...panelProps}
         contentRenderer={contentSlotRenderer}
-      />
-    );
-  }
-
-  if (customDetailPanelContent) {
-    return (
-      <EventDetailPanelWithContent
-        {...panelProps}
-        contentRenderer={customDetailPanelContent}
       />
     );
   }

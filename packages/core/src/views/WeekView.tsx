@@ -54,13 +54,11 @@ import {
 const WeekView = ({
   app,
   config,
-  customDetailPanelContent,
-  customEventDetailDialog,
+  onDateChange,
   useEventDetailPanel,
   calendarRef,
   selectedEventId: propSelectedEventId,
   onEventSelect: propOnEventSelect,
-  onDateChange,
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: WeekViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
@@ -107,8 +105,7 @@ const WeekView = ({
     setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const MobileEventDrawerComponent =
-    app.getCustomMobileEventRenderer() || MobileEventDrawer;
+  const MobileEventDrawerComponent = MobileEventDrawer;
 
   const isMobileView = screenSize !== 'desktop';
   const columnsPerPage = isMobileView ? 2 : 7;
@@ -296,23 +293,20 @@ const WeekView = ({
       isResizing?: boolean,
       source?: 'drag' | 'resize'
     ) => {
-      const newEvents = updateFunc(currentWeekEvents);
-      // Find events that need to be deleted (in old list but not in new list)
-      const newEventIds = new Set(newEvents.map(e => e.id));
-      const eventsToDelete = currentWeekEvents.filter(
-        e => !newEventIds.has(e.id)
-      );
+      const prevEvents = currentWeekEvents;
+      const newEvents = updateFunc(prevEvents);
 
-      // Find events that need to be added (in new list but not in old list)
-      const oldEventIds = new Set(currentWeekEvents.map(e => e.id));
-      const eventsToAdd = newEvents.filter(e => !oldEventIds.has(e.id));
+      // Build a Map for O(1) lookups instead of O(N) .find() per element.
+      // The previous O(N²) pattern (filter + find) was the primary drag bottleneck.
+      const prevMap = new Map(prevEvents.map(e => [e.id, e]));
+      const newSet = new Set(newEvents.map(e => e.id));
 
-      // Find events that need to be updated (exist in both lists but content may differ)
+      const eventsToDelete = prevEvents.filter(e => !newSet.has(e.id));
+      const eventsToAdd = newEvents.filter(e => !prevMap.has(e.id));
+      // Reference equality short-circuits hasEventChanged for unchanged events
       const eventsToUpdate = newEvents.filter(e => {
-        if (!oldEventIds.has(e.id)) return false;
-        const oldEvent = currentWeekEvents.find(old => old.id === e.id);
-        // Check if there are real changes
-        return oldEvent && hasEventChanged(oldEvent, e);
+        const old = prevMap.get(e.id);
+        return old !== undefined && old !== e && hasEventChanged(old, e);
       });
 
       // Apply batched changes.
@@ -715,8 +709,6 @@ const WeekView = ({
         handleCreateAllDayEvent={handleCreateAllDayEvent}
         handleDragOver={handleDragOver}
         handleDrop={handleDrop}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
         useEventDetailPanel={useEventDetailPanel}
       />
 
@@ -771,8 +763,6 @@ const WeekView = ({
         setSelectedEventId={setSelectedEventId}
         detailPanelEventId={detailPanelEventId}
         setDetailPanelEventId={setDetailPanelEventId}
-        customDetailPanelContent={customDetailPanelContent}
-        customEventDetailDialog={customEventDetailDialog}
         useEventDetailPanel={useEventDetailPanel}
         isCurrentWeek={isCurrentWeek}
         currentTime={currentTime}

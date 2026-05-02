@@ -11,7 +11,10 @@ import { Temporal } from 'temporal-polyfill';
 
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
-import { groupDaysIntoRows } from '@/components/yearView/utils';
+import {
+  getEventDayRange,
+  groupDaysIntoRows,
+} from '@/components/yearView/utils';
 import { YearRowComponent } from '@/components/yearView/YearRowComponent';
 import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
@@ -24,23 +27,14 @@ import {
   Event,
   ViewType,
   MonthEventDragState,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
   ICalendarApp,
   YearViewConfig,
 } from '@/types';
-import {
-  dateToPlainDate,
-  dateToZonedDateTime,
-  hasEventChanged,
-  temporalToVisualDate,
-} from '@/utils';
+import { dateToPlainDate, dateToZonedDateTime, hasEventChanged } from '@/utils';
 
 export interface YearViewProps {
   app: ICalendarApp;
   calendarRef: RefObject<HTMLDivElement>;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   config?: YearViewConfig;
   selectedEventId?: string | null;
@@ -52,8 +46,6 @@ export interface YearViewProps {
 export const DefaultYearView = ({
   app,
   calendarRef,
-  customDetailPanelContent,
-  customEventDetailDialog,
   useEventDetailPanel,
   config,
   selectedEventId: propSelectedEventId,
@@ -67,6 +59,9 @@ export const DefaultYearView = ({
   const rawEvents = app.getEvents();
   const appTimeZone = app.timeZone;
   const scrollElementRef = useRef<HTMLDivElement>(null);
+  // Stable bucket refs: reused when element refs are identical so YearRowComponent
+  // memo comparator can bail out on rows whose events didn't change.
+  const stableBucketsRef = useRef<Event[][]>([]);
   const MIN_YEAR_CELL_WIDTH = 80;
 
   const [columnsPerRow, setColumnsPerRow] = useState(7);
@@ -130,6 +125,14 @@ export const DefaultYearView = ({
     date: Date;
   } | null>(null);
   const isEditable = app.canMutateFromUI();
+
+  const handleRowContextMenu = useCallback(
+    (menu: { x: number; y: number; date: Date } | null) => {
+      if (!isEditable) return;
+      setContextMenu(menu);
+    },
+    [isEditable]
+  );
 
   useEffect(() => {
     if (isEditable) return;
@@ -249,10 +252,16 @@ export const DefaultYearView = ({
     onEventsUpdate: (updateFunc, isResizing, source) => {
       const newEvents = updateFunc(rawEvents);
 
-      // Find events that need to be updated
+      // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
+      // caused ~100M string comparisons/tick with 10000 events.
+      const prevMap = new Map(rawEvents.map(e => [e.id, e]));
       const eventsToUpdate = newEvents.filter(newEvent => {
-        const oldEvent = rawEvents.find(e => e.id === newEvent.id);
-        return oldEvent && hasEventChanged(oldEvent, newEvent);
+        const old = prevMap.get(newEvent.id);
+        return (
+          old !== undefined &&
+          old !== newEvent &&
+          hasEventChanged(old, newEvent)
+        );
       });
 
       if (eventsToUpdate.length > 0) {
@@ -331,41 +340,43 @@ export const DefaultYearView = ({
     [yearDays, columnsPerRow]
   );
 
-  // Filter events for the current year
+  // Filter events for the current year (uses per-event cache via getEventDayRange)
   const yearEvents = useMemo(() => {
-    // Simple filter: Event must overlap with the current year
-    const yearStart = new Date(currentYear, 0, 1);
-    const yearEnd = new Date(currentYear, 11, 31, 23, 59, 59);
+    const yearStartMs = new Date(currentYear, 0, 1).getTime();
+    const yearEndMs = new Date(currentYear, 11, 31, 23, 59, 59).getTime();
 
-    return rawEvents.filter(event => {
-      if (!event.start) return false;
-      // If showTimedEvents is false, only show all-day events
-      if (!showTimedEvents && !event.allDay) return false;
-      const s = temporalToVisualDate(event.start, appTimeZone);
-      const e = event.end ? temporalToVisualDate(event.end, appTimeZone) : s;
-      return s <= yearEnd && e >= yearStart;
-    });
+    const result: Event[] = [];
+    for (let i = 0; i < rawEvents.length; i++) {
+      const event = rawEvents[i];
+      if (!event.start) continue;
+      if (!showTimedEvents && !event.allDay) continue;
+      const range = getEventDayRange(event, appTimeZone);
+      if (range.startMs <= yearEndMs && range.endMsEod >= yearStartMs) {
+        result.push(event);
+      }
+    }
+    return result;
   }, [rawEvents, currentYear, showTimedEvents, appTimeZone]);
 
-  // Group events by row for better performance
+  // Bucket events into rows in a single O(N + R) pass instead of O(N x R).
+  // Most events span 1-2 weeks; we walk forward through rows from the first
+  // overlap and stop once the event's end is past the row.
   const eventsByRow = useMemo(() => {
-    // 1. Pre-normalize event dates for the year once
-    const yearEventsWithDates = yearEvents.map(event => {
-      const start = temporalToVisualDate(event.start, appTimeZone);
-      const end = event.end
-        ? temporalToVisualDate(event.end, appTimeZone)
-        : start;
+    const rowBoundaries = rows.map(rowDays => {
+      if (rowDays.length === 0) return null;
+      const firstDay = rowDays[0];
+      const lastDay = rowDays.at(-1);
+      if (!firstDay || !lastDay) return null;
       return {
-        event,
-        startMs: new Date(
-          start.getFullYear(),
-          start.getMonth(),
-          start.getDate()
+        rowStartMs: new Date(
+          firstDay.getFullYear(),
+          firstDay.getMonth(),
+          firstDay.getDate()
         ).getTime(),
-        endMs: new Date(
-          end.getFullYear(),
-          end.getMonth(),
-          end.getDate(),
+        rowEndMs: new Date(
+          lastDay.getFullYear(),
+          lastDay.getMonth(),
+          lastDay.getDate(),
           23,
           59,
           59,
@@ -374,32 +385,37 @@ export const DefaultYearView = ({
       };
     });
 
-    // 2. Map rows to their events
-    return rows.map(rowDays => {
-      if (rowDays.length === 0) return [];
-      const firstDay = rowDays[0];
-      const lastDay = rowDays.at(-1);
-      if (!firstDay || !lastDay) return [];
+    const newBuckets: Event[][] = rows.map(() => []);
 
-      const rowStartMs = new Date(
-        firstDay.getFullYear(),
-        firstDay.getMonth(),
-        firstDay.getDate()
-      ).getTime();
-      const rowEndMs = new Date(
-        lastDay.getFullYear(),
-        lastDay.getMonth(),
-        lastDay.getDate(),
-        23,
-        59,
-        59,
-        999
-      ).getTime();
+    for (let i = 0; i < yearEvents.length; i++) {
+      const event = yearEvents[i];
+      const range = getEventDayRange(event, appTimeZone);
+      for (let r = 0; r < rowBoundaries.length; r++) {
+        const b = rowBoundaries[r];
+        if (!b) continue;
+        if (range.startMs > b.rowEndMs) continue;
+        if (range.endMsEod < b.rowStartMs) break;
+        newBuckets[r].push(event);
+      }
+    }
 
-      return yearEventsWithDates
-        .filter(item => item.startMs <= rowEndMs && item.endMs >= rowStartMs)
-        .map(item => item.event);
+    // Stabilize: reuse previous bucket array ref when element refs are identical.
+    // This lets YearRowComponent's memo comparator (which checks events===) bail
+    // out for rows whose events didn't change during drag.
+    const prev = stableBucketsRef.current;
+    const stable = newBuckets.map((bucket, i) => {
+      const prevBucket = prev[i];
+      if (
+        prevBucket &&
+        prevBucket.length === bucket.length &&
+        bucket.every((e, j) => e === prevBucket[j])
+      ) {
+        return prevBucket;
+      }
+      return bucket;
     });
+    stableBucketsRef.current = stable;
+    return stable;
   }, [rows, yearEvents, appTimeZone]);
 
   const dragPreviewEvent = useMemo(() => {
@@ -497,13 +513,8 @@ export const DefaultYearView = ({
               onDetailPanelOpen={handleDetailPanelOpen}
               detailPanelEventId={detailPanelEventId}
               onDetailPanelToggle={setDetailPanelEventId}
-              customDetailPanelContent={customDetailPanelContent}
-              customEventDetailDialog={customEventDetailDialog}
               useEventDetailPanel={useEventDetailPanel}
-              onContextMenu={menu => {
-                if (!isEditable) return;
-                setContextMenu(menu);
-              }}
+              onContextMenu={handleRowContextMenu}
               appTimeZone={appTimeZone}
             />
           ))}

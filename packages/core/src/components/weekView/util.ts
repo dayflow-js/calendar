@@ -16,6 +16,91 @@ import {
 
 // ... existing code ...
 
+// Build the projected event list for a single day plus the source-event refs
+// that contributed (for cache-key comparison).
+const buildDayEventsForLayout = (
+  currentWeekEvents: Event[],
+  day: number,
+  currentWeekStart: Date,
+  daysToShow: number,
+  appTimeZone?: string
+): { events: Event[]; sources: Event[] } => {
+  const dayEventsForLayout: Event[] = [];
+  const sourceRefs: Event[] = [];
+
+  currentWeekEvents.forEach(event => {
+    if (event.allDay) return;
+
+    const segments = analyzeMultiDayRegularEvent(
+      event,
+      currentWeekStart,
+      daysToShow,
+      appTimeZone
+    );
+
+    if (segments.length > 0) {
+      const segment = segments.find(s => s.dayIndex === day);
+      if (segment) {
+        const segmentEndHour = segment.endHour >= 24 ? 23.99 : segment.endHour;
+
+        const virtualEvent: Event = {
+          ...event,
+          start: dateToZonedDateTime(
+            createDateWithHour(
+              getDateByDayIndex(currentWeekStart, day),
+              segment.startHour
+            ) as Date
+          ),
+          end: dateToZonedDateTime(
+            createDateWithHour(
+              getDateByDayIndex(currentWeekStart, day),
+              segmentEndHour
+            ) as Date
+          ),
+          day: day,
+          _originalStartHour: extractHourFromDate(event.start),
+          _originalEndHour: getEventEndHour(event),
+        };
+        dayEventsForLayout.push(virtualEvent);
+        sourceRefs.push(event);
+      }
+    } else if (event.day === day) {
+      const toVisual = (t: Event['start']) =>
+        appTimeZone ? temporalToVisualDate(t, appTimeZone) : temporalToDate(t);
+      dayEventsForLayout.push({
+        ...event,
+        start: dateToZonedDateTime(toVisual(event.start), appTimeZone),
+        end: dateToZonedDateTime(
+          toVisual(event.end ?? event.start),
+          appTimeZone
+        ),
+        day,
+        _originalStartHour: extractHourFromDate(event.start),
+        _originalEndHour: getEventEndHour(event),
+      });
+      sourceRefs.push(event);
+    }
+  });
+
+  return { events: dayEventsForLayout, sources: sourceRefs };
+};
+
+// Per-week-context layout cache. Each entry stores the source-event refs that
+// contributed to a day plus the resulting layouts. On the next render, if the
+// day's source refs match (element-wise), we reuse the cached layouts. During
+// drag/resize only one event ref changes, so 5/7 of days hit the cache.
+type LayoutCacheEntry = {
+  contextKey: string;
+  perDay: Map<number, { sources: Event[]; layouts: Map<string, EventLayout> }>;
+};
+let layoutCacheEntry: LayoutCacheEntry | null = null;
+
+const sameRefs = (a: Event[], b: Event[]): boolean => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+};
+
 // Calculate event layouts for the entire week
 export const calculateEventLayouts = (
   currentWeekEvents: Event[],
@@ -23,70 +108,34 @@ export const calculateEventLayouts = (
   daysToShow: number = 7,
   appTimeZone?: string
 ): Map<number, Map<string, EventLayout>> => {
+  const contextKey = `${currentWeekStart.getTime()}|${daysToShow}|${appTimeZone ?? ''}`;
+  if (!layoutCacheEntry || layoutCacheEntry.contextKey !== contextKey) {
+    layoutCacheEntry = { contextKey, perDay: new Map() };
+  }
+  const cache = layoutCacheEntry.perDay;
+
   const allLayouts = new Map<number, Map<string, EventLayout>>();
 
   for (let day = 0; day < daysToShow; day++) {
-    const dayEventsForLayout: Event[] = [];
+    const { events: dayEvents, sources } = buildDayEventsForLayout(
+      currentWeekEvents,
+      day,
+      currentWeekStart,
+      daysToShow,
+      appTimeZone
+    );
 
-    currentWeekEvents.forEach(event => {
-      if (event.allDay) return;
-
-      const segments = analyzeMultiDayRegularEvent(
-        event,
-        currentWeekStart,
-        daysToShow,
-        appTimeZone
-      );
-
-      if (segments.length > 0) {
-        const segment = segments.find(s => s.dayIndex === day);
-        if (segment) {
-          const segmentEndHour =
-            segment.endHour >= 24 ? 23.99 : segment.endHour;
-
-          const virtualEvent: Event = {
-            ...event,
-            start: dateToZonedDateTime(
-              createDateWithHour(
-                getDateByDayIndex(currentWeekStart, day),
-                segment.startHour
-              ) as Date
-            ),
-            end: dateToZonedDateTime(
-              createDateWithHour(
-                getDateByDayIndex(currentWeekStart, day),
-                segmentEndHour
-              ) as Date
-            ),
-            day: day,
-            _originalStartHour: extractHourFromDate(event.start),
-            _originalEndHour: getEventEndHour(event),
-          };
-          dayEventsForLayout.push(virtualEvent);
-        }
-      } else if (event.day === day) {
-        const toVisual = (t: Event['start']) =>
-          appTimeZone
-            ? temporalToVisualDate(t, appTimeZone)
-            : temporalToDate(t);
-        dayEventsForLayout.push({
-          ...event,
-          start: dateToZonedDateTime(toVisual(event.start), appTimeZone),
-          end: dateToZonedDateTime(
-            toVisual(event.end ?? event.start),
-            appTimeZone
-          ),
-          day,
-          _originalStartHour: extractHourFromDate(event.start),
-          _originalEndHour: getEventEndHour(event),
-        });
-      }
-    });
+    const cached = cache.get(day);
+    if (cached && sameRefs(cached.sources, sources)) {
+      allLayouts.set(day, cached.layouts);
+      continue;
+    }
 
     const dayLayouts = EventLayoutCalculator.calculateDayEventLayouts(
-      dayEventsForLayout,
+      dayEvents,
       { viewType: 'week' }
     );
+    cache.set(day, { sources, layouts: dayLayouts });
     allLayouts.set(day, dayLayouts);
   }
 
@@ -102,6 +151,54 @@ export const getWeekStart = (date: Date, startOfWeek: number = 1): Date => {
   return start;
 };
 
+// Per-event cache for filter/day classification. Keyed by event reference;
+// inner key encodes the week context so events from different weeks coexist.
+// During drag/resize 99%+ of events are unchanged refs so this turns the
+// per-tick filter from O(N) toDate calls into ~1 actual computation.
+const weekFilterCache = new WeakMap<
+  Event,
+  Map<string, { inWeek: boolean; day: number }>
+>();
+
+const classifyEventForWeek = (
+  event: Event,
+  contextKey: string,
+  weekStartMs: number,
+  weekEndMs: number,
+  daysToShow: number,
+  appTimeZone?: string
+): { inWeek: boolean; day: number } => {
+  let perEvent = weekFilterCache.get(event);
+  if (perEvent) {
+    const cached = perEvent.get(contextKey);
+    if (cached) return cached;
+  }
+
+  const toDate = (temporal: Event['start']) =>
+    appTimeZone
+      ? temporalToVisualDate(temporal, appTimeZone)
+      : temporalToDate(temporal);
+
+  const eventStart = toDate(event.start);
+  const startDayMs = new Date(eventStart).setHours(0, 0, 0, 0);
+  const eventEnd = toDate(event.end ?? event.start);
+  const endDayMs = new Date(eventEnd).setHours(23, 59, 59, 999);
+
+  const inWeek = endDayMs >= weekStartMs && startDayMs <= weekEndMs;
+  const dayDiff = Math.floor(
+    (startDayMs - weekStartMs) / (24 * 60 * 60 * 1000)
+  );
+  const day = Math.max(0, Math.min(daysToShow - 1, dayDiff));
+
+  const result = { inWeek, day };
+  if (!perEvent) {
+    perEvent = new Map();
+    weekFilterCache.set(event, perEvent);
+  }
+  perEvent.set(contextKey, result);
+  return result;
+};
+
 // Filter events for the current week
 export const filterWeekEvents = (
   events: Event[],
@@ -109,36 +206,31 @@ export const filterWeekEvents = (
   daysToShow: number = 7,
   appTimeZone?: string
 ): Event[] => {
+  const weekStartMs = currentWeekStart.getTime();
   const weekEnd = new Date(currentWeekStart);
   weekEnd.setDate(currentWeekStart.getDate() + (daysToShow - 1));
   weekEnd.setHours(23, 59, 59, 999);
+  const weekEndMs = weekEnd.getTime();
+  const contextKey = `${weekStartMs}|${daysToShow}|${appTimeZone ?? ''}`;
 
-  const toDate = (temporal: Event['start']) =>
-    appTimeZone
-      ? temporalToVisualDate(temporal, appTimeZone)
-      : temporalToDate(temporal);
-
-  const filtered = events.filter(event => {
-    const eventStart = toDate(event.start);
-    eventStart.setHours(0, 0, 0, 0);
-    const eventEnd = toDate(event.end ?? event.start);
-    eventEnd.setHours(23, 59, 59, 999);
-
-    return eventEnd >= currentWeekStart && eventStart <= weekEnd;
-  });
-
-  return filtered.map(event => {
-    const eventDate = toDate(event.start);
-    const dayDiff = Math.floor(
-      (eventDate.getTime() - currentWeekStart.getTime()) / (24 * 60 * 60 * 1000)
+  const result: Event[] = [];
+  for (let i = 0; i < events.length; i++) {
+    const event = events[i];
+    const { inWeek, day } = classifyEventForWeek(
+      event,
+      contextKey,
+      weekStartMs,
+      weekEndMs,
+      daysToShow,
+      appTimeZone
     );
-    const correctDay = Math.max(0, Math.min(daysToShow - 1, dayDiff));
+    if (!inWeek) continue;
 
-    return {
-      ...event,
-      day: correctDay,
-    };
-  });
+    // Preserve reference when day is already correct so downstream WeakMap
+    // caches (e.g. analyzeMultiDayRegularEvent) can hit on repeated renders.
+    result.push(event.day === day ? event : { ...event, day });
+  }
+  return result;
 };
 
 // Organize all-day segments
@@ -247,7 +339,7 @@ export const calculateNewEventLayout = (
   return allLayouts.get(targetDay)?.get('-1') || null;
 };
 
-// Calculate drag layout
+// Calculate drag layout — only computes the target day for performance
 export const calculateDragLayout = (
   draggedEvent: Event,
   targetDay: number,
@@ -276,11 +368,15 @@ export const calculateDragLayout = (
     return { ...e, day: targetDay, start: newStart, end: newEnd };
   });
 
-  const dayLayouts = calculateEventLayouts(
-    tempEvents,
-    currentWeekStart,
-    daysToShow,
-    appTimeZone
+  const dayLayouts = EventLayoutCalculator.calculateDayEventLayouts(
+    buildDayEventsForLayout(
+      tempEvents,
+      targetDay,
+      currentWeekStart,
+      daysToShow,
+      appTimeZone
+    ).events,
+    { viewType: 'week' }
   );
-  return dayLayouts.get(targetDay)?.get(draggedEvent.id) || null;
+  return dayLayouts.get(draggedEvent.id) || null;
 };

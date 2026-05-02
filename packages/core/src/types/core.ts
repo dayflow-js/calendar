@@ -17,11 +17,6 @@ export type TComponent = AnyComponent<any, any>;
 export type TNode = ComponentChildren;
 
 /**
- * Custom mobile event renderer (Drawer or Dialog)
- */
-export type MobileEventRenderer = AnyComponent<any, any>;
-
-/**
  * View type enum
  */
 export enum ViewType {
@@ -171,7 +166,6 @@ export interface CalendarAppConfig {
   useEventDetailDialog?: boolean;
   useEventDetailPanel?: boolean;
   useCalendarHeader?: boolean;
-  customMobileEventRenderer?: MobileEventRenderer;
   locale?: string | Locale;
   readOnly?: boolean | ReadOnlyConfig;
   /** Custom sort comparator for all-day events, applied in day/week/month/year views. */
@@ -316,9 +310,6 @@ export interface ICalendarApp {
 
   // Get whether to use event detail panel
   getUseEventDetailPanel: () => boolean;
-
-  // Get custom mobile event renderer
-  getCustomMobileEventRenderer: () => MobileEventRenderer | undefined;
 
   // Update configuration dynamically
   updateConfig: (config: Partial<CalendarAppConfig>) => void;

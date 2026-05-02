@@ -2,14 +2,7 @@ import { ComponentChildren, RefObject } from 'preact';
 
 import { MultiDayEventSegment } from '@/components/monthView/util';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
-import {
-  Event,
-  EventLayout,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ICalendarApp,
-  ViewType,
-} from '@/types';
+import { Event, EventLayout, ICalendarApp, ViewType } from '@/types';
 
 export interface CalendarEventProps {
   event: Event;
@@ -42,10 +35,6 @@ export interface CalendarEventProps {
   onEventSelect?: (eventId: string | null) => void;
   onEventLongPress?: (eventId: string) => void;
   onDetailPanelToggle?: (eventId: string | null) => void;
-  /** Custom event detail content component (content only, will be wrapped in default panel) */
-  customDetailPanelContent?: EventDetailContentRenderer;
-  /** Custom event detail dialog component (Dialog mode) */
-  customEventDetailDialog?: EventDetailDialogRenderer;
   /** When false, suppresses the floating event detail panel entirely */
   useEventDetailPanel?: boolean;
   /** Multi-day regular event segment information */

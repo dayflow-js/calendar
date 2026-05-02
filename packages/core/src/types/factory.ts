@@ -4,10 +4,6 @@ import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 
 import { CalendarView, CalendarViewType, ViewType, ICalendarApp } from './core';
 import { Event } from './event';
-import {
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-} from './eventDetail';
 import { EventLayout } from './layout';
 import { TimeZoneValue } from './timezone';
 
@@ -42,8 +38,6 @@ export interface BaseViewProps<TConfig = unknown> {
   onDetailPanelToggle?: (eventId: string | null) => void;
 
   // Customization
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
   useEventDetailPanel?: boolean;
   calendarRef: RefObject<HTMLDivElement>;
   switcherMode?: ViewSwitcherMode;
