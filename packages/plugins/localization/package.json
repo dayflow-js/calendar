@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-localization",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Localization plugin for DayFlow calendar, providing support for multiple languages",
   "keywords": [
     "calendar",

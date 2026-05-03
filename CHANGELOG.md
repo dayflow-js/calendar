@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.6.0] - 2026-05-03
+
+### New Features & Enhancements
+
+- **Agenda List View**: Added a new `createAgendaView` factory for a scrollable agenda-style list layout. Events are grouped by day with configurable options including `daysToShow`, `showEmptyDays`, and `timeFormat` (12h/24h). Supports both timed and all-day events, multi-day event continuation indicators, and full Content Slot integration.
+- **Grid Date Click Callbacks**: Added `gridDateClick` and `gridDateDoubleClick` callbacks to Month and Week views, enabling click and double-click handlers on empty date/time grid cells.
+- **Mobile Event Detail as Content Slot**: Migrated the internal `MobileEventDetailComponent` to the Content Slot system, making the mobile event detail panel fully customizable via framework render props.
+- **Keyboard Shortcuts Callbacks**: Added lifecycle callbacks to the keyboard-shortcuts plugin (`onKeyDown`, `onKeyUp`, and per-action hooks) for programmatic integration and custom shortcut handling.
+- **Sidebar `onReorder` Callback**: Added an `onReorder` callback to the sidebar plugin, fired whenever the user drags calendars to reorder them in the list.
+
+### Fixed
+
+- **Range Picker `startOfWeek` Prop**: Added `startOfWeek` configuration to the range picker component so the calendar grid respects the locale or app-level week start setting.
+- **`useEventDetailPanel` API**: Moved `useEventDetailPanel` into `useCalendarApp`, making the event detail panel controls accessible from the same unified app hook across React, Vue, Angular, and Svelte.
+- **Framework Adapter Rendering**: Updated core rendering and framework-specific adapters (Vue, Angular, Svelte) to align with the Content Slot architecture introduced in v3.5.0.
+
+### Performance
+
+- **View Rendering for Large Datasets**: Significantly optimized event layout calculations across Month, Week, Day, and Year views for calendars with large numbers of events.
+- **Plugin Bundle Size**: Reduced bundle size for the drag, keyboard-shortcuts, localization, sidebar, and UI packages by streamlining rollup configurations.
+- **Bundle Shrink & CSS Isolation**: Reduced the core bundle footprint and eliminated residual CSS conflicts by refining the build pipeline and library import boundaries.
+
 ## [3.5.0] - 2026-04-20
 
 ### New Features & Enhancements
