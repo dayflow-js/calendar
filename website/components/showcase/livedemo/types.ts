@@ -14,6 +14,8 @@ export interface CalendarFeatures {
   showCalendarGroups: boolean;
   showMultiCalendar: boolean;
   readOnly: boolean;
+  collapsedSafeAreaLeft: boolean;
+  sidebarOrder?: ('calendarList' | 'miniCalendar')[];
 }
 
 export interface CalendarSelections {

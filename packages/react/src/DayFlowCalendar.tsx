@@ -141,10 +141,13 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
     const renderer = new CalendarRenderer(app, initialOverrides);
     rendererRef.current = renderer;
     renderer.setProps(renderProps);
-    renderer.mount(containerRef.current);
 
     const store = renderer.getCustomRenderingStore();
 
+    // Subscribe BEFORE mount so every slot registration that happens during
+    // the synchronous Preact render is captured in the same React batch.
+    // This eliminates the gap between "old containers detached" and "new
+    // portals created" that caused titleBarSlot (and other slots) to flicker.
     const unsubscribeStore = store.subscribe(
       (
         renderings:
@@ -156,10 +159,15 @@ export const DayFlowCalendar: FC<DayFlowCalendarProps> = ({
       }
     );
 
+    renderer.mount(containerRef.current);
+
     return () => {
-      // if React recycles this fiber on the next route.
-      store.setOverrides([]);
+      // Unsubscribe FIRST so that when renderer.unmount() triggers
+      // store.unregister() calls, React state is NOT cleared to an empty map.
+      // The old portals stay in React state (invisible, containers detached)
+      // until the next effect's subscribe + mount batch replaces them atomically.
       unsubscribeStore();
+      store.setOverrides([]);
       renderer.unmount();
       rendererRef.current = null;
     };

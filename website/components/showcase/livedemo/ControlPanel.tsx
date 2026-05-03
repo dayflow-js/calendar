@@ -2,7 +2,7 @@
 
 import { TimeZone } from '@dayflow/core';
 import { ViewType } from '@dayflow/react';
-import { CircleAlert } from 'lucide-react';
+import { CircleAlert, Inbox, PanelRightClose, RefreshCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -292,6 +292,86 @@ export function ControlPanel({
                 }
               />
 
+              {features.showSidebar && (
+                <div className='flex items-center space-x-2'>
+                  <Checkbox
+                    id='collapsed-safe-area'
+                    checked={features.collapsedSafeAreaLeft}
+                    onCheckedChange={checked =>
+                      onUpdateFeatures({
+                        collapsedSafeAreaLeft: checked === true,
+                      })
+                    }
+                    className='data-[state=checked]:border-black data-[state=checked]:bg-black data-[state=checked]:text-white dark:data-[state=checked]:border-white dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black'
+                  />
+                  <div className='flex items-center gap-1'>
+                    <Label
+                      htmlFor='collapsed-safe-area'
+                      className='cursor-pointer text-xs font-normal text-slate-600 dark:text-slate-400'
+                    >
+                      Title Bar Slot
+                    </Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className='inline-flex cursor-help items-center'>
+                          <CircleAlert className='h-3 w-3 text-slate-400' />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side='top' className='w-64 p-3'>
+                        <p className='mb-1 text-sm font-semibold'>
+                          Title Bar Slot
+                        </p>
+                        <p className='mb-2 text-xs text-slate-500 dark:text-slate-400'>
+                          <code className='text-slate-700 dark:text-slate-300'>
+                            titleBarSlot
+                          </code>{' '}
+                          renders custom content in the top-left corner, while{' '}
+                          <code className='text-slate-700 dark:text-slate-300'>
+                            collapsedSafeAreaLeft
+                          </code>{' '}
+                          reserves that pixel width so the calendar never slides
+                          under it when the sidebar collapses. Use both together
+                          in frameless Mac apps.
+                        </p>
+                        <div className='overflow-hidden rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'>
+                          <div className='flex items-center gap-1 px-3 py-2'>
+                            <div className='flex items-center gap-1.5'>
+                              <div
+                                className='h-3 w-3 rounded-full bg-[#ff5f57]'
+                                style={{
+                                  border: '0.5px solid rgba(0,0,0,0.12)',
+                                }}
+                              />
+                              <div
+                                className='h-3 w-3 rounded-full bg-[#febc2e]'
+                                style={{
+                                  border: '0.5px solid rgba(0,0,0,0.12)',
+                                }}
+                              />
+                              <div
+                                className='h-3 w-3 rounded-full bg-[#28c840]'
+                                style={{
+                                  border: '0.5px solid rgba(0,0,0,0.12)',
+                                }}
+                              />
+                            </div>
+                            <PanelRightClose
+                              size={14}
+                              className='ml-3 text-gray-500'
+                            />
+                            <Inbox size={14} className='text-gray-500' />
+                            <RefreshCw
+                              size={14}
+                              className='ml-1 text-gray-500'
+                            />
+                          </div>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              )}
+
               <MultiCalFeature
                 checked={features.showMultiCalendar}
                 onUpdateFeatures={onUpdateFeatures}
@@ -304,69 +384,26 @@ export function ControlPanel({
             <h3 className='text-xs font-semibold tracking-tight text-slate-900 uppercase dark:text-slate-100'>
               Views
             </h3>
-            <div className='flex gap-2'>
-              <div className='flex flex-wrap gap-1.5'>
-                {VIEW_OPTIONS.map(opt => {
-                  const isSelected = selections.selectedViews.includes(
-                    opt.value
-                  );
-                  return (
-                    <Button
-                      key={opt.value}
-                      size='sm'
-                      variant={isSelected ? 'default' : 'ghost'}
-                      className={cn(
-                        'h-7 rounded-full px-2.5 text-[11px] transition-all',
-                        isSelected
-                          ? 'bg-black text-white hover:bg-black/90 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
-                          : 'bg-transparent text-black hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
-                      )}
-                      onClick={() => toggleView(opt.value)}
-                    >
-                      {opt.label}
-                    </Button>
-                  );
-                })}
-              </div>
-
-              {/* Year Mode Selection */}
-              {selections.selectedViews.includes(ViewType.YEAR) && (
-                <div className='animate-in fade-in slide-in-from-left-1 flex items-center gap-2'>
-                  <span className='text-[9px] font-bold tracking-wider text-slate-500 uppercase'>
-                    Year:
-                  </span>
-                  <Select
-                    value={selections.yearMode}
-                    onValueChange={val =>
-                      onUpdateSelections({ yearMode: val as YearMode })
-                    }
+            <div className='flex flex-wrap gap-1.5'>
+              {VIEW_OPTIONS.map(opt => {
+                const isSelected = selections.selectedViews.includes(opt.value);
+                return (
+                  <Button
+                    key={opt.value}
+                    size='sm'
+                    variant={isSelected ? 'default' : 'ghost'}
+                    className={cn(
+                      'h-7 rounded-full px-2.5 text-[11px] transition-all',
+                      isSelected
+                        ? 'bg-black text-white hover:bg-black/90 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200'
+                        : 'bg-transparent text-black hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                    )}
+                    onClick={() => toggleView(opt.value)}
                   >
-                    <SelectTrigger className='h-7 w-35 px-2 text-xs'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        value='fixed-week'
-                        className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
-                      >
-                        Fixed Week
-                      </SelectItem>
-                      <SelectItem
-                        value='canvas'
-                        className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
-                      >
-                        Canvas
-                      </SelectItem>
-                      <SelectItem
-                        value='grid'
-                        className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
-                      >
-                        Grid Year
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                    {opt.label}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -579,6 +616,109 @@ export function ControlPanel({
                   className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
                 >
                   Select
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sidebar Order Column */}
+          {features.showSidebar && (
+            <div className='space-y-1'>
+              <div className='flex items-center gap-1'>
+                <h3 className='text-xs font-semibold tracking-tight text-slate-900 uppercase dark:text-slate-100'>
+                  Sidebar Order
+                </h3>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className='inline-flex cursor-help items-center'>
+                      <CircleAlert className='h-3 w-3 text-slate-400' />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side='top' className='w-60 p-3'>
+                    <p className='mb-1 text-sm font-semibold'>Sidebar Order</p>
+                    <p className='text-xs text-slate-500 dark:text-slate-400'>
+                      Controls the vertical order of the two sidebar sections:
+                      the calendar list and the mini calendar. Use{' '}
+                      <code className='text-slate-700 dark:text-slate-300'>
+                        componentsOrder
+                      </code>{' '}
+                      in{' '}
+                      <code className='text-slate-700 dark:text-slate-300'>
+                        createSidebarPlugin
+                      </code>{' '}
+                      to configure this.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Select
+                value={
+                  features.sidebarOrder?.[0] === 'calendarList'
+                    ? 'list-first'
+                    : 'mini-first'
+                }
+                onValueChange={val =>
+                  onUpdateFeatures({
+                    sidebarOrder:
+                      val === 'list-first'
+                        ? ['calendarList', 'miniCalendar']
+                        : ['miniCalendar', 'calendarList'],
+                  })
+                }
+              >
+                <SelectTrigger className='h-7 w-35 text-xs'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    value='list-first'
+                    className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                  >
+                    List → Mini
+                  </SelectItem>
+                  <SelectItem
+                    value='mini-first'
+                    className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                  >
+                    Mini → List
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Year View Mode — always shown in Row 2 */}
+          <div className='space-y-1'>
+            <h3 className='text-xs font-semibold tracking-tight text-slate-900 uppercase dark:text-slate-100'>
+              Year View Mode
+            </h3>
+            <Select
+              value={selections.yearMode}
+              onValueChange={val =>
+                onUpdateSelections({ yearMode: val as YearMode })
+              }
+            >
+              <SelectTrigger className='h-7 w-35 px-2 text-xs'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  value='fixed-week'
+                  className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                >
+                  Fixed Week
+                </SelectItem>
+                <SelectItem
+                  value='canvas'
+                  className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                >
+                  Canvas
+                </SelectItem>
+                <SelectItem
+                  value='grid'
+                  className='cursor-pointer text-xs focus:bg-slate-100 dark:focus:bg-slate-800'
+                >
+                  Grid Year
                 </SelectItem>
               </SelectContent>
             </Select>

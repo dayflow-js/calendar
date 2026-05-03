@@ -52,6 +52,7 @@ const DefaultCalendarSidebar = ({
   onSubscribeCalendar,
   onLoadSubscription,
   onReorder,
+  componentsOrder = ['calendarList', 'miniCalendar'],
 }: CalendarSidebarRenderProps) => {
   const { t } = useLocale();
 
@@ -531,53 +532,65 @@ const DefaultCalendarSidebar = ({
         />
       ) : (
         <>
-          <CalendarList
-            calendars={calendars}
-            onToggleVisibility={toggleCalendarVisibility}
-            onReorder={
-              isDraggable
-                ? handleReorder
-                : () => {
-                    /* noop */
+          {componentsOrder.map(component => {
+            if (component === 'calendarList') {
+              return (
+                <CalendarList
+                  key='calendarList'
+                  calendars={calendars}
+                  onToggleVisibility={toggleCalendarVisibility}
+                  onReorder={
+                    isDraggable
+                      ? handleReorder
+                      : () => {
+                          /* noop */
+                        }
                   }
-            }
-            onRename={
-              isEditable
-                ? (id, newName) => app.updateCalendar(id, { name: newName })
-                : () => {
-                    /* noop */
+                  onRename={
+                    isEditable
+                      ? (id, newName) =>
+                          app.updateCalendar(id, { name: newName })
+                      : () => {
+                          /* noop */
+                        }
                   }
-            }
-            onContextMenu={
-              isEditable
-                ? handleContextMenu
-                : () => {
-                    /* noop */
+                  onContextMenu={
+                    isEditable
+                      ? handleContextMenu
+                      : () => {
+                          /* noop */
+                        }
                   }
+                  editingId={editingCalendarId}
+                  setEditingId={setEditingCalendarId}
+                  activeContextMenuCalendarId={contextMenu?.calendarId}
+                  isDraggable={isDraggable}
+                  isEditable={isEditable}
+                />
+              );
             }
-            editingId={editingCalendarId}
-            setEditingId={setEditingCalendarId}
-            activeContextMenuCalendarId={contextMenu?.calendarId}
-            isDraggable={isDraggable}
-            isEditable={isEditable}
-          />
-
-          <div className='df-sidebar-mini-calendar'>
-            <MiniCalendar
-              visibleMonth={app.getVisibleMonth()}
-              currentDate={app.getCurrentDate()}
-              showHeader={true}
-              onMonthChange={handleMonthChange}
-              onDateSelect={date => app.setCurrentDate(date)}
-              events={app.getEvents()}
-              showEventDots={showEventDots}
-              calendarRegistry={app.getCalendarRegistry()}
-              timeZone={
-                (app.getViewConfig(app.state.currentView)
-                  ?.secondaryTimeZone as string) || undefined
-              }
-            />
-          </div>
+            if (component === 'miniCalendar') {
+              return (
+                <div key='miniCalendar' className='df-sidebar-mini-calendar'>
+                  <MiniCalendar
+                    visibleMonth={app.getVisibleMonth()}
+                    currentDate={app.getCurrentDate()}
+                    showHeader={true}
+                    onMonthChange={handleMonthChange}
+                    onDateSelect={date => app.setCurrentDate(date)}
+                    events={app.getEvents()}
+                    showEventDots={showEventDots}
+                    calendarRegistry={app.getCalendarRegistry()}
+                    timeZone={
+                      (app.getViewConfig(app.state.currentView)
+                        ?.secondaryTimeZone as string) || undefined
+                    }
+                  />
+                </div>
+              );
+            }
+            return null;
+          })}
         </>
       )}
 

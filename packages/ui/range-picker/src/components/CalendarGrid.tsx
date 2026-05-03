@@ -48,8 +48,8 @@ const CalendarGrid = ({
   return (
     <>
       <div className='df-range-picker-weekday-row'>
-        {weekDayLabels.map((day: string) => (
-          <span key={day} className='df-range-picker-weekday-label'>
+        {weekDayLabels.map((day: string, index: number) => (
+          <span key={index} className='df-range-picker-weekday-label'>
             {day}
           </span>
         ))}

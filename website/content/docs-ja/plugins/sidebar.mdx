@@ -35,20 +35,21 @@ function MyCalendar() {
 
 ## 設定リファレンス
 
-| プロパティ                   | 型                                                     | デフォルト  | 説明                                                   |
-| :--------------------------- | :----------------------------------------------------- | :---------- | :----------------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`   | サイドバーの幅（例: `280` または `'20rem'`）           |
-| `miniWidth`                  | `string`                                               | `'50px'`    | 折りたたみ時のサイドバーの幅                           |
-| `initialCollapsed`           | `boolean`                                              | `false`     | サイドバーを折りたたんだ状態で開始するかどうか         |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`  | カレンダー作成フォームの表示方法                       |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'` | 使用するカラーピッカーコンポーネント                   |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined` | 新しい購読が追加された後のコールバック                 |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined` | 既存の購読用のカスタムローダー                         |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined` | カレンダーの並べ替え後のコールバック                   |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined` | サイドバー UI を完全にオーバーライドします             |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined` | カスタムサイドバーヘッダーレンダラー                   |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined` | カレンダー項目のカスタムコンテキストメニューレンダラー |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined` | カスタムカレンダー作成ダイアログレンダラー             |
+| プロパティ                   | 型                                                     | デフォルト                         | 説明                                                   |
+| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :----------------------------------------------------- |
+| `width`                      | `number \| string`                                     | `'240px'`                          | サイドバーの幅（例: `280` または `'20rem'`）           |
+| `miniWidth`                  | `string`                                               | `'50px'`                           | 折りたたみ時のサイドバーの幅                           |
+| `initialCollapsed`           | `boolean`                                              | `false`                            | サイドバーを折りたたんだ状態で開始するかどうか         |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | カレンダー作成フォームの表示方法                       |
+| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | 使用するカラーピッカーコンポーネント                   |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | 新しい購読が追加された後のコールバック                 |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | 既存の購読用のカスタムローダー                         |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | カレンダーの並べ替え後のコールバック                   |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | サイドバーコンポーネントの表示順序                     |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | サイドバー UI を完全にオーバーライドします             |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | カスタムサイドバーヘッダーレンダラー                   |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | カレンダー項目のカスタムコンテキストメニューレンダラー |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | カスタムカレンダー作成ダイアログレンダラー             |
 
 ## 機能
 

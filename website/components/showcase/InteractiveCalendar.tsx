@@ -22,6 +22,7 @@ import {
   createYearView,
   UseCalendarAppReturn,
 } from '@dayflow/react';
+import { Inbox, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import React, {
   useMemo,
@@ -81,10 +82,12 @@ export function InteractiveCalendar() {
     showHeader: true,
     enableDrag: true,
     enableShortcuts: true,
-    showEventDots: false,
-    showCalendarGroups: false,
+    showEventDots: true,
+    showCalendarGroups: true,
     showMultiCalendar: false,
     readOnly: false,
+    collapsedSafeAreaLeft: false,
+    sidebarOrder: ['calendarList', 'miniCalendar'],
   });
 
   const [selections, setSelections] = useState<CalendarSelections>({
@@ -131,6 +134,77 @@ export function InteractiveCalendar() {
     calendarWrapperRef.current?.style.setProperty('--df-color-primary', color);
   }, []);
 
+  const titleBarSlot = useMemo(
+    () =>
+      features.collapsedSafeAreaLeft && features.showSidebar
+        ? ({
+            isCollapsed,
+            toggleCollapsed,
+          }: {
+            isCollapsed: boolean;
+            toggleCollapsed: () => void;
+          }) => (
+            <>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  left: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  zIndex: 50,
+                }}
+              >
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: '#ff5f57',
+                    border: '0.5px solid rgba(0,0,0,0.12)',
+                  }}
+                />
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: '#febc2e',
+                    border: '0.5px solid rgba(0,0,0,0.12)',
+                  }}
+                />
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    background: '#28c840',
+                    border: '0.5px solid rgba(0,0,0,0.12)',
+                  }}
+                />
+              </div>
+              <div
+                className='calendar-title-bar absolute z-50 flex items-center gap-1'
+                style={{ top: '10px', left: '72px' }}
+              >
+                <button type='button' onClick={toggleCollapsed}>
+                  {isCollapsed ? (
+                    <PanelRightClose size={16} className='mx-2 text-gray-600' />
+                  ) : (
+                    <PanelRightOpen size={16} className='mx-2 text-gray-600' />
+                  )}
+                </button>
+                <button type='button' onClick={toggleCollapsed}>
+                  <Inbox size={16} className='text-gray-600' />
+                </button>
+              </div>
+            </>
+          )
+        : undefined,
+    [features.collapsedSafeAreaLeft, features.showSidebar]
+  );
+
   const allEvents = useMemo(() => generateSampleEvents(), []);
   const events = useMemo(() => {
     if (features.showMultiCalendar) return allEvents;
@@ -164,6 +238,7 @@ export function InteractiveCalendar() {
         createSidebarPlugin({
           createCalendarMode: 'modal',
           showEventDots: features.showEventDots,
+          componentsOrder: features.sidebarOrder,
         })
       );
     }
@@ -216,7 +291,6 @@ export function InteractiveCalendar() {
       v.push(
         createAgendaView({
           daysToShow: 14,
-          timeFormat: '12h',
           gridDateDoubleClick: 'day-view',
         })
       );
@@ -269,6 +343,7 @@ export function InteractiveCalendar() {
     features.showHeader,
     features.readOnly,
     features.showEventDots,
+    features.sidebarOrder,
     selections.selectedViews,
     selections.activeView,
     selections.timeZone,
@@ -304,7 +379,7 @@ export function InteractiveCalendar() {
 
         <div
           ref={calendarWrapperRef}
-          className='calendar-wrapper w-full'
+          className={`calendar-wrapper w-full${features.collapsedSafeAreaLeft && features.showSidebar ? ' mac-title-bar-active' : ''}`}
           style={
             {
               '--df-color-primary':
@@ -315,9 +390,15 @@ export function InteractiveCalendar() {
         >
           <CalendarViewer
             key={`${selections.locale}-${selections.selectedViews.join(',')}-${selections.yearMode}-${selections.switcherMode}`}
-            version={`${features.showSidebar}-${features.enableDrag}-${features.enableShortcuts}-${features.showEventDots}-${features.showMultiCalendar}`}
+            version={`${features.showSidebar}-${features.enableDrag}-${features.enableShortcuts}-${features.showEventDots}-${features.showMultiCalendar}-${features.sidebarOrder?.join(',')}-${features.collapsedSafeAreaLeft}`}
             config={config}
             calendarRef={calendarRef}
+            collapsedSafeAreaLeft={
+              features.collapsedSafeAreaLeft && features.showSidebar
+                ? 130
+                : undefined
+            }
+            titleBarSlot={titleBarSlot}
           />
         </div>
       </div>

@@ -1,5 +1,11 @@
 import { ComponentChildren } from 'preact';
-import { useRef, useEffect, useContext, useState } from 'preact/hooks';
+import {
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useContext,
+  useState,
+} from 'preact/hooks';
 
 import { CustomRenderingContext } from './CustomRenderingContext';
 import { CustomRenderingStore } from './CustomRenderingStore';
@@ -39,8 +45,11 @@ export function ContentSlot({
     idRef.current = generateId();
   }
 
-  // Register/Unregister the container once, and subscribe only to override changes
-  useEffect(() => {
+  // Register/Unregister the container once, and subscribe only to override changes.
+  // useLayoutEffect so registration happens synchronously before
+  // the browser paints — eliminating the one-frame gap where the React portal
+  // has no container and the slot appears blank.
+  useLayoutEffect(() => {
     if (!containerRef.current || !store || !generatorName) return;
 
     const id = idRef.current!;

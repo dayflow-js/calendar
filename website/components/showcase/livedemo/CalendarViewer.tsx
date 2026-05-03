@@ -1,5 +1,6 @@
 'use client';
 
+import { TitleBarSlotProps } from '@dayflow/core';
 import {
   useCalendarApp,
   DayFlowCalendar,
@@ -14,6 +15,8 @@ interface CalendarViewerProps {
   calendarRef: React.MutableRefObject<UseCalendarAppReturn | null>;
   version: string;
   search?: CalendarSearchProps;
+  collapsedSafeAreaLeft?: number;
+  titleBarSlot?: (context: TitleBarSlotProps) => React.ReactNode;
 }
 
 export function CalendarViewer({
@@ -21,11 +24,20 @@ export function CalendarViewer({
   calendarRef,
   version,
   search,
+  collapsedSafeAreaLeft,
+  titleBarSlot,
 }: CalendarViewerProps) {
   const calendar = useCalendarApp(config, version);
   useEffect(() => {
     calendarRef.current = calendar;
   }, [calendar, calendarRef]);
 
-  return <DayFlowCalendar calendar={calendar} search={search} />;
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      search={search}
+      collapsedSafeAreaLeft={collapsedSafeAreaLeft}
+      titleBarSlot={titleBarSlot}
+    />
+  );
 }

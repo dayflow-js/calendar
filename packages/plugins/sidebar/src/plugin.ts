@@ -58,6 +58,7 @@ export interface CalendarSidebarRenderProps {
   ) => Promise<void>;
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
   onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
+  componentsOrder?: ('calendarList' | 'miniCalendar')[];
 }
 export interface SidebarPluginConfig {
   width?: number | string;
@@ -78,6 +79,7 @@ export interface SidebarPluginConfig {
   ) => Promise<void>;
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
   onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
+  componentsOrder?: ('calendarList' | 'miniCalendar')[];
 }
 
 export function createSidebarPlugin(
@@ -194,6 +196,7 @@ export function createSidebarPlugin(
               onSubscribeCalendar: config.onSubscribeCalendar,
               onLoadSubscription: config.onLoadSubscription,
               onReorder: config.onReorder,
+              componentsOrder: config.componentsOrder,
             }),
             [
               app,
@@ -211,6 +214,7 @@ export function createSidebarPlugin(
               config.onSubscribeCalendar,
               config.onLoadSubscription,
               config.onReorder,
+              config.componentsOrder,
             ]
           );
 

@@ -35,20 +35,21 @@ function MyCalendar() {
 
 ## 属性参数
 
-| 属性                         | 类型                                                   | 默认值      | 描述                                |
-| :--------------------------- | :----------------------------------------------------- | :---------- | :---------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`   | 侧边栏宽度（如 `280` 或 `'20rem'`） |
-| `miniWidth`                  | `string`                                               | `'50px'`    | 折叠状态下的侧边栏宽度              |
-| `initialCollapsed`           | `boolean`                                              | `false`     | 是否以折叠状态启动侧边栏            |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`  | 创建日历表单的显示方式              |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'` | 使用的颜色选择器组件                |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined` | 成功订阅新日历后的回调              |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined` | 针对现有订阅的自定义加载逻辑        |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined` | 日历排序变更后的回调                |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined` | 完全自定义侧边栏 UI                 |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined` | 自定义侧边栏头部渲染器              |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined` | 日历项的自定义右键菜单渲染器        |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined` | 自定义创建日历对话框渲染器          |
+| 属性                         | 类型                                                   | 默认值                             | 描述                                |
+| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :---------------------------------- |
+| `width`                      | `number \| string`                                     | `'240px'`                          | 侧边栏宽度（如 `280` 或 `'20rem'`） |
+| `miniWidth`                  | `string`                                               | `'50px'`                           | 折叠状态下的侧边栏宽度              |
+| `initialCollapsed`           | `boolean`                                              | `false`                            | 是否以折叠状态启动侧边栏            |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | 创建日历表单的显示方式              |
+| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | 使用的颜色选择器组件                |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | 成功订阅新日历后的回调              |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | 针对现有订阅的自定义加载逻辑        |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | 日历排序变更后的回调                |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | 侧边栏组件显示顺序                  |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | 完全自定义侧边栏 UI                 |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | 自定义侧边栏头部渲染器              |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | 日历项的自定义右键菜单渲染器        |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | 自定义创建日历对话框渲染器          |
 
 ## 功能
 

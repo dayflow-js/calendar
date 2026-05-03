@@ -213,3 +213,23 @@
     padding-right: 0;
   }
 }
+
+.df-calendar-container .df-header button,
+.df-calendar-container .df-header input,
+.df-calendar-container .df-header select,
+.df-calendar-container .df-header a {
+  -webkit-app-region: no-drag;
+}
+
+/* Active only when collapsedSafeAreaLeft / Mac title bar feature is enabled */
+.mac-title-bar-active .df-calendar-container .calendar-title-bar {
+  -webkit-app-region: no-drag;
+}
+
+.mac-title-bar-active .df-calendar-container .df-sidebar-header {
+  display: none;
+}
+
+.mac-title-bar-active .df-calendar-container .df-sidebar {
+  margin-top: 35px;
+}
