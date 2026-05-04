@@ -319,7 +319,7 @@
   }
 
   .df-event-month-regular {
-    height: 1rem;
+    height: var(--df-month-event-height, 1rem);
     justify-content: space-between;
     padding-inline: 0.125rem;
   }
@@ -341,6 +341,7 @@
   }
 
   .df-event-month-color-bar {
+    height: calc(var(--df-month-event-height, 1rem) - 0.25rem);
     margin-right: 0.25rem;
   }
 

@@ -73,6 +73,7 @@ interface EventContentProps {
     defaultContent: ComponentChildren
   ) => ComponentChildren;
   resizeHandleOrientation?: 'vertical' | 'horizontal';
+  monthEventHeight?: number;
 }
 
 export const EventContent = ({
@@ -104,6 +105,7 @@ export const EventContent = ({
   appTimeZone,
   renderVisualContent,
   resizeHandleOrientation,
+  monthEventHeight,
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
@@ -126,6 +128,7 @@ export const EventContent = ({
       <MultiDayEvent
         segment={segment}
         segmentIndex={segmentIndex ?? 0}
+        eventHeight={monthEventHeight}
         isDragging={isBeingDragged || isEventSelected}
         isResizing={isBeingResized}
         isSelected={isEventSelected}

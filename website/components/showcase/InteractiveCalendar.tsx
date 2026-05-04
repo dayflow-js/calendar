@@ -11,7 +11,10 @@ import {
   de,
   es,
 } from '@dayflow/plugin-localization';
+import { createPrintPlugin } from '@dayflow/plugin-print';
 import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+import '@dayflow/plugin-print/dist/styles.components.css';
 import {
   CalendarAppConfig,
   createAgendaView,
@@ -295,6 +298,8 @@ export function InteractiveCalendar() {
         })
       );
     }
+
+    p.push(createPrintPlugin());
 
     const currentView = selections.selectedViews.includes(selections.activeView)
       ? selections.activeView

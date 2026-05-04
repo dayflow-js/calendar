@@ -75,9 +75,8 @@ interface WeekDayCellProps {
   showWeekNumbers?: boolean;
   totalSlotsNeeded: number;
   weekHeightPx: string;
+  eventHeight?: number;
 }
-
-const ROW_SPACING = 17;
 
 const WeekDayCell = ({
   app,
@@ -121,7 +120,9 @@ const WeekDayCell = ({
   showWeekNumbers,
   totalSlotsNeeded,
   weekHeightPx,
+  eventHeight = 16,
 }: WeekDayCellProps) => {
+  const rowSpacing = eventHeight + 1;
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -199,7 +200,7 @@ const WeekDayCell = ({
   const maskHiddenOverlayRows =
     hasMoreEvents && overlayVisibleLayerCount > displaySlotLimit;
   const hiddenOverlayHeight =
-    (overlayVisibleLayerCount - displaySlotLimit) * ROW_SPACING;
+    (overlayVisibleLayerCount - displaySlotLimit) * rowSpacing;
 
   const dragEventId =
     isDragging && dragState.eventId ? dragState.eventId : null;
@@ -240,8 +241,8 @@ const WeekDayCell = ({
           key={`placeholder-layer-${slot}-${day.date.getTime()}`}
           className='df-shrink-0'
           style={{
-            height: `${ROW_SPACING}px`,
-            minHeight: `${ROW_SPACING}px`,
+            height: `${rowSpacing}px`,
+            minHeight: `${rowSpacing}px`,
           }}
         />
       );
@@ -278,6 +279,7 @@ const WeekDayCell = ({
           isMobile={screenSize !== 'desktop'}
           enableTouch={enableTouch}
           appTimeZone={appTimeZone}
+          monthEventHeight={eventHeight}
         />
       );
       timedEventIndex++;
@@ -381,7 +383,7 @@ const WeekDayCell = ({
           <div
             className='df-month-day-cell-overlay-mask'
             style={{
-              top: `${displaySlotLimit * ROW_SPACING}px`,
+              top: `${displaySlotLimit * rowSpacing}px`,
               height: `${hiddenOverlayHeight}px`,
             }}
           />

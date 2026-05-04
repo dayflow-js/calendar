@@ -34,6 +34,7 @@ import {
 interface MultiDayEventProps {
   segment: MultiDayEventSegment;
   segmentIndex: number;
+  eventHeight?: number;
   isDragging: boolean;
   isResizing?: boolean;
   isSelected?: boolean;
@@ -54,8 +55,7 @@ interface MultiDayEventProps {
   appTimeZone?: string;
 }
 
-const ROW_HEIGHT = 16;
-const ROW_SPACING = 17;
+const DEFAULT_EVENT_HEIGHT = 16;
 const POP_TRANSITION = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
 const mobileFadeStyle = {
   whiteSpace: 'nowrap',
@@ -71,6 +71,7 @@ export const MultiDayEvent = memo(
   ({
     segment,
     segmentIndex,
+    eventHeight = DEFAULT_EVENT_HEIGHT,
     isDragging,
     isResizing = false,
     isSelected = false,
@@ -87,6 +88,7 @@ export const MultiDayEvent = memo(
   }: MultiDayEventProps) => {
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
+    const rowSpacing = eventHeight + 1;
 
     const visualEvent = useMemo(() => {
       if (!appTimeZone || segment.event.allDay) return segment.event;
@@ -106,7 +108,7 @@ export const MultiDayEvent = memo(
     const startPercent = (segment.startDayIndex / 7) * 100;
     const widthPercent =
       ((segment.endDayIndex - segment.startDayIndex + 1) / 7) * 100;
-    const topOffset = segmentIndex * ROW_SPACING;
+    const topOffset = segmentIndex * rowSpacing;
 
     // Calculate actual position and width with spacing
     const adjustedLeft = `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`;
@@ -350,7 +352,7 @@ export const MultiDayEvent = memo(
           left: adjustedLeft,
           width: adjustedWidth,
           top: `${topOffset}px`,
-          height: `${ROW_HEIGHT}px`,
+          height: `${eventHeight}px`,
           pointerEvents: 'auto',
           zIndex: 10,
           transform: isPopping ? 'scale(1.02)' : 'scale(1)',

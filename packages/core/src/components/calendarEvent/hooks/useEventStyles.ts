@@ -47,6 +47,7 @@ interface UseEventStylesProps {
     isLast: boolean;
     dayIndex?: number;
   };
+  monthEventHeight?: number;
 }
 
 export const useEventStyles = ({
@@ -76,6 +77,7 @@ export const useEventStyles = ({
   getActiveDayIdx,
   getDayMetricsWrapper,
   multiDaySegmentInfo,
+  monthEventHeight,
 }: UseEventStylesProps) => {
   const isDayView = viewType === ViewType.DAY;
   const isMonthView = viewType === ViewType.MONTH;
@@ -129,6 +131,10 @@ export const useEventStyles = ({
         };
       }
       return {
+        ...(monthEventHeight !== undefined && {
+          height: `${monthEventHeight}px`,
+          '--df-month-event-height': `${monthEventHeight}px`,
+        }),
         opacity: 1,
         zIndex: isEventSelected || showDetailPanel ? 1000 : 1,
         transform: isPopping ? 'scale(1.05)' : 'scale(1)',
