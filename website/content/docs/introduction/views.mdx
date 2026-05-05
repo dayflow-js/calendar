@@ -20,6 +20,7 @@ The day view focuses on a single day with detailed time slots, perfect for manag
 | `scrollToCurrentTime` | `boolean`        | `true`      | Whether to scroll to the current time on initial load. |
 | `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | The time format for the time axis.                     |
 | `secondaryTimeZone`   | `string`         | `undefined` | Secondary reference timeline shown in Day view only.   |
+| `hourHeight`          | `number`         | `72`        | Height in pixels of each hour row in the time grid.    |
 
 ```tsx {10}
 import {
@@ -56,6 +57,7 @@ The week view displays a 7-day grid with time slots, showing events with their e
 | `secondaryTimeZone`   | `string`                           | `undefined`  | Secondary reference timeline shown in Week view only.         |
 | `gridDateClick`       | `'day-view' \| 'none' \| function` | `undefined`  | Action when a date cell is clicked.                           |
 | `gridDateDoubleClick` | `'day-view' \| 'none' \| function` | `'day-view'` | Action when a date cell is double-clicked.                    |
+| `hourHeight`          | `number`                           | `72`         | Height in pixels of each hour row in the time grid.           |
 
 ```tsx {10}
 import {
@@ -90,6 +92,7 @@ The month view displays a traditional calendar grid showing all days in a month.
 | `snapToMonth`         | `boolean`                                         | `false`       | When enabled, the view snaps to the start of the dominant month after the user stops scrolling. |
 | `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function` | `undefined`   | Action when a date cell is clicked.                                                             |
 | `gridDateDoubleClick` | `'week-view' \| 'day-view' \| 'none' \| function` | `'week-view'` | Action when a date cell is double-clicked.                                                      |
+| `eventHeight`         | `number`                                          | `16`          | Height in pixels of each event row in the month grid.                                           |
 | `scroll`              | `MonthScrollConfig`                               | —             | Controls scroll locking and month-switch animation. See below.                                  |
 
 #### MonthScrollConfig

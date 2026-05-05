@@ -19,6 +19,7 @@ type SingleDayTimedResizeEventParams = {
 type TimedCreatePreviewDragLike = {
   duration?: number;
   endHour: number;
+  originalStartHour: number;
   hourOffset?: number | null;
   startHour: number;
   startY: number;
@@ -93,7 +94,7 @@ export const buildTimedCreatePreview = ({
   const newHour = roundToTimeStep(mouseHour);
   const [newStartHour, newEndHour] =
     clientY < drag.startY
-      ? [newHour, Math.max(newHour + timeStep, drag.endHour)]
+      ? [newHour, Math.max(newHour + timeStep, drag.originalStartHour)]
       : [drag.startHour, Math.max(drag.startHour + timeStep, newHour)];
 
   return {

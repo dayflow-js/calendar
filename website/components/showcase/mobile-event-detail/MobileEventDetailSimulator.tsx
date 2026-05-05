@@ -1,6 +1,6 @@
 'use client';
 
-import { createYearView } from '@dayflow/core';
+import { createAgendaView, createYearView } from '@dayflow/core';
 import type { Event, MobileEventProps } from '@dayflow/core';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import {
@@ -52,6 +52,7 @@ const useDemoCalendar = () => {
       }),
       createMonthView(),
       createYearView({ mode: 'fixed-week' }),
+      createAgendaView(),
     ],
     []
   );

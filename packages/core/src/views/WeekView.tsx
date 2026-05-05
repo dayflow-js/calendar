@@ -1,4 +1,4 @@
-import { RefObject } from 'preact';
+import { JSX, RefObject } from 'preact';
 import {
   useState,
   useEffect,
@@ -387,6 +387,8 @@ const WeekView = ({
       isMobile,
       gridWidth,
       displayDays,
+      HOUR_HEIGHT,
+      FIRST_HOUR,
     }),
     [
       calendarRef,
@@ -402,6 +404,8 @@ const WeekView = ({
       isMobile,
       gridWidth,
       displayDays,
+      HOUR_HEIGHT,
+      FIRST_HOUR,
     ]
   );
 
@@ -627,7 +631,10 @@ const WeekView = ({
   );
 
   return (
-    <div className={`${calendarContainer} df-week-view`}>
+    <div
+      className={`${calendarContainer} df-week-view`}
+      style={{ '--df-hour-height': `${HOUR_HEIGHT}px` } as JSX.CSSProperties}
+    >
       {/* Header navigation */}
       <ViewHeader
         calendar={app}

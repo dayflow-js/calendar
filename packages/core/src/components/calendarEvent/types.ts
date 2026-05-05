@@ -74,4 +74,6 @@ export interface CalendarEventProps {
   resizeHandleOrientation?: 'vertical' | 'horizontal';
   /** App-level timezone used to project event times for display (Month/Year view). */
   appTimeZone?: string;
+  /** Height in pixels of each event row in the month grid (month multi-day events only). */
+  monthEventHeight?: number;
 }

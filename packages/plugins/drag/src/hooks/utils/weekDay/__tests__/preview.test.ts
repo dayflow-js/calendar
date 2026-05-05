@@ -11,6 +11,7 @@ describe('weekDayPreview', () => {
       drag: {
         duration: 2,
         endHour: 11,
+        originalStartHour: 9,
         hourOffset: 0,
         startHour: 9,
         startY: 0,

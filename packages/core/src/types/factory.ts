@@ -143,6 +143,8 @@ export interface MonthViewConfig extends ViewFactoryConfig {
   /** Scroll / navigation behavior for the month view */
   scroll?: MonthScrollConfig;
   showEventDots?: boolean;
+  /** Height in pixels of each event row in the month grid. Default: 16 */
+  eventHeight?: number;
   /**
    * Action when a date cell is clicked.
    */

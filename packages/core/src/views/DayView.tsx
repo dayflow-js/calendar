@@ -1,4 +1,4 @@
-import { RefObject } from 'preact';
+import { JSX, RefObject } from 'preact';
 import {
   useState,
   useEffect,
@@ -241,20 +241,10 @@ const DayView = ({
     return (maxRow + 1) * ALL_DAY_HEIGHT;
   }, [organizedAllDayEvents, ALL_DAY_HEIGHT]);
 
-  // Use drag functionality provided by the plugin
-  const {
-    handleMoveStart,
-    handleCreateStart,
-    handleResizeStart,
-    handleCreateAllDayEvent,
-    dragState,
-    isDragging,
-  } = useDragForView(app, {
-    calendarRef,
-    allDayRowRef: showAllDay ? allDayRowRef : undefined,
-    timeGridRef,
-    viewType: DragViewType.DAY,
-    onEventsUpdate: (
+  const sidebarWidth = secondaryTimeZone && !isMobile ? 88 : isMobile ? 48 : 80;
+
+  const handleEventsUpdate = useCallback(
+    (
       updateFunc: (events: Event[]) => Event[],
       _isResizing?: boolean,
       source?: 'drag' | 'resize'
@@ -267,6 +257,7 @@ const DayView = ({
 
       const eventsToDelete = prevEvents.filter(e => !newSet.has(e.id));
       const eventsToAdd = newEvents.filter(e => !prevMap.has(e.id));
+      // Reference equality short-circuits hasEventChanged for unchanged events
       const eventsToUpdate = newEvents.filter(e => {
         const old = prevMap.get(e.id);
         return old !== undefined && old !== e && hasEventChanged(old, e);
@@ -285,7 +276,11 @@ const DayView = ({
         source
       );
     },
-    onEventCreate: (event: Event) => {
+    [currentDayEvents, app]
+  );
+
+  const handleEventCreate = useCallback(
+    (event: Event) => {
       if (isMobile) {
         app.onMobileEventDetailToggle(event);
       } else {
@@ -293,12 +288,15 @@ const DayView = ({
         setNewlyCreatedEventId(event.id);
       }
     },
-    onEventEdit: () => {
-      /* noop */
-    },
-    currentWeekStart,
-    events: currentDayEvents,
-    calculateNewEventLayout: (targetDay, startHour, endHour) =>
+    [isMobile, app]
+  );
+
+  const handleEventEdit = useCallback(() => {
+    /* noop */
+  }, []);
+
+  const handleCalculateNewEventLayout = useCallback(
+    (targetDay: number, startHour: number, endHour: number) =>
       calculateNewEventLayout(
         targetDay,
         startHour,
@@ -307,11 +305,15 @@ const DayView = ({
         layoutEvents,
         appTimeZone
       ),
-    calculateDragLayout: (
-      draggedEvent,
-      targetDay,
-      targetStartHour,
-      targetEndHour
+    [currentDate, layoutEvents, appTimeZone]
+  );
+
+  const handleCalculateDragLayout = useCallback(
+    (
+      draggedEvent: Event,
+      targetDay: number,
+      targetStartHour: number,
+      targetEndHour: number
     ) =>
       calculateDragLayout(
         draggedEvent,
@@ -322,9 +324,53 @@ const DayView = ({
         layoutEvents,
         appTimeZone
       ),
-    TIME_COLUMN_WIDTH: secondaryTimeZone && !isMobile ? 88 : isMobile ? 48 : 80,
-    isMobile,
-  });
+    [currentDate, layoutEvents, appTimeZone]
+  );
+
+  const dragOptions = useMemo(
+    () => ({
+      calendarRef,
+      allDayRowRef: showAllDay ? allDayRowRef : undefined,
+      timeGridRef,
+      viewType: DragViewType.DAY,
+      onEventsUpdate: handleEventsUpdate,
+      onEventCreate: handleEventCreate,
+      onEventEdit: handleEventEdit,
+      currentWeekStart,
+      events: currentDayEvents,
+      calculateNewEventLayout: handleCalculateNewEventLayout,
+      calculateDragLayout: handleCalculateDragLayout,
+      TIME_COLUMN_WIDTH: sidebarWidth,
+      isMobile,
+      HOUR_HEIGHT,
+      FIRST_HOUR,
+    }),
+    [
+      calendarRef,
+      showAllDay,
+      handleEventsUpdate,
+      handleEventCreate,
+      handleEventEdit,
+      currentWeekStart,
+      currentDayEvents,
+      handleCalculateNewEventLayout,
+      handleCalculateDragLayout,
+      sidebarWidth,
+      isMobile,
+      HOUR_HEIGHT,
+      FIRST_HOUR,
+    ]
+  );
+
+  // Use drag functionality provided by the plugin
+  const {
+    handleMoveStart,
+    handleCreateStart,
+    handleResizeStart,
+    handleCreateAllDayEvent,
+    dragState,
+    isDragging,
+  } = useDragForView(app, dragOptions);
 
   const handleTouchStart = (e: TouchEvent, dayIndex: number) => {
     if (!isMobile && !isTouch) return;
@@ -477,7 +523,10 @@ const DayView = ({
   }, [appTimeZone]);
 
   return (
-    <div className='df-day-view'>
+    <div
+      className='df-day-view'
+      style={{ '--df-hour-height': `${HOUR_HEIGHT}px` } as JSX.CSSProperties}
+    >
       <DayContent
         app={app}
         currentDate={currentDate}

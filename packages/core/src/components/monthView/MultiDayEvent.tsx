@@ -34,6 +34,7 @@ import {
 interface MultiDayEventProps {
   segment: MultiDayEventSegment;
   segmentIndex: number;
+  eventHeight?: number;
   isDragging: boolean;
   isResizing?: boolean;
   isSelected?: boolean;
@@ -54,8 +55,7 @@ interface MultiDayEventProps {
   appTimeZone?: string;
 }
 
-const ROW_HEIGHT = 16;
-const ROW_SPACING = 17;
+const DEFAULT_EVENT_HEIGHT = 16;
 const POP_TRANSITION = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
 const mobileFadeStyle = {
   whiteSpace: 'nowrap',
@@ -71,6 +71,7 @@ export const MultiDayEvent = memo(
   ({
     segment,
     segmentIndex,
+    eventHeight = DEFAULT_EVENT_HEIGHT,
     isDragging,
     isResizing = false,
     isSelected = false,
@@ -87,6 +88,7 @@ export const MultiDayEvent = memo(
   }: MultiDayEventProps) => {
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
+    const rowSpacing = eventHeight + 1;
 
     const visualEvent = useMemo(() => {
       if (!appTimeZone || segment.event.allDay) return segment.event;
@@ -106,7 +108,7 @@ export const MultiDayEvent = memo(
     const startPercent = (segment.startDayIndex / 7) * 100;
     const widthPercent =
       ((segment.endDayIndex - segment.startDayIndex + 1) / 7) * 100;
-    const topOffset = segmentIndex * ROW_SPACING;
+    const topOffset = segmentIndex * rowSpacing;
 
     // Calculate actual position and width with spacing
     const adjustedLeft = `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`;
@@ -240,7 +242,12 @@ export const MultiDayEvent = memo(
       const startTimeText = formatTime(startHour);
       const endTimeText = formatTime(endHour);
       const lineColors = getCalendarLineColors(segment.event);
-      const hideColorBar = isActive && isMultiCalendarEvent;
+      const hideColorBar =
+        (isActive && isMultiCalendarEvent) ||
+        (!isAllDayEvent &&
+          segment.segmentType !== 'start' &&
+          segment.segmentType !== 'start-week-end' &&
+          segment.segmentType !== 'single');
 
       if (isAllDayEvent) {
         const getDisplayText = () => {
@@ -291,6 +298,13 @@ export const MultiDayEvent = memo(
       const segmentDays = segment.endDayIndex - segment.startDayIndex + 1;
       const remainingPercent =
         segmentDays > 1 ? ((segmentDays - 1) / segmentDays) * 100 : 0;
+      const isMultiDayTimedStart =
+        !isAllDayEvent && segment.isFirstSegment && segmentDays > 1;
+
+      // For multi-day timed start, we want to limit the title to the first day's cell width minus the time display space.
+      // 100 / segmentDays is the width of exactly one day relative to the full segment width.
+      const firstDayPercent = 100 / segmentDays;
+
       const startTimeStyle =
         segmentDays > 1
           ? {
@@ -312,9 +326,25 @@ export const MultiDayEvent = memo(
               }
             />
           )}
-          <div className='df-event-month-main'>
+          <div
+            className='df-event-month-main'
+            style={
+              isMultiDayTimedStart && !isMobile
+                ? {
+                    maxWidth: `calc(${firstDayPercent}% - 45px)`,
+                    overflow: 'hidden',
+                    WebkitMaskImage:
+                      'linear-gradient(to right, black 70%, transparent 100%)',
+                    maskImage:
+                      'linear-gradient(to right, black 70%, transparent 100%)',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                  }
+                : undefined
+            }
+          >
             <span
-              className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
+              className={`df-event-month-title ${isMobile || isMultiDayTimedStart ? 'df-mobile-mask-fade' : ''}`}
               style={isMobile ? mobileFadeStyle : undefined}
             >
               {titleText}
@@ -350,7 +380,7 @@ export const MultiDayEvent = memo(
           left: adjustedLeft,
           width: adjustedWidth,
           top: `${topOffset}px`,
-          height: `${ROW_HEIGHT}px`,
+          height: `${eventHeight}px`,
           pointerEvents: 'auto',
           zIndex: 10,
           transform: isPopping ? 'scale(1.02)' : 'scale(1)',

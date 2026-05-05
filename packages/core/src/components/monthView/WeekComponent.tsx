@@ -30,6 +30,7 @@ interface WeekComponentProps {
   showMonthIndicator?: boolean;
   item: VirtualWeekItem;
   weekHeight: number; // Use this instead of item.height to avoid sync issues
+  eventHeight?: number;
   events: Event[];
   dragState: MonthEventDragState;
   calendarRef: RefObject<HTMLDivElement>;
@@ -71,8 +72,6 @@ interface WeekComponentProps {
   appTimeZone?: string;
 }
 
-// Constants
-const ROW_SPACING = 17;
 const MULTI_DAY_TOP_OFFSET = 33;
 const MORE_TEXT_HEIGHT = 20; // Height reserved for the "+ x more" indicator
 
@@ -88,6 +87,7 @@ const WeekComponent = memo(
     showMonthIndicator = true,
     item,
     weekHeight,
+    eventHeight = 16,
     events,
     dragState,
     calendarRef,
@@ -138,17 +138,19 @@ const WeekComponent = memo(
       setContextMenu({ x: e.clientX, y: e.clientY, date });
     };
 
+    const rowSpacing = eventHeight + 1;
+
     // Calculate layout parameters once per week render
     const layoutParams = useMemo(() => {
       const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET;
       if (availableHeight <= 0) return { maxSlots: 0, maxSlotsWithMore: 0 };
 
-      const maxSlots = Math.floor(availableHeight / ROW_SPACING);
+      const maxSlots = Math.floor(availableHeight / rowSpacing);
 
       const spaceForMore = availableHeight - MORE_TEXT_HEIGHT;
       const maxSlotsWithMoreRaw = Math.max(
         0,
-        Math.floor(spaceForMore / ROW_SPACING)
+        Math.floor(spaceForMore / rowSpacing)
       );
 
       // Ensure maxSlotsWithMore is always at most maxSlots - 1 to leave room for the "+ x more" indicator
@@ -158,7 +160,7 @@ const WeekComponent = memo(
           : maxSlotsWithMoreRaw;
 
       return { maxSlots, maxSlotsWithMore };
-    }, [weekHeight]);
+    }, [weekHeight, rowSpacing]);
 
     useEffect(() => {
       if (isScrolling) {
@@ -425,8 +427,8 @@ const WeekComponent = memo(
 
     // Calculate the height of the multi-day event area
     const multiDayAreaHeight = useMemo(
-      () => Math.max(0, overlayVisibleLayerCount * ROW_SPACING),
-      [overlayVisibleLayerCount]
+      () => Math.max(0, overlayVisibleLayerCount * rowSpacing),
+      [overlayVisibleLayerCount, rowSpacing]
     );
 
     const localizedMonthYear = useMemo(() => {
@@ -502,6 +504,7 @@ const WeekComponent = memo(
                   showWeekNumbers={showWeekNumbers}
                   totalSlotsNeeded={dayLayoutData[index].totalSlotsNeeded}
                   weekHeightPx={weekHeightPx}
+                  eventHeight={eventHeight}
                 />
               ))}
             </div>
@@ -565,6 +568,7 @@ const WeekComponent = memo(
                             isMobile={screenSize !== 'desktop'}
                             enableTouch={enableTouch}
                             appTimeZone={appTimeZone}
+                            monthEventHeight={eventHeight}
                           />
                         ))}
                     </div>
@@ -611,6 +615,7 @@ const WeekComponent = memo(
     prevProps.showMonthIndicator === nextProps.showMonthIndicator &&
     prevProps.item.weekData === nextProps.item.weekData &&
     prevProps.weekHeight === nextProps.weekHeight &&
+    prevProps.eventHeight === nextProps.eventHeight &&
     prevProps.events === nextProps.events &&
     prevProps.calendarRef === nextProps.calendarRef &&
     prevProps.onEventUpdate === nextProps.onEventUpdate &&

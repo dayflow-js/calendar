@@ -99,6 +99,7 @@ type WeekDayCreateStartDragUpdates = {
   dayIndex: number;
   startHour: number;
   endHour: number;
+  originalStartHour: number;
   allDay: false;
   eventDate: Date;
   duration: number;
@@ -361,6 +362,7 @@ export const buildWeekDayCreateStartData = ({
     dayIndex,
     startHour: adjustedStart,
     endHour: adjustedStart + initialDuration,
+    originalStartHour: adjustedStart,
     allDay: false,
     eventDate: currentWeekStart
       ? getDateByDayIndex(currentWeekStart, dayIndex)

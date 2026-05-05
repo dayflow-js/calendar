@@ -423,7 +423,7 @@
   .df-time-slot {
     position: relative;
     display: flex;
-    height: 4.5rem;
+    height: var(--df-hour-height, 4.5rem);
   }
 
   .df-time-label {
@@ -438,7 +438,7 @@
 
   .df-time-grid-row {
     display: flex;
-    height: 4.5rem;
+    height: var(--df-hour-height, 4.5rem);
     border-top: 1px solid var(--df-color-border);
   }
 

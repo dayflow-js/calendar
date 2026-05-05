@@ -4,6 +4,7 @@ import { TitleBarSlotProps } from '@dayflow/core';
 import {
   useCalendarApp,
   DayFlowCalendar,
+  DayFlowCalendarProps,
   UseCalendarAppReturn,
   CalendarAppConfig,
   CalendarSearchProps,
@@ -16,7 +17,7 @@ interface CalendarViewerProps {
   version: string;
   search?: CalendarSearchProps;
   collapsedSafeAreaLeft?: number;
-  titleBarSlot?: (context: TitleBarSlotProps) => React.ReactNode;
+  titleBarSlot?: DayFlowCalendarProps['titleBarSlot'];
 }
 
 export function CalendarViewer({

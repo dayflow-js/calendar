@@ -89,6 +89,7 @@ const CalendarEvent = ({
   renderVisualContent,
   resizeHandleOrientation,
   appTimeZone,
+  monthEventHeight,
 }: CalendarEventProps) => {
   const customRenderingStore = useContext(CustomRenderingContext);
   const isTouchEnabled = enableTouch ?? isMobile;
@@ -290,6 +291,7 @@ const CalendarEvent = ({
     getActiveDayIdx,
     getDayMetricsWrapper,
     multiDaySegmentInfo,
+    monthEventHeight,
   });
 
   // Visibility Hook
@@ -547,6 +549,7 @@ const CalendarEvent = ({
           appTimeZone={appTimeZone}
           renderVisualContent={renderVisualContent}
           resizeHandleOrientation={resizeHandleOrientation}
+          monthEventHeight={monthEventHeight}
         />
       </div>
 

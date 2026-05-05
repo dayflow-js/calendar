@@ -65,4 +65,56 @@ describe('EventContent', () => {
     const title = screen.getByText('All Day in Month');
     expect(title.className).toContain('df-mobile-mask-fade');
   });
+
+  it('uses mask fade for multi-day timed event titles on desktop', () => {
+    const multiDayTimedEvent: Event = {
+      ...baseEvent,
+      title: 'Multi-day Timed Event',
+      allDay: false,
+    };
+
+    const multiDaySegment = {
+      id: 'segment-1',
+      originalEventId: multiDayTimedEvent.id,
+      event: multiDayTimedEvent,
+      startDayIndex: 0,
+      endDayIndex: 2, // Spans 3 days in this row
+      isFirstSegment: true,
+      isLastSegment: false, // Not the last segment of the entire event to ensure it's multi-day
+      totalDays: 5,
+      segmentType: 'start' as const,
+      segmentIndex: 0,
+    };
+
+    render(
+      <EventContent
+        event={multiDayTimedEvent}
+        viewType={ViewType.MONTH}
+        isAllDay={false}
+        isMultiDay={true}
+        segment={multiDaySegment}
+        segmentIndex={0}
+        isBeingDragged={false}
+        isBeingResized={false}
+        isEventSelected={false}
+        isPopping={false}
+        isEditable={false}
+        isDraggable={false}
+        canOpenDetail={true}
+        isTouchEnabled={false}
+        isMobile={false}
+        customRenderingStore={null}
+        eventContentSlotArgs={{}}
+      />
+    );
+
+    const title = screen.getByText('Multi-day Timed Event');
+    // In MultiDayEvent, the title wrapper is a div with df-event-month-main class
+    const titleWrapper = title.closest('.df-event-month-main') as HTMLElement;
+
+    // The mask is now on this wrapper
+    const style = titleWrapper.style;
+    const maskValue = `${style.maskImage}${style.webkitMaskImage}`;
+    expect(maskValue).toContain('linear-gradient');
+  });
 });

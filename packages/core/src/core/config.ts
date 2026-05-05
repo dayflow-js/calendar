@@ -37,6 +37,7 @@ export const defaultViewConfigs = {
     showAllDay: true,
     weekHeight: 120,
     showEventDots: false,
+    eventHeight: 16,
   },
   agenda: {
     daysToShow: 14,
