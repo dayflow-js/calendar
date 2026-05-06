@@ -4,7 +4,12 @@ import ViewHeader from '@/components/common/ViewHeader';
 import { useLocale } from '@/locale';
 import { monthViewContainer } from '@/styles/classNames';
 import { Event, ICalendarApp, ViewType, YearViewConfig } from '@/types';
-import { getTodayInTimeZone, temporalToVisualDate } from '@/utils';
+import {
+  getTodayInTimeZone,
+  temporalToVisualDate,
+  generateUniKey,
+  dateToZonedDateTime,
+} from '@/utils';
 
 import { GridDayPopup } from './GridDayPopup';
 
@@ -102,7 +107,7 @@ function calcPopupPosition(anchorEl: HTMLElement): {
 }
 
 export const GridYearView = ({ app, config }: GridYearViewProps) => {
-  const { locale, getWeekDaysLabels: getLabels } = useLocale();
+  const { t: translate, locale, getWeekDaysLabels: getLabels } = useLocale();
   const currentDate = app.getCurrentDate();
   const currentYear = currentDate.getFullYear();
   const rawEvents = app.getEvents();
@@ -241,11 +246,36 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
   const handleDateDoubleClick = useCallback(
     (date: Date) => {
-      const dblClickAction = config?.gridDateDoubleClick ?? 'day-view';
+      const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         dblClickAction(date, fullEventMap.get(key) ?? []);
+        return;
+      }
+
+      if (dblClickAction === 'create-event') {
+        if (!app.canMutateFromUI()) return;
+        const writableCal = app
+          .getCalendarRegistry()
+          .getDefaultWritableCalendar();
+        if (!writableCal) return;
+
+        const startTime = new Date(date);
+        startTime.setHours(9, 0, 0, 0);
+        const endTime = new Date(date);
+        endTime.setHours(10, 0, 0, 0);
+
+        const newEvent: Event = {
+          id: generateUniKey(),
+          title: translate('newEvent') || 'New Event',
+          start: dateToZonedDateTime(startTime, appTimeZone),
+          end: dateToZonedDateTime(endTime, appTimeZone),
+          allDay: false,
+          calendarId: writableCal.id,
+        };
+        setPopup(null);
+        app.addEvent(newEvent);
         return;
       }
 
@@ -256,7 +286,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       }
       // 'none' → do nothing
     },
-    [config, app, fullEventMap]
+    [config, app, fullEventMap, translate, appTimeZone]
   );
 
   const getCustomTitle = () => {

@@ -15,29 +15,6 @@
     width: 0.75rem;
   }
 
-  .df-drag-indicator-text {
-    padding-right: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .df-drag-indicator-text:not([data-mobile='true']) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .df-drag-indicator-text[data-mobile='true'] {
-    overflow: hidden;
-    white-space: nowrap;
-    mask-image: linear-gradient(to right, black 70%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
-  }
-
-  .df-drag-indicator-text[data-light='false'] {
-    color: white;
-  }
-
   .df-drag-indicator-all-day {
     display: flex;
     height: 100%;
@@ -53,30 +30,12 @@
   /* Specific styles for regular timed indicators */
   .df-drag-indicator-regular-wrapper {
     position: relative;
-    display: flex;
     height: 100%;
-    flex-direction: column;
     overflow: hidden;
   }
 
   .df-drag-indicator-regular-wrapper[data-light='false'] {
     color: white;
-  }
-
-  .df-drag-indicator-time {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.75rem;
-  }
-
-  .df-drag-indicator-time[data-light='true'] {
-    opacity: 0.7;
-  }
-
-  .df-drag-indicator-time[data-light='false'] {
-    color: white;
-    opacity: 0.9;
   }
 
   /* Mobile interaction handles */

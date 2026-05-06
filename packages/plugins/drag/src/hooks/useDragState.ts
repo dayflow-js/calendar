@@ -109,9 +109,7 @@ export const useDragState = (options: useDragProps): UseDragStateReturn => {
       default: createThrottledUpdater(16),
       move: createThrottledUpdater(16),
       create: createThrottledUpdater(16),
-      // Resize previews are the heaviest path in week/day view. A slightly
-      // lower update frequency keeps DevTools-open interactions responsive.
-      resize: createThrottledUpdater(24),
+      resize: createThrottledUpdater(16),
     };
   }, [isDateGridView, onEventsUpdate]);
 

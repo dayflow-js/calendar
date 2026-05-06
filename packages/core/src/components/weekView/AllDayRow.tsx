@@ -303,6 +303,19 @@ export const AllDayRow = (props: AllDayRowProps) => {
                     isMobile || !hasScrollbarSpace ? 'false' : 'true'
                   }
                   style={{ minHeight: `${allDayAreaHeight}px` }}
+                  onDragOver={handleDragOver}
+                  onDrop={e => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const relativeX = e.clientX - rect.left;
+                    const dayIndex = Math.floor(
+                      relativeX / (rect.width / weekDaysLabels.length)
+                    );
+
+                    const dropDate = new Date(currentWeekStart);
+                    dropDate.setDate(currentWeekStart.getDate() + dayIndex);
+
+                    handleDrop(e, dropDate, undefined, true);
+                  }}
                 >
                   {weekDaysLabels.map((_, dayIndex) => {
                     const dropDate = new Date(currentWeekStart);
@@ -355,10 +368,6 @@ export const AllDayRow = (props: AllDayRowProps) => {
                           } else {
                             handleCreateAllDayEvent?.(e, dayIndex);
                           }
-                        }}
-                        onDragOver={handleDragOver}
-                        onDrop={e => {
-                          handleDrop(e, dropDate, undefined, true);
                         }}
                         onContextMenu={e => handleContextMenu(e, dayIndex)}
                       />

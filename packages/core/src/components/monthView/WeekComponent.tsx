@@ -457,7 +457,20 @@ const WeekComponent = memo(
         )}
 
         <div className='df-month-week-inner'>
-          <div className='df-month-week-grid-shell'>
+          <div
+            className='df-month-week-grid-shell'
+            onDragOver={onCalendarDragOver}
+            onDrop={e => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const relativeX = e.clientX - rect.left;
+              const dayIndex = Math.floor(relativeX / (rect.width / 7));
+
+              const dropDate = new Date(weekData.startDate);
+              dropDate.setDate(weekData.startDate.getDate() + dayIndex);
+
+              onCalendarDrop(e, dropDate);
+            }}
+          >
             {/* Date grid */}
             <div className='df-month-week-grid'>
               {weekData.days.map((day, index) => (
@@ -480,8 +493,6 @@ const WeekComponent = memo(
                   locale={locale}
                   moreLabel={t('more')}
                   newlyCreatedEventId={newlyCreatedEventId}
-                  onCalendarDragOver={onCalendarDragOver}
-                  onCalendarDrop={onCalendarDrop}
                   onChangeView={onChangeView}
                   onContextMenu={handleContextMenu}
                   onCreateStart={onCreateStart}

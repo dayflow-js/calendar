@@ -108,11 +108,13 @@ export interface WeekViewConfig extends ViewFactoryConfig {
   gridDateClick?: 'day-view' | 'none' | ((date: Date, events: Event[]) => void);
   /**
    * Action when a date cell is double-clicked.
-   * - 'day-view' (default): navigate to the Day View
+   * - 'create-event' (default): create a 1-hour timed event at the clicked position (hour)
+   * - 'day-view': navigate to the Day View
    * - 'none': no action
    * - function: custom handler
    */
   gridDateDoubleClick?:
+    | 'create-event'
     | 'day-view'
     | 'none'
     | ((date: Date, events: Event[]) => void);
@@ -155,11 +157,14 @@ export interface MonthViewConfig extends ViewFactoryConfig {
     | ((date: Date, events: Event[]) => void);
   /**
    * Action when a date cell is double-clicked.
-   * - 'week-view' (default): navigate to the Week View
+   * - 'create-event' (default): create a timed event from 9:00 to 10:00 on the clicked date
+   * - 'week-view': navigate to the Week View
+   * - 'day-view': navigate to the Day View
    * - 'none': no action
    * - function: custom handler
    */
   gridDateDoubleClick?:
+    | 'create-event'
     | 'week-view'
     | 'day-view'
     | 'none'
@@ -210,11 +215,13 @@ export interface YearViewConfig extends ViewFactoryConfig {
     | ((date: Date, events: Event[]) => void);
   /**
    * Grid mode: action when a date cell is double-clicked.
-   * - 'day-view' (default): navigate to the Day View
+   * - 'create-event' (default): create a timed event from 9:00 to 10:00 on the clicked date
+   * - 'day-view': navigate to the Day View
    * - 'none': no action
    * - function: custom handler
    */
   gridDateDoubleClick?:
+    | 'create-event'
     | 'day-view'
     | 'none'
     | ((date: Date, events: Event[]) => void);

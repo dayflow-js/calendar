@@ -47,17 +47,17 @@ The week view displays a 7-day grid with time slots, showing events with their e
 
 #### Configuration
 
-| Property              | Type                               | Default      | Description                                                   |
-| :-------------------- | :--------------------------------- | :----------- | :------------------------------------------------------------ |
-| `showWeekends`        | `boolean`                          | `true`       | Whether to show Saturday and Sunday.                          |
-| `showAllDay`          | `boolean`                          | `true`       | Whether to show the all-day events row.                       |
-| `startOfWeek`         | `number`                           | `1`          | The start day of the week (0 for Sunday, 1 for Monday, etc.). |
-| `scrollToCurrentTime` | `boolean`                          | `true`       | Whether to scroll to the current time on initial load.        |
-| `timeFormat`          | `'12h' \| '24h'`                   | `'24h'`      | The time format for the time axis.                            |
-| `secondaryTimeZone`   | `string`                           | `undefined`  | Secondary reference timeline shown in Week view only.         |
-| `gridDateClick`       | `'day-view' \| 'none' \| function` | `undefined`  | Action when a date cell is clicked.                           |
-| `gridDateDoubleClick` | `'day-view' \| 'none' \| function` | `'day-view'` | Action when a date cell is double-clicked.                    |
-| `hourHeight`          | `number`                           | `72`         | Height in pixels of each hour row in the time grid.           |
+| Property              | Type                                                 | Default          | Description                                                                                                                        |
+| :-------------------- | :--------------------------------------------------- | :--------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| `showWeekends`        | `boolean`                                            | `true`           | Whether to show Saturday and Sunday.                                                                                               |
+| `showAllDay`          | `boolean`                                            | `true`           | Whether to show the all-day events row.                                                                                            |
+| `startOfWeek`         | `number`                                             | `1`              | The start day of the week (0 for Sunday, 1 for Monday, etc.).                                                                      |
+| `scrollToCurrentTime` | `boolean`                                            | `true`           | Whether to scroll to the current time on initial load.                                                                             |
+| `timeFormat`          | `'12h' \| '24h'`                                     | `'24h'`          | The time format for the time axis.                                                                                                 |
+| `secondaryTimeZone`   | `string`                                             | `undefined`      | Secondary reference timeline shown in Week view only.                                                                              |
+| `gridDateClick`       | `'day-view' \| 'none' \| function`                   | `undefined`      | Action when a date cell is clicked.                                                                                                |
+| `gridDateDoubleClick` | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | Action when a date cell is double-clicked. `'create-event'` (default) creates a 1-hour timed event at the clicked position (hour). |
+| `hourHeight`          | `number`                                             | `72`             | Height in pixels of each hour row in the time grid.                                                                                |
 
 ```tsx {10}
 import {
@@ -84,16 +84,16 @@ The month view displays a traditional calendar grid showing all days in a month.
 
 #### Configuration
 
-| Property              | Type                                              | Default       | Description                                                                                     |
-| :-------------------- | :------------------------------------------------ | :------------ | :---------------------------------------------------------------------------------------------- |
-| `showWeekNumbers`     | `boolean`                                         | `false`       | Whether to show week numbers.                                                                   |
-| `showMonthIndicator`  | `boolean`                                         | `true`        | Whether to show the month indicator title when scrolling.                                       |
-| `startOfWeek`         | `number`                                          | `1`           | The start day of the week (0 for Sunday, 1 for Monday, etc.).                                   |
-| `snapToMonth`         | `boolean`                                         | `false`       | When enabled, the view snaps to the start of the dominant month after the user stops scrolling. |
-| `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function` | `undefined`   | Action when a date cell is clicked.                                                             |
-| `gridDateDoubleClick` | `'week-view' \| 'day-view' \| 'none' \| function` | `'week-view'` | Action when a date cell is double-clicked.                                                      |
-| `eventHeight`         | `number`                                          | `16`          | Height in pixels of each event row in the month grid.                                           |
-| `scroll`              | `MonthScrollConfig`                               | —             | Controls scroll locking and month-switch animation. See below.                                  |
+| Property              | Type                                                                | Default          | Description                                                                                                                         |
+| :-------------------- | :------------------------------------------------------------------ | :--------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `showWeekNumbers`     | `boolean`                                                           | `false`          | Whether to show week numbers.                                                                                                       |
+| `showMonthIndicator`  | `boolean`                                                           | `true`           | Whether to show the month indicator title when scrolling.                                                                           |
+| `startOfWeek`         | `number`                                                            | `1`              | The start day of the week (0 for Sunday, 1 for Monday, etc.).                                                                       |
+| `snapToMonth`         | `boolean`                                                           | `false`          | When enabled, the view snaps to the start of the dominant month after the user stops scrolling.                                     |
+| `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function`                   | `undefined`      | Action when a date cell is clicked.                                                                                                 |
+| `gridDateDoubleClick` | `'create-event' \| 'week-view' \| 'day-view' \| 'none' \| function` | `'create-event'` | Action when a date cell is double-clicked. `'create-event'` (default) creates a timed event from 9:00 to 10:00 on the clicked date. |
+| `eventHeight`         | `number`                                                            | `16`             | Height in pixels of each event row in the month grid.                                                                               |
+| `scroll`              | `MonthScrollConfig`                                                 | —                | Controls scroll locking and month-switch animation. See below.                                                                      |
 
 #### MonthScrollConfig
 
@@ -175,15 +175,15 @@ The year view provides a comprehensive annual overview. DayFlow's Year View supp
 
 #### Configuration
 
-| Property                    | Type                                          | Default         | Description                                                                                          |
-| :-------------------------- | :-------------------------------------------- | :-------------- | :--------------------------------------------------------------------------------------------------- |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`     | `'year-canvas'` | The display mode for the year view.                                                                  |
-| `startOfWeek`               | `number`                                      | `1`             | The start day of the week (0 for Sunday, 1 for Monday, etc.). Used in `fixed-week` and `grid` modes. |
-| `showTimedEventsInYearView` | `boolean`                                     | `false`         | Whether to show timed events (dots/indicators/intensity) in the year view.                           |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function` | `'popup'`       | (Grid mode) Action when a date cell is clicked.                                                      |
-| `gridDateDoubleClick`       | `'day-view' \| 'none' \| function`            | `'day-view'`    | (Grid mode) Action when a date cell is double-clicked.                                               |
-| `gridPopupContent`          | `function`                                    | `undefined`     | (Grid mode) Custom renderer for the day popup content.                                               |
-| `gridHeatmapLevels`         | `number`                                      | `5`             | (Grid mode) Number of heatmap intensity levels to use.                                               |
+| Property                    | Type                                                 | Default          | Description                                                                                                                 |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | The display mode for the year view.                                                                                         |
+| `startOfWeek`               | `number`                                             | `1`              | The start day of the week (0 for Sunday, 1 for Monday, etc.). Used in `fixed-week` and `grid` modes.                        |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | Whether to show timed events (dots/indicators/intensity) in the year view.                                                  |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid mode) Action when a date cell is clicked.                                                                             |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid mode) Action when a date cell is double-clicked. `'create-event'` (default) creates a timed event from 9:00 to 10:00. |
+| `gridPopupContent`          | `function`                                           | `undefined`      | (Grid mode) Custom renderer for the day popup content.                                                                      |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid mode) Number of heatmap intensity levels to use.                                                                      |
 
 #### Heatmap Customization (Grid Mode)
 

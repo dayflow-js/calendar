@@ -38,6 +38,7 @@ import {
   hasEventChanged,
   generateWeekData,
   temporalToVisualDate,
+  generateUniKey,
 } from '@/utils';
 
 /** Compute the 6 weeks that fill a month-view grid for the given date. */
@@ -131,7 +132,7 @@ const MonthView = ({
   detailPanelEventId: propDetailPanelEventId,
   onDetailPanelToggle: propOnDetailPanelToggle,
 }: MonthViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
-  const { getWeekDaysLabels, getMonthLabels, locale } = useLocale();
+  const { t, getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
   const rawEvents = app.getEvents();
   const startOfWeek = config.startOfWeek ?? 1;
@@ -809,10 +810,39 @@ const MonthView = ({
 
   const handleGridDateDoubleClick = useCallback(
     (e: MouseEvent | TouchEvent, date: Date, dayEvents: Event[]) => {
-      const dblClickAction = config?.gridDateDoubleClick ?? 'week-view';
+      const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
         dblClickAction(date, dayEvents);
+        return;
+      }
+
+      if (dblClickAction === 'create-event') {
+        if (!app.canMutateFromUI()) return;
+        const writableCal = app
+          .getCalendarRegistry()
+          .getDefaultWritableCalendar();
+        if (!writableCal) return;
+
+        const startTime = new Date(date);
+        startTime.setHours(9, 0, 0, 0);
+        const endTime = new Date(date);
+        endTime.setHours(10, 0, 0, 0);
+
+        const newEvent: Event = {
+          id: generateUniKey(),
+          title: t('newEvent') || 'New Event',
+          start: dateToZonedDateTime(startTime, appTimeZone),
+          end: dateToZonedDateTime(endTime, appTimeZone),
+          allDay: false,
+          calendarId: writableCal.id,
+        };
+        if (screenSize === 'desktop') {
+          app.addEvent(newEvent);
+          setNewlyCreatedEventId(newEvent.id);
+        } else {
+          app.onMobileEventDetailToggle(newEvent);
+        }
         return;
       }
 
@@ -825,7 +855,7 @@ const MonthView = ({
       }
       // 'none' → do nothing
     },
-    [config.gridDateDoubleClick, app]
+    [config.gridDateDoubleClick, app, screenSize, t, appTimeZone]
   );
 
   return (

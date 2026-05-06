@@ -38,13 +38,6 @@ interface WeekDayCellProps {
   locale: string;
   moreLabel: string;
   newlyCreatedEventId: string | null;
-  onCalendarDragOver?: (e: DragEvent) => void;
-  onCalendarDrop?: (
-    e: DragEvent,
-    dropDate: Date,
-    dropHour?: number,
-    isAllDay?: boolean
-  ) => Event | null;
   onChangeView?: (view: ViewType) => void;
   onContextMenu: (e: MouseEvent, date: Date) => void;
   onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
@@ -96,8 +89,6 @@ const WeekDayCell = ({
   locale,
   moreLabel,
   newlyCreatedEventId,
-  onCalendarDragOver,
-  onCalendarDrop,
   onChangeView,
   onContextMenu,
   onCreateStart,
@@ -354,8 +345,6 @@ const WeekDayCell = ({
         }
         touchStartPosRef.current = null;
       }}
-      onDragOver={onCalendarDragOver}
-      onDrop={event => onCalendarDrop?.(event, day.date)}
       onContextMenu={event => onContextMenu(event, day.date)}
     >
       <div className={monthDateNumberContainer}>

@@ -448,7 +448,31 @@ export const TimeGrid = ({
                 />
               ))}
             </div>
-            <div ref={timeGridRef} className='df-week-time-grid-grid-inner'>
+            <div
+              ref={timeGridRef}
+              className='df-week-time-grid-grid-inner'
+              onDragOver={handleDragOver}
+              onDrop={e => {
+                const rect = timeGridRef.current?.getBoundingClientRect();
+                if (!rect) return;
+
+                const daysToShow = weekDaysLabels.length;
+                const relativeX = e.clientX - rect.left;
+                const relativeY = e.clientY - rect.top;
+
+                const dayIndex = Math.floor(
+                  relativeX / (rect.width / daysToShow)
+                );
+                const dropHour = Math.floor(
+                  FIRST_HOUR + relativeY / HOUR_HEIGHT
+                );
+
+                const dropDate = new Date(currentWeekStart);
+                dropDate.setDate(currentWeekStart.getDate() + dayIndex);
+
+                handleDrop(e, dropDate, dropHour);
+              }}
+            >
               {/* Current time line */}
               {isCurrentWeek &&
                 currentTime &&
@@ -512,81 +536,73 @@ export const TimeGrid = ({
                     isMobile || !hasScrollbarSpace ? 'false' : 'true'
                   }
                 >
-                  {weekDaysLabels.map((_, dayIndex) => {
-                    const dropDate = new Date(currentWeekStart);
-                    dropDate.setDate(currentWeekStart.getDate() + dayIndex);
-                    return (
-                      <div
-                        key={`${slotIndex}-${dayIndex}`}
-                        className={`${timeGridCell} df-week-time-grid-cell`}
-                        style={columnStyle}
-                        onClick={() => {
-                          const clickedDate = new Date(currentWeekStart);
-                          clickedDate.setDate(
-                            currentWeekStart.getDate() + dayIndex
-                          );
-                          if (onGridDateClick) {
-                            const dayEvents = [
-                              ...getEventsForDay(dayIndex, currentWeekEvents),
-                              ...getAllDayEventsForDay(
-                                dayIndex,
-                                currentWeekEvents,
-                                currentWeekStart
-                              ),
-                            ];
-                            onGridDateClick(clickedDate, dayEvents);
-                          } else {
-                            onDateChange?.(clickedDate);
-                          }
-                        }}
-                        onMouseDown={e => {
-                          startPendingCreate(
+                  {weekDaysLabels.map((_, dayIndex) => (
+                    <div
+                      key={`${slotIndex}-${dayIndex}`}
+                      className={`${timeGridCell} df-week-time-grid-cell`}
+                      style={columnStyle}
+                      onClick={() => {
+                        const clickedDate = new Date(currentWeekStart);
+                        clickedDate.setDate(
+                          currentWeekStart.getDate() + dayIndex
+                        );
+                        if (onGridDateClick) {
+                          const dayEvents = [
+                            ...getEventsForDay(dayIndex, currentWeekEvents),
+                            ...getAllDayEventsForDay(
+                              dayIndex,
+                              currentWeekEvents,
+                              currentWeekStart
+                            ),
+                          ];
+                          onGridDateClick(clickedDate, dayEvents);
+                        } else {
+                          onDateChange?.(clickedDate);
+                        }
+                      }}
+                      onMouseDown={e => {
+                        startPendingCreate(
+                          e,
+                          dayIndex,
+                          getGridHour(e.clientY),
+                          isTouch,
+                          handleCreateStart
+                        );
+                      }}
+                      onDblClick={e => {
+                        const clickedDate = new Date(currentWeekStart);
+                        clickedDate.setDate(
+                          currentWeekStart.getDate() + dayIndex
+                        );
+                        if (onGridDateDoubleClick) {
+                          const dayEvents = [
+                            ...getEventsForDay(dayIndex, currentWeekEvents),
+                            ...getAllDayEventsForDay(
+                              dayIndex,
+                              currentWeekEvents,
+                              currentWeekStart
+                            ),
+                          ];
+                          onGridDateDoubleClick(clickedDate, dayEvents);
+                        } else {
+                          handleCreateStart?.(
                             e,
                             dayIndex,
-                            getGridHour(e.clientY),
-                            isTouch,
-                            handleCreateStart
+                            getGridHour(e.clientY)
                           );
-                        }}
-                        onDblClick={e => {
-                          const clickedDate = new Date(currentWeekStart);
-                          clickedDate.setDate(
-                            currentWeekStart.getDate() + dayIndex
-                          );
-                          if (onGridDateDoubleClick) {
-                            const dayEvents = [
-                              ...getEventsForDay(dayIndex, currentWeekEvents),
-                              ...getAllDayEventsForDay(
-                                dayIndex,
-                                currentWeekEvents,
-                                currentWeekStart
-                              ),
-                            ];
-                            onGridDateDoubleClick(clickedDate, dayEvents);
-                          } else {
-                            handleCreateStart?.(
-                              e,
-                              dayIndex,
-                              getGridHour(e.clientY)
-                            );
-                            finalizeCreateOnDblClick();
-                          }
-                        }}
-                        onTouchStart={e =>
-                          handleTouchStart(e, dayIndex, slot.hour)
+                          finalizeCreateOnDblClick();
                         }
-                        onTouchEnd={handleTouchEnd}
-                        onTouchMove={handleTouchMove}
-                        onDragOver={handleDragOver}
-                        onDrop={e => {
-                          handleDrop(e, dropDate, slot.hour);
-                        }}
-                        onContextMenu={e =>
-                          handleContextMenu(e, dayIndex, slot.hour)
-                        }
-                      />
-                    );
-                  })}
+                      }}
+                      onTouchStart={e =>
+                        handleTouchStart(e, dayIndex, slot.hour)
+                      }
+                      onTouchEnd={handleTouchEnd}
+                      onTouchMove={handleTouchMove}
+                      onContextMenu={e =>
+                        handleContextMenu(e, dayIndex, slot.hour)
+                      }
+                    />
+                  ))}
                 </div>
               ))}
 

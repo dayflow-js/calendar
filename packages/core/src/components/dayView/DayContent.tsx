@@ -494,6 +494,17 @@ export const DayContent = ({
                 data-scrollbar-space={
                   !isMobile && hasScrollbarSpace ? 'true' : 'false'
                 }
+                onDragOver={handleDragOver}
+                onDrop={e => {
+                  const rect = timeGridRef.current?.getBoundingClientRect();
+                  if (!rect) return;
+
+                  const relativeY = e.clientY - rect.top;
+                  const dropHour = Math.floor(
+                    FIRST_HOUR + relativeY / HOUR_HEIGHT
+                  );
+                  handleDrop(e, currentDate, dropHour);
+                }}
               >
                 {timeSlots.map((_slot, slotIndex) => (
                   <div
@@ -537,26 +548,6 @@ export const DayContent = ({
                     }}
                     onTouchEnd={handleTouchEnd}
                     onTouchMove={handleTouchMove}
-                    onDragOver={handleDragOver}
-                    onDrop={e => {
-                      const rect = calendarRef.current
-                        ?.querySelector('.df-calendar-content')
-                        ?.getBoundingClientRect();
-                      if (!rect) return;
-                      const scrollTop =
-                        (
-                          calendarRef.current?.querySelector(
-                            '.df-calendar-content'
-                          ) as HTMLElement
-                        )?.scrollTop || 0;
-                      const gridOffset = getGridOffset();
-                      const relativeY =
-                        e.clientY - rect.top + scrollTop - gridOffset;
-                      const dropHour = Math.floor(
-                        FIRST_HOUR + relativeY / HOUR_HEIGHT
-                      );
-                      handleDrop(e, currentDate, dropHour);
-                    }}
                     onContextMenu={e => handleContextMenu(e, false)}
                   />
                 ))}

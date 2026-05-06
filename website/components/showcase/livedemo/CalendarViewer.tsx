@@ -1,6 +1,5 @@
 'use client';
 
-import { TitleBarSlotProps } from '@dayflow/core';
 import {
   useCalendarApp,
   DayFlowCalendar,

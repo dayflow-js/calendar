@@ -41,6 +41,8 @@ import {
   formatTime,
   getNowInTimeZone,
   getTodayInTimeZone,
+  generateUniKey,
+  dateToPlainDate,
 } from '@/utils';
 
 import {
@@ -614,10 +616,34 @@ const WeekView = ({
 
   const handleGridDateDoubleClick = useCallback(
     (date: Date, dayEvents: CalendarEvent[]) => {
-      const dblClickAction = config?.gridDateDoubleClick ?? 'day-view';
+      const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
         dblClickAction(date, dayEvents);
+        return;
+      }
+
+      if (dblClickAction === 'create-event') {
+        if (!app.canMutateFromUI()) return;
+        const writableCal = app
+          .getCalendarRegistry()
+          .getDefaultWritableCalendar();
+        if (!writableCal) return;
+        const plainDate = dateToPlainDate(date);
+        const newEvent: CalendarEvent = {
+          id: generateUniKey(),
+          title: t('newEvent') || 'New Event',
+          start: plainDate,
+          end: plainDate,
+          allDay: true,
+          calendarId: writableCal.id,
+        };
+        if (isMobile) {
+          app.onMobileEventDetailToggle(newEvent);
+        } else {
+          app.addEvent(newEvent);
+          setNewlyCreatedEventId(newEvent.id);
+        }
         return;
       }
 
@@ -627,7 +653,7 @@ const WeekView = ({
       }
       // 'none' → do nothing
     },
-    [config.gridDateDoubleClick, app]
+    [config.gridDateDoubleClick, app, isMobile, t]
   );
 
   return (
@@ -761,7 +787,12 @@ const WeekView = ({
         }}
         onDateChange={onDateChange}
         onGridDateClick={handleGridDateClick}
-        onGridDateDoubleClick={handleGridDateDoubleClick}
+        onGridDateDoubleClick={
+          config?.gridDateDoubleClick &&
+          config.gridDateDoubleClick !== 'create-event'
+            ? handleGridDateDoubleClick
+            : undefined
+        }
         newlyCreatedEventId={newlyCreatedEventId}
         setNewlyCreatedEventId={setNewlyCreatedEventId}
         selectedEventId={selectedEventId}

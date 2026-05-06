@@ -181,7 +181,7 @@ const DefaultCalendarExample: React.FC<{
       onEventDoubleClick: (event: Event) => {
         console.log('double click event:', event);
         // You could use the event element as an anchor for a custom popover here
-        return false;
+        return true;
       },
       onEventUpdate: async (event: Event) => {
         await new Promise(resolve => {
@@ -245,7 +245,7 @@ const DefaultCalendarExample: React.FC<{
     defaultView: ViewType.MONTH,
     // useEventDetailDialog: true,
     // switcherMode: 'select' as const,
-    readOnly,
+    // readOnly,
     callbacks,
   });
 

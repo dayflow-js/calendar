@@ -43,17 +43,17 @@ function MyCalendar() {
 
 #### 配置
 
-| 属性                  | 类型                               | 默认值       | 描述                                     |
-| :-------------------- | :--------------------------------- | :----------- | :--------------------------------------- |
-| `showWeekends`        | `boolean`                          | `true`       | 是否显示周六和周日。                     |
-| `showAllDay`          | `boolean`                          | `true`       | 是否显示全天事件行。                     |
-| `startOfWeek`         | `number`                           | `1`          | 一周的开始日期（0 为周日，1 为周一等）。 |
-| `scrollToCurrentTime` | `boolean`                          | `true`       | 初始加载时是否自动滚动到当前时间。       |
-| `timeFormat`          | `'12h' \| '24h'`                   | `'24h'`      | 时间轴的时间格式。                       |
-| `secondaryTimeZone`   | `string`                           | `undefined`  | 仅在周视图中显示的辅助参考时间轴。       |
-| `gridDateClick`       | `'day-view' \| 'none' \| function` | `undefined`  | 点击日期单元格时的操作。                 |
-| `gridDateDoubleClick` | `'day-view' \| 'none' \| function` | `'day-view'` | 双击日期单元格时的操作。                 |
-| `hourHeight`          | `number`                           | `72`         | 时间网格中每小时行的高度（px）。         |
+| 属性                  | 类型                                                 | 默认值           | 描述                                                                                                  |
+| :-------------------- | :--------------------------------------------------- | :--------------- | :---------------------------------------------------------------------------------------------------- |
+| `showWeekends`        | `boolean`                                            | `true`           | 是否显示周六和周日。                                                                                  |
+| `showAllDay`          | `boolean`                                            | `true`           | 是否显示全天事件行。                                                                                  |
+| `startOfWeek`         | `number`                                             | `1`              | 一周的开始日期（0 为周日，1 为周一等）。                                                              |
+| `scrollToCurrentTime` | `boolean`                                            | `true`           | 初始加载时是否自动滚动到当前时间。                                                                    |
+| `timeFormat`          | `'12h' \| '24h'`                                     | `'24h'`          | 时间轴的时间格式。                                                                                    |
+| `secondaryTimeZone`   | `string`                                             | `undefined`      | 仅在周视图中显示的辅助参考时间轴。                                                                    |
+| `gridDateClick`       | `'day-view' \| 'none' \| function`                   | `undefined`      | 点击日期单元格时的操作。                                                                              |
+| `gridDateDoubleClick` | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的位置 (小时) 创建一个 1 小时的 Timed Event。 |
+| `hourHeight`          | `number`                                             | `72`             | 时间网格中每小时行的高度（px）。                                                                      |
 
 ```tsx {10}
 import {
@@ -80,16 +80,16 @@ function MyCalendar() {
 
 #### 配置
 
-| 属性                  | 类型                                              | 默认值        | 描述                                                           |
-| :-------------------- | :------------------------------------------------ | :------------ | :------------------------------------------------------------- |
-| `showWeekNumbers`     | `boolean`                                         | `false`       | 是否显示周数。                                                 |
-| `showMonthIndicator`  | `boolean`                                         | `true`        | 是否在滚动时显示月份指示标题。                                 |
-| `startOfWeek`         | `number`                                          | `1`           | 一周的开始日期（0 为周日，1 为周一等）。                       |
-| `snapToMonth`         | `boolean`                                         | `false`       | 启用后，用户停止滚动时视图会自动对齐到当前主要月份的起始位置。 |
-| `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function` | `undefined`   | 点击日期单元格时的操作。                                       |
-| `gridDateDoubleClick` | `'week-view' \| 'day-view' \| 'none' \| function` | `'week-view'` | 双击日期单元格时的操作。                                       |
-| `eventHeight`         | `number`                                          | `16`          | 月视图网格中每个事件行的高度（px）。                           |
-| `scroll`              | `MonthScrollConfig`                               | —             | 控制滚动锁定与月份切换动画，详见下方说明。                     |
+| 属性                  | 类型                                                                | 默认值           | 描述                                                                                                  |
+| :-------------------- | :------------------------------------------------------------------ | :--------------- | :---------------------------------------------------------------------------------------------------- |
+| `showWeekNumbers`     | `boolean`                                                           | `false`          | 是否显示周数。                                                                                        |
+| `showMonthIndicator`  | `boolean`                                                           | `true`           | 是否在滚动时显示月份指示标题。                                                                        |
+| `startOfWeek`         | `number`                                                            | `1`              | 一周的开始日期（0 为周日，1 为周一等）。                                                              |
+| `snapToMonth`         | `boolean`                                                           | `false`          | 启用后，用户停止滚动时视图会自动对齐到当前主要月份的起始位置。                                        |
+| `gridDateClick`       | `'week-view' \| 'day-view' \| 'none' \| function`                   | `undefined`      | 点击日期单元格时的操作。                                                                              |
+| `gridDateDoubleClick` | `'create-event' \| 'week-view' \| 'day-view' \| 'none' \| function` | `'create-event'` | 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的日期创建一个 9:00 至 10:00 的 Timed Event。 |
+| `eventHeight`         | `number`                                                            | `16`             | 月视图网格中每个事件行的高度（px）。                                                                  |
+| `scroll`              | `MonthScrollConfig`                                                 | —                | 控制滚动锁定与月份切换动画，详见下方说明。                                                            |
 
 #### MonthScrollConfig
 
@@ -171,15 +171,15 @@ function MyCalendar() {
 
 #### 配置
 
-| 属性                        | 类型                                          | 默认值          | 描述                                                                     |
-| :-------------------------- | :-------------------------------------------- | :-------------- | :----------------------------------------------------------------------- |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`     | `'year-canvas'` | 年视图的显示模式。                                                       |
-| `startOfWeek`               | `number`                                      | `1`             | 设置周起始日（0 为周日，1 为周一等）。用于 `fixed-week` 和 `grid` 模式。 |
-| `showTimedEventsInYearView` | `boolean`                                     | `false`         | 是否在年视图中显示定时事件（圆点/指示器/热力强度）。                     |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function` | `'popup'`       | (Grid 模式) 点击日期单元格时的操作。                                     |
-| `gridDateDoubleClick`       | `'day-view' \| 'none' \| function`            | `'day-view'`    | (Grid 模式) 双击日期单元格时的操作。                                     |
-| `gridPopupContent`          | `function`                                    | `undefined`     | (Grid 模式) 日期弹出层的自定义渲染函数。                                 |
-| `gridHeatmapLevels`         | `number`                                      | `5`             | (Grid 模式) 热力图的强度层级数量。                                       |
+| 属性                        | 类型                                                 | 默认值           | 描述                                                                                                              |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :---------------------------------------------------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | 年视图的显示模式。                                                                                                |
+| `startOfWeek`               | `number`                                             | `1`              | 设置周起始日（0 为周日，1 为周一等）。用于 `fixed-week` 和 `grid` 模式。                                          |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | 是否在年视图中显示定时事件（圆点/指示器/热力强度）。                                                              |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid 模式) 点击日期单元格时的操作。                                                                              |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid 模式) 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的日期创建一个 9:00 至 10:00 的 Timed Event。 |
+| `gridPopupContent`          | `function`                                           | `undefined`      | (Grid 模式) 自定义日期悬浮弹窗内容的渲染函数。                                                                    |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid 模式) 热力图的强度层级数量。                                                                                |
 
 #### 热力图自定义 (Grid 模式)
 

@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
 } from 'preact/hooks';
-import { Temporal } from 'temporal-polyfill';
 
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
@@ -19,7 +18,11 @@ import {
   ICalendarApp,
   YearViewConfig,
 } from '@/types';
-import { hasEventChanged, scrollbarTakesSpace } from '@/utils';
+import {
+  hasEventChanged,
+  scrollbarTakesSpace,
+  dateToZonedDateTime,
+} from '@/utils';
 
 import { FixedWeekMonthRow } from './FixedWeekMonthRow';
 import {
@@ -246,49 +249,44 @@ export const FixedWeekYearView = ({
   );
 
   // Drag and Drop Hook
-  const {
-    handleMoveStart,
-    handleResizeStart,
-    handleCreateStart,
-    dragState,
-    isDragging,
-  } = useDragForView(app, {
-    calendarRef,
-    viewType: ViewType.YEAR,
-    onEventsUpdate: (updateFunc, isResizing, source) => {
-      const newEvents = updateFunc(rawEvents);
+  const { handleMoveStart, handleResizeStart, dragState, isDragging } =
+    useDragForView(app, {
+      calendarRef,
+      viewType: ViewType.YEAR,
+      onEventsUpdate: (updateFunc, isResizing, source) => {
+        const newEvents = updateFunc(rawEvents);
 
-      // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
-      // caused ~100M string comparisons/tick with 10000 events.
-      const prevMap = new Map(rawEvents.map(e => [e.id, e]));
-      const eventsToUpdate = newEvents.filter(newEvent => {
-        const old = prevMap.get(newEvent.id);
-        return (
-          old !== undefined &&
-          old !== newEvent &&
-          hasEventChanged(old, newEvent)
-        );
-      });
+        // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
+        // caused ~100M string comparisons/tick with 10000 events.
+        const prevMap = new Map(rawEvents.map(e => [e.id, e]));
+        const eventsToUpdate = newEvents.filter(newEvent => {
+          const old = prevMap.get(newEvent.id);
+          return (
+            old !== undefined &&
+            old !== newEvent &&
+            hasEventChanged(old, newEvent)
+          );
+        });
 
-      if (eventsToUpdate.length > 0) {
-        app.applyEventsChanges(
-          {
-            update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
-          },
-          isResizing,
-          source
-        );
-      }
-    },
-    currentWeekStart: new Date(),
-    events: rawEvents,
-    onEventCreate: event => {
-      app.addEvent(event);
-    },
-    onEventEdit: event => {
-      setNewlyCreatedEventId(event.id);
-    },
-  });
+        if (eventsToUpdate.length > 0) {
+          app.applyEventsChanges(
+            {
+              update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+            },
+            isResizing,
+            source
+          );
+        }
+      },
+      currentWeekStart: new Date(),
+      events: rawEvents,
+      onEventCreate: event => {
+        app.addEvent(event);
+      },
+      onEventEdit: event => {
+        setNewlyCreatedEventId(event.id);
+      },
+    });
   const yearDragState = dragState as MonthEventDragState;
 
   // Get config value
@@ -327,7 +325,7 @@ export const FixedWeekYearView = ({
   // otherwise preserve the existing create-event behavior.
   const handleCellDoubleClick = useCallback(
     (e: unknown, date: Date) => {
-      const dblClickAction = config?.gridDateDoubleClick;
+      const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
         dblClickAction(date, getDayEvents(date));
@@ -344,35 +342,30 @@ export const FixedWeekYearView = ({
         return;
       }
 
-      if (showTimedEvents) {
-        // Use default drag behavior for timed events
-        handleCreateStart?.(e, date);
-      } else {
-        // Create all-day event directly using Temporal.PlainDate
-        const plainDate = Temporal.PlainDate.from({
-          year: date.getFullYear(),
-          month: date.getMonth() + 1,
-          day: date.getDate(),
-        });
-        const newEvent: Event = {
-          id: `event-${Date.now()}`,
-          title: t('newEvent') || 'New Event',
-          start: plainDate,
-          end: plainDate,
-          allDay: true,
-        };
-        app.addEvent(newEvent);
-        setNewlyCreatedEventId(newEvent.id);
-      }
+      // 'create-event' (default)
+      if (!app.canMutateFromUI()) return;
+      const writableCal = app
+        .getCalendarRegistry()
+        .getDefaultWritableCalendar();
+      if (!writableCal) return;
+
+      const startTime = new Date(date);
+      startTime.setHours(9, 0, 0, 0);
+      const endTime = new Date(date);
+      endTime.setHours(10, 0, 0, 0);
+
+      const newEvent: Event = {
+        id: `event-${Date.now()}`,
+        title: t('newEvent') || 'New Event',
+        start: dateToZonedDateTime(startTime, appTimeZone),
+        end: dateToZonedDateTime(endTime, appTimeZone),
+        allDay: false,
+        calendarId: writableCal.id,
+      };
+      app.addEvent(newEvent);
+      setNewlyCreatedEventId(newEvent.id);
     },
-    [
-      config?.gridDateDoubleClick,
-      getDayEvents,
-      showTimedEvents,
-      handleCreateStart,
-      app,
-      t,
-    ]
+    [config?.gridDateDoubleClick, getDayEvents, app, t, appTimeZone]
   );
 
   // Generate week header labels
