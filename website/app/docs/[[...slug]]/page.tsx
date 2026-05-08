@@ -1,13 +1,19 @@
 import { DocsBody, DocsPage } from 'fumadocs-ui/layouts/docs/page';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { getPageImage, source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
+
+  if (!params.slug || params.slug.length === 0) {
+    const first = source.getPages()[0];
+    redirect(first ? `/docs/${first.slugs.join('/')}` : '/docs/introduction');
+  }
+
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
@@ -35,7 +41,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 }
 
 export function generateStaticParams() {
-  return source.generateParams();
+  return [{ slug: [] as string[] }, ...source.generateParams()];
 }
 
 export async function generateMetadata(

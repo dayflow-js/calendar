@@ -1,4 +1,4 @@
 {
   "title": "Documentation",
-  "pages": ["introduction", "plugins", "features", "guides", "ui"]
+  "pages": ["introduction", "plugins", "features", "caldav", "guides", "ui"]
 }

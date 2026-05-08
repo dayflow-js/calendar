@@ -143,6 +143,12 @@
       "rules": {
         "import/no-unassigned-import": "off"
       }
+    },
+    {
+      "files": ["examples/**/*"],
+      "rules": {
+        "import/no-relative-parent-imports": "off"
+      }
     }
   ]
 }

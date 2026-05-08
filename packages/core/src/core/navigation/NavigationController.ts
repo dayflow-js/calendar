@@ -7,11 +7,14 @@ import {
   CalendarViewType,
   RangeChangeReason,
   ViewType,
+  VisibleRangePayload,
 } from '@/types';
 import { getWeekRange } from '@/utils/dateRangeUtils';
 
 export class NavigationController {
   private visibleMonth: Date;
+  private visibleRangeListeners: Set<(payload: VisibleRangePayload) => void> =
+    new Set();
 
   private static getAgendaPageDays(view?: CalendarView): number {
     const pageDays = Number(view?.config?.daysToShow);
@@ -54,6 +57,13 @@ export class NavigationController {
     return view;
   }
 
+  subscribeVisibleRangeChange(
+    listener: (payload: VisibleRangePayload) => void
+  ): () => void {
+    this.visibleRangeListeners.add(listener);
+    return () => this.visibleRangeListeners.delete(listener);
+  }
+
   emitVisibleRange(
     start: Date,
     end: Date,
@@ -64,6 +74,13 @@ export class NavigationController {
       new Date(end),
       reason
     );
+    const payload: VisibleRangePayload = {
+      start: new Date(start),
+      end: new Date(end),
+      reason,
+      view: this.state.currentView,
+    };
+    this.visibleRangeListeners.forEach(listener => listener(payload));
   }
 
   handleVisibleRangeChange(reason: RangeChangeReason): void {

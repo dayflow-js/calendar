@@ -6,9 +6,17 @@ import { createRoot } from 'react-dom/client';
 import '@/styles/tailwind-components.css';
 import './styles/tailwind.css';
 import CalendarExample from './defaultCalendarExample/defaultCalendarExample';
+import SyncConnectivityExample from './sync-connectivity/SyncConnectivityExample';
 
 const container = document.querySelector('#root');
 if (container) {
   const root = createRoot(container);
-  root.render(<CalendarExample />);
+  const showSyncConnectivity =
+    window.location.pathname.includes('sync-connectivity') ||
+    new URLSearchParams(window.location.search).get('example') ===
+      'sync-connectivity';
+
+  root.render(
+    showSyncConnectivity ? <SyncConnectivityExample /> : <CalendarExample />
+  );
 }

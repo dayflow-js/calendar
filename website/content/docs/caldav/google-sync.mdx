@@ -1,0 +1,264 @@
+# @dayflow/google-sync
+
+`@dayflow/google-sync` connects DayFlow to the Google Calendar REST API v3. It is a separate package from `@dayflow/caldav` — it speaks the Google Calendar API directly, not CalDAV.
+
+## Installation
+
+<PackageTabs pkg='@dayflow/google-sync' />
+
+## Quick Start
+
+```tsx
+import { useRef, useEffect } from 'react';
+import {
+  DayFlowCalendar,
+  useCalendarApp,
+  createMonthView,
+} from '@dayflow/react';
+import {
+  attachGoogleSyncToDayFlow,
+  createGoogleSync,
+  createGoogleSyncAdapter,
+  type GoogleDayFlowController,
+  type GoogleSyncStatus,
+} from '@dayflow/google-sync';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    calendars: [],
+    events: [],
+  });
+
+  const controllerRef = useRef<GoogleDayFlowController | null>(null);
+  const [syncStatus, setSyncStatus] = useState<GoogleSyncStatus>({
+    state: 'idle',
+  });
+
+  useEffect(() => {
+    if (controllerRef.current) return;
+
+    const adapter = createGoogleSyncAdapter({
+      baseUrl: '/api/google-calendar',
+      fetch: (url, init) => fetch(url, init),
+    });
+
+    const sync = createGoogleSync(adapter);
+    const controller = attachGoogleSyncToDayFlow(calendar.app, sync, {
+      writable: true,
+      onStatusChange: setSyncStatus,
+      onWriteError: (error, ctx) =>
+        console.error(`[google-sync] ${ctx.action} failed:`, error.message),
+    });
+
+    controllerRef.current = controller;
+    controller.start();
+
+    return () => {
+      controller.stop();
+      controllerRef.current = null;
+    };
+  }, [calendar.app]);
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Backend Proxy
+
+The Google Calendar API supports CORS, but sending OAuth tokens from the browser exposes them to anyone who can inspect network requests. Keep tokens on the server.
+
+```js
+// proxy.mjs (Node.js example)
+import { createServer } from 'node:http';
+
+const {
+  GOOGLE_ACCESS_TOKEN,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REFRESH_TOKEN,
+  PORT = '3002',
+} = process.env;
+
+const GOOGLE_API_BASE = 'https://www.googleapis.com/calendar/v3';
+const ALLOWED_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+
+let cachedToken = GOOGLE_ACCESS_TOKEN
+  ? { token: GOOGLE_ACCESS_TOKEN, expiresAt: Infinity }
+  : null;
+
+async function getAccessToken() {
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 30_000) {
+    return cachedToken.token;
+  }
+  // Refresh using client credentials
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: GOOGLE_REFRESH_TOKEN,
+      grant_type: 'refresh_token',
+    }),
+  });
+  const data = await res.json();
+  cachedToken = {
+    token: data.access_token,
+    expiresAt: Date.now() + data.expires_in * 1000,
+  };
+  return cachedToken.token;
+}
+
+createServer(async (req, res) => {
+  // Strip the proxy prefix: /api/google-calendar/... → /calendar/v3/...
+  const upstreamPath = req.url.replace(/^\/api\/google-calendar/, '');
+  const upstreamUrl = `${GOOGLE_API_BASE}${upstreamPath}`;
+
+  if (!ALLOWED_METHODS.has(req.method)) {
+    res.writeHead(405);
+    res.end();
+    return;
+  }
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const body =
+    req.method === 'GET' || req.method === 'DELETE'
+      ? undefined
+      : Buffer.concat(chunks).toString();
+
+  const token = await getAccessToken();
+  const upstream = await fetch(upstreamUrl, {
+    method: req.method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(req.headers['if-match']
+        ? { 'If-Match': req.headers['if-match'] }
+        : {}),
+    },
+    body,
+  });
+
+  const responseBody = upstream.status === 204 ? '' : await upstream.text();
+  res.writeHead(upstream.status, { 'Content-Type': 'application/json' });
+  res.end(responseBody);
+}).listen(Number(PORT));
+```
+
+### Token Options
+
+You can configure the proxy with either a short-lived access token or a refresh-token flow:
+
+| Env Var                                                              | When to use                                                   |
+| :------------------------------------------------------------------- | :------------------------------------------------------------ |
+| `GOOGLE_ACCESS_TOKEN`                                                | Quick local testing. Token expires in ~1 hour.                |
+| `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` + `GOOGLE_REFRESH_TOKEN` | Long-lived server access. The proxy auto-refreshes the token. |
+
+Generate an access token for testing at [Google OAuth 2.0 Playground](https://developers.google.com/oauthplayground). Select the `https://www.googleapis.com/auth/calendar` scope.
+
+Start the proxy:
+
+```bash
+# Quick test with an access token
+GOOGLE_ACCESS_TOKEN=ya29.xxx node proxy.mjs
+
+# Long-lived with refresh token
+GOOGLE_CLIENT_ID=xxx \
+GOOGLE_CLIENT_SECRET=xxx \
+GOOGLE_REFRESH_TOKEN=xxx \
+node proxy.mjs
+```
+
+Point the adapter at your proxy:
+
+```ts
+const adapter = createGoogleSyncAdapter({
+  baseUrl: 'http://localhost:3002/api/google-calendar',
+  fetch: (url, init) => fetch(url, init),
+});
+```
+
+## Options Reference
+
+### `attachGoogleSyncToDayFlow` Options
+
+| Option           | Type                                 | Default         | Description                                                                                     |
+| :--------------- | :----------------------------------- | :-------------- | :---------------------------------------------------------------------------------------------- |
+| `writable`       | `boolean`                            | `true`          | Allow local mutations to be written back to Google Calendar.                                    |
+| `onStatusChange` | `(status: GoogleSyncStatus) => void` | —               | Called whenever the sync state changes.                                                         |
+| `onWriteError`   | `(error: Error, ctx) => void`        | `console.error` | Called when a create / update / delete write-back fails. `ctx` includes `action` and `eventId`. |
+
+### `GoogleSyncStatus`
+
+```ts
+type GoogleSyncStatus = {
+  state: 'idle' | 'syncing' | 'error';
+  lastSyncedAt?: string; // ISO timestamp
+  error?: {
+    message: string;
+    calendarId?: string;
+  };
+};
+```
+
+## Controller API
+
+```ts
+// Load calendars, sync initial events, and subscribe to visible-range and event changes
+await controller.start();
+
+// Unsubscribe all listeners
+controller.stop();
+
+// Re-sync all calendars for the current visible range
+await controller.refresh();
+
+// Re-sync a specific calendar
+await controller.refresh({ calendarId: 'primary' });
+
+// Re-sync with an explicit range
+await controller.refresh({
+  calendarId: 'primary',
+  range: { start: new Date('2025-01-01'), end: new Date('2025-02-01') },
+});
+
+// Current sync state
+const status = controller.getStatus();
+```
+
+## How Sync Works
+
+### Calendar discovery
+
+On `controller.start()`, the package fetches the authenticated user's calendar list (`GET /calendarList`) and registers each calendar as a `CalendarType` in DayFlow. Calendars with `accessRole: 'reader'` or `'freeBusyReader'` are marked `readOnly: true`.
+
+### Event loading
+
+Events are loaded for the currently visible date range. When the user navigates (week forward, month back, etc.), events for the new range are loaded automatically if `refreshOnVisibleRangeChange` is `true` (default for Google sync via the range-change listener).
+
+### Incremental sync
+
+After the initial load, the package uses Google Calendar's `syncToken` for incremental sync — only changed events are fetched on subsequent syncs, not the full range.
+
+### Write-back
+
+When `writable: true`, local event changes (create, update, delete) are automatically written back to Google Calendar:
+
+- **Create**: `POST /calendars/{calendarId}/events`
+- **Update**: `PUT /calendars/{calendarId}/events/{eventId}` with `If-Match: <etag>`
+- **Delete**: `DELETE /calendars/{calendarId}/events/{eventId}`
+
+If an update returns **412 Precondition Failed** (ETag conflict — the event was changed on another device), the package automatically re-fetches the latest ETag and retries the update once.
+
+Recurring events are **never** written back — they are read-only.
+
+## Google Calendar API Scopes
+
+Your OAuth token must include at least one of these scopes:
+
+| Scope                                               | Access                                        |
+| :-------------------------------------------------- | :-------------------------------------------- |
+| `https://www.googleapis.com/auth/calendar`          | Full read/write access                        |
+| `https://www.googleapis.com/auth/calendar.readonly` | Read-only access (use with `writable: false`) |

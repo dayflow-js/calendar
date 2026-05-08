@@ -13,6 +13,7 @@ import {
   CalendarType,
   RangeChangeReason,
   Event,
+  EventMutationSource,
 } from '@/types';
 import {
   createConfigSyncSnapshot,
@@ -99,7 +100,7 @@ export function useCalendarApp(
       id: string,
       eventUpdate: Partial<Event>,
       isPending?: boolean,
-      source?: 'drag' | 'resize'
+      source?: EventMutationSource
     ) => {
       const result = originalUpdateEvent(id, eventUpdate, isPending, source);
       setEvents([...app.getEvents()]);
@@ -230,9 +231,10 @@ export function useCalendarApp(
         update?: Array<{ id: string; updates: Partial<Event> }>;
         delete?: string[];
       },
-      isPending?: boolean
+      isPending?: boolean,
+      source?: EventMutationSource
     ) => {
-      app.applyEventsChanges(changes, isPending);
+      app.applyEventsChanges(changes, isPending, source);
       triggerUpdate();
     },
     [app, triggerUpdate]
@@ -243,7 +245,7 @@ export function useCalendarApp(
       id: string,
       event: Partial<Event>,
       isPending?: boolean,
-      source?: 'drag' | 'resize'
+      source?: EventMutationSource
     ) => {
       const result = app.updateEvent(id, event, isPending, source);
       triggerUpdate();

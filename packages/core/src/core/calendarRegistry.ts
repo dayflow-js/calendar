@@ -391,14 +391,19 @@ export class CalendarRegistry {
   }
 
   /**
-   * Get the first writable (non-readOnly, non-subscription) calendar for event creation.
-   * Prefers the default calendar; falls back to the first writable calendar.
+   * Get the first writable calendar for event creation.
+   * Prefers non-subscription calendars; falls back to non-readOnly subscription
+   * calendars (e.g. a writable Google Calendar sync).
    * Returns undefined if every calendar is read-only.
    */
   getDefaultWritableCalendar(): CalendarType | undefined {
     const defaultCal = this.getDefaultCalendar();
     if (defaultCal && isWritable(defaultCal)) return defaultCal;
-    return this.getAll().find(isWritable);
+    const found = this.getAll().find(isWritable);
+    if (found) return found;
+    // Fallback: non-readOnly subscription calendar (e.g. writable Google/CalDAV sync)
+    if (defaultCal && defaultCal.readOnly !== true) return defaultCal;
+    return this.getAll().find(cal => cal.readOnly !== true);
   }
 
   /**

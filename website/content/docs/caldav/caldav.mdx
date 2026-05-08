@@ -1,0 +1,307 @@
+# @dayflow/caldav
+
+`@dayflow/caldav` is a headless, adapter-first CalDAV sync engine. It works with iCloud Calendar, Nextcloud, Radicale, Fastmail, and any RFC 4791-compliant CalDAV server.
+
+## Installation
+
+<PackageTabs pkg='@dayflow/caldav' />
+
+## Quick Start
+
+```tsx
+import { useRef, useEffect } from 'react';
+import {
+  DayFlowCalendar,
+  useCalendarApp,
+  createMonthView,
+} from '@dayflow/react';
+import {
+  attachCalDAVToDayFlow,
+  createCalDAVAdapter,
+  createCalDAVSync,
+  type CalDAVDayFlowController,
+} from '@dayflow/caldav';
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    calendars: [],
+    events: [],
+  });
+  const controllerRef = useRef<CalDAVDayFlowController | null>(null);
+
+  useEffect(() => {
+    if (controllerRef.current) return;
+
+    const adapter = createCalDAVAdapter({
+      calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+      fetch: (url, init) =>
+        fetch('/api/caldav-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, init }),
+        }),
+    });
+
+    const sync = createCalDAVSync({ adapter });
+    const controller = attachCalDAVToDayFlow(calendar.app, sync, {
+      writable: true,
+      refreshOnVisibleRangeChange: true,
+    });
+
+    controllerRef.current = controller;
+    controller.start();
+
+    return () => {
+      controller.stop();
+      controllerRef.current = null;
+    };
+  }, [calendar.app]);
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+## Calendar Home Discovery
+
+If you don't know the calendar home URL upfront, use `discoverCalendarHome` to find it dynamically from the server root:
+
+```ts
+import { discoverCalendarHome, ICLOUD_CALDAV_SERVER } from '@dayflow/caldav';
+
+// iCloud
+const calendarHomeUrl = await discoverCalendarHome(
+  ICLOUD_CALDAV_SERVER,
+  authenticatedFetch
+);
+
+// Any RFC 4791 server
+const calendarHomeUrl = await discoverCalendarHome(
+  'https://nextcloud.example.com/remote.php/dav/',
+  authenticatedFetch
+);
+```
+
+`discoverCalendarHome` performs a two-step PROPFIND:
+
+1. Fetches `current-user-principal` from the server root
+2. Fetches `calendar-home-set` from the principal URL
+
+The `fetch` argument must inject auth credentials — discovery requests require authentication like any other CalDAV request.
+
+## Provider Presets
+
+Use the built-in presets to construct the correct `calendarHomeUrl` for known providers:
+
+```ts
+import {
+  ICLOUD_CALDAV_SERVER,
+  nextcloudConfig,
+  radicaleConfig,
+  fastmailConfig,
+  discoverCalendarHome,
+  createCalDAVAdapter,
+} from '@dayflow/caldav';
+
+// iCloud — must always discover dynamically
+const icloudHomeUrl = await discoverCalendarHome(
+  ICLOUD_CALDAV_SERVER,
+  proxiedFetch
+);
+const icloudAdapter = createCalDAVAdapter({
+  calendarHomeUrl: icloudHomeUrl,
+  fetch: proxiedFetch,
+});
+
+// Nextcloud
+const nextcloudAdapter = createCalDAVAdapter({
+  ...nextcloudConfig('https://nextcloud.example.com', 'alice'),
+  fetch: proxiedFetch,
+});
+
+// Radicale
+const radicaleAdapter = createCalDAVAdapter({
+  ...radicaleConfig('https://radicale.example.com', 'alice'),
+  fetch: proxiedFetch,
+});
+
+// Fastmail
+const fastmailAdapter = createCalDAVAdapter({
+  ...fastmailConfig('https://caldav.fastmail.com/dav', 'alice@fastmail.com'),
+  fetch: proxiedFetch,
+});
+```
+
+### iCloud Calendar
+
+iCloud CalDAV requires an **app-specific password** — not your Apple ID password. Generate one at [appleid.apple.com](https://appleid.apple.com) → Sign-In and Security → App-Specific Passwords.
+
+iCloud does not support browser CORS, so a backend proxy is required for all requests, including `discoverCalendarHome`.
+
+iCloud-specific behavior handled automatically by the adapter:
+
+- 8-digit RGBA hex colors (`#RRGGBBAA`) — alpha channel is stripped
+- Conditional writes (`If-Match` ETag) work correctly
+- All-day events use standard `VALUE=DATE` format
+- Timezone-aware events use the standard `TZID` parameter
+
+### Nextcloud
+
+Use an [app password](https://docs.nextcloud.com/server/latest/user_manual/en/session_management.html) from Personal Settings → Security, not your account password.
+
+Nextcloud returns `current-user-privilege-set` correctly, so read/write permissions are detected automatically. CORS is not supported — use a proxy.
+
+### Radicale
+
+Radicale typically does not return `current-user-privilege-set`, so the adapter defaults to read-only for discovered calendars. If you know the user has write access, set `readOnly: false` on the `CalendarType` after discovery.
+
+### Fastmail
+
+Fastmail supports standard CalDAV. Use `fastmailConfig` with your Fastmail email address as the username.
+
+## Backend Proxy
+
+CalDAV servers do not support browser CORS. The browser cannot call them directly. You need a backend proxy that:
+
+1. Receives requests from DayFlow (as JSON-wrapped CalDAV requests)
+2. Injects credentials (Basic Auth, token, etc.)
+3. Forwards to the CalDAV server and returns the response
+
+```js
+// proxy.mjs (minimal Node.js example)
+import { createServer } from 'node:http';
+
+const {
+  CALDAV_BASE_URL, // e.g. https://caldav.icloud.com
+  CALDAV_USERNAME,
+  CALDAV_PASSWORD,
+  PORT = '3001',
+} = process.env;
+
+const ALLOWED_METHODS = new Set(['PROPFIND', 'REPORT', 'PUT', 'DELETE']);
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': 'http://localhost:5173',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Expose-Headers': 'ETag, DAV',
+};
+
+createServer(async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, CORS_HEADERS);
+    res.end();
+    return;
+  }
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const { url, init } = JSON.parse(Buffer.concat(chunks).toString());
+
+  if (!url.startsWith(CALDAV_BASE_URL)) {
+    res.writeHead(403);
+    res.end();
+    return;
+  }
+  if (!ALLOWED_METHODS.has(init?.method ?? 'PROPFIND')) {
+    res.writeHead(405);
+    res.end();
+    return;
+  }
+
+  const upstream = await fetch(url, {
+    ...init,
+    headers: {
+      ...init?.headers,
+      Authorization:
+        'Basic ' +
+        Buffer.from(`${CALDAV_USERNAME}:${CALDAV_PASSWORD}`).toString('base64'),
+    },
+  });
+
+  const body = await upstream.text();
+  res.writeHead(upstream.status, {
+    'Content-Type': upstream.headers.get('Content-Type') ?? 'text/xml',
+    ETag: upstream.headers.get('ETag') ?? '',
+    ...CORS_HEADERS,
+  });
+  res.end(body);
+}).listen(Number(PORT));
+```
+
+Start the proxy with credentials in environment variables:
+
+```bash
+CALDAV_BASE_URL=https://caldav.icloud.com \
+CALDAV_USERNAME=alice@icloud.com \
+CALDAV_PASSWORD=xxxx-xxxx-xxxx-xxxx \
+node proxy.mjs
+```
+
+## Options Reference
+
+### `attachCalDAVToDayFlow` Options
+
+| Option                        | Type                       | Default       | Description                                                      |
+| :---------------------------- | :------------------------- | :------------ | :--------------------------------------------------------------- |
+| `writable`                    | `boolean`                  | `true`        | Allow local mutations to be written back to the CalDAV server.   |
+| `refreshOnVisibleRangeChange` | `boolean`                  | `true`        | Re-sync when the user navigates to a new date range.             |
+| `eventMode.recurring`         | `'read-only'`              | `'read-only'` | Recurring events are read-only. Only `'read-only'` is supported. |
+| `onError`                     | `(error, context) => void` | —             | Called on any sync or write failure.                             |
+
+`CalDAVErrorContext` includes `operation` (`'list-calendars'` \| `'initial-sync'` \| `'range-sync'` \| `'create'` \| `'update'` \| `'delete'`), `calendarId`, and `eventId`.
+
+### `createCalDAVAdapter` Options
+
+| Option            | Type       | Required | Description                                                     |
+| :---------------- | :--------- | :------- | :-------------------------------------------------------------- |
+| `calendarHomeUrl` | `string`   | ✓        | The CalDAV calendar home collection URL.                        |
+| `fetch`           | `function` | ✓        | Authenticated fetch function. Route through your backend proxy. |
+
+## Controller API
+
+```ts
+// Discover remote calendars, load initial events, and subscribe to DayFlow changes
+await controller.start();
+
+// Unsubscribe all listeners (does not clear DayFlow state)
+controller.stop();
+
+// Re-sync all calendars using the last known visible range
+await controller.refresh();
+
+// Re-sync a specific calendar
+await controller.refresh({ calendarId: 'my-calendar-id' });
+
+// Re-sync with an explicit date range
+await controller.refresh({
+  range: { start: new Date('2025-01-01'), end: new Date('2025-02-01') },
+});
+
+// Get current sync status
+const status = controller.getStatus();
+// { state: 'idle' | 'syncing' | 'error', lastSyncedAt?: Date, error?: unknown }
+```
+
+## Storage Interface
+
+`createCalDAVSync` accepts an optional `storage` object for persisting sync tokens and ETags across page reloads. If not provided, sync state is kept in memory only.
+
+```ts
+import { createCalDAVSync, type CalDAVStorage } from '@dayflow/caldav';
+
+const storage: CalDAVStorage = {
+  getSyncToken: async calendarId =>
+    localStorage.getItem(`sync:${calendarId}`) ?? undefined,
+  setSyncToken: async (calendarId, token) =>
+    localStorage.setItem(`sync:${calendarId}`, token),
+  deleteSyncToken: async calendarId =>
+    localStorage.removeItem(`sync:${calendarId}`),
+
+  getEtag: async uid => localStorage.getItem(`etag:${uid}`) ?? undefined,
+  setEtag: async (uid, etag) => localStorage.setItem(`etag:${uid}`, etag),
+  deleteEtag: async uid => localStorage.removeItem(`etag:${uid}`),
+};
+
+const sync = createCalDAVSync({ adapter, storage });
+```

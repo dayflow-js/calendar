@@ -2,7 +2,6 @@ import {
   Event,
   CalendarType,
   EventChange,
-  ReadOnlyConfig,
   TimeZone,
   ViewType,
 } from '@dayflow/core';
@@ -20,8 +19,15 @@ import {
 import { getWebsiteCalendars } from '@examples/utils/palette';
 import { generateSampleEvents } from '@examples/utils/sampleData';
 import { createKeyboardShortcutsPlugin } from '@keyboard-shortcuts/plugin';
-import { createSidebarPlugin } from '@sidebar/plugin';
-import { Sun, Moon, Globe, Clock } from 'lucide-react';
+import { createSidebarPlugin, SidebarService } from '@sidebar/plugin';
+import {
+  Sun,
+  Moon,
+  Globe,
+  Clock,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 const TZ_OPTIONS = Object.entries(TimeZone).map(([key, value]) => ({
@@ -58,13 +64,13 @@ const DefaultCalendarExample: React.FC<{
 }> = ({ themeMode }) => {
   const [events] = useState<Event[]>(generateSampleEvents());
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
-  const [readOnly] = useState<boolean | ReadOnlyConfig>(false);
   // Global calendar timezone — affects all views' event bucketing and editing
   const [appTz, setAppTz] = useState<string>('');
   // Secondary timezone — only adds a second timeline label column in Day/Week
   const [secondaryTz, setSecondaryTz] = useState<string>('');
 
   const [isMobile, setIsMobile] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -245,7 +251,6 @@ const DefaultCalendarExample: React.FC<{
     defaultView: ViewType.MONTH,
     // useEventDetailDialog: true,
     // switcherMode: 'select' as const,
-    // readOnly,
     callbacks,
   });
 
@@ -254,6 +259,30 @@ const DefaultCalendarExample: React.FC<{
   return (
     <div>
       <div className='mb-4 flex flex-wrap items-center gap-3 px-4'>
+        {/* Sidebar toggle button — exercises the SidebarService API */}
+        {!isMobile && (
+          <button
+            type='button'
+            onClick={() => {
+              const sidebar = calendar.app.getPlugin<SidebarService>('sidebar');
+              if (!sidebar) return;
+              const next = !sidebar.isCollapsed();
+              sidebar.setCollapsed(next);
+              setSidebarCollapsed(next);
+            }}
+            className='flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700'
+          >
+            {sidebarCollapsed ? (
+              <>
+                <PanelLeftOpen size={16} /> Show Sidebar
+              </>
+            ) : (
+              <>
+                <PanelLeftClose size={16} /> Hide Sidebar
+              </>
+            )}
+          </button>
+        )}
         {/* Global calendar timezone */}
         <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-88 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
           <Globe size={16} className='text-gray-400' />

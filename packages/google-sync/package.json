@@ -1,0 +1,55 @@
+{
+  "name": "@dayflow/google-sync",
+  "version": "0.1.0",
+  "description": "Headless Google Calendar sync engine for DayFlow - transport-agnostic, adapter-first",
+  "keywords": [
+    "calendar",
+    "dayflow",
+    "google-calendar",
+    "sync"
+  ],
+  "license": "MIT",
+  "author": "Jayce Li",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "clean": "rimraf dist node_modules",
+    "postbuild": "rimraf dist/types",
+    "prebuild": "rimraf dist",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "temporal-polyfill": "catalog:"
+  },
+  "devDependencies": {
+    "@dayflow/core": "workspace:*",
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
+    "jest-environment-jsdom": "catalog:",
+    "rimraf": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-dts": "catalog:",
+    "ts-jest": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:*"
+  }
+}

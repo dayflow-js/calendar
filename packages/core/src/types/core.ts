@@ -58,10 +58,31 @@ export type RangeChangeReason =
   | 'viewChange'
   | 'scroll';
 
-export type EventChange =
+/**
+ * Source of an event mutation.
+ * - 'local': user-initiated change from the UI
+ * - 'remote': applied by an external sync engine (e.g. CalDAV); must not trigger write-back
+ * - 'drag' / 'resize': UI drag or resize interaction (pending → confirmed)
+ */
+export type EventMutationSource = 'local' | 'remote' | 'drag' | 'resize';
+
+export type RawEventChange =
   | { type: 'create'; event: Event }
   | { type: 'update'; before: Event; after: Event }
   | { type: 'delete'; event: Event };
+
+export type EventChange = RawEventChange & { source: EventMutationSource };
+
+/**
+ * Payload delivered to subscribeVisibleRangeChange listeners.
+ * Includes the view type so sync engines can scope their range queries correctly.
+ */
+export type VisibleRangePayload = {
+  start: Date;
+  end: Date;
+  reason: RangeChangeReason;
+  view: CalendarViewType;
+};
 
 /**
  * Calendar callbacks interface
@@ -228,6 +249,25 @@ export interface ICalendarApp {
   // Subscription management
   subscribe: (listener: (app: ICalendarApp) => void) => () => void;
 
+  /**
+   * Subscribe to visible range changes. Fires on navigation, view change, and scroll.
+   * The payload includes the current view so sync engines can scope range queries.
+   * Returns an unsubscribe function.
+   */
+  subscribeVisibleRangeChange: (
+    listener: (payload: VisibleRangePayload) => void
+  ) => () => void;
+
+  /**
+   * Subscribe to all event mutations (create, update, delete).
+   * Each change includes a `source` field — remote sync engines should skip write-back
+   * when `source === 'remote'`.
+   * Returns an unsubscribe function.
+   */
+  subscribeEventChanges: (
+    listener: (changes: EventChange[]) => void
+  ) => () => void;
+
   // View management
   changeView: (view: CalendarViewType) => void;
   getCurrentView: () => CalendarView;
@@ -252,7 +292,7 @@ export interface ICalendarApp {
       delete?: string[];
     },
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ) => void;
   addEvent: (event: Event) => void;
   /** Add events from external sources (like subscriptions) without persisting to main DB */
@@ -261,7 +301,7 @@ export interface ICalendarApp {
     id: string,
     event: Partial<Event>,
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   getEvents: () => Event[];
@@ -350,7 +390,7 @@ export interface UseCalendarAppReturn {
       delete?: string[];
     },
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ) => void;
   changeView: (view: CalendarViewType) => void;
   setCurrentDate: (date: Date) => void;
@@ -359,7 +399,7 @@ export interface UseCalendarAppReturn {
     id: string,
     event: Partial<Event>,
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
   goToToday: () => void;

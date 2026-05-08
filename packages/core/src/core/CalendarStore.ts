@@ -1,4 +1,4 @@
-import { EventChange } from '@/types/core';
+import { RawEventChange } from '@/types/core';
 import { Event } from '@/types/event';
 
 /**
@@ -18,11 +18,13 @@ export class CalendarStore {
 
   // Transaction state
   private isInTransaction = false;
-  private pendingChanges: EventChange[] = [];
+  private pendingChanges: RawEventChange[] = [];
 
   // Callbacks
-  public onEventChange?: (change: EventChange) => void | Promise<void>;
-  public onEventBatchChange?: (changes: EventChange[]) => void | Promise<void>;
+  public onEventChange?: (change: RawEventChange) => void | Promise<void>;
+  public onEventBatchChange?: (
+    changes: RawEventChange[]
+  ) => void | Promise<void>;
 
   constructor(initialEvents: Event[] = []) {
     initialEvents.forEach(e => this.events.set(e.id, e));
@@ -110,7 +112,7 @@ export class CalendarStore {
 
   // Internal Logic
 
-  private emitChange(change: EventChange): void | Promise<void> {
+  private emitChange(change: RawEventChange): void | Promise<void> {
     if (this.isInTransaction) {
       this.pendingChanges.push(change);
     } else {
@@ -122,9 +124,9 @@ export class CalendarStore {
    * Pure function to normalize a list of changes.
    * Merges multiple changes for the same ID into a single effective change.
    */
-  private static normalizeChanges(changes: EventChange[]): EventChange[] {
+  private static normalizeChanges(changes: RawEventChange[]): RawEventChange[] {
     // Map to track the net effect for each event ID
-    const changeMap = new Map<string, EventChange>();
+    const changeMap = new Map<string, RawEventChange>();
 
     for (const change of changes) {
       const id =

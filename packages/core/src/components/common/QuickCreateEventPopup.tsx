@@ -113,7 +113,7 @@ export const QuickCreateEventPopup = ({
 
     if (targetCalendarId) {
       const resolved = app.getCalendarRegistry().get(targetCalendarId);
-      if (resolved?.readOnly || resolved?.subscription) {
+      if (resolved?.readOnly) {
         targetCalendarId = app
           .getCalendarRegistry()
           .getDefaultWritableCalendar()?.id;

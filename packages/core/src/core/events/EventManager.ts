@@ -5,6 +5,8 @@ import {
   CalendarCallbacks,
   Event,
   EventChange,
+  EventMutationSource,
+  RawEventChange,
 } from '@/types';
 import { logger } from '@/utils/logger';
 
@@ -12,9 +14,11 @@ export class EventManager {
   private store: CalendarStore;
   private undoStack: Array<{ type: string; data: unknown }> = [];
   private pendingSnapshot: Event[] | null = null;
-  private pendingChangeSource: 'drag' | 'resize' | null = null;
+  private pendingChangeSource: EventMutationSource | null = null;
   private externalEvents: Map<string, Event[]> = new Map();
   private readonly MAX_UNDO_STACK = 50;
+  private eventChangeListeners: Set<(changes: EventChange[]) => void> =
+    new Set();
 
   constructor(
     private state: CalendarAppState,
@@ -28,31 +32,58 @@ export class EventManager {
     this.setupStoreListeners();
   }
 
+  subscribeEventChanges(
+    listener: (changes: EventChange[]) => void
+  ): () => void {
+    this.eventChangeListeners.add(listener);
+    return () => this.eventChangeListeners.delete(listener);
+  }
+
+  private notifyEventChangeListeners(changes: EventChange[]): void {
+    this.eventChangeListeners.forEach(listener => listener(changes));
+  }
+
+  private static stampChanges(
+    changes: RawEventChange[],
+    source: EventMutationSource
+  ): EventChange[] {
+    return changes.map(change => ({ ...change, source }) as EventChange);
+  }
+
   private setupStoreListeners(): void {
-    this.store.onEventChange = (change: EventChange) => {
+    this.store.onEventChange = change => {
       this.syncExternalEventsToState();
 
+      const source: EventMutationSource = this.pendingChangeSource ?? 'local';
+      const [stampedChange] = EventManager.stampChanges([change], source);
+      this.notifyEventChangeListeners([stampedChange]);
+
       let callbackPromise = null;
-      if (change.type === 'create') {
+      if (source === 'remote') {
+        callbackPromise = null;
+      } else if (change.type === 'create') {
         callbackPromise = this.getCallbacks().onEventCreate?.(change.event);
       } else if (change.type === 'update') {
         callbackPromise = this.getCallbacks().onEventUpdate?.(change.after);
       }
+      this.pendingChangeSource = null;
 
       this.triggerRender();
       this.notify();
       return callbackPromise ?? undefined;
     };
 
-    this.store.onEventBatchChange = (_changes: EventChange[]) => {
+    this.store.onEventBatchChange = _changes => {
       this.syncExternalEventsToState();
 
+      const source: EventMutationSource = this.pendingChangeSource ?? 'local';
+      const stampedChanges = EventManager.stampChanges(_changes, source);
+      this.notifyEventChangeListeners(stampedChanges);
+
       let callbackPromise = null;
-      if (
-        this.pendingChangeSource !== 'drag' &&
-        this.pendingChangeSource !== 'resize'
-      ) {
-        callbackPromise = this.getCallbacks().onEventBatchChange?.(_changes);
+      if (source !== 'drag' && source !== 'resize' && source !== 'remote') {
+        callbackPromise =
+          this.getCallbacks().onEventBatchChange?.(stampedChanges);
       }
       this.pendingChangeSource = null;
 
@@ -97,7 +128,7 @@ export class EventManager {
       delete?: string[];
     },
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ): void {
     if (isPending) {
       if (!this.pendingSnapshot) {
@@ -162,6 +193,9 @@ export class EventManager {
     }
 
     this.store.endTransaction();
+    if (source && this.pendingChangeSource === source) {
+      this.pendingChangeSource = null;
+    }
   }
 
   addEvent(event: Event): void {
@@ -199,7 +233,7 @@ export class EventManager {
     id: string,
     eventUpdate: Partial<Event>,
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ): Promise<void> {
     if (source) {
       this.pendingChangeSource = source;
@@ -230,7 +264,13 @@ export class EventManager {
       return;
     }
 
-    await this.store.updateEvent(id, eventUpdate);
+    try {
+      await this.store.updateEvent(id, eventUpdate);
+    } finally {
+      if (source && this.pendingChangeSource === source) {
+        this.pendingChangeSource = null;
+      }
+    }
   }
 
   async deleteEvent(id: string): Promise<void> {

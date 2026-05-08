@@ -180,9 +180,9 @@ const DefaultEventDetailPanel = ({
     return !!calendar?.subscription;
   }, [app, event.calendarId]);
 
-  // If subscribed calendar and no notes, hide notes field
+  // For editable calendars always show notes; for read-only subscriptions hide if empty
   const shouldShowNotes =
-    !isSubscribed || (draftEvent.description || '').trim() !== '';
+    isEditable || !isSubscribed || (draftEvent.description || '').trim() !== '';
 
   if (!isViewable) return null;
 

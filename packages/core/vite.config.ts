@@ -47,6 +47,22 @@ export default defineConfig({
         find: '@dayflow/react',
         replacement: resolve(__dirname, '../react/src/index.ts'),
       },
+      {
+        find: '@dayflow/caldav',
+        replacement: resolve(__dirname, '../caldav/src/index.ts'),
+      },
+      {
+        find: '@caldav',
+        replacement: resolve(__dirname, '../caldav/src'),
+      },
+      {
+        find: '@dayflow/google-sync',
+        replacement: resolve(__dirname, '../google-sync/src/index.ts'),
+      },
+      {
+        find: '@google-sync',
+        replacement: resolve(__dirname, '../google-sync/src'),
+      },
       { find: '@examples', replacement: resolve(__dirname, '../../examples') },
       {
         find: '@dayflow/plugin-sidebar',

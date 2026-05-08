@@ -10,10 +10,13 @@ import {
   CalendarView,
   CalendarViewType,
   Event,
+  EventChange,
+  EventMutationSource,
   ICalendarApp,
   RangeChangeReason,
   ReadOnlyConfig,
   ViewType,
+  VisibleRangePayload,
 } from '@/types';
 import { ThemeMode } from '@/types/calendarTypes';
 import { compareViews } from '@/utils/calendarApp';
@@ -130,6 +133,14 @@ export class CalendarApp implements ICalendarApp {
     return () => this.listeners.delete(listener);
   };
 
+  subscribeVisibleRangeChange = (
+    listener: (payload: VisibleRangePayload) => void
+  ): (() => void) => this.navigation.subscribeVisibleRangeChange(listener);
+
+  subscribeEventChanges = (
+    listener: (changes: EventChange[]) => void
+  ): (() => void) => this.eventManager.subscribeEventChanges(listener);
+
   private notify = (): void => {
     this.listeners.forEach(listener => listener(this));
   };
@@ -180,7 +191,7 @@ export class CalendarApp implements ICalendarApp {
       delete?: string[];
     },
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ): void => this.eventManager.applyEventsChanges(changes, isPending, source);
 
   addEvent = (event: Event): void => this.eventManager.addEvent(event);
@@ -192,7 +203,7 @@ export class CalendarApp implements ICalendarApp {
     id: string,
     eventUpdate: Partial<Event>,
     isPending?: boolean,
-    source?: 'drag' | 'resize'
+    source?: EventMutationSource
   ): Promise<void> =>
     this.eventManager.updateEvent(id, eventUpdate, isPending, source);
 

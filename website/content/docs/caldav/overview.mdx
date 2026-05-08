@@ -1,0 +1,55 @@
+# Remote Sync Overview
+
+DayFlow provides two open-source, headless sync packages for connecting your calendar to remote servers:
+
+- **[`@dayflow/caldav`](/docs/caldav/caldav)** — CalDAV sync engine. Works with iCloud Calendar, Nextcloud, Radicale, Fastmail, and any RFC 4791-compliant CalDAV server.
+- **[`@dayflow/google-sync`](/docs/caldav/google-sync)** — Google Calendar API sync engine.
+
+## Design Principles
+
+### No credentials in the browser
+
+Neither package accepts passwords, tokens, or OAuth secrets directly. All authentication lives in your backend. The browser only talks to your own proxy server.
+
+```
+Browser (DayFlow)  →  Your backend proxy  →  CalDAV / Google Calendar API
+```
+
+This means DayFlow never sees your users' credentials, and you remain in full control of your authentication strategy.
+
+### Adapter-first transport
+
+Each package takes a user-supplied `fetch` function for transport. You inject an authenticated fetch — the sync engine executes requests through it without knowing what credentials are attached.
+
+```ts
+const adapter = createCalDAVAdapter({
+  calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+  fetch: (url, init) =>
+    fetch('/api/caldav-proxy', {
+      method: 'POST',
+      body: JSON.stringify({ url, init }),
+    }),
+});
+```
+
+### Headless
+
+Neither package ships login forms, OAuth popups, credential storage, or a hosted sync service. They expose sync infrastructure. Your application owns the authentication experience.
+
+### Read-only and write-back
+
+Both packages support:
+
+- **Read-only mode** (`writable: false`) — syncs events from the server into DayFlow without writing back.
+- **Write-back mode** (`writable: true`, default) — writes local creates, updates, and deletes back to the server.
+
+## What Is Not Supported
+
+| Limitation                  | Detail                                                                                                       |
+| :-------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Recurring event editing** | Recurring events are read-only. Editing, dragging, or deleting recurring instances is blocked.               |
+| **Built-in OAuth**          | OAuth flows, token refresh, and credential storage are your responsibility.                                  |
+| **Offline support**         | Both packages require a live network connection.                                                             |
+| **Conflict UI**             | ETag conflicts (412) are retried automatically; manual conflict resolution UI is not included.               |
+| **CalDAV CORS**             | CalDAV servers do not support browser CORS — a backend proxy is required.                                    |
+| **Google CORS**             | The Google Calendar API supports CORS, but sending tokens from the browser is a security risk — use a proxy. |
