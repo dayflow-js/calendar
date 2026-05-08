@@ -36,14 +36,10 @@ import { Event } from '@dayflow/core';
 
 ### Simple Event Creation (Recommended)
 
-Use the `createEvent()` helper for most use cases:
+Use the `createEvent()` and `createAllDayEvent()` helpers for most use cases:
 
 ```tsx
-import {
-  createEvent,
-  createAllDayEvent,
-  createTimedEvent,
-} from '@dayflow/core';
+import { createEvent, createAllDayEvent } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
 // Local timed event (no timezone complexity)
@@ -52,18 +48,16 @@ const meeting = createEvent({
   title: 'Team Meeting',
   start: new Date(2024, 9, 15, 10, 0), // October 15, 2024, 10:00 AM
   end: new Date(2024, 9, 15, 11, 0), // October 15, 2024, 11:00 AM
+  calendarId: 'work',
 });
 
 // All-day event
-const holiday = createAllDayEvent('2', 'Conference', new Date(2024, 9, 20));
-
-// Quick timed event
-const lunch = createTimedEvent(
-  '3',
-  'Lunch Break',
-  new Date(2024, 9, 15, 12, 0), // 12:00 PM
-  new Date(2024, 9, 15, 13, 0) // 1:00 PM
-);
+const holiday = createAllDayEvent({
+  id: '2',
+  title: 'Conference',
+  start: new Date(2024, 9, 20),
+  calendarId: 'work',
+});
 ```
 
 ### Advanced: Using Temporal API Directly
@@ -123,6 +117,7 @@ const event = createEvent({
   description: 'Discuss Q4 roadmap',
   start: new Date(2024, 9, 16, 14, 0),
   end: new Date(2024, 9, 16, 15, 0),
+  calendarId: 'work',
   meta: {
     location: 'Zoom',
     attendees: ['john@example.com', 'jane@example.com'],
@@ -142,6 +137,18 @@ calendar.addEvent(event);
 // Add multiple events during initialization
 const calendar = useCalendarApp({
   views: [createMonthView()],
+  calendars: [
+    {
+      id: 'work',
+      name: 'Work',
+      colors: {
+        lineColor: '#2563eb',
+        eventColor: '#dbeafe',
+        eventSelectedColor: '#bfdbfe',
+        textColor: '#1e3a8a',
+      },
+    },
+  ],
   events: [event1, event2, event3],
 });
 ```
@@ -182,7 +189,7 @@ const { events } = calendar;
 Day Flow provides callbacks to handle event lifecycle:
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/react';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -224,7 +231,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from '@dayflow/core';
+} from '@dayflow/react';
 
 function MyCalendar() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -252,7 +259,7 @@ function MyCalendar() {
 ### Syncing with Backend
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/react';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -360,7 +367,7 @@ const calendar = useCalendarApp({
 ### Example
 
 ```tsx
-import { createEvent, useCalendarApp, createWeekView } from '@dayflow/core';
+import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
 
 // This event belongs to both "team" and "marketing" calendars
 const sharedEvent = createEvent({

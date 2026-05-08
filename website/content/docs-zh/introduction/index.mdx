@@ -94,14 +94,32 @@ module.exports = {
       const calendar = useCalendarApp({
         views: [createDayView(), createWeekView(), createMonthView()],
         plugins: [createDragPlugin(), createEventsPlugin()],
+        calendars: [
+          {
+            id: 'work',
+            name: '工作',
+            colors: {
+              lineColor: '#2563eb',
+              eventColor: '#dbeafe',
+              eventSelectedColor: '#bfdbfe',
+              textColor: '#1e3a8a',
+            },
+          },
+        ],
         events: [
           createEvent({
             id: '1',
             title: '团队会议',
             start: new Date(2025, 10, 15, 10, 0),
             end: new Date(2025, 10, 15, 11, 0),
+            calendarId: 'work',
           }),
-          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+          createAllDayEvent({
+            id: '2',
+            title: '全天会议',
+            start: new Date(2025, 10, 20),
+            calendarId: 'work',
+          }),
         ],
         initialDate: new Date(),
       });
@@ -133,14 +151,32 @@ module.exports = {
       const calendar = useCalendarApp({
         views: [createDayView(), createWeekView(), createMonthView()],
         plugins: [createDragPlugin(), createEventsPlugin()],
+        calendars: [
+          {
+            id: 'work',
+            name: '工作',
+            colors: {
+              lineColor: '#2563eb',
+              eventColor: '#dbeafe',
+              eventSelectedColor: '#bfdbfe',
+              textColor: '#1e3a8a',
+            },
+          },
+        ],
         events: [
           createEvent({
             id: '1',
             title: '团队会议',
             start: new Date(2025, 10, 15, 10, 0),
             end: new Date(2025, 10, 15, 11, 0),
+            calendarId: 'work',
           }),
-          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+          createAllDayEvent({
+            id: '2',
+            title: '全天会议',
+            start: new Date(2025, 10, 20),
+            calendarId: 'work',
+          }),
         ],
         initialDate: new Date(),
       });
@@ -175,14 +211,32 @@ module.exports = {
       calendar = {
         views: [createDayView(), createWeekView(), createMonthView()],
         plugins: [createDragPlugin(), createEventsPlugin()],
+        calendars: [
+          {
+            id: 'work',
+            name: '工作',
+            colors: {
+              lineColor: '#2563eb',
+              eventColor: '#dbeafe',
+              eventSelectedColor: '#bfdbfe',
+              textColor: '#1e3a8a',
+            },
+          },
+        ],
         events: [
           createEvent({
             id: '1',
             title: '团队会议',
             start: new Date(2025, 10, 15, 10, 0),
             end: new Date(2025, 10, 15, 11, 0),
+            calendarId: 'work',
           }),
-          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+          createAllDayEvent({
+            id: '2',
+            title: '全天会议',
+            start: new Date(2025, 10, 20),
+            calendarId: 'work',
+          }),
         ],
         initialDate: new Date(),
       };
@@ -208,14 +262,32 @@ module.exports = {
       const calendar = useCalendarApp({
         views: [createDayView(), createWeekView(), createMonthView()],
         plugins: [createDragPlugin(), createEventsPlugin()],
+        calendars: [
+          {
+            id: 'work',
+            name: '工作',
+            colors: {
+              lineColor: '#2563eb',
+              eventColor: '#dbeafe',
+              eventSelectedColor: '#bfdbfe',
+              textColor: '#1e3a8a',
+            },
+          },
+        ],
         events: [
           createEvent({
             id: '1',
             title: '团队会议',
             start: new Date(2025, 10, 15, 10, 0),
             end: new Date(2025, 10, 15, 11, 0),
+            calendarId: 'work',
           }),
-          createAllDayEvent('2', '全天会议', new Date(2025, 10, 20)),
+          createAllDayEvent({
+            id: '2',
+            title: '全天会议',
+            start: new Date(2025, 10, 20),
+            calendarId: 'work',
+          }),
         ],
         initialDate: new Date(),
       });

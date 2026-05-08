@@ -30,7 +30,10 @@ describe('CalendarApp', () => {
       const events = app.getAllEvents();
 
       expect(events).toHaveLength(1);
-      expect(events[0]).toEqual(event);
+      expect(events[0]).toEqual({
+        ...event,
+        calendarId: 'blue',
+      });
     });
 
     it('should update an event', () => {
@@ -111,6 +114,47 @@ describe('CalendarApp', () => {
       expect(app.getAllEvents()).toHaveLength(0);
     });
 
+    it('shows initial events without calendarId by assigning the default calendar', () => {
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [
+          {
+            id: 'initial-no-calendar',
+            title: 'Initial Event',
+            start: Temporal.Now.plainDateISO(),
+            end: Temporal.Now.plainDateISO(),
+          },
+        ],
+        calendars: [
+          {
+            id: 'work',
+            name: 'Work',
+            colors: {
+              eventColor: '#000',
+              eventSelectedColor: '#111',
+              lineColor: '#222',
+              textColor: '#333',
+            },
+          },
+        ],
+        defaultCalendar: 'work',
+      });
+
+      expect(app.getAllEvents()).toEqual([
+        expect.objectContaining({
+          id: 'initial-no-calendar',
+          calendarId: 'work',
+        }),
+      ]);
+      expect(app.getEvents()).toEqual([
+        expect.objectContaining({
+          id: 'initial-no-calendar',
+          calendarId: 'work',
+        }),
+      ]);
+    });
+
     it('applies batched programmatic changes while readOnly is true', () => {
       const app = new CalendarApp({
         views: [],
@@ -133,7 +177,7 @@ describe('CalendarApp', () => {
       });
 
       expect(app.getAllEvents()).toEqual([
-        { ...event, title: 'Batch Updated' },
+        { ...event, title: 'Batch Updated', calendarId: 'blue' },
       ]);
 
       app.applyEventsChanges({ delete: [event.id] });

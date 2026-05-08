@@ -32,14 +32,10 @@ import { Event } from '@dayflow/core';
 
 ### ヘルパー関数（最も簡単）
 
-`createEvent` などのヘルパーは `Date` を渡すだけで内部で Temporal に変換してくれます。
+`createEvent` や `createAllDayEvent` などのヘルパーは `Date` を渡すだけで内部で Temporal に変換してくれます。
 
 ```tsx
-import {
-  createEvent,
-  createAllDayEvent,
-  createTimedEvent,
-} from '@dayflow/core';
+import { createEvent, createAllDayEvent } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
 const meeting = createEvent({
@@ -47,16 +43,15 @@ const meeting = createEvent({
   title: 'チームミーティング',
   start: new Date(2024, 9, 15, 10, 0),
   end: new Date(2024, 9, 15, 11, 0),
+  calendarId: 'work',
 });
 
-const holiday = createAllDayEvent('2', 'カンファレンス', new Date(2024, 9, 20));
-
-const lunch = createTimedEvent(
-  '3',
-  'ランチ休憩',
-  new Date(2024, 9, 15, 12, 0),
-  new Date(2024, 9, 15, 13, 0)
-);
+const holiday = createAllDayEvent({
+  id: '2',
+  title: 'カンファレンス',
+  start: new Date(2024, 9, 20),
+  calendarId: 'work',
+});
 ```
 
 ### Temporal を直接扱う
@@ -113,6 +108,7 @@ const event = createEvent({
   description: 'Q4 のロードマップ確認',
   start: new Date(2024, 9, 16, 14, 0),
   end: new Date(2024, 9, 16, 15, 0),
+  calendarId: 'work',
   meta: {
     location: 'Zoom',
     attendees: ['john@example.com', 'jane@example.com'],
@@ -132,6 +128,18 @@ calendar.addEvent(event);
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
+  calendars: [
+    {
+      id: 'work',
+      name: '仕事',
+      colors: {
+        lineColor: '#2563eb',
+        eventColor: '#dbeafe',
+        eventSelectedColor: '#bfdbfe',
+        textColor: '#1e3a8a',
+      },
+    },
+  ],
   events: [event1, event2],
 });
 ```
@@ -169,7 +177,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from '@dayflow/core';
+} from '@dayflow/react';
 
 function MyCalendar() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -222,7 +230,7 @@ const calendar = useCalendarApp({
 `calendarId` と `calendars` 設定を組み合わせると、予定ごとに色やスタイルを切り替えられます。
 
 ```tsx
-import { createEvent, useCalendarApp, createMonthView } from '@dayflow/core';
+import { createEvent, useCalendarApp, createMonthView } from '@dayflow/react';
 
 const workEvent = createEvent({
   id: '1',
@@ -284,7 +292,7 @@ const calendar = useCalendarApp({
 ### 使用例
 
 ```tsx
-import { createEvent, useCalendarApp, createWeekView } from '@dayflow/core';
+import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
 
 // "team" と "marketing" の両カレンダーに帰属させる
 const sharedEvent = createEvent({

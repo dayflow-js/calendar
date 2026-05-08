@@ -20,7 +20,7 @@ Define unique colors for each calendar type with separate light and dark variant
 
 ```tsx
 const calendar = useCalendarApp({
-  calendarTypes: [
+  calendars: [
     {
       id: 'personal',
       name: 'Personal',
@@ -266,7 +266,7 @@ function ThemedCalendar({ calendar }) {
 // themes/oceanTheme.ts
 export const oceanTheme = {
   mode: 'light' as const,
-  calendarTypes: [
+  calendars: [
     {
       id: 'deep-ocean',
       name: 'Deep Ocean',

@@ -32,14 +32,10 @@ import { Event } from '@dayflow/core';
 
 ### **简单事件创建（推荐）**
 
-在大多数场景下，使用 `createEvent()` 辅助函数：
+在大多数场景下，使用 `createEvent()` 和 `createAllDayEvent()` 辅助函数：
 
 ```tsx
-import {
-  createEvent,
-  createAllDayEvent,
-  createTimedEvent,
-} from '@dayflow/core';
+import { createEvent, createAllDayEvent } from '@dayflow/core';
 import '@dayflow/core/dist/styles.css';
 
 // 本地定时事件（无时区复杂性）
@@ -48,18 +44,16 @@ const meeting = createEvent({
   title: '团队会议',
   start: new Date(2024, 9, 15, 10, 0), // 2024年10月15日 10:00
   end: new Date(2024, 9, 15, 11, 0), // 2024年10月15日 11:00
+  calendarId: 'work',
 });
 
 // 全天事件
-const holiday = createAllDayEvent('2', '技术大会', new Date(2024, 9, 20));
-
-// 快速创建定时事件
-const lunch = createTimedEvent(
-  '3',
-  '午餐休息',
-  new Date(2024, 9, 15, 12, 0), // 12:00
-  new Date(2024, 9, 15, 13, 0) // 13:00
-);
+const holiday = createAllDayEvent({
+  id: '2',
+  title: '技术大会',
+  start: new Date(2024, 9, 20),
+  calendarId: 'work',
+});
 ```
 
 ### **高级用法：直接使用 Temporal API**
@@ -119,6 +113,7 @@ const event = createEvent({
   description: '讨论第四季度路线图',
   start: new Date(2024, 9, 16, 14, 0),
   end: new Date(2024, 9, 16, 15, 0),
+  calendarId: 'work',
   meta: {
     location: 'Zoom 会议',
     attendees: ['zhangsan@example.com', 'lisi@example.com'],
@@ -135,8 +130,21 @@ const event = createEvent({
 // 添加单个事件
 calendar.addEvent(event);
 
-// 初始化时添加多个事件const calendar = useCalendarApp({
+// 初始化时添加多个事件
+const calendar = useCalendarApp({
   views: [createMonthView()],
+  calendars: [
+    {
+      id: 'work',
+      name: '工作',
+      colors: {
+        lineColor: '#2563eb',
+        eventColor: '#dbeafe',
+        eventSelectedColor: '#bfdbfe',
+        textColor: '#1e3a8a',
+      },
+    },
+  ],
   events: [event1, event2, event3],
 });
 ```
@@ -175,7 +183,7 @@ calendar.deleteEvent('event-id');
 Day Flow 提供回调函数来处理事件生命周期：
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/react';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -217,7 +225,7 @@ import {
   DayFlowCalendar,
   createMonthView,
   Event,
-} from '@dayflow/core';
+} from '@dayflow/react';
 
 function MyCalendar() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -245,7 +253,7 @@ function MyCalendar() {
 ### **与后端同步**
 
 ```tsx
-import { useCalendarApp, createMonthView, Event } from '@dayflow/core';
+import { useCalendarApp, createMonthView, Event } from '@dayflow/react';
 
 const calendar = useCalendarApp({
   views: [createMonthView()],
@@ -351,7 +359,7 @@ const calendar = useCalendarApp({
 ### 示例
 
 ```tsx
-import { createEvent, useCalendarApp, createWeekView } from '@dayflow/core';
+import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
 
 // 同时归属于 "team" 和 "marketing" 两个日历
 const sharedEvent = createEvent({

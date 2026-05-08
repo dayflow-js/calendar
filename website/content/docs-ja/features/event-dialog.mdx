@@ -8,11 +8,15 @@ DayFlow には、イベントの作成・編集・削除をまとめて行える
 
 ## 使い方
 
-`DayFlowCalendar` を描画すれば、イベントクリック時にダイアログが自動で開きます。
-新規作成は空きスロットのダブルクリックやドラッグ（ドラッグプラグイン有効時）から呼び出せます。
+DayFlow のデフォルト動作では、イベントをクリックすると組み込みのフローティング詳細パネルが開きます。組み込みモーダルダイアログを使いたい場合は、`useCalendarApp` で `useEventDetailDialog` を有効にしてから `DayFlowCalendar` を描画します。
 
 ```tsx
-import { DayFlowCalendar } from '@dayflow/core';
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+
+const calendar = useCalendarApp({
+  views: [...],
+  useEventDetailDialog: true,
+});
 
 <DayFlowCalendar calendar={calendar} />;
 ```

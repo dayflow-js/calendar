@@ -28,8 +28,38 @@ export class EventManager {
     private triggerRender: () => void,
     initialEvents: Event[]
   ) {
-    this.store = new CalendarStore(initialEvents);
+    const normalizedInitialEvents = initialEvents.map(event =>
+      this.normalizeEvent(event)
+    );
+    this.state.events = normalizedInitialEvents;
+    this.store = new CalendarStore(normalizedInitialEvents);
     this.setupStoreListeners();
+  }
+
+  private normalizeEvent(event: Event): Event {
+    if (event.calendarId || (event.calendarIds?.length ?? 0) > 0) {
+      return event;
+    }
+
+    const fallbackCalendarId = this.registry.getDefaultCalendar()?.id;
+    if (!fallbackCalendarId) {
+      return event;
+    }
+
+    return {
+      ...event,
+      calendarId: fallbackCalendarId,
+    };
+  }
+
+  private normalizeEventUpdate(
+    existingEvent: Event,
+    updates: Partial<Event>
+  ): Partial<Event> {
+    return this.normalizeEvent({
+      ...existingEvent,
+      ...updates,
+    });
   }
 
   subscribeEventChanges(
@@ -152,12 +182,18 @@ export class EventManager {
         changes.update.forEach(({ id, updates }) => {
           const index = newEvents.findIndex(e => e.id === id);
           if (index !== -1) {
-            newEvents[index] = { ...newEvents[index], ...updates };
+            newEvents[index] = this.normalizeEvent({
+              ...newEvents[index],
+              ...updates,
+            });
           }
         });
       }
       if (changes.add) {
-        newEvents = [...newEvents, ...changes.add];
+        newEvents = [
+          ...newEvents,
+          ...changes.add.map(event => this.normalizeEvent(event)),
+        ];
       }
 
       this.state.events = newEvents;
@@ -176,7 +212,14 @@ export class EventManager {
     if (changes.update) {
       changes.update.forEach(({ id, updates }) => {
         try {
-          this.store.updateEvent(id, updates);
+          const existingEvent = this.store.getEvent(id);
+          if (!existingEvent) {
+            throw new Error(`Event with id ${id} not found`);
+          }
+          this.store.updateEvent(
+            id,
+            this.normalizeEventUpdate(existingEvent, updates)
+          );
         } catch (e) {
           logger.warn(`Failed to update event ${id}:`, e);
         }
@@ -185,7 +228,7 @@ export class EventManager {
     if (changes.add) {
       changes.add.forEach(event => {
         try {
-          this.store.createEvent(event);
+          this.store.createEvent(this.normalizeEvent(event));
         } catch (e) {
           logger.warn(`Failed to create event ${event.id}:`, e);
         }
@@ -201,7 +244,7 @@ export class EventManager {
   addEvent(event: Event): void {
     this.pendingSnapshot = null;
     this.pushToUndo();
-    this.store.createEvent(event);
+    this.store.createEvent(this.normalizeEvent(event));
   }
 
   addExternalEvents(calendarId: string, events: Event[]): void {
@@ -254,7 +297,10 @@ export class EventManager {
       const eventIndex = this.state.events.findIndex(e => e.id === id);
       if (eventIndex === -1) throw new Error(`Event with id ${id} not found`);
 
-      const updatedEvent = { ...this.state.events[eventIndex], ...eventUpdate };
+      const updatedEvent = this.normalizeEvent({
+        ...this.state.events[eventIndex],
+        ...eventUpdate,
+      });
       this.state.events = [
         ...this.state.events.slice(0, eventIndex),
         updatedEvent,
@@ -265,7 +311,15 @@ export class EventManager {
     }
 
     try {
-      await this.store.updateEvent(id, eventUpdate);
+      const existingEvent = this.store.getEvent(id);
+      if (!existingEvent) {
+        throw new Error(`Event with id ${id} not found`);
+      }
+
+      await this.store.updateEvent(
+        id,
+        this.normalizeEventUpdate(existingEvent, eventUpdate)
+      );
     } finally {
       if (source && this.pendingChangeSource === source) {
         this.pendingChangeSource = null;

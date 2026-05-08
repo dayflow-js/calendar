@@ -44,6 +44,16 @@ export interface CreateEventParams {
   meta?: Record<string, unknown>;
 }
 
+export type CreateAllDayEventDateInput = Date | Temporal.PlainDate;
+
+export interface CreateAllDayEventParams extends Omit<
+  CreateEventParams,
+  'start' | 'end' | 'allDay'
+> {
+  start: CreateAllDayEventDateInput;
+  end?: CreateAllDayEventDateInput;
+}
+
 /**
  * Timezone event creation parameters
  * For events that need explicit timezone handling
@@ -93,6 +103,12 @@ function normalizeLocalTime(
   }
 
   throw new Error(`Invalid time type: ${typeof time}`);
+}
+
+function isAllDayDateInput(
+  value: unknown
+): value is CreateAllDayEventDateInput {
+  return value instanceof Date || value instanceof Temporal.PlainDate;
 }
 
 /**
@@ -248,39 +264,73 @@ export function createTimezoneEvents(
 // ============================================================================
 
 /**
- * Quick create all-day event
+ * Quick create all-day event.
+ *
+ * Preferred API:
+ * createAllDayEvent({
+ *   id: '1',
+ *   title: 'Conference',
+ *   start: new Date(2025, 0, 15),
+ *   end: new Date(2025, 0, 17),
+ *   calendarId: 'work',
+ * });
+ *
+ * Legacy positional signature is still supported for backward compatibility:
+ * createAllDayEvent('1', 'Conference', new Date(2025, 0, 15));
  */
+export function createAllDayEvent(params: CreateAllDayEventParams): Event;
 export function createAllDayEvent(
   id: string,
   title: string,
-  date: Date,
-  options?: Omit<CreateEventParams, 'id' | 'title' | 'start' | 'end' | 'allDay'>
-): Event {
-  return createEvent({
-    id,
-    title,
-    start: date,
-    end: date,
-    allDay: true,
-    ...options,
-  });
-}
-
-/**
- * Quick create timed event
- */
-export function createTimedEvent(
+  start: CreateAllDayEventDateInput,
+  end?: CreateAllDayEventDateInput,
+  calendarId?: string
+): Event;
+export function createAllDayEvent(
   id: string,
   title: string,
-  start: Date,
-  end: Date,
-  options?: Omit<CreateEventParams, 'id' | 'title' | 'start' | 'end'>
+  start: CreateAllDayEventDateInput,
+  options?: Omit<CreateAllDayEventParams, 'id' | 'title' | 'start'>
+): Event;
+export function createAllDayEvent(
+  paramsOrId: CreateAllDayEventParams | string,
+  title?: string,
+  start?: CreateAllDayEventDateInput,
+  endOrOptions?:
+    | CreateAllDayEventDateInput
+    | Omit<CreateAllDayEventParams, 'id' | 'title' | 'start'>,
+  legacyCalendarId?: string
 ): Event {
+  if (typeof paramsOrId === 'object' && paramsOrId !== null) {
+    const params = paramsOrId;
+    return createEvent({
+      ...params,
+      start: params.start,
+      end: params.end ?? params.start,
+      allDay: true,
+    });
+  }
+
+  if (!title || !start) {
+    throw new Error(
+      'createAllDayEvent requires either a params object or id, title, and start arguments'
+    );
+  }
+
+  const legacyOptions =
+    endOrOptions && !isAllDayDateInput(endOrOptions) ? endOrOptions : undefined;
+  const endDate =
+    endOrOptions && isAllDayDateInput(endOrOptions) ? endOrOptions : start;
+  const calendarId = legacyOptions?.calendarId ?? legacyCalendarId;
+
   return createEvent({
-    id,
+    id: paramsOrId,
     title,
     start,
-    end,
-    ...options,
+    end: endDate,
+    allDay: true,
+    description: legacyOptions?.description,
+    calendarId,
+    meta: legacyOptions?.meta,
   });
 }

@@ -179,8 +179,8 @@ const calendar = useCalendarApp({
   locale: 'ja',
 });
 
-// 組み込み Locale オブジェクト
-import { ja } from '@dayflow/core';
+// ローカライズプラグインが提供する Locale オブジェクト
+import { ja } from '@dayflow/plugin-localization';
 const calendar = useCalendarApp({
   locale: ja,
 });
@@ -198,7 +198,7 @@ const calendar = useCalendarApp({
 ### useEventDetailDialog
 
 - `true`：デフォルトのモーダルダイアログ（`DefaultEventDetailDialog`）を有効にします。
-- `DayFlowCalendar` の `customDetailPanelContent` または `customEventDetailDialog` と組み合わせると、内部のステートマシンを保ちながら UI を差し替えられます。
+- `DayFlowCalendar` の `eventDetailContent` または `eventDetailDialog` と組み合わせると、内部のステートマシンを保ちながら UI を差し替えられます。
 
 ### useCalendarHeader
 

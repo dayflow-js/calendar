@@ -224,8 +224,8 @@ const calendar = useCalendarApp({
   locale: 'zh',
 });
 
-// 使用内置 Locale 对象
-import { zh } from '@dayflow/core';
+// 使用多语言插件提供的 Locale 对象
+import { zh } from '@dayflow/plugin-localization';
 const calendar = useCalendarApp({
   locale: zh,
 });
@@ -243,7 +243,7 @@ const calendar = useCalendarApp({
 ### useEventDetailDialog
 
 - `true`：启用默认模态对话框（`DefaultEventDetailDialog`）。
-- 与 `DayFlowCalendar` 上的 `customDetailPanelContent` 或 `customEventDetailDialog` 配合使用，可替换 UI 同时保留内部状态机。
+- 与 `DayFlowCalendar` 上的 `eventDetailContent` 或 `eventDetailDialog` 配合使用，可替换 UI 同时保留内部状态机。
 
 ### useCalendarHeader
 

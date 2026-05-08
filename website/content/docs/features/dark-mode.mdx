@@ -19,7 +19,7 @@ DayFlow Calendar includes comprehensive dark mode support out of the box. The ca
 Enable dark mode by setting the `theme` configuration:
 
 ```tsx
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/core';
+import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
 
 function MyCalendar() {
   const calendar = useCalendarApp({
@@ -77,7 +77,7 @@ const calendar = useCalendarApp({
 Use the calendar API to change themes dynamically:
 
 ```tsx
-import { useCalendarApp } from '@dayflow/core';
+import { useCalendarApp } from '@dayflow/react';
 
 function ThemeToggle() {
   const calendar = useCalendarApp({
@@ -132,7 +132,7 @@ const calendar = useCalendarApp({
   theme: {
     mode: 'auto',
   },
-  calendarTypes: [
+  calendars: [
     {
       id: 'work',
       name: 'Work',
@@ -226,7 +226,7 @@ interface CalendarType {
 ### Simple Theme Toggle
 
 ```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/core';
+import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
 import { Sun, Moon } from 'lucide-react';
 
 function SimpleThemeToggle() {

@@ -207,8 +207,8 @@ const calendar = useCalendarApp({
   locale: 'ja',
 });
 
-// Built-in Locale object
-import { ja } from '@dayflow/core';
+// Additional Locale object from the localization plugin
+import { ja } from '@dayflow/plugin-localization';
 const calendar = useCalendarApp({
   locale: ja,
 });
@@ -226,7 +226,7 @@ const calendar = useCalendarApp({
 ### useEventDetailDialog
 
 - `true` turns on the default modal dialog (`DefaultEventDetailDialog`).
-- Combine with `customDetailPanelContent` or `customEventDetailDialog` on `DayFlowCalendar` to swap the UI while keeping the core state machine.
+- Combine with `eventDetailContent` or `eventDetailDialog` on `DayFlowCalendar` to swap the UI while keeping the core state machine.
 
 ### useCalendarHeader
 
