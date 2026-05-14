@@ -21,6 +21,7 @@ const en: Locale = {
     week: 'Week',
     month: 'Month',
     year: 'Year',
+    agenda: 'Agenda',
     newEvent: 'New Event',
     newAllDayEvent: 'New All-day Event',
     newCalendarEvent: 'New {calendarName} Event',

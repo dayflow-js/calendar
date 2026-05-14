@@ -70,6 +70,7 @@ const zh: DayflowLocale = {
     pasteHere: '粘贴在此处',
     eventSummary: '简介',
     viewEvent: '查看日程',
+    agenda: '日程',
     subscribeCalendar: '订阅日历',
     subscribeCalendarTitle: '输入您要订阅的日历地址。',
     calendarUrl: '日历 URL',

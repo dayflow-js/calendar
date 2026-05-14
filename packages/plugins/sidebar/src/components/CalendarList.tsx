@@ -1,11 +1,18 @@
 import {
   CalendarType,
   AudioLines,
-  ChevronDown,
+  ChevronRight,
   AlertCircle,
+  Loader2,
 } from '@dayflow/core';
 import { JSX } from 'preact';
-import { useState, useCallback, useRef, useEffect } from 'preact/hooks';
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from 'preact/hooks';
 
 interface CalendarListProps {
   calendars: CalendarType[];
@@ -18,6 +25,7 @@ interface CalendarListProps {
   activeContextMenuCalendarId?: string | null;
   isDraggable?: boolean;
   isEditable?: boolean;
+  groupStatus?: Record<string, { isLoading: boolean }>;
 }
 
 const getCalendarInitials = (calendar: CalendarType): string => {
@@ -199,6 +207,7 @@ export const CalendarList = ({
   activeContextMenuCalendarId,
   isDraggable = true,
   isEditable = true,
+  groupStatus = {},
 }: CalendarListProps) => {
   const [editingName, setEditingName] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -393,15 +402,36 @@ export const CalendarList = ({
     setEditingId,
   };
 
-  // Check if any calendar has a source
-  const hasSources = calendars.some(c => c.source);
+  // Group calendars by source; calendars without a source go into a null group
+  const groups = useMemo(() => {
+    const next = new Map<string | null, CalendarType[]>();
 
-  if (!hasSources) {
-    // Flat list (original behaviour)
+    // Initialize with expected groups from status
+    Object.keys(groupStatus).forEach(source => {
+      next.set(source, []);
+    });
+
+    for (const calendar of calendars) {
+      const key = calendar.source ?? null;
+      if (!next.has(key)) next.set(key, []);
+      next.get(key)!.push(calendar);
+    }
+    return next;
+  }, [calendars, groupStatus]);
+
+  // Check if any calendar has a source or if we have expected groups
+  const hasGroups = groups.size > (groups.has(null) ? 1 : 0);
+
+  if (!hasGroups && !groups.has(null)) {
+    return null;
+  }
+
+  if (!hasGroups) {
+    // Flat list
     return (
       <div className='df-sidebar-list-shell'>
         <ul className='df-sidebar-list'>
-          {calendars.map(calendar => (
+          {groups.get(null)!.map(calendar => (
             <CalendarItem
               key={calendar.id}
               calendar={calendar}
@@ -411,14 +441,6 @@ export const CalendarList = ({
         </ul>
       </div>
     );
-  }
-
-  // Group calendars by source; calendars without a source go into a null group
-  const groups = new Map<string | null, CalendarType[]>();
-  for (const calendar of calendars) {
-    const key = calendar.source ?? null;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(calendar);
   }
 
   return (
@@ -441,6 +463,8 @@ export const CalendarList = ({
         .filter(([source]) => source !== null)
         .map(([source, groupCalendars]) => {
           const isCollapsed = collapsedSources[source!];
+          const isLoading = groupStatus[source!]?.isLoading;
+
           return (
             <div key={source} className='df-sidebar-source-group'>
               <button
@@ -449,12 +473,20 @@ export const CalendarList = ({
                 onClick={() => toggleSource(source!)}
               >
                 <span className='df-sidebar-source-label'>{source}</span>
-                <ChevronDown
-                  width={13}
-                  height={13}
-                  className='df-sidebar-source-chevron'
-                  data-collapsed={isCollapsed ? 'true' : 'false'}
-                />
+                {isLoading ? (
+                  <Loader2
+                    width={13}
+                    height={13}
+                    className='df-sidebar-source-loading'
+                  />
+                ) : (
+                  <ChevronRight
+                    width={13}
+                    height={13}
+                    className='df-sidebar-source-chevron'
+                    data-collapsed={isCollapsed ? 'true' : 'false'}
+                  />
+                )}
               </button>
               <div
                 className='df-sidebar-source-panel'

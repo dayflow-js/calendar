@@ -18,6 +18,7 @@
     GridContextMenuSlotArgs,
     CalendarSearchProps,
     MobileEventProps,
+    MonthDateNumberSlotArgs,
   } from "@dayflow/core";
 
   const {
@@ -39,6 +40,7 @@
     calendarHeader = null,
     eventContextMenu = null,
     gridContextMenu = null,
+    monthDateNumberContent = null,
     mobileEventDetail = null,
     collapsedSafeAreaLeft = null,
     search = null,
@@ -61,6 +63,7 @@
     calendarHeader?: Component<CalendarHeaderProps>;
     eventContextMenu?: Component<EventContextMenuSlotArgs>;
     gridContextMenu?: Component<GridContextMenuSlotArgs>;
+    monthDateNumberContent?: Component<MonthDateNumberSlotArgs>;
     mobileEventDetail?: Component<MobileEventProps>;
     collapsedSafeAreaLeft?: number | null;
     search?: CalendarSearchProps | null;
@@ -97,6 +100,7 @@
     calendarHeader,
     eventContextMenu,
     gridContextMenu,
+    monthDateNumberContent,
     mobileEventDetail,
     collapsedSafeAreaLeft,
     search,

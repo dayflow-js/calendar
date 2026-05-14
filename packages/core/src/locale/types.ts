@@ -19,6 +19,7 @@ export type TranslationKey =
   | 'week'
   | 'month'
   | 'year'
+  | 'agenda'
   | 'newEvent'
   | 'newAllDayEvent'
   | 'newCalendarEvent'

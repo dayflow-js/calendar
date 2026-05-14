@@ -59,6 +59,7 @@ export interface CalendarSidebarRenderProps {
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
   onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
   componentsOrder?: ('calendarList' | 'miniCalendar')[];
+  groupStatus?: Record<string, { isLoading: boolean }>;
 }
 export interface SidebarPluginConfig {
   width?: number | string;
@@ -80,6 +81,7 @@ export interface SidebarPluginConfig {
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
   onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
   componentsOrder?: ('calendarList' | 'miniCalendar')[];
+  groupStatus?: Record<string, { isLoading: boolean }>;
 }
 
 /** Control handle written by the Preact bridge on every render cycle. */
@@ -219,49 +221,49 @@ export function createSidebarPlugin(
             setEditingCalendarId(null);
           }, [isEditable]);
 
-          const sidebarProps: CalendarSidebarRenderProps = useMemo(
-            () => ({
+          const sidebarProps: CalendarSidebarRenderProps = useMemo(() => {
+            const currentConfig = app.getPluginConfig(
+              'sidebar'
+            ) as SidebarPluginConfig;
+            return {
               app,
               calendars,
               toggleCalendarVisibility: handleToggleCalendarVisibility,
               toggleAll: handleToggleAllCalendars,
               isCollapsed,
               setCollapsed: setIsCollapsed,
-              showEventDots: config.showEventDots,
-              renderCalendarContextMenu: config.renderCalendarContextMenu,
-              renderSidebarHeader: config.renderSidebarHeader,
-              createCalendarMode: config.createCalendarMode,
-              renderCreateCalendarDialog: config.renderCreateCalendarDialog,
+              showEventDots: currentConfig.showEventDots,
+              renderCalendarContextMenu:
+                currentConfig.renderCalendarContextMenu,
+              renderSidebarHeader: currentConfig.renderSidebarHeader,
+              createCalendarMode: currentConfig.createCalendarMode,
+              renderCreateCalendarDialog:
+                currentConfig.renderCreateCalendarDialog,
               editingCalendarId,
               setEditingCalendarId,
               onCreateCalendar: handleCreateCalendar,
-              onSubscribeCalendar: config.onSubscribeCalendar,
-              onLoadSubscription: config.onLoadSubscription,
-              onReorder: config.onReorder,
-              componentsOrder: config.componentsOrder,
-            }),
-            [
-              app,
-              calendars,
-              handleToggleCalendarVisibility,
-              handleToggleAllCalendars,
-              isCollapsed,
-              handleCreateCalendar,
-              editingCalendarId,
-              config.showEventDots,
-              config.renderCalendarContextMenu,
-              config.renderSidebarHeader,
-              config.createCalendarMode,
-              config.renderCreateCalendarDialog,
-              config.onSubscribeCalendar,
-              config.onLoadSubscription,
-              config.onReorder,
-              config.componentsOrder,
-            ]
-          );
+              onSubscribeCalendar: currentConfig.onSubscribeCalendar,
+              onLoadSubscription: currentConfig.onLoadSubscription,
+              onReorder: currentConfig.onReorder,
+              componentsOrder: currentConfig.componentsOrder,
+              groupStatus: currentConfig.groupStatus,
+            };
+          }, [
+            app,
+            calendars,
+            handleToggleCalendarVisibility,
+            handleToggleAllCalendars,
+            isCollapsed,
+            handleCreateCalendar,
+            editingCalendarId,
+            sidebarVersion, // Depend on sidebarVersion to refresh when config updates trigger notify()
+          ]);
 
           const renderContent = () => {
-            if (config.render) {
+            const currentConfig = app.getPluginConfig(
+              'sidebar'
+            ) as SidebarPluginConfig;
+            if (currentConfig.render) {
               return h(ContentSlot, {
                 generatorName: 'sidebar',
                 generatorArgs: sidebarProps,
@@ -299,12 +301,15 @@ export function createSidebarPlugin(
             });
           };
 
+          const currentConfig = app.getPluginConfig(
+            'sidebar'
+          ) as SidebarPluginConfig;
           return {
             enabled: true,
             width: sidebarWidth,
             isCollapsed,
             toggleCollapsed: () => setIsCollapsed(prev => !prev),
-            miniWidth: config.miniWidth ?? '50px',
+            miniWidth: currentConfig.miniWidth ?? '50px',
             content: renderContent(),
             extraContent: renderExtraContent(),
             safeAreaLeft: 0,

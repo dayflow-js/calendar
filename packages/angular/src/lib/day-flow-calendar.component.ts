@@ -29,6 +29,7 @@ import type {
   GridContextMenuSlotArgs,
   CalendarSearchProps,
   MobileEventProps,
+  MonthDateNumberSlotArgs,
 } from '@dayflow/core';
 import {
   CalendarRenderer,
@@ -86,6 +87,7 @@ export class DayFlowCalendarComponent
   @Input() calendarHeader?: TemplateRef<CalendarHeaderProps>;
   @Input() eventContextMenu?: TemplateRef<EventContextMenuSlotArgs>;
   @Input() gridContextMenu?: TemplateRef<GridContextMenuSlotArgs>;
+  @Input() monthDateNumberContent?: TemplateRef<MonthDateNumberSlotArgs>;
   @Input() mobileEventDetail?: TemplateRef<MobileEventProps>;
   @Input() collapsedSafeAreaLeft?: number;
   @Input() search?: CalendarSearchProps;
@@ -157,6 +159,7 @@ export class DayFlowCalendarComponent
         'calendarHeader',
         'eventContextMenu',
         'gridContextMenu',
+        'monthDateNumberContent',
         'mobileEventDetail',
       ];
       if (slotKeys.some(key => changes[key])) {
@@ -216,6 +219,7 @@ export class DayFlowCalendarComponent
       calendarHeader: this.calendarHeader,
       eventContextMenu: this.eventContextMenu,
       gridContextMenu: this.gridContextMenu,
+      monthDateNumberContent: this.monthDateNumberContent,
       mobileEventDetail: this.mobileEventDetail,
     };
     return Object.keys(templateInputs).filter(
@@ -345,6 +349,9 @@ export class DayFlowCalendarComponent
       }
       case 'gridContextMenu': {
         return this.gridContextMenu ?? null;
+      }
+      case 'monthDateNumberContent': {
+        return this.monthDateNumberContent ?? null;
       }
       case 'mobileEventDetail': {
         return this.mobileEventDetail ?? null;

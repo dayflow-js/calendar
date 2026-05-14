@@ -12,6 +12,14 @@ export interface RangePickerProps {
     Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
     Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
   ];
+  minDate?:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime;
+  maxDate?:
+    | Temporal.PlainDate
+    | Temporal.PlainDateTime
+    | Temporal.ZonedDateTime;
   format?: string;
   showTimeFormat?: string;
   showTime?: boolean | { format?: string };

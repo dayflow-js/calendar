@@ -78,13 +78,4 @@ To keep the project maintainable and easy to review:
 
 ---
 
-## License and Contribution Terms
-
-By submitting a contribution to this project, you represent that:
-
-- The contribution is your original work, or you have the legal right to submit it.
-- You grant DayFlow the right to use, modify, distribute, and relicense your contribution as part of both open source and commercial versions of the project.
-
----
-
 Thanks again for contributing to **DayFlow**! 🚀

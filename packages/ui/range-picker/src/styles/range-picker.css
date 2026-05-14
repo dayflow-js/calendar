@@ -303,6 +303,48 @@
     );
   }
 
+  /* Base: fill grid column, flat ends, extend into gap on both sides */
+  .df-range-picker-day-cell[data-disabled-range='true'] {
+    width: 100%;
+    border-radius: 0;
+    background-color: color-mix(
+      in srgb,
+      var(--df-color-muted-foreground) 13%,
+      transparent
+    );
+    color: var(--df-color-muted-foreground);
+    pointer-events: auto;
+    cursor: not-allowed;
+    box-shadow:
+      0.125rem 0 0
+        color-mix(in srgb, var(--df-color-muted-foreground) 13%, transparent),
+      -0.125rem 0 0
+        color-mix(in srgb, var(--df-color-muted-foreground) 13%, transparent);
+  }
+
+  /* Left rounded cap: first in a consecutive group or first column of a row */
+  .df-range-picker-day-grid
+    > :not([data-disabled-range='true'])
+    + [data-disabled-range='true'],
+  .df-range-picker-day-grid > [data-disabled-range='true']:first-child,
+  .df-range-picker-day-grid > [data-disabled-range='true']:nth-child(7n + 1) {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+    box-shadow: 0.125rem 0 0
+      color-mix(in srgb, var(--df-color-muted-foreground) 13%, transparent);
+  }
+
+  /* Right rounded cap: last in a consecutive group or last column of a row */
+  .df-range-picker-day-grid
+    > [data-disabled-range='true']:not(:has(+ [data-disabled-range='true'])),
+  .df-range-picker-day-grid > [data-disabled-range='true']:last-child,
+  .df-range-picker-day-grid > [data-disabled-range='true']:nth-child(7n) {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    box-shadow: -0.125rem 0 0
+      color-mix(in srgb, var(--df-color-muted-foreground) 13%, transparent);
+  }
+
   .df-range-picker-day-cell[data-in-range='true'] {
     background-color: color-mix(
       in srgb,

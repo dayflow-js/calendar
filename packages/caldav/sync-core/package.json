@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/sync-core",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Provider-neutral sync primitives for DayFlow calendar integrations",
   "keywords": [
     "calendar",
@@ -26,7 +26,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && rollup -c",
     "clean": "rimraf dist node_modules",
-    "postbuild": "rimraf dist/types",
+    "postbuild": "rimraf dist/types dist/build",
     "prebuild": "rimraf dist",
     "test": "jest",
     "typecheck": "tsc --noEmit"

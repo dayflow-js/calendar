@@ -223,11 +223,27 @@
   .df-sidebar-source-chevron {
     margin-left: 0.25rem;
     flex-shrink: 0;
-    transition: transform 200ms ease;
+    transition: transform 200ms ease-in-out;
+    transform: rotate(90deg);
   }
 
   .df-sidebar-source-chevron[data-collapsed='true'] {
-    transform: rotate(-90deg);
+    transform: rotate(0deg);
+  }
+
+  .df-sidebar-source-loading {
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+    animation: df-spin 1s linear infinite;
+  }
+
+  @keyframes df-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .df-sidebar-source-panel {

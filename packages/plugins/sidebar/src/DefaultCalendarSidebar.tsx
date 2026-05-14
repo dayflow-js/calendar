@@ -53,6 +53,7 @@ const DefaultCalendarSidebar = ({
   onLoadSubscription,
   onReorder,
   componentsOrder = ['calendarList', 'miniCalendar'],
+  groupStatus,
 }: CalendarSidebarRenderProps) => {
   const { t } = useLocale();
 
@@ -529,6 +530,7 @@ const DefaultCalendarSidebar = ({
           activeContextMenuCalendarId={contextMenu?.calendarId}
           isDraggable={isDraggable}
           isEditable={isEditable}
+          groupStatus={groupStatus}
         />
       ) : (
         <>
@@ -566,6 +568,7 @@ const DefaultCalendarSidebar = ({
                   activeContextMenuCalendarId={contextMenu?.calendarId}
                   isDraggable={isDraggable}
                   isEditable={isEditable}
+                  groupStatus={groupStatus}
                 />
               );
             }

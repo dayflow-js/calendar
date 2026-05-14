@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/outlook-sync",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Headless Microsoft Outlook Calendar sync engine for DayFlow - transport-agnostic, adapter-first",
   "keywords": [
     "calendar",
@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && rollup -c",
     "clean": "rimraf dist node_modules",
-    "postbuild": "rimraf dist/types",
+    "postbuild": "rimraf dist/types dist/build",
     "prebuild": "rimraf dist",
     "test": "jest",
     "typecheck": "tsc --noEmit"
