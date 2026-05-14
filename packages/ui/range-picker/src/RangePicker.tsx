@@ -1,4 +1,3 @@
-import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
 import {
   useCallback,
@@ -12,7 +11,7 @@ import { Temporal } from 'temporal-polyfill';
 import RangePickerPanel from './components/RangePickerPanel';
 import { DEFAULT_FORMAT, DEFAULT_TIME_FORMAT } from './constants';
 import { MoveRight } from './icons';
-import { RangePickerProps, ZonedRange } from './types';
+import type { RangePickerProps, ZonedRange } from './types';
 import { getMonthLabels, getWeekDaysLabels } from './utils/locale';
 import {
   mergeFormatTemplate,
@@ -26,6 +25,8 @@ import { isPlainDate } from './utils/temporal';
 
 const RangePicker = ({
   value,
+  minDate,
+  maxDate,
   format = DEFAULT_FORMAT,
   showTimeFormat = DEFAULT_TIME_FORMAT,
   showTime = true,
@@ -91,6 +92,16 @@ const RangePicker = ({
     const end = normalizeToZoned(value[1], zone, start).withTimeZone(zone);
     return [start, end];
   }, [value, timeZone]);
+
+  const normalizedMinDate = useMemo(() => {
+    if (!minDate) return;
+    return normalizeToZoned(minDate, timeZone).toPlainDate();
+  }, [minDate, timeZone]);
+
+  const normalizedMaxDate = useMemo(() => {
+    if (!maxDate) return;
+    return normalizeToZoned(maxDate, timeZone).toPlainDate();
+  }, [maxDate, timeZone]);
 
   const [draftRange, setDraftRange] = useState<ZonedRange>(normalizedValue);
   const lastNormalizedRef = useRef<ZonedRange>(normalizedValue);
@@ -277,62 +288,92 @@ const RangePicker = ({
     [effectiveTimeFormat, format, onOk]
   );
 
-  const updateRange = useCallback(
-    (field: 'start' | 'end', nextValue: Temporal.ZonedDateTime) => {
-      setDraftRange(prev => {
-        const current: ZonedRange = [...prev] as ZonedRange;
-        if (field === 'start') {
-          const safeEnd = normalizeToZoned(
-            current[1],
-            getZoneId(nextValue),
-            nextValue
-          );
-          const adjustedEnd =
-            Temporal.ZonedDateTime.compare(nextValue, safeEnd) > 0
-              ? nextValue
-              : safeEnd;
-          return [nextValue, adjustedEnd];
-        }
-
-        const safeStart = normalizeToZoned(
-          current[0],
-          getZoneId(nextValue),
-          nextValue
-        );
-        const adjustedStart =
-          Temporal.ZonedDateTime.compare(safeStart, nextValue) > 0
-            ? nextValue
-            : safeStart;
-        return [adjustedStart, nextValue];
-      });
-    },
-    []
-  );
-
-  const handleDaySelect = (day: Temporal.PlainDate) => {
-    if (disabled) return;
-
-    const buildValue = (
+  const buildValueWithDate = useCallback(
+    (
       base: Temporal.ZonedDateTime,
-      source: Temporal.PlainDate
-    ): Temporal.ZonedDateTime => {
-      const zoneId = getZoneId(base);
-      return Temporal.ZonedDateTime.from({
-        timeZone: zoneId,
-        year: source.year,
-        month: source.month,
-        day: source.day,
+      day: Temporal.PlainDate
+    ): Temporal.ZonedDateTime =>
+      Temporal.ZonedDateTime.from({
+        timeZone: getZoneId(base),
+        year: day.year,
+        month: day.month,
+        day: day.day,
         hour: base.hour,
         minute: base.minute,
         second: base.second ?? 0,
         millisecond: base.millisecond ?? 0,
         microsecond: base.microsecond ?? 0,
         nanosecond: base.nanosecond ?? 0,
+      }),
+    []
+  );
+
+  const clampToDateBounds = useCallback(
+    (zonedDate: Temporal.ZonedDateTime) => {
+      const date = zonedDate.toPlainDate();
+      if (
+        normalizedMinDate &&
+        Temporal.PlainDate.compare(date, normalizedMinDate) < 0
+      ) {
+        return buildValueWithDate(zonedDate, normalizedMinDate);
+      }
+      if (
+        normalizedMaxDate &&
+        Temporal.PlainDate.compare(date, normalizedMaxDate) > 0
+      ) {
+        return buildValueWithDate(zonedDate, normalizedMaxDate);
+      }
+      return zonedDate;
+    },
+    [buildValueWithDate, normalizedMaxDate, normalizedMinDate]
+  );
+
+  const updateRange = useCallback(
+    (field: 'start' | 'end', nextValue: Temporal.ZonedDateTime) => {
+      const boundedNextValue = clampToDateBounds(nextValue);
+      setDraftRange(prev => {
+        const current: ZonedRange = [...prev] as ZonedRange;
+        if (field === 'start') {
+          const safeEnd = normalizeToZoned(
+            current[1],
+            getZoneId(boundedNextValue),
+            boundedNextValue
+          );
+          const adjustedEnd =
+            Temporal.ZonedDateTime.compare(boundedNextValue, safeEnd) > 0
+              ? boundedNextValue
+              : safeEnd;
+          return [boundedNextValue, adjustedEnd];
+        }
+
+        const safeStart = normalizeToZoned(
+          current[0],
+          getZoneId(boundedNextValue),
+          boundedNextValue
+        );
+        const adjustedStart =
+          Temporal.ZonedDateTime.compare(safeStart, boundedNextValue) > 0
+            ? boundedNextValue
+            : safeStart;
+        return [adjustedStart, boundedNextValue];
       });
-    };
+    },
+    [clampToDateBounds]
+  );
+
+  const handleDaySelect = (day: Temporal.PlainDate) => {
+    if (disabled) return;
+    if (
+      (normalizedMinDate &&
+        Temporal.PlainDate.compare(day, normalizedMinDate) < 0) ||
+      (normalizedMaxDate &&
+        Temporal.PlainDate.compare(day, normalizedMaxDate) > 0)
+    ) {
+      return;
+    }
 
     if (focusedField === 'start') {
-      const nextStart = buildValue(draftRange[0], day);
+      const nextStart = buildValueWithDate(draftRange[0], day);
       const durationMs =
         draftRange[1].epochMilliseconds - draftRange[0].epochMilliseconds;
       const adjustedEnd = nextStart.add({ milliseconds: durationMs });
@@ -340,12 +381,12 @@ const RangePicker = ({
       return;
     }
 
-    const nextEndCandidate = buildValue(draftRange[1], day);
+    const nextEndCandidate = buildValueWithDate(draftRange[1], day);
     const durationMs =
       draftRange[1].epochMilliseconds - draftRange[0].epochMilliseconds;
 
     if (Temporal.ZonedDateTime.compare(nextEndCandidate, draftRange[0]) < 0) {
-      const newStart = buildValue(draftRange[0], day);
+      const newStart = buildValueWithDate(draftRange[0], day);
       const newEnd = newStart.add({ milliseconds: durationMs });
       setDraftRange([newStart, newEnd]);
       return;
@@ -510,70 +551,67 @@ const RangePicker = ({
   );
 
   const handleInputChange = useCallback(
-    (field: 'start' | 'end') =>
-      (event: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>) => {
-        const newValue = event.currentTarget.value;
-        isEditingRef.current = true;
-        updateInputValue(field, newValue);
+    (field: 'start' | 'end') => (event: any) => {
+      const newValue = event.currentTarget.value;
+      isEditingRef.current = true;
+      updateInputValue(field, newValue);
 
-        const index = field === 'start' ? 0 : 1;
-        const reference = draftRangeRef.current[index];
-        const zoneId = getZoneId(reference);
-        const parsed = parseTemporalString(
-          newValue,
-          parseRegExp,
-          reference,
-          zoneId
-        );
-        if (parsed) {
-          updateRange(field, parsed);
-          const month = parsed.toPlainDate().with({ day: 1 });
-          setVisibleMonth(month);
-          scrollToActiveTime(field);
-        }
-      },
+      const index = field === 'start' ? 0 : 1;
+      const reference = draftRangeRef.current[index];
+      const zoneId = getZoneId(reference);
+      const parsed = parseTemporalString(
+        newValue,
+        parseRegExp,
+        reference,
+        zoneId
+      );
+      if (parsed) {
+        updateRange(field, parsed);
+        const month = parsed.toPlainDate().with({ day: 1 });
+        setVisibleMonth(month);
+        scrollToActiveTime(field);
+      }
+    },
     [updateInputValue, parseRegExp, updateRange, scrollToActiveTime]
   );
 
   const handleInputBlur = useCallback(
-    (field: 'start' | 'end') =>
-      (event: JSX.TargetedFocusEvent<HTMLInputElement>) => {
-        if (disabled) return;
-        isEditingRef.current = false;
+    (field: 'start' | 'end') => (event: any) => {
+      if (disabled) return;
+      isEditingRef.current = false;
 
-        if (isOpen) {
-          const index = field === 'start' ? 0 : 1;
-          const formatted = formatTemporal(
-            draftRangeRef.current[index],
-            format,
-            effectiveTimeFormat
-          );
-          setInputValues(prev => {
-            const next: [string, string] = [...prev] as [string, string];
-            next[index] = formatted;
-            return next;
-          });
-          return;
-        }
+      if (isOpen) {
+        const index = field === 'start' ? 0 : 1;
+        const formatted = formatTemporal(
+          draftRangeRef.current[index],
+          format,
+          effectiveTimeFormat
+        );
+        setInputValues(prev => {
+          const next: [string, string] = [...prev] as [string, string];
+          next[index] = formatted;
+          return next;
+        });
+        return;
+      }
 
-        const relatedTarget = event.relatedTarget as HTMLElement;
-        if (!relatedTarget || !containerRef.current?.contains(relatedTarget)) {
-          commitInputValue(field, event.currentTarget.value);
-        }
-      },
+      const relatedTarget = event.relatedTarget as HTMLElement;
+      if (!relatedTarget || !containerRef.current?.contains(relatedTarget)) {
+        commitInputValue(field, event.currentTarget.value);
+      }
+    },
     [commitInputValue, disabled, isOpen, format, effectiveTimeFormat]
   );
 
   const handleInputKeyDown = useCallback(
-    (field: 'start' | 'end') =>
-      (event: JSX.TargetedKeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          isEditingRef.current = false;
-          commitInputValue(field, event.currentTarget.value);
-        }
-        if (event.key === 'Escape') event.currentTarget.blur();
-      },
+    (field: 'start' | 'end') => (event: any) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        isEditingRef.current = false;
+        commitInputValue(field, event.currentTarget.value);
+      }
+      if (event.key === 'Escape') event.currentTarget.blur();
+    },
     [commitInputValue]
   );
 
@@ -698,12 +736,12 @@ const RangePicker = ({
     };
   }, [isOpen, adjustPopupPlacement]);
 
-  const getPopupStyle = (): JSX.CSSProperties => {
+  const getPopupStyle = (): any => {
     if (!containerRef.current) return {};
 
     const triggerRect = containerRef.current.getBoundingClientRect();
     const placementDom = popupPlacementRef.current;
-    const style: JSX.CSSProperties = { position: 'fixed', zIndex: 9999 };
+    const style: any = { position: 'fixed', zIndex: 9999 };
 
     if (placementDom.startsWith('bottom')) {
       style.top = triggerRect.bottom + 8;
@@ -774,13 +812,15 @@ const RangePicker = ({
 
       {isOpen &&
         (getPopupContainer
-          ? createPortal(
+          ? (createPortal(
               <RangePickerPanel
                 visibleMonth={visibleMonth}
                 monthLabels={monthLabels}
                 weekDayLabels={weekDayLabels}
                 calendarDays={calendarDays}
                 draftRange={draftRange}
+                minDate={normalizedMinDate}
+                maxDate={normalizedMaxDate}
                 focusedField={focusedField}
                 isTimeEnabled={!!isTimeEnabled}
                 disabled={disabled}
@@ -796,14 +836,16 @@ const RangePicker = ({
                 getPopupStyle={getPopupStyle}
               />,
               getPopupContainer()
-            )
-          : createPortal(
+            ) as any)
+          : (createPortal(
               <RangePickerPanel
                 visibleMonth={visibleMonth}
                 monthLabels={monthLabels}
                 weekDayLabels={weekDayLabels}
                 calendarDays={calendarDays}
                 draftRange={draftRange}
+                minDate={normalizedMinDate}
+                maxDate={normalizedMaxDate}
                 focusedField={focusedField}
                 isTimeEnabled={!!isTimeEnabled}
                 disabled={disabled}
@@ -819,9 +861,9 @@ const RangePicker = ({
                 getPopupStyle={getPopupStyle}
               />,
               document.body
-            ))}
+            ) as any))}
     </div>
-  );
+  ) as any;
 };
 
 export default RangePicker;

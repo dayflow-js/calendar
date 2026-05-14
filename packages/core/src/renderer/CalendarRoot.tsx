@@ -1,4 +1,4 @@
-import { h, ComponentChildren } from 'preact';
+import { h, ComponentChildren, JSX } from 'preact';
 import { createPortal } from 'preact/compat';
 import {
   useCallback,
@@ -346,13 +346,16 @@ export const CalendarRoot = ({
             className='df-calendar-shell'
             data-sidebar-enabled={sidebar.enabled ? 'true' : 'false'}
             data-sidebar-collapsed={sidebar.isCollapsed}
-            style={{
-              marginLeft: sidebar.enabled
-                ? `calc(${
-                    sidebar.isCollapsed ? miniSidebarWidth : sidebar.width
-                  } - 1px)`
-                : 0,
-            }}
+            style={
+              {
+                '--df-safe-area-left': `${safeAreaLeft}px`,
+                marginLeft: sidebar.enabled
+                  ? `calc(${
+                      sidebar.isCollapsed ? miniSidebarWidth : sidebar.width
+                    } - 1px)`
+                  : 0,
+              } as JSX.CSSProperties
+            }
           >
             {renderHeader()}
 

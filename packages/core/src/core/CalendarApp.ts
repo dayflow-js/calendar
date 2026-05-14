@@ -455,26 +455,31 @@ export class CalendarApp implements ICalendarApp {
       }
     }
     if (config.views !== undefined) {
-      const newViews = new Map(this.state.views);
+      const newViews = new Map<CalendarViewType, CalendarView>();
       let viewsChanged = false;
-      let viewsUpdated = false;
+
       config.views.forEach(view => {
-        const existingView = newViews.get(view.type);
+        const existingView = this.state.views.get(view.type);
+        newViews.set(view.type, view);
+
         const diff = compareViews(existingView, view);
-
-        if (diff.hasChanges) {
-          newViews.set(view.type, view);
-          viewsUpdated = true;
-        }
-
-        viewsChanged = viewsChanged || diff.requiresRender;
+        viewsChanged = viewsChanged || diff.requiresRender || diff.hasChanges;
       });
 
-      if (viewsUpdated) {
-        this.state.views = newViews;
+      // Check if any views were removed
+      if (this.state.views.size === newViews.size) {
+        for (const type of this.state.views.keys()) {
+          if (!newViews.has(type)) {
+            viewsChanged = true;
+            break;
+          }
+        }
+      } else {
+        viewsChanged = true;
       }
 
       if (viewsChanged) {
+        this.state.views = newViews;
         hasChanged = true;
       }
     }

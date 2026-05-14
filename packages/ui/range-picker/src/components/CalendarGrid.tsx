@@ -6,6 +6,8 @@ interface CalendarGridProps {
   startDate: Temporal.PlainDate;
   endDate: Temporal.PlainDate;
   weekDayLabels: string[];
+  minDate?: Temporal.PlainDate;
+  maxDate?: Temporal.PlainDate;
   disabled?: boolean;
   onDaySelect: (day: Temporal.PlainDate) => void;
 }
@@ -19,6 +21,8 @@ const CalendarGrid = ({
   startDate,
   endDate,
   weekDayLabels,
+  minDate,
+  maxDate,
   disabled,
   onDaySelect,
 }: CalendarGridProps) => {
@@ -28,17 +32,21 @@ const CalendarGrid = ({
     const isEnd = compareDates(day, endDate) === 0;
     const isInRange =
       compareDates(day, startDate) >= 0 && compareDates(day, endDate) <= 0;
+    const isOutOfSelectableRange =
+      (minDate && compareDates(day, minDate) < 0) ||
+      (maxDate && compareDates(day, maxDate) > 0);
 
     return (
       <button
         key={day.toString()}
         type='button'
-        disabled={disabled}
+        disabled={disabled || isOutOfSelectableRange}
         onClick={() => onDaySelect(day)}
         className='df-range-picker-day-cell'
         data-outside={isOutsideMonth}
         data-range-edge={isStart ? 'start' : isEnd ? 'end' : undefined}
         data-in-range={isInRange && !isStart && !isEnd}
+        data-disabled-range={isOutOfSelectableRange || undefined}
       >
         {day.day}
       </button>

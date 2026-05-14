@@ -18,7 +18,6 @@ const CalendarHeader = ({
   searchValue = '',
   isSearchOpen = false,
   isEditable = true,
-  safeAreaLeft,
 }: CalendarHeaderProps) => {
   const isSwitcherCentered = switcherMode === 'buttons';
   const isDayView = calendar.state.currentView === ViewType.DAY;
@@ -47,8 +46,8 @@ const CalendarHeader = ({
       className='df-header'
       data-bordered={isBordered ? 'true' : 'false'}
       style={{
-        paddingLeft: safeAreaLeft || 8,
-        transition: 'padding-left 160ms ease-in-out',
+        paddingLeft: 'var(--df-safe-area-left, 8px)',
+        transition: 'padding-left 200ms ease-in-out',
       }}
       onContextMenu={e => e.preventDefault()}
     >

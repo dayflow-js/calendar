@@ -72,6 +72,7 @@ const ko: DayflowLocale = {
     pasteHere: '여기에 붙여넣기',
     eventSummary: '요약',
     viewEvent: '일정 보기',
+    agenda: '일정',
     subscribeCalendar: '캘린더 구독',
     subscribeCalendarTitle: '구독할 캘린더의 URL을 입력하세요.',
     calendarUrl: '캘린더 URL',

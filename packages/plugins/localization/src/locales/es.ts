@@ -73,6 +73,7 @@ const es: DayflowLocale = {
     pasteHere: 'Pegar aquí',
     eventSummary: 'Resumen',
     viewEvent: 'Ver evento',
+    agenda: 'Agenda',
     subscribeCalendar: 'Suscribirse a un calendario',
     subscribeCalendarTitle:
       'Introduce la URL del calendario al que quieres suscribirte.',

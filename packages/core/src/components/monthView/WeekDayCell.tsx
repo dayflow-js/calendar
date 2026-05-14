@@ -1,7 +1,8 @@
 import { ComponentChild, RefObject } from 'preact';
-import { useRef } from 'preact/hooks';
+import { useMemo, useRef } from 'preact/hooks';
 
 import CalendarEvent from '@/components/calendarEvent';
+import { ContentSlot } from '@/renderer/ContentSlot';
 import {
   monthDayCell,
   monthDateNumberContainer,
@@ -288,6 +289,18 @@ const WeekDayCell = ({
       .map(segment => segment.event),
   ];
 
+  const monthDateNumberSlotArgs = useMemo(
+    () => ({
+      date: day.date,
+      day: day.day,
+      isToday: day.isToday,
+      belongsToCurrentMonth,
+      locale,
+      viewType: ViewType.MONTH as const,
+    }),
+    [belongsToCurrentMonth, day.date, day.day, day.isToday, locale]
+  );
+
   return (
     <div
       key={`day-${day.date.getTime()}`}
@@ -353,6 +366,12 @@ const WeekDayCell = ({
             {getWeekNumber(day.date)}
           </span>
         )}
+        <div className='df-month-date-number-slot'>
+          <ContentSlot
+            generatorName='monthDateNumberContent'
+            generatorArgs={monthDateNumberSlotArgs}
+          />
+        </div>
         <span
           className={monthDateNumber}
           data-today={day.isToday ? 'true' : undefined}

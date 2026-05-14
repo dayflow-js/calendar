@@ -1,7 +1,7 @@
 import { HOURS, MINUTES } from '@ui-range-picker/constants';
-import { ZonedRange } from '@ui-range-picker/types';
+import type { ZonedRange } from '@ui-range-picker/types';
 import { pad } from '@ui-range-picker/utils/rangePicker';
-import { h, RefObject } from 'preact';
+import type { RefObject } from 'preact';
 
 const scrollbarHide = 'df-scrollbar-hide';
 
@@ -54,7 +54,7 @@ const TimeSelector = ({
               }
             }}
           >
-            {HOURS.map(hour => {
+            {HOURS.map((hour: number) => {
               const isActive = hour === current.hour;
               return (
                 <button
@@ -84,7 +84,7 @@ const TimeSelector = ({
               }
             }}
           >
-            {minuteOptions.map(minute => {
+            {minuteOptions.map((minute: number) => {
               const isActive = minute === currentMinute;
               return (
                 <button

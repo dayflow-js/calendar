@@ -73,6 +73,7 @@ const ja: DayflowLocale = {
     pasteHere: 'ここに貼り付け',
     eventSummary: '概要',
     viewEvent: '予定を表示',
+    agenda: 'スケジュール',
     subscribeCalendar: 'カレンダーを登録',
     subscribeCalendarTitle: '登録するカレンダーのURLを入力してください。',
     calendarUrl: 'カレンダーURL',

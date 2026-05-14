@@ -6,6 +6,7 @@ import type {
   EventContentSlotArgs,
   EventContextMenuSlotArgs,
   GridContextMenuSlotArgs,
+  MonthDateNumberSlotArgs,
   EventDetailContentProps,
   EventDetailDialogProps,
   CreateCalendarDialogProps,
@@ -65,6 +66,8 @@ export interface DayFlowCalendarProps {
   eventContextMenu?: (args: EventContextMenuSlotArgs) => ReactNode;
   /** Custom grid/cell right-click context menu renderer (React) */
   gridContextMenu?: (args: GridContextMenuSlotArgs) => ReactNode;
+  /** Custom content rendered inside `df-month-date-number-container` */
+  monthDateNumberContent?: (args: MonthDateNumberSlotArgs) => ReactNode;
   /** Custom mobile event detail drawer (React) */
   mobileEventDetail?: (args: MobileEventProps) => ReactNode;
   /** Search configuration */

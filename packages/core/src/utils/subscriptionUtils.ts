@@ -43,6 +43,7 @@ export async function subscribeCalendar(url: string): Promise<SubscribeResult> {
     calendar: {
       id: generateUniKey(),
       name: calendarName,
+      source: 'Subscription',
       isVisible: true,
       colors,
       darkColors,

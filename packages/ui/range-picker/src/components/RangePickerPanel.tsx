@@ -1,5 +1,5 @@
-import { ZonedRange } from '@ui-range-picker/types';
-import { RefObject, JSX } from 'preact';
+import type { ZonedRange } from '@ui-range-picker/types';
+import type { RefObject, JSX } from 'preact';
 import { Temporal } from 'temporal-polyfill';
 
 import CalendarGrid from './CalendarGrid';
@@ -12,6 +12,8 @@ interface RangePickerPanelProps {
   weekDayLabels: string[];
   calendarDays: Temporal.PlainDate[];
   draftRange: ZonedRange;
+  minDate?: Temporal.PlainDate;
+  maxDate?: Temporal.PlainDate;
   focusedField: 'start' | 'end';
   isTimeEnabled: boolean;
   disabled?: boolean;
@@ -36,6 +38,8 @@ const RangePickerPanel = ({
   weekDayLabels,
   calendarDays,
   draftRange,
+  minDate,
+  maxDate,
   focusedField,
   isTimeEnabled,
   disabled,
@@ -57,15 +61,17 @@ const RangePickerPanel = ({
     <div
       ref={popupRef}
       className='df-range-picker df-range-picker-popup'
-      style={getPopupStyle()}
+      style={getPopupStyle() as any}
       data-range-picker-popup='true'
     >
       <div
         className='df-range-picker-panel'
-        style={{
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-          width: matchTriggerWidth ? '100%' : undefined,
-        }}
+        style={
+          {
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            width: matchTriggerWidth ? '100%' : undefined,
+          } as any
+        }
       >
         <div className='df-range-picker-panel-body'>
           <div className='df-range-picker-calendar-pane'>
@@ -82,6 +88,8 @@ const RangePickerPanel = ({
               startDate={startDate}
               endDate={endDate}
               weekDayLabels={weekDayLabels}
+              minDate={minDate}
+              maxDate={maxDate}
               disabled={disabled}
               onDaySelect={onDaySelect}
             />

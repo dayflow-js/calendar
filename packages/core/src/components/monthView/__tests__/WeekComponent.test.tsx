@@ -232,6 +232,73 @@ describe('WeekComponent', () => {
     ).toBeTruthy();
   });
 
+  it('renders a month date-number content slot container', () => {
+    const app = new CalendarApp({
+      views: [],
+      plugins: [],
+      events: [],
+      defaultView: ViewType.MONTH,
+      calendars: [
+        {
+          id: 'work',
+          name: 'Work',
+          colors: {
+            lineColor: '#2563eb',
+            eventColor: '#dbeafe',
+            eventSelectedColor: '#bfdbfe',
+            textColor: '#1e3a8a',
+          },
+        },
+      ],
+    });
+
+    const calendarRef = {
+      current: document.createElement('div'),
+    } as { current: HTMLDivElement };
+
+    const { container } = render(
+      <WeekComponent
+        currentMonth='March'
+        currentYear={2026}
+        newlyCreatedEventId={null}
+        screenSize='desktop'
+        isScrolling={false}
+        isDragging={false}
+        showWeekNumbers={false}
+        item={{
+          index: 0,
+          weekData: generateWeekData(new Date(2026, 2, 9)),
+          top: 0,
+          height: 113,
+        }}
+        weekHeight={113}
+        events={[]}
+        dragState={{
+          active: false,
+          mode: null,
+          eventId: null,
+          targetDate: null,
+          startDate: null,
+          endDate: null,
+        }}
+        calendarRef={calendarRef}
+        onEventUpdate={jest.fn()}
+        onEventDelete={jest.fn()}
+        onDetailPanelOpen={jest.fn()}
+        {...createRequiredWeekProps()}
+        app={app}
+      />
+    );
+
+    const dayCell = container.querySelector('[data-date="2026-03-11"]');
+    expect(dayCell).not.toBeNull();
+    expect(
+      (dayCell as HTMLElement).querySelector(
+        '.df-month-date-number-slot .df-content-slot'
+      )
+    ).not.toBeNull();
+  });
+
   it('ensures maxSlotsWithMore is always less than maxSlots when more events exist', () => {
     const events = [
       createAllDayEvent('a', 'Event A', '2026-03-12'),

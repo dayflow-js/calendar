@@ -169,6 +169,16 @@ export interface GridContextMenuSlotArgs {
   onClose: () => void;
 }
 
+/** Args passed to the monthDateNumberContent slot renderer. */
+export interface MonthDateNumberSlotArgs {
+  date: Date;
+  day: number;
+  isToday: boolean;
+  belongsToCurrentMonth: boolean;
+  locale: string;
+  viewType: ViewType.MONTH;
+}
+
 /**
  * Calendar application configuration
  * Used to initialize CalendarApp
@@ -342,6 +352,11 @@ export interface ICalendarApp {
   // Plugin management
   getPlugin: <T = unknown>(name: string) => T | undefined;
   hasPlugin: (name: string) => boolean;
+  getPluginConfig: (pluginName: string) => Record<string, unknown>;
+  updatePluginConfig: (
+    pluginName: string,
+    config: Record<string, unknown>
+  ) => void;
 
   // Calendar Header
   getCalendarHeaderConfig: () => boolean;
