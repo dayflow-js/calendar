@@ -15,6 +15,7 @@ import {
   getEventsForYearDate,
   groupDaysIntoRows,
 } from '@/components/yearView/utils';
+import { YearEventOverlayHost } from '@/components/yearView/YearEventOverlayHost';
 import { YearRowComponent } from '@/components/yearView/YearRowComponent';
 import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
@@ -115,9 +116,14 @@ export const DefaultYearView = ({
     [propOnDetailPanelToggle]
   );
 
-  const handleDetailPanelOpen = useCallback(() => {
+  // Auto-open the detail panel when a new event is created so the user can
+  // immediately edit it.
+  useEffect(() => {
+    if (!newlyCreatedEventId) return;
+    setSelectedEventId(newlyCreatedEventId);
+    setDetailPanelEventId(newlyCreatedEventId);
     setNewlyCreatedEventId(null);
-  }, []);
+  }, [newlyCreatedEventId, setSelectedEventId, setDetailPanelEventId]);
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -130,6 +136,30 @@ export const DefaultYearView = ({
     (menu: { x: number; y: number; date: Date } | null) => {
       if (!isEditable) return;
       setContextMenu(menu);
+    },
+    [isEditable]
+  );
+
+  const [eventContextMenu, setEventContextMenu] = useState<{
+    x: number;
+    y: number;
+    event: Event;
+  } | null>(null);
+
+  const handleSelectEvent = useCallback(
+    (eventId: string, segmentId: string) => {
+      setSelectedEventId(eventId);
+      setDetailPanelEventId(segmentId);
+    },
+    [setSelectedEventId, setDetailPanelEventId]
+  );
+
+  const handleEventContextMenu = useCallback(
+    (e: MouseEvent, event: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isEditable) return;
+      setEventContextMenu({ x: e.clientX, y: e.clientY, event });
     },
     [isEditable]
   );
@@ -240,45 +270,49 @@ export const DefaultYearView = ({
   }, [app.state.highlightedEventId]);
 
   // Drag and Drop Hook
-  const { handleMoveStart, handleResizeStart, dragState, isDragging } =
-    useDragForView(app, {
-      calendarRef,
-      viewType: ViewType.YEAR,
-      onEventsUpdate: (updateFunc, isResizing, source) => {
-        const newEvents = updateFunc(rawEvents);
+  const {
+    handleMoveStart,
+    handleResizeStart: _handleResizeStart,
+    dragState,
+    isDragging,
+  } = useDragForView(app, {
+    calendarRef,
+    viewType: ViewType.YEAR,
+    onEventsUpdate: (updateFunc, isResizing, source) => {
+      const newEvents = updateFunc(rawEvents);
 
-        // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
-        // caused ~100M string comparisons/tick with 10000 events.
-        const prevMap = new Map(rawEvents.map(e => [e.id, e]));
-        const eventsToUpdate = newEvents.filter(newEvent => {
-          const old = prevMap.get(newEvent.id);
-          return (
-            old !== undefined &&
-            old !== newEvent &&
-            hasEventChanged(old, newEvent)
-          );
-        });
+      // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
+      // caused ~100M string comparisons/tick with 10000 events.
+      const prevMap = new Map(rawEvents.map(e => [e.id, e]));
+      const eventsToUpdate = newEvents.filter(newEvent => {
+        const old = prevMap.get(newEvent.id);
+        return (
+          old !== undefined &&
+          old !== newEvent &&
+          hasEventChanged(old, newEvent)
+        );
+      });
 
-        if (eventsToUpdate.length > 0) {
-          app.applyEventsChanges(
-            {
-              update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
-            },
-            isResizing,
-            source
-          );
-        }
-      },
-      currentWeekStart: new Date(),
-      events: rawEvents,
-      onEventCreate: event => {
-        app.addEvent(event);
-      },
-      onEventEdit: event => {
-        setNewlyCreatedEventId(event.id);
-      },
-      isMobile,
-    });
+      if (eventsToUpdate.length > 0) {
+        app.applyEventsChanges(
+          {
+            update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+          },
+          isResizing,
+          source
+        );
+      }
+    },
+    currentWeekStart: new Date(),
+    events: rawEvents,
+    onEventCreate: event => {
+      app.addEvent(event);
+    },
+    onEventEdit: event => {
+      setNewlyCreatedEventId(event.id);
+    },
+    isMobile,
+  });
   const yearDragState = dragState as MonthEventDragState;
 
   // Get config value
@@ -540,26 +574,20 @@ export const DefaultYearView = ({
               events={eventsByRow[index]}
               columnsPerRow={columnsPerRow}
               app={app}
-              calendarRef={calendarRef}
               locale={locale}
               isDragging={isDragging}
               dragState={yearDragState}
               dragPreviewEvent={dragPreviewEvent}
               onMoveStart={handleMoveStart}
-              onResizeStart={handleResizeStart}
               onSelectDate={handleCellClick}
               onCreateStart={handleCellDoubleClick}
               selectedEventId={selectedEventId}
-              onEventSelect={setSelectedEventId}
+              onSelectEvent={handleSelectEvent}
+              onContextMenuEvent={handleEventContextMenu}
               onMoreEventsClick={app.onMoreEventsClick}
-              newlyCreatedEventId={newlyCreatedEventId}
-              onDetailPanelOpen={handleDetailPanelOpen}
-              detailPanelEventId={detailPanelEventId}
-              onDetailPanelToggle={setDetailPanelEventId}
-              useEventDetailPanel={useEventDetailPanel}
               onContextMenu={handleRowContextMenu}
               appTimeZone={appTimeZone}
-              isMobile={isMobile}
+              isDraggable={isEditable}
             />
           ))}
         </div>
@@ -589,6 +617,19 @@ export const DefaultYearView = ({
           }}
         />
       )}
+      <YearEventOverlayHost
+        app={app}
+        events={rawEvents}
+        selectedEventId={selectedEventId}
+        detailPanelEventId={detailPanelEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+        onEventSelect={setSelectedEventId}
+        eventContextMenu={eventContextMenu}
+        onCloseContextMenu={() => setEventContextMenu(null)}
+        useEventDetailPanel={useEventDetailPanel}
+        isEditable={isEditable}
+        calendarRef={calendarRef}
+      />
     </div>
   );
 };

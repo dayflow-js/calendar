@@ -22,17 +22,26 @@ export const applyGlobalDragCursor = (
   mode: 'move' | 'resize' | 'create',
   cursor: 'grabbing' | 'ew-resize' | 'ns-resize'
 ) => {
-  document.body.classList.add('df-drag-active');
-  document.body.style.cursor = cursor;
+  const body = document.body;
+  if (!body.classList.contains('df-drag-active')) {
+    body.classList.add('df-drag-active');
+  }
+  if (body.style.cursor !== cursor) {
+    body.style.cursor = cursor;
+  }
 
   if (mode === 'move' || mode === 'create') {
-    document.body.classList.add('df-cursor-grabbing');
+    if (!body.classList.contains('df-cursor-grabbing')) {
+      body.classList.add('df-cursor-grabbing');
+    }
     return;
   }
 
-  document.body.classList.add(
-    cursor === 'ew-resize' ? 'df-cursor-ew-resize' : 'df-cursor-ns-resize'
-  );
+  const targetClass =
+    cursor === 'ew-resize' ? 'df-cursor-ew-resize' : 'df-cursor-ns-resize';
+  if (!body.classList.contains(targetClass)) {
+    body.classList.add(targetClass);
+  }
 };
 
 export const clearGlobalDragCursor = () => {

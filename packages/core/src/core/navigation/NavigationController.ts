@@ -103,6 +103,16 @@ export class NavigationController {
         this.emitVisibleRange(start, end, reason);
         break;
       }
+      case ViewType.AWARENESS: {
+        const startOfWeek = (view?.config?.startOfWeek as number) ?? 1;
+        const { monday } = getWeekRange(this.state.currentDate, startOfWeek);
+        const start = new Date(monday);
+        start.setDate(start.getDate() - 7);
+        const end = new Date(monday);
+        end.setDate(end.getDate() + 14);
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
       case ViewType.MONTH: {
         if (reason === 'navigation') {
           // MonthView emits its own range based on virtual scroll position
@@ -185,6 +195,7 @@ export class NavigationController {
         newDate.setDate(newDate.getDate() - 1);
         break;
       case ViewType.WEEK:
+      case ViewType.AWARENESS:
         newDate.setDate(newDate.getDate() - 7);
         break;
       case ViewType.MONTH:
@@ -213,6 +224,7 @@ export class NavigationController {
         newDate.setDate(newDate.getDate() + 1);
         break;
       case ViewType.WEEK:
+      case ViewType.AWARENESS:
         newDate.setDate(newDate.getDate() + 7);
         break;
       case ViewType.MONTH:

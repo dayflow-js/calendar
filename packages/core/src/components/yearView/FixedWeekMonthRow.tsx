@@ -1,83 +1,94 @@
-import { RefObject } from 'preact';
 import { memo } from 'preact/compat';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 
-import { CalendarEvent } from '@/components/calendarEvent';
-import {
-  Event,
-  MonthEventDragState,
-  ViewType,
-  EventDetailContentRenderer,
-  EventDetailDialogRenderer,
-  ICalendarApp,
-} from '@/types';
+import { Event, ICalendarApp } from '@/types';
 import { getTodayInTimeZone } from '@/utils';
 
-import {
-  createPreviewMonthSegment,
-  eventOverlapsMonth,
-  FixedWeekMonthData,
-} from './utils';
+import { FixedWeekMonthData, MonthEventSegment } from './utils';
+import { YearEventBar } from './YearEventBar';
+
+interface StaticEventsLayerProps {
+  segments: MonthEventSegment[];
+  totalColumns: number;
+  app: ICalendarApp;
+  selectedEventId: string | null;
+  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
+  onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
+  isDraggable: boolean;
+}
+
+// Renders the non-dragged events for a month using lightweight YearEventBars.
+// every drag cell crossing.
+const StaticEventsLayer = memo(
+  ({
+    segments,
+    totalColumns,
+    app,
+    selectedEventId,
+    onSelectEvent,
+    onMoveStart,
+    onContextMenuEvent,
+    isDraggable,
+  }: StaticEventsLayerProps) => (
+    <>
+      {segments.map(segment => (
+        <YearEventBar
+          key={segment.id}
+          event={segment.event}
+          segment={segment}
+          columnsPerRow={totalColumns}
+          isSelected={selectedEventId === segment.event.id}
+          isBeingDragged={false}
+          isDraggable={isDraggable}
+          app={app}
+          onSelect={onSelectEvent}
+          onMoveStart={onMoveStart}
+          onContextMenu={onContextMenuEvent}
+        />
+      ))}
+    </>
+  )
+);
+
+(StaticEventsLayer as { displayName?: string }).displayName =
+  'FixedWeekStaticEventsLayer';
 
 interface FixedWeekMonthRowProps {
   monthData: FixedWeekMonthData;
-  currentYear: number;
   startOfWeek: number;
   totalColumns: number;
   app: ICalendarApp;
-  calendarRef: RefObject<HTMLDivElement>;
+  excludedEventId: string | null;
   isDragging: boolean;
-  dragState: MonthEventDragState;
-  dragPreviewEvent?: Event | null;
   selectedEventId: string | null;
+  onSelectEvent: (eventId: string, segmentId: string) => void;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
-  onResizeStart?: (
-    e: MouseEvent | TouchEvent,
-    event: Event,
-    direction: string
-  ) => void;
+  onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   onSelectDate: (date: Date) => void;
   onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
-  onEventSelect: (eventId: string | null) => void;
-  newlyCreatedEventId?: string | null;
-  onDetailPanelOpen?: () => void;
-  detailPanelEventId: string | null;
-  onDetailPanelToggle: (eventId: string | null) => void;
-  customDetailPanelContent?: EventDetailContentRenderer;
-  customEventDetailDialog?: EventDetailDialogRenderer;
-  useEventDetailPanel?: boolean;
   onContextMenu: (e: MouseEvent, date: Date) => void;
   appTimeZone?: string;
-  isMobile?: boolean;
+  isDraggable: boolean;
 }
 
 export const FixedWeekMonthRow = memo(
   ({
     monthData,
-    currentYear,
     startOfWeek,
     totalColumns,
     app,
-    calendarRef,
+    excludedEventId,
     isDragging,
-    dragState,
-    dragPreviewEvent,
     selectedEventId,
+    onSelectEvent,
     onMoveStart,
-    onResizeStart,
+    onContextMenuEvent,
     onSelectDate,
     onCreateStart,
-    onEventSelect,
-    newlyCreatedEventId,
-    onDetailPanelOpen,
-    detailPanelEventId,
-    onDetailPanelToggle,
-    customDetailPanelContent: _customDetailPanelContent,
-    customEventDetailDialog: _customEventDetailDialog,
-    useEventDetailPanel,
     onContextMenu,
     appTimeZone,
-    isMobile,
+    isDraggable,
   }: FixedWeekMonthRowProps) => {
     const today = useMemo(() => {
       const now = getTodayInTimeZone(appTimeZone);
@@ -85,61 +96,12 @@ export const FixedWeekMonthRow = memo(
       return now;
     }, [appTimeZone]);
 
-    const handleEventUpdate = useCallback(
-      (updated: Event) => app.updateEvent(updated.id, updated),
-      [app]
-    );
-
-    const handleEventDelete = useCallback(
-      (id: string) => app.deleteEvent(id),
-      [app]
-    );
-
-    const isMovePreviewActive =
-      isDragging &&
-      dragState.mode === 'move' &&
-      !!dragPreviewEvent &&
-      dragPreviewEvent.id === dragState.eventId;
-
-    const dragPreviewSegment = useMemo(
-      () =>
-        isMovePreviewActive
-          ? createPreviewMonthSegment(
-              dragPreviewEvent,
-              monthData.monthIndex,
-              currentYear,
-              startOfWeek,
-              appTimeZone
-            )
-          : null,
-      [
-        isMovePreviewActive,
-        dragPreviewEvent,
-        monthData.monthIndex,
-        currentYear,
-        startOfWeek,
-        appTimeZone,
-      ]
-    );
-
-    const renderedSegments = useMemo(() => {
-      if (!isMovePreviewActive || !dragState.eventId) {
-        return monthData.eventSegments;
-      }
-
-      const staticSegments = monthData.eventSegments.filter(
-        segment => segment.event.id !== dragState.eventId
+    const staticSegments = useMemo(() => {
+      if (!excludedEventId) return monthData.eventSegments;
+      return monthData.eventSegments.filter(
+        segment => segment.event.id !== excludedEventId
       );
-
-      return dragPreviewSegment
-        ? [...staticSegments, dragPreviewSegment]
-        : staticSegments;
-    }, [
-      isMovePreviewActive,
-      dragState.eventId,
-      monthData.eventSegments,
-      dragPreviewSegment,
-    ]);
+    }, [monthData.eventSegments, excludedEventId]);
 
     return (
       <div
@@ -194,100 +156,23 @@ export const FixedWeekMonthRow = memo(
           })}
         </div>
 
-        {renderedSegments.length > 0 && (
+        {staticSegments.length > 0 && (
           <div className='df-year-fixed-event-layer' style={{ top: 20 }}>
             <div className='df-year-fixed-event-layer-inner'>
-              {renderedSegments.map(segment => (
-                <div key={segment.id} className='df-year-fixed-event-hitbox'>
-                  <CalendarEvent
-                    event={segment.event}
-                    isAllDay={!!segment.event.allDay}
-                    viewType={ViewType.YEAR}
-                    yearSegment={segment}
-                    columnsPerRow={totalColumns}
-                    isBeingDragged={
-                      isDragging && dragState.eventId === segment.event.id
-                    }
-                    selectedEventId={selectedEventId}
-                    onMoveStart={onMoveStart}
-                    onResizeStart={isMobile ? undefined : onResizeStart}
-                    onEventSelect={onEventSelect}
-                    onDetailPanelToggle={onDetailPanelToggle}
-                    newlyCreatedEventId={newlyCreatedEventId}
-                    onDetailPanelOpen={onDetailPanelOpen}
-                    calendarRef={calendarRef}
-                    app={app}
-                    detailPanelEventId={detailPanelEventId}
-                    useEventDetailPanel={useEventDetailPanel}
-                    firstHour={0}
-                    hourHeight={0}
-                    onEventUpdate={handleEventUpdate}
-                    onEventDelete={handleEventDelete}
-                    appTimeZone={appTimeZone}
-                    isMobile={isMobile}
-                    enableTouch={isMobile}
-                  />
-                </div>
-              ))}
+              <StaticEventsLayer
+                segments={staticSegments}
+                totalColumns={totalColumns}
+                app={app}
+                selectedEventId={selectedEventId}
+                onSelectEvent={onSelectEvent}
+                onMoveStart={onMoveStart}
+                onContextMenuEvent={onContextMenuEvent}
+                isDraggable={isDraggable}
+              />
             </div>
           </div>
         )}
       </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    const prevPreviewId = prevProps.dragPreviewEvent?.id;
-    const nextPreviewId = nextProps.dragPreviewEvent?.id;
-    const monthContainsDraggedEvent =
-      (!!prevPreviewId &&
-        prevProps.monthData.monthEvents.some(
-          event => event.id === prevPreviewId
-        )) ||
-      (!!nextPreviewId &&
-        nextProps.monthData.monthEvents.some(
-          event => event.id === nextPreviewId
-        ));
-    const prevOverlaps = eventOverlapsMonth(
-      prevProps.dragPreviewEvent,
-      prevProps.currentYear,
-      prevProps.monthData.monthIndex,
-      prevProps.appTimeZone
-    );
-    const nextOverlaps = eventOverlapsMonth(
-      nextProps.dragPreviewEvent,
-      nextProps.currentYear,
-      nextProps.monthData.monthIndex,
-      nextProps.appTimeZone
-    );
-
-    if (monthContainsDraggedEvent || prevOverlaps || nextOverlaps) {
-      return false;
-    }
-
-    return (
-      prevProps.monthData === nextProps.monthData &&
-      prevProps.currentYear === nextProps.currentYear &&
-      prevProps.startOfWeek === nextProps.startOfWeek &&
-      prevProps.totalColumns === nextProps.totalColumns &&
-      prevProps.app === nextProps.app &&
-      prevProps.calendarRef === nextProps.calendarRef &&
-      prevProps.selectedEventId === nextProps.selectedEventId &&
-      prevProps.onMoveStart === nextProps.onMoveStart &&
-      prevProps.onResizeStart === nextProps.onResizeStart &&
-      prevProps.onSelectDate === nextProps.onSelectDate &&
-      prevProps.onCreateStart === nextProps.onCreateStart &&
-      prevProps.onEventSelect === nextProps.onEventSelect &&
-      prevProps.newlyCreatedEventId === nextProps.newlyCreatedEventId &&
-      prevProps.onDetailPanelOpen === nextProps.onDetailPanelOpen &&
-      prevProps.detailPanelEventId === nextProps.detailPanelEventId &&
-      prevProps.onDetailPanelToggle === nextProps.onDetailPanelToggle &&
-      prevProps.customDetailPanelContent ===
-        nextProps.customDetailPanelContent &&
-      prevProps.customEventDetailDialog === nextProps.customEventDetailDialog &&
-      prevProps.useEventDetailPanel === nextProps.useEventDetailPanel &&
-      prevProps.onContextMenu === nextProps.onContextMenu &&
-      prevProps.appTimeZone === nextProps.appTimeZone &&
-      prevProps.isMobile === nextProps.isMobile
     );
   }
 );

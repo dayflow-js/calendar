@@ -19,6 +19,9 @@ export class EventManager {
   private readonly MAX_UNDO_STACK = 50;
   private eventChangeListeners: Set<(changes: EventChange[]) => void> =
     new Set();
+  private cachedFilteredEventsSource: Event[] | null = null;
+  private cachedFilteredVisibilityKey: string = '';
+  private cachedFilteredEvents: Event[] = [];
 
   constructor(
     private state: CalendarAppState,
@@ -340,18 +343,40 @@ export class EventManager {
 
   getEvents(): Event[] {
     const allEvents = this.state.events || [];
-    const visibleCalendars = new Set(
-      this.registry
-        .getAll()
-        .filter(calendar => calendar.isVisible !== false)
-        .map(calendar => calendar.id)
-    );
-    return allEvents.filter(event => {
+    const calendars = this.registry.getAll();
+
+    let visibilityKey = '';
+    for (let i = 0; i < calendars.length; i++) {
+      const cal = calendars[i];
+      if (cal.isVisible !== false) {
+        visibilityKey += cal.id + '|';
+      }
+    }
+
+    if (
+      this.cachedFilteredEventsSource === allEvents &&
+      this.cachedFilteredVisibilityKey === visibilityKey
+    ) {
+      return this.cachedFilteredEvents;
+    }
+
+    const visibleCalendars = new Set<string>();
+    for (let i = 0; i < calendars.length; i++) {
+      const cal = calendars[i];
+      if (cal.isVisible !== false) visibleCalendars.add(cal.id);
+    }
+
+    const filtered = allEvents.filter(event => {
       const ids =
         event.calendarIds ?? (event.calendarId ? [event.calendarId] : []);
       if (ids.length === 0) return false;
       return ids.some(id => visibleCalendars.has(id));
     });
+
+    this.cachedFilteredEventsSource = allEvents;
+    this.cachedFilteredVisibilityKey = visibilityKey;
+    this.cachedFilteredEvents = filtered;
+    return filtered;
   }
 
   onEventClick(event: Event): void {

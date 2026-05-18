@@ -27,14 +27,19 @@ export class CustomRenderingStore {
    */
   register(rendering: CustomRendering): void {
     this.renderings.set(rendering.id, rendering);
-    this.notify();
+    if (this.overrides.has(rendering.generatorName)) {
+      this.notify();
+    }
   }
 
   /**
    * Unregister a custom rendering placeholder.
    */
   unregister(id: string): void {
-    if (this.renderings.delete(id)) {
+    const existing = this.renderings.get(id);
+    if (!existing) return;
+    this.renderings.delete(id);
+    if (this.overrides.has(existing.generatorName)) {
       this.notify();
     }
   }

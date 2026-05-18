@@ -387,7 +387,11 @@ export const MultiDayEvent = memo(
           zIndex: 10,
           transform: isPopping ? 'scale(1.02)' : 'scale(1)',
           transition: POP_TRANSITION,
-          willChange: 'transform',
+          // Only set will-change while actually animating — permanent
+          // will-change on every event forces the browser to allocate a
+          // compositor layer per event, hurting paint/composite throughput
+          // (including the drag indicator cursor).
+          ...(isPopping ? { willChange: 'transform' as const } : {}),
           ...(isActive
             ? {
                 backgroundColor: getSelectedBgColor(calendarId),

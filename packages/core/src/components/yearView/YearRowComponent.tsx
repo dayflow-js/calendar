@@ -1,43 +1,179 @@
-import { RefObject } from 'preact';
 import { memo } from 'preact/compat';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { CalendarEvent } from '@/components/calendarEvent';
-import { Event, MonthEventDragState, ICalendarApp, ViewType } from '@/types';
-import { getTodayInTimeZone } from '@/utils';
+import { getEventIcon } from '@/components/monthView/util';
+import { Event, MonthEventDragState, ICalendarApp } from '@/types';
+import {
+  getLineColor,
+  getPrimaryCalendarId,
+  getSelectedBgColor,
+  getTodayInTimeZone,
+} from '@/utils';
 
-import { analyzeMultiDayEventsForRow, getEventDayRange } from './utils';
+import {
+  analyzeMultiDayEventsForRow,
+  getEventDayRange,
+  YearMultiDaySegment,
+} from './utils';
 import { YearDayCell } from './YearDayCell';
+import { YearEventBar } from './YearEventBar';
+
+const PILL_HORIZONTAL_MARGIN = 2;
+const PILL_EVENT_HEIGHT = 16;
+const PILL_ROW_SPACING = 18;
+
+// Lightweight drag-preview pill for year-canvas mode. Same purpose as the
+// fixed-week overlay: avoid a full CalendarEvent render per drag tick.
+interface YearDragPreviewPillProps {
+  segment: YearMultiDaySegment;
+  event: Event;
+  columnsPerRow: number;
+  app: ICalendarApp;
+}
+
+const YearDragPreviewPill = ({
+  segment,
+  event,
+  columnsPerRow,
+  app,
+}: YearDragPreviewPillProps) => {
+  const calendarId = getPrimaryCalendarId(event);
+  const registry = app.getCalendarRegistry();
+  // Drag preview uses the selected bg color so the cell-snap target reads as
+  // the active "this is where it will land" pill, matching Apple/Google.
+  const bgColor = getSelectedBgColor(calendarId, registry);
+  const textColor = '#fff';
+  const isAllDay = !!event.allDay;
+  const {
+    startCellIndex,
+    endCellIndex,
+    visualRowIndex,
+    isFirstSegment,
+    isLastSegment,
+  } = segment;
+  const startPercent = (startCellIndex / columnsPerRow) * 100;
+  const widthPercent =
+    ((endCellIndex - startCellIndex + 1) / columnsPerRow) * 100;
+  const radius = '4px';
+  const icon = isAllDay && isFirstSegment ? getEventIcon(event) : null;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: `calc(${startPercent}% + ${PILL_HORIZONTAL_MARGIN}px)`,
+        top: `${visualRowIndex * PILL_ROW_SPACING}px`,
+        width: `calc(${widthPercent}% - ${PILL_HORIZONTAL_MARGIN * 2}px)`,
+        height: `${PILL_EVENT_HEIGHT}px`,
+        backgroundColor: bgColor,
+        color: textColor,
+        borderTopLeftRadius: isFirstSegment ? radius : '0',
+        borderBottomLeftRadius: isFirstSegment ? radius : '0',
+        borderTopRightRadius: isLastSegment ? radius : '0',
+        borderBottomRightRadius: isLastSegment ? radius : '0',
+        fontSize: '11px',
+        lineHeight: `${PILL_EVENT_HEIGHT}px`,
+        padding: '0 4px',
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'hidden',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.12)',
+        pointerEvents: 'none',
+        zIndex: 100,
+      }}
+    >
+      {icon && (
+        <div
+          className='df-event-year-icon-badge'
+          style={{
+            flexShrink: 0,
+            backgroundColor: getLineColor(calendarId, registry),
+            marginRight: '4px',
+          }}
+        >
+          {icon}
+        </div>
+      )}
+      <span
+        className='df-event-year-title-fade'
+        style={{
+          flex: 1,
+          minWidth: 0,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {isFirstSegment ? event.title : ''}
+      </span>
+    </div>
+  );
+};
+
+interface YearStaticEventsLayerProps {
+  segments: YearMultiDaySegment[];
+  columnsPerRow: number;
+  app: ICalendarApp;
+  selectedEventId: string | null;
+  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
+  onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
+  isDraggable: boolean;
+}
+
+// Lightweight static layer: renders all non-dragged events as bare
+// YearEventBars. Memoized — does not re-render during drag.
+const YearStaticEventsLayer = memo(
+  ({
+    segments,
+    columnsPerRow,
+    app,
+    selectedEventId,
+    onSelectEvent,
+    onMoveStart,
+    onContextMenuEvent,
+    isDraggable,
+  }: YearStaticEventsLayerProps) => (
+    <>
+      {segments.map(segment => (
+        <YearEventBar
+          key={segment.id}
+          event={segment.event}
+          segment={segment}
+          columnsPerRow={columnsPerRow}
+          isSelected={selectedEventId === segment.event.id}
+          isBeingDragged={false}
+          isDraggable={isDraggable}
+          app={app}
+          onSelect={onSelectEvent}
+          onMoveStart={onMoveStart}
+          onContextMenu={onContextMenuEvent}
+        />
+      ))}
+    </>
+  )
+);
+
+(YearStaticEventsLayer as { displayName?: string }).displayName =
+  'YearStaticEventsLayer';
 
 interface YearRowComponentProps {
   rowDays: Date[];
   events: Event[];
   columnsPerRow: number;
   app: ICalendarApp;
-  calendarRef: RefObject<HTMLDivElement>;
   locale: string;
   isDragging: boolean;
   dragState: MonthEventDragState;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
-  onResizeStart?: (
-    e: MouseEvent | TouchEvent,
-    event: Event,
-    direction: string
-  ) => void;
   onSelectDate: (date: Date) => void;
   onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
   selectedEventId: string | null;
-  onEventSelect: (eventId: string | null) => void;
+  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   onMoreEventsClick?: (date: Date) => void;
-  newlyCreatedEventId?: string | null;
-  onDetailPanelOpen?: () => void;
-  detailPanelEventId: string | null;
-  onDetailPanelToggle: (eventId: string | null) => void;
-  useEventDetailPanel?: boolean;
   onContextMenu: (menu: { x: number; y: number; date: Date } | null) => void;
   appTimeZone?: string;
   dragPreviewEvent?: Event | null;
-  isMobile?: boolean;
+  isDraggable: boolean;
 }
 
 const eventOverlapsRow = (
@@ -130,26 +266,20 @@ export const YearRowComponent = memo(
     events,
     columnsPerRow,
     app,
-    calendarRef,
     locale,
     isDragging,
     dragState,
     onMoveStart,
-    onResizeStart,
     onSelectDate,
     onCreateStart,
     selectedEventId,
-    onEventSelect,
+    onSelectEvent,
+    onContextMenuEvent,
     onMoreEventsClick,
-    newlyCreatedEventId,
-    onDetailPanelOpen,
-    detailPanelEventId,
-    onDetailPanelToggle,
-    useEventDetailPanel,
     onContextMenu,
     appTimeZone,
     dragPreviewEvent,
-    isMobile,
+    isDraggable,
   }: YearRowComponentProps) => {
     const MAX_VISIBLE_ROWS = 3;
     const HEADER_HEIGHT = 26;
@@ -166,15 +296,6 @@ export const YearRowComponent = memo(
         onContextMenu({ x: e.clientX, y: e.clientY, date });
       },
       [onContextMenu]
-    );
-
-    const handleEventUpdate = useCallback(
-      (updated: Event) => app.updateEvent(updated.id, updated),
-      [app]
-    );
-    const handleEventDelete = useCallback(
-      (id: string) => app.deleteEvent(id),
-      [app]
     );
 
     const segments = useMemo(
@@ -250,15 +371,12 @@ export const YearRowComponent = memo(
     );
 
     const { visibleSegments, moreCounts } = useMemo(() => {
-      // 1. Calculate how many events are in each column
       const colCounts = Array.from({ length: rowDays.length }).fill(
         0
       ) as number[];
       effectiveSegments.forEach(segment => {
-        // Be careful with boundaries
         const start = Math.max(0, segment.startCellIndex);
         const end = Math.min(rowDays.length - 1, segment.endCellIndex);
-
         for (let i = start; i <= end; i++) {
           colCounts[i]++;
         }
@@ -267,18 +385,13 @@ export const YearRowComponent = memo(
       const visible: typeof effectiveSegments = [];
       const counts = Array.from({ length: rowDays.length }).fill(0) as number[];
 
-      // 2. Determine visibility for each segment
       effectiveSegments.forEach(segment => {
         let isVisible = true;
         const start = Math.max(0, segment.startCellIndex);
         const end = Math.min(rowDays.length - 1, segment.endCellIndex);
 
-        // Check each column this segment spans
         for (let i = start; i <= end; i++) {
           const count = colCounts[i];
-          // If column has more than MAX, must reserve the last slot (MAX-1) for "More"
-          // So valid indices are 0 to MAX-2.
-          // If column has <= MAX, can use 0 to MAX-1.
           const maxAllowedIndex =
             count > MAX_VISIBLE_ROWS
               ? MAX_VISIBLE_ROWS - 2
@@ -293,7 +406,6 @@ export const YearRowComponent = memo(
         if (isVisible) {
           visible.push(segment);
         } else {
-          // Increment hidden count for covered days
           for (let i = start; i <= end; i++) {
             counts[i]++;
           }
@@ -303,24 +415,16 @@ export const YearRowComponent = memo(
       return { visibleSegments: visible, moreCounts: counts };
     }, [effectiveSegments, rowDays.length]);
 
-    const renderedSegments = useMemo(() => {
-      if (!isMovePreviewActive || !dragState.eventId) {
-        return effectiveSegments;
-      }
+    // Stable during drag: only flips when drag starts/ends. The static layer
+    // keys off this so its events don't re-render on every drag cell crossing.
+    const moveDraggedEventId = isMovePreviewActive ? dragState.eventId : null;
 
-      const staticSegments = effectiveSegments.filter(
-        segment => segment.event.id !== dragState.eventId
+    const staticVisibleSegments = useMemo(() => {
+      if (!moveDraggedEventId) return visibleSegments;
+      return visibleSegments.filter(
+        segment => segment.event.id !== moveDraggedEventId
       );
-
-      return dragPreviewSegment
-        ? [...staticSegments, dragPreviewSegment]
-        : staticSegments;
-    }, [
-      isMovePreviewActive,
-      dragState.eventId,
-      effectiveSegments,
-      dragPreviewSegment,
-    ]);
+    }, [visibleSegments, moveDraggedEventId]);
 
     return (
       <div
@@ -331,7 +435,6 @@ export const YearRowComponent = memo(
         }}
         onContextMenu={e => e.preventDefault()}
       >
-        {/* Background Cells */}
         {rowDays.map((date, index) => {
           const isToday = date.getTime() === today.getTime();
           return (
@@ -359,97 +462,27 @@ export const YearRowComponent = memo(
           onContextMenu={e => e.preventDefault()}
         >
           <div className='df-year-row-event-layer-inner'>
-            {(isMovePreviewActive && dragState.eventId
-              ? renderedSegments.filter(
-                  segment =>
-                    visibleSegments.some(
-                      visibleSegment => visibleSegment.id === segment.id
-                    ) || segment.id === dragPreviewSegment?.id
-                )
-              : visibleSegments
-            ).map(segment => (
-              <div key={segment.id} className='df-year-row-event-hitbox'>
-                <CalendarEvent
-                  event={segment.event}
-                  isAllDay={!!segment.event.allDay}
-                  viewType={ViewType.YEAR}
-                  yearSegment={segment}
-                  columnsPerRow={columnsPerRow}
-                  isBeingDragged={
-                    isDragging && dragState.eventId === segment.event.id
-                  }
-                  selectedEventId={selectedEventId}
-                  onMoveStart={onMoveStart}
-                  onResizeStart={isMobile ? undefined : onResizeStart}
-                  onEventSelect={onEventSelect}
-                  onDetailPanelToggle={onDetailPanelToggle}
-                  newlyCreatedEventId={newlyCreatedEventId}
-                  onDetailPanelOpen={onDetailPanelOpen}
-                  calendarRef={calendarRef}
-                  app={app}
-                  detailPanelEventId={detailPanelEventId}
-                  useEventDetailPanel={useEventDetailPanel}
-                  // Required props for CalendarEvent
-                  firstHour={0}
-                  hourHeight={0}
-                  onEventUpdate={handleEventUpdate}
-                  onEventDelete={handleEventDelete}
-                  appTimeZone={appTimeZone}
-                  isMobile={isMobile}
-                  enableTouch={isMobile}
-                />
-              </div>
-            ))}
+            <YearStaticEventsLayer
+              segments={staticVisibleSegments}
+              columnsPerRow={columnsPerRow}
+              app={app}
+              selectedEventId={selectedEventId}
+              onSelectEvent={onSelectEvent}
+              onMoveStart={onMoveStart}
+              onContextMenuEvent={onContextMenuEvent}
+              isDraggable={isDraggable}
+            />
+            {dragPreviewSegment && (
+              <YearDragPreviewPill
+                segment={dragPreviewSegment}
+                event={dragPreviewSegment.event}
+                columnsPerRow={columnsPerRow}
+                app={app}
+              />
+            )}
           </div>
         </div>
       </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    const prevPreviewId = prevProps.dragPreviewEvent?.id;
-    const nextPreviewId = nextProps.dragPreviewEvent?.id;
-    const rowContainsDraggedEvent =
-      (!!prevPreviewId &&
-        prevProps.events.some(event => event.id === prevPreviewId)) ||
-      (!!nextPreviewId &&
-        nextProps.events.some(event => event.id === nextPreviewId));
-    const prevOverlaps = eventOverlapsRow(
-      prevProps.dragPreviewEvent,
-      prevProps.rowDays,
-      prevProps.appTimeZone
-    );
-    const nextOverlaps = eventOverlapsRow(
-      nextProps.dragPreviewEvent,
-      nextProps.rowDays,
-      nextProps.appTimeZone
-    );
-
-    if (rowContainsDraggedEvent || prevOverlaps || nextOverlaps) {
-      return false;
-    }
-
-    return (
-      prevProps.rowDays === nextProps.rowDays &&
-      prevProps.events === nextProps.events &&
-      prevProps.columnsPerRow === nextProps.columnsPerRow &&
-      prevProps.app === nextProps.app &&
-      prevProps.calendarRef === nextProps.calendarRef &&
-      prevProps.locale === nextProps.locale &&
-      prevProps.onMoveStart === nextProps.onMoveStart &&
-      prevProps.onResizeStart === nextProps.onResizeStart &&
-      prevProps.onSelectDate === nextProps.onSelectDate &&
-      prevProps.onCreateStart === nextProps.onCreateStart &&
-      prevProps.selectedEventId === nextProps.selectedEventId &&
-      prevProps.onEventSelect === nextProps.onEventSelect &&
-      prevProps.onMoreEventsClick === nextProps.onMoreEventsClick &&
-      prevProps.newlyCreatedEventId === nextProps.newlyCreatedEventId &&
-      prevProps.onDetailPanelOpen === nextProps.onDetailPanelOpen &&
-      prevProps.detailPanelEventId === nextProps.detailPanelEventId &&
-      prevProps.onDetailPanelToggle === nextProps.onDetailPanelToggle &&
-      prevProps.useEventDetailPanel === nextProps.useEventDetailPanel &&
-      prevProps.onContextMenu === nextProps.onContextMenu &&
-      prevProps.appTimeZone === nextProps.appTimeZone &&
-      prevProps.isMobile === nextProps.isMobile
     );
   }
 );

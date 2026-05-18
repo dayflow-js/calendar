@@ -94,6 +94,12 @@ export const useEventStyles = ({
       const HORIZONTAL_MARGIN = 2;
       const EVENT_HEIGHT = 16;
 
+      const yearWillChange = isBeingDragged
+        ? ('left, top, width, transform' as const)
+        : isPopping
+          ? ('transform' as const)
+          : undefined;
+
       return {
         position: 'absolute',
         left: `calc(${startPercent}% + ${HORIZONTAL_MARGIN}px)`,
@@ -111,9 +117,7 @@ export const useEventStyles = ({
               POP_TRANSITION,
             ].join(', ')
           : POP_TRANSITION,
-        willChange: isBeingDragged
-          ? ('left, top, width, transform' as const)
-          : ('transform' as const),
+        willChange: yearWillChange,
         cursor: isDraggable ? 'pointer' : canOpenDetail ? 'pointer' : 'default',
       };
     }

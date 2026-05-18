@@ -24,6 +24,7 @@ import {
   dateToZonedDateTime,
 } from '@/utils';
 
+import { FixedWeekDragPreviewOverlay } from './FixedWeekDragPreviewOverlay';
 import { FixedWeekMonthRow } from './FixedWeekMonthRow';
 import {
   buildEffectiveFixedWeekMonthsData,
@@ -35,6 +36,7 @@ import {
   getFixedWeekLabels,
   getFixedWeekTotalColumns,
 } from './utils';
+import { YearEventOverlayHost } from './YearEventOverlayHost';
 
 interface FixedWeekYearViewProps {
   app: ICalendarApp;
@@ -122,15 +124,25 @@ export const FixedWeekYearView = ({
     null
   );
 
-  const handleDetailPanelOpen = useCallback(
-    () => setNewlyCreatedEventId(null),
-    []
-  );
+  // Auto-open the detail panel when a new event is created so the user can
+  // immediately edit it. Mirrors the legacy CalendarEvent behaviour that
+  // opened the panel via the newlyCreatedEventId effect.
+  useEffect(() => {
+    if (!newlyCreatedEventId) return;
+    setSelectedEventId(newlyCreatedEventId);
+    setDetailPanelEventId(newlyCreatedEventId);
+    setNewlyCreatedEventId(null);
+  }, [newlyCreatedEventId, setSelectedEventId, setDetailPanelEventId]);
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     date: Date;
+  } | null>(null);
+  const [eventContextMenu, setEventContextMenu] = useState<{
+    x: number;
+    y: number;
+    event: Event;
   } | null>(null);
   const isEditable = app.canMutateFromUI();
 
@@ -140,6 +152,26 @@ export const FixedWeekYearView = ({
       e.stopPropagation();
       if (!isEditable) return;
       setContextMenu({ x: e.clientX, y: e.clientY, date });
+    },
+    [isEditable]
+  );
+
+  const handleSelectEvent = useCallback(
+    (eventId: string, segmentId: string) => {
+      setSelectedEventId(eventId);
+      // Detail-panel key matches the legacy CalendarEvent format for year
+      // segments: yearSegment.id (e.g., `${event.id}::year-${rowStartMs}`).
+      setDetailPanelEventId(segmentId);
+    },
+    [setSelectedEventId, setDetailPanelEventId]
+  );
+
+  const handleEventContextMenu = useCallback(
+    (e: MouseEvent, event: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isEditable) return;
+      setEventContextMenu({ x: e.clientX, y: e.clientY, event });
     },
     [isEditable]
   );
@@ -259,45 +291,49 @@ export const FixedWeekYearView = ({
   );
 
   // Drag and Drop Hook
-  const { handleMoveStart, handleResizeStart, dragState, isDragging } =
-    useDragForView(app, {
-      calendarRef,
-      viewType: ViewType.YEAR,
-      onEventsUpdate: (updateFunc, isResizing, source) => {
-        const newEvents = updateFunc(rawEvents);
+  const {
+    handleMoveStart,
+    handleResizeStart: _handleResizeStart,
+    dragState,
+    isDragging,
+  } = useDragForView(app, {
+    calendarRef,
+    viewType: ViewType.YEAR,
+    onEventsUpdate: (updateFunc, isResizing, source) => {
+      const newEvents = updateFunc(rawEvents);
 
-        // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
-        // caused ~100M string comparisons/tick with 10000 events.
-        const prevMap = new Map(rawEvents.map(e => [e.id, e]));
-        const eventsToUpdate = newEvents.filter(newEvent => {
-          const old = prevMap.get(newEvent.id);
-          return (
-            old !== undefined &&
-            old !== newEvent &&
-            hasEventChanged(old, newEvent)
-          );
-        });
+      // Build a Map for O(1) lookups — the previous O(N²) .find() in .filter()
+      // caused ~100M string comparisons/tick with 10000 events.
+      const prevMap = new Map(rawEvents.map(e => [e.id, e]));
+      const eventsToUpdate = newEvents.filter(newEvent => {
+        const old = prevMap.get(newEvent.id);
+        return (
+          old !== undefined &&
+          old !== newEvent &&
+          hasEventChanged(old, newEvent)
+        );
+      });
 
-        if (eventsToUpdate.length > 0) {
-          app.applyEventsChanges(
-            {
-              update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
-            },
-            isResizing,
-            source
-          );
-        }
-      },
-      currentWeekStart: new Date(),
-      events: rawEvents,
-      onEventCreate: event => {
-        app.addEvent(event);
-      },
-      onEventEdit: event => {
-        setNewlyCreatedEventId(event.id);
-      },
-      isMobile,
-    });
+      if (eventsToUpdate.length > 0) {
+        app.applyEventsChanges(
+          {
+            update: eventsToUpdate.map(e => ({ id: e.id, updates: e })),
+          },
+          isResizing,
+          source
+        );
+      }
+    },
+    currentWeekStart: new Date(),
+    events: rawEvents,
+    onEventCreate: event => {
+      app.addEvent(event);
+    },
+    onEventEdit: event => {
+      setNewlyCreatedEventId(event.id);
+    },
+    isMobile,
+  });
   const yearDragState = dragState as MonthEventDragState;
 
   // Get config value
@@ -588,36 +624,41 @@ export const FixedWeekYearView = ({
       >
         <div
           className='df-year-fixed-content-inner'
-          style={{ minWidth: '1352px' }}
+          style={{ minWidth: '1352px', position: 'relative' }}
         >
           {effectiveMonthsData.map(monthData => (
             <FixedWeekMonthRow
               key={monthData.monthIndex}
               monthData={monthData}
-              currentYear={currentYear}
               startOfWeek={startOfWeek}
               totalColumns={totalColumns}
               app={app}
-              calendarRef={calendarRef}
+              excludedEventId={
+                isMovePreviewActive ? yearDragState.eventId : null
+              }
               isDragging={isDragging}
-              dragState={yearDragState}
-              dragPreviewEvent={dragPreviewEvent}
               selectedEventId={selectedEventId}
+              onSelectEvent={handleSelectEvent}
               onMoveStart={handleMoveStart}
-              onResizeStart={handleResizeStart}
+              onContextMenuEvent={handleEventContextMenu}
               onSelectDate={handleCellClick}
               onCreateStart={handleCellDoubleClick}
-              onEventSelect={setSelectedEventId}
-              newlyCreatedEventId={newlyCreatedEventId}
-              onDetailPanelOpen={handleDetailPanelOpen}
-              detailPanelEventId={detailPanelEventId}
-              onDetailPanelToggle={setDetailPanelEventId}
-              useEventDetailPanel={useEventDetailPanel}
               onContextMenu={handleContextMenu}
               appTimeZone={appTimeZone}
-              isMobile={isMobile}
+              isDraggable={isEditable}
             />
           ))}
+          {isMovePreviewActive && dragPreviewEvent && (
+            <FixedWeekDragPreviewOverlay
+              dragPreviewEvent={dragPreviewEvent}
+              monthsData={effectiveMonthsData}
+              currentYear={currentYear}
+              startOfWeek={startOfWeek}
+              totalColumns={totalColumns}
+              appTimeZone={appTimeZone}
+              app={app}
+            />
+          )}
         </div>
       </div>
       {isEditable && contextMenu && (
@@ -643,6 +684,19 @@ export const FixedWeekYearView = ({
           }}
         />
       )}
+      <YearEventOverlayHost
+        app={app}
+        events={rawEvents}
+        selectedEventId={selectedEventId}
+        detailPanelEventId={detailPanelEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+        onEventSelect={setSelectedEventId}
+        eventContextMenu={eventContextMenu}
+        onCloseContextMenu={() => setEventContextMenu(null)}
+        useEventDetailPanel={useEventDetailPanel}
+        isEditable={isEditable}
+        calendarRef={calendarRef}
+      />
     </div>
   );
 };
