@@ -16,6 +16,7 @@
     CalendarHeaderProps,
     EventContextMenuSlotArgs,
     GridContextMenuSlotArgs,
+    GridPopupContentSlotArgs,
     CalendarSearchProps,
     MobileEventProps,
     MonthDateNumberSlotArgs,
@@ -40,6 +41,7 @@
     calendarHeader = null,
     eventContextMenu = null,
     gridContextMenu = null,
+    gridPopupContent = null,
     monthDateNumberContent = null,
     mobileEventDetail = null,
     collapsedSafeAreaLeft = null,
@@ -63,6 +65,7 @@
     calendarHeader?: Component<CalendarHeaderProps>;
     eventContextMenu?: Component<EventContextMenuSlotArgs>;
     gridContextMenu?: Component<GridContextMenuSlotArgs>;
+    gridPopupContent?: Component<GridPopupContentSlotArgs>;
     monthDateNumberContent?: Component<MonthDateNumberSlotArgs>;
     mobileEventDetail?: Component<MobileEventProps>;
     collapsedSafeAreaLeft?: number | null;
@@ -100,6 +103,7 @@
     calendarHeader,
     eventContextMenu,
     gridContextMenu,
+    gridPopupContent,
     monthDateNumberContent,
     mobileEventDetail,
     collapsedSafeAreaLeft,

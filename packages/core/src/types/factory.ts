@@ -1,4 +1,4 @@
-import { AnyComponent, ComponentChildren, RefObject } from 'preact';
+import { AnyComponent, RefObject } from 'preact';
 
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 
@@ -225,11 +225,6 @@ export interface YearViewConfig extends ViewFactoryConfig {
     | 'day-view'
     | 'none'
     | ((date: Date, events: Event[]) => void);
-  /**
-   * Grid mode: render custom popup content.
-   * Receives the clicked date and its events; return null/undefined to use the default popup.
-   */
-  gridPopupContent?: (date: Date, events: Event[]) => ComponentChildren;
   /**
    * Grid mode: number of heatmap intensity levels.
    * @default 5

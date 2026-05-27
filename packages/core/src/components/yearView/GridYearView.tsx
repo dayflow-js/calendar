@@ -408,7 +408,6 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
           onClose={() => setPopup(null)}
           locale={locale}
           app={app}
-          customContent={config?.gridPopupContent}
           appTimeZone={appTimeZone}
         />
       )}
