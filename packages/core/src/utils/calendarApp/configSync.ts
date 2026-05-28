@@ -5,6 +5,7 @@ export type SyncableCalendarAppConfig = Pick<
   CalendarAppConfig,
   | 'allDaySortComparator'
   | 'calendars'
+  | 'eventDetailTrigger'
   | 'locale'
   | 'readOnly'
   | 'switcherMode'
@@ -39,6 +40,7 @@ export function pickSyncableConfig(
     useCalendarHeader: config.useCalendarHeader,
     useEventDetailDialog: config.useEventDetailDialog,
     useEventDetailPanel: config.useEventDetailPanel,
+    eventDetailTrigger: config.eventDetailTrigger,
     views: config.views,
   };
 }
@@ -79,6 +81,9 @@ export function getSyncConfigUpdates(
   }
   if (previous.useEventDetailPanel !== next.useEventDetailPanel) {
     updates.useEventDetailPanel = next.useEventDetailPanel;
+  }
+  if (previous.eventDetailTrigger !== next.eventDetailTrigger) {
+    updates.eventDetailTrigger = next.eventDetailTrigger;
   }
   if (previous.useCalendarHeader !== next.useCalendarHeader) {
     updates.useCalendarHeader = next.useCalendarHeader;

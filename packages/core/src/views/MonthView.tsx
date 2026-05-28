@@ -8,6 +8,7 @@ import {
   useCallback,
 } from 'preact/hooks';
 
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
@@ -1024,6 +1025,17 @@ const MonthView = ({
           <div style={{ height: bottomSpacerHeight }} />
         </div>
       )}
+      <EventDetailPanelHost
+        detailPanelEventId={detailPanelEventId}
+        events={rawEvents}
+        calendarRef={calendarRef}
+        useEventDetailPanel={useEventDetailPanel}
+        onEventUpdate={handleEventUpdate}
+        onEventDelete={handleEventDelete}
+        onEventSelect={setSelectedEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+        app={app}
+      />
     </div>
   );
 };

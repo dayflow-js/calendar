@@ -1,6 +1,7 @@
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
 
+import { usePanelHandoffAnimation } from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
 import { getCalendarContentElement } from '@/components/calendarEvent/utils';
 import { useTheme } from '@/contexts/ThemeContext';
 import { eventDetailPanel } from '@/styles/classNames';
@@ -34,6 +35,13 @@ export const EventDetailPanelWithContent = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const arrowBgColor = appliedTheme === 'dark' ? '#1f2937' : 'white';
+
+  usePanelHandoffAnimation({
+    panelRef,
+    calendarRef,
+    eventId: event.id,
+    position,
+  });
   const arrowBorderColor =
     appliedTheme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
 

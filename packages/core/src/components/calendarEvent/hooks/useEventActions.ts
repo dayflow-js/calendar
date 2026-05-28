@@ -1,6 +1,10 @@
 import { RefObject } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
+import {
+  clearPanelHandoffStartPosition,
+  getPanelHandoffStartPosition,
+} from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
 import { getCalendarContentElement } from '@/components/calendarEvent/utils';
 import { MultiDayEventSegment } from '@/components/monthView/util';
 import { Event, ViewType, ICalendarApp, EventDetailPosition } from '@/types';
@@ -8,6 +12,13 @@ import { extractHourFromDate, getEventEndHour } from '@/utils';
 import { logger } from '@/utils/logger';
 
 const SINGLE_CLICK_DELAY_MS = 180;
+const DETAIL_PANEL_MEASURE_POSITION: EventDetailPosition = {
+  top: -9999,
+  left: -9999,
+  eventHeight: 0,
+  eventMiddleY: 0,
+  isSunday: false,
+};
 
 interface UseEventActionsProps {
   event: Event;
@@ -308,6 +319,7 @@ export const useEventActions = ({
       }
 
       if (!app || app.getEventDetailEnabled()) {
+        clearPanelHandoffStartPosition(calendarRef);
         onDetailPanelToggle?.(null);
         setDetailPanelPosition(null);
       }
@@ -324,6 +336,7 @@ export const useEventActions = ({
       setIsSelected,
       onDetailPanelToggle,
       setDetailPanelPosition,
+      calendarRef,
     ]
   );
 
@@ -339,13 +352,14 @@ export const useEventActions = ({
     [applySingleClickSelection, emitSingleClick]
   );
 
-  const handleDoubleClick = useCallback(
+  // Marks the event as selected, snaps active-day for multi-day segments, and
+  // captures the DOM node used to anchor the detail panel. Shared between the
+  // double-click handler (default trigger) and the single-click handler when
+  // `eventDetailTrigger === 'click'`. Does NOT open the panel — that's the
+  // caller's responsibility so callbacks like `onEventDoubleClick` returning
+  // `false` can suppress the open without losing the selection state.
+  const applyDetailSelection = useCallback(
     (e: MouseEvent) => {
-      clearPendingClick();
-      e.preventDefault();
-      e.stopPropagation();
-      if (!canOpenDetail) return;
-
       let targetElement = e.currentTarget as HTMLDivElement;
       if (isMultiDay) {
         const multiDayElement = targetElement.querySelector(
@@ -372,27 +386,65 @@ export const useEventActions = ({
 
       setIsSelected(true);
       onEventSelect?.(event.id);
+    },
+    [
+      isMultiDay,
+      selectedEventElementRef,
+      getClickedDayIdx,
+      setActiveDayIndex,
+      segment?.startDayIndex,
+      segment?.endDayIndex,
+      event,
+      setIsSelected,
+      onEventSelect,
+    ]
+  );
 
-      const openDetailPanel = () => {
-        scrollEventToCenter().then(() => {
-          if (app && !app.getEventDetailEnabled()) return;
-          if (isMobile) return;
+  const openDetailPanel = useCallback(() => {
+    scrollEventToCenter().then(() => {
+      if (app && !app.getEventDetailEnabled()) return;
+      if (isMobile) return;
 
-          onDetailPanelToggle?.(detailPanelKey);
-          // Positioning only matters when the floating panel renders;
-          // the dialog handles its own placement.
-          if (useEventDetailPanel !== false) {
-            setDetailPanelPosition({
-              top: -9999,
-              left: -9999,
-              eventHeight: 0,
-              eventMiddleY: 0,
-              isSunday: false,
-            });
-            requestAnimationFrame(() => updatePanelPosition());
-          }
-        });
-      };
+      // Positioning only matters when the floating panel renders; the dialog
+      // handles its own placement.
+      if (useEventDetailPanel !== false) {
+        setDetailPanelPosition(
+          getPanelHandoffStartPosition(calendarRef, event.id) ??
+            DETAIL_PANEL_MEASURE_POSITION
+        );
+      }
+
+      onDetailPanelToggle?.(detailPanelKey);
+
+      if (useEventDetailPanel !== false) {
+        requestAnimationFrame(() => updatePanelPosition());
+      }
+    });
+  }, [
+    scrollEventToCenter,
+    app,
+    calendarRef,
+    event.id,
+    isMobile,
+    onDetailPanelToggle,
+    detailPanelKey,
+    useEventDetailPanel,
+    setDetailPanelPosition,
+    updatePanelPosition,
+  ]);
+
+  const handleDoubleClick = useCallback(
+    (e: MouseEvent) => {
+      clearPendingClick();
+      e.preventDefault();
+      e.stopPropagation();
+      if (!canOpenDetail) return;
+
+      // 'click' trigger mode: the panel is opened by handleClick on the first
+      // click; the dblclick that follows is intentionally inert.
+      if (app?.getEventDetailTrigger() === 'click') return;
+
+      applyDetailSelection(e);
 
       if (!app) {
         openDetailPanel();
@@ -412,24 +464,10 @@ export const useEventActions = ({
     [
       clearPendingClick,
       canOpenDetail,
-      isMultiDay,
-      selectedEventElementRef,
-      getClickedDayIdx,
-      setActiveDayIndex,
-      segment?.startDayIndex,
-      segment?.endDayIndex,
-      event.day,
       app,
       event,
-      scrollEventToCenter,
-      setIsSelected,
-      isYearView,
-      isMobile,
-      onEventSelect,
-      onDetailPanelToggle,
-      detailPanelKey,
-      setDetailPanelPosition,
-      updatePanelPosition,
+      applyDetailSelection,
+      openDetailPanel,
     ]
   );
 
@@ -438,6 +476,18 @@ export const useEventActions = ({
       e.preventDefault();
       e.stopPropagation();
       const clientX = e.clientX;
+      const trigger = app?.getEventDetailTrigger() ?? 'dblclick';
+
+      // 'click' trigger mode: open the detail panel immediately on single-click
+      // (Google Calendar style). No need to debounce for a potential dblclick.
+      if (trigger === 'click' && !isMobile && canOpenDetail) {
+        clearPendingClick();
+        applyDetailSelection(e);
+        emitSingleClick();
+        openDetailPanel();
+        return;
+      }
+
       if (!isMobile && canOpenDetail) {
         clearPendingClick();
         if (!isYearView && !isResourceView) {
@@ -458,10 +508,13 @@ export const useEventActions = ({
       performSingleClick(clientX);
     },
     [
+      app,
       clearPendingClick,
       canOpenDetail,
       applySingleClickSelection,
+      applyDetailSelection,
       emitSingleClick,
+      openDetailPanel,
       isYearView,
       isResourceView,
       isMobile,

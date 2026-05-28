@@ -10,14 +10,8 @@ import {
 import { Temporal } from 'temporal-polyfill';
 
 import { EventContextMenu } from '@/components/contextMenu';
-import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
-import {
-  Event,
-  ViewType,
-  ReadOnlyConfig,
-  EventDetailContentProps,
-} from '@/types';
+import { Event, ViewType, ReadOnlyConfig } from '@/types';
 import {
   getSelectedBgColor,
   getEventBgColor,
@@ -29,7 +23,6 @@ import {
 } from '@/utils';
 
 import { EventContent } from './components/EventContent';
-import { EventDetailPanel } from './components/EventDetailPanel';
 import { useClickOutside } from './hooks/useClickOutside';
 import { useDetailPanelPosition } from './hooks/useDetailPanelPosition';
 import { useEventActions } from './hooks/useEventActions';
@@ -68,8 +61,6 @@ const CalendarEvent = ({
   detailPanelEventId,
   onMoveStart,
   onResizeStart,
-  onEventUpdate,
-  onEventDelete,
   newlyCreatedEventId,
   onDetailPanelOpen,
   onEventSelect,
@@ -228,7 +219,7 @@ const CalendarEvent = ({
   );
 
   // Positioning Hook
-  const { detailPanelPosition, setDetailPanelPosition, updatePanelPosition } =
+  const { setDetailPanelPosition, updatePanelPosition } =
     useDetailPanelPosition({
       event,
       viewType,
@@ -348,6 +339,7 @@ const CalendarEvent = ({
   useClickOutside({
     eventRef,
     detailPanelRef,
+    calendarRef,
     eventId: event.id,
     isEventSelected: isEventSelected,
     showDetailPanel: showDetailPanelForClickOutside,
@@ -356,14 +348,6 @@ const CalendarEvent = ({
     setIsSelected,
     setActiveDayIndex,
   });
-
-  // Stable panel close handler
-  const handlePanelClose = useCallback(() => {
-    if (onEventSelect) onEventSelect(null);
-    selectedDayIndexRef.current = null;
-    setIsSelected(false);
-    onDetailPanelToggle?.(null);
-  }, [onEventSelect, onDetailPanelToggle, setIsSelected]);
 
   // Memoized args for the eventContent ContentSlot
   const eventContentSlotArgs = useMemo(
@@ -387,17 +371,6 @@ const CalendarEvent = ({
       segment,
       layout,
     ]
-  );
-
-  const contentSlotRenderer = useCallback(
-    (contentProps: EventDetailContentProps) => (
-      <ContentSlot
-        store={customRenderingStore}
-        generatorName='eventDetailContent'
-        generatorArgs={contentProps}
-      />
-    ),
-    [customRenderingStore]
   );
 
   // Highlight effect
@@ -469,6 +442,7 @@ const CalendarEvent = ({
       <div
         ref={eventRef}
         data-event-id={event.id}
+        data-detail-panel-key={detailPanelKey}
         data-view={viewType}
         data-all-day={String(isAllDay)}
         data-selected={String(isEventSelected)}
@@ -597,37 +571,6 @@ const CalendarEvent = ({
           monthEventHeight={monthEventHeight}
         />
       </div>
-
-      {showDetailPanel && panelEnabled && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 9998,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      <EventDetailPanel
-        showDetailPanel={showDetailPanel && panelEnabled}
-        detailPanelPosition={detailPanelPosition}
-        event={event}
-        detailPanelRef={detailPanelRef}
-        isAllDay={isAllDay}
-        eventVisibility={eventVisibility}
-        calendarRef={calendarRef}
-        selectedEventElementRef={selectedEventElementRef}
-        onEventUpdate={onEventUpdate}
-        onEventDelete={onEventDelete}
-        handlePanelClose={handlePanelClose}
-        customRenderingStore={customRenderingStore}
-        contentSlotRenderer={contentSlotRenderer}
-        app={app}
-      />
 
       {contextMenuPosition && app && isEditable && (
         <EventContextMenu

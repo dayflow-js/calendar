@@ -212,6 +212,7 @@ const ALLOWED_CSS_VALUES = new Set([
   'stroke-width',
   'stroke-linecap',
   'stroke-linejoin',
+  'transitionend',
 ]);
 
 function hasForbiddenPrefix(token) {

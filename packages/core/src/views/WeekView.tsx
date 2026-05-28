@@ -8,6 +8,7 @@ import {
   useCallback,
 } from 'preact/hooks';
 
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import ViewHeader from '@/components/common/ViewHeader';
 import { AllDayRow } from '@/components/weekView/AllDayRow';
 import { TimeGrid } from '@/components/weekView/TimeGrid';
@@ -809,6 +810,18 @@ const WeekView = ({
         timeFormat={timeFormat}
         secondaryTimeSlots={secondaryTimeSlots}
         appTimeZone={appTimeZone}
+      />
+      <EventDetailPanelHost
+        detailPanelEventId={detailPanelEventId}
+        events={events}
+        calendarRef={calendarRef}
+        useEventDetailPanel={useEventDetailPanel}
+        isMobile={isMobile}
+        onEventUpdate={handleEventUpdate}
+        onEventDelete={handleEventDelete}
+        onEventSelect={setSelectedEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+        app={app}
       />
     </div>
   );

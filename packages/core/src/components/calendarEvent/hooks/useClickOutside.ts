@@ -1,9 +1,12 @@
 import { RefObject } from 'preact';
 import { useEffect } from 'preact/hooks';
 
+import { clearPanelHandoffStartPosition } from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
+
 interface UseClickOutsideProps {
   eventRef: RefObject<HTMLElement>;
   detailPanelRef: RefObject<HTMLElement>;
+  calendarRef: RefObject<HTMLElement>;
   eventId: string;
   isEventSelected: boolean;
   showDetailPanel: boolean;
@@ -16,6 +19,7 @@ interface UseClickOutsideProps {
 export const useClickOutside = ({
   eventRef,
   detailPanelRef,
+  calendarRef,
   eventId,
   isEventSelected,
   showDetailPanel,
@@ -30,9 +34,13 @@ export const useClickOutside = ({
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const clickedInsideEvent = eventRef.current?.contains(target);
+      const clickedAnyEvent = target.closest('[data-event-id]') !== null;
       const clickedOnSameEvent =
         target.closest(`[data-event-id="${eventId}"]`) !== null;
       const clickedInsidePanel = detailPanelRef.current?.contains(target);
+      const clickedInsideGlobalPanel = target.closest(
+        '[data-event-detail-panel]'
+      );
       const clickedInsideDetailDialog = target.closest(
         '[data-event-detail-dialog]'
       );
@@ -44,10 +52,13 @@ export const useClickOutside = ({
       );
 
       if (showDetailPanel) {
+        if (clickedAnyEvent) return;
+
         if (
           !clickedInsideEvent &&
           !clickedOnSameEvent &&
           !clickedInsidePanel &&
+          !clickedInsideGlobalPanel &&
           !clickedInsideDetailDialog &&
           !clickedInsideRangePickerPopup &&
           !clickedInsideCalendarPickerDropdown
@@ -55,12 +66,14 @@ export const useClickOutside = ({
           onEventSelect?.(null);
           setActiveDayIndex(null);
           setIsSelected(false);
+          clearPanelHandoffStartPosition(calendarRef);
           onDetailPanelToggle?.(null);
         }
       } else if (
         isEventSelected &&
         !clickedInsideEvent &&
         !clickedOnSameEvent &&
+        !clickedInsideGlobalPanel &&
         !clickedInsideDetailDialog &&
         !clickedInsideRangePickerPopup &&
         !clickedInsideCalendarPickerDropdown
@@ -68,6 +81,7 @@ export const useClickOutside = ({
         onEventSelect?.(null);
         setActiveDayIndex(null);
         setIsSelected(false);
+        clearPanelHandoffStartPosition(calendarRef);
         onDetailPanelToggle?.(null);
       }
     };
@@ -82,5 +96,6 @@ export const useClickOutside = ({
     onEventSelect,
     onDetailPanelToggle,
     eventId,
+    calendarRef,
   ]);
 };

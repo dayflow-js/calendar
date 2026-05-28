@@ -8,6 +8,7 @@ import {
   useLayoutEffect,
 } from 'preact/hooks';
 
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import { DayContent } from '@/components/dayView/DayContent';
 import { RightPanel } from '@/components/dayView/RightPanel';
 import {
@@ -615,6 +616,18 @@ const DayView = ({
         showEventDots={showEventDots}
         appTimeZone={appTimeZone}
         calendarRef={calendarRef}
+      />
+      <EventDetailPanelHost
+        detailPanelEventId={detailPanelEventId}
+        events={events}
+        calendarRef={calendarRef}
+        useEventDetailPanel={useEventDetailPanel}
+        isMobile={isMobile}
+        onEventUpdate={handleEventUpdate}
+        onEventDelete={handleEventDelete}
+        onEventSelect={setSelectedEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+        app={app}
       />
     </div>
   );

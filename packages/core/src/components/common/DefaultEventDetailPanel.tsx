@@ -10,6 +10,7 @@ import {
 } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
+import { usePanelHandoffAnimation } from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
 import { getCalendarContentElement } from '@/components/calendarEvent/utils';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
@@ -53,6 +54,13 @@ const DefaultEventDetailPanel = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
+
+  usePanelHandoffAnimation({
+    panelRef,
+    calendarRef,
+    eventId: event.id,
+    position,
+  });
 
   const [draftEvent, setDraftEvent] = useState(event);
   const [isLoading, setIsLoading] = useState(false);

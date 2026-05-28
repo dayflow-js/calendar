@@ -202,6 +202,13 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useEventDetailDialog?: boolean;
   useEventDetailPanel?: boolean;
+  /**
+   * Gesture that opens the event detail panel/dialog on desktop.
+   * - 'dblclick' (default): single-click selects, double-click opens (Mac Calendar style).
+   * - 'click': single-click opens (Google Calendar style).
+   * Touch input is unaffected — a single tap always opens.
+   */
+  eventDetailTrigger?: 'click' | 'dblclick';
   useCalendarHeader?: boolean;
   locale?: string | Locale;
   readOnly?: boolean | ReadOnlyConfig;
@@ -376,6 +383,9 @@ export interface ICalendarApp {
   // Whether any event-detail UI (panel or dialog) is enabled. Behavior gates
   // (e.g. open-on-dblclick) should use this instead of the per-UI flags.
   getEventDetailEnabled: () => boolean;
+
+  // Get which gesture opens the event detail panel/dialog on desktop.
+  getEventDetailTrigger: () => 'click' | 'dblclick';
 
   // Update configuration dynamically
   updateConfig: (config: Partial<CalendarAppConfig>) => void;

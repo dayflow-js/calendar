@@ -176,6 +176,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'dblclick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -240,6 +241,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'dblclick' as const,
       onEventDoubleClick: jest.fn(),
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
@@ -311,6 +313,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'dblclick' as const,
       onEventDoubleClick: jest.fn(() => false),
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
@@ -374,6 +377,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'dblclick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -512,6 +516,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'dblclick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -618,5 +623,134 @@ describe('useEventActions', () => {
     expect(onEventSelect).toHaveBeenCalledWith('event-1');
     expect(setIsSelected).toHaveBeenCalledWith(true);
     expect(onDetailPanelToggle).toHaveBeenCalledWith('event-1::resource');
+  });
+
+  it('opens the detail panel on single click when eventDetailTrigger is "click"', async () => {
+    const app = {
+      onEventClick: jest.fn(),
+      onEventDoubleClick: jest.fn(),
+      getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'click' as const,
+    } as unknown as import('@/types').ICalendarApp;
+    const onEventSelect = jest.fn();
+    const onDetailPanelToggle = jest.fn();
+    const selectedEventElementRef = { current: null as HTMLElement | null };
+    const setIsSelected = jest.fn();
+    const callOrder: string[] = [];
+    const setDetailPanelPosition = jest.fn(() => {
+      callOrder.push('position');
+    });
+    onDetailPanelToggle.mockImplementation(() => {
+      callOrder.push('toggle');
+    });
+
+    const ClickHarness = () => {
+      const handlers = useEventActions({
+        event: baseEvent,
+        viewType: ViewType.DAY,
+        isAllDay: true,
+        isMultiDay: false,
+        app,
+        calendarRef: { current: document.createElement('div') },
+        firstHour: 0,
+        hourHeight: 56,
+        isMobile: false,
+        canOpenDetail: true,
+        detailPanelKey: 'event-1',
+        onEventSelect,
+        onDetailPanelToggle,
+        setIsSelected,
+        setDetailPanelPosition,
+        setContextMenuPosition: jest.fn(),
+        setActiveDayIndex: jest.fn(),
+        getClickedDayIdx: jest.fn(),
+        updatePanelPosition: jest.fn(),
+        selectedEventElementRef,
+      });
+
+      return (
+        <button
+          type='button'
+          data-testid='click-trigger-event'
+          onClick={handlers.handleClick}
+          onDblClick={handlers.handleDoubleClick}
+        >
+          Event
+        </button>
+      );
+    };
+
+    const { getByTestId } = render(<ClickHarness />);
+
+    await act(async () => {
+      fireEvent.click(getByTestId('click-trigger-event'), { clientX: 24 });
+      await Promise.resolve();
+    });
+
+    expect(app.onEventClick).toHaveBeenCalledWith(baseEvent);
+    expect(onEventSelect).toHaveBeenCalledWith('event-1');
+    expect(setIsSelected).toHaveBeenCalledWith(true);
+    expect(onDetailPanelToggle).toHaveBeenCalledWith('event-1');
+    expect(callOrder).toEqual(['position', 'toggle']);
+  });
+
+  it('ignores the follow-up dblclick when eventDetailTrigger is "click"', async () => {
+    const app = {
+      onEventClick: jest.fn(),
+      onEventDoubleClick: jest.fn(),
+      getEventDetailEnabled: () => true,
+      getEventDetailTrigger: () => 'click' as const,
+    } as unknown as import('@/types').ICalendarApp;
+    const onEventSelect = jest.fn();
+    const onDetailPanelToggle = jest.fn();
+    const selectedEventElementRef = { current: null as HTMLElement | null };
+    const setIsSelected = jest.fn();
+
+    const ClickHarness = () => {
+      const handlers = useEventActions({
+        event: baseEvent,
+        viewType: ViewType.DAY,
+        isAllDay: true,
+        isMultiDay: false,
+        app,
+        calendarRef: { current: document.createElement('div') },
+        firstHour: 0,
+        hourHeight: 56,
+        isMobile: false,
+        canOpenDetail: true,
+        detailPanelKey: 'event-1',
+        onEventSelect,
+        onDetailPanelToggle,
+        setIsSelected,
+        setDetailPanelPosition: jest.fn(),
+        setContextMenuPosition: jest.fn(),
+        setActiveDayIndex: jest.fn(),
+        getClickedDayIdx: jest.fn(),
+        updatePanelPosition: jest.fn(),
+        selectedEventElementRef,
+      });
+
+      return (
+        <button
+          type='button'
+          data-testid='click-trigger-double'
+          onClick={handlers.handleClick}
+          onDblClick={handlers.handleDoubleClick}
+        >
+          Event
+        </button>
+      );
+    };
+
+    const { getByTestId } = render(<ClickHarness />);
+    const eventButton = getByTestId('click-trigger-double');
+
+    await act(async () => {
+      fireEvent.click(eventButton, { clientX: 24 });
+      fireEvent.dblClick(eventButton, { clientX: 24 });
+      await Promise.resolve();
+    });
+
+    expect(app.onEventDoubleClick).not.toHaveBeenCalled();
   });
 });
