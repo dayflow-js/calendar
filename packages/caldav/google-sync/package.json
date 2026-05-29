@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/google-sync",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Headless Google Calendar sync engine for DayFlow - transport-agnostic, adapter-first",
   "keywords": [
     "calendar",

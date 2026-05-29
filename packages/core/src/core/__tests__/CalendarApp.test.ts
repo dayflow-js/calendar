@@ -436,6 +436,28 @@ describe('CalendarApp', () => {
   });
 
   describe('Config Updates', () => {
+    it('defaults eventDetailTrigger to dbClick and updates it dynamically', () => {
+      const onRender = jest.fn();
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        events: [],
+        callbacks: { onRender },
+      });
+
+      expect(app.getEventDetailTrigger()).toBe('dbClick');
+
+      onRender.mockClear();
+      app.updateConfig({ eventDetailTrigger: 'click' });
+      expect(app.getEventDetailTrigger()).toBe('click');
+      expect(onRender).toHaveBeenCalledTimes(1);
+
+      onRender.mockClear();
+      app.updateConfig({ eventDetailTrigger: 'dbClick' });
+      expect(app.getEventDetailTrigger()).toBe('dbClick');
+      expect(onRender).toHaveBeenCalledTimes(1);
+    });
+
     it('updates day/week secondaryTimeZone and month/year visualTimeZone independently', () => {
       const app = new CalendarApp({
         views: [

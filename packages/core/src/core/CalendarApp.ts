@@ -6,6 +6,7 @@ import {
   CalendarAppConfig,
   CalendarAppState,
   CalendarCallbacks,
+  EventDetailTrigger,
   CalendarType,
   CalendarView,
   CalendarViewType,
@@ -46,7 +47,7 @@ export class CalendarApp implements ICalendarApp {
   private pluginManager: PluginManager;
   private useEventDetailDialog: boolean;
   private useEventDetailPanel: boolean;
-  private eventDetailTrigger: 'click' | 'dblclick';
+  private eventDetailTrigger: EventDetailTrigger;
   private useCalendarHeader: boolean;
 
   constructor(config: CalendarAppConfig) {
@@ -108,7 +109,7 @@ export class CalendarApp implements ICalendarApp {
     this.useEventDetailPanel = this.useEventDetailDialog
       ? false
       : (config.useEventDetailPanel ?? true);
-    this.eventDetailTrigger = config.eventDetailTrigger ?? 'dblclick';
+    this.eventDetailTrigger = config.eventDetailTrigger ?? 'dbClick';
     this.useCalendarHeader = config.useCalendarHeader ?? true;
 
     config.views.forEach(view => this.state.views.set(view.type, view));
@@ -380,7 +381,7 @@ export class CalendarApp implements ICalendarApp {
   getUseEventDetailPanel = (): boolean => this.useEventDetailPanel;
   getEventDetailEnabled = (): boolean =>
     this.useEventDetailDialog || this.useEventDetailPanel;
-  getEventDetailTrigger = (): 'click' | 'dblclick' => this.eventDetailTrigger;
+  getEventDetailTrigger = (): EventDetailTrigger => this.eventDetailTrigger;
   getCalendarHeaderConfig = (): boolean => this.useCalendarHeader;
 
   get timeZone(): string {

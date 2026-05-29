@@ -8,7 +8,7 @@ DayFlow には、イベントの作成・編集・削除をまとめて行える
 
 ## 使い方
 
-DayFlow のデフォルト動作では、イベントをクリックすると組み込みのフローティング詳細パネルが開きます。組み込みモーダルダイアログを使いたい場合は、`useCalendarApp` で `useEventDetailDialog` を有効にしてから `DayFlowCalendar` を描画します。
+DayFlow のデフォルト動作では、イベント詳細を開くと組み込みのフローティング詳細パネルが表示されます。デスクトップではデフォルトでダブルクリック（`eventDetailTrigger: 'dbClick'`）で開き、`eventDetailTrigger: 'click'` を設定するとシングルクリックで開きます。組み込みモーダルダイアログを使いたい場合は、`useCalendarApp` で `useEventDetailDialog` を有効にしてから `DayFlowCalendar` を描画します。
 
 ```tsx
 import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';

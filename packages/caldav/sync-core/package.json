@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/sync-core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Provider-neutral sync primitives for DayFlow calendar integrations",
   "keywords": [
     "calendar",

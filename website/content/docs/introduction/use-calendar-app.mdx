@@ -47,6 +47,7 @@ export function TeamCalendar() {
 | `theme`                | `ThemeConfig`               | Optional | `{ mode: 'light' }`                                      | Sets global theme mode and optional token overrides.                                                                                  |
 | `locale`               | `string \| Locale`          | Optional | `'en-US'`                                                | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.                              |
 | `useEventDetailDialog` | `boolean`                   | Optional | `false`                                                  | Enables the default modal detail dialog instead of inline panels.                                                                     |
+| `eventDetailTrigger`   | `'click' \| 'dbClick'`      | Optional | `'dbClick'`                                              | Controls whether desktop event details open on single click or double click. Touch input always opens details with a single tap.      |
 | `useCalendarHeader`    | `boolean`                   | Optional | `true`                                                   | Enables the default header (`true`) or hides it (`false`). For a custom header, use the `calendarHeader` slot on `DayFlowCalendar`.   |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | Optional | `false`                                                  | Disables built-in mutation UI. Can be a boolean or a config for fine-grained control (drag/view). Programmatic event APIs still work. |
 | `allDaySortComparator` | `AllDaySortComparator`      | Optional | Calendar-group order with multi-day all-day events first | Custom comparator controlling the row order of all-day events across all views. When provided, it fully overrides the default order.  |
@@ -78,7 +79,7 @@ export function TeamCalendar() {
 - `onDateChange(date)` fires whenever the focused date changes (navigation or selection).
 - `onVisibleRangeChange(start, end, reason)` fires whenever visible date-range shifts. Helps in more precise fetches without additional calculations.
 - `onEventCreate(event)`, `onEventUpdate(event)`, `onEventDelete(id)` mirror CRUD operations—ideal for syncing APIs.
-- `onEventDoubleClick(event, e)` fires when an event is double-clicked. Use `e.currentTarget` as an anchor for external popovers, and return `false` to suppress DayFlow's default detail panel/dialog.
+- `onEventDoubleClick(event, e)` fires when an event is double-clicked in the default `eventDetailTrigger: 'dbClick'` mode. Use `e.currentTarget` as an anchor for external popovers, and return `false` to suppress DayFlow's default detail panel/dialog.
 - `onMoreEventsClick(date)` fires when the "+ X more" link is clicked in Month view.
 - `onCalendarCreate(calendar)`, `onCalendarUpdate(calendar)`, `onCalendarDelete(id)` mirror calendar CRUD operations.
 - `onCalendarMerge(sourceId, targetId)` fires when merging two calendars (e.g., merging "Work" into "Personal").
@@ -227,6 +228,19 @@ const calendar = useCalendarApp({
 
 - `true` turns on the default modal dialog (`DefaultEventDetailDialog`).
 - Combine with `eventDetailContent` or `eventDetailDialog` on `DayFlowCalendar` to swap the UI while keeping the core state machine.
+
+### eventDetailTrigger
+
+- `'dbClick'` (default): a single click selects the event, and a double click opens the detail panel/dialog.
+- `'click'`: a single click opens the detail panel/dialog immediately.
+- Touch input is unchanged: tapping an event opens details regardless of this option.
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  eventDetailTrigger: 'click',
+});
+```
 
 ### useCalendarHeader
 

@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/caldav",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Headless CalDAV sync engine for DayFlow - transport-agnostic, adapter-first",
   "keywords": [
     "caldav",

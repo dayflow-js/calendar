@@ -30,19 +30,19 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 
 ## Available Slots
 
-| Generator Name                    | Description                                                                                              | Arguments                                                                 |
-| :-------------------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| `colorPicker`                     | A small color picker used for event colors.                                                              | `{ color, onChange, onChangeComplete }`                                   |
-| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                                                            | `{ color, onChange, onAccept, onCancel, styles }`                         |
-| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).                                               | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
-| `eventContextMenu`                | Custom right-click context menu for events.                                                              | `{ event, onClose }`                                                      |
-| `eventDetailContent`              | The content shown in the popover/panel when an event is clicked.                                         | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
-| `eventDetailDialog`               | Custom dialog shown when an event is clicked. Requires `useEventDetailDialog: true` in `useCalendarApp`. | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
-| `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.                                                 | `{ date, viewType, onClose }`                                             |
-| `gridPopupContent`                | Custom popup content for Year view grid mode (when `gridDateClick: 'popup'`).                            | `{ date, events }`                                                        |
-| `mobileEventDetail`               | Custom mobile event detail drawer/dialog.                                                                | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
-| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.                                                  | `{ color, onChange, onChangeComplete }`                                   |
-| `titleBarSlot`                    | Extra content in the sidebar title bar.                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
+| Generator Name                    | Description                                                                                             | Arguments                                                                 |
+| :-------------------------------- | :------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------ |
+| `colorPicker`                     | A small color picker used for event colors.                                                             | `{ color, onChange, onChangeComplete }`                                   |
+| `createCalendarDialogColorPicker` | A full-featured color picker used in dialogs.                                                           | `{ color, onChange, onAccept, onCancel, styles }`                         |
+| `eventContent*`                   | Custom rendering for event cards (e.g. `eventContentDay`).                                              | `{ event, viewType, isAllDay, isMobile, isSelected, isDragging, layout }` |
+| `eventContextMenu`                | Custom right-click context menu for events.                                                             | `{ event, onClose }`                                                      |
+| `eventDetailContent`              | The content shown in the popover/panel when event details open.                                         | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
+| `eventDetailDialog`               | Custom dialog shown when event details open. Requires `useEventDetailDialog: true` in `useCalendarApp`. | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
+| `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.                                                | `{ date, viewType, onClose }`                                             |
+| `gridPopupContent`                | Custom popup content for Year view grid mode (when `gridDateClick: 'popup'`).                           | `{ date, events }`                                                        |
+| `mobileEventDetail`               | Custom mobile event detail drawer/dialog.                                                               | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
+| `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.                                                 | `{ color, onChange, onChangeComplete }`                                   |
+| `titleBarSlot`                    | Extra content in the sidebar title bar.                                                                 | `{ isCollapsed, toggleCollapsed }`                                        |
 
 ## Event Content
 
@@ -97,7 +97,7 @@ export const EventContentShowcase = () => {
 
 ## Event Detail Content
 
-The `eventDetailContent` slot lets you customize the content displayed in the event detail popover or panel when an event is clicked.
+The `eventDetailContent` slot lets you customize the content displayed in the event detail popover or panel when event details open.
 
 <CustomDetailPanelShowcase />
 

@@ -326,6 +326,7 @@ export function InteractiveCalendar() {
         ? calendarsWithGroups
         : calendarTypes,
       useCalendarHeader: features.showHeader,
+      eventDetailTrigger: 'click',
       switcherMode: selections.switcherMode,
       theme: { mode: themeMode as 'light' | 'dark' | 'auto' },
       readOnly: features.readOnly

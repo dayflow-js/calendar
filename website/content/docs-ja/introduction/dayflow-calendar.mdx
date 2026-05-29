@@ -97,7 +97,7 @@ return <DayFlowCalendar calendar={calendar} />;
 
 DayFlow には 3 つのイベント詳細表示オプションがあります。
 
-1. **デフォルトパネルモード** — `useEventDetailDialog` が `false`（デフォルト）の場合、イベントをクリックすると組み込みのフローティングパネル `DefaultEventDetailPanel` が開きます。`eventDetailContent` スロットを使用すると、パネルの外枠を維持しながら中身だけを置き換えられます。
+1. **デフォルトパネルモード** — `useEventDetailDialog` が `false`（デフォルト）の場合、イベント詳細を開くと組み込みのフローティングパネル `DefaultEventDetailPanel` が表示されます。デスクトップではデフォルトでダブルクリック（`eventDetailTrigger: 'dbClick'`）で開き、`eventDetailTrigger: 'click'` を設定するとシングルクリックで開きます。タッチ入力では常にタップで開きます。
 2. **ダイアログモード** — `useCalendarApp` で `useEventDetailDialog: true` を設定すると組み込みのモーダルが有効になります。`eventDetailDialog` スロットで独自のダイアログ UI に置き換えられます。
 3. **完全に無効化** — アプリ側のコールバックで独自のモーダルを管理している場合は、`useCalendarApp` で `useEventDetailPanel: false` を設定するとフローティングパネルを完全に非表示にできます。
 

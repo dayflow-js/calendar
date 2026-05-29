@@ -97,7 +97,7 @@ return <DayFlowCalendar calendar={calendar} />;
 
 DayFlow 提供三种事件详情展示方式：
 
-1. **默认面板模式** — `useEventDetailDialog` 为 `false`（默认值）时，点击事件会打开内置的浮动面板 `DefaultEventDetailPanel`。使用 `eventDetailContent` 插槽可在保留默认面板框架的同时替换面板内容。
+1. **默认面板模式** — `useEventDetailDialog` 为 `false`（默认值）时，打开事件详情会显示内置浮动面板 `DefaultEventDetailPanel`。桌面端默认通过双击打开（`eventDetailTrigger: 'dbClick'`），也可以设置 `eventDetailTrigger: 'click'` 改为单击打开；触摸端始终轻触打开。
 2. **弹窗模式** — 在 `useCalendarApp` 中设置 `useEventDetailDialog: true` 可启用内置居中模态框。使用 `eventDetailDialog` 插槽可替换为您自定义的弹窗 UI。
 3. **完全关闭** — 若您的应用通过回调或全局状态管理事件详情，可在 `useCalendarApp` 中设置 `useEventDetailPanel: false` 来完全隐藏浮动面板。
 

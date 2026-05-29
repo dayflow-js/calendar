@@ -176,7 +176,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
-      getEventDetailTrigger: () => 'dblclick' as const,
+      getEventDetailTrigger: () => 'dbClick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -223,25 +223,27 @@ describe('useEventActions', () => {
     fireEvent.click(getByTestId('day-click-event'), { clientX: 24 });
 
     expect(onEventSelect).toHaveBeenCalledWith('event-1');
-    expect(onDetailPanelToggle).toHaveBeenCalledWith(null);
+    expect(onDetailPanelToggle).not.toHaveBeenCalledWith(null);
     expect(app.onEventClick).not.toHaveBeenCalled();
 
     act(() => {
       jest.advanceTimersByTime(179);
     });
     expect(app.onEventClick).not.toHaveBeenCalled();
+    expect(onDetailPanelToggle).not.toHaveBeenCalledWith(null);
 
     act(() => {
       jest.advanceTimersByTime(1);
     });
     expect(app.onEventClick).toHaveBeenCalledWith(baseEvent);
+    expect(onDetailPanelToggle).toHaveBeenCalledWith(null);
   });
 
   it('suppresses click callbacks when a non-year event becomes a double click', async () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
-      getEventDetailTrigger: () => 'dblclick' as const,
+      getEventDetailTrigger: () => 'dbClick' as const,
       onEventDoubleClick: jest.fn(),
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
@@ -306,6 +308,7 @@ describe('useEventActions', () => {
       expect.any(MouseEvent)
     );
     expect(onEventSelect).toHaveBeenCalledWith('event-1');
+    expect(onDetailPanelToggle).not.toHaveBeenCalledWith(null);
     expect(onDetailPanelToggle).toHaveBeenCalledWith('event-1');
   });
 
@@ -313,7 +316,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
-      getEventDetailTrigger: () => 'dblclick' as const,
+      getEventDetailTrigger: () => 'dbClick' as const,
       onEventDoubleClick: jest.fn(() => false),
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
@@ -377,7 +380,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
-      getEventDetailTrigger: () => 'dblclick' as const,
+      getEventDetailTrigger: () => 'dbClick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -516,7 +519,7 @@ describe('useEventActions', () => {
     const app = {
       onEventClick: jest.fn(),
       getEventDetailEnabled: () => true,
-      getEventDetailTrigger: () => 'dblclick' as const,
+      getEventDetailTrigger: () => 'dbClick' as const,
     } as unknown as import('@/types').ICalendarApp;
     const onEventSelect = jest.fn();
     const onDetailPanelToggle = jest.fn();
@@ -694,7 +697,7 @@ describe('useEventActions', () => {
     expect(callOrder).toEqual(['position', 'toggle']);
   });
 
-  it('ignores the follow-up dblclick when eventDetailTrigger is "click"', async () => {
+  it('ignores the follow-up double-click when eventDetailTrigger is "click"', async () => {
     const app = {
       onEventClick: jest.fn(),
       onEventDoubleClick: jest.fn(),

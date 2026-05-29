@@ -43,6 +43,7 @@ export function TeamCalendar() {
 | `theme`                | `ThemeConfig`               | 任意 | `{ mode: 'light' }`                      | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                                                                                      |
 | `locale`               | `string \| Locale`          | 任意 | `'en-US'`                                | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。                                                         |
 | `useEventDetailDialog` | `boolean`                   | 任意 | `false`                                  | 詳細表示をモーダルダイアログに切り替える。                                                                                                   |
+| `eventDetailTrigger`   | `'click' \| 'dbClick'`      | 任意 | `'dbClick'`                              | デスクトップでイベント詳細をシングルクリックまたはダブルクリックのどちらで開くかを制御します。タッチ入力では常にタップで開きます。           |
 | `useCalendarHeader`    | `boolean`                   | 任意 | `true`                                   | デフォルトヘッダーの有効化（`true`）または非表示（`false`）。カスタムヘッダーは `DayFlowCalendar` の `calendarHeader` スロットを使用します。 |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | 任意 | `false`                                  | 組み込みの変更 UI を無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。プログラム API は引き続き利用可能。                 |
 | `allDaySortComparator` | `AllDaySortComparator`      | 任意 | カレンダーグループ順（複数日終日は先頭） | 全ビューでの終日イベントの行順を制御するカスタム比較関数。指定するとデフォルト順を完全に上書きします。                                       |
@@ -89,17 +90,17 @@ const calendar = useCalendarApp({
 
 ### Callbacks
 
-| コールバック                                             | 役割                                                                                                                                                                   |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `onViewChange(view)`                                     | ビュー切り替え後に発火。アナリティクスや URL 同期に便利。                                                                                                              |
-| `onDateChange(date)`                                     | 選択日が変わったときに発火。日付連動のサイドバーなどに。                                                                                                               |
-| `onVisibleRangeChange(start, end, reason)`               | 可視日付範囲が変わるたびに発火。追加計算なしで、より正確なデータ取得に役立ちます。                                                                                     |
-| `onEventCreate / onEventUpdate / onEventDelete`          | イベント CRUD を捕捉。バックエンドと同期。                                                                                                                             |
-| `onEventDoubleClick(event, e)`                           | イベントがダブルクリックされたときに発火。`e.currentTarget` を外部ポップオーバーのアンカーに使え、`false` を返すと DayFlow の既定詳細パネル/ダイアログを抑止できます。 |
-| `onMoreEventsClick(date)`                                | 月ビューで「+ X 件」リンクがクリックされたときに発火。                                                                                                                 |
-| `onCalendarCreate / onCalendarUpdate / onCalendarDelete` | カレンダーの追加・更新・削除を捕捉。                                                                                                                                   |
-| `onCalendarMerge(sourceId, targetId)`                    | カレンダーのマージ操作を捕捉（例：「仕事」を「個人」に統合）。                                                                                                         |
-| `onRender()`                                             | レンダリング完了時に 1 度だけ発火。計測用。                                                                                                                            |
+| コールバック                                             | 役割                                                                                                                                                                                                                        |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onViewChange(view)`                                     | ビュー切り替え後に発火。アナリティクスや URL 同期に便利。                                                                                                                                                                   |
+| `onDateChange(date)`                                     | 選択日が変わったときに発火。日付連動のサイドバーなどに。                                                                                                                                                                    |
+| `onVisibleRangeChange(start, end, reason)`               | 可視日付範囲が変わるたびに発火。追加計算なしで、より正確なデータ取得に役立ちます。                                                                                                                                          |
+| `onEventCreate / onEventUpdate / onEventDelete`          | イベント CRUD を捕捉。バックエンドと同期。                                                                                                                                                                                  |
+| `onEventDoubleClick(event, e)`                           | デフォルトの `eventDetailTrigger: 'dbClick'` モードでイベントがダブルクリックされたときに発火。`e.currentTarget` を外部ポップオーバーのアンカーに使え、`false` を返すと DayFlow の既定詳細パネル/ダイアログを抑止できます。 |
+| `onMoreEventsClick(date)`                                | 月ビューで「+ X 件」リンクがクリックされたときに発火。                                                                                                                                                                      |
+| `onCalendarCreate / onCalendarUpdate / onCalendarDelete` | カレンダーの追加・更新・削除を捕捉。                                                                                                                                                                                        |
+| `onCalendarMerge(sourceId, targetId)`                    | カレンダーのマージ操作を捕捉（例：「仕事」を「個人」に統合）。                                                                                                                                                              |
+| `onRender()`                                             | レンダリング完了時に 1 度だけ発火。計測用。                                                                                                                                                                                 |
 
 ### defaultView と initialDate
 
@@ -199,6 +200,19 @@ const calendar = useCalendarApp({
 
 - `true`：デフォルトのモーダルダイアログ（`DefaultEventDetailDialog`）を有効にします。
 - `DayFlowCalendar` の `eventDetailContent` または `eventDetailDialog` と組み合わせると、内部のステートマシンを保ちながら UI を差し替えられます。
+
+### eventDetailTrigger
+
+- `'dbClick'`（デフォルト）：シングルクリックでイベントを選択し、ダブルクリックで詳細パネル / ダイアログを開きます。
+- `'click'`：シングルクリックですぐに詳細パネル / ダイアログを開きます。
+- タッチ入力は変わりません。イベントをタップすると常に詳細を開きます。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  eventDetailTrigger: 'click',
+});
+```
 
 ### useCalendarHeader
 

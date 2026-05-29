@@ -294,8 +294,15 @@ export const useEventActions = ({
     [app, clearPendingClick, event.id, onEventSelect, setContextMenuPosition]
   );
 
+  const dismissDetailPanel = useCallback(() => {
+    if (app && !app.getEventDetailEnabled()) return;
+    clearPanelHandoffStartPosition(calendarRef);
+    onDetailPanelToggle?.(null);
+    setDetailPanelPosition(null);
+  }, [app, calendarRef, onDetailPanelToggle, setDetailPanelPosition]);
+
   const applySingleClickSelection = useCallback(
-    (clientX: number) => {
+    (clientX: number, options: { dismissDetailPanel?: boolean } = {}) => {
       if (isMultiDay) {
         const clickedDay = getClickedDayIdx(clientX);
         setActiveDayIndex(
@@ -318,10 +325,8 @@ export const useEventActions = ({
         setIsSelected(true);
       }
 
-      if (!app || app.getEventDetailEnabled()) {
-        clearPanelHandoffStartPosition(calendarRef);
-        onDetailPanelToggle?.(null);
-        setDetailPanelPosition(null);
+      if (options.dismissDetailPanel !== false) {
+        dismissDetailPanel();
       }
     },
     [
@@ -334,9 +339,7 @@ export const useEventActions = ({
       onEventSelect,
       canOpenDetail,
       setIsSelected,
-      onDetailPanelToggle,
-      setDetailPanelPosition,
-      calendarRef,
+      dismissDetailPanel,
     ]
   );
 
@@ -441,7 +444,7 @@ export const useEventActions = ({
       if (!canOpenDetail) return;
 
       // 'click' trigger mode: the panel is opened by handleClick on the first
-      // click; the dblclick that follows is intentionally inert.
+      // click; the double-click event that follows is intentionally inert.
       if (app?.getEventDetailTrigger() === 'click') return;
 
       applyDetailSelection(e);
@@ -476,10 +479,10 @@ export const useEventActions = ({
       e.preventDefault();
       e.stopPropagation();
       const clientX = e.clientX;
-      const trigger = app?.getEventDetailTrigger() ?? 'dblclick';
+      const trigger = app?.getEventDetailTrigger() ?? 'dbClick';
 
       // 'click' trigger mode: open the detail panel immediately on single-click
-      // (Google Calendar style). No need to debounce for a potential dblclick.
+      // (Google Calendar style). No need to debounce for a potential double-click.
       if (trigger === 'click' && !isMobile && canOpenDetail) {
         clearPendingClick();
         applyDetailSelection(e);
@@ -491,12 +494,14 @@ export const useEventActions = ({
       if (!isMobile && canOpenDetail) {
         clearPendingClick();
         if (!isYearView && !isResourceView) {
-          applySingleClickSelection(clientX);
+          applySingleClickSelection(clientX, { dismissDetailPanel: false });
         }
         setHasPendingSelection(true);
         clickTimeoutRef.current = setTimeout(() => {
           if (isYearView || isResourceView) {
             applySingleClickSelection(clientX);
+          } else if (!app || app.getEventDetailEnabled()) {
+            dismissDetailPanel();
           }
           emitSingleClick();
           clickTimeoutRef.current = null;
@@ -519,6 +524,7 @@ export const useEventActions = ({
       isResourceView,
       isMobile,
       performSingleClick,
+      dismissDetailPanel,
     ]
   );
 

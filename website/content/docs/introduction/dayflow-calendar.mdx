@@ -103,7 +103,7 @@ return <DayFlowCalendar calendar={calendar} />;
 
 DayFlow ships with three options for event details:
 
-1. **Default panel mode** – when `useEventDetailDialog` is `false` (the default), clicking an event opens the built-in floating `DefaultEventDetailPanel`. Use the `eventDetailContent` slot to replace the panel body while keeping the default chrome.
+1. **Default panel mode** – when `useEventDetailDialog` is `false` (the default), opening an event detail shows the built-in floating `DefaultEventDetailPanel`. Desktop opens on double click by default (`eventDetailTrigger: 'dbClick'`), or on single click when `eventDetailTrigger: 'click'` is set. Touch input always opens with a tap.
 2. **Dialog mode** – set `useEventDetailDialog: true` in `useCalendarApp` to enable the built-in centered modal. Use the `eventDetailDialog` slot to replace it with your own dialog UI.
 3. **Opt out entirely** – set `useEventDetailPanel: false` in `useCalendarApp` to suppress the floating panel when you have your own event modals driven by app callbacks.
 
