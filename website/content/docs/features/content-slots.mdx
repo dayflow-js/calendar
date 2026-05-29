@@ -21,6 +21,7 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 - [Mobile Event Detail](#mobile-event-detail)
 - [Injecting a Custom Color Picker](#example-injecting-a-custom-color-picker)
 - [Context Menu](#context-menu-slots)
+- [Year View Grid Popup](#year-view-grid-popup)
 
 ## How it Works
 
@@ -38,6 +39,7 @@ This is powered by the `ContentSlot` mechanism. While the core engine provides d
 | `eventDetailContent`              | The content shown in the popover/panel when an event is clicked.                                         | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | Custom dialog shown when an event is clicked. Requires `useEventDetailDialog: true` in `useCalendarApp`. | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
 | `gridContextMenu`                 | Custom right-click context menu for calendar cells/grid.                                                 | `{ date, viewType, onClose }`                                             |
+| `gridPopupContent`                | Custom popup content for Year view grid mode (when `gridDateClick: 'popup'`).                            | `{ date, events }`                                                        |
 | `mobileEventDetail`               | Custom mobile event detail drawer/dialog.                                                                | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
 | `sidebarCalendarColorPicker`      | A color picker used for calendar colors in the sidebar.                                                  | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | Extra content in the sidebar title bar.                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
@@ -359,3 +361,51 @@ function MyCalendar() {
 ```
 
 </details>
+
+## Year View Grid Popup
+
+When the Year view runs in `grid` mode with `gridDateClick: 'popup'` (the default), clicking a date cell opens a popup listing that day's events. The `gridPopupContent` slot lets you replace that popup's body with your own UI.
+
+The slot must be passed as a prop on `<DayFlowCalendar>` — **not** in `createYearView`. Framework-rendered nodes (React, Vue, etc.) must flow through the slot system; passing them through the core view config will crash Preact.
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createYearView,
+  ViewType,
+  type GridPopupContentSlotArgs,
+} from '@dayflow/react';
+
+function renderYearGridPopup({ date, events }: GridPopupContentSlotArgs) {
+  return (
+    <div className='rounded-xl border bg-white p-3 shadow-xl'>
+      <div className='text-sm font-semibold'>{date.toDateString()}</div>
+      {events.length === 0 ? (
+        <div className='text-gray-400'>No events</div>
+      ) : (
+        events.map(e => <div key={e.id}>{e.title}</div>)
+      )}
+    </div>
+  );
+}
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createYearView({
+        mode: 'grid',
+        gridDateClick: 'popup',
+      }),
+    ],
+    defaultView: ViewType.YEAR,
+  });
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      gridPopupContent={renderYearGridPopup}
+    />
+  );
+}
+```

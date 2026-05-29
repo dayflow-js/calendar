@@ -21,6 +21,7 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 - [モバイルイベント詳細](#モバイルイベント詳細)
 - [カスタムカラーピッカーの注入](#カスタムカラーピッカー의-注入)
 - [コンテキストメニュー](#コンテキストメニュー)
+- [年ビュー Grid ポップアップ](#年ビュー-grid-ポップアップ)
 
 ## 仕組み
 
@@ -38,6 +39,7 @@ DayFlow はスロットベースのアーキテクチャを採用しており、
 | `eventDetailContent`              | イベントがクリックされたときにポップオーバー/パネルに表示される内容。                                                 | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | イベントがクリックされたときに表示されるカスタムダイアログ。`useCalendarApp` で `useEventDetailDialog: true` が必要。 | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
 | `gridContextMenu`                 | カレンダーのセル / グリッドのカスタム右クリックコンテキストメニュー。                                                 | `{ date, viewType, onClose }`                                             |
+| `gridPopupContent`                | 年ビュー Grid モード（`gridDateClick: 'popup'`）での日付ポップアップのカスタムコンテンツ。                            | `{ date, events }`                                                        |
 | `mobileEventDetail`               | モバイル用のカスタムイベント詳細ドロワー / ダイアログ。                                                               | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
 | `sidebarCalendarColorPicker`      | サイドバーのカレンダー色用のカラーピッカー。                                                                          | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | サイドバーのタイトルバー内の追加コンテンツ。                                                                          | `{ isCollapsed, toggleCollapsed }`                                        |
@@ -359,3 +361,51 @@ function MyCalendar() {
 ```
 
 </details>
+
+## 年ビュー Grid ポップアップ
+
+年ビューが `grid` モードで `gridDateClick: 'popup'`（デフォルト）の場合、日付セルをクリックするとその日のイベントを一覧表示するポップアップが開きます。`gridPopupContent` スロットを使うと、このポップアップの中身を独自の UI に置き換えられます。
+
+このスロットは `<DayFlowCalendar>` の prop として渡す必要があります。`createYearView` には**渡さないでください**。React や Vue などのフレームワークでレンダリングされたノードはスロットシステムを経由する必要があり、コアのビュー設定経由で渡すと Preact がクラッシュします。
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createYearView,
+  ViewType,
+  type GridPopupContentSlotArgs,
+} from '@dayflow/react';
+
+function renderYearGridPopup({ date, events }: GridPopupContentSlotArgs) {
+  return (
+    <div className='rounded-xl border bg-white p-3 shadow-xl'>
+      <div className='text-sm font-semibold'>{date.toDateString()}</div>
+      {events.length === 0 ? (
+        <div className='text-gray-400'>イベントなし</div>
+      ) : (
+        events.map(e => <div key={e.id}>{e.title}</div>)
+      )}
+    </div>
+  );
+}
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createYearView({
+        mode: 'grid',
+        gridDateClick: 'popup',
+      }),
+    ],
+    defaultView: ViewType.YEAR,
+  });
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      gridPopupContent={renderYearGridPopup}
+    />
+  );
+}
+```

@@ -21,6 +21,7 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 - [移动端事件详情](#移动端事件详情)
 - [注入自定义颜色选择器](#注入自定义颜色选择器)
 - [右键菜单](#右键菜单)
+- [年视图 Grid 弹窗](#年视图-grid-弹窗)
 
 ## 工作原理
 
@@ -38,6 +39,7 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 | `eventDetailContent`              | 点击事件时在弹出框/面板中显示的内容。                                                       | `{ event, isAllDay, onEventDelete, onEventUpdate, onClose, app }`         |
 | `eventDetailDialog`               | 点击事件时显示的自定义对话框。需要在 `useCalendarApp` 中设置 `useEventDetailDialog: true`。 | `{ event, isOpen, isAllDay, onEventDelete, onEventUpdate, onClose, app }` |
 | `gridContextMenu`                 | 日历单元格 / 网格的自定义右键上下文菜单。                                                   | `{ date, viewType, onClose }`                                             |
+| `gridPopupContent`                | 年视图 Grid 模式（`gridDateClick: 'popup'`）下日期弹窗的自定义内容。                        | `{ date, events }`                                                        |
 | `mobileEventDetail`               | 自定义移动端事件详情抽屉 / 对话框。                                                         | `{ isOpen, onClose, onSave, onEventDelete, draftEvent, app, timeFormat }` |
 | `sidebarCalendarColorPicker`      | 侧边栏中用于日历颜色的颜色选择器。                                                          | `{ color, onChange, onChangeComplete }`                                   |
 | `titleBarSlot`                    | 侧边栏标题栏中的额外内容。                                                                  | `{ isCollapsed, toggleCollapsed }`                                        |
@@ -359,3 +361,51 @@ function MyCalendar() {
 ```
 
 </details>
+
+## 年视图 Grid 弹窗
+
+当年视图运行在 `grid` 模式且 `gridDateClick: 'popup'`（默认值）时，点击日期单元格会打开一个列出当日事件的弹窗。`gridPopupContent` 插槽允许您用自己的 UI 替换该弹窗的内容。
+
+该插槽必须作为 prop 传给 `<DayFlowCalendar>`，**而不是**传给 `createYearView`。框架渲染的节点（React、Vue 等）必须通过插槽系统流转；将它们通过核心视图配置传递会导致 Preact 崩溃。
+
+```tsx
+import {
+  useCalendarApp,
+  DayFlowCalendar,
+  createYearView,
+  ViewType,
+  type GridPopupContentSlotArgs,
+} from '@dayflow/react';
+
+function renderYearGridPopup({ date, events }: GridPopupContentSlotArgs) {
+  return (
+    <div className='rounded-xl border bg-white p-3 shadow-xl'>
+      <div className='text-sm font-semibold'>{date.toDateString()}</div>
+      {events.length === 0 ? (
+        <div className='text-gray-400'>暂无事件</div>
+      ) : (
+        events.map(e => <div key={e.id}>{e.title}</div>)
+      )}
+    </div>
+  );
+}
+
+function MyCalendar() {
+  const calendar = useCalendarApp({
+    views: [
+      createYearView({
+        mode: 'grid',
+        gridDateClick: 'popup',
+      }),
+    ],
+    defaultView: ViewType.YEAR,
+  });
+
+  return (
+    <DayFlowCalendar
+      calendar={calendar}
+      gridPopupContent={renderYearGridPopup}
+    />
+  );
+}
+```

@@ -1,8 +1,8 @@
-import { ComponentChildren } from 'preact';
 import { createPortal } from 'preact/compat';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { useLocale } from '@/locale';
+import { ContentSlot } from '@/renderer/ContentSlot';
 import { ICalendarApp, Event } from '@/types';
 import { temporalToVisualDate } from '@/utils';
 
@@ -15,7 +15,6 @@ interface GridDayPopupProps {
   onClose: () => void;
   locale: string;
   app: ICalendarApp;
-  customContent?: (date: Date, events: Event[]) => ComponentChildren;
   appTimeZone?: string;
 }
 
@@ -27,7 +26,6 @@ export const GridDayPopup = ({
   onClose,
   locale,
   app,
-  customContent,
   appTimeZone,
 }: GridDayPopupProps) => {
   const { t } = useLocale();
@@ -122,6 +120,12 @@ export const GridDayPopup = ({
     </>
   );
 
+  // Route custom popup content through the ContentSlot system so framework
+  // adapters (React/Vue/Angular/Svelte) can portal their own (non-Preact)
+  // content into the placeholder. Custom content is supplied as the
+  // `gridPopupContent` slot on the framework's <DayFlowCalendar>, NOT through
+  // the view config — feeding foreign vnodes to Preact would crash (the `_H`
+  // hooks error). When no adapter claims the slot, the built-in default shows.
   return createPortal(
     <div
       ref={popupRef}
@@ -129,7 +133,11 @@ export const GridDayPopup = ({
       className='df-year-popup df-animate-in df-fade-in df-zoom-in-95'
       style={{ top: position.top, left: position.left }}
     >
-      {customContent ? customContent(date, events) : defaultContent}
+      <ContentSlot
+        generatorName='gridPopupContent'
+        generatorArgs={{ date, events }}
+        defaultContent={defaultContent}
+      />
     </div>,
     document.body
   );

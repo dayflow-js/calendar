@@ -169,6 +169,12 @@ export interface GridContextMenuSlotArgs {
   onClose: () => void;
 }
 
+/** Args passed to the gridPopupContent slot renderer (Year view grid mode). */
+export interface GridPopupContentSlotArgs {
+  date: Date;
+  events: Event[];
+}
+
 /** Args passed to the monthDateNumberContent slot renderer. */
 export interface MonthDateNumberSlotArgs {
   date: Date;
