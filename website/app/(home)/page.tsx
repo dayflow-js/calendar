@@ -28,7 +28,6 @@ export const metadata: Metadata = {
     title: 'DayFlow Calendar - Build Product-Ready Calendar Interfaces',
     description:
       'A modern calendar UI toolkit with multi-view scheduling, event editing, resource planning, search, localization, and print workflows.',
-    url: '/',
     images: [
       {
         url: '/images/landing/og-card.png',
