@@ -8,8 +8,11 @@ import {
   useMemo,
 } from 'preact/hooks';
 
-import { ThemeMode } from '@/types/calendarTypes';
-import { resolveAppliedTheme } from '@/utils/themeUtils';
+import { ThemeColors, ThemeMode } from '@/types/calendarTypes';
+import {
+  getThemeColorCssVariables,
+  resolveAppliedTheme,
+} from '@/utils/themeUtils';
 
 /**
  * Theme Context Type
@@ -35,6 +38,8 @@ export interface ThemeProviderProps {
   children: ComponentChildren;
   /** Initial theme mode */
   initialTheme?: ThemeMode;
+  /** Runtime system-level color tokens */
+  colors?: ThemeColors;
   /** Callback when theme changes */
   onThemeChange?: (theme: ThemeMode, effectiveTheme: 'light' | 'dark') => void;
 }
@@ -55,6 +60,7 @@ export interface ThemeProviderProps {
 export const ThemeProvider = ({
   children,
   initialTheme = 'light',
+  colors,
   onThemeChange,
 }: ThemeProviderProps) => {
   const [theme, setThemeState] = useState<ThemeMode>(initialTheme as ThemeMode);
@@ -154,6 +160,44 @@ export const ThemeProvider = ({
       root.dataset.dfTheme = targetTheme;
     }
   }, [effectiveTheme, theme, systemTheme]);
+
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const root = document.documentElement;
+    const variables = getThemeColorCssVariables(colors);
+    const keys = Object.keys(variables);
+    const previous = new Map(
+      keys.map(key => [
+        key,
+        {
+          value: root.style.getPropertyValue(key),
+          priority: root.style.getPropertyPriority(key),
+        },
+      ])
+    );
+
+    keys.forEach(key => {
+      root.style.setProperty(key, variables[key]);
+    });
+
+    return () => {
+      keys.forEach(key => {
+        const previousValue = previous.get(key);
+        if (!previousValue?.value) {
+          root.style.removeProperty(key);
+          return;
+        }
+        root.style.setProperty(
+          key,
+          previousValue.value,
+          previousValue.priority
+        );
+      });
+    };
+  }, [colors]);
 
   /**
    * Notify parent of theme changes

@@ -26,10 +26,10 @@
   }
 
   .df-form-input:focus {
-    border-color: var(--df-color-primary);
+    border-color: var(--df-color-ring);
     box-shadow:
       0 0 0 0px var(--df-color-background),
-      0 0 0 2px var(--df-color-primary);
+      0 0 0 2px var(--df-color-ring);
   }
 
   .df-form-input:disabled,
@@ -54,10 +54,10 @@
   }
 
   .df-form-textarea:focus {
-    border-color: var(--df-color-primary);
+    border-color: var(--df-color-ring);
     box-shadow:
       0 0 0 0px var(--df-color-background),
-      0 0 0 2px var(--df-color-primary);
+      0 0 0 2px var(--df-color-ring);
   }
 
   .df-form-textarea:disabled,

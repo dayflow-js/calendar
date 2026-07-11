@@ -14,6 +14,7 @@
     --df-color-secondary-foreground: rgb(255 255 255);
     --df-color-destructive: rgb(212 36 34);
     --df-color-destructive-foreground: rgb(255 255 255);
+    --df-color-ring: var(--df-color-primary);
     --df-heat-1: #ebf5ff;
     --df-heat-2: #cfe8ff;
     --df-heat-3: #91d5ff;
@@ -36,6 +37,7 @@
     --df-color-secondary-foreground: rgb(15 23 42);
     --df-color-destructive: rgb(147 70 69);
     --df-color-destructive-foreground: rgb(254 242 242);
+    --df-color-ring: var(--df-color-primary);
     --df-heat-1: #1e3a5f;
     --df-heat-2: #2563eb;
     --df-heat-3: #1e40af;
@@ -59,6 +61,7 @@
       --df-color-secondary-foreground: rgb(23 23 23);
       --df-color-destructive: rgb(147 70 69);
       --df-color-destructive-foreground: rgb(254 242 242);
+      --df-color-ring: var(--df-color-primary);
       --df-heat-1: #1e3a5f;
       --df-heat-2: #2563eb;
       --df-heat-3: #1e40af;
@@ -143,6 +146,7 @@
     --color-secondary-foreground: var(--df-color-secondary-foreground);
     --color-destructive: var(--df-color-destructive);
     --color-destructive-foreground: var(--df-color-destructive-foreground);
+    --color-ring: var(--df-color-ring);
     --hover: var(--df-color-hover);
   }
 
@@ -540,15 +544,11 @@
   }
 
   .df-ring-primary {
-    --tw-ring-color: color-mix(
-      in srgb,
-      var(--df-color-primary) 20%,
-      transparent
-    );
+    --tw-ring-color: color-mix(in srgb, var(--df-color-ring) 20%, transparent);
   }
 
   .df-ring-primary-solid {
-    --tw-ring-color: var(--df-color-primary);
+    --tw-ring-color: var(--df-color-ring);
   }
 
   .df-shadow-primary {
@@ -560,16 +560,16 @@
   }
 
   .df-focus-ring:focus {
-    border-color: var(--df-color-primary);
+    border-color: var(--df-color-ring);
     box-shadow:
       0 0 0 0px var(--df-color-background),
-      0 0 0 2px var(--df-color-primary);
+      0 0 0 2px var(--df-color-ring);
   }
 
   .df-focus-ring-only:focus {
     box-shadow:
       0 0 0 0px var(--df-color-background),
-      0 0 0 2px var(--df-color-primary);
+      0 0 0 2px var(--df-color-ring);
   }
 
   .df-focus-border-primary:focus {
