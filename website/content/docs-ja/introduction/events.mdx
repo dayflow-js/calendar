@@ -170,37 +170,151 @@ const { events } = calendar; // 現在の状態をそのまま参照
 
 使用しているフレームワーク（React, Vue, Svelte, Angular）の状態管理と組み合わせると次のようになります。
 
-```tsx
-import { useState } from 'react';
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  Event,
-} from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useState } from 'react';
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createMonthView,
+      Event,
+    } from '@dayflow/react';
 
-function MyCalendar() {
-  const [events, setEvents] = useState<Event[]>([]);
+    function MyCalendar() {
+      const [events, setEvents] = useState<Event[]>([]);
 
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    events,
-    callbacks: {
-      onEventCreate: event => setEvents(prev => [...prev, event]),
-      onEventUpdate: event =>
-        setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
-      onEventDelete: eventId =>
-        setEvents(prev => prev.filter(e => e.id !== eventId)),
-      onEventDoubleClick: (event, e) => {
-        console.log('イベントがダブルクリックされました:', event);
-        // e.currentTarget をカスタムポップオーバーのアンカーとして使用
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        events,
+        callbacks: {
+          onEventCreate: event => setEvents(prev => [...prev, event]),
+          onEventUpdate: event =>
+            setEvents(prev => prev.map(e => (e.id === event.id ? event : e))),
+          onEventDelete: eventId =>
+            setEvents(prev => prev.filter(e => e.id !== eventId)),
+          onEventDoubleClick: (event, e) => {
+            console.log('イベントがダブルクリックされました:', event);
+            // e.currentTarget をカスタムポップオーバーのアンカーとして使用
+          },
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { ref } from 'vue';
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView } from '@dayflow/core';
+
+    const events = ref([]);
+
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      events,
+      callbacks: {
+        onEventCreate: (event) => {
+          events.value.push(event);
+        },
+        onEventUpdate: (event) => {
+          events.value = events.value.map(e => e.id === event.id ? event : e);
+        },
+        onEventDelete: (eventId) => {
+          events.value = events.value.filter(e => e.id !== eventId);
+        },
+        onEventDoubleClick: (event, e) => {
+          console.log('イベントがダブルクリックされました:', event);
+        },
       },
-    },
-  });
+    });
+    </script>
+    ```
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createMonthView, Event } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      events: Event[] = [];
+
+      calendar = {
+        views: [createMonthView()],
+        events: this.events,
+        callbacks: {
+          onEventCreate: (event: Event) => {
+            this.events = [...this.events, event];
+            this.calendar.events = this.events;
+          },
+          onEventUpdate: (event: Event) => {
+            this.events = this.events.map(e => e.id === event.id ? event : e);
+            this.calendar.events = this.events;
+          },
+          onEventDelete: (eventId: string) => {
+            this.events = this.events.filter(e => e.id !== eventId);
+            this.calendar.events = this.events;
+          },
+          onEventDoubleClick: (event: Event, e: MouseEvent) => {
+            console.log('イベントがダブルクリックされました:', event);
+          },
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script lang="ts">
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView, type Event } from '@dayflow/core';
+
+      let events = $state<Event[]>([]);
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        get events() { return events; },
+        callbacks: {
+          onEventCreate: (event) => {
+            events = [...events, event];
+          },
+          onEventUpdate: (event) => {
+            events = events.map(e => e.id === event.id ? event : e);
+          },
+          onEventDelete: (eventId) => {
+            events = events.filter(e => e.id !== eventId);
+          },
+          onEventDoubleClick: (event, e) => {
+            console.log('イベントがダブルクリックされました:', event);
+          },
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 バックエンドと同期する場合は非同期処理をコールバックに直接書いて問題ありません。
 
@@ -291,81 +405,350 @@ const calendar = useCalendarApp({
 
 ### 使用例
 
-```tsx
-import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { createEvent, useCalendarApp, createWeekView, DayFlowCalendar } from '@dayflow/react';
+    import { Temporal } from 'temporal-polyfill';
 
-// "team" と "marketing" の両カレンダーに帰属させる
-const sharedEvent = createEvent({
-  id: 'shared-1',
-  title: '全社ミーティング',
-  start: new Date(2024, 9, 15, 10, 0),
-  end: new Date(2024, 9, 15, 11, 30),
-  calendarIds: ['team', 'marketing'], // 複数カレンダー
-});
+    function App() {
+      // "team" と "marketing" の両カレンダーに帰属させる
+      const sharedEvent = createEvent({
+        id: 'shared-1',
+        title: '全社ミーティング',
+        start: new Date(2024, 9, 15, 10, 0),
+        end: new Date(2024, 9, 15, 11, 30),
+        calendarIds: ['team', 'marketing'], // 複数カレンダー
+      });
 
-// 3 カレンダーにまたがる終日予定
-const crossCalendarDay = {
-  id: 'shared-2',
-  title: 'チーム合宿',
-  start: Temporal.PlainDate.from('2024-10-20'),
-  end: Temporal.PlainDate.from('2024-10-22'),
-  allDay: true,
-  calendarIds: ['team', 'personal', 'travel'],
-};
+      // 3 カレンダーにまたがる終日予定
+      const crossCalendarDay = {
+        id: 'shared-2',
+        title: 'チーム合宿',
+        start: Temporal.PlainDate.from('2024-10-20'),
+        end: Temporal.PlainDate.from('2024-10-22'),
+        allDay: true,
+        calendarIds: ['team', 'personal', 'travel'],
+      };
 
-const calendars = [
-  {
-    id: 'team',
-    name: 'チーム',
-    colors: {
-      eventColor: '#3b82f6',
-      lineColor: '#3b82f6',
-      eventSelectedColor: '#2563eb',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'marketing',
-    name: 'マーケティング',
-    colors: {
-      eventColor: '#f59e0b',
-      lineColor: '#f59e0b',
-      eventSelectedColor: '#d97706',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'personal',
-    name: 'プライベート',
-    colors: {
-      eventColor: '#10b981',
-      lineColor: '#10b981',
-      eventSelectedColor: '#059669',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'travel',
-    name: '旅行',
-    colors: {
-      eventColor: '#8b5cf6',
-      lineColor: '#8b5cf6',
-      eventSelectedColor: '#7c3aed',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-];
+      const calendars = [
+        {
+          id: 'team',
+          name: 'チーム',
+          colors: {
+            eventColor: '#3b82f6',
+            lineColor: '#3b82f6',
+            eventSelectedColor: '#2563eb',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'marketing',
+          name: 'マーケティング',
+          colors: {
+            eventColor: '#f59e0b',
+            lineColor: '#f59e0b',
+            eventSelectedColor: '#d97706',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'personal',
+          name: 'プライベート',
+          colors: {
+            eventColor: '#10b981',
+            lineColor: '#10b981',
+            eventSelectedColor: '#059669',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'travel',
+          name: '旅行',
+          colors: {
+            eventColor: '#8b5cf6',
+            lineColor: '#8b5cf6',
+            eventSelectedColor: '#7c3aed',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+      ];
 
-const calendar = useCalendarApp({
-  views: [createWeekView()],
-  events: [sharedEvent, crossCalendarDay],
-  calendars,
-});
-```
+      const calendar = useCalendarApp({
+        views: [createWeekView()],
+        events: [sharedEvent, crossCalendarDay],
+        calendars,
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createEvent, createWeekView } from '@dayflow/core';
+    import { Temporal } from 'temporal-polyfill';
+
+    // "team" と "marketing" の両カレンダーに帰属させる
+    const sharedEvent = createEvent({
+      id: 'shared-1',
+      title: '全社ミーティング',
+      start: new Date(2024, 9, 15, 10, 0),
+      end: new Date(2024, 9, 15, 11, 30),
+      calendarIds: ['team', 'marketing'], // 複数カレンダー
+    });
+
+    // 3 カレンダーにまたがる終日予定
+    const crossCalendarDay = {
+      id: 'shared-2',
+      title: 'チーム合宿',
+      start: Temporal.PlainDate.from('2024-10-20'),
+      end: Temporal.PlainDate.from('2024-10-22'),
+      allDay: true,
+      calendarIds: ['team', 'personal', 'travel'],
+    };
+
+    const calendars = [
+      {
+        id: 'team',
+        name: 'チーム',
+        colors: {
+          eventColor: '#3b82f6',
+          lineColor: '#3b82f6',
+          eventSelectedColor: '#2563eb',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'marketing',
+        name: 'マーケティング',
+        colors: {
+          eventColor: '#f59e0b',
+          lineColor: '#f59e0b',
+          eventSelectedColor: '#d97706',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'personal',
+        name: 'プライベート',
+        colors: {
+          eventColor: '#10b981',
+          lineColor: '#10b981',
+          eventSelectedColor: '#059669',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'travel',
+        name: '旅行',
+        colors: {
+          eventColor: '#8b5cf6',
+          lineColor: '#8b5cf6',
+          eventSelectedColor: '#7c3aed',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+    ];
+
+    const calendar = useCalendarApp({
+      views: [createWeekView()],
+      events: [sharedEvent, crossCalendarDay],
+      calendars,
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createEvent, createWeekView } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { Temporal } from 'temporal-polyfill';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      sharedEvent = createEvent({
+        id: 'shared-1',
+        title: '全社ミーティング',
+        start: new Date(2024, 9, 15, 10, 0),
+        end: new Date(2024, 9, 15, 11, 30),
+        calendarIds: ['team', 'marketing'], // 複数カレンダー
+      });
+
+      crossCalendarDay = {
+        id: 'shared-2',
+        title: 'チーム合宿',
+        start: Temporal.PlainDate.from('2024-10-20'),
+        end: Temporal.PlainDate.from('2024-10-22'),
+        allDay: true,
+        calendarIds: ['team', 'personal', 'travel'],
+      };
+
+      calendars = [
+        {
+          id: 'team',
+          name: 'チーム',
+          colors: {
+            eventColor: '#3b82f6',
+            lineColor: '#3b82f6',
+            eventSelectedColor: '#2563eb',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'marketing',
+          name: 'マーケティング',
+          colors: {
+            eventColor: '#f59e0b',
+            lineColor: '#f59e0b',
+            eventSelectedColor: '#d97706',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'personal',
+          name: 'プライベート',
+          colors: {
+            eventColor: '#10b981',
+            lineColor: '#10b981',
+            eventSelectedColor: '#059669',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'travel',
+          name: '旅行',
+          colors: {
+            eventColor: '#8b5cf6',
+            lineColor: '#8b5cf6',
+            eventSelectedColor: '#7c3aed',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+      ];
+
+      calendar = {
+        views: [createWeekView()],
+        events: [this.sharedEvent, this.crossCalendarDay],
+        calendars: this.calendars,
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createEvent, createWeekView } from '@dayflow/core';
+      import { Temporal } from 'temporal-polyfill';
+
+      // "team" と "marketing" の両カレンダーに帰属させる
+      const sharedEvent = createEvent({
+        id: 'shared-1',
+        title: '全社ミーティング',
+        start: new Date(2024, 9, 15, 10, 0),
+        end: new Date(2024, 9, 15, 11, 30),
+        calendarIds: ['team', 'marketing'], // 複数カレンダー
+      });
+
+      // 3 カレンダーにまたがる終日予定
+      const crossCalendarDay = {
+        id: 'shared-2',
+        title: 'チーム合宿',
+        start: Temporal.PlainDate.from('2024-10-20'),
+        end: Temporal.PlainDate.from('2024-10-22'),
+        allDay: true,
+        calendarIds: ['team', 'personal', 'travel'],
+      };
+
+      const calendars = [
+        {
+          id: 'team',
+          name: 'チーム',
+          colors: {
+            eventColor: '#3b82f6',
+            lineColor: '#3b82f6',
+            eventSelectedColor: '#2563eb',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'marketing',
+          name: 'マーケティング',
+          colors: {
+            eventColor: '#f59e0b',
+            lineColor: '#f59e0b',
+            eventSelectedColor: '#d97706',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'personal',
+          name: 'プライベート',
+          colors: {
+            eventColor: '#10b981',
+            lineColor: '#10b981',
+            eventSelectedColor: '#059669',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'travel',
+          name: '旅行',
+          colors: {
+            eventColor: '#8b5cf6',
+            lineColor: '#8b5cf6',
+            eventSelectedColor: '#7c3aed',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+      ];
+
+      const calendar = useCalendarApp({
+        views: [createWeekView()],
+        events: [sharedEvent, crossCalendarDay],
+        calendars,
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 複数日にまたがる予定
 

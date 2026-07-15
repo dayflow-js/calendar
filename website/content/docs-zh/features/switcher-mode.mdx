@@ -13,19 +13,81 @@ import { SwitcherModeShowcase } from '@/components/showcase/FeatureShowcase';
 
 ## 快速上手
 
-```tsx {9}
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-} from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx {9}
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createMonthView,
+    } from '@dayflow/react';
 
-const calendar = useCalendarApp({
-  views: [createMonthView()],
-  switcherMode: 'select', // 默认 switcherMode: 'buttons'
-});
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      switcherMode: 'select', // 默认 switcherMode: 'buttons'
+    });
 
-<DayFlowCalendar calendar={calendar} />;
-```
+    <DayFlowCalendar calendar={calendar} />;
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView } from '@dayflow/core';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      switcherMode: 'select', // 默认 switcherMode: 'buttons'
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView()],
+        switcherMode: 'select', // 默认 switcherMode: 'buttons'
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        switcherMode: 'select', // 默认 switcherMode: 'buttons'
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 在 `'buttons'` 与 `'select'` 之间切换即可即时预览差异。如果还需要完全自定义的切换器，可以直接构建自己的控件并调用 `calendar.changeView`.

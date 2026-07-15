@@ -25,41 +25,166 @@ status: pro
 
 ## 基本用法
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
-import { createResourceTimelineView } from '@dayflow-pro/resource-timeline';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
+    import { createResourceTimelineView } from '@dayflow-pro/resource-timeline';
 
-function App() {
-  const calendar = useCalendarApp({
-    views: [
-      createResourceTimelineView({
-        resources: [
-          {
-            id: 'eng-alice',
-            name: 'Alice Chen',
-            groupId: 'engineering',
-            groupName: 'Engineering',
-            subtitle: 'Frontend',
-          },
-          {
-            id: 'eng-bob',
-            name: 'Bob Torres',
-            groupId: 'engineering',
-            groupName: 'Engineering',
-            subtitle: 'Platform',
-          },
+    function App() {
+      const calendar = useCalendarApp({
+        views: [
+          createResourceTimelineView({
+            resources: [
+              {
+                id: 'eng-alice',
+                name: 'Alice Chen',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Frontend',
+              },
+              {
+                id: 'eng-bob',
+                name: 'Bob Torres',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Platform',
+              },
+            ],
+            defaultView: 'week',
+            height: 640,
+            getResourceId: event =>
+              (event as { resourceId?: string }).resourceId ?? event.calendarId,
+          }),
         ],
-        defaultView: 'week',
-        height: 640,
-        getResourceId: event =>
-          (event as { resourceId?: string }).resourceId ?? event.calendarId,
-      }),
-    ],
-  });
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+      import { createResourceTimelineView } from '@dayflow-pro/resource-timeline';
+
+      const calendar = useCalendarApp({
+        views: [
+          createResourceTimelineView({
+            resources: [
+              {
+                id: 'eng-alice',
+                name: 'Alice Chen',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Frontend',
+              },
+              {
+                id: 'eng-bob',
+                name: 'Bob Torres',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Platform',
+              },
+            ],
+            defaultView: 'week',
+            height: 640,
+            getResourceId: event => event.resourceId ?? event.calendarId,
+          }),
+        ],
+      });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createResourceTimelineView } from '@dayflow-pro/resource-timeline';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          createResourceTimelineView({
+            resources: [
+              {
+                id: 'eng-alice',
+                name: 'Alice Chen',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Frontend',
+              },
+              {
+                id: 'eng-bob',
+                name: 'Bob Torres',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Platform',
+              },
+            ],
+            defaultView: 'week',
+            height: 640,
+            getResourceId: (event: any) => event.resourceId ?? event.calendarId,
+          }),
+        ],
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createResourceTimelineView } from '@dayflow-pro/resource-timeline';
+
+      const calendar = useCalendarApp({
+        views: [
+          createResourceTimelineView({
+            resources: [
+              {
+                id: 'eng-alice',
+                name: 'Alice Chen',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Frontend',
+              },
+              {
+                id: 'eng-bob',
+                name: 'Bob Torres',
+                groupId: 'engineering',
+                groupName: 'Engineering',
+                subtitle: 'Platform',
+              },
+            ],
+            defaultView: 'week',
+            height: 640,
+            getResourceId: event => event.resourceId ?? event.calendarId,
+          }),
+        ],
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 时间线模式
 

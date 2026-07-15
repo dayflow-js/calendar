@@ -1,34 +1,34 @@
 ---
-title: Pro Installation
-description: Install DayFlow Pro packages, configure private registry access, and activate your DayFlow Pro license key.
+title: Proのインストール
+description: DayFlow Pro パッケージのインストール、プライベートレジストリへのアクセス設定、および DayFlow Pro ライセンスキーのアクティベーションを行います。
 status: pro
 ---
 
-# Pro Installation
+# Proのインストール
 
-DayFlow Pro uses two separate credentials:
+DayFlow Pro は、2 つの異なる認証情報を使用します：
 
-- A private npm registry token for installing `@dayflow-pro/*` packages
-- A signed DayFlow Pro license key used to activate Pro features
+- `@dayflow-pro/*` パッケージをインストールするためのプライベート npm レジストリトークン
+- Pro 機能をアクティベートするために使用する、署名済みの DayFlow Pro ライセンスキー
 
-## 1. Configure private registry access
+## 1. プライベートレジストリへのアクセス設定
 
-Add your DayFlow Pro npm token to `.npmrc` before installing private packages:
+プライベートパッケージをインストールする前に、`.npmrc` に DayFlow Pro の npm トークンを追加します：
 
 ```ini
 @dayflow-pro:registry=https://gitlab.com/api/v4/projects/81880038/packages/npm/
 //gitlab.com/api/v4/projects/81880038/packages/npm/:_authToken=${DAYFLOW_PRO_NPM_TOKEN}
 ```
 
-After that, install the packages you purchased as usual:
+その後、購入したパッケージを通常どおりインストールします：
 
 ```bash
 pnpm add @dayflow-pro/license @dayflow-pro/resource-grid
 ```
 
-## 2. Register your license key once
+## 2. ライセンスキーを一度登録する
 
-Register your DayFlow Pro license key during app startup:
+アプリケーションの起動時に、DayFlow Pro ライセンスキーを登録します：
 
 ```tsx
 import { registerDayflowProLicense } from '@dayflow-pro/license';
@@ -38,11 +38,11 @@ registerDayflowProLicense({
 });
 ```
 
-Once this is registered, your Pro views and plugins can read the token automatically.
+一度登録すれば、Pro ビューやプラグインが自動的にトークンを読み取ります。
 
-## 3. Use Pro packages normally
+## 3. 通常どおり Pro パッケージを使用する
 
-After installation and registration, you can use Pro packages without repeating the license config in every call:
+インストールと登録の完了後は、毎回の呼び出しでライセンス設定を繰り返すことなく、Pro パッケージを使用できます：
 
 <FrameworkTabs>
   <Tab>
@@ -56,8 +56,8 @@ After installation and registration, you can use Pro packages without repeating 
           createResourceGridView({
             mode: 'resourceView',
             resources: [
-              { id: 'room-a', title: 'Room A' },
-              { id: 'room-b', title: 'Room B' },
+              { id: 'room-a', title: 'ルームA' },
+              { id: 'room-b', title: 'ルームB' },
             ],
           }),
         ],
@@ -83,8 +83,8 @@ After installation and registration, you can use Pro packages without repeating 
         createResourceGridView({
           mode: 'resourceView',
           resources: [
-            { id: 'room-a', title: 'Room A' },
-            { id: 'room-b', title: 'Room B' },
+            { id: 'room-a', title: 'ルームA' },
+            { id: 'room-b', title: 'ルームB' },
           ],
         }),
       ],
@@ -113,8 +113,8 @@ After installation and registration, you can use Pro packages without repeating 
           createResourceGridView({
             mode: 'resourceView',
             resources: [
-              { id: 'room-a', title: 'Room A' },
-              { id: 'room-b', title: 'Room B' },
+              { id: 'room-a', title: 'ルームA' },
+              { id: 'room-b', title: 'ルームB' },
             ],
           }),
         ],
@@ -134,8 +134,8 @@ After installation and registration, you can use Pro packages without repeating 
           createResourceGridView({
             mode: 'resourceView',
             resources: [
-              { id: 'room-a', title: 'Room A' },
-              { id: 'room-b', title: 'Room B' },
+              { id: 'room-a', title: 'ルームA' },
+              { id: 'room-b', title: 'ルームB' },
             ],
           }),
         ],

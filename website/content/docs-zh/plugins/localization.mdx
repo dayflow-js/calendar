@@ -12,31 +12,127 @@ i18n 插件提供多语言和本地化支持。默认情况下，Day Flow 核心
 
 要启用其他语言支持，请注册插件并提供所需的语言对象。
 
-```tsx
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
-import {
-  createLocalizationPlugin,
-  zh,
-  ja,
-  fr,
-} from '@dayflow/plugin-localization';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [
-      /* 视图配置 */
-    ],
-    plugins: [
-      createLocalizationPlugin({
-        locales: [zh, ja, fr], // 注册你需要的语言包
-      }),
-    ],
-    locale: 'zh-CN', // 设置当前语言
-  });
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 注册需要的语言包
+          }),
+        ],
+        locale: 'zh-CN', // 设置当前语言
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
+
+    const calendar = useCalendarApp({
+      views: [
+        /* 视图 */
+      ],
+      plugins: [
+        createLocalizationPlugin({
+          locales: [zh, ja, fr], // 注册需要的语言包
+        }),
+      ],
+      locale: 'zh-CN', // 设置当前语言
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          /* 视图 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 注册需要的语言包
+          })
+        ],
+        locale: 'zh-CN', // 设置当前语言
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import {
+        createLocalizationPlugin,
+        zh,
+        ja,
+        fr,
+      } from '@dayflow/plugin-localization';
+
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 注册需要的语言包
+          }),
+        ],
+        locale: 'zh-CN', // 设置当前语言
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 配置项
 

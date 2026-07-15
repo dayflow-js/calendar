@@ -13,20 +13,84 @@ import { SwitcherModeShowcase } from '@/components/showcase/FeatureShowcase';
 
 ## 使い方
 
-```tsx {9}
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-} from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createMonthView,
+    } from '@dayflow/react';
 
-const calendar = useCalendarApp({
-  views: [createMonthView()],
-  switcherMode: 'select', // 初期値 switcherMode: 'buttons'
-});
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        switcherMode: 'select', // 初期値 switcherMode: 'buttons'
+      });
 
-<DayFlowCalendar calendar={calendar} />;
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView } from '@dayflow/core';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      switcherMode: 'select', // 初期値 switcherMode: 'buttons'
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView()],
+        switcherMode: 'select' as const, // 初期値 switcherMode: 'buttons'
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        switcherMode: 'select', // 初期値 switcherMode: 'buttons'
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 `switcherMode` を `'buttons'` ↔ `'select'` に切り替えるだけで、即座に別の UI を試せます。
 

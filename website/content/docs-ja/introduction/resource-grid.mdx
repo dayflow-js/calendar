@@ -18,30 +18,125 @@ DayFlow Pro のインストール手順については、[Pro のインストー
 
 ## 基本的な使い方
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
-import { createResourceGridView } from '@dayflow-pro/resource-grid';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
+    import { createResourceGridView } from '@dayflow-pro/resource-grid';
 
-function App() {
-  const calendar = useCalendarApp({
-    views: [
-      createResourceGridView({
-        mode: 'resourceView',
-        resources: [
-          { id: 'room-a', title: 'Room A' },
-          { id: 'room-b', title: 'Room B' },
+    function App() {
+      const calendar = useCalendarApp({
+        views: [
+          createResourceGridView({
+            mode: 'resourceView',
+            resources: [
+              { id: 'room-a', title: 'ルーム A' },
+              { id: 'room-b', title: 'ルーム B' },
+            ],
+            visibleDays: 3,
+            hourHeight: 72,
+            firstHour: 8,
+            lastHour: 20,
+          }),
         ],
-        visibleDays: 3,
-        hourHeight: 72,
-        firstHour: 8,
-        lastHour: 20,
-      }),
-    ],
-  });
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createResourceGridView } from '@dayflow-pro/resource-grid';
+
+    const calendar = useCalendarApp({
+      views: [
+        createResourceGridView({
+          mode: 'resourceView',
+          resources: [
+            { id: 'room-a', title: 'ルーム A' },
+            { id: 'room-b', title: 'ルーム B' },
+          ],
+          visibleDays: 3,
+          hourHeight: 72,
+          firstHour: 8,
+          lastHour: 20,
+        }),
+      ],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createResourceGridView } from '@dayflow-pro/resource-grid';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          createResourceGridView({
+            mode: 'resourceView',
+            resources: [
+              { id: 'room-a', title: 'ルーム A' },
+              { id: 'room-b', title: 'ルーム B' },
+            ],
+            visibleDays: 3,
+            hourHeight: 72,
+            firstHour: 8,
+            lastHour: 20,
+          }),
+        ],
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createResourceGridView } from '@dayflow-pro/resource-grid';
+
+      const calendar = useCalendarApp({
+        views: [
+          createResourceGridView({
+            mode: 'resourceView',
+            resources: [
+              { id: 'room-a', title: 'ルーム A' },
+              { id: 'room-b', title: 'ルーム B' },
+            ],
+            visibleDays: 3,
+            hourHeight: 72,
+            firstHour: 8,
+            lastHour: 20,
+          }),
+        ],
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## ビューモード
 

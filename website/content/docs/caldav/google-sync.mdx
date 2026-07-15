@@ -8,65 +8,237 @@
 
 ## Quick Start
 
-```tsx
-import { useRef, useEffect, useState } from 'react';
-import {
-  DayFlowCalendar,
-  useCalendarApp,
-  createMonthView,
-} from '@dayflow/react';
-import {
-  attachGoogleSyncToDayFlow,
-  createGoogleSync,
-  createGoogleSyncAdapter,
-  type GoogleDayFlowController,
-  type GoogleSyncStatus,
-} from '@dayflow/google-sync';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useRef, useEffect, useState } from 'react';
+    import {
+      DayFlowCalendar,
+      useCalendarApp,
+      createMonthView,
+    } from '@dayflow/react';
+    import {
+      attachGoogleSyncToDayFlow,
+      createGoogleSync,
+      createGoogleSyncAdapter,
+      type GoogleDayFlowController,
+      type GoogleSyncStatus,
+    } from '@dayflow/google-sync';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    calendars: [],
-    events: [],
-  });
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
 
-  const controllerRef = useRef<GoogleDayFlowController | null>(null);
-  const [syncStatus, setSyncStatus] = useState<GoogleSyncStatus>({
-    state: 'idle',
-  });
+      const controllerRef = useRef<GoogleDayFlowController | null>(null);
+      const [syncStatus, setSyncStatus] = useState<GoogleSyncStatus>({
+        state: 'idle',
+      });
 
-  useEffect(() => {
-    if (controllerRef.current) return;
+      useEffect(() => {
+        if (controllerRef.current) return;
 
-    const adapter = createGoogleSyncAdapter({
-      baseUrl: '/api/google-calendar',
-    });
+        const adapter = createGoogleSyncAdapter({
+          baseUrl: '/api/google-calendar',
+        });
 
-    const sync = createGoogleSync(adapter);
-    const controller = attachGoogleSyncToDayFlow(calendar.app, sync, {
-      writable: true,
-      onStatusChange: setSyncStatus,
-      onWriteError: (error, ctx) =>
-        console.error(`[google-sync] ${ctx.action} failed:`, error.message),
-      onSyncComplete: delta => {
-        console.log(
-          `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
-        );
-      },
-    });
+        const sync = createGoogleSync(adapter);
+        const controller = attachGoogleSyncToDayFlow(calendar.app, sync, {
+          writable: true,
+          onStatusChange: setSyncStatus,
+          onWriteError: (error, ctx) =>
+            console.error(`[google-sync] ${ctx.action} failed:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
 
-    controllerRef.current = controller;
-    controller.start();
+        controllerRef.current = controller;
+        controller.start();
 
-    return () => {
-      controller.stop();
-      controllerRef.current = null;
-    };
-  }, [calendar.app]);
+        return () => {
+          controller.stop();
+          controllerRef.current = null;
+        };
+      }, [calendar.app]);
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+      import { ref, onMounted, onBeforeUnmount } from 'vue';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+      import { createMonthView } from '@dayflow/core';
+      import {
+        attachGoogleSyncToDayFlow,
+        createGoogleSync,
+        createGoogleSyncAdapter,
+      } from '@dayflow/google-sync';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      const syncStatus = ref({ state: 'idle' });
+      let controller;
+
+      onMounted(() => {
+        const adapter = createGoogleSyncAdapter({
+          baseUrl: '/api/google-calendar',
+        });
+
+        const sync = createGoogleSync(adapter);
+        controller = attachGoogleSyncToDayFlow(calendar.app, sync, {
+          writable: true,
+          onStatusChange: status => {
+            syncStatus.value = status;
+          },
+          onWriteError: (error, ctx) =>
+            console.error(`[google-sync] ${ctx.action} failed:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controller.start();
+      });
+
+      onBeforeUnmount(() => {
+        controller?.stop();
+      });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component, OnInit, OnDestroy } from '@angular/core';
+    import { CalendarApp, createMonthView } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import {
+      attachGoogleSyncToDayFlow,
+      createGoogleSync,
+      createGoogleSyncAdapter,
+      type GoogleDayFlowController,
+      type GoogleSyncStatus,
+    } from '@dayflow/google-sync';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent implements OnInit, OnDestroy {
+      calendar = new CalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      syncStatus: GoogleSyncStatus = { state: 'idle' };
+      private controller?: GoogleDayFlowController;
+
+      ngOnInit() {
+        const adapter = createGoogleSyncAdapter({
+          baseUrl: '/api/google-calendar',
+        });
+
+        const sync = createGoogleSync(adapter);
+        this.controller = attachGoogleSyncToDayFlow(this.calendar, sync, {
+          writable: true,
+          onStatusChange: status => {
+            this.syncStatus = status;
+          },
+          onWriteError: (error, ctx) =>
+            console.error(`[google-sync] ${ctx.action} failed:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        this.controller.start();
+      }
+
+      ngOnDestroy() {
+        this.controller?.stop();
+      }
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { onMount, onDestroy } from 'svelte';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+      import {
+        attachGoogleSyncToDayFlow,
+        createGoogleSync,
+        createGoogleSyncAdapter,
+      } from '@dayflow/google-sync';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      let syncStatus = { state: 'idle' };
+      let controller;
+
+      onMount(() => {
+        const adapter = createGoogleSyncAdapter({
+          baseUrl: '/api/google-calendar',
+        });
+
+        const sync = createGoogleSync(adapter);
+        controller = attachGoogleSyncToDayFlow(calendar.app, sync, {
+          writable: true,
+          onStatusChange: status => {
+            syncStatus = status;
+          },
+          onWriteError: (error, ctx) =>
+            console.error(`[google-sync] ${ctx.action} failed:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controller.start();
+      });
+
+      onDestroy(() => {
+        controller?.stop();
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## Token Injection
 

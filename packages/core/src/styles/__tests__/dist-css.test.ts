@@ -70,6 +70,7 @@ const REQUIRED_COLOR_MAPPINGS: string[] = [
   '--color-secondary-foreground',
   '--color-destructive',
   '--color-destructive-foreground',
+  '--color-ring',
   // Tailwind v4 arbitrary CSS-variable syntax: hover:bg-(--hover)
   // generates background-color: var(--hover); this must be defined.
   '--hover',
@@ -281,6 +282,15 @@ describe('CSS dist output integrity', () => {
     it('includes df-focus-ring and df-ring-primary-solid rules', () => {
       expect(getCss()).toMatch(/\.df-focus-ring:focus\s*\{/);
       expect(getCss()).toMatch(/\.df-ring-primary-solid\s*\{/);
+    });
+
+    it('uses the ring token for built-in form focus styles', () => {
+      expect(getCss()).toMatch(
+        /\.df-form-input:focus\s*\{[\s\S]*border-color:\s*var\(--df-color-ring\)[\s\S]*0 0 0 2px var\(--df-color-ring\)/
+      );
+      expect(getCss()).toMatch(
+        /\.df-form-textarea:focus\s*\{[\s\S]*border-color:\s*var\(--df-color-ring\)[\s\S]*0 0 0 2px var\(--df-color-ring\)/
+      );
     });
 
     it('includes df-fill-destructive and df-hover-destructive rules', () => {

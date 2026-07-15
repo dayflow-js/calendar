@@ -1,12 +1,12 @@
 # @dayflow/outlook-sync
 
-`@dayflow/outlook-sync` connects DayFlow to the Microsoft Graph Calendar API. It is a separate package from `@dayflow/caldav` — it speaks the Microsoft Graph API directly.
+`@dayflow/outlook-sync` は、DayFlow を Microsoft Graph Calendar API に接続します。これは `@dayflow/caldav` とは別のパッケージであり、CalDAV ではなく Microsoft Graph API を直接使用します。
 
-## Installation
+## インストール
 
 <PackageTabs pkg='@dayflow/outlook-sync' />
 
-## Quick Start
+## クイックスタート
 
 <FrameworkTabs>
   <Tab>
@@ -49,10 +49,10 @@
           writable: true,
           onStatusChange: setSyncStatus,
           onWriteError: (error, ctx) =>
-            console.error(`[outlook-sync] ${ctx.action} failed:`, error.message),
+            console.error(`[outlook-sync] ${ctx.action} 失敗:`, error.message),
           onSyncComplete: delta => {
             console.log(
-              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
             );
           },
         });
@@ -108,10 +108,10 @@
             syncStatus.value = status;
           },
           onWriteError: (error, ctx) =>
-            console.error(`[outlook-sync] ${ctx.action} failed:`, error.message),
+            console.error(`[outlook-sync] ${ctx.action} 失敗:`, error.message),
           onSyncComplete: delta => {
             console.log(
-              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
             );
           },
         });
@@ -167,10 +167,10 @@
             this.syncStatus = status;
           },
           onWriteError: (error, ctx) =>
-            console.error(`[outlook-sync] ${ctx.action} failed:`, error.message),
+            console.error(`[outlook-sync] ${ctx.action} 失敗:`, error.message),
           onSyncComplete: delta => {
             console.log(
-              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
             );
           },
         });
@@ -218,10 +218,10 @@
             syncStatus = status;
           },
           onWriteError: (error, ctx) =>
-            console.error(`[outlook-sync] ${ctx.action} failed:`, error.message),
+            console.error(`[outlook-sync] ${ctx.action} 失敗:`, error.message),
           onSyncComplete: delta => {
             console.log(
-              `Sync done: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
             );
           },
         });
@@ -240,11 +240,11 @@
   </Tab>
 </FrameworkTabs>
 
-## Token Injection
+## トークンの注入
 
-### Using `getToken` (recommended for client-side tokens)
+### `getToken` の使用（クライアントサイドトークンに推奨）
 
-Pass a `getToken` factory so the adapter fetches a fresh token before every request. This is ideal when using MSAL or another auth library that manages token refresh:
+アダプターがリクエストごとに新しいトークンを取得するように、`getToken` ファクトリを渡します。これは、トークンの更新を管理する MSAL などの認証ライブラリを使用している場合に最適です。
 
 ```ts
 import { PublicClientApplication } from '@azure/msal-browser';
@@ -261,19 +261,19 @@ const adapter = createOutlookSyncAdapter({
 });
 ```
 
-### Using a backend proxy (recommended for production)
+### バックエンドプロキシの使用（本番環境に推奨）
 
-Keep OAuth tokens on the server — route all Graph API requests through a proxy:
+OAuth トークンをサーバー上に保持します — すべての Graph API リクエストをプロキシ経由でルーティングします。
 
 ```ts
 const adapter = createOutlookSyncAdapter({
   baseUrl: '/api/outlook-calendar',
-  // No getToken needed — the proxy injects Authorization
+  // getToken は不要 — プロキシが Authorization を注入します
 });
 ```
 
 ```js
-// proxy.mjs (Node.js example using MSAL Node)
+// proxy.mjs (MSAL Node を使用した Node.js の例)
 import { createServer } from 'node:http';
 import { ConfidentialClientApplication } from '@azure/msal-node';
 
@@ -331,9 +331,9 @@ createServer(async (req, res) => {
 }).listen(3003);
 ```
 
-## Delta Token Persistence
+## デルタトークンの永続化
 
-By default, Outlook sync tokens (delta tokens) are stored in memory and lost on page reload. Provide an `OutlookSyncStorage` implementation to persist them across sessions:
+デフォルトでは、Outlook の同期トークン（デルタトークン）はメモリ内に保存され、ページのリロードで失われます。`OutlookSyncStorage` の実装を提供して、セッション間でトークンを永続化してください。
 
 ```ts
 import {
@@ -353,11 +353,11 @@ const storage: OutlookSyncStorage = {
 const sync = createOutlookSync(adapter, { storage });
 ```
 
-With storage wired up, each session starts with an incremental delta sync instead of fetching all events from scratch.
+同期ストレージを連携させることで、各セッションは最初からすべてのイベントを取得するのではなく、増分デルタ同期を開始します。
 
-## Local Cache Hydration
+## ローカルキャッシュのハイドレーション
 
-Seed DayFlow from a local store before the first remote sync so the calendar renders immediately:
+初回のリモート同期の前にローカルストアから DayFlow をシードすることで、カレンダーを即座にレンダリングできます。
 
 ```ts
 const controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
@@ -374,9 +374,9 @@ const controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
 });
 ```
 
-## Applying a Remote Snapshot Manually
+## リモートスナップショットの手動適用
 
-For applications with custom sync orchestration, `applyRemoteSnapshot` applies a batch of remote events to DayFlow without triggering write-back:
+独自の同期オーケストレーションを管理するアプリケーションの場合、`applyRemoteSnapshot` を使用して、書き戻しをトリガーせずにリモートイベントのバッチを DayFlow に適用できます。
 
 ```ts
 import { applyRemoteSnapshot, getOutlookMeta } from '@dayflow/outlook-sync';
@@ -394,35 +394,35 @@ const delta = await applyRemoteSnapshot(
 );
 ```
 
-Use `snapshotMode: 'authoritative'` only for full provider snapshots. Range-limited, filtered, or paginated snapshots should keep the default partial mode so missing local records are preserved.
+スナップショットがプロバイダーの完全なスナップショットである場合に实施する、`snapshotMode: 'authoritative'` を使用してください。表示範囲が限られているスナップショット、フィルターされたスナップショット、またはページネーションされたスナップショットについては、デフォルトの部分モード（partial）を維持し、不足しているローカルレコードが保持されるようにしてください。
 
-## Options Reference
+## オプションリファレンス
 
-### `attachOutlookSyncToDayFlow` Options
+### `attachOutlookSyncToDayFlow` オプション
 
-| Option               | Type                                   | Default         | Description                                                                     |
-| :------------------- | :------------------------------------- | :-------------- | :------------------------------------------------------------------------------ |
-| `writable`           | `boolean`                              | `true`          | Allow local mutations to be written back to Outlook Calendar.                   |
-| `onStatusChange`     | `(status: OutlookSyncStatus) => void`  | —               | Called whenever the sync state changes.                                         |
-| `onWriteError`       | `(error: Error, ctx) => void`          | `console.error` | Called when a write-back fails. `ctx` includes `action` and `eventId`.          |
-| `getInitialSnapshot` | `() => Promise<{ events, calendars }>` | —               | Seed DayFlow from a local cache before the first remote sync.                   |
-| `onSyncComplete`     | `(delta: OutlookSyncDelta) => void`    | —               | Called after each successful sync with counts of what changed.                  |
-| `onWriteComplete`    | `(operation, event) => void`           | —               | Called after a local mutation is successfully written back to Outlook Calendar. |
+| オプション           | 型                                     | デフォルト      | 説明                                                                                    |
+| :------------------- | :------------------------------------- | :-------------- | :-------------------------------------------------------------------------------------- |
+| `writable`           | `boolean`                              | `true`          | ローカルの変更を Outlook カレンダーに書き戻すことを許可します。                         |
+| `onStatusChange`     | `(status: OutlookSyncStatus) => void`  | —               | 同期状態が変更されるたびに呼び出されます。                                              |
+| `onWriteError`       | `(error: Error, ctx) => void`          | `console.error` | 書き戻しが失敗したときに呼び出されます。`ctx` には `action` と `eventId` が含まれます。 |
+| `getInitialSnapshot` | `() => Promise<{ events, calendars }>` | —               | 初回リモート同期の前にローカルキャッシュから DayFlow をシードします。                   |
+| `onSyncComplete`     | `(delta: OutlookSyncDelta) => void`    | —               | 同期が成功するたびに、変更内容のカウントとともに呼び出されます。                        |
+| `onWriteComplete`    | `(operation, event) => void`           | —               | ローカルでの変更が Outlook カレンダーへの書き戻しに成功した後に呼び出されます。         |
 
-### `createOutlookSyncAdapter` Options
+### `createOutlookSyncAdapter` オプション
 
-| Option     | Type                              | Default                            | Description                                                                                        |
-| :--------- | :-------------------------------- | :--------------------------------- | :------------------------------------------------------------------------------------------------- |
-| `baseUrl`  | `string`                          | `https://graph.microsoft.com/v1.0` | Override to point at a backend proxy.                                                              |
-| `fetch`    | `function`                        | `globalThis.fetch`                 | Custom fetch implementation.                                                                       |
-| `getToken` | `() => string \| Promise<string>` | —                                  | Called before every request. Returns the access token injected as `Authorization: Bearer <token>`. |
+| オプション | 型                                | デフォルト                         | 説明                                                                                                         |
+| :--------- | :-------------------------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| `baseUrl`  | `string`                          | `https://graph.microsoft.com/v1.0` | バックエンドプロキシを指すようにオーバーライドします。                                                       |
+| `fetch`    | `function`                        | `globalThis.fetch`                 | カスタムの fetch 実装。                                                                                      |
+| `getToken` | `() => string \| Promise<string>` | —                                  | リクエストの前に呼び出されます。`Authorization: Bearer <token>` として注入されるアクセストークンを返します。 |
 
 ### `OutlookSyncStatus`
 
 ```ts
 type OutlookSyncStatus = {
   state: 'idle' | 'syncing' | 'error';
-  lastSyncedAt?: string; // ISO timestamp
+  lastSyncedAt?: string; // ISO タイムスタンプ
   error?: {
     message: string;
     calendarId?: string;
@@ -439,72 +439,72 @@ type OutlookSyncDelta = {
 };
 ```
 
-## Controller API
+## コントローラー API
 
 ```ts
-// Load calendars, sync initial events, and subscribe to changes
+// カレンダーを読み込み、初期イベントを同期し、変更を購読（サブスクライブ）します
 await controller.start();
 
-// Unsubscribe all listeners
+// すべてのリスナーの購読を解除します
 controller.stop();
 
-// Re-sync all calendars for the current visible range
+// 現在表示されている範囲のすべてのカレンダーを再同期します
 await controller.refresh();
 
-// Re-sync a specific calendar
+// 特定のカレンダーを再同期します
 await controller.refresh({ calendarId: 'AAMk...' });
 
-// Re-sync with an explicit range
+// 明示的な範囲で再同期します
 await controller.refresh({
   range: { start: new Date('2025-01-01'), end: new Date('2025-02-01') },
 });
 
-// Current sync state
+// 現在の同期ステータスを取得します
 const status = controller.getStatus();
 ```
 
-## How Sync Works
+## 同期の仕組み
 
-### Calendar discovery
+### カレンダーの検出
 
-On `controller.start()`, the package fetches the user's calendar list (`GET /me/calendars`) and registers each calendar in DayFlow. Calendars where `canEdit` is `false` are marked `readOnly: true`.
+`controller.start()` が呼び出されると、ユーザーのカレンダーリスト (`GET /me/calendars`) をフェッチし、各カレンダーを DayFlow に登録します。`canEdit` が `false` のカレンダーは `readOnly: true` としてマークされます。
 
-### Event loading
+### イベントの読み込み
 
-Events are loaded via Microsoft Graph's `calendarView/delta` endpoint with `startDateTime` and `endDateTime` parameters, which expands recurring events within the time window. When the user navigates, events for the new range are loaded automatically.
+イベントは、Microsoft Graph の `calendarView/delta` エンドポイントを介して `startDateTime` および `endDateTime` パラメータとともに読み込まれます。これにより、時間枠内の繰り返しイベントが展開されます。ユーザーがナビゲートすると、新しい範囲 of イベントが自動的に読み込まれます。
 
-### Incremental sync with delta tokens
+### デルタトークンによる増分同期
 
-After the initial load, the Graph API returns an `@odata.deltaLink`. On subsequent syncs, the package follows this link to fetch only changed events — not the full range. When `OutlookSyncStorage` is provided, delta tokens survive page reloads.
+初期ロードの後、Graph API は `@odata.deltaLink` を返します。その後の同期では、パッケージはこのリンクに従って、全範囲ではなく変更されたイベントのみをフェッチします。`OutlookSyncStorage` が提供されている場合、デルタトークンはページのリロードをまたいで保持されます。
 
-If a delta token expires (Graph returns a `410 Gone`), the package falls back to a full range query automatically.
+デルタトークンが期限切れになった場合（Graph が `410 Gone` を返した場合）、パッケージは自動的に全範囲クエリにフォールバックします。
 
-### Write-back
+### 書き戻し
 
-When `writable: true`, local event changes are written back to Outlook Calendar:
+`writable: true` の場合、ローカルイベントの変更は Outlook カレンダーに書き戻されます。
 
-- **Create**: `POST /me/calendars/{calendarId}/events`
-- **Update**: `PATCH /me/calendars/{calendarId}/events/{eventId}` with `If-Match: <etag>`
-- **Delete**: `DELETE /me/calendars/{calendarId}/events/{eventId}`
+- **作成**: `POST /me/calendars/{calendarId}/events`
+- **更新**: `PATCH /me/calendars/{calendarId}/events/{eventId}` (`If-Match: <etag>` 付き)
+- **削除**: `DELETE /me/calendars/{calendarId}/events/{eventId}`
 
-If an update returns **412 Precondition Failed** (ETag conflict), the package re-fetches the latest ETag and retries once.
+更新が **412 Precondition Failed** (ETag の競合) を返した場合、パッケージは最新の ETag を再フェッチして一度だけ再試行します。
 
-Recurring events are **never** written back — they are read-only.
+繰り返しイベントは**決して**書き戻されません — これらは読み取り専用です。
 
-### Calendar colors
+### カレンダーの色
 
-Outlook uses named colors (e.g. `lightBlue`, `darkGreen`) rather than hex codes. The package maps these to approximate hex values and passes them through `getCalendarColorsForHex` for consistent DayFlow theming.
+Outlook は、16 進コードではなく名前付きの色（例：`lightBlue`、`darkGreen`）を使用します。パッケージはこれらを近似の 16 進値にマッピングし、DayFlow のテーマを一貫させるために `getCalendarColorsForHex` に通します。
 
-## Microsoft Graph API Scopes
+## Microsoft Graph API スコープ
 
-Your OAuth token must include at least one of these scopes:
+OAuth トークンには、少なくとも以下のスコープのいずれかが含まれている必要があります。
 
-| Scope                 | Access                                        |
-| :-------------------- | :-------------------------------------------- |
-| `Calendars.ReadWrite` | Full read/write access                        |
-| `Calendars.Read`      | Read-only access (use with `writable: false`) |
+| スコープ              | アクセス                                        |
+| :-------------------- | :---------------------------------------------- |
+| `Calendars.ReadWrite` | 完全な読み取り/書き込みアクセス                 |
+| `Calendars.Read`      | 読み取り専用アクセス (`writable: false` と併用) |
 
-For app-only (server-to-server) flows, use the `.default` scope with a service principal:
+アプリ専用（サーバー間）フローの場合は、サービスプリンシパルで `.default` スコープを使用します。
 
 ```
 https://graph.microsoft.com/.default

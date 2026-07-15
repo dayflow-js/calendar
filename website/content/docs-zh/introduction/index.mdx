@@ -53,24 +53,6 @@ import '@dayflow/core/dist/styles.css';
 
 </Callout>
 
-<Callout title="正在使用 Next.js Pages Router 或 Node.js require()？" type="warn">
-  `@dayflow/core` 是 **ESM-only** 的，不提供 CommonJS 构建版本。这意味着：
-
-- **`require('@dayflow/core')`** 会报错。请改用 `import`。
-- **Next.js Pages Router** 默认不会转译 `node_modules` 中的 ESM。请在 `next.config.js` 的 `transpilePackages` 中添加该包：
-
-```js
-// next.config.js
-module.exports = {
-  transpilePackages: ['@dayflow/core'],
-};
-```
-
-- **Next.js App Router** (带有 `"use client"` / Server Components) 无需额外配置，开箱即用。
-- **SSR 框架** (Nuxt, SvelteKit 等) 通常原生支持 ESM。如果遇到导入错误，请检查您的构建器选项（如 `ssr.noExternal`）中是否包含 `@dayflow/core`。
-
-</Callout>
-
 ## 基础用法
 
 选择您的框架，查看如何将 DayFlow 集成到您的应用中。

@@ -53,24 +53,6 @@ See [Tailwind V4 integration](https://calendar.dayflow.studio/docs/guides/theme-
 
 </Callout>
 
-<Callout title="Using Next.js Pages Router or Node.js require()?" type="warn">
-  `@dayflow/core` is **ESM-only** and does not ship a CommonJS build. This means:
-
-- **`require('@dayflow/core')`** will throw an error. Use `import` instead.
-- **Next.js Pages Router** does not transpile `node_modules` ESM by default. Add the package to `transpilePackages` in your `next.config.js`:
-
-```js
-// next.config.js
-module.exports = {
-  transpilePackages: ['@dayflow/core'],
-};
-```
-
-- **Next.js App Router** (with `"use client"` / Server Components) works out of the box — no extra config needed.
-- **SSR frameworks** (Nuxt, SvelteKit, etc.) generally handle ESM natively. If you encounter import errors, check that your bundler's `ssr.noExternal` or equivalent option includes `@dayflow/core`.
-
-</Callout>
-
 ## Basic Usage
 
 Select your framework to see how to integrate DayFlow into your application.

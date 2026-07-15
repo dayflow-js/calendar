@@ -1,34 +1,34 @@
 ---
-title: Pro Installation
-description: Install DayFlow Pro packages, configure private registry access, and activate your DayFlow Pro license key.
+title: Pro 安装
+description: 安装 DayFlow Pro 软件包，配置私有镜像源访问，并激活您的 DayFlow Pro 许可证密钥。
 status: pro
 ---
 
-# Pro Installation
+# Pro 安装
 
-DayFlow Pro uses two separate credentials:
+DayFlow Pro 使用两种独立的凭据：
 
-- A private npm registry token for installing `@dayflow-pro/*` packages
-- A signed DayFlow Pro license key used to activate Pro features
+- 用于安装 `@dayflow-pro/*` 软件包的私有 npm 镜像源 token
+- 用于激活 Pro 功能的已签名 DayFlow Pro 许可证密钥
 
-## 1. Configure private registry access
+## 1. 配置私有镜像源访问
 
-Add your DayFlow Pro npm token to `.npmrc` before installing private packages:
+在安装私有软件包之前，将您的 DayFlow Pro npm token 添加到 `.npmrc`：
 
 ```ini
 @dayflow-pro:registry=https://gitlab.com/api/v4/projects/81880038/packages/npm/
 //gitlab.com/api/v4/projects/81880038/packages/npm/:_authToken=${DAYFLOW_PRO_NPM_TOKEN}
 ```
 
-After that, install the packages you purchased as usual:
+之后，像往常一样安装您购买的软件包：
 
 ```bash
 pnpm add @dayflow-pro/license @dayflow-pro/resource-grid
 ```
 
-## 2. Register your license key once
+## 2. 注册您的许可证密钥一次
 
-Register your DayFlow Pro license key during app startup:
+在应用启动时注册您的 DayFlow Pro 许可证密钥：
 
 ```tsx
 import { registerDayflowProLicense } from '@dayflow-pro/license';
@@ -38,11 +38,11 @@ registerDayflowProLicense({
 });
 ```
 
-Once this is registered, your Pro views and plugins can read the token automatically.
+一旦注册成功，您的 Pro 视图和插件将自动读取该 token。
 
-## 3. Use Pro packages normally
+## 3. 正常使用 Pro 软件包
 
-After installation and registration, you can use Pro packages without repeating the license config in every call:
+在安装和注册后，您可以正常使用 Pro 软件包，而无需在每次调用中重复许可证配置：
 
 <FrameworkTabs>
   <Tab>
@@ -75,20 +75,20 @@ After installation and registration, you can use Pro packages without repeating 
     </template>
 
     <script setup>
-    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
-    import { createResourceGridView } from '@dayflow-pro/resource-grid';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+      import { createResourceGridView } from '@dayflow-pro/resource-grid';
 
-    const calendar = useCalendarApp({
-      views: [
-        createResourceGridView({
-          mode: 'resourceView',
-          resources: [
-            { id: 'room-a', title: 'Room A' },
-            { id: 'room-b', title: 'Room B' },
-          ],
-        }),
-      ],
-    });
+      const calendar = useCalendarApp({
+        views: [
+          createResourceGridView({
+            mode: 'resourceView',
+            resources: [
+              { id: 'room-a', title: 'Room A' },
+              { id: 'room-b', title: 'Room B' },
+            ],
+          }),
+        ],
+      });
     </script>
     ```
 

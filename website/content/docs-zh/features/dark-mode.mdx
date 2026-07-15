@@ -14,27 +14,114 @@ DayFlow Calendar 原生支持完整的深色模式能力：从视图、侧边栏
 
 ## 快速上手
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    theme: {
-      mode: 'dark', // 'light' | 'dark' | 'auto'
-    },
-  });
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        theme: {
+          mode: 'dark', // 'light' | 'dark' | 'auto'
+        },
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+
+    const calendar = useCalendarApp({
+      theme: {
+        mode: 'dark', // 'light' | 'dark' | 'auto'
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        theme: {
+          mode: 'dark', // 'light' | 'dark' | 'auto'
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+
+      const calendar = useCalendarApp({
+        theme: {
+          mode: 'dark', // 'light' | 'dark' | 'auto'
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 切换模式也只需修改 `mode`：
 
-```tsx
-useCalendarApp({ theme: { mode: 'light' } });
-useCalendarApp({ theme: { mode: 'dark' } });
-useCalendarApp({ theme: { mode: 'auto' } });
-```
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    useCalendarApp({ theme: { mode: 'light' } });
+    useCalendarApp({ theme: { mode: 'dark' } });
+    useCalendarApp({ theme: { mode: 'auto' } });
+    ```
+  </Tab>
+  <Tab>
+    ```javascript
+    useCalendarApp({ theme: { mode: 'light' } });
+    useCalendarApp({ theme: { mode: 'dark' } });
+    useCalendarApp({ theme: { mode: 'auto' } });
+    ```
+  </Tab>
+  <Tab>
+    ```typescript
+    calendar = {
+      theme: { mode: 'light' } // 'light' | 'dark' | 'auto'
+    };
+    ```
+  </Tab>
+  <Tab>
+    ```javascript
+    useCalendarApp({ theme: { mode: 'light' } });
+    useCalendarApp({ theme: { mode: 'dark' } });
+    useCalendarApp({ theme: { mode: 'auto' } });
+    ```
+  </Tab>
+</FrameworkTabs>
 
 ## 编程式主题切换
 
@@ -124,31 +211,132 @@ app.unsubscribeThemeChange(callback: (theme: ThemeMode) => void): void;
 
 ### 简单主题切换
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
-import { Sun, Moon } from 'lucide-react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useState } from 'react';
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
 
-function SimpleThemeToggle() {
-  const calendar = useCalendarApp({
-    theme: { mode: 'light' },
-  });
+    function SimpleThemeToggle() {
+      const calendar = useCalendarApp({
+        theme: { mode: 'light' },
+      });
 
-  const [isDark, setIsDark] = useState(false);
+      const [isDark, setIsDark] = useState(false);
 
-  const toggleTheme = () => {
-    const nextTheme = isDark ? 'light' : 'dark';
-    calendar.app.setTheme(nextTheme);
-    setIsDark(!isDark);
-  };
+      const toggleTheme = () => {
+        const nextTheme = isDark ? 'light' : 'dark';
+        calendar.app.setTheme(nextTheme);
+        setIsDark(!isDark);
+      };
 
-  return (
+      return (
+        <div>
+          <button onClick={toggleTheme}>
+            {isDark ? '切换至浅色模式' : '切换至深色模式'}
+          </button>
+          <DayFlowCalendar calendar={calendar} />
+        </div>
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <div>
+        <button @click="toggleTheme">
+          {{ isDark ? '切换至浅色模式' : '切换至深色模式' }}
+        </button>
+        <DayFlowCalendar :calendar="calendar" />
+      </div>
+    </template>
+
+    <script setup>
+    import { ref } from 'vue';
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+
+    const calendar = useCalendarApp({
+      theme: { mode: 'light' },
+    });
+
+    const isDark = ref(false);
+
+    const toggleTheme = () => {
+      const nextTheme = isDark.value ? 'light' : 'dark';
+      calendar.app.setTheme(nextTheme);
+      isDark.value = !isDark.value;
+    };
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <div>
+          <button (click)="toggleTheme()">
+            {{ isDark ? '切换至浅色模式' : '切换至深色模式' }}
+          </button>
+          <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+        </div>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        theme: { mode: 'light' },
+      };
+
+      isDark = false;
+
+      toggleTheme() {
+        this.isDark = !this.isDark;
+        const nextTheme = this.isDark ? 'dark' : 'light';
+        this.calendar = {
+          ...this.calendar,
+          theme: { mode: nextTheme }
+        };
+      }
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+
+      const calendar = useCalendarApp({
+        theme: { mode: 'light' },
+      });
+
+      let isDark = $state(false);
+
+      function toggleTheme() {
+        const nextTheme = isDark ? 'light' : 'dark';
+        calendar.app.setTheme(nextTheme);
+        isDark = !isDark;
+      }
+    </script>
+
     <div>
-      <button onClick={toggleTheme}>{isDark ? <Sun /> : <Moon />}</button>
-      <DayFlowCalendar calendar={calendar} />
+      <button onclick={toggleTheme}>
+        {isDark ? '切换至浅色模式' : '切换至深色模式'}
+      </button>
+      <DayFlowCalendar {calendar} />
     </div>
-  );
-}
-```
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 相关文档
 

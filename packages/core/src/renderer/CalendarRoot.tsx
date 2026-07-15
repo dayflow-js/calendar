@@ -31,6 +31,7 @@ import {
 } from '@/types';
 import { ThemeMode } from '@/types/calendarTypes';
 import { CalendarSearchProps } from '@/types/search';
+import { getThemeColorCssVariables } from '@/utils/themeUtils';
 
 import { ContentSlot } from './ContentSlot';
 import { CustomRenderingContext } from './CustomRenderingContext';
@@ -116,6 +117,11 @@ export const CalendarRoot = ({
   const handleThemeChange = useCallback(
     (newTheme: ThemeMode) => app.setTheme(newTheme),
     [app]
+  );
+  const themeColors = app.getThemeColors();
+  const themeColorStyle = useMemo(
+    () => getThemeColorCssVariables(themeColors) as JSX.CSSProperties,
+    [themeColors]
   );
   // Cross-cutting: dismiss UI
   // Patches the app callback so that app.dismissUI() collapses any open
@@ -315,12 +321,16 @@ export const CalendarRoot = ({
   };
 
   return (
-    <ThemeProvider initialTheme={theme} onThemeChange={handleThemeChange}>
+    <ThemeProvider
+      initialTheme={theme}
+      colors={themeColors}
+      onThemeChange={handleThemeChange}
+    >
       <CalendarInternalLocaleProvider
         locale={app.state.locale}
         messages={customMessages}
       >
-        <div className='df-calendar-container'>
+        <div className='df-calendar-container' style={themeColorStyle}>
           <ContentSlot
             store={customRenderingStore}
             generatorName='titleBarSlot'

@@ -20,6 +20,9 @@
     CalendarSearchProps,
     MobileEventProps,
     MonthDateNumberSlotArgs,
+    CalendarSidebarRenderProps,
+    SidebarHeaderSlotArgs,
+    CalendarContextMenuSlotArgs,
   } from "@dayflow/core";
 
   const {
@@ -46,7 +49,10 @@
     mobileEventDetail = null,
     collapsedSafeAreaLeft = null,
     search = null,
-    } = $props<{
+    sidebar = null,
+    sidebarHeader = null,
+    calendarContextMenu = null,
+  } = $props<{
     calendar: ICalendarApp | UseCalendarAppReturn;
     eventContentDay?: Component<EventContentSlotArgs>;
     eventContentWeek?: Component<EventContentSlotArgs>;
@@ -70,7 +76,10 @@
     mobileEventDetail?: Component<MobileEventProps>;
     collapsedSafeAreaLeft?: number | null;
     search?: CalendarSearchProps | null;
-    }>();
+    sidebar?: Component<CalendarSidebarRenderProps>;
+    sidebarHeader?: Component<SidebarHeaderSlotArgs>;
+    calendarContextMenu?: Component<CalendarContextMenuSlotArgs>;
+  }>();
 
   let container: HTMLElement | undefined = $state();
   let renderer: CalendarRenderer | undefined;
@@ -108,6 +117,9 @@
     mobileEventDetail,
     collapsedSafeAreaLeft,
     search,
+    sidebar,
+    sidebarHeader,
+    calendarContextMenu,
   } as Record<string, unknown>);
 
   onMount(async () => {

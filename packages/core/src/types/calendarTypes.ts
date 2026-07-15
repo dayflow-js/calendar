@@ -68,7 +68,20 @@ export type ThemeMode = 'light' | 'dark' | 'auto';
 export interface ThemeColors {
   background?: string;
   text?: string;
+  foreground?: string;
+  hover?: string;
   border?: string;
+  card?: string;
+  cardForeground?: string;
+  muted?: string;
+  mutedForeground?: string;
+  primary?: string;
+  primaryForeground?: string;
+  secondary?: string;
+  secondaryForeground?: string;
+  destructive?: string;
+  destructiveForeground?: string;
+  ring?: string;
   [key: string]: string | undefined;
 }
 

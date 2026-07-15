@@ -18,31 +18,129 @@ Refer to the [Pro Installation](/docs/introduction/pro-installation) guide for i
 
 ## Basic usage
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
-import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
 
-function App() {
-  const printPlugin = createPrintPlugin({
-    defaultOptions: {
-      miniCalendar: true,
-      calendarKeys: true,
-      textSize: 'medium',
-    },
-  });
+    function App() {
+      const printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
 
-  const calendar = useCalendarApp({
-    plugins: [printPlugin],
-  });
+      const calendar = useCalendarApp({
+        views: [
+          /* your views */
+        ],
+        plugins: [printPlugin],
+      });
 
-  return (
-    <>
-      <button onClick={() => printPlugin.api.open()}>Print</button>
-      <DayFlowCalendar calendar={calendar} />
-    </>
-  );
-}
-```
+      return (
+        <>
+          <button onClick={() => printPlugin.api.open()}>Print</button>
+          <DayFlowCalendar calendar={calendar} />
+        </>
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <button @click="printPlugin.api.open()">Print</button>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+    const printPlugin = createPrintPlugin({
+      defaultOptions: {
+        miniCalendar: true,
+        calendarKeys: true,
+        textSize: 'medium',
+      },
+    });
+
+    const calendar = useCalendarApp({
+      views: [
+        /* your views */
+      ],
+      plugins: [printPlugin],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <button (click)="printPlugin.api.open()">Print</button>
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
+
+      calendar = {
+        views: [
+          /* your views */
+        ],
+        plugins: [this.printPlugin]
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+      const printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
+
+      const calendar = useCalendarApp({
+        views: [
+          /* your views */
+        ],
+        plugins: [printPlugin],
+      });
+    </script>
+
+    <button onclick={() => printPlugin.api.open()}>Print</button>
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 The plugin also installs two helpers directly onto the calendar app:
 

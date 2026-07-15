@@ -66,32 +66,147 @@ DayFlow 采用了基于插槽的架构，允许您直接从所使用的框架（
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar } from '@dayflow/react';
 
-export const EventContentShowcase = () => {
-  return (
+    function MyCalendar() {
+      return (
+        <DayFlowCalendar
+          calendar={calendar}
+          // 自定义天视图的事件渲染
+          eventContentDay={({ event, isSelected }) => (
+            <div className='custom-event-card'>
+              <span>{event.title}</span>
+              {/* ... 自定义图标或布局 */}
+            </div>
+          )}
+          // 自定义月视图的事件渲染
+          eventContentMonth={({ event }) => (
+            <div className='flex items-center gap-1'>
+              <span>🗓️</span>
+              <span className='truncate'>{event.title}</span>
+            </div>
+          )}
+          // 省略其他视图的重写以保持简洁...
+        />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <!-- 自定义天视图的事件渲染 -->
+        <template #eventContentDay="{ event, isSelected }">
+          <div class="custom-event-card">
+            <span>{{ event.title }}</span>
+            <!-- ... 自定义图标或布局 -->
+          </div>
+        </template>
+
+        <!-- 自定义月视图的事件渲染 -->
+        <template #eventContentMonth="{ event }">
+          <div class="flex items-center gap-1">
+            <span>🗓️</span>
+            <span class="truncate">{{ event.title }}</span>
+          </div>
+        </template>
+        <!-- 省略其他视图的重写以保持简洁... -->
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [eventContentDay]="dayTemplate"
+          [eventContentMonth]="monthTemplate"
+        >
+        </dayflow-calendar>
+
+        <!-- 自定义天视图的事件渲染 -->
+        <ng-template #dayTemplate let-args>
+          <div class="custom-event-card">
+            <span>{{ args.event.title }}</span>
+            <!-- ... 自定义图标或布局 -->
+          </div>
+        </ng-template>
+
+        <!-- 自定义月视图的事件渲染 -->
+        <ng-template #monthTemplate let-args>
+          <div class="flex items-center gap-1">
+            <span>🗓️</span>
+            <span class="truncate">{{ args.event.title }}</span>
+          </div>
+        </ng-template>
+        <!-- 省略其他视图的重写以保持简洁... -->
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import DayEvent from './DayEvent.svelte';
+      import MonthEvent from './MonthEvent.svelte';
+    </script>
+
     <DayFlowCalendar
-      calendar={calendar}
-      // 自定义天视图的事件渲染
-      eventContentDay={({ event, isSelected }) => (
-        <div className='custom-event-card'>
-          <span>{event.title}</span>
-          {/* ... 自定义图标或布局 */}
-        </div>
-      )}
-      // 自定义月视图的事件渲染
-      eventContentMonth={({ event }) => (
-        <div className='flex items-center gap-1'>
-          <span>🗓️</span>
-          <span className='truncate'>{event.title}</span>
-        </div>
-      )}
-      // 省略其他视图的重写以保持简洁...
+      {calendar}
+      eventContentDay={DayEvent}
+      eventContentMonth={MonthEvent}
+      <!-- 省略其他视图的重写以保持简洁... -->
     />
-  );
-};
-```
+
+    <!-- DayEvent.svelte (自定义天视图的事件渲染) -->
+    <script lang="ts">
+      import type { EventContentSlotArgs } from '@dayflow/core';
+      let { event, isSelected } = $props<EventContentSlotArgs>();
+    </script>
+
+    <div class="custom-event-card">
+      <span>{event.title}</span>
+      <!-- ... 自定义图标或布局 -->
+    </div>
+
+    <!-- MonthEvent.svelte (自定义月视图的事件渲染) -->
+    <script lang="ts">
+      import type { EventContentSlotArgs } from '@dayflow/core';
+      let { event } = $props<EventContentSlotArgs>();
+    </script>
+
+    <div class="flex items-center gap-1">
+      <span>🗓️</span>
+      <span class="truncate">{event.title}</span>
+    </div>
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 </details>
 
@@ -104,37 +219,135 @@ export const EventContentShowcase = () => {
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
-import { useCallback } from 'react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCallback } from 'react';
+    import { DayFlowCalendar } from '@dayflow/react';
 
-export const CustomDetailPanelShowcase = () => {
-  const detailPanel = useCallback(
-    ({ event, onEventDelete, onEventUpdate, onClose }) => {
-      return (
-        <div className='p-4 space-y-3'>
-          <h5 className='font-bold'>{event.title}</h5>
-          <p>{event.description}</p>
+    function MyCalendar() {
+      const detailPanel = useCallback(
+        ({ event, onEventDelete, onEventUpdate, onClose }) => {
+          return (
+            <div className='p-4 space-y-3'>
+              <h5 className='font-bold'>{event.title}</h5>
+              <p>{event.description}</p>
 
-          <div className='flex gap-2'>
-            <button
-              onClick={() => onEventUpdate({ ...event, title: '已更新' })}
-            >
-              更新
-            </button>
-            <button onClick={() => onEventDelete(event.id)}>删除</button>
-          </div>
-        </div>
+              <div className='flex gap-2'>
+                <button
+                  onClick={() => onEventUpdate({ ...event, title: '已更新' })}
+                >
+                  更新
+                </button>
+                <button onClick={() => onEventDelete(event.id)}>删除</button>
+              </div>
+            </div>
+          );
+        },
+        []
       );
-    },
-    []
-  );
 
-  return (
-    <DayFlowCalendar calendar={calendar} eventDetailContent={detailPanel} />
-  );
-};
-```
+      return (
+        <DayFlowCalendar calendar={calendar} eventDetailContent={detailPanel} />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #eventDetailContent="{ event, onEventDelete, onEventUpdate }">
+          <div class="p-4 space-y-3">
+            <h5 class="font-bold">{{ event.title }}</h5>
+            <p>{{ event.description }}</p>
+
+            <div class="flex gap-2">
+              <button @click="onEventUpdate({ ...event, title: '已更新' })">
+                更新
+              </button>
+              <button @click="onEventDelete(event.id)">删除</button>
+            </div>
+          </div>
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [eventDetailContent]="detailTemplate"
+        >
+        </dayflow-calendar>
+
+        <ng-template #detailTemplate let-args>
+          <div class="p-4 space-y-3">
+            <h5 class="font-bold">{{ args.event.title }}</h5>
+            <p>{{ args.event.description }}</p>
+
+            <div class="flex gap-2">
+              <button (click)="args.onEventUpdate({ ...args.event, title: '已更新' })">
+                更新
+              </button>
+              <button (click)="args.onEventDelete(args.event.id)">删除</button>
+            </div>
+          </div>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import CustomDetailPanel from './CustomDetailPanel.svelte';
+    </script>
+
+    <DayFlowCalendar {calendar} eventDetailContent={CustomDetailPanel} />
+
+    <!-- CustomDetailPanel.svelte -->
+    <script lang="ts">
+      import type { EventDetailContentProps } from '@dayflow/core';
+      let { event, onEventDelete, onEventUpdate } = $props<EventDetailContentProps>();
+    </script>
+
+    <div class="p-4 space-y-3">
+      <h5 class="font-bold">{event.title}</h5>
+      <p>{event.description}</p>
+
+      <div class="flex gap-2">
+        <button onclick={() => onEventUpdate({ ...event, title: '已更新' })}>
+          更新
+        </button>
+        <button onclick={() => onEventDelete(event.id)}>删除</button>
+      </div>
+    </div>
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 </details>
 
@@ -151,30 +364,118 @@ export const CustomDetailPanelShowcase = () => {
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
-import { useCallback } from 'react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCallback } from 'react';
+    import { DayFlowCalendar } from '@dayflow/react';
 
-export const CustomDetailDialogShowcase = () => {
-  const customDialog = useCallback(({ event, isOpen, onClose }) => {
-    if (!isOpen) return null;
+    function MyCalendar() {
+      const customDialog = useCallback(({ event, isOpen, onClose }) => {
+        if (!isOpen) return null;
 
-    return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-        <div className='bg-white p-6 rounded-lg shadow-xl'>
+        return (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+            <div className='bg-white p-6 rounded-lg shadow-xl'>
+              <h2>{event.title}</h2>
+              {/* ... 在此构建您的自定义对话框 UI */}
+              <button onClick={onClose}>关闭</button>
+            </div>
+          </div>
+        );
+      }, []);
+
+      return (
+        <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #eventDetailDialog="{ event, isOpen, onClose }">
+          <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white p-6 rounded-lg shadow-xl">
+              <h2>{{ event.title }}</h2>
+              <!-- ... 在此构建您的自定义对话框 UI -->
+              <button @click="onClose">关闭</button>
+            </div>
+          </div>
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [eventDetailDialog]="dialogTemplate"
+        >
+        </dayflow-calendar>
+
+        <ng-template #dialogTemplate let-args>
+          <div *ngIf="args.isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div class="bg-white p-6 rounded-lg shadow-xl">
+              <h2>{{ args.event.title }}</h2>
+              <!-- ... 在此构建您的自定义对话框 UI -->
+              <button (click)="args.onClose()">关闭</button>
+            </div>
+          </div>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import CustomDetailDialog from './CustomDetailDialog.svelte';
+    </script>
+
+    <DayFlowCalendar {calendar} eventDetailDialog={CustomDetailDialog} />
+
+    <!-- CustomDetailDialog.svelte -->
+    <script lang="ts">
+      import type { EventDetailDialogProps } from '@dayflow/core';
+      let { event, isOpen, onClose } = $props<EventDetailDialogProps>();
+    </script>
+
+    {#if isOpen}
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="bg-white p-6 rounded-lg shadow-xl">
           <h2>{event.title}</h2>
-          {/* ... 在此构建您的自定义对话框 UI */}
-          <button onClick={onClose}>关闭</button>
+          <!-- ... 在此构建您的自定义对话框 UI -->
+          <button onclick={onClose}>关闭</button>
         </div>
       </div>
-    );
-  }, []);
+    {/if}
+    ```
 
-  return (
-    <DayFlowCalendar calendar={calendar} eventDetailDialog={customDialog} />
-  );
-};
-```
+  </Tab>
+</FrameworkTabs>
 
 </details>
 
@@ -187,43 +488,152 @@ export const CustomDetailDialogShowcase = () => {
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react';
-import { useCallback } from 'react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCallback } from 'react';
+    import { DayFlowCalendar } from '@dayflow/react';
 
-export const MobileEventDetailShowcase = () => {
-  const customMobileDrawer = useCallback(
-    ({ isOpen, onClose, onSave, onEventDelete, draftEvent }) => {
-      if (!isOpen || !draftEvent) return null;
+    function MyCalendar() {
+      const customMobileDrawer = useCallback(
+        ({ isOpen, onClose, onSave, onEventDelete, draftEvent }) => {
+          if (!isOpen || !draftEvent) return null;
+
+          return (
+            <div className='fixed inset-0 z-50 flex flex-col bg-white'>
+              <header className='flex items-center justify-between p-4 border-b'>
+                <button onClick={onClose}>返回</button>
+                <h2>{draftEvent.id ? '编辑' : '新建'}事件</h2>
+                <button onClick={() => onSave(draftEvent)}>保存</button>
+              </header>
+              <div className='p-4'>
+                <input
+                  defaultValue={draftEvent.title}
+                  onChange={e => (draftEvent.title = e.target.value)}
+                />
+                {/* ... 构建您的移动端优化 UI */}
+              </div>
+            </div>
+          );
+        },
+        []
+      );
 
       return (
-        <div className='fixed inset-0 z-50 flex flex-col bg-white'>
-          <header className='flex items-center justify-between p-4 border-b'>
-            <button onClick={onClose}>返回</button>
-            <h2>{draftEvent.id ? '编辑' : '新建'}事件</h2>
-            <button onClick={() => onSave(draftEvent)}>保存</button>
-          </header>
-          <div className='p-4'>
-            <input
-              defaultValue={draftEvent.title}
-              onChange={e => (draftEvent.title = e.target.value)}
-            />
-            {/* ... 构建您的移动端优化 UI */}
-          </div>
-        </div>
+        <DayFlowCalendar
+          calendar={calendar}
+          mobileEventDetail={customMobileDrawer}
+        />
       );
-    },
-    []
-  );
+    }
+    ```
 
-  return (
-    <DayFlowCalendar
-      calendar={calendar}
-      mobileEventDetail={customMobileDrawer}
-    />
-  );
-};
-```
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #mobileEventDetail="{ isOpen, onClose, onSave, draftEvent }">
+          <div v-if="isOpen && draftEvent" class="fixed inset-0 z-50 flex flex-col bg-white">
+            <header class="flex items-center justify-between p-4 border-b">
+              <button @click="onClose">返回</button>
+              <h2>{{ draftEvent.id ? '编辑' : '新建' }}事件</h2>
+              <button @click="onSave(draftEvent)">保存</button>
+            </header>
+            <div class="p-4">
+              <input
+                :value="draftEvent.title"
+                @input="draftEvent.title = $event.target.value"
+              />
+              <!-- ... 构建您的移动端优化 UI -->
+            </div>
+          </div>
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [mobileEventDetail]="mobileTemplate"
+        >
+        </dayflow-calendar>
+
+        <ng-template #mobileTemplate let-args>
+          <div *ngIf="args.isOpen && args.draftEvent" class="fixed inset-0 z-50 flex flex-col bg-white">
+            <header class="flex items-center justify-between p-4 border-b">
+              <button (click)="args.onClose()">返回</button>
+              <h2>{{ args.draftEvent.id ? '编辑' : '新建' }}事件</h2>
+              <button (click)="args.onSave(args.draftEvent)">保存</button>
+            </header>
+            <div class="p-4">
+              <input
+                [value]="args.draftEvent.title"
+                (input)="args.draftEvent.title = $any($event.target).value"
+              />
+              <!-- ... 构建您的移动端优化 UI -->
+            </div>
+          </div>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import CustomMobileDrawer from './CustomMobileDrawer.svelte';
+    </script>
+
+    <DayFlowCalendar {calendar} mobileEventDetail={CustomMobileDrawer} />
+
+    <!-- CustomMobileDrawer.svelte -->
+    <script lang="ts">
+      import type { MobileEventProps } from '@dayflow/core';
+      let { isOpen, onClose, onSave, draftEvent } = $props<MobileEventProps>();
+    </script>
+
+    {#if isOpen && draftEvent}
+      <div class="fixed inset-0 z-50 flex flex-col bg-white">
+        <header class="flex items-center justify-between p-4 border-b">
+          <button onclick={onClose}>返回</button>
+          <h2>{draftEvent.id ? '编辑' : '新建'}事件</h2>
+          <button onclick={() => onSave(draftEvent)}>保存</button>
+        </header>
+        <div class="p-4">
+          <input
+            value={draftEvent.title}
+            oninput={(e) => draftEvent.title = e.currentTarget.value}
+          />
+          <!-- ... 构建您的移动端优化 UI -->
+        </div>
+      </div>
+    {/if}
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 </details>
 
@@ -246,32 +656,142 @@ export const MobileEventDetailShowcase = () => {
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
-import { SketchPicker, PhotoshopPicker } from 'react-color';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar } from '@dayflow/react';
+    import { SketchPicker, PhotoshopPicker } from 'react-color';
 
-function MyCalendar() {
-  return (
+    function MyCalendar() {
+      return (
+        <DayFlowCalendar
+          calendar={calendar}
+          colorPicker={args => (
+            <SketchPicker
+              color={args.color}
+              onChange={color => args.onChange({ hex: color.hex })}
+            />
+          )}
+          createCalendarDialogColorPicker={args => (
+            <PhotoshopPicker
+              color={args.color}
+              onChange={color => args.onChange({ hex: color.hex })}
+              onAccept={args.onAccept}
+              onCancel={args.onCancel}
+            />
+          )}
+        />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #colorPicker="args">
+          <SketchPicker
+            :color="args.color"
+            @change="color => args.onChange({ hex: color.hex })"
+          />
+        </template>
+        <template #createCalendarDialogColorPicker="args">
+          <PhotoshopPicker
+            :color="args.color"
+            @change="color => args.onChange({ hex: color.hex })"
+            @accept="args.onAccept"
+            @cancel="args.onCancel"
+          />
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    import { SketchPicker, PhotoshopPicker } from 'vue-color'; // 或者是其他库
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [colorPicker]="pickerTemplate"
+          [createCalendarDialogColorPicker]="dialogPickerTemplate"
+        >
+        </dayflow-calendar>
+
+        <ng-template #pickerTemplate let-args>
+          <!-- 在此使用您自定义的 Angular 颜色选择器组件 -->
+          <sketch-picker
+            [color]="args.color"
+            (colorChange)="args.onChange({ hex: $event })"
+          >
+          </sketch-picker>
+        </ng-template>
+
+        <ng-template #dialogPickerTemplate let-args>
+          <photoshop-picker
+            [color]="args.color"
+            (colorChange)="args.onChange({ hex: $event })"
+            (accept)="args.onAccept()"
+            (cancel)="args.onCancel()"
+          >
+          </photoshop-picker>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import ColorPicker from './ColorPicker.svelte';
+      import DialogColorPicker from './DialogColorPicker.svelte';
+    </script>
+
     <DayFlowCalendar
-      calendar={calendar}
-      colorPicker={args => (
-        <SketchPicker
-          color={args.color}
-          onChange={color => args.onChange({ hex: color.hex })}
-        />
-      )}
-      createCalendarDialogColorPicker={args => (
-        <PhotoshopPicker
-          color={args.color}
-          onChange={color => args.onChange({ hex: color.hex })}
-          onAccept={args.onAccept}
-          onCancel={args.onCancel}
-        />
-      )}
+      {calendar}
+      colorPicker={ColorPicker}
+      createCalendarDialogColorPicker={DialogColorPicker}
     />
-  );
-}
-```
+
+    <!-- ColorPicker.svelte -->
+    <script lang="ts">
+      import type { ColorPickerProps } from '@dayflow/core';
+      // 在此使用您自定义的 Svelte 颜色选择器组件，例如 svelte-color-picker
+      let { color, onChange } = $props<ColorPickerProps>();
+    </script>
+
+    <!-- 颜色选择器的自定义实现 -->
+
+    <!-- DialogColorPicker.svelte -->
+    <script lang="ts">
+      import type { CreateCalendarDialogColorPickerProps } from '@dayflow/core';
+      let { color, onChange, onAccept, onCancel } = $props<CreateCalendarDialogColorPickerProps>();
+    </script>
+
+    <!-- 弹窗颜色选择器的自定义实现 -->
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 </details>
 
@@ -289,76 +809,186 @@ function MyCalendar() {
 <details>
 <summary>查看源代码</summary>
 
-```tsx
-import { DayFlowCalendar } from '@dayflow/react';
-import type {
-  EventContextMenuSlotArgs,
-  GridContextMenuSlotArgs,
-} from '@dayflow/core';
-import { useCallback } from 'react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCallback } from 'react';
+    import { DayFlowCalendar } from '@dayflow/react';
+    import type {
+      EventContextMenuSlotArgs,
+      GridContextMenuSlotArgs,
+    } from '@dayflow/core';
 
-function MyCalendar() {
-  const eventContextMenu = useCallback(
-    ({ event, onClose }: EventContextMenuSlotArgs) => (
-      <div className='custom-menu'>
-        <button
-          onClick={() => {
-            /* 复制 */ onClose();
-          }}
-        >
-          复制
-        </button>
-        <button
-          onClick={() => {
-            /* 分享 */ onClose();
-          }}
-        >
-          分享
-        </button>
-        <button
-          onClick={() => {
-            calendar.deleteEvent(event.id);
-            onClose();
-          }}
-        >
-          删除
-        </button>
-      </div>
-    ),
-    []
-  );
+    function MyCalendar() {
+      const eventContextMenu = useCallback(
+        ({ event, onClose }: EventContextMenuSlotArgs) => (
+          <div className='custom-menu'>
+            <button
+              onClick={() => {
+                /* 复制 */ onClose();
+              }}
+            >
+              复制
+            </button>
+            <button
+              onClick={() => {
+                /* 分享 */ onClose();
+              }}
+            >
+              分享
+            </button>
+            <button
+              onClick={() => {
+                calendar.deleteEvent(event.id);
+                onClose();
+              }}
+            >
+              删除
+            </button>
+          </div>
+        ),
+        []
+      );
 
-  const gridContextMenu = useCallback(
-    ({ date, onClose }: GridContextMenuSlotArgs) => (
-      <div className='custom-menu'>
-        <button
-          onClick={() => {
-            /* 在此创建事件 */ onClose();
-          }}
-        >
-          新建事件
-        </button>
-        <button
-          onClick={() => {
-            /* 设置提醒 */ onClose();
-          }}
-        >
-          设置提醒
-        </button>
-      </div>
-    ),
-    []
-  );
+      const gridContextMenu = useCallback(
+        ({ date, onClose }: GridContextMenuSlotArgs) => (
+          <div className='custom-menu'>
+            <button
+              onClick={() => {
+                /* 在此创建事件 */ onClose();
+              }}
+            >
+              新建事件
+            </button>
+            <button
+              onClick={() => {
+                /* 设置提醒 */ onClose();
+              }}
+            >
+              设置提醒
+            </button>
+          </div>
+        ),
+        []
+      );
 
-  return (
+      return (
+        <DayFlowCalendar
+          calendar={calendar}
+          eventContextMenu={eventContextMenu}
+          gridContextMenu={gridContextMenu}
+        />
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #eventContextMenu="{ event, onClose }">
+          <div class="custom-menu">
+            <button @click="/* 复制 */ onClose()">复制</button>
+            <button @click="/* 分享 */ onClose()">分享</button>
+            <button @click="calendar.deleteEvent(event.id); onClose()">删除</button>
+          </div>
+        </template>
+        <template #gridContextMenu="{ date, onClose }">
+          <div class="custom-menu">
+            <button @click="/* 在此创建事件 */ onClose()">新建事件</button>
+            <button @click="/* 设置提醒 */ onClose()">设置提醒</button>
+          </div>
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar } from '@dayflow/vue';
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [eventContextMenu]="eventMenu"
+          [gridContextMenu]="gridMenu"
+        >
+        </dayflow-calendar>
+
+        <ng-template #eventMenu let-args>
+          <div class="custom-menu">
+            <button (click)="/* 复制 */ args.onClose()">复制</button>
+            <button (click)="/* 分享 */ args.onClose()">分享</button>
+            <button (click)="calendar.app.deleteEvent(args.event.id); args.onClose()">删除</button>
+          </div>
+        </ng-template>
+
+        <ng-template #gridMenu let-args>
+          <div class="custom-menu">
+            <button (click)="/* 在此创建事件 */ args.onClose()">新建事件</button>
+            <button (click)="/* 设置提醒 */ args.onClose()">设置提醒</button>
+          </div>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      // calendar = ...
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar } from '@dayflow/svelte';
+      import EventMenu from './EventMenu.svelte';
+      import GridMenu from './GridMenu.svelte';
+    </script>
+
     <DayFlowCalendar
-      calendar={calendar}
-      eventContextMenu={eventContextMenu}
-      gridContextMenu={gridContextMenu}
+      {calendar}
+      eventContextMenu={EventMenu}
+      gridContextMenu={GridMenu}
     />
-  );
-}
-```
+
+    <!-- EventMenu.svelte -->
+    <script lang="ts">
+      import type { EventContextMenuSlotArgs } from '@dayflow/core';
+      let { event, onClose } = $props<EventContextMenuSlotArgs>();
+    </script>
+
+    <div class="custom-menu">
+      <button onclick={() => { /* 复制 */ onClose(); }}>复制</button>
+      <button onclick={() => { /* 分享 */ onClose(); }}>分享</button>
+      <button onclick={() => { calendar.deleteEvent(event.id); onClose(); }}>删除</button>
+    </div>
+
+    <!-- GridMenu.svelte -->
+    <script lang="ts">
+      import type { GridContextMenuSlotArgs } from '@dayflow/core';
+      let { date, onClose } = $props<GridContextMenuSlotArgs>();
+    </script>
+
+    <div class="custom-menu">
+      <button onclick={() => { /* 在此创建事件 */ onClose(); }}>新建事件</button>
+      <button onclick={() => { /* 设置提醒 */ onClose(); }}>设置提醒</button>
+    </div>
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 </details>
 

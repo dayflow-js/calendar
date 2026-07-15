@@ -12,27 +12,107 @@ import { createEventsPlugin } from '@dayflow/core';
 
 ## 使用方法
 
-```tsx
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createEventsPlugin,
-} from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+    import { createEventsPlugin } from '@dayflow/core';
 
-function MyCalendar() {
-  const eventsPlugin = createEventsPlugin({
-    enableValidation: true,
-    maxEventsPerDay: 50,
-  });
+    function MyCalendar() {
+      const eventsPlugin = createEventsPlugin({
+        enableValidation: true,
+        maxEventsPerDay: 50,
+      });
 
-  const calendar = useCalendarApp({
-    // ... 视图配置
-    plugins: [eventsPlugin],
-  });
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [eventsPlugin],
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createEventsPlugin } from '@dayflow/core';
+
+    const eventsPlugin = createEventsPlugin({
+      enableValidation: true,
+      maxEventsPerDay: 50,
+    });
+
+    const calendar = useCalendarApp({
+      views: [
+        /* 视图 */
+      ],
+      plugins: [eventsPlugin],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createEventsPlugin } from '@dayflow/core';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          /* 视图 */
+        ],
+        plugins: [
+          createEventsPlugin({
+            enableValidation: true,
+            maxEventsPerDay: 50,
+          })
+        ]
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createEventsPlugin } from '@dayflow/core';
+
+      const eventsPlugin = createEventsPlugin({
+        enableValidation: true,
+        maxEventsPerDay: 50,
+      });
+
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [eventsPlugin],
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 配置项
 

@@ -4,27 +4,98 @@
 
 ## クイックスタート
 
-```tsx {11-16}
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  createWeekView,
-  ViewType,
-} from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
-import '@dayflow/core/dist/styles.css';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createMonthView,
+      createWeekView,
+      ViewType,
+    } from '@dayflow/react';
+    import '@dayflow/core/dist/styles.css';
 
-export function TeamCalendar() {
-  const calendar = useCalendarApp({
-    views: [createMonthView(), createWeekView()],
-    defaultView: ViewType.MONTH,
-    initialDate: new Date(),
-    events: [],
-  });
+    export function TeamCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createWeekView()],
+        defaultView: ViewType.MONTH,
+        initialDate: new Date(),
+        events: [],
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView, createWeekView, ViewType } from '@dayflow/core';
+    import '@dayflow/core/dist/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createWeekView()],
+      defaultView: ViewType.MONTH,
+      initialDate: new Date(),
+      events: [],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createMonthView, createWeekView, ViewType } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import '@dayflow/core/dist/styles.css';
+
+    @Component({
+      selector: 'app-team-calendar',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class TeamCalendarComponent {
+      calendar = {
+        views: [createMonthView(), createWeekView()],
+        defaultView: ViewType.MONTH,
+        initialDate: new Date(),
+        events: [],
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView, createWeekView, ViewType } from '@dayflow/core';
+      import '@dayflow/core/dist/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createWeekView()],
+        defaultView: ViewType.MONTH,
+        initialDate: new Date(),
+        events: [],
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 主な設定項目
 

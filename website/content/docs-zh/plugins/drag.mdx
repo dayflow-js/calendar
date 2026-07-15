@@ -14,31 +14,135 @@ import { createDragPlugin } from '@dayflow/plugin-drag';
 
 ## 使用方法
 
-```tsx
-import { useCalendarApp, ViewType } from '@dayflow/react'; // or '@dayflow/vue', '@dayflow/svelte', '@dayflow/angular'
-import { createDragPlugin } from '@dayflow/plugin-drag';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
 
-function MyCalendar() {
-  const dragPlugin = createDragPlugin({
-    enableDrag: true,
-    enableResize: true,
-    enableCreate: true,
-    onEventDrop: (updated, original) => {
-      console.log('Event moved:', updated);
-    },
-    onEventResize: (updated, original) => {
-      console.log('Event resized:', updated);
-    },
-  });
+    function MyCalendar() {
+      const dragPlugin = createDragPlugin({
+        enableDrag: true,
+        enableResize: true,
+        enableCreate: true,
+        onEventDrop: (updated, original) => {
+          console.log('事件已移动:', updated);
+        },
+        onEventResize: (updated, original) => {
+          console.log('事件大小已调整:', updated);
+        },
+      });
 
-  const calendar = useCalendarApp({
-    // ... 视图配置
-    plugins: [dragPlugin],
-  });
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [dragPlugin],
+      });
 
-  // ...
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+
+    const dragPlugin = createDragPlugin({
+      enableDrag: true,
+      enableResize: true,
+      enableCreate: true,
+      onEventDrop: (updated, original) => {
+        console.log('事件已移动:', updated);
+      },
+      onEventResize: (updated, original) => {
+        console.log('事件大小已调整:', updated);
+      },
+    });
+
+    const calendar = useCalendarApp({
+      views: [
+        /* 视图 */
+      ],
+      plugins: [dragPlugin],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createDragPlugin } from '@dayflow/plugin-drag';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          /* 视图 */
+        ],
+        plugins: [
+          createDragPlugin({
+            enableDrag: true,
+            enableResize: true,
+            enableCreate: true,
+            onEventDrop: (updated, original) => {
+              console.log('事件已移动:', updated);
+            },
+            onEventResize: (updated, original) => {
+              console.log('事件大小已调整:', updated);
+            },
+          })
+        ]
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createDragPlugin } from '@dayflow/plugin-drag';
+
+      const dragPlugin = createDragPlugin({
+        enableDrag: true,
+        enableResize: true,
+        enableCreate: true,
+        onEventDrop: (updated, original) => {
+          console.log('事件已移动:', updated);
+        },
+        onEventResize: (updated, original) => {
+          console.log('事件大小已调整:', updated);
+        },
+      });
+
+      const calendar = useCalendarApp({
+        views: [
+          /* 视图 */
+        ],
+        plugins: [dragPlugin],
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 配置项
 

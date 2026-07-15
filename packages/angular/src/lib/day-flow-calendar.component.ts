@@ -31,6 +31,9 @@ import type {
   CalendarSearchProps,
   MobileEventProps,
   MonthDateNumberSlotArgs,
+  CalendarSidebarRenderProps,
+  SidebarHeaderSlotArgs,
+  CalendarContextMenuSlotArgs,
 } from '@dayflow/core';
 import {
   CalendarRenderer,
@@ -93,6 +96,9 @@ export class DayFlowCalendarComponent
   @Input() mobileEventDetail?: TemplateRef<MobileEventProps>;
   @Input() collapsedSafeAreaLeft?: number;
   @Input() search?: CalendarSearchProps;
+  @Input() sidebar?: TemplateRef<CalendarSidebarRenderProps>;
+  @Input() sidebarHeader?: TemplateRef<SidebarHeaderSlotArgs>;
+  @Input() calendarContextMenu?: TemplateRef<CalendarContextMenuSlotArgs>;
 
   @ViewChild('container') container!: ElementRef<HTMLElement>;
 
@@ -164,6 +170,9 @@ export class DayFlowCalendarComponent
         'gridPopupContent',
         'monthDateNumberContent',
         'mobileEventDetail',
+        'sidebar',
+        'sidebarHeader',
+        'calendarContextMenu',
       ];
       if (slotKeys.some(key => changes[key])) {
         const activeOverrides = this.getActiveOverrides();
@@ -225,6 +234,9 @@ export class DayFlowCalendarComponent
       gridPopupContent: this.gridPopupContent,
       monthDateNumberContent: this.monthDateNumberContent,
       mobileEventDetail: this.mobileEventDetail,
+      sidebar: this.sidebar,
+      sidebarHeader: this.sidebarHeader,
+      calendarContextMenu: this.calendarContextMenu,
     };
     return Object.keys(templateInputs).filter(
       key => templateInputs[key] !== null && templateInputs[key] !== undefined
@@ -362,6 +374,15 @@ export class DayFlowCalendarComponent
       }
       case 'mobileEventDetail': {
         return this.mobileEventDetail ?? null;
+      }
+      case 'sidebar': {
+        return this.sidebar ?? null;
+      }
+      case 'sidebarHeader': {
+        return this.sidebarHeader ?? null;
+      }
+      case 'calendarContextMenu': {
+        return this.calendarContextMenu ?? null;
       }
       default: {
         return null;

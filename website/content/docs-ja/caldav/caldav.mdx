@@ -8,64 +8,238 @@
 
 ## クイックスタート
 
-```tsx
-import { useRef, useEffect } from 'react';
-import {
-  DayFlowCalendar,
-  useCalendarApp,
-  createMonthView,
-} from '@dayflow/react';
-import {
-  attachCalDAVToDayFlow,
-  createCalDAVAdapter,
-  createCalDAVSync,
-  type CalDAVDayFlowController,
-} from '@dayflow/caldav';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useRef, useEffect } from 'react';
+    import {
+      DayFlowCalendar,
+      useCalendarApp,
+      createMonthView,
+    } from '@dayflow/react';
+    import {
+      attachCalDAVToDayFlow,
+      createCalDAVAdapter,
+      createCalDAVSync,
+      type CalDAVDayFlowController,
+    } from '@dayflow/caldav';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    calendars: [],
-    events: [],
-  });
-  const controllerRef = useRef<CalDAVDayFlowController | null>(null);
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+      const controllerRef = useRef<CalDAVDayFlowController | null>(null);
 
-  useEffect(() => {
-    if (controllerRef.current) return;
+      useEffect(() => {
+        if (controllerRef.current) return;
 
-    const adapter = createCalDAVAdapter({
-      calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
-      fetch: (url, init) =>
-        fetch('/api/caldav-proxy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url, init }),
-        }),
-    });
+        const adapter = createCalDAVAdapter({
+          calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+          fetch: (url, init) =>
+            fetch('/api/caldav-proxy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, init }),
+            }),
+        });
 
-    const sync = createCalDAVSync({ adapter });
-    const controller = attachCalDAVToDayFlow(calendar.app, sync, {
-      writable: true,
-      maxConcurrentCalendars: 4,
-      onSyncComplete: delta => {
-        console.log(
-          `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
-        );
-      },
-    });
+        const sync = createCalDAVSync({ adapter });
+        const controller = attachCalDAVToDayFlow(calendar.app, sync, {
+          writable: true,
+          maxConcurrentCalendars: 4,
+          onSyncComplete: delta => {
+            console.log(
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
 
-    controllerRef.current = controller;
-    controller.start();
+        controllerRef.current = controller;
+        controller.start();
 
-    return () => {
-      controller.stop();
-      controllerRef.current = null;
-    };
-  }, [calendar.app]);
+        return () => {
+          controller.stop();
+          controllerRef.current = null;
+        };
+      }, [calendar.app]);
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+      import { onMounted, onBeforeUnmount } from 'vue';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+      import { createMonthView } from '@dayflow/core';
+      import {
+        attachCalDAVToDayFlow,
+        createCalDAVAdapter,
+        createCalDAVSync,
+      } from '@dayflow/caldav';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      let controller;
+
+      onMounted(() => {
+        const adapter = createCalDAVAdapter({
+          calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+          fetch: (url, init) =>
+            fetch('/api/caldav-proxy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, init }),
+            }),
+        });
+
+        const sync = createCalDAVSync({ adapter });
+        controller = attachCalDAVToDayFlow(calendar.app, sync, {
+          writable: true,
+          maxConcurrentCalendars: 4,
+          onSyncComplete: delta => {
+            console.log(
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controller.start();
+      });
+
+      onBeforeUnmount(() => {
+        controller?.stop();
+      });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component, OnInit, OnDestroy } from '@angular/core';
+    import { CalendarApp, createMonthView } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import {
+      attachCalDAVToDayFlow,
+      createCalDAVAdapter,
+      createCalDAVSync,
+      type CalDAVDayFlowController,
+    } from '@dayflow/caldav';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent implements OnInit, OnDestroy {
+      calendar = new CalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      private controller?: CalDAVDayFlowController;
+
+      ngOnInit() {
+        const adapter = createCalDAVAdapter({
+          calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+          fetch: (url, init) =>
+            fetch('/api/caldav-proxy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, init }),
+            }),
+        });
+
+        const sync = createCalDAVSync({ adapter });
+        this.controller = attachCalDAVToDayFlow(this.calendar, sync, {
+          writable: true,
+          maxConcurrentCalendars: 4,
+          onSyncComplete: delta => {
+            console.log(
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        this.controller.start();
+      }
+
+      ngOnDestroy() {
+        this.controller?.stop();
+      }
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { onMount, onDestroy } from 'svelte';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+      import {
+        attachCalDAVToDayFlow,
+        createCalDAVAdapter,
+        createCalDAVSync,
+      } from '@dayflow/caldav';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      let controller;
+
+      onMount(() => {
+        const adapter = createCalDAVAdapter({
+          calendarHomeUrl: 'https://caldav.example.com/calendars/alice/',
+          fetch: (url, init) =>
+            fetch('/api/caldav-proxy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, init }),
+            }),
+        });
+
+        const sync = createCalDAVSync({ adapter });
+        controller = attachCalDAVToDayFlow(calendar.app, sync, {
+          writable: true,
+          maxConcurrentCalendars: 4,
+          onSyncComplete: delta => {
+            console.log(
+              `同期完了: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controller.start();
+      });
+
+      onDestroy(() => {
+        controller?.stop();
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## カレンダーホームの検出
 

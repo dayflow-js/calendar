@@ -224,37 +224,142 @@ const calendar = useCalendarApp({
 
 You can use the native state management of your framework (React, Vue, Svelte, Angular) to manage events.
 
-```tsx
-import { useState } from 'react';
-import {
-  useCalendarApp,
-  DayFlowCalendar,
-  createMonthView,
-  Event,
-} from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useState } from 'react';
+    import {
+      useCalendarApp,
+      DayFlowCalendar,
+      createMonthView,
+      Event,
+    } from '@dayflow/react';
 
-function MyCalendar() {
-  const [events, setEvents] = useState<Event[]>([]);
+    function MyCalendar() {
+      const [events, setEvents] = useState<Event[]>([]);
 
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    events,
-    callbacks: {
-      onEventCreate: (event: Event) => {
-        setEvents(prev => [...prev, event]);
-      },
-      onEventUpdate: (event: Event) => {
-        setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
-      },
-      onEventDelete: (eventId: string) => {
-        setEvents(prev => prev.filter(e => e.id !== eventId));
-      },
-    },
-  });
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        events,
+        callbacks: {
+          onEventCreate: (event: Event) => {
+            setEvents(prev => [...prev, event]);
+          },
+          onEventUpdate: (event: Event) => {
+            setEvents(prev => prev.map(e => (e.id === event.id ? event : e)));
+          },
+          onEventDelete: (eventId: string) => {
+            setEvents(prev => prev.filter(e => e.id !== eventId));
+          },
+        },
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { ref } from 'vue';
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView } from '@dayflow/core';
+
+    const events = ref([]);
+
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      events,
+      callbacks: {
+        onEventCreate: (event) => {
+          events.value = [...events.value, event];
+        },
+        onEventUpdate: (event) => {
+          events.value = events.value.map(e => (e.id === event.id ? event : e));
+        },
+        onEventDelete: (eventId) => {
+          events.value = events.value.filter(e => e.id !== eventId);
+        },
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createMonthView, Event } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      events: Event[] = [];
+
+      calendar = {
+        views: [createMonthView()],
+        events: this.events,
+        callbacks: {
+          onEventCreate: (event: Event) => {
+            this.events = [...this.events, event];
+            this.calendar.events = this.events;
+          },
+          onEventUpdate: (event: Event) => {
+            this.events = this.events.map(e => (e.id === event.id ? event : e));
+            this.calendar.events = this.events;
+          },
+          onEventDelete: (eventId: string) => {
+            this.events = this.events.filter(e => e.id !== eventId);
+            this.calendar.events = this.events;
+          },
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+
+      let events = $state([]);
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        events,
+        callbacks: {
+          onEventCreate: (event) => {
+            events = [...events, event];
+          },
+          onEventUpdate: (event) => {
+            events = events.map(e => (e.id === event.id ? event : e));
+          },
+          onEventDelete: (eventId) => {
+            events = events.filter(e => e.id !== eventId);
+          },
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ### Syncing with Backend
 
@@ -366,81 +471,340 @@ const calendar = useCalendarApp({
 
 ### Example
 
-```tsx
-import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { createEvent, useCalendarApp, createWeekView } from '@dayflow/react';
+    import { Temporal } from 'temporal-polyfill';
 
-// This event belongs to both "team" and "marketing" calendars
-const sharedEvent = createEvent({
-  id: 'shared-1',
-  title: 'Company All-Hands',
-  start: new Date(2024, 9, 15, 10, 0),
-  end: new Date(2024, 9, 15, 11, 30),
-  calendarIds: ['team', 'marketing'], // multi-calendar
-});
+    // This event belongs to both "team" and "marketing" calendars
+    const sharedEvent = createEvent({
+      id: 'shared-1',
+      title: 'Company All-Hands',
+      start: new Date(2024, 9, 15, 10, 0),
+      end: new Date(2024, 9, 15, 11, 30),
+      calendarIds: ['team', 'marketing'], // multi-calendar
+    });
 
-// All-day event spanning three calendars
-const crossCalendarDay = {
-  id: 'shared-2',
-  title: 'Team Offsite',
-  start: Temporal.PlainDate.from('2024-10-20'),
-  end: Temporal.PlainDate.from('2024-10-22'),
-  allDay: true,
-  calendarIds: ['team', 'personal', 'travel'],
-};
+    // All-day event spanning three calendars
+    const crossCalendarDay = {
+      id: 'shared-2',
+      title: 'Team Offsite',
+      start: Temporal.PlainDate.from('2024-10-20'),
+      end: Temporal.PlainDate.from('2024-10-22'),
+      allDay: true,
+      calendarIds: ['team', 'personal', 'travel'],
+    };
 
-const calendars = [
-  {
-    id: 'team',
-    name: 'Team',
-    colors: {
-      eventColor: '#3b82f6',
-      lineColor: '#3b82f6',
-      eventSelectedColor: '#2563eb',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'marketing',
-    name: 'Marketing',
-    colors: {
-      eventColor: '#f59e0b',
-      lineColor: '#f59e0b',
-      eventSelectedColor: '#d97706',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'personal',
-    name: 'Personal',
-    colors: {
-      eventColor: '#10b981',
-      lineColor: '#10b981',
-      eventSelectedColor: '#059669',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-  {
-    id: 'travel',
-    name: 'Travel',
-    colors: {
-      eventColor: '#8b5cf6',
-      lineColor: '#8b5cf6',
-      eventSelectedColor: '#7c3aed',
-      textColor: '#fff',
-    },
-    isVisible: true,
-  },
-];
+    const calendars = [
+      {
+        id: 'team',
+        name: 'Team',
+        colors: {
+          eventColor: '#3b82f6',
+          lineColor: '#3b82f6',
+          eventSelectedColor: '#2563eb',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'marketing',
+        name: 'Marketing',
+        colors: {
+          eventColor: '#f59e0b',
+          lineColor: '#f59e0b',
+          eventSelectedColor: '#d97706',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        colors: {
+          eventColor: '#10b981',
+          lineColor: '#10b981',
+          eventSelectedColor: '#059669',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'travel',
+        name: 'Travel',
+        colors: {
+          eventColor: '#8b5cf6',
+          lineColor: '#8b5cf6',
+          eventSelectedColor: '#7c3aed',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+    ];
 
-const calendar = useCalendarApp({
-  views: [createWeekView()],
-  events: [sharedEvent, crossCalendarDay],
-  calendars,
-});
-```
+    const calendar = useCalendarApp({
+      views: [createWeekView()],
+      events: [sharedEvent, crossCalendarDay],
+      calendars,
+    });
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createEvent, createWeekView } from '@dayflow/core';
+    import { Temporal } from 'temporal-polyfill';
+
+    const sharedEvent = createEvent({
+      id: 'shared-1',
+      title: 'Company All-Hands',
+      start: new Date(2024, 9, 15, 10, 0),
+      end: new Date(2024, 9, 15, 11, 30),
+      calendarIds: ['team', 'marketing'],
+    });
+
+    const crossCalendarDay = {
+      id: 'shared-2',
+      title: 'Team Offsite',
+      start: Temporal.PlainDate.from('2024-10-20'),
+      end: Temporal.PlainDate.from('2024-10-22'),
+      allDay: true,
+      calendarIds: ['team', 'personal', 'travel'],
+    };
+
+    const calendars = [
+      {
+        id: 'team',
+        name: 'Team',
+        colors: {
+          eventColor: '#3b82f6',
+          lineColor: '#3b82f6',
+          eventSelectedColor: '#2563eb',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'marketing',
+        name: 'Marketing',
+        colors: {
+          eventColor: '#f59e0b',
+          lineColor: '#f59e0b',
+          eventSelectedColor: '#d97706',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'personal',
+        name: 'Personal',
+        colors: {
+          eventColor: '#10b981',
+          lineColor: '#10b981',
+          eventSelectedColor: '#059669',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+      {
+        id: 'travel',
+        name: 'Travel',
+        colors: {
+          eventColor: '#8b5cf6',
+          lineColor: '#8b5cf6',
+          eventSelectedColor: '#7c3aed',
+          textColor: '#fff',
+        },
+        isVisible: true,
+      },
+    ];
+
+    const calendar = useCalendarApp({
+      views: [createWeekView()],
+      events: [sharedEvent, crossCalendarDay],
+      calendars,
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { createEvent, createWeekView } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { Temporal } from 'temporal-polyfill';
+
+    const sharedEvent = createEvent({
+      id: 'shared-1',
+      title: 'Company All-Hands',
+      start: new Date(2024, 9, 15, 10, 0),
+      end: new Date(2024, 9, 15, 11, 30),
+      calendarIds: ['team', 'marketing'],
+    });
+
+    const crossCalendarDay = {
+      id: 'shared-2',
+      title: 'Team Offsite',
+      start: Temporal.PlainDate.from('2024-10-20'),
+      end: Temporal.PlainDate.from('2024-10-22'),
+      allDay: true,
+      calendarIds: ['team', 'personal', 'travel'],
+    };
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createWeekView()],
+        events: [sharedEvent, crossCalendarDay],
+        calendars: [
+          {
+            id: 'team',
+            name: 'Team',
+            colors: {
+              eventColor: '#3b82f6',
+              lineColor: '#3b82f6',
+              eventSelectedColor: '#2563eb',
+              textColor: '#fff',
+            },
+            isVisible: true,
+          },
+          {
+            id: 'marketing',
+            name: 'Marketing',
+            colors: {
+              eventColor: '#f59e0b',
+              lineColor: '#f59e0b',
+              eventSelectedColor: '#d97706',
+              textColor: '#fff',
+            },
+            isVisible: true,
+          },
+          {
+            id: 'personal',
+            name: 'Personal',
+            colors: {
+              eventColor: '#10b981',
+              lineColor: '#10b981',
+              eventSelectedColor: '#059669',
+              textColor: '#fff',
+            },
+            isVisible: true,
+          },
+          {
+            id: 'travel',
+            name: 'Travel',
+            colors: {
+              eventColor: '#8b5cf6',
+              lineColor: '#8b5cf6',
+              eventSelectedColor: '#7c3aed',
+              textColor: '#fff',
+            },
+            isVisible: true,
+          },
+        ],
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createEvent, createWeekView } from '@dayflow/core';
+      import { Temporal } from 'temporal-polyfill';
+
+      const sharedEvent = createEvent({
+        id: 'shared-1',
+        title: 'Company All-Hands',
+        start: new Date(2024, 9, 15, 10, 0),
+        end: new Date(2024, 9, 15, 11, 30),
+        calendarIds: ['team', 'marketing'],
+      });
+
+      const crossCalendarDay = {
+        id: 'shared-2',
+        title: 'Team Offsite',
+        start: Temporal.PlainDate.from('2024-10-20'),
+        end: Temporal.PlainDate.from('2024-10-22'),
+        allDay: true,
+        calendarIds: ['team', 'personal', 'travel'],
+      };
+
+      const calendars = [
+        {
+          id: 'team',
+          name: 'Team',
+          colors: {
+            eventColor: '#3b82f6',
+            lineColor: '#3b82f6',
+            eventSelectedColor: '#2563eb',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'marketing',
+          name: 'Marketing',
+          colors: {
+            eventColor: '#f59e0b',
+            lineColor: '#f59e0b',
+            eventSelectedColor: '#d97706',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'personal',
+          name: 'Personal',
+          colors: {
+            eventColor: '#10b981',
+            lineColor: '#10b981',
+            eventSelectedColor: '#059669',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+        {
+          id: 'travel',
+          name: 'Travel',
+          colors: {
+            eventColor: '#8b5cf6',
+            lineColor: '#8b5cf6',
+            eventSelectedColor: '#7c3aed',
+            textColor: '#fff',
+          },
+          isVisible: true,
+        },
+      ];
+
+      const calendar = useCalendarApp({
+        views: [createWeekView()],
+        events: [sharedEvent, crossCalendarDay],
+        calendars,
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## Multi-Day Events
 

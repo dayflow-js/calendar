@@ -263,7 +263,10 @@ export function createSidebarPlugin(
             const currentConfig = app.getPluginConfig(
               'sidebar'
             ) as SidebarPluginConfig;
-            if (currentConfig.render) {
+            if (
+              currentConfig.render ||
+              app.state.overrides.includes('sidebar')
+            ) {
               return h(ContentSlot, {
                 generatorName: 'sidebar',
                 generatorArgs: sidebarProps,

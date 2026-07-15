@@ -12,31 +12,127 @@ i18n プラグインは、多言語およびローカライズのサポートを
 
 他の言語のサポートを有効にするには、プラグインを登録し、必要なロケールオブジェクトを提供します。
 
-```tsx
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
-import {
-  createLocalizationPlugin,
-  zh,
-  ja,
-  fr,
-} from '@dayflow/plugin-localization';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [
-      /* ビューの設定 */
-    ],
-    plugins: [
-      createLocalizationPlugin({
-        locales: [zh, ja, fr], // 必要な言語を登録
-      }),
-    ],
-    locale: 'ja-JP', // 現在のロケールを設定
-  });
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [
+          /* ビューの設定 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 必要な言語を登録
+          }),
+        ],
+        locale: 'ja-JP', // 現在のロケールを設定
+      });
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
+
+    const calendar = useCalendarApp({
+      views: [
+        /* ビューの設定 */
+      ],
+      plugins: [
+        createLocalizationPlugin({
+          locales: [zh, ja, fr], // 必要な言語を登録
+        }),
+      ],
+      locale: 'ja-JP', // 現在のロケールを設定
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import {
+      createLocalizationPlugin,
+      zh,
+      ja,
+      fr,
+    } from '@dayflow/plugin-localization';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`
+    })
+    export class AppComponent {
+      calendar = {
+        views: [
+          /* ビューの設定 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 必要な言語を登録
+          }),
+        ],
+        locale: 'ja-JP', // 現在のロケールを設定
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import {
+        createLocalizationPlugin,
+        zh,
+        ja,
+        fr,
+      } from '@dayflow/plugin-localization';
+
+      const calendar = useCalendarApp({
+        views: [
+          /* ビューの設定 */
+        ],
+        plugins: [
+          createLocalizationPlugin({
+            locales: [zh, ja, fr], // 必要な言語を登録
+          }),
+        ],
+        locale: 'ja-JP', // 現在のロケールを設定
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 設定
 

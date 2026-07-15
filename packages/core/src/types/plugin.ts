@@ -1,7 +1,7 @@
 import { CalendarType } from './calendarTypes';
 // Plugin-related type definitions
 import { DragConfig } from './config';
-import { ICalendarApp, ViewType } from './core';
+import { ICalendarApp, ViewType, TNode } from './core';
 import { MonthDragState, WeekDayDragState } from './dragIndicator';
 import { Event } from './event';
 import { EventLayout } from './layout';
@@ -15,6 +15,39 @@ export interface TitleBarSlotProps {
 export interface SidebarHeaderSlotArgs {
   isCollapsed: boolean;
   onCollapseToggle: () => void;
+}
+
+export interface CalendarSidebarRenderProps {
+  app: ICalendarApp;
+  calendars: CalendarType[];
+  toggleCalendarVisibility: (calendarId: string, visible: boolean) => void;
+  toggleAll: (visible: boolean) => void;
+  isCollapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+  showEventDots?: boolean;
+  renderCalendarContextMenu?: (
+    calendar: CalendarType,
+    onClose: () => void
+  ) => TNode;
+  renderSidebarHeader?: (args: SidebarHeaderSlotArgs) => TNode;
+  createCalendarMode?: 'inline' | 'modal';
+  renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
+  editingCalendarId?: string | null;
+  setEditingCalendarId?: (id: string | null) => void;
+  onCreateCalendar?: () => void;
+  onSubscribeCalendar?: (
+    calendar: CalendarType,
+    events: Event[]
+  ) => Promise<void>;
+  onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
+  onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
+  componentsOrder?: ('calendarList' | 'miniCalendar')[];
+  groupStatus?: Record<string, { isLoading: boolean }>;
+}
+
+export interface CalendarContextMenuSlotArgs {
+  calendar: CalendarType;
+  onClose: () => void;
 }
 
 export interface CreateCalendarDialogColorPickerProps {

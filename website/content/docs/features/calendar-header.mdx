@@ -2,13 +2,6 @@
 
 The calendar header provides navigation controls, the view switcher, and search functionality. You can customize its behavior or replace it entirely.
 
-<Callout title='Docs Site Navigation' type='info'>
-  The documentation site's top navigation now includes a separate DayFlow Pro
-  entry alongside the main DayFlow logo and Blossom Picker. That Pro entry uses
-  the `pro-logo.png + Pro badge` structure and is part of the website chrome,
-  not the calendar component API described on this page.
-</Callout>
-
 ## Hiding the Header
 
 If you want to build your own navigation or just don't need the default header, you can disable it.
@@ -30,42 +23,76 @@ const calendar = useCalendarApp({
 
 You can replace the default header with your own component using the `calendarHeader` content slot. Your renderer receives the calendar's state and helper methods so you can drive navigation and search from your own UI.
 
-### React
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+    });
 
-Pass a `calendarHeader` render prop to `DayFlowCalendar`:
+    <DayFlowCalendar
+      calendar={calendar}
+      calendarHeader={() => (
+        <div className='custom-header'>
+          <button onClick={() => calendar.goToPrevious()}>‹</button>
+          <button onClick={() => calendar.goToToday()}>Today</button>
+          <button onClick={() => calendar.goToNext()}>›</button>
+        </div>
+      )}
+    />;
+    ```
 
-```tsx
-const calendar = useCalendarApp({
-  views: [createMonthView()],
-});
+  </Tab>
+  <Tab>
+    ```vue
+    <DayFlowCalendar :calendar="calendar">
+      <template #calendarHeader="{ calendar }">
+        <div class="custom-header">
+          <button @click="calendar.goToPrevious()">‹</button>
+          <button @click="calendar.goToToday()">Today</button>
+          <button @click="calendar.goToNext()">›</button>
+        </div>
+      </template>
+    </DayFlowCalendar>
+    ```
+  </Tab>
+  <Tab>
+    ```html
+    <dayflow-calendar
+      [calendar]="calendar"
+      [calendarHeader]="header"
+    >
+    </dayflow-calendar>
 
-<DayFlowCalendar
-  calendar={calendar}
-  calendarHeader={() => (
-    <div className='custom-header'>
-      <button onClick={() => calendar.goToPrevious()}>‹</button>
-      <button onClick={() => calendar.goToToday()}>Today</button>
-      <button onClick={() => calendar.goToNext()}>›</button>
-    </div>
-  )}
-/>;
-```
+    <ng-template #header let-args>
+      <div class="custom-header">
+        <button (click)="args.calendar.goToPrevious()">‹</button>
+        <button (click)="args.calendar.goToToday()">Today</button>
+        <button (click)="args.calendar.goToNext()">›</button>
+      </div>
+    </ng-template>
+    ```
 
-### Vue
+  </Tab>
+  <Tab>
+    ```svelte
+    <DayFlowCalendar {calendar} calendarHeader={CustomHeader} />
 
-Use the named `calendarHeader` slot:
+    <!-- CustomHeader.svelte -->
+    <script lang="ts">
+      import type { CalendarHeaderProps } from '@dayflow/core';
+      let { calendar } = $props<CalendarHeaderProps>();
+    </script>
 
-```vue
-<DayFlowCalendar :calendar="calendar">
-  <template #calendarHeader="{ calendar, switcherMode, onSearchChange }">
     <div class="custom-header">
-      <button @click="calendar.goToPrevious()">‹</button>
-      <button @click="calendar.goToToday()">Today</button>
-      <button @click="calendar.goToNext()">›</button>
+      <button onclick={() => calendar.goToPrevious()}>‹</button>
+      <button onclick={() => calendar.goToToday()}>Today</button>
+      <button onclick={() => calendar.goToNext()}>›</button>
     </div>
-  </template>
-</DayFlowCalendar>
-```
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ### Slot Args
 

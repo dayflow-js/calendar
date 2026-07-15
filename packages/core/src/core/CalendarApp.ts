@@ -19,7 +19,7 @@ import {
   ViewType,
   VisibleRangePayload,
 } from '@/types';
-import { ThemeMode } from '@/types/calendarTypes';
+import { ThemeColors, ThemeMode } from '@/types/calendarTypes';
 import { compareViews } from '@/utils/calendarApp';
 import { isDeepEqual } from '@/utils/helpers';
 import { normalizeTimeZoneValue } from '@/utils/timeZoneUtils';
@@ -49,6 +49,7 @@ export class CalendarApp implements ICalendarApp {
   private useEventDetailPanel: boolean;
   private eventDetailTrigger: EventDetailTrigger;
   private useCalendarHeader: boolean;
+  private themeColors?: ThemeColors;
 
   constructor(config: CalendarAppConfig) {
     const resolvedTimeZone =
@@ -83,6 +84,7 @@ export class CalendarApp implements ICalendarApp {
       config.defaultCalendar,
       config.theme?.mode || 'light'
     );
+    this.themeColors = config.theme?.colors;
     setDefaultCalendarRegistry(this.calendarRegistry);
 
     this.eventManager = new EventManager(
@@ -358,6 +360,8 @@ export class CalendarApp implements ICalendarApp {
 
   getTheme = (): ThemeMode => this.calendarRegistry.getTheme();
 
+  getThemeColors = (): ThemeColors | undefined => this.themeColors;
+
   subscribeThemeChange = (
     callback: (theme: ThemeMode) => void
   ): (() => void) => {
@@ -445,6 +449,10 @@ export class CalendarApp implements ICalendarApp {
     ) {
       this.setTheme(config.theme.mode);
       // setTheme already triggers re-render
+    }
+    if (config.theme && !isDeepEqual(config.theme.colors, this.themeColors)) {
+      this.themeColors = config.theme.colors;
+      hasChanged = true;
     }
     if (
       config.switcherMode !== undefined &&

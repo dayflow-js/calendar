@@ -8,65 +8,238 @@
 
 ## 快速开始
 
-```tsx
-import { useRef, useEffect, useState } from 'react';
-import {
-  DayFlowCalendar,
-  useCalendarApp,
-  createMonthView,
-} from '@dayflow/react';
-import {
-  attachOutlookSyncToDayFlow,
-  createOutlookSync,
-  createOutlookSyncAdapter,
-  type OutlookDayFlowController,
-  type OutlookSyncStatus,
-} from '@dayflow/outlook-sync';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useRef, useEffect, useState } from 'react';
+    import {
+      DayFlowCalendar,
+      useCalendarApp,
+      createMonthView,
+    } from '@dayflow/react';
+    import {
+      attachOutlookSyncToDayFlow,
+      createOutlookSync,
+      createOutlookSyncAdapter,
+      type OutlookDayFlowController,
+      type OutlookSyncStatus,
+    } from '@dayflow/outlook-sync';
 
-function MyCalendar() {
-  const calendar = useCalendarApp({
-    views: [createMonthView()],
-    calendars: [],
-    events: [],
-  });
+    function MyCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
 
-  const controllerRef = useRef<OutlookDayFlowController | null>(null);
-  const [syncStatus, setSyncStatus] = useState<OutlookSyncStatus>({
-    state: 'idle',
-  });
+      const controllerRef = useRef<OutlookDayFlowController | null>(null);
+      const [syncStatus, setSyncStatus] = useState<OutlookSyncStatus>({
+        state: 'idle',
+      });
 
-  useEffect(() => {
-    if (controllerRef.current) return;
+      useEffect(() => {
+        if (controllerRef.current) return;
 
-    const adapter = createOutlookSyncAdapter({
-      baseUrl: '/api/outlook-calendar',
+        const adapter = createOutlookSyncAdapter({
+          baseUrl: '/api/outlook-calendar',
+        });
+
+        const sync = createOutlookSync(adapter);
+        const controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
+          writable: true,
+          onStatusChange: setSyncStatus,
+          onWriteError: (error, ctx) =>
+            console.error(`[outlook-sync] ${ctx.action} 失败:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `同步完成: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controllerRef.current = controller;
+        controller.start();
+
+        return () => {
+          controller.stop();
+          controllerRef.current = null;
+        };
+      }, [calendar.app]);
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { onMounted, onUnmounted, ref } from 'vue';
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createMonthView } from '@dayflow/core';
+    import {
+      attachOutlookSyncToDayFlow,
+      createOutlookSync,
+      createOutlookSyncAdapter,
+    } from '@dayflow/outlook-sync';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView()],
+      calendars: [],
+      events: [],
     });
 
-    const sync = createOutlookSync(adapter);
-    const controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
-      writable: true,
-      onStatusChange: setSyncStatus,
-      onWriteError: (error, ctx) =>
-        console.error(`[outlook-sync] ${ctx.action} 失败:`, error.message),
-      onSyncComplete: delta => {
-        console.log(
-          `同步完成: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
-        );
-      },
+    const syncStatus = ref({ state: 'idle' });
+    let controller;
+
+    onMounted(() => {
+      const adapter = createOutlookSyncAdapter({
+        baseUrl: '/api/outlook-calendar',
+      });
+
+      const sync = createOutlookSync(adapter);
+      controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
+        writable: true,
+        onStatusChange: (status) => {
+          syncStatus.value = status;
+        },
+        onWriteError: (error, ctx) =>
+          console.error(`[outlook-sync] ${ctx.action} 失败:`, error.message),
+        onSyncComplete: delta => {
+          console.log(
+            `同步完成: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+          );
+        },
+      });
+
+      controller.start();
     });
 
-    controllerRef.current = controller;
-    controller.start();
+    onUnmounted(() => {
+      if (controller) {
+        controller.stop();
+      }
+    });
+    </script>
+    ```
 
-    return () => {
-      controller.stop();
-      controllerRef.current = null;
-    };
-  }, [calendar.app]);
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component, OnInit, OnDestroy } from '@angular/core';
+    import { createMonthView, CalendarApp } from '@dayflow/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import {
+      attachOutlookSyncToDayFlow,
+      createOutlookSync,
+      createOutlookSyncAdapter,
+      type OutlookDayFlowController,
+      type OutlookSyncStatus,
+    } from '@dayflow/outlook-sync';
 
-  return <DayFlowCalendar calendar={calendar} />;
-}
-```
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`
+    })
+    export class AppComponent implements OnInit, OnDestroy {
+      calendar = new CalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      syncStatus: OutlookSyncStatus = { state: 'idle' };
+      private controller?: OutlookDayFlowController;
+
+      ngOnInit() {
+        const adapter = createOutlookSyncAdapter({
+          baseUrl: '/api/outlook-calendar',
+        });
+
+        const sync = createOutlookSync(adapter);
+        this.controller = attachOutlookSyncToDayFlow(this.calendar, sync, {
+          writable: true,
+          onStatusChange: status => {
+            this.syncStatus = status;
+          },
+          onWriteError: (error, ctx) =>
+            console.error(`[outlook-sync] ${ctx.action} 失败:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `同步完成: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        this.controller.start();
+      }
+
+      ngOnDestroy() {
+        this.controller?.stop();
+      }
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { onMount } from 'svelte';
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createMonthView } from '@dayflow/core';
+      import {
+        attachOutlookSyncToDayFlow,
+        createOutlookSync,
+        createOutlookSyncAdapter,
+      } from '@dayflow/outlook-sync';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView()],
+        calendars: [],
+        events: [],
+      });
+
+      let syncStatus = $state({ state: 'idle' });
+
+      onMount(() => {
+        const adapter = createOutlookSyncAdapter({
+          baseUrl: '/api/outlook-calendar',
+        });
+
+        const sync = createOutlookSync(adapter);
+        const controller = attachOutlookSyncToDayFlow(calendar.app, sync, {
+          writable: true,
+          onStatusChange: (status) => {
+            syncStatus = status;
+          },
+          onWriteError: (error, ctx) =>
+            console.error(`[outlook-sync] ${ctx.action} 失败:`, error.message),
+          onSyncComplete: delta => {
+            console.log(
+              `同步完成: +${delta.events.added} ~${delta.events.updated} -${delta.events.deleted}`
+            );
+          },
+        });
+
+        controller.start();
+
+        return () => {
+          controller.stop();
+        };
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## 令牌注入
 

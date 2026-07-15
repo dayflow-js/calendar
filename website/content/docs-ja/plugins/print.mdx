@@ -18,31 +18,117 @@ DayFlow Pro のインストール手順については、[Pro のインストー
 
 ## 基本的な使い方
 
-```tsx
-import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
-import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
 
-function App() {
-  const printPlugin = createPrintPlugin({
-    defaultOptions: {
-      miniCalendar: true,
-      calendarKeys: true,
-      textSize: 'medium',
-    },
-  });
+    function App() {
+      const printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
 
-  const calendar = useCalendarApp({
-    plugins: [printPlugin],
-  });
+      const calendar = useCalendarApp({
+        plugins: [printPlugin],
+      });
 
-  return (
-    <>
-      <button onClick={() => printPlugin.api.open()}>印刷</button>
-      <DayFlowCalendar calendar={calendar} />
-    </>
-  );
-}
-```
+      return (
+        <>
+          <button onClick={() => printPlugin.api.open()}>印刷</button>
+          <DayFlowCalendar calendar={calendar} />
+        </>
+      );
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <button @click="printPlugin.api.open()">印刷</button>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+    const printPlugin = createPrintPlugin({
+      defaultOptions: {
+        miniCalendar: true,
+        calendarKeys: true,
+        textSize: 'medium',
+      },
+    });
+
+    const calendar = useCalendarApp({
+      plugins: [printPlugin],
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <button (click)="printPlugin.api.open()">印刷</button>
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
+
+      calendar = {
+        plugins: [this.printPlugin]
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+
+      const printPlugin = createPrintPlugin({
+        defaultOptions: {
+          miniCalendar: true,
+          calendarKeys: true,
+          textSize: 'medium',
+        },
+      });
+
+      const calendar = useCalendarApp({
+        plugins: [printPlugin],
+      });
+    </script>
+
+    <button on:click={() => printPlugin.api.open()}>印刷</button>
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 このプラグインは、カレンダーアプリに 2 つのヘルパーを直接インストールします。
 

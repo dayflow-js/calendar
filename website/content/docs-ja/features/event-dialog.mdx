@@ -10,16 +10,75 @@ DayFlow には、イベントの作成・編集・削除をまとめて行える
 
 DayFlow のデフォルト動作では、イベント詳細を開くと組み込みのフローティング詳細パネルが表示されます。デスクトップではデフォルトでダブルクリック（`eventDetailTrigger: 'dbClick'`）で開き、`eventDetailTrigger: 'click'` を設定するとシングルクリックで開きます。組み込みモーダルダイアログを使いたい場合は、`useCalendarApp` で `useEventDetailDialog` を有効にしてから `DayFlowCalendar` を描画します。
 
-```tsx
-import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
 
-const calendar = useCalendarApp({
-  views: [...],
-  useEventDetailDialog: true,
-});
+    const calendar = useCalendarApp({
+      views: [/* ビュー */],
+      useEventDetailDialog: true,
+    });
 
-<DayFlowCalendar calendar={calendar} />;
-```
+    <DayFlowCalendar calendar={calendar} />;
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+
+    const calendar = useCalendarApp({
+      views: [/* ビュー */],
+      useEventDetailDialog: true,
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [/* ビュー */],
+        useEventDetailDialog: true,
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+
+      const calendar = useCalendarApp({
+        views: [/* ビュー */],
+        useEventDetailDialog: true,
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ## カスタマイズ
 
@@ -27,35 +86,184 @@ const calendar = useCalendarApp({
 
 `eventDetailDialog` スロットを使用すると、DayFlow の開閉状態管理はそのままに、独自のダイアログコンポーネントに差し替えられます。この機能を使用するには、`useCalendarApp` の設定で `useEventDetailDialog: true` を設定する必要があります。
 
-```tsx
-// 1. カレンダー設定でダイアログモードを有効にする
-const calendar = useCalendarApp({
-  views: [...],
-  useEventDetailDialog: true,
-});
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    // 1. カレンダー設定でダイアログモードを有効にする
+    const calendar = useCalendarApp({
+      views: [/* ビュー */],
+      useEventDetailDialog: true,
+    });
 
-// 2. スロット経由で独自のダイアログを提供する
-<DayFlowCalendar
-  calendar={calendar}
-  eventDetailDialog={({ event, isOpen, onClose }) => (
-    <MyDialog isOpen={isOpen} onClose={onClose}>
-      <EventForm event={event} />
+    // 2. レンダープロップ経由で独自のダイアログを提供する
+    <DayFlowCalendar
+      calendar={calendar}
+      eventDetailDialog={({ event, isOpen, onClose }) => (
+        <MyDialog isOpen={isOpen} onClose={onClose}>
+          <EventForm event={event} />
+        </MyDialog>
+      )}
+    />
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar">
+        <template #eventDetailDialog="{ event, isOpen, onClose }">
+          <MyDialog :isOpen="isOpen" @close="onClose">
+            <EventForm :event="event" />
+          </MyDialog>
+        </template>
+      </DayFlowCalendar>
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+
+    const calendar = useCalendarApp({
+      views: [/* ビュー */],
+      useEventDetailDialog: true,
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar
+          [calendar]="calendar"
+          [eventDetailDialog]="customDialog"
+        >
+        </dayflow-calendar>
+
+        <ng-template #customDialog let-args>
+          <my-dialog [isOpen]="args.isOpen" (close)="args.onClose()">
+            <event-form [event]="args.event"></event-form>
+          </my-dialog>
+        </ng-template>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        views: [/* ビュー */],
+        useEventDetailDialog: true,
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <!-- App.svelte -->
+    <script lang="ts">
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+      import CustomDialog from './CustomDialog.svelte';
+
+      const calendar = useCalendarApp({
+        views: [/* ビュー */],
+        useEventDetailDialog: true,
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} eventDetailDialog={CustomDialog} />
+
+    <!-- CustomDialog.svelte -->
+    <script lang="ts">
+      import type { EventDetailDialogProps } from '@dayflow/core';
+      import MyDialog from './MyDialog.svelte';
+      import EventForm from './EventForm.svelte';
+
+      let { event, isOpen, onClose } = $props<EventDetailDialogProps>();
+    </script>
+
+    <MyDialog {isOpen} onclose={onClose}>
+      <EventForm {event} />
     </MyDialog>
-  )}
-/>
-```
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 ### 組み込みパネルを無効にする
 
 アプリケーション側でコールバックやグローバルな状態からイベント詳細を管理している場合は、`useCalendarApp` の設定で `useEventDetailPanel: false` を設定することで、組み込みのフローティングパネルを完全に非表示にできます。
 
-```tsx
-const calendar = useCalendarApp({
-  // ...
-  useEventDetailPanel: false,
-});
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    const calendar = useCalendarApp({
+      // ...
+      useEventDetailPanel: false,
+    });
 
-<DayFlowCalendar calendar={calendar} />;
-```
+    <DayFlowCalendar calendar={calendar} />;
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
+
+    const calendar = useCalendarApp({
+      // ...
+      useEventDetailPanel: false,
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `
+        <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
+      `
+    })
+    export class AppComponent {
+      calendar = {
+        // ...
+        useEventDetailPanel: false,
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
+
+      const calendar = useCalendarApp({
+        // ...
+        useEventDetailPanel: false,
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
 
 React、Vue、Svelte、Angular の各アダプターで利用できます。
