@@ -34,10 +34,10 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "autoprefixer": "catalog:",
-    "lefthook": "^2.1.1",
+    "lefthook": "^2.1.12",
     "lucide-react": "catalog:",
-    "oxfmt": "^0.35.0",
-    "oxlint": "^1.50.0",
+    "oxfmt": "^0.66.0",
+    "oxlint": "~1.50.0",
     "postcss-import": "catalog:",
     "preact": "catalog:",
     "react": "catalog:",
@@ -45,10 +45,15 @@
     "rimraf": "catalog:",
     "tailwindcss": "catalog:",
     "temporal-polyfill": "catalog:",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "^1.9.4",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "yaml@2": "^2.9.0"
+    }
+  }
 }

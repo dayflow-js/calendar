@@ -41,8 +41,8 @@
     "rollup-plugin-vue": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "vue": "^3.5.13",
-    "vue-tsc": "^2.2.0"
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
   },
   "peerDependencies": {
     "@dayflow/core": "workspace:^",

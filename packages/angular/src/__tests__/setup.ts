@@ -3,13 +3,13 @@ import '@analogjs/vitest-angular/setup-zone';
 import '@testing-library/jest-dom/vitest';
 import { getTestBed } from '@angular/core/testing';
 import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting,
-} from '@angular/platform-browser-dynamic/testing';
+  BrowserTestingModule,
+  platformBrowserTesting,
+} from '@angular/platform-browser/testing';
 
 getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
+  BrowserTestingModule,
+  platformBrowserTesting()
 );
 
 // jsdom does not implement ResizeObserver, which the calendar's layout code uses.

@@ -7,56 +7,56 @@ packages:
   - 'examples/*'
 
 catalog:
-  '@analogjs/vite-plugin-angular': 1.9.4
-  '@analogjs/vitest-angular': 1.9.4
-  '@angular-devkit/architect': ^0.1802.0
-  '@angular/build': ^18.2.0
+  '@analogjs/vite-plugin-angular': 2.7.1
+  '@analogjs/vitest-angular': 2.7.1
+  '@angular-devkit/architect': ^0.2102.0
+  '@angular/build': ^21.2.0
   '@dayflow/blossom-color-picker': ^2.0.1
-  '@preact/preset-vite': ^2.10.3
-  '@rollup/plugin-commonjs': ^28.0.2
+  '@preact/preset-vite': ^2.10.6
+  '@rollup/plugin-commonjs': ^29.0.3
   '@rollup/plugin-node-resolve': ^16.0.0
-  '@rollup/plugin-terser': ^0.4.4
+  '@rollup/plugin-terser': ^1.0.0
   '@rollup/plugin-typescript': ^12.1.2
-  '@sveltejs/vite-plugin-svelte': ^4.0.4
+  '@sveltejs/vite-plugin-svelte': ^6.2.4
   '@tailwindcss/postcss': ^4.2.1
   '@testing-library/angular': ^19.4.2
   '@testing-library/dom': ^10.4.1
-  '@testing-library/jest-dom': ^6.9.1
+  '@testing-library/jest-dom': ^7.0.1
   '@testing-library/preact': ^3.2.4
   '@testing-library/react': ^16.3.2
   '@testing-library/svelte': ^5.4.2
   '@testing-library/user-event': ^14.6.1
   '@testing-library/vue': ^8.1.0
-  '@vitest/coverage-v8': ^2.1.9
+  '@vitest/coverage-v8': ^4.1.11
   '@types/lodash': ^4.17.13
-  '@types/node': ^22.10.2
-  '@types/react': ^18.3.12
-  '@types/react-dom': ^18.3.1
+  '@types/node': ^24.13.3
+  '@types/react': ^19.2.18
+  '@types/react-dom': ^19.2.5
   '@vue/test-utils': ^2.4.11
-  autoprefixer: ^10.4.24
-  cssnano: ^7.0.6
-  esbuild: ^0.27.3
-  jsdom: ^25.0.1
-  lucide-react: 0.575.0
-  postcss: ^8.5.10
-  postcss-import: ^16.1.1
+  autoprefixer: ^10.5.4
+  cssnano: ^8.0.10
+  esbuild: ^0.28.2
+  jsdom: ^29.1.1
+  lucide-react: 1.39.0
+  postcss: ^8.5.26
+  postcss-import: ^17.0.0
   preact: ^10.28.3
-  react: ^18.3.1
-  react-dom: ^18.3.1
+  react: ^19.2.8
+  react-dom: ^19.2.8
   rimraf: ^6.1.2
-  rollup: ^4.29.1
+  rollup: ^4.63.1
   rollup-plugin-dts: ^6.3.0
   rollup-plugin-esbuild: ^6.2.1
   rollup-plugin-peer-deps-external: ^2.2.4
   rollup-plugin-postcss: ^4.0.2
   rollup-plugin-svelte: ^7.2.2
-  rollup-plugin-visualizer: ^6.0.5
+  rollup-plugin-visualizer: ^7.1.1
   rollup-plugin-vue: ^6.0.0
   tailwindcss: ^4.2.1
-  temporal-polyfill: ^0.3.0
+  temporal-polyfill: ^1.0.4
   tslib: ^2.8.1
   typescript: ^5.9.3
-  vite: ^5.4.20
-  vitest: ^2.1.9
+  vite: ^7.3.6
+  vitest: ^4.1.11
 
 catalogMode: prefer
