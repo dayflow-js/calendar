@@ -46,7 +46,7 @@
     "rimraf": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-dts": "catalog:",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "^1.9.4",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

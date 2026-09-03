@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 
 @Directive({
+  standalone: false,
   selector: '[dayflowPortal]',
 })
 export class DayFlowPortalDirective implements OnChanges, OnDestroy {

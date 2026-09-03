@@ -1,7 +1,7 @@
 'use client';
 
+import { useTranslations } from '@fuma-translate/react';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
-import { useI18n } from 'fumadocs-ui/contexts/i18n';
 import { useSearchContext } from 'fumadocs-ui/contexts/search';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
@@ -31,7 +31,7 @@ function DocsLink() {
 
 export function HeaderSearchLarge() {
   const { setOpenSearch, enabled, hotKey } = useSearchContext();
-  const { text } = useI18n();
+  const t = useTranslations({ note: 'search trigger' });
 
   return (
     <>
@@ -45,7 +45,7 @@ export function HeaderSearchLarge() {
           className='bg-fd-secondary/50 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground inline-flex w-full max-w-[240px] items-center gap-2 rounded-full border p-1.5 ps-2.5 text-sm transition-colors'
         >
           <Search className='size-4' />
-          {text.search}
+          {t('Search')}
           <div className='ms-auto inline-flex gap-0.5'>
             {hotKey.map((key, i) => (
               <kbd

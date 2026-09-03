@@ -15,7 +15,7 @@
     "jsxImportSource": "preact",
     "declaration": true,
     "declarationMap": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "react": ["../../node_modules/preact/compat"],

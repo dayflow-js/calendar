@@ -23,6 +23,7 @@ import { DayFlowCalendarComponent } from '../lib/day-flow-calendar.component';
 import { DayFlowCalendarModule } from '../lib/day-flow-calendar.module';
 
 @Component({
+  standalone: false,
   template: `
     <ng-template #titleTpl let-args>
       <span data-testid="title-bar">my toolbar:{{ args.slot }}</span>
@@ -51,6 +52,15 @@ describe('DayFlowCalendarComponent', () => {
   let fixture: ComponentFixture<HostComponent>;
   let app: FakeApp;
 
+  /**
+   * Angular 19+ only refreshes views that are marked dirty. These tests mutate
+   * host state from outside the Angular zone, so nothing marks the view for us.
+   */
+  const sync = () => {
+    fixture.changeDetectorRef.markForCheck();
+    fixture.detectChanges();
+  };
+
   const setup = (
     options: { withTitle?: boolean; withHeader?: boolean } = {}
   ) => {
@@ -59,7 +69,7 @@ describe('DayFlowCalendarComponent', () => {
     fixture.componentInstance.calendar = app;
     fixture.componentInstance.withTitle = options.withTitle ?? true;
     fixture.componentInstance.withHeader = options.withHeader ?? false;
-    fixture.detectChanges();
+    sync();
     return fixture;
   };
 
@@ -100,7 +110,7 @@ describe('DayFlowCalendarComponent', () => {
 
     it('portals the template output into the placeholder', () => {
       setup();
-      fixture.detectChanges();
+      sync();
 
       const placeholder = document.querySelector('[data-slot="titleBarSlot"]');
       expect(placeholder).not.toBeNull();
@@ -109,7 +119,7 @@ describe('DayFlowCalendarComponent', () => {
 
     it('passes the generator args into the template context', () => {
       setup();
-      fixture.detectChanges();
+      sync();
 
       const el = document.querySelector('[data-testid="title-bar"]');
       expect(el?.textContent?.trim()).toBe('my toolbar:titleBarSlot');
@@ -117,7 +127,7 @@ describe('DayFlowCalendarComponent', () => {
 
     it('renders each registered template independently', () => {
       setup({ withTitle: true, withHeader: true });
-      fixture.detectChanges();
+      sync();
 
       expect(
         document.querySelector('[data-slot="titleBarSlot"]')?.textContent
@@ -137,7 +147,7 @@ describe('DayFlowCalendarComponent', () => {
         generatorName: 'gridPopupContent',
         generatorArgs: {},
       });
-      fixture.detectChanges();
+      sync();
 
       expect(el.childNodes).toHaveLength(0);
     });
@@ -148,7 +158,7 @@ describe('DayFlowCalendarComponent', () => {
       setup({ withTitle: true, withHeader: false });
 
       fixture.componentInstance.withHeader = true;
-      fixture.detectChanges();
+      sync();
 
       const storeUpdates = lifecycleLog.filter(e => e.type === 'setOverrides');
       expect(storeUpdates.at(-1)).toMatchObject({
@@ -161,7 +171,7 @@ describe('DayFlowCalendarComponent', () => {
       setup({ withTitle: true, withHeader: true });
 
       fixture.componentInstance.withHeader = false;
-      fixture.detectChanges();
+      sync();
 
       expect(app.overrides).toEqual(['titleBarSlot']);
     });

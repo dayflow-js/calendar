@@ -8,6 +8,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DayFlowCalendarModule } from '../lib/day-flow-calendar.module';
 
 @Component({
+  standalone: false,
   template: `
     <div style="display: none">
       <div *ngIf="visible" [dayflowPortal]="target">
@@ -24,6 +25,15 @@ class HostComponent {
 describe('DayFlowPortalDirective', () => {
   let fixture: ComponentFixture<HostComponent>;
 
+  /**
+   * Angular 19+ only refreshes views that are marked dirty. These tests mutate
+   * host state from outside the Angular zone, so nothing marks the view for us.
+   */
+  const sync = () => {
+    fixture.changeDetectorRef.markForCheck();
+    fixture.detectChanges();
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [HostComponent],
@@ -38,7 +48,7 @@ describe('DayFlowPortalDirective', () => {
 
   it('moves the host element into the target on first binding', () => {
     const { target } = fixture.componentInstance;
-    fixture.detectChanges();
+    sync();
 
     expect(target.querySelector('[data-testid="portaled"]')).not.toBeNull();
     // It must leave the staging area, not be copied into both places.
@@ -48,24 +58,24 @@ describe('DayFlowPortalDirective', () => {
   });
 
   it('moves the element again when the target changes', () => {
-    fixture.detectChanges();
+    sync();
     const first = fixture.componentInstance.target;
     const second = document.createElement('div');
 
     fixture.componentInstance.target = second;
-    fixture.detectChanges();
+    sync();
 
     expect(second.querySelector('[data-testid="portaled"]')).not.toBeNull();
     expect(first.querySelector('[data-testid="portaled"]')).toBeNull();
   });
 
   it('removes the element from the target on destroy', () => {
-    fixture.detectChanges();
+    sync();
     const { target } = fixture.componentInstance;
     expect(target.childNodes.length).toBe(1);
 
     fixture.componentInstance.visible = false;
-    fixture.detectChanges();
+    sync();
 
     expect(target.childNodes.length).toBe(0);
   });
@@ -73,15 +83,15 @@ describe('DayFlowPortalDirective', () => {
   it('leaves a target it no longer owns untouched on destroy', () => {
     // After the target switches, destroying the directive must not reach back
     // into the old container and remove something it does not own.
-    fixture.detectChanges();
+    sync();
     const first = fixture.componentInstance.target;
     const stranger = document.createElement('span');
     first.append(stranger);
 
     fixture.componentInstance.target = document.createElement('div');
-    fixture.detectChanges();
+    sync();
     fixture.componentInstance.visible = false;
-    fixture.detectChanges();
+    sync();
 
     expect(first.contains(stranger)).toBe(true);
   });

@@ -48,7 +48,7 @@
     "./dist/styles.components.css": "./dist/styles.components.css"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs && pnpm run build:css && pnpm run check:css",
+    "build": "tsc -p tsconfig.build.json && rollup -c && pnpm run build:css && pnpm run check:css",
     "build:css": "node ./scripts/build-css.mjs",
     "check:css": "pnpm run check:css:source && pnpm run check:css:dist",
     "check:css:dist": "node ./scripts/check-dist-styling.mjs --package-root .",
