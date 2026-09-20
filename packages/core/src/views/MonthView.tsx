@@ -538,6 +538,8 @@ const MonthView = ({
     [eventsByWeek, dragPreviewEvent, startOfWeek, appTimeZone]
   );
 
+  const isGridDateClickRef = useRef(false);
+
   const {
     currentMonth,
     currentYear,
@@ -571,6 +573,7 @@ const MonthView = ({
     startOfWeek: startOfWeek,
     isEnabled: isWeekHeightInitialized,
     snapToMonth: config.snapToMonth,
+    skipScrollOnDateChange: isGridDateClickRef,
   });
 
   const previousStartIndexRef = useRef(0);
@@ -807,6 +810,7 @@ const MonthView = ({
 
   const handleGridDateClick = useCallback(
     (date: Date, dayEvents: Event[], e?: MouseEvent) => {
+      isGridDateClickRef.current = true;
       const clickAction = config?.gridDateClick;
       if (!clickAction) {
         app.selectDate(date);
@@ -828,6 +832,14 @@ const MonthView = ({
       // 'none' → do nothing
     },
     [config.gridDateClick, app]
+  );
+
+  const handleSelectDate = useCallback(
+    (date: Date) => {
+      isGridDateClickRef.current = true;
+      app.selectDate(date);
+    },
+    [app]
   );
 
   const handleGridDateDoubleClick = useCallback(
@@ -938,8 +950,15 @@ const MonthView = ({
                   eventHeight={config.eventHeight}
                   showWeekNumbers={config.showWeekNumbers}
                   showMonthIndicator={false}
-                  currentMonth={''}
-                  currentYear={0}
+                  currentMonth={
+                    getMonthLabels(
+                      locale,
+                      locale.startsWith('zh') || locale.startsWith('ja')
+                        ? 'short'
+                        : 'long'
+                    )[fadeDisplayDate.getMonth()]
+                  }
+                  currentYear={fadeDisplayDate.getFullYear()}
                   screenSize={screenSize}
                   isScrolling={false}
                   calendarRef={calendarRef}
@@ -955,7 +974,7 @@ const MonthView = ({
                   onDetailPanelOpen={handleDetailPanelOpen}
                   onMoreEventsClick={app.onMoreEventsClick}
                   onChangeView={handleChangeView}
-                  onSelectDate={app.selectDate}
+                  onSelectDate={handleSelectDate}
                   onGridDateClick={handleGridDateClick}
                   onGridDateDoubleClick={handleGridDateDoubleClick}
                   selectedEventId={selectedEventId}
@@ -1026,7 +1045,7 @@ const MonthView = ({
                 onDetailPanelOpen={handleDetailPanelOpen}
                 onMoreEventsClick={app.onMoreEventsClick}
                 onChangeView={handleChangeView}
-                onSelectDate={app.selectDate}
+                onSelectDate={handleSelectDate}
                 onGridDateClick={handleGridDateClick}
                 onGridDateDoubleClick={handleGridDateDoubleClick}
                 selectedEventId={selectedEventId}

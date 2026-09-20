@@ -120,6 +120,7 @@ export const useVirtualMonthScroll = ({
   startOfWeek = 1,
   isEnabled = true,
   snapToMonth = false,
+  skipScrollOnDateChange,
 }: UseVirtualMonthScrollProps): UseVirtualMonthScrollReturn => {
   const targetNavigationRef = useRef<{ month: string; year: number } | null>(
     null
@@ -671,6 +672,12 @@ export const useVirtualMonthScroll = ({
     const nextMonth = currentDate.getMonth();
     const nextYear = currentDate.getFullYear();
 
+    if (skipScrollOnDateChange?.current) {
+      skipScrollOnDateChange.current = false;
+      previousDateRef.current = currentDate;
+      return;
+    }
+
     if (prevMonth !== nextMonth || prevYear !== nextYear) {
       // Check if the new date is already visible in the current viewport
       const FIXED_WEEKS_TO_SHOW = 6;
@@ -679,6 +686,21 @@ export const useVirtualMonthScroll = ({
         weeksData.length - 1,
         startIndex + FIXED_WEEKS_TO_SHOW - 1
       );
+
+      // Check if the target date is already visible within the currently displayed weeks
+      // and is not the 1st day of a new month being navigated to.
+      const isDateVisible =
+        currentDate.getDate() !== 1 &&
+        weeksData
+          .slice(startIndex, endIndex + 1)
+          .some(week =>
+            week?.days.some(
+              day =>
+                day.date.getFullYear() === currentDate.getFullYear() &&
+                day.date.getMonth() === currentDate.getMonth() &&
+                day.date.getDate() === currentDate.getDate()
+            )
+          );
 
       // Check if nextMonth/nextYear is already the dominant displayed month.
       // Using dominant-month logic instead of raw date presence avoids a false
@@ -704,7 +726,7 @@ export const useVirtualMonthScroll = ({
       }
       const isVisible = dominantKey === `${nextMonth}-${nextYear}`;
 
-      if (!isVisible) {
+      if (!isVisible && !isDateVisible) {
         const firstDayOfMonth = new Date(nextYear, nextMonth, 1);
         const monthName = getMonthName(nextMonth, nextYear);
 
@@ -724,6 +746,7 @@ export const useVirtualMonthScroll = ({
     virtualData,
     weeksData,
     getMonthName,
+    skipScrollOnDateChange,
   ]);
 
   // Container size listener

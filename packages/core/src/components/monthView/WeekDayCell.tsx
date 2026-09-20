@@ -315,7 +315,6 @@ const WeekDayCell = ({
       }
       data-date={createDateString(day.date)}
       onClick={() => {
-        if (!belongsToCurrentMonth) return;
         if (onGridDateClick) {
           onGridDateClick(day.date, dayEvents);
         } else {

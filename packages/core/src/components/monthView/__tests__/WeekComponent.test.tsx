@@ -1,4 +1,4 @@
-import { render, within } from '@testing-library/preact';
+import { render, within, fireEvent } from '@testing-library/preact';
 import { Temporal } from 'temporal-polyfill';
 
 import WeekComponent from '@/components/monthView/WeekComponent';
@@ -631,5 +631,136 @@ describe('WeekComponent', () => {
     ).map(node => (node as HTMLElement).dataset.eventId);
 
     expect(renderedEvents.slice(0, 3)).toEqual(['b', 'a', 'c']);
+  });
+
+  it('triggers onGridDateClick when clicking an out-of-month day cell (e.g. Aug 31 in Sept)', () => {
+    const onGridDateClick = vi.fn();
+    const onSelectDate = vi.fn();
+
+    const app = new CalendarApp({
+      views: [],
+      plugins: [],
+      events: [],
+      defaultView: ViewType.MONTH,
+    });
+
+    const calendarRef = {
+      current: document.createElement('div'),
+    } as { current: HTMLDivElement };
+
+    // 2026-08-31 is Monday, week start is Monday
+    const weekData = generateWeekData(new Date(2026, 7, 31));
+
+    const { container } = render(
+      <WeekComponent
+        currentMonth='September'
+        currentYear={2026}
+        newlyCreatedEventId={null}
+        screenSize='desktop'
+        isScrolling={false}
+        isDragging={false}
+        showWeekNumbers={false}
+        item={{
+          index: 0,
+          weekData,
+          top: 0,
+          height: 140,
+        }}
+        weekHeight={140}
+        events={[]}
+        dragState={{
+          active: false,
+          mode: null,
+          eventId: null,
+          targetDate: null,
+          startDate: null,
+          endDate: null,
+        }}
+        calendarRef={calendarRef}
+        onEventUpdate={vi.fn()}
+        onEventDelete={vi.fn()}
+        onDetailPanelOpen={vi.fn()}
+        onGridDateClick={onGridDateClick}
+        onSelectDate={onSelectDate}
+        {...createRequiredWeekProps()}
+        app={app}
+      />
+    );
+
+    const aug31Cell = container.querySelector('[data-date="2026-08-31"]');
+    expect(aug31Cell).not.toBeNull();
+    expect(aug31Cell.dataset.otherMonth).toBe('true');
+
+    fireEvent.click(aug31Cell!);
+
+    expect(onGridDateClick).toHaveBeenCalledTimes(1);
+    const calledDate: Date = onGridDateClick.mock.calls[0][0];
+    expect(calledDate.getFullYear()).toBe(2026);
+    expect(calledDate.getMonth()).toBe(7); // August (0-indexed)
+    expect(calledDate.getDate()).toBe(31);
+  });
+
+  it('triggers onSelectDate when clicking an out-of-month day cell without onGridDateClick', () => {
+    const onSelectDate = vi.fn();
+
+    const app = new CalendarApp({
+      views: [],
+      plugins: [],
+      events: [],
+      defaultView: ViewType.MONTH,
+    });
+
+    const calendarRef = {
+      current: document.createElement('div'),
+    } as { current: HTMLDivElement };
+
+    const weekData = generateWeekData(new Date(2026, 7, 31));
+
+    const { container } = render(
+      <WeekComponent
+        currentMonth='September'
+        currentYear={2026}
+        newlyCreatedEventId={null}
+        screenSize='desktop'
+        isScrolling={false}
+        isDragging={false}
+        showWeekNumbers={false}
+        item={{
+          index: 0,
+          weekData,
+          top: 0,
+          height: 140,
+        }}
+        weekHeight={140}
+        events={[]}
+        dragState={{
+          active: false,
+          mode: null,
+          eventId: null,
+          targetDate: null,
+          startDate: null,
+          endDate: null,
+        }}
+        calendarRef={calendarRef}
+        onEventUpdate={vi.fn()}
+        onEventDelete={vi.fn()}
+        onDetailPanelOpen={vi.fn()}
+        onSelectDate={onSelectDate}
+        {...createRequiredWeekProps()}
+        app={app}
+      />
+    );
+
+    const aug31Cell = container.querySelector('[data-date="2026-08-31"]');
+    expect(aug31Cell).not.toBeNull();
+    expect(aug31Cell.dataset.otherMonth).toBe('true');
+
+    fireEvent.click(aug31Cell!);
+
+    expect(onSelectDate).toHaveBeenCalledTimes(1);
+    const calledDate: Date = onSelectDate.mock.calls[0][0];
+    expect(calledDate.getFullYear()).toBe(2026);
+    expect(calledDate.getMonth()).toBe(7); // August
+    expect(calledDate.getDate()).toBe(31);
   });
 });
