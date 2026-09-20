@@ -1,20 +1,33 @@
 ---
 title: 打印插件
-description: DayFlow Pro 打印和导出工作流，支持预览、纸张尺寸、日历过滤和多种打印布局。
+description: DayFlow Pro 打印与多格式导出工作流，支持交互式预览、9 种纸张规格、触控板捏合缩放、实时表格数据预览以及代码无头导出。
 status: pro
 ---
 
 # 打印插件 (Print Plugin)
 
-`@dayflow-pro/plugin-print` 为 DayFlow 增加了内置的打印对话框和预览流程。它支持日、周、月以及两种年度布局，允许用户选择纸张尺寸和方向，并能根据上下文打印当前可见的事件集或所有匹配的事件。
+`@dayflow-pro/plugin-print` 为 DayFlow 提供了内置的打印对话框与多格式导出工作流。它支持交互式页面预览、纸张尺寸与方向控制、触控板手势缩放、表格数据实时预览以及纯代码无头导出。
 
-试用[在线演示](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print)
+| 导出格式 | 输出说明                                                                                   |
+| :------- | :----------------------------------------------------------------------------------------- |
+| `print`  | 浏览器原生打印对话框，严格匹配所选纸张规格；支持纸质打印或直接另存为高清矢量 PDF           |
+| `png`    | 高分辨率逐页图像渲染；多页导出时会自动打包为 ZIP 压缩包下载                                |
+| `xlsx`   | 原生 Excel 工作簿：包含 **Events**（事件明细）与 **Summary**（日历分类统计）两个完整工作表 |
+| `ics`    | 标准 iCalendar 文件，可直接导入至 Google 日历、Apple 日历、Outlook 等主流日历应用          |
+
+试用[在线演示](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print)。
 
 ## 安装
 
 <PackageTabs pkg='@dayflow-pro/plugin-print' />
 
-有关 DayFlow Pro 的安装步骤，请参阅 [Pro 安装](/docs/introduction/pro-installation)。
+有关许可证配置与激活，请参阅 [Pro 安装](/docs/introduction/pro-installation)。
+
+请确保在项目中引入组件样式：
+
+```ts
+import '@dayflow-pro/plugin-print/dist/styles.components.css';
+```
 
 ## 基本用法
 
@@ -23,6 +36,7 @@ status: pro
     ```tsx
     import { useCalendarApp, DayFlowCalendar } from '@dayflow/react';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     function App() {
       const printPlugin = createPrintPlugin({
@@ -35,14 +49,17 @@ status: pro
 
       const calendar = useCalendarApp({
         views: [
-          /* 视图 */
+          /* 你的视图配置 */
         ],
         plugins: [printPlugin],
       });
 
       return (
         <>
-          <button onClick={() => printPlugin.api.open()}>打印</button>
+          <button onClick={() => calendar.app.openPrintDialog()}>打印</button>
+          <button onClick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+            导出 Excel
+          </button>
           <DayFlowCalendar calendar={calendar} />
         </>
       );
@@ -54,7 +71,10 @@ status: pro
     ```vue
     <template>
       <div>
-        <button @click="printPlugin.api.open()">打印</button>
+        <button @click="calendar.app.openPrintDialog()">打印</button>
+        <button @click="calendar.app.openPrintDialog({ format: 'xlsx' })">
+          导出 Excel
+        </button>
         <DayFlowCalendar :calendar="calendar" />
       </div>
     </template>
@@ -62,6 +82,7 @@ status: pro
     <script setup>
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     const printPlugin = createPrintPlugin({
       defaultOptions: {
@@ -73,7 +94,7 @@ status: pro
 
     const calendar = useCalendarApp({
       views: [
-        /* 视图 */
+        /* 你的视图配置 */
       ],
       plugins: [printPlugin],
     });
@@ -86,13 +107,15 @@ status: pro
     import { Component } from '@angular/core';
     import { DayFlowCalendarModule } from '@dayflow/angular';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     @Component({
       selector: 'app-root',
       standalone: true,
       imports: [DayFlowCalendarModule],
       template: `
-        <button (click)="printPlugin.api.open()">打印</button>
+        <button (click)="calendar.app.openPrintDialog()">打印</button>
+        <button (click)="calendar.app.openPrintDialog({ format: 'xlsx' })">导出 Excel</button>
         <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
       `
     })
@@ -107,7 +130,7 @@ status: pro
 
       calendar = {
         views: [
-          /* 视图 */
+          /* 你的视图配置 */
         ],
         plugins: [this.printPlugin]
       };
@@ -120,6 +143,7 @@ status: pro
     <script>
       import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
       import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+      import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
       const printPlugin = createPrintPlugin({
         defaultOptions: {
@@ -131,34 +155,50 @@ status: pro
 
       const calendar = useCalendarApp({
         views: [
-          /* 视图 */
+          /* 你的视图配置 */
         ],
         plugins: [printPlugin],
       });
     </script>
 
-    <button on:click={() => printPlugin.api.open()}>打印</button>
+    <button onclick={() => calendar.app.openPrintDialog()}>打印</button>
+    <button onclick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+      导出 Excel
+    </button>
     <DayFlowCalendar {calendar} />
     ```
 
   </Tab>
 </FrameworkTabs>
 
-该插件还会在日历实例上直接安装两个辅助方法：
+该插件会在日历实例上直接挂载辅助方法：
 
 ```tsx
-await calendar.openPrintDialog();
-await calendar.print();
+// 打开默认打印预览弹窗
+await calendar.app.openPrintDialog();
+
+// 打开指定格式或视图的弹窗
+await calendar.app.openPrintDialog({ format: 'xlsx', view: 'month' });
+
+// 直接触发浏览器原生打印流程
+await calendar.app.print();
+
+// 纯代码无头导出（不挂载弹窗）
+const result = await calendar.app.exportCalendar({
+  format: 'png',
+  view: 'week',
+});
 ```
 
-## 插件提供的功能
+## 功能特性
 
-- 渲染到 `document.body` 的打印预览对话框
-- 通过 `window.print()` 调用原生浏览器打印
-- 提供日、周、月和年度布局的视图选择
-- 通过 `calendarIds` 进行日历级别的过滤
-- 纸张尺寸和方向控制
-- 安装插件后支持 Cmd/Ctrl + P 快捷键
+- **4 种导出格式**：Print/PDF 矢量打印、PNG 图像（支持多页 ZIP 打包）、Excel (.xlsx) 表格及 iCalendar (.ics) 日历文件。
+- **9 种纸张尺寸**：全面支持 `A3`、`A4`、`A5`、`B3`、`B4`、`B5`、`Letter`、`Legal`、`Tabloid`。
+- **交互式预览弹窗**：按纸张精确缩放预览、触控板双指捏合缩放（Pinch Zoom）、拖拽平移及自适应布局调整。
+- **实时表格数据预览**：切换至 `xlsx` 或 `ics` 格式时，弹窗内会即时呈现表格化数据明细，确认无误后再行下载。
+- **代码无头导出**：可直接调用 `calendar.app.exportCalendar()` 或 `printPlugin.api.export()`，支持直接接收 Blob 数据流。
+- **日历与类别过滤**：支持勾选特定日历、全天事件与带时间事件。
+- **全局快捷键**：安装插件后按下 `Cmd + P` 或 `Ctrl + P` 即可呼出打印弹窗。
 
 ## 支持的打印视图
 
@@ -170,79 +210,108 @@ await calendar.print();
 | `year-fixed-week` | 使用固定的每周行进行年度概览。默认为横向。 |
 | `year-canvas`     | 针对纵向输出优化的密集年度概览。           |
 
-对话框打开时，会根据当前的 DayFlow 视图派生其初始视图：
+对话框打开时，会根据当前的 DayFlow 视图自动选择对应视图：
 
 - 当前为月视图 -> `month`
 - 当前为周视图 -> `week`
 - 当前为日视图 -> `day`
 - 当前为年视图 -> `year-fixed-week`
 
-## 插件配置
+## 代码无头导出 (Headless Export)
 
-| 属性             | 类型                            | 默认值 | 备注                               |
-| :--------------- | :------------------------------ | :----- | :--------------------------------- |
-| `enabled`        | `boolean`                       | `true` | 设置为 `false` 时完全禁用安装。    |
-| `defaultOptions` | `Partial<CalendarPrintOptions>` | —      | 预加载自定义打印选项。             |
-| `license`        | `PackageLicenseConfig`          | —      | 当你不使用全局注册时的可选覆盖项。 |
+无需打开弹窗界面，即可通过代码静默导出日历数据：
+
+```ts
+const result = await calendar.app.exportCalendar({
+  format: 'xlsx',
+  view: 'month',
+  startDate: new Date(2026, 8, 1),
+  endDate: new Date(2026, 11, 1), // 导出 9 月至 12 月
+  calendarIds: ['work', 'personal'],
+  download: true, // 设为 false 则不触发浏览器下载，而是通过 result.blob 返回
+  pixelRatio: 3, // 用于 PNG 渲染分辨率倍率（1 为 96 DPI）
+  onProgress: ({ completed, total }) => {
+    console.log(`已渲染 ${completed} / ${total} 页`);
+  },
+});
+
+console.log(result.filename); // 'calendar-2026-09_2026-12.xlsx'
+console.log(result.eventCount); // 匹配导出的事件总数
+console.log(result.pageCount); // 渲染的页面数（xlsx 和 ics 为 0）
+console.log(result.blob); // 当 download: false 时返回的 Blob 对象
+```
+
+### CalendarExportRequest 参数
+
+| 参数          | 类型                                                       | 默认值           | 说明                                                                           |
+| :------------ | :--------------------------------------------------------- | :--------------- | :----------------------------------------------------------------------------- |
+| `format`      | `'print' \| 'png' \| 'xlsx' \| 'ics'`                      | 必填             | 目标导出格式。                                                                 |
+| `view`        | `PrintView`                                                | 当前视图         | 渲染布局（`day`、`week`、`month`、`year-fixed-week`、`year-canvas`）。         |
+| `paper`       | `PaperSize`                                                | 当前选择         | 纸张规格（`A3`, `A4`, `A5`, `B3`, `B4`, `B5`, `Letter`, `Legal`, `Tabloid`）。 |
+| `orientation` | `'portrait' \| 'landscape'`                                | 视图默认值       | 纸张方向（纵向 / 横向）。                                                      |
+| `startDate`   | `Date`                                                     | 当前应用日期     | 导出范围起始日期。                                                             |
+| `endDate`     | `Date`                                                     | 自动推算         | 导出范围结束日期。                                                             |
+| `calendarIds` | `string[]`                                                 | 全部日历         | 包含的日历 ID 列表。                                                           |
+| `options`     | `Partial<CalendarPrintOptions>`                            | 插件默认选项     | 字体密度、图例、事件类型过滤等。                                               |
+| `filename`    | `string`                                                   | 根据范围自动生成 | 自定义文件名（无需后缀）。                                                     |
+| `download`    | `boolean`                                                  | `true`           | 为 `false` 时不触发保存弹窗，仅在返回结果中包含 `result.blob`。                |
+| `pixelRatio`  | `number`                                                   | `3`              | PNG 图像清晰度倍率（1 代表 96 DPI）。                                          |
+| `onProgress`  | `(progress: { completed: number; total: number }) => void` | —                | PNG 逐页光栅化完成时的进度回调。                                               |
+| `signal`      | `AbortSignal`                                              | —                | 用于中途取消多页导出的信号。                                                   |
+
+## 插件配置 (PrintPluginConfig)
+
+在 `createPrintPlugin(config)` 中可配置全局默认值：
+
+```ts
+const printPlugin = createPrintPlugin({
+  formats: ['print', 'png', 'xlsx', 'ics'], // 弹窗中展示的格式及顺序
+  filename: ({ format, view, rangeStart, rangeEnd }) => `schedule-${view}`,
+  pixelRatio: 3,
+  defaultOptions: {
+    miniCalendar: true,
+    calendarKeys: true,
+    textSize: 'medium',
+  },
+});
+```
+
+| 属性             | 类型                                                             | 默认值                            | 说明                            |
+| :--------------- | :--------------------------------------------------------------- | :-------------------------------- | :------------------------------ |
+| `enabled`        | `boolean`                                                        | `true`                            | 设置为 `false` 时完全禁用插件。 |
+| `formats`        | `CalendarExportFormat[]`                                         | `['print', 'png', 'xlsx', 'ics']` | 弹窗格式切换标签中的可用格式。  |
+| `filename`       | `string \| ((context: CalendarExportFilenameContext) => string)` | —                                 | 自定义文件名或名称生成函数。    |
+| `pixelRatio`     | `number`                                                         | `3`                               | PNG 默认分辨率倍率。            |
+| `defaultOptions` | `Partial<CalendarPrintOptions>`                                  | —                                 | 预加载的打印和展示选项。        |
+| `license`        | `PackageLicenseConfig`                                           | —                                 | 非全局注册模式下的许可证配置。  |
 
 ## CalendarPrintOptions
 
-| 属性            | 类型                             | 默认值   | 备注                       |
+| 属性            | 类型                             | 默认值   | 说明                       |
 | :-------------- | :------------------------------- | :------- | :------------------------- |
-| `allDayEvents`  | `boolean`                        | `true`   | 包含全天事件。             |
-| `timedEvents`   | `boolean`                        | `true`   | 包含带时间事件。           |
+| `allDayEvents`  | `boolean`                        | `true`   | 是否包含全天事件。         |
+| `timedEvents`   | `boolean`                        | `true`   | 是否包含带时间事件。       |
 | `miniCalendar`  | `boolean`                        | `true`   | 在打印页眉中显示迷你日历。 |
-| `calendarKeys`  | `boolean`                        | `true`   | 显示日历图例。             |
-| `blackAndWhite` | `boolean`                        | `false`  | 渲染时不带日历颜色。       |
-| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium` | 控制预览和打印的排版密度。 |
+| `calendarKeys`  | `boolean`                        | `true`   | 显示日历类别图例。         |
+| `blackAndWhite` | `boolean`                        | `false`  | 黑白无色彩模式。           |
+| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium` | 控制预览与排版字号密度。   |
 
-## CalendarPrintConfig
+## 插件 API
 
-你可以使用部分配置预设或覆盖打印对话框：
-
-```ts
-type CalendarPrintConfig = {
-  view: 'month' | 'week' | 'day' | 'year-fixed-week' | 'year-canvas';
-  paper: 'A4' | 'Letter';
-  orientation?: 'portrait' | 'landscape';
-  startDate: Date;
-  endDate?: Date;
-  calendarIds: string[];
-  options: CalendarPrintOptions;
-};
-```
-
-源码中的重要行为：
-
-- `year-fixed-week` 强制使用 `landscape`（横向）。
-- `year-canvas` 强制使用 `portrait`（纵向）。
-- 对话框在打开浏览器原生打印 UI 之前会注入 `@page` 规则。
-- 预览支持在打印前进行缩放和移动。
-
-## 打印范围
-
-对话框并不总是从同一个事件源拉取数据：
-
-- 如果选择的打印视图与当前日历视图匹配，且 `startDate` 与应用当前日期匹配，预览渲染将使用 `app.getEvents()` 获取可见事件集。
-- 否则，它将使用 `app.getAllEvents()`，以便打印可以覆盖当前渲染屏幕之外的日期。
-
-这在内部公开为 `sourceScope: 'visible' | 'all'`。
-
-## API
-
-`createPrintPlugin()` 返回一个带有 `api` 对象的普通 DayFlow 插件：
+插件实例通过 `api` 对象暴露方法：
 
 ```ts
 type PrintPluginApi = {
-  open: () => void;
+  open: (options?: PrintDialogOpenOptions) => void;
   close: () => void;
-  print: (config?: Partial<CalendarPrintConfig>) => void;
+  print: (config?: CalendarPrintConfigInput) => void;
+  export: (request: CalendarExportRequest) => Promise<CalendarExportResult>;
 };
 ```
 
-备注：
+## 补充说明
 
-- `api.open()` 打开打印对话框。
-- `api.close()` 关闭已挂载的对话框。
-- `api.print(config)` 目前也会打开对话框；暂不支持绕过预览直接打印。
-- 插件安装后会全局监听 `Cmd/Ctrl + P`。
+- **PDF 导出方式**：在浏览器原生打印界面（`print`）中，打印机选择 **“另存为 PDF”** 即可生成文字可检索、可高亮选中的矢量 PDF 文件。
+- **时区与标准支持**：导出的 Excel 文件会严格遵照当前日历的 `timeZone` 呈现时间；ICS 文件遵从 RFC 5545 标准规范（时区时间转为 UTC，浮动时间以本地展示）。
+- **Retina 高清图与字体**：PNG 导出内置字体自动内联机制，并默认使用高 DPI 光栅化渲染（`pixelRatio: 3`）。
+- **交互手势操作**：预览窗口支持触控板双指捏合缩放（或 `Ctrl/Cmd` + 滚轮缩放），并可随时按住左键拖拽平移浏览页面细节。

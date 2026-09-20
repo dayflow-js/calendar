@@ -1,20 +1,33 @@
 ---
 title: 印刷プラグイン
-description: プレビュー、用紙サイズ設定、カレンダーフィルタリング、および複数の印刷用レイアウトを備えた DayFlow Pro の印刷およびエクスポートワークフロー。
+description: プレビュー、9種類の用紙サイズ、トラックパッドのピンチズーム、ライブデータプレビュー、およびヘッドレスエクスポートを備えた DayFlow Pro の印刷およびエクスポートワークフロー。
 status: pro
 ---
 
 # 印刷プラグイン (Print Plugin)
 
-`@dayflow-pro/plugin-print` は、DayFlow に組み込みの印刷ダイアログとプレビューフローを追加します。日、週、月、および 2 つの年間レイアウトをサポートし、ユーザーは用紙サイズや向きを選択できます。コンテキストに応じて、現在表示されているイベントセットまたは一致するすべてのイベントを印刷できます。
+`@dayflow-pro/plugin-print` は、DayFlow に組み込みの印刷ダイアログとマルチフォーマットエクスポート機能を追加します。インタラクティブなページプレビュー、用紙サイズと向きの制御、トラックパッドのピンチズーム、スプレッドシートのリアルタイムデータプレビュー、およびヘッドレスエクスポートAPIを提供します。
 
-[ライブデモ](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print)を試す
+| フォーマット | 出力                                                                                         |
+| :----------- | :------------------------------------------------------------------------------------------- |
+| `print`      | ブラウザの印刷ダイアログ。選択した用紙に合わせてサイズ設定され、印刷または PDF 保存が可能    |
+| `png`        | 高解像度画像（ページごと）。複数ページは ZIP アーカイブとしてダウンロード                    |
+| `xlsx`       | Excel ワークブック：**Events** シート（イベント一覧）と **Summary** シート（カレンダー集計） |
+| `ics`        | Google カレンダー、Apple カレンダー、Outlook 向けの標準 iCalendar ファイル                   |
+
+[ライブデモ](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print)を試す。
 
 ## インストール
 
 <PackageTabs pkg='@dayflow-pro/plugin-print' />
 
-DayFlow Pro のインストール手順については、[Pro のインストール](/docs/introduction/pro-installation)を参照してください。
+ライセンス設定の詳細については、[Pro のインストール](/docs/introduction/pro-installation)を参照してください。
+
+コンポーネントのスタイルをインポートしてください：
+
+```ts
+import '@dayflow-pro/plugin-print/dist/styles.components.css';
+```
 
 ## 基本的な使い方
 
@@ -23,6 +36,7 @@ DayFlow Pro のインストール手順については、[Pro のインストー
     ```tsx
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     function App() {
       const printPlugin = createPrintPlugin({
@@ -34,12 +48,18 @@ DayFlow Pro のインストール手順については、[Pro のインストー
       });
 
       const calendar = useCalendarApp({
+        views: [
+          /* ビュー設定 */
+        ],
         plugins: [printPlugin],
       });
 
       return (
         <>
-          <button onClick={() => printPlugin.api.open()}>印刷</button>
+          <button onClick={() => calendar.app.openPrintDialog()}>印刷</button>
+          <button onClick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+            Excel エクスポート
+          </button>
           <DayFlowCalendar calendar={calendar} />
         </>
       );
@@ -50,13 +70,19 @@ DayFlow Pro のインストール手順については、[Pro のインストー
   <Tab>
     ```vue
     <template>
-      <button @click="printPlugin.api.open()">印刷</button>
-      <DayFlowCalendar :calendar="calendar" />
+      <div>
+        <button @click="calendar.app.openPrintDialog()">印刷</button>
+        <button @click="calendar.app.openPrintDialog({ format: 'xlsx' })">
+          Excel エクスポート
+        </button>
+        <DayFlowCalendar :calendar="calendar" />
+      </div>
     </template>
 
     <script setup>
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     const printPlugin = createPrintPlugin({
       defaultOptions: {
@@ -67,6 +93,9 @@ DayFlow Pro のインストール手順については、[Pro のインストー
     });
 
     const calendar = useCalendarApp({
+      views: [
+        /* ビュー設定 */
+      ],
       plugins: [printPlugin],
     });
     </script>
@@ -78,13 +107,15 @@ DayFlow Pro のインストール手順については、[Pro のインストー
     import { Component } from '@angular/core';
     import { DayFlowCalendarModule } from '@dayflow/angular';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     @Component({
       selector: 'app-root',
       standalone: true,
       imports: [DayFlowCalendarModule],
       template: `
-        <button (click)="printPlugin.api.open()">印刷</button>
+        <button (click)="calendar.app.openPrintDialog()">印刷</button>
+        <button (click)="calendar.app.openPrintDialog({ format: 'xlsx' })">Excel エクスポート</button>
         <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
       `
     })
@@ -98,6 +129,9 @@ DayFlow Pro のインストール手順については、[Pro のインストー
       });
 
       calendar = {
+        views: [
+          /* ビュー設定 */
+        ],
         plugins: [this.printPlugin]
       };
     }
@@ -109,6 +143,7 @@ DayFlow Pro のインストール手順については、[Pro のインストー
     <script>
       import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
       import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+      import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
       const printPlugin = createPrintPlugin({
         defaultOptions: {
@@ -119,116 +154,146 @@ DayFlow Pro のインストール手順については、[Pro のインストー
       });
 
       const calendar = useCalendarApp({
+        views: [
+          /* ビュー設定 */
+        ],
         plugins: [printPlugin],
       });
     </script>
 
-    <button on:click={() => printPlugin.api.open()}>印刷</button>
+    <button onclick={() => calendar.app.openPrintDialog()}>印刷</button>
+    <button onclick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+      Excel エクスポート
+    </button>
     <DayFlowCalendar {calendar} />
     ```
 
   </Tab>
 </FrameworkTabs>
 
-このプラグインは、カレンダーアプリに 2 つのヘルパーを直接インストールします。
+プラグインはカレンダーインスタンスに直接ヘルパーメソッドを登録します：
 
 ```tsx
-await calendar.openPrintDialog();
-await calendar.print();
+// デフォルトの印刷ダイアログを開く
+await calendar.app.openPrintDialog();
+
+// フォーマットやビューを指定して開く
+await calendar.app.openPrintDialog({ format: 'xlsx', view: 'month' });
+
+// ネイティブ印刷をトリガー
+await calendar.app.print();
+
+// UI ダイアログを開かずにコードからエクスポート
+const result = await calendar.app.exportCalendar({
+  format: 'png',
+  view: 'week',
+});
 ```
 
-## プラグインが提供するもの
+## 機能一覧
 
-- `document.body` にレンダリングされる印刷プレビューダイアログ
-- `window.print()` を介したブラウザ標準の印刷
-- 日、週、月、および年間レイアウトのビュー選択
-- `calendarIds` によるカレンダーレベルのフィルタリング
-- 用紙サイズと向きの制御
-- プラグインがインストールされている間の Cmd/Ctrl + P ショートカットのサポート
+- **4つのエクスポート形式**：Print/PDF、PNG（単一または複数ページの ZIP）、Excel (.xlsx)、および iCalendar (.ics)。
+- **9種類の用紙サイズ**：`A3`、`A4`、`A5`、`B3`、`B4`、`B5`、`Letter`、`Legal`、`Tabloid`。
+- **インタラクティブプレビュー**：用紙サイズ調整プレビュー、トラックパッドピンチズーム、ドラッグパン移動。
+- **リアルタイムデータプレビュー**：`xlsx` や `ics` に切り替えると、ダイアログ内にテーブル形式のデータプレビューを表示。
+- **ヘッドレスエクスポート**：`calendar.app.exportCalendar()` や `printPlugin.api.export()` を直接呼び出してファイルや Blob を取得。
+- **フィルタリング**：カレンダーごとの絞り込み、終日イベント/時間指定イベントの表示切り替え。
+- **ショートカット**：`Cmd + P` または `Ctrl + P` で印刷ダイアログを起動。
 
 ## サポートされている印刷ビュー
 
-| ビュー            | 備考                                                         |
-| :---------------- | :----------------------------------------------------------- |
-| `day`             | 選択した 1 日または複数日を印刷します。                      |
-| `week`            | 週間スタイルのレイアウトを印刷します。                       |
-| `month`           | 月間グリッドを印刷します。                                   |
-| `year-fixed-week` | 固定された週ごとの行を使用した年間概要。デフォルトは横向き。 |
-| `year-canvas`     | 縦向き出力に最適化された高密度な年間概要。                   |
+| ビュー            | 説明                                                          |
+| :---------------- | :------------------------------------------------------------ |
+| `day`             | 選択した1日または複数日を印刷。                               |
+| `week`            | 週間カレンダーレイアウトを印刷。                              |
+| `month`           | 月間グリッドレイアウトを印刷。                                |
+| `year-fixed-week` | 固定週行を使用した年間概要。デフォルトは横向き（landscape）。 |
+| `year-canvas`     | 縦向き（portrait）に最適化された高密度な年間概要。            |
 
-ダイアログが開くと、現在の DayFlow ビューから初期ビューが派生します。
+## コードからのエクスポート (Headless Export)
 
-- 現在が月表示 -> `month`
-- 現在が週表示 -> `week`
-- 現在が日表示 -> `day`
-- 現在が年表示 -> `year-fixed-week`
+ダイアログを開かずに直接エクスポートを実行できます：
 
-## プラグインの設定
+```ts
+const result = await calendar.app.exportCalendar({
+  format: 'xlsx',
+  view: 'month',
+  startDate: new Date(2026, 8, 1),
+  endDate: new Date(2026, 11, 1),
+  calendarIds: ['work', 'personal'],
+  download: true, // false に設定するとブラウザダウンロードを行わず result.blob を返します
+  pixelRatio: 3, // PNG 出力解像度倍率（1 = 96 DPI）
+  onProgress: ({ completed, total }) => {
+    console.log(`${total} ページ中 ${completed} ページをレンダリング`);
+  },
+});
 
-| プロパティ       | 型                              | デフォルト | 備考                                                     |
-| :--------------- | :------------------------------ | :--------- | :------------------------------------------------------- |
-| `enabled`        | `boolean`                       | `true`     | `false` に設定すると、インストールを完全に無効にします。 |
-| `defaultOptions` | `Partial<CalendarPrintOptions>` | —          | カスタム印刷オプションでダイアログをプリロードします。   |
-| `license`        | `PackageLicenseConfig`          | —          | グローバル登録を使用しない場合のオプションの上書き。     |
+console.log(result.filename); // 'calendar-2026-09_2026-12.xlsx'
+console.log(result.eventCount); // エクスポートされたイベント数
+console.log(result.pageCount); // レンダリングされたページ数（xlsx, ics は 0）
+console.log(result.blob); // download: false 時の Blob オブジェクト
+```
+
+### CalendarExportRequest オプション
+
+| オプション    | 型                                                         | デフォルト値       | 説明                                                                                 |
+| :------------ | :--------------------------------------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
+| `format`      | `'print' \| 'png' \| 'xlsx' \| 'ics'`                      | 必須               | エクスポート形式。                                                                   |
+| `view`        | `PrintView`                                                | 現在のビュー       | レンダリングレイアウト（`day`, `week`, `month`, `year-fixed-week`, `year-canvas`）。 |
+| `paper`       | `PaperSize`                                                | 現在の用紙設定     | 用紙サイズ（`A3`, `A4`, `A5`, `B3`, `B4`, `B5`, `Letter`, `Legal`, `Tabloid`）。     |
+| `orientation` | `'portrait' \| 'landscape'`                                | ビューの初期設定   | ページの向き。                                                                       |
+| `startDate`   | `Date`                                                     | 現在の日付         | エクスポート範囲の開始日。                                                           |
+| `endDate`     | `Date`                                                     | 自動計算           | エクスポート範囲の終了日。                                                           |
+| `calendarIds` | `string[]`                                                 | すべてのカレンダー | 対象のカレンダー ID 配列。                                                           |
+| `options`     | `Partial<CalendarPrintOptions>`                            | プラグインの初期値 | タイポグラフィ、凡例、イベントフィルタリングオプション。                             |
+| `filename`    | `string`                                                   | 範囲から自動生成   | 拡張子なしのカスタムファイル名。                                                     |
+| `download`    | `boolean`                                                  | `true`             | `false` の場合、ブラウザ保存を行わず `result.blob` を返します。                      |
+| `pixelRatio`  | `number`                                                   | `3`                | PNG 解像度倍率（1 = 96 DPI）。                                                       |
+| `onProgress`  | `(progress: { completed: number; total: number }) => void` | —                  | PNG ページごとの進行状況コールバック。                                               |
+| `signal`      | `AbortSignal`                                              | —                  | 処理を途中でキャンセルするためのシグナル。                                           |
+
+## プラグイン設定 (PrintPluginConfig)
+
+```ts
+const printPlugin = createPrintPlugin({
+  formats: ['print', 'png', 'xlsx', 'ics'],
+  filename: ({ format, view, rangeStart, rangeEnd }) => `schedule-${view}`,
+  pixelRatio: 3,
+  defaultOptions: {
+    miniCalendar: true,
+    calendarKeys: true,
+    textSize: 'medium',
+  },
+});
+```
+
+| プロパティ       | 型                                                               | デフォルト値                      | 説明                                     |
+| :--------------- | :--------------------------------------------------------------- | :-------------------------------- | :--------------------------------------- |
+| `enabled`        | `boolean`                                                        | `true`                            | `false` に設定するとプラグインを無効化。 |
+| `formats`        | `CalendarExportFormat[]`                                         | `['print', 'png', 'xlsx', 'ics']` | ダイアログに表示するフォーマットと順序。 |
+| `filename`       | `string \| ((context: CalendarExportFilenameContext) => string)` | —                                 | カスタムファイル名または生成関数。       |
+| `pixelRatio`     | `number`                                                         | `3`                               | PNG のデフォルト解像度倍率。             |
+| `defaultOptions` | `Partial<CalendarPrintOptions>`                                  | —                                 | 初期オプション設定。                     |
+| `license`        | `PackageLicenseConfig`                                           | —                                 | 個別ライセンス設定。                     |
 
 ## CalendarPrintOptions
 
-| プロパティ      | 型                               | デフォルト | 備考                                                 |
-| :-------------- | :------------------------------- | :--------- | :--------------------------------------------------- |
-| `allDayEvents`  | `boolean`                        | `true`     | 終日イベントを含めます。                             |
-| `timedEvents`   | `boolean`                        | `true`     | 時間指定イベントを含めます。                         |
-| `miniCalendar`  | `boolean`                        | `true`     | 印刷ヘッダーにミニカレンダーを表示します。           |
-| `calendarKeys`  | `boolean`                        | `true`     | カレンダーの凡例を表示します。                       |
-| `blackAndWhite` | `boolean`                        | `false`    | カレンダーの色を使用せずにレンダリングします。       |
-| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium`   | プレビューと印刷のタイポグラフィの密度を制御します。 |
+| プロパティ      | 型                               | デフォルト値 | 説明                                       |
+| :-------------- | :------------------------------- | :----------- | :----------------------------------------- |
+| `allDayEvents`  | `boolean`                        | `true`       | 終日イベントを含める。                     |
+| `timedEvents`   | `boolean`                        | `true`       | 時間指定イベントを含める。                 |
+| `miniCalendar`  | `boolean`                        | `true`       | 印刷ヘッダーにミニカレンダーを表示。       |
+| `calendarKeys`  | `boolean`                        | `true`       | カレンダー凡例を表示。                     |
+| `blackAndWhite` | `boolean`                        | `false`      | モノクロ印刷モード。                       |
+| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium`     | プレビューおよび印刷のタイポグラフィ密度。 |
 
-## CalendarPrintConfig
-
-印刷ダイアログを部分的な設定で事前シードまたは上書きできます。
-
-```ts
-type CalendarPrintConfig = {
-  view: 'month' | 'week' | 'day' | 'year-fixed-week' | 'year-canvas';
-  paper: 'A4' | 'Letter';
-  orientation?: 'portrait' | 'landscape';
-  startDate: Date;
-  endDate?: Date;
-  calendarIds: string[];
-  options: CalendarPrintOptions;
-};
-```
-
-ソースコードからの重要な動作:
-
-- `year-fixed-week` は強制的に `landscape`（横向き）になります。
-- `year-canvas` は強制的に `portrait`（縦向き）になります。
-- ダイアログは、ブラウザのネイティブ印刷 UI を開く前に `@page` ルールを注入します。
-- プレビューでは、印刷前にズームとパンがサポートされます。
-
-## 印刷スコープ
-
-ダイアログは常に同じイベントソースからプルするとは限りません。
-
-- 選択した印刷ビューが現在のカレンダービューと一致し、`startDate` がアプリの現在の日付と一致する場合、プレビューレンダリングは表示されているイベントセットに `app.getEvents()` を使用します。
-- それ以外の場合は `app.getAllEvents()` を使用し、現在画面にレンダリングされている範囲外の日付も印刷対象に含めることができます。
-
-これは内部的に `sourceScope: 'visible' | 'all'` として公開されています。
-
-## API
-
-`createPrintPlugin()` は、`api` オブジェクトを持つ通常の DayFlow プラグインを返します。
+## プラグイン API
 
 ```ts
 type PrintPluginApi = {
-  open: () => void;
+  open: (options?: PrintDialogOpenOptions) => void;
   close: () => void;
-  print: (config?: Partial<CalendarPrintConfig>) => void;
+  print: (config?: CalendarPrintConfigInput) => void;
+  export: (request: CalendarExportRequest) => Promise<CalendarExportResult>;
 };
 ```
-
-備考:
-
-- `api.open()`: 印刷ダイアログを開きます。
-- `api.close()`: ダイアログがマウントされている場合に閉じます。
-- `api.print(config)`: 現在、これもダイアログを開きます。まだプレビューをバイパスしません。
-- プラグインは、インストールされると `Cmd/Ctrl + P` をグローバルにリッスンします。
