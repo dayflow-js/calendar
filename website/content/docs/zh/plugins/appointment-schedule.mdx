@@ -186,21 +186,22 @@ appointmentPlugin.api.openEdit('product-demo');
 
 这些参数构成 `AppointmentSchedulePluginConfig`。
 
-| 配置项                     | 默认值         | 用途                                   |
-| -------------------------- | -------------- | -------------------------------------- |
-| `schedules`                | 必填           | 由应用控制的预约排期列表。             |
-| `activeScheduleId`         | 无             | 打开编辑器时选中指定排期。             |
-| `availabilitySnapMinutes`  | `15`           | 编辑可用时间时采用的分钟间隔。         |
-| `drawerPlacement`          | `'viewport'`   | 将编辑器挂载到视口或日历。             |
-| `drawerWidth`              | `420`          | 抽屉宽度，可传像素值或 CSS 长度。      |
-| `drawerTarget`             | 第一个日历     | `calendar` 模式使用的元素或 selector。 |
-| `drawerRenderer`           | 内置 drawer    | 替换完整的组织者编辑器。               |
-| `timeFormat`               | 当前视图的格式 | 使用 12 小时制或 24 小时制。           |
-| `conferenceProviders`      | `[]`           | 在地点选择器中加入具名会议服务。       |
-| `onCreateSchedule`         | 无             | 在你的应用中持久化新建的排期。         |
-| `onUpdateSchedule`         | 无             | 在你的应用中持久化已有排期的修改。     |
-| `onDeleteScheduleRequest`  | 无             | 请求宿主确认并删除排期。               |
-| `onExternalUpdateConflict` | 无             | 编辑期间收到外部受控更新时报告冲突。   |
+| 配置项                     | 默认值           | 用途                                                                                             |
+| -------------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| `schedules`                | 必填             | 由应用控制的预约排期列表。                                                                       |
+| `activeScheduleId`         | 无               | 打开编辑器时选中指定排期。                                                                       |
+| `availabilitySnapMinutes`  | `15`             | 编辑可用时间时采用的分钟间隔。                                                                   |
+| `drawerPlacement`          | `'viewport'`     | 将编辑器挂载到视口或日历。                                                                       |
+| `drawerWidth`              | `420`            | 抽屉宽度，可传像素值或 CSS 长度。                                                                |
+| `drawerTarget`             | 第一个日历       | `calendar` 模式使用的元素或 selector。                                                           |
+| `drawerRenderer`           | 内置 drawer      | 替换完整的组织者编辑器。                                                                         |
+| `timeFormat`               | 当前视图的格式   | 使用 12 小时制或 24 小时制。                                                                     |
+| `unavailableDisplayMode`   | `'grid-overlay'` | 不可用时间在时间网格上的展示样式（`'grid-overlay'` 全列对角斜纹遮罩，或 `'bar'` 侧边细条标记）。 |
+| `conferenceProviders`      | `[]`             | 在地点选择器中加入具名会议服务。                                                                 |
+| `onCreateSchedule`         | 无               | 在你的应用中持久化新建的排期。                                                                   |
+| `onUpdateSchedule`         | 无               | 在你的应用中持久化已有排期的修改。                                                               |
+| `onDeleteScheduleRequest`  | 无               | 请求宿主确认并删除排期。                                                                         |
+| `onExternalUpdateConflict` | 无               | 编辑期间收到外部受控更新时报告冲突。                                                             |
 
 ### Plugin API
 

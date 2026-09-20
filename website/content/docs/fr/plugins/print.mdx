@@ -1,20 +1,33 @@
 ---
-title: Plugin d'impression
-description: Flux d'impression et d'export de DayFlow Pro, avec aperçu, format de papier, filtrage par calendrier et plusieurs mises en page imprimables.
+title: Plugin d'Impression
+description: Flux d'impression et d'exportation multi-format DayFlow Pro avec aperçu interactif, 9 formats de papier, zoom par pincement sur pavé tactile, prévisualisation des données en direct et export programmatique headless.
 status: pro
 ---
 
-# Plugin d'impression
+# Plugin d'Impression (Print Plugin)
 
-`@dayflow-pro/plugin-print` ajoute à DayFlow une boîte de dialogue d'impression avec aperçu. Elle prend en charge les mises en page jour, semaine, mois et deux formats annuels, laisse choisir le format et l'orientation du papier, et peut imprimer soit les événements actuellement visibles, soit tous les événements correspondants selon le contexte.
+`@dayflow-pro/plugin-print` ajoute une boîte de dialogue d'impression intégrée et un flux d'exportation multi-format pour DayFlow. Il prend en charge l'aperçu interactif des pages, le contrôle du format et de l'orientation du papier, le zoom par pincement sur pavé tactile, la prévisualisation tabulaire des données en direct et l'exportation programmatique headless.
 
-Essayez la [démo en direct](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print)
+| Format  | Sortie                                                                                                  |
+| :------ | :------------------------------------------------------------------------------------------------------ |
+| `print` | Boîte de dialogue d'impression du navigateur adaptée au papier sélectionné ; impression ou PDF          |
+| `png`   | Image haute résolution par page imprimée ; les pages multiples sont téléchargées sous forme de ZIP      |
+| `xlsx`  | Classeur Excel natif : feuille **Events** (événements) et feuille **Summary** (synthèse par calendrier) |
+| `ics`   | Fichier iCalendar standard pour Google Agenda, Apple Calendrier, Outlook et autres applications         |
+
+Essayez la [démo en direct](https://pro.dayflow.studio/?utm_source=calendar.dayflow.studio&utm_medium=referral&utm_content=docs_print).
 
 ## Installation
 
 <PackageTabs pkg='@dayflow-pro/plugin-print' />
 
-Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installation) pour les étapes d'installation.
+Consultez le guide d'[Installation de Pro](/docs/introduction/pro-installation) pour la configuration de la licence.
+
+Veillez à importer les styles du composant :
+
+```ts
+import '@dayflow-pro/plugin-print/dist/styles.components.css';
+```
 
 ## Utilisation de base
 
@@ -23,6 +36,7 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
     ```tsx
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/react';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     function App() {
       const printPlugin = createPrintPlugin({
@@ -35,14 +49,17 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
 
       const calendar = useCalendarApp({
         views: [
-          /* your views */
+          /* vos vues */
         ],
         plugins: [printPlugin],
       });
 
       return (
         <>
-          <button onClick={() => printPlugin.api.open()}>Print</button>
+          <button onClick={() => calendar.app.openPrintDialog()}>Imprimer</button>
+          <button onClick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+            Exporter en Excel
+          </button>
           <DayFlowCalendar calendar={calendar} />
         </>
       );
@@ -53,13 +70,19 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
   <Tab>
     ```vue
     <template>
-      <button @click="printPlugin.api.open()">Print</button>
-      <DayFlowCalendar :calendar="calendar" />
+      <div>
+        <button @click="calendar.app.openPrintDialog()">Imprimer</button>
+        <button @click="calendar.app.openPrintDialog({ format: 'xlsx' })">
+          Exporter en Excel
+        </button>
+        <DayFlowCalendar :calendar="calendar" />
+      </div>
     </template>
 
     <script setup>
     import { DayFlowCalendar, useCalendarApp } from '@dayflow/vue';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     const printPlugin = createPrintPlugin({
       defaultOptions: {
@@ -71,7 +94,7 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
 
     const calendar = useCalendarApp({
       views: [
-        /* your views */
+        /* vos vues */
       ],
       plugins: [printPlugin],
     });
@@ -84,13 +107,15 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
     import { Component } from '@angular/core';
     import { DayFlowCalendarModule } from '@dayflow/angular';
     import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+    import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
     @Component({
       selector: 'app-root',
       standalone: true,
       imports: [DayFlowCalendarModule],
       template: `
-        <button (click)="printPlugin.api.open()">Print</button>
+        <button (click)="calendar.app.openPrintDialog()">Imprimer</button>
+        <button (click)="calendar.app.openPrintDialog({ format: 'xlsx' })">Exporter en Excel</button>
         <dayflow-calendar [calendar]="calendar"></dayflow-calendar>
       `
     })
@@ -105,7 +130,7 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
 
       calendar = {
         views: [
-          /* your views */
+          /* vos vues */
         ],
         plugins: [this.printPlugin]
       };
@@ -118,6 +143,7 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
     <script>
       import { DayFlowCalendar, useCalendarApp } from '@dayflow/svelte';
       import { createPrintPlugin } from '@dayflow-pro/plugin-print';
+      import '@dayflow-pro/plugin-print/dist/styles.components.css';
 
       const printPlugin = createPrintPlugin({
         defaultOptions: {
@@ -129,118 +155,133 @@ Consultez le guide d'[installation de Pro](/docs-fr/introduction/pro-installatio
 
       const calendar = useCalendarApp({
         views: [
-          /* your views */
+          /* vos vues */
         ],
         plugins: [printPlugin],
       });
     </script>
 
-    <button onclick={() => printPlugin.api.open()}>Print</button>
+    <button onclick={() => calendar.app.openPrintDialog()}>Imprimer</button>
+    <button onclick={() => calendar.app.openPrintDialog({ format: 'xlsx' })}>
+      Exporter en Excel
+    </button>
     <DayFlowCalendar {calendar} />
     ```
 
   </Tab>
 </FrameworkTabs>
 
-Le plugin installe également deux fonctions utilitaires directement sur l'application calendrier :
+Le plugin enregistre des méthodes d'assistance directement sur l'instance du calendrier :
 
 ```tsx
-await calendar.openPrintDialog();
-await calendar.print();
+// Ouvre la boîte de dialogue avec le format par défaut
+await calendar.app.openPrintDialog();
+
+// Ouvre la boîte de dialogue avec un format ou une vue préconfigurée
+await calendar.app.openPrintDialog({ format: 'xlsx', view: 'month' });
+
+// Déclenche l'impression native du navigateur
+await calendar.app.print();
+
+// Exportation programmatique sans ouvrir l'interface
+const result = await calendar.app.exportCalendar({
+  format: 'png',
+  view: 'week',
+});
 ```
 
-## Ce que fournit le plugin
+## Fonctionnalités principales
 
-- Une boîte de dialogue d'aperçu avant impression rendue dans `document.body`
-- L'impression native du navigateur via `window.print()`
-- Le choix de la mise en page : jour, semaine, mois et année
-- Le filtrage par calendrier via `calendarIds`
-- Des réglages de format et d'orientation du papier
-- La prise en charge du raccourci Cmd/Ctrl + P tant que le plugin est installé
+- **4 formats d'exportation** : Impression/PDF, PNG (page unique ou archive ZIP), Excel (.xlsx) et iCalendar (.ics).
+- **9 formats de papier** : `A3`, `A4`, `A5`, `B3`, `B4`, `B5`, `Letter`, `Legal`, `Tabloid`.
+- **Boîte de dialogue d'aperçu interactif** : Échelle précise, zoom par pincement sur pavé tactile, panoramique et adaptation automatique.
+- **Prévisualisation tabulaire des données** : Présentation interactive des données avant téléchargement lors de la sélection de `xlsx` ou `ics`.
+- **Exportation headless** : Appel direct via `calendar.app.exportCalendar()` ou `printPlugin.api.export()`.
+- **Filtrage par calendrier et catégorie** : Filtrage par calendrier, événements sur toute la journée et avec horaire.
+- **Raccourci global** : Appuyez sur `Cmd + P` ou `Ctrl + P` pour déclencher la boîte de dialogue.
 
-## Mises en page prises en charge
+## Exportation par code (Headless)
 
-| Mise en page      | Notes                                                           |
-| :---------------- | :-------------------------------------------------------------- |
-| `day`             | Imprime un ou plusieurs jours sélectionnés.                     |
-| `week`            | Imprime une mise en page hebdomadaire.                          |
-| `month`           | Imprime une grille mensuelle.                                   |
-| `year-fixed-week` | Vue annuelle en lignes hebdomadaires fixes. Paysage par défaut. |
-| `year-canvas`     | Vue annuelle dense, optimisée pour une sortie en portrait.      |
+```ts
+const result = await calendar.app.exportCalendar({
+  format: 'xlsx',
+  view: 'month',
+  startDate: new Date(2026, 8, 1),
+  endDate: new Date(2026, 11, 1),
+  calendarIds: ['work', 'personal'],
+  download: true, // définir à false pour recevoir result.blob sans téléchargement automatique
+  pixelRatio: 3, // multiplicateur de résolution PNG (1 = 96 DPI)
+  onProgress: ({ completed, total }) => {
+    console.log(`Page rendue : ${completed} sur ${total}`);
+  },
+});
 
-À son ouverture, la boîte de dialogue déduit sa mise en page initiale de la vue DayFlow courante :
+console.log(result.filename); // 'calendar-2026-09_2026-12.xlsx'
+console.log(result.eventCount); // nombre d'événements exportés
+console.log(result.pageCount); // nombre de pages générées (0 pour xlsx et ics)
+console.log(result.blob); // instance de Blob lorsque download: false
+```
 
-- vue mois courante -> `month`
-- vue semaine courante -> `week`
-- vue jour courante -> `day`
-- vue année courante -> `year-fixed-week`
+### Options de CalendarExportRequest
 
-## Configuration du plugin
+| Option        | Type                                                       | Valeur par défaut | Description                                                                          |
+| :------------ | :--------------------------------------------------------- | :---------------- | :----------------------------------------------------------------------------------- |
+| `format`      | `'print' \| 'png' \| 'xlsx' \| 'ics'`                      | Requis            | Format cible de l'exportation.                                                       |
+| `view`        | `PrintView`                                                | Vue actuelle      | Mise en page (`day`, `week`, `month`, `year-fixed-week`, `year-canvas`).             |
+| `paper`       | `PaperSize`                                                | Sélection act.    | Format de papier (`A3`, `A4`, `A5`, `B3`, `B4`, `B5`, `Letter`, `Legal`, `Tabloid`). |
+| `orientation` | `'portrait' \| 'landscape'`                                | Défaut de la vue  | Orientation de la page.                                                              |
+| `startDate`   | `Date`                                                     | Date actuelle     | Date de début de la plage d'exportation.                                             |
+| `endDate`     | `Date`                                                     | Calculé auto.     | Date de fin de la plage d'exportation.                                               |
+| `calendarIds` | `string[]`                                                 | Tous              | Identifiants des calendriers inclus.                                                 |
+| `options`     | `Partial<CalendarPrintOptions>`                            | Valeurs plugin    | Options de typographie, légende et filtres d'événements.                             |
+| `filename`    | `string`                                                   | Auto-généré       | Nom de fichier personnalisé sans extension.                                          |
+| `download`    | `boolean`                                                  | `true`            | Si `false`, renvoie `result.blob` sans déclencher de téléchargement.                 |
+| `pixelRatio`  | `number`                                                   | `3`               | Multiplicateur de résolution PNG (1 = 96 DPI).                                       |
+| `onProgress`  | `(progress: { completed: number; total: number }) => void` | —                 | Callback de progression après chaque page PNG générée.                               |
+| `signal`      | `AbortSignal`                                              | —                 | Signal pour annuler les exportations multi-pages en cours.                           |
 
-| Propriété        | Type                            | Par défaut | Notes                                                                        |
-| :--------------- | :------------------------------ | :--------- | :--------------------------------------------------------------------------- |
-| `enabled`        | `boolean`                       | `true`     | À `false`, le plugin ne s'installe pas du tout.                              |
-| `defaultOptions` | `Partial<CalendarPrintOptions>` | —          | Préremplit la boîte de dialogue avec vos options d'impression.               |
-| `license`        | `PackageLicenseConfig`          | —          | Remplacement facultatif lorsque vous n'utilisez pas l'enregistrement global. |
+## Configuration du plugin (PrintPluginConfig)
+
+```ts
+const printPlugin = createPrintPlugin({
+  formats: ['print', 'png', 'xlsx', 'ics'],
+  filename: ({ format, view, rangeStart, rangeEnd }) => `planning-${view}`,
+  pixelRatio: 3,
+  defaultOptions: {
+    miniCalendar: true,
+    calendarKeys: true,
+    textSize: 'medium',
+  },
+});
+```
+
+| Propriété        | Type                                                             | Valeur par défaut                 | Description                                              |
+| :--------------- | :--------------------------------------------------------------- | :-------------------------------- | :------------------------------------------------------- |
+| `enabled`        | `boolean`                                                        | `true`                            | Désactive totalement le plugin lorsque défini à `false`. |
+| `formats`        | `CalendarExportFormat[]`                                         | `['print', 'png', 'xlsx', 'ics']` | Formats proposés dans le sélecteur du dialogue.          |
+| `filename`       | `string \| ((context: CalendarExportFilenameContext) => string)` | —                                 | Nom de fichier de base ou fonction de génération.        |
+| `pixelRatio`     | `number`                                                         | `3`                               | Multiplicateur de résolution par défaut pour le PNG.     |
+| `defaultOptions` | `Partial<CalendarPrintOptions>`                                  | —                                 | Options de visibilité et d'impression préconfigurées.    |
+| `license`        | `PackageLicenseConfig`                                           | —                                 | Configuration de licence individuelle.                   |
 
 ## CalendarPrintOptions
 
-| Propriété       | Type                             | Par défaut | Notes                                                             |
-| :-------------- | :------------------------------- | :--------- | :---------------------------------------------------------------- |
-| `allDayEvents`  | `boolean`                        | `true`     | Inclut les événements sur la journée entière.                     |
-| `timedEvents`   | `boolean`                        | `true`     | Inclut les événements horodatés.                                  |
-| `miniCalendar`  | `boolean`                        | `true`     | Affiche le mini-calendrier dans l'en-tête imprimé.                |
-| `calendarKeys`  | `boolean`                        | `true`     | Affiche la légende des calendriers.                               |
-| `blackAndWhite` | `boolean`                        | `false`    | Imprime sans les couleurs des calendriers.                        |
-| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium`   | Contrôle la densité typographique de l'aperçu et de l'impression. |
+| Propriété       | Type                             | Valeur par défaut | Description                                      |
+| :-------------- | :------------------------------- | :---------------- | :----------------------------------------------- |
+| `allDayEvents`  | `boolean`                        | `true`            | Inclure les événements sur toute la journée.     |
+| `timedEvents`   | `boolean`                        | `true`            | Inclure les événements avec heure.               |
+| `miniCalendar`  | `boolean`                        | `true`            | Afficher le mini calendrier dans l'en-tête.      |
+| `calendarKeys`  | `boolean`                        | `true`            | Afficher la légende des calendriers.             |
+| `blackAndWhite` | `boolean`                        | `false`           | Mode noir et blanc sans couleurs.                |
+| `textSize`      | `'small' \| 'medium' \| 'large'` | `medium`          | Densité de la typographie et de la mise en page. |
 
-## CalendarPrintConfig
-
-Vous pouvez préremplir ou remplacer la configuration de la boîte de dialogue avec un objet partiel :
-
-```ts
-type CalendarPrintConfig = {
-  view: 'month' | 'week' | 'day' | 'year-fixed-week' | 'year-canvas';
-  paper: 'A4' | 'Letter';
-  orientation?: 'portrait' | 'landscape';
-  startDate: Date;
-  endDate?: Date;
-  calendarIds: string[];
-  options: CalendarPrintOptions;
-};
-```
-
-Comportements importants issus du code source :
-
-- `year-fixed-week` force l'orientation `landscape`.
-- `year-canvas` force l'orientation `portrait`.
-- La boîte de dialogue injecte une règle `@page` avant d'ouvrir l'interface d'impression native du navigateur.
-- L'aperçu permet de zoomer et de se déplacer avant l'impression.
-
-## Portée de l'impression
-
-La boîte de dialogue ne puise pas toujours dans la même source d'événements :
-
-- Si la mise en page choisie correspond à la vue courante du calendrier et que `startDate` correspond à la date courante de l'application, l'aperçu utilise `app.getEvents()`, c'est-à-dire l'ensemble des événements visibles.
-- Sinon, il utilise `app.getAllEvents()`, ce qui permet d'imprimer des dates situées hors de l'écran affiché.
-
-En interne, cela se traduit par `sourceScope: 'visible' | 'all'`.
-
-## API
-
-`createPrintPlugin()` renvoie un plugin DayFlow classique doté d'un objet `api` :
+## API du Plugin
 
 ```ts
 type PrintPluginApi = {
-  open: () => void;
+  open: (options?: PrintDialogOpenOptions) => void;
   close: () => void;
-  print: (config?: Partial<CalendarPrintConfig>) => void;
+  print: (config?: CalendarPrintConfigInput) => void;
+  export: (request: CalendarExportRequest) => Promise<CalendarExportResult>;
 };
 ```
-
-Remarques :
-
-- `api.open()` ouvre la boîte de dialogue d'impression.
-- `api.close()` la ferme si elle est montée.
-- `api.print(config)` ouvre également la boîte de dialogue pour l'instant ; il ne contourne pas encore l'aperçu.
-- Une fois installé, le plugin écoute `Cmd/Ctrl + P` de façon globale.

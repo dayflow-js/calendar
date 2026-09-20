@@ -190,21 +190,22 @@ Das Plugin ergänzt außerdem einen Eintrag im Schnellanlegen-Popup des Kalender
 
 Diese Felder bilden `AppointmentSchedulePluginConfig`.
 
-| Option                     | Standard                   | Zweck                                                                                      |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
-| `schedules`                | Erforderlich               | Kontrollierte Liste der Terminpläne.                                                       |
-| `activeScheduleId`         | Keiner                     | Öffnet den Editor mit einem bestimmten ausgewählten Zeitplan.                              |
-| `availabilitySnapMinutes`  | `15`                       | Minutenraster beim Bearbeiten der Verfügbarkeit.                                           |
-| `drawerPlacement`          | `'viewport'`               | Verankert den Editor am Ansichtsfenster oder am Kalender.                                  |
-| `drawerWidth`              | `420`                      | Breite des Drawers in Pixeln oder als beliebige CSS-Länge.                                 |
-| `drawerTarget`             | Erster Kalender            | Element oder Selektor für die Platzierung `calendar`.                                      |
-| `drawerRenderer`           | Eingebauter Drawer         | Ersetzt den Organisator-Editor vollständig.                                                |
-| `timeFormat`               | Format der aktiven Ansicht | Verwendet das 12- oder 24-Stunden-Format.                                                  |
-| `conferenceProviders`      | `[]`                       | Ergänzt benannte Konferenzanbieter im Ortsauswahlfeld.                                     |
-| `onCreateSchedule`         | Keiner                     | Speichert einen neu angelegten Zeitplan in Ihrer Anwendung.                                |
-| `onUpdateSchedule`         | Keiner                     | Speichert Änderungen an einem bestehenden Zeitplan.                                        |
-| `onDeleteScheduleRequest`  | Keiner                     | Bittet die Host-Anwendung, das Löschen zu bestätigen und auszuführen.                      |
-| `onExternalUpdateConflict` | Keiner                     | Meldet eine während der Bearbeitung eingetroffene Aktualisierung der kontrollierten Daten. |
+| Option                     | Standard                   | Zweck                                                                                                                                        |
+| -------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schedules`                | Erforderlich               | Kontrollierte Liste der Terminpläne.                                                                                                         |
+| `activeScheduleId`         | Keiner                     | Öffnet den Editor mit einem bestimmten ausgewählten Zeitplan.                                                                                |
+| `availabilitySnapMinutes`  | `15`                       | Minutenraster beim Bearbeiten der Verfügbarkeit.                                                                                             |
+| `drawerPlacement`          | `'viewport'`               | Verankert den Editor am Ansichtsfenster oder am Kalender.                                                                                    |
+| `drawerWidth`              | `420`                      | Breite des Drawers in Pixeln oder als beliebige CSS-Länge.                                                                                   |
+| `drawerTarget`             | Erster Kalender            | Element oder Selektor für die Platzierung `calendar`.                                                                                        |
+| `drawerRenderer`           | Eingebauter Drawer         | Ersetzt den Organisator-Editor vollständig.                                                                                                  |
+| `timeFormat`               | Format der aktiven Ansicht | Verwendet das 12- oder 24-Stunden-Format.                                                                                                    |
+| `unavailableDisplayMode`   | `'grid-overlay'`           | Anzeigestil für nicht verfügbare Intervalle im Zeitraster (`'grid-overlay'` diagonal gestreiftes Overlay oder `'bar'` schmale Akzentleiste). |
+| `conferenceProviders`      | `[]`                       | Ergänzt benannte Konferenzanbieter in der Ortsauswahl.                                                                                       |
+| `onCreateSchedule`         | Keiner                     | Speichert einen neu angelegten Zeitplan in Ihrer Anwendung.                                                                                  |
+| `onUpdateSchedule`         | Keiner                     | Speichert Änderungen an einem bestehenden Zeitplan.                                                                                          |
+| `onDeleteScheduleRequest`  | Keiner                     | Bittet die Host-Anwendung, das Löschen zu bestätigen und auszuführen.                                                                        |
+| `onExternalUpdateConflict` | Keiner                     | Meldet eine während der Bearbeitung eingetroffene Aktualisierung der kontrollierten Daten.                                                   |
 
 ### Plugin-API
 

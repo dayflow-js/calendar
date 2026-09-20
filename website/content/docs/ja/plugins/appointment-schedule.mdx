@@ -190,21 +190,22 @@ appointmentPlugin.api.openEdit('product-demo');
 
 これらの項目が `AppointmentSchedulePluginConfig` を構成します。
 
-| オプション                 | 既定値             | 用途                                             |
-| -------------------------- | ------------------ | ------------------------------------------------ |
-| `schedules`                | 必須               | アプリケーションが管理する予約スケジュール。     |
-| `activeScheduleId`         | なし               | エディターを開くときに特定の予定を選択。         |
-| `availabilitySnapMinutes`  | `15`               | 予約可能時間を編集するときの分単位の間隔。       |
-| `drawerPlacement`          | `'viewport'`       | エディターをビューポートまたはカレンダーに配置。 |
-| `drawerWidth`              | `420`              | ピクセル値または CSS 長さで指定する幅。          |
-| `drawerTarget`             | 最初のカレンダー   | `calendar` 配置で使う要素または selector。       |
-| `drawerRenderer`           | 組み込み drawer    | 主催者エディター全体を置き換えます。             |
-| `timeFormat`               | 現在のビューの形式 | 12 時間表記または 24 時間表記。                  |
-| `conferenceProviders`      | `[]`               | 場所ピッカーに Web 会議サービスを追加。          |
-| `onCreateSchedule`         | なし               | 新しいスケジュールをアプリ側で永続化。           |
-| `onUpdateSchedule`         | なし               | 既存スケジュールの変更をアプリ側で永続化。       |
-| `onDeleteScheduleRequest`  | なし               | ホストに確認と削除を依頼。                       |
-| `onExternalUpdateConflict` | なし               | 編集中の外部制御更新を競合として通知。           |
+| オプション                 | 既定値             | 用途                                                                                                               |
+| -------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `schedules`                | 必須               | アプリケーションが管理する予約スケジュール。                                                                       |
+| `activeScheduleId`         | なし               | エディターを開くときに特定の予定を選択。                                                                           |
+| `availabilitySnapMinutes`  | `15`               | 予約可能時間を編集するときの分単位の間隔。                                                                         |
+| `drawerPlacement`          | `'viewport'`       | エディターをビューポートまたはカレンダーに配置。                                                                   |
+| `drawerWidth`              | `420`              | ピクセル値または CSS 長さで指定する幅。                                                                            |
+| `drawerTarget`             | 最初のカレンダー   | `calendar` 配置で使う要素または selector。                                                                         |
+| `drawerRenderer`           | 組み込み drawer    | 主催者エディター全体を置き換えます。                                                                               |
+| `timeFormat`               | 現在のビューの形式 | 12 時間表記または 24 時間表記。                                                                                    |
+| `unavailableDisplayMode`   | `'grid-overlay'`   | 予約不可時間帯の表示スタイル（`'grid-overlay'` 斜線ストライプオーバーレイ、または `'bar'` スリムアクセントバー）。 |
+| `conferenceProviders`      | `[]`               | 場所ピッカーに会議プロバイダーを追加。                                                                             |
+| `onCreateSchedule`         | なし               | 新しいスケジュールをアプリ側で永続化。                                                                             |
+| `onUpdateSchedule`         | なし               | 既存スケジュールの変更をアプリ側で永続化。                                                                         |
+| `onDeleteScheduleRequest`  | なし               | ホストに確認と削除を依頼。                                                                                         |
+| `onExternalUpdateConflict` | なし               | 編集中の外部制御更新を競合として通知。                                                                             |
 
 ### Plugin API
 
