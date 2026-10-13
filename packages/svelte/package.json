@@ -34,7 +34,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "typecheck": "svelte-check"
+    "typecheck": "svelte-check && tsc -p type-tests/tsconfig.json"
   },
   "devDependencies": {
     "@dayflow/core": "workspace:^",
@@ -61,6 +61,6 @@
   },
   "peerDependencies": {
     "@dayflow/core": "workspace:^",
-    "svelte": "^4.0.0 || ^5.0.0"
+    "svelte": "^5.0.0"
   }
 }

@@ -14,6 +14,16 @@ const createConfig = ssr => ({
     },
   ],
   plugins: [
+    // Before svelte(): rune modules (*.svelte.ts) must be plain JS by the time
+    // the Svelte compiler sees them. It only strips types inside components.
+    esbuild({
+      sourceMap: true,
+      minify: false,
+      target: 'esnext',
+      loaders: {
+        '.ts': 'ts',
+      },
+    }),
     svelte({
       preprocess: sveltePreprocess(),
       emitCss: false,
@@ -25,14 +35,6 @@ const createConfig = ssr => ({
       browser: !ssr,
       dedupe: ['svelte'],
       extensions: ['.mjs', '.js', '.ts', '.svelte'],
-    }),
-    esbuild({
-      sourceMap: true,
-      minify: false,
-      target: 'esnext',
-      loaders: {
-        '.ts': 'ts',
-      },
     }),
     commonjs(),
   ],

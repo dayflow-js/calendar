@@ -1,6 +1,6 @@
 import DayFlowCalendar from './DayFlowCalendar.svelte';
 export { DayFlowCalendar };
-export { useCalendarApp } from './useCalendarApp';
+export { useCalendarApp } from './useCalendarApp.svelte';
 export default DayFlowCalendar;
 
 export {

@@ -1,91 +1,48 @@
 <script lang="ts">
-  import { onMount, onDestroy, tick } from "svelte";
-  import type { Component } from "svelte";
+  import { onMount, onDestroy, tick, untrack } from "svelte";
   import { CalendarRenderer } from "@dayflow/core";
-  import type {
-    ICalendarApp,
-    UseCalendarAppReturn,
-    CustomRendering,
-    EventDetailContentProps,
-    EventDetailDialogProps,
-    CreateCalendarDialogProps,
-    TitleBarSlotProps,
-    EventContentSlotArgs,
-    ColorPickerProps,
-    CreateCalendarDialogColorPickerProps,
-    CalendarHeaderProps,
-    EventContextMenuSlotArgs,
-    GridContextMenuSlotArgs,
-    GridPopupContentSlotArgs,
-    CalendarSearchProps,
-    MobileEventProps,
-    MonthDateNumberSlotArgs,
-    CalendarSidebarRenderProps,
-    SidebarHeaderSlotArgs,
-    CalendarContextMenuSlotArgs,
-  } from "@dayflow/core";
+  import type { ICalendarApp, CustomRendering } from "@dayflow/core";
+  // The published typings are the single source of truth for the props.
+  // oxlint-disable-next-line import/no-relative-parent-imports
+  import type { DayFlowCalendarProps } from "../index";
 
   const {
     calendar,
-    eventContentDay = null,
-    eventContentWeek = null,
-    eventContentMonth = null,
-    eventContentYear = null,
-    eventContentAllDayDay = null,
-    eventContentAllDayWeek = null,
-    eventContentAllDayMonth = null,
-    eventContentAllDayYear = null,
-    eventDetailContent = null,
-    eventDetailDialog = null,
-    createCalendarDialog = null,
-    titleBarSlot = null,
-    colorPicker = null,
-    createCalendarDialogColorPicker = null,
-    calendarHeader = null,
-    eventContextMenu = null,
-    gridContextMenu = null,
-    gridPopupContent = null,
-    monthDateNumberContent = null,
-    mobileEventDetail = null,
-    collapsedSafeAreaLeft = null,
-    search = null,
-    sidebar = null,
-    sidebarHeader = null,
-    calendarContextMenu = null,
-  } = $props<{
-    calendar: ICalendarApp | UseCalendarAppReturn;
-    eventContentDay?: Component<EventContentSlotArgs>;
-    eventContentWeek?: Component<EventContentSlotArgs>;
-    eventContentMonth?: Component<EventContentSlotArgs>;
-    eventContentYear?: Component<EventContentSlotArgs>;
-    eventContentAllDayDay?: Component<EventContentSlotArgs>;
-    eventContentAllDayWeek?: Component<EventContentSlotArgs>;
-    eventContentAllDayMonth?: Component<EventContentSlotArgs>;
-    eventContentAllDayYear?: Component<EventContentSlotArgs>;
-    eventDetailContent?: Component<EventDetailContentProps>;
-    eventDetailDialog?: Component<EventDetailDialogProps>;
-    createCalendarDialog?: Component<CreateCalendarDialogProps>;
-    titleBarSlot?: Component<TitleBarSlotProps>;
-    colorPicker?: Component<ColorPickerProps>;
-    createCalendarDialogColorPicker?: Component<CreateCalendarDialogColorPickerProps>;
-    calendarHeader?: Component<CalendarHeaderProps>;
-    eventContextMenu?: Component<EventContextMenuSlotArgs>;
-    gridContextMenu?: Component<GridContextMenuSlotArgs>;
-    gridPopupContent?: Component<GridPopupContentSlotArgs>;
-    monthDateNumberContent?: Component<MonthDateNumberSlotArgs>;
-    mobileEventDetail?: Component<MobileEventProps>;
-    collapsedSafeAreaLeft?: number | null;
-    search?: CalendarSearchProps | null;
-    sidebar?: Component<CalendarSidebarRenderProps>;
-    sidebarHeader?: Component<SidebarHeaderSlotArgs>;
-    calendarContextMenu?: Component<CalendarContextMenuSlotArgs>;
-  }>();
+    eventContentDay,
+    eventContentWeek,
+    eventContentMonth,
+    eventContentYear,
+    eventContentAllDayDay,
+    eventContentAllDayWeek,
+    eventContentAllDayMonth,
+    eventContentAllDayYear,
+    eventDetailContent,
+    eventDetailDialog,
+    createCalendarDialog,
+    titleBarSlot,
+    colorPicker,
+    createCalendarDialogColorPicker,
+    calendarHeader,
+    eventContextMenu,
+    gridContextMenu,
+    gridPopupContent,
+    monthDateNumberContent,
+    mobileEventDetail,
+    collapsedSafeAreaLeft,
+    search,
+    sidebar,
+    sidebarHeader,
+    calendarContextMenu,
+  }: DayFlowCalendarProps = $props();
 
   let container: HTMLElement | undefined = $state();
   let renderer: CalendarRenderer | undefined;
   let customRenderings: CustomRendering[] = $state([]);
   let unsubscribe: (() => void) | undefined;
   let mounted = $state(false);
+  let destroyed = false;
+  // The app the current renderer was built for.
+  let renderedApp: ICalendarApp | undefined;
 
   // Guard for browser environment
   const isBrowser = typeof window !== "undefined";
@@ -122,17 +79,14 @@
     calendarContextMenu,
   } as Record<string, unknown>);
 
-  onMount(async () => {
-    if (!container) {
-      return;
-    }
-
-    await tick();
-
-    const activeOverrides = Object.keys(renderProps).filter(
-      (key) => renderProps[key] !== null,
+  const getActiveOverrides = () =>
+    Object.keys(renderProps).filter(
+      (key) => renderProps[key] !== null && renderProps[key] !== undefined,
     );
-    renderer = new CalendarRenderer(app, activeOverrides);
+
+  function createRenderer(target: HTMLElement) {
+    renderedApp = app;
+    renderer = new CalendarRenderer(app, getActiveOverrides());
     renderer.setProps(renderProps);
 
     // Subscribe BEFORE mount. mount() renders synchronously and registers every
@@ -143,18 +97,45 @@
       customRenderings = [...renderings.values()];
     });
 
-    renderer.mount(container);
+    renderer.mount(target);
+  }
 
+  function destroyRenderer() {
+    unsubscribe?.();
+    renderer?.unmount();
+    unsubscribe = undefined;
+    renderer = undefined;
+  }
+
+  onMount(async () => {
+    await tick();
+
+    // The component can be destroyed while the tick is pending.
+    if (!container || destroyed) {
+      return;
+    }
+
+    createRenderer(container);
     mounted = true;
   });
 
   onDestroy(() => {
-    if (unsubscribe) {
-      unsubscribe();
+    destroyed = true;
+    destroyRenderer();
+  });
+
+  // Rebuild the renderer when the calendar prop is replaced with another app.
+  // Declared before the prop-forwarding effect so that one sees the new renderer.
+  $effect(() => {
+    const nextApp = app;
+    if (!mounted || !container || nextApp === renderedApp) {
+      return;
     }
-    if (renderer) {
-      renderer.unmount();
-    }
+    const target = container;
+    untrack(() => {
+      destroyRenderer();
+      createRenderer(target);
+    });
   });
 
   // Reactively forward prop changes to the renderer after mount.
@@ -165,9 +146,7 @@
       return;
     }
     renderer.setProps(renderProps);
-    const activeOverrides = Object.keys(renderProps).filter(
-      (key) => renderProps[key] !== null,
-    );
+    const activeOverrides = getActiveOverrides();
     renderer.getCustomRenderingStore().setOverrides(activeOverrides);
     app.setOverrides(activeOverrides);
   });
