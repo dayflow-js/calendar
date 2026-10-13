@@ -6,6 +6,7 @@ export default defineWorkspace([
   'packages/vue/vitest.config.ts',
   'packages/svelte/vitest.config.ts',
   'packages/plugins/drag/vitest.config.ts',
+  'packages/plugins/keyboard-shortcuts/vitest.config.ts',
   'packages/plugins/sidebar/vitest.config.ts',
   'packages/caldav/core/vitest.config.ts',
   'packages/caldav/google-sync/vitest.config.ts',

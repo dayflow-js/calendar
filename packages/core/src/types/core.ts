@@ -127,7 +127,14 @@ export interface QuickCreatePopupContext {
  */
 export interface CalendarPlugin {
   name: string;
-  install: (app: ICalendarApp) => void;
+  /**
+   * May return a cleanup function. It runs on `app.destroy()` and should undo
+   * anything `install` attached outside the app (global listeners, timers).
+   * A plugin that returns one must tolerate `install` running again on the
+   * same app: adapters re-arm it via `app.restore()`.
+   */
+  // oxlint-disable-next-line typescript/no-invalid-void-type
+  install: (app: ICalendarApp) => void | (() => void);
   updateConfig?: (config: Record<string, unknown>) => void;
   config?: any;
   api?: unknown;
@@ -485,6 +492,14 @@ export interface ICalendarApp {
     pluginName: string,
     config: Record<string, unknown>
   ) => void;
+
+  /**
+   * Run every plugin's cleanup. Call it when the app is no longer needed;
+   * `useCalendarApp` in the framework adapters does so on unmount.
+   */
+  destroy: () => void;
+  /** Re-install the plugins `destroy()` tore down. No-op otherwise. */
+  restore: () => void;
 
   // Calendar Header
   getCalendarHeaderConfig: () => boolean;

@@ -353,6 +353,10 @@ export class CalendarApp implements ICalendarApp {
     config: Record<string, unknown>
   ): void => this.pluginManager.updatePluginConfig(pluginName, config);
 
+  destroy = (): void => this.pluginManager.destroy();
+
+  restore = (): void => this.pluginManager.restore(this);
+
   // Theme
 
   setTheme = (mode: ThemeMode): void => {

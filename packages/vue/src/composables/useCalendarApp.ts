@@ -40,6 +40,7 @@ export function useCalendarApp(
 
   onUnmounted(() => {
     unsubscribe();
+    app.destroy();
   });
 
   return {

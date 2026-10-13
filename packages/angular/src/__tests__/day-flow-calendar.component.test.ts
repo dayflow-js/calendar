@@ -8,6 +8,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
+  calendarAppInstances,
   createFakeApp,
   createdRenderers,
   initialOverrides,
@@ -181,6 +182,33 @@ describe('DayFlowCalendarComponent', () => {
       fixture.destroy();
 
       expectNoEmptyEmitAfterMount(lifecycleLog);
+    });
+
+    it('destroys the app it created from a config object', () => {
+      // Given a config, the component owns the app and its plugins' global
+      // listeners. An app passed in belongs to the caller and is left alone.
+      fixture = TestBed.createComponent(HostComponent);
+      fixture.componentInstance.calendar = { views: [] };
+      fixture.detectChanges();
+      const [internalApp] = calendarAppInstances;
+
+      expect(internalApp.destroyed).toBe(false);
+
+      fixture.destroy();
+
+      expect(internalApp.destroyed).toBe(true);
+    });
+
+    it('destroys the app it created when the calendar input is replaced', () => {
+      fixture = TestBed.createComponent(HostComponent);
+      fixture.componentInstance.calendar = { views: [] };
+      fixture.detectChanges();
+      const [internalApp] = calendarAppInstances;
+
+      fixture.componentInstance.calendar = createFakeApp();
+      fixture.detectChanges();
+
+      expect(internalApp.destroyed).toBe(true);
     });
   });
 
