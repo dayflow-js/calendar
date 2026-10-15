@@ -12,6 +12,7 @@ import { EventDetailPanel } from '@/components/calendarEvent/components/EventDet
 import ViewHeader from '@/components/common/ViewHeader';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale';
+import { formatDateLabel, formatDateRangeLabel } from '@/locale/intl';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import { AgendaViewProps, Event, ICalendarApp } from '@/types';
@@ -127,6 +128,13 @@ const formatAgendaTitle = (
   locale: string
 ): string => {
   const endInclusive = addDays(endExclusive, -1);
+  if (new Intl.Locale(locale).calendar === 'persian') {
+    return formatDateRangeLabel(start, endInclusive, locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
   const sameYear = start.getFullYear() === endInclusive.getFullYear();
   const sameMonth = sameYear && start.getMonth() === endInclusive.getMonth();
 
@@ -780,11 +788,11 @@ const AgendaView = ({
                   className='df-agenda-day-number'
                   data-today={isSameDate(group.date, today) ? 'true' : 'false'}
                 >
-                  {group.date.getDate()}
+                  {group.date.toLocaleDateString(locale, { day: 'numeric' })}
                 </div>
                 <div className='df-agenda-day-meta'>
                   <div className='df-agenda-day-month'>
-                    {group.date.toLocaleDateString(locale, {
+                    {formatDateLabel(group.date, locale, {
                       month: 'short',
                       year: 'numeric',
                     })}

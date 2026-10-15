@@ -1,6 +1,7 @@
 import type { ComponentChild } from 'preact';
 
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { headerTitle, headerSubtitle } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
 
@@ -64,19 +65,19 @@ const ViewHeader = ({
   const getDefaultTitle = (): string => {
     switch (viewType) {
       case 'day':
-        return currentDate.toLocaleDateString(locale, {
+        return formatDateLabel(currentDate, locale, {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
         });
       case 'week':
       case 'month':
-        return currentDate.toLocaleDateString(locale, {
+        return formatDateLabel(currentDate, locale, {
           month: 'long',
           year: 'numeric',
         });
       case 'year':
-        return currentDate.getFullYear().toString();
+        return formatDateLabel(currentDate, locale, { year: 'numeric' });
       default:
         return '';
     }

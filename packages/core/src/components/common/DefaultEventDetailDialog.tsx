@@ -276,6 +276,7 @@ const DefaultEventDetailDialog = ({
                 onChange={handleAllDayRangeChange}
                 onOk={handleAllDayRangeChange}
                 locale={rangePickerLocale}
+                calendarSystem={app?.state.calendarSystem}
               />
             </div>
           ) : (
@@ -302,6 +303,7 @@ const DefaultEventDetailDialog = ({
                   setEditedEvent({ ...editedEvent, start, end });
                 }}
                 locale={rangePickerLocale}
+                calendarSystem={app?.state.calendarSystem}
               />
             </div>
           )}

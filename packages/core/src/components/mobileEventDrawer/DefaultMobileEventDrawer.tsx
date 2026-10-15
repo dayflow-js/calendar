@@ -2,6 +2,7 @@ import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
 import { useState, useEffect, useMemo, useRef, useId } from 'preact/hooks';
 
+import { addCalendarMonths } from '@/calendar/calendarSystem';
 import {
   CalendarPicker,
   CalendarOption,
@@ -9,6 +10,7 @@ import {
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import {
   Event as CalendarEvent,
   MobileEventProps,
@@ -34,7 +36,7 @@ export const MobileEventDrawer = ({
   app,
   timeFormat = '24h',
 }: MobileEventProps) => {
-  const { locale, t } = useLocale();
+  const { locale, t, calendarSystem = 'gregorian' } = useLocale();
   const readOnlyConfig = app.getReadOnlyConfig(draftEvent?.id);
   const isEditable = app.canMutateFromUI(draftEvent?.id);
   const isViewable = readOnlyConfig.viewable !== false;
@@ -282,7 +284,7 @@ export const MobileEventDrawer = ({
   };
 
   const formatDate = (date: Date) =>
-    date.toLocaleDateString(locale, {
+    formatDateLabel(date, locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -326,14 +328,12 @@ export const MobileEventDrawer = ({
   const handleMonthChange = (type: 'start' | 'end', offset: number) => {
     if (type === 'start') {
       setStartVisibleMonth(prev => {
-        const next = new Date(prev);
-        next.setMonth(prev.getMonth() + offset);
+        const next = addCalendarMonths(prev, offset, calendarSystem);
         return next;
       });
     } else {
       setEndVisibleMonth(prev => {
-        const next = new Date(prev);
-        next.setMonth(prev.getMonth() + offset);
+        const next = addCalendarMonths(prev, offset, calendarSystem);
         return next;
       });
     }

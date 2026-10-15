@@ -4,6 +4,7 @@ import { WeeksData } from './calendar';
 
 export interface UseVirtualMonthScrollProps {
   currentDate: Date;
+  calendarSystem?: import('@/calendar/calendarSystem').CalendarSystem;
   weekHeight: number;
   onCurrentMonthChange?: (month: string, year: number) => void;
   initialWeeksToLoad?: number;

@@ -25,7 +25,12 @@ export const YearDayCell = memo(
     onContextMenu,
   }: YearDayCellProps) => {
     const { t } = useLocale();
-    const day = date.getDate();
+    const day = Number(
+      date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        calendar: new Intl.Locale(locale).calendar ?? 'gregory',
+      })
+    );
     const isFirstDay = day === 1;
     const monthLabel = date
       .toLocaleDateString(locale, { month: 'short' })
@@ -54,7 +59,7 @@ export const YearDayCell = memo(
             className='df-year-day-cell-date'
             data-today={isToday ? 'true' : 'false'}
           >
-            {day}
+            {date.toLocaleDateString(locale, { day: 'numeric' })}
           </span>
         </div>
 

@@ -5,6 +5,7 @@ export type SyncableCalendarAppConfig = Pick<
   CalendarAppConfig,
   | 'allDaySortComparator'
   | 'calendars'
+  | 'calendarSystem'
   | 'eventDetailTrigger'
   | 'locale'
   | 'readOnly'
@@ -32,6 +33,7 @@ export function pickSyncableConfig(
   return {
     allDaySortComparator: config.allDaySortComparator,
     calendars: config.calendars,
+    calendarSystem: config.calendarSystem ?? 'gregorian',
     locale: config.locale,
     readOnly: config.readOnly,
     switcherMode: config.switcherMode,
@@ -70,6 +72,8 @@ export function getSyncConfigUpdates(
   next: SyncableCalendarAppConfig
 ): Partial<CalendarAppConfig> {
   const updates: Partial<CalendarAppConfig> = {};
+  if (previous.calendarSystem !== next.calendarSystem)
+    updates.calendarSystem = next.calendarSystem;
 
   if (previous.views !== next.views) updates.views = next.views;
   if (!isDeepEqual(previous.calendars, next.calendars)) {

@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'preact/hooks';
 import CalendarEventComponent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
 import { MultiDayEventSegment } from '@/components/monthView/util';
+import { useLocale } from '@/locale';
 import {
   allDayRow,
   allDayLabel,
@@ -96,6 +97,7 @@ interface AllDayRowProps {
 }
 
 export const AllDayRow = (props: AllDayRowProps) => {
+  const { locale } = useLocale();
   const {
     app,
     weekDaysLabels,
@@ -274,7 +276,9 @@ export const AllDayRow = (props: AllDayRowProps) => {
                           className={`${dateNumber} df-week-all-day-date-number df-week-all-day-date-number-mobile`}
                           data-today={weekDates[i].isToday ? 'true' : undefined}
                         >
-                          {weekDates[i].date}
+                          {new Intl.NumberFormat(locale).format(
+                            weekDates[i].date
+                          )}
                         </div>
                       </>
                     ) : (
@@ -286,7 +290,9 @@ export const AllDayRow = (props: AllDayRowProps) => {
                           className={`${dateNumber} df-week-all-day-date-number`}
                           data-today={weekDates[i].isToday ? 'true' : undefined}
                         >
-                          {weekDates[i].date}
+                          {new Intl.NumberFormat(locale).format(
+                            weekDates[i].date
+                          )}
                         </div>
                       </>
                     )}

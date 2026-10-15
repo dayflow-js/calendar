@@ -5,6 +5,7 @@ const en: Locale = {
   messages: {
     allDay: 'All day',
     noEvents: 'No events for this day',
+    noEventsInRange: 'No events in this range.',
     more: 'more',
     eventTitle: 'Event Title',
     dateRange: 'Date Range',
@@ -78,7 +79,6 @@ const en: Locale = {
     closeSearch: 'Close search',
     close: 'Close',
     noon: 'Noon',
-    noEventsInRange: 'No events in this range.',
     removeSlot: 'Remove slot',
     subscriptionLoadFailed: 'Failed to load subscription',
     startDate: 'Start date',

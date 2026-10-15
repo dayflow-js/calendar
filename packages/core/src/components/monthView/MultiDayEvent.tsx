@@ -8,6 +8,7 @@ import {
   MultiDayEventSegment,
   getEventIcon,
 } from '@/components/monthView/util';
+import { useLocale } from '@/locale';
 import {
   monthEventColorBar,
   resizeHandleLeft,
@@ -88,6 +89,7 @@ export const MultiDayEvent = memo(
     appTimeZone,
     timeFormat = '24h',
   }: MultiDayEventProps) => {
+    const { locale, calendarSystem = 'gregorian' } = useLocale();
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
     const rowSpacing = eventHeight + 1;
@@ -430,7 +432,7 @@ export const MultiDayEvent = memo(
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        title={`${visualEvent.title} (${formatDateConsistent(visualEvent.start)} - ${formatDateConsistent(visualEvent.end)})`}
+        title={`${visualEvent.title} (${formatDateConsistent(visualEvent.start, locale, calendarSystem)} - ${formatDateConsistent(visualEvent.end, locale, calendarSystem)})`}
       >
         {renderResizeHandle('left')}
         <div

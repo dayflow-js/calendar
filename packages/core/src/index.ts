@@ -13,6 +13,9 @@ export type { CustomRendering } from './renderer/CustomRenderingStore';
 // Types
 export * from './types';
 
+// Calendar systems
+export * from './calendar/calendarSystem';
+
 // Utils
 export * from './utils';
 export { subscribeCalendar } from './utils/subscriptionUtils';

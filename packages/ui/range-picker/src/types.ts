@@ -33,4 +33,6 @@ export interface RangePickerProps {
   getPopupContainer?: () => HTMLElement;
   matchTriggerWidth?: boolean;
   locale?: string | Locale;
+  /** Display/edit calendar; returned Temporal values retain ISO calendar fields. */
+  calendarSystem?: 'gregorian' | 'jalali';
 }

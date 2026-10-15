@@ -1,8 +1,13 @@
 import { useMemo } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
+import {
+  dateToCalendarDate,
+  startOfCalendarMonth,
+} from '@/calendar/calendarSystem';
 import { CalendarRegistry } from '@/core/calendarRegistry';
 import { useLocale, getWeekDaysLabels } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import {
   miniCalendarDay,
   miniCalendarDayHeader,
@@ -39,7 +44,7 @@ export const MiniCalendar = ({
   calendarRegistry,
   timeZone,
 }: MiniCalendarProps) => {
-  const { locale, t } = useLocale();
+  const { locale, t, calendarSystem = 'gregorian' } = useLocale();
   const todayKey = useMemo(() => {
     const todayInTz = timeZone
       ? Temporal.Now.plainDateISO(timeZone)
@@ -60,7 +65,7 @@ export const MiniCalendar = ({
 
   const monthLabel = useMemo(
     () =>
-      visibleMonth.toLocaleDateString(locale, {
+      formatDateLabel(visibleMonth, locale, {
         month: 'long',
         year: 'numeric',
       }),
@@ -122,9 +127,8 @@ export const MiniCalendar = ({
   }, [showEventDots, events, timeZone, calendarRegistry]);
 
   const miniCalendarDays = useMemo(() => {
-    const year = visibleMonth.getFullYear();
-    const month = visibleMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
+    const { year, month } = dateToCalendarDate(visibleMonth, calendarSystem);
+    const firstDay = startOfCalendarMonth(visibleMonth, calendarSystem);
     const startOffset = (firstDay.getDay() + 6) % 7;
     const totalCells = 42;
     const days: Array<{
@@ -136,19 +140,21 @@ export const MiniCalendar = ({
     }> = [];
 
     for (let cell = 0; cell < totalCells; cell++) {
-      const cellDate = new Date(year, month, cell - startOffset + 1);
+      const cellDate = new Date(firstDay);
+      cellDate.setDate(firstDay.getDate() + cell - startOffset);
+      const parts = dateToCalendarDate(cellDate, calendarSystem);
       const cellDateString = cellDate.toDateString();
       days.push({
-        date: cellDate.getDate(),
+        date: parts.day,
         fullDate: cellDate,
-        isCurrentMonth: cellDate.getMonth() === month,
+        isCurrentMonth: parts.month === month && parts.year === year,
         isToday: cellDateString === todayKey,
         isSelected: cellDateString === currentDateKey,
       });
     }
 
     return days;
-  }, [visibleMonth, currentDateKey, todayKey]);
+  }, [visibleMonth, currentDateKey, todayKey, calendarSystem]);
 
   return (
     <div className='df-mini-calendar-body'>
@@ -191,7 +197,7 @@ export const MiniCalendar = ({
                 !day.isToday && day.isSelected ? 'true' : undefined
               }
               data-other-month={day.isCurrentMonth ? undefined : 'true'}
-              aria-label={day.fullDate.toLocaleDateString(locale, {
+              aria-label={formatDateLabel(day.fullDate, locale, {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
@@ -201,7 +207,9 @@ export const MiniCalendar = ({
               aria-pressed={day.isSelected}
               onClick={() => onDateSelect(day.fullDate)}
             >
-              <span className='df-mini-calendar-day-number'>{day.date}</span>
+              <span className='df-mini-calendar-day-number'>
+                {new Intl.NumberFormat(locale).format(day.date)}
+              </span>
               {showEventDots && dots.length > 0 && (
                 <div className='df-mini-calendar-dots'>
                   {dots.slice(0, MAX_EVENT_DOTS).map((color, index) => (

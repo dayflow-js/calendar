@@ -3,6 +3,7 @@ export type LocaleCode = string;
 export type TranslationKey =
   | 'allDay'
   | 'noEvents'
+  | 'noEventsInRange'
   | 'more'
   | 'eventTitle'
   | 'dateRange'
@@ -71,7 +72,6 @@ export type TranslationKey =
   | 'closeSearch'
   | 'close'
   | 'noon'
-  | 'noEventsInRange'
   | 'removeSlot'
   | 'subscriptionLoadFailed'
   | 'startDate'
