@@ -37,6 +37,23 @@ const MobileSearchDialog = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useLocale();
 
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    // Return focus to whatever opened the dialog once it closes.
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseRef.current();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -55,13 +72,19 @@ const MobileSearchDialog = ({
   if (!isOpen || typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className={mobileFullscreen}>
+    <div
+      className={mobileFullscreen}
+      role='dialog'
+      aria-modal='true'
+      aria-label={t('search')}
+    >
       {/* Header with Back button and Search Input */}
       <div className='df-search-dialog-header'>
         <button
           type='button'
           onClick={onClose}
           className='df-search-dialog-back-btn'
+          aria-label={t('closeSearch')}
         >
           <ArrowLeft className='df-search-dialog-back-icon' />
         </button>
@@ -70,6 +93,7 @@ const MobileSearchDialog = ({
             ref={inputRef}
             type='text'
             placeholder={t('search') || 'Search'}
+            aria-label={t('search')}
             value={keyword}
             onChange={e => {
               const val = (e.target as HTMLInputElement).value;
@@ -84,6 +108,7 @@ const MobileSearchDialog = ({
                 if (keyword !== '') onSearchChange('');
               }}
               className='df-search-dialog-input-clear'
+              aria-label={t('clearSearch')}
             >
               <X className='df-search-dialog-clear-icon' />
             </button>

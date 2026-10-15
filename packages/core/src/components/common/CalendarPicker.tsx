@@ -6,6 +6,7 @@ import {
   getDefaultCalendarRegistry,
   CalendarRegistry,
 } from '@/core/calendarRegistry';
+import { useLocale } from '@/locale';
 import { calendarPickerDropdown } from '@/styles/classNames';
 
 import { ChevronsUpDown } from './Icons';
@@ -37,6 +38,7 @@ export const CalendarPicker = ({
   variant = 'desktop',
   disabled = false,
 }: CalendarPickerProps) => {
+  const { t } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<JSX.CSSProperties>({});
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -224,6 +226,7 @@ export const CalendarPicker = ({
             if (!disabled) setIsOpen(!isOpen);
           }}
           className='df-calendar-picker-trigger df-calendar-picker-trigger-mobile'
+          aria-expanded={isOpen}
         >
           <span
             className='df-calendar-picker-color-swatch df-calendar-picker-color-swatch-sm'
@@ -249,6 +252,8 @@ export const CalendarPicker = ({
           setIsOpen(!isOpen);
         }}
         className='df-calendar-picker-trigger'
+        aria-label={`${t('calendar')}: ${currentOption?.label || value}`}
+        aria-expanded={isOpen}
       >
         <span
           className='df-calendar-picker-color-swatch'

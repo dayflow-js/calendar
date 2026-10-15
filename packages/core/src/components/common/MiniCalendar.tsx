@@ -39,7 +39,7 @@ export const MiniCalendar = ({
   calendarRegistry,
   timeZone,
 }: MiniCalendarProps) => {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const todayKey = useMemo(() => {
     const todayInTz = timeZone
       ? Temporal.Now.plainDateISO(timeZone)
@@ -158,7 +158,7 @@ export const MiniCalendar = ({
             type='button'
             className='df-mini-calendar-nav-btn'
             onClick={() => onMonthChange(-1)}
-            aria-label='Previous month'
+            aria-label={t('previousMonth')}
           >
             <ChevronLeft />
           </button>
@@ -167,7 +167,7 @@ export const MiniCalendar = ({
             type='button'
             className='df-mini-calendar-nav-btn'
             onClick={() => onMonthChange(1)}
-            aria-label='Next month'
+            aria-label={t('nextMonth')}
           >
             <ChevronRight />
           </button>
@@ -191,6 +191,14 @@ export const MiniCalendar = ({
                 !day.isToday && day.isSelected ? 'true' : undefined
               }
               data-other-month={day.isCurrentMonth ? undefined : 'true'}
+              aria-label={day.fullDate.toLocaleDateString(locale, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+              aria-current={day.isToday ? 'date' : undefined}
+              aria-pressed={day.isSelected}
               onClick={() => onDateSelect(day.fullDate)}
             >
               <span className='df-mini-calendar-day-number'>{day.date}</span>

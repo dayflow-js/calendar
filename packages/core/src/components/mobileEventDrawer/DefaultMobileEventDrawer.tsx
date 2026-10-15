@@ -324,7 +324,12 @@ export const MobileEventDrawer = ({
   };
 
   return createPortal(
-    <div className='df-portal df-mobile-event-drawer'>
+    <div
+      className='df-portal df-mobile-event-drawer'
+      role='dialog'
+      aria-modal='true'
+      aria-label={title || t('newEvent')}
+    >
       <div
         className='df-mobile-event-drawer-backdrop'
         data-closing={String(isClosing)}
@@ -370,6 +375,7 @@ export const MobileEventDrawer = ({
             <input
               type='text'
               placeholder={t('titlePlaceholder')}
+              aria-label={t('eventTitle')}
               value={title}
               onChange={(
                 e: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>
@@ -410,6 +416,7 @@ export const MobileEventDrawer = ({
                 {t('allDay')}
               </span>
               <Switch
+                label={t('allDay')}
                 checked={isAllDay}
                 onChange={
                   isEditable
@@ -561,6 +568,7 @@ export const MobileEventDrawer = ({
             <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
               <textarea
                 placeholder={t('notesPlaceholder')}
+                aria-label={t('notes')}
                 value={notes}
                 onChange={(
                   e: JSX.TargetedEvent<HTMLTextAreaElement, globalThis.Event>

@@ -1,5 +1,6 @@
 import type { JSX } from 'preact';
 
+import { useLocale } from '@/locale';
 import { formatTime } from '@/utils/timeUtils';
 
 export interface TimeAxisLabelProps {
@@ -13,6 +14,7 @@ export const TimeAxisLabel = ({
   minute = 0,
   timeFormat = '24h',
 }: TimeAxisLabelProps): JSX.Element => {
+  const { t } = useLocale();
   if (timeFormat === '24h') {
     return <>{formatTime(hour, minute, '24h')}</>;
   }
@@ -21,7 +23,7 @@ export const TimeAxisLabel = ({
   if (normalizedHour === 12 && minute === 0) {
     return (
       <span className='df-time-axis-label' data-12h='true'>
-        <span className='df-time-axis-num'>Noon</span>
+        <span className='df-time-axis-num'>{t('noon')}</span>
       </span>
     );
   }

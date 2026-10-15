@@ -4,6 +4,7 @@ import {
   ChevronRight,
   AlertCircle,
   Loader2,
+  useLocale,
 } from '@dayflow/core';
 import { JSX } from 'preact';
 import {
@@ -93,6 +94,7 @@ const CalendarItem = ({
   onRenameSave,
   onRenameKeyDown,
 }: CalendarItemProps) => {
+  const { t } = useLocale();
   const isVisible = calendar.isVisible !== false;
   const calendarColor = calendar.colors?.lineColor || '#3b82f6';
   const showIcon = Boolean(calendar.icon);
@@ -139,6 +141,7 @@ const CalendarItem = ({
               } as Record<string, string | number>
             }
             checked={isVisible}
+            aria-label={calendar.name || calendar.id}
             onChange={event =>
               onToggleVisibility(
                 calendar.id,
@@ -166,6 +169,7 @@ const CalendarItem = ({
               onBlur={onRenameSave}
               onKeyDown={onRenameKeyDown}
               className='df-sidebar-rename-input'
+              aria-label={t('calendar')}
               onClick={e => e.stopPropagation()}
             />
           ) : (
@@ -181,7 +185,10 @@ const CalendarItem = ({
                   width={13}
                   height={13}
                   className='df-sidebar-status-icon df-sidebar-status-icon-error'
-                  title='Failed to load subscription'
+                  title={t('subscriptionLoadFailed')}
+                  role='img'
+                  aria-hidden={false}
+                  aria-label={t('subscriptionLoadFailed')}
                 />
               )}
               {calendar.subscription &&

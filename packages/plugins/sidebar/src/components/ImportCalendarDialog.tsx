@@ -5,7 +5,7 @@ import {
   ChevronsUpDown,
   LoadingButton,
 } from '@dayflow/core';
-import { useState, useRef, useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 
 interface ImportCalendarDialogProps {
   calendars: CalendarType[];
@@ -25,6 +25,7 @@ export const ImportCalendarDialog = ({
   onCancel,
 }: ImportCalendarDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
   const [selectedCalendarId, setSelectedCalendarId] = useState<string>(
     calendars[0]?.id || NEW_CALENDAR_ID
   );
@@ -170,8 +171,13 @@ export const ImportCalendarDialog = ({
 
   return (
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
-        <h2 className='df-sidebar-dialog-title'>
+      <div
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
           {t('addSchedule') || 'Add Schedule'}
         </h2>
         <p className='df-sidebar-dialog-text'>

@@ -1,5 +1,5 @@
 import { useLocale, LoadingButton } from '@dayflow/core';
-import { useState } from 'preact/hooks';
+import { useId, useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
 
@@ -40,6 +40,7 @@ export const MergeCalendarDialog = ({
   onCancel,
 }: MergeCalendarDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
   const [isLoading, setIsLoading] = useState(false);
   const source = { name: sourceName, color: sourceColor };
   const target = { name: targetName, color: targetColor };
@@ -62,8 +63,13 @@ export const MergeCalendarDialog = ({
 
   return (
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
-        <h2 className='df-sidebar-dialog-title'>
+      <div
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
           {t('mergeConfirmTitle', { sourceName, targetName })}
         </h2>
         <div className='df-sidebar-dialog-lines'>

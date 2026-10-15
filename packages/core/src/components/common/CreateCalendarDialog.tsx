@@ -167,6 +167,9 @@ export const CreateCalendarDialog = ({
     <div className='df-portal df-create-calendar-dialog-backdrop'>
       <div
         className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog-panel'
+        role='dialog'
+        aria-modal='true'
+        aria-label={t('createCalendar')}
         onClick={e => e.stopPropagation()}
       >
         <h2
@@ -260,7 +263,7 @@ export const CreateCalendarDialog = ({
                                   onClick={handleAccept}
                                   className='df-fill-primary df-btn-sm'
                                 >
-                                  OK
+                                  {t('ok')}
                                 </button>
                               </div>
                             </div>

@@ -1,7 +1,7 @@
 import { LoadingButton, useLocale } from '@dayflow/core';
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
-import { useMemo, useState } from 'preact/hooks';
+import { useId, useMemo, useState } from 'preact/hooks';
 
 interface GroupNameDialogProps {
   title: string;
@@ -23,6 +23,7 @@ const GroupNameDialog = ({
   onCancel,
 }: GroupNameDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
   const [name, setName] = useState(initialName);
   const [isLoading, setIsLoading] = useState(false);
   const trimmedName = name.trim();
@@ -54,8 +55,15 @@ const GroupNameDialog = ({
 
   return createPortal(
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
-        <h2 className='df-sidebar-dialog-title'>{title}</h2>
+      <div
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
+          {title}
+        </h2>
         <form onSubmit={handleSubmit}>
           <label className='df-sidebar-group-name-label' htmlFor={inputId}>
             {t('groupName')}
@@ -169,6 +177,7 @@ export const DeleteGroupDialog = ({
   onCancel,
 }: DeleteGroupDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -183,8 +192,13 @@ export const DeleteGroupDialog = ({
 
   return createPortal(
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
-        <h2 className='df-sidebar-dialog-title'>
+      <div
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
           {t('deleteGroupTitle', { groupName })}
         </h2>
         <p className='df-sidebar-dialog-text'>

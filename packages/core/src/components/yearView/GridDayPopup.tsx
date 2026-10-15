@@ -75,7 +75,7 @@ export const GridDayPopup = ({
       </div>
       <div className='df-year-popup-body'>
         {events.length === 0 ? (
-          <div className='df-year-popup-empty'>No events</div>
+          <div className='df-year-popup-empty'>{t('noEvents')}</div>
         ) : (
           events.map(event => {
             const cal = event.calendarId
@@ -139,6 +139,8 @@ export const GridDayPopup = ({
     <div
       ref={popupRef}
       data-grid-day-popup
+      role='dialog'
+      aria-label={dateLabel}
       className='df-year-popup df-animate-in df-fade-in df-zoom-in-95'
       style={{ top: position.top, left: position.left }}
     >

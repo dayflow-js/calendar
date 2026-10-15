@@ -4,7 +4,7 @@ import {
   useLocale,
   LoadingButton,
 } from '@dayflow/core';
-import { useState, useMemo } from 'preact/hooks';
+import { useId, useMemo, useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
 
@@ -46,6 +46,7 @@ export const DeleteCalendarDialog = ({
   const [showMergeDropdown, setShowMergeDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLocale();
+  const titleId = useId();
   const calendarColor =
     calendars.find(c => c.id === calendarId)?.colors.lineColor ?? '#6b7280';
 
@@ -118,10 +119,15 @@ export const DeleteCalendarDialog = ({
 
   return createPortal(
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
+      <div
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
         {step === 'initial' ? (
           <>
-            <h2 className='df-sidebar-dialog-title'>
+            <h2 id={titleId} className='df-sidebar-dialog-title'>
               {t('deleteCalendar', { calendarName })}
             </h2>
             <p className='df-sidebar-dialog-text df-sidebar-dialog-line'>
@@ -240,7 +246,7 @@ export const DeleteCalendarDialog = ({
           </>
         ) : (
           <>
-            <h2 className='df-sidebar-dialog-title'>
+            <h2 id={titleId} className='df-sidebar-dialog-title'>
               {t('confirmDeleteTitle', { calendarName })}
             </h2>
             <p className='df-sidebar-dialog-text'>

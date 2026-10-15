@@ -13,6 +13,7 @@ import RangePickerPanel from './components/RangePickerPanel';
 import { DEFAULT_FORMAT, DEFAULT_TIME_FORMAT } from './constants';
 import { MoveRight } from './icons';
 import type { RangePickerProps, ZonedRange } from './types';
+import { resolveLabels } from './utils/labels';
 import { getMonthLabels, getWeekDaysLabels } from './utils/locale';
 import {
   mergeFormatTemplate,
@@ -46,6 +47,8 @@ const RangePicker = ({
     () => (typeof locale === 'string' ? locale : locale?.code || 'en-US'),
     [locale]
   );
+
+  const labels = useMemo(() => resolveLabels(locale), [locale]);
 
   const isTimeEnabled = useMemo(() => {
     if (showTime === undefined) return true;
@@ -777,6 +780,7 @@ const RangePicker = ({
           <input
             type='text'
             name='range-start'
+            aria-label={labels.startDate}
             value={inputValues[0]}
             onChange={handleInputChange('start')}
             onFocus={() => openPanelForField('start')}
@@ -798,6 +802,7 @@ const RangePicker = ({
           <input
             type='text'
             name='range-end'
+            aria-label={labels.endDate}
             value={inputValues[1]}
             onChange={handleInputChange('end')}
             onFocus={() => openPanelForField('end')}
@@ -830,6 +835,7 @@ const RangePicker = ({
                 disabled={disabled}
                 timeFormat={effectiveTimeFormat}
                 matchTriggerWidth={matchTriggerWidth}
+                labels={labels}
                 popupRef={popupRef}
                 timeListRefs={timeListRefs}
                 onMonthChange={changeMonth}
@@ -856,6 +862,7 @@ const RangePicker = ({
                 disabled={disabled}
                 timeFormat={effectiveTimeFormat}
                 matchTriggerWidth={matchTriggerWidth}
+                labels={labels}
                 popupRef={popupRef}
                 timeListRefs={timeListRefs}
                 onMonthChange={changeMonth}

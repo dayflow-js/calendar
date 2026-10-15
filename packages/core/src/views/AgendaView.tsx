@@ -390,7 +390,7 @@ const AgendaView = ({
   onEventSelect,
   onDetailPanelToggle,
 }: AgendaViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
   const customRenderingStore = useContext(CustomRenderingContext);
@@ -745,6 +745,7 @@ const AgendaView = ({
       <ViewHeader
         calendar={app}
         viewType='month'
+        navigationUnit='period'
         currentDate={rangeStart}
         customTitle={title}
         onPrevious={() => app.goToPrevious()}
@@ -754,7 +755,7 @@ const AgendaView = ({
 
       <div className='df-agenda-scroll'>
         {groups.length === 0 ? (
-          <div className='df-agenda-empty'>No events in this range.</div>
+          <div className='df-agenda-empty'>{t('noEventsInRange')}</div>
         ) : (
           groups.map(group => (
             <section
@@ -797,12 +798,12 @@ const AgendaView = ({
               <div className='df-agenda-day-content'>
                 {group.allDayEntries.length === 0 &&
                 group.timedEntries.length === 0 ? (
-                  <div className='df-agenda-empty-row'>No events</div>
+                  <div className='df-agenda-empty-row'>{t('noEvents')}</div>
                 ) : (
                   <>
                     {group.allDayEntries.length > 0 && (
                       <div className='df-agenda-item df-agenda-item-all-day'>
-                        <div className='df-agenda-time'>All day</div>
+                        <div className='df-agenda-time'>{t('allDay')}</div>
                         <div className='df-agenda-all-day-events'>
                           {group.allDayEntries.map(entry => (
                             <div

@@ -5,6 +5,7 @@ import { headerTitle, headerSubtitle } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
 
 import TodayBox from './TodayBox';
+import type { NavigationUnit } from './TodayBox';
 
 export type ViewHeaderType = 'day' | 'week' | 'month' | 'year';
 export type ViewSwitcherMode = 'buttons' | 'select';
@@ -29,6 +30,8 @@ interface ViewHeaderProps {
   subtitleMeta?: ComponentChild;
   /** Whether to show TodayBox (default determined by viewType: day=false, week/month=true) */
   showTodayBox?: boolean;
+  /** Unit the previous/next arrows move by, used for their accessible names (defaults to viewType) */
+  navigationUnit?: NavigationUnit;
   /** Sticky year for Year view (optional, only for Year view) */
   stickyYear?: number | null;
   /** Push-away offset for sticky year (in pixels) */
@@ -49,6 +52,7 @@ const ViewHeader = ({
   customSubtitle,
   subtitleMeta,
   showTodayBox,
+  navigationUnit,
   stickyYear,
   stickyYearOffset = 0,
   nextYear,
@@ -142,6 +146,7 @@ const ViewHeader = ({
             handlePreviousMonth={onPrevious}
             handleNextMonth={onNext}
             handleToday={onToday}
+            navigationUnit={navigationUnit ?? viewType}
           />
         </div>
       )}
