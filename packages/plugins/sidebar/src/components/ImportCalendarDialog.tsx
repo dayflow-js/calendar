@@ -4,6 +4,7 @@ import {
   Check,
   ChevronsUpDown,
   LoadingButton,
+  useDialogFocus,
 } from '@dayflow/core';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -128,6 +129,12 @@ export const ImportCalendarDialog = ({
     </div>
   );
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape closes the calendar dropdown first, then the dialog.
+  useDialogFocus(dialogRef, {
+    onClose: isOpen ? () => setIsOpen(false) : isLoading ? undefined : onCancel,
+  });
+
   const renderDropdown = () => {
     if (!isOpen) return null;
 
@@ -172,6 +179,7 @@ export const ImportCalendarDialog = ({
   return (
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog'
         role='dialog'
         aria-modal='true'

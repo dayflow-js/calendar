@@ -1,6 +1,7 @@
 import { createPortal } from 'preact/compat';
 import { useEffect, useRef } from 'preact/hooks';
 
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { ICalendarApp, Event } from '@/types';
@@ -48,16 +49,15 @@ export const GridDayPopup = ({
         onClose();
       }
     };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
     document.addEventListener('mousedown', handleDown);
-    document.addEventListener('keydown', handleKey);
     return () => {
       document.removeEventListener('mousedown', handleDown);
-      document.removeEventListener('keydown', handleKey);
     };
   }, [anchorEl, onClose]);
+
+  // Non-modal popup: Escape closes it and focus returns to the day cell, but
+  // Tab is free to leave.
+  useDialogFocus(popupRef, { onClose, trapFocus: false });
 
   const calendars = app.getCalendars();
   const calendarMap = new Map(calendars.map(c => [c.id, c]));

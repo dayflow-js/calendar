@@ -2,6 +2,7 @@ import { createPortal } from 'preact/compat';
 import { useRef, useEffect } from 'preact/hooks';
 
 import { ArrowLeft, X } from '@/components/common/Icons';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { mobileFullscreen } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
@@ -37,22 +38,10 @@ const MobileSearchDialog = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useLocale();
 
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    if (!isOpen) return;
-    // Return focus to whatever opened the dialog once it closes.
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCloseRef.current();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      previouslyFocused?.focus?.();
-    };
-  }, [isOpen]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape closes, Tab stays inside, focus returns to the opener on close.
+  // The search input is focused below, so skip the hook's own auto-focus.
+  useDialogFocus(dialogRef, { onClose, active: isOpen, autoFocus: false });
 
   useEffect(() => {
     if (isOpen) {
@@ -73,6 +62,7 @@ const MobileSearchDialog = ({
 
   return createPortal(
     <div
+      ref={dialogRef}
       className={mobileFullscreen}
       role='dialog'
       aria-modal='true'

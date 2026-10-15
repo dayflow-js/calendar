@@ -3,8 +3,9 @@ import {
   CalendarType,
   useLocale,
   LoadingButton,
+  useDialogFocus,
 } from '@dayflow/core';
-import { useId, useMemo, useState } from 'preact/hooks';
+import { useId, useMemo, useRef, useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
 
@@ -107,6 +108,16 @@ export const DeleteCalendarDialog = ({
     }
   };
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape closes the merge dropdown first, then the dialog.
+  useDialogFocus(dialogRef, {
+    onClose: showMergeDropdown
+      ? () => setShowMergeDropdown(false)
+      : isLoading
+        ? undefined
+        : onCancel,
+  });
+
   const handleConfirmDelete = async () => {
     if (isLoading) return;
     setIsLoading(true);
@@ -120,6 +131,7 @@ export const DeleteCalendarDialog = ({
   return createPortal(
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog'
         role='dialog'
         aria-modal='true'

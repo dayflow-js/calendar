@@ -1,7 +1,7 @@
-import { LoadingButton, useLocale } from '@dayflow/core';
+import { LoadingButton, useDialogFocus, useLocale } from '@dayflow/core';
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
-import { useId, useMemo, useState } from 'preact/hooks';
+import { useId, useMemo, useRef, useState } from 'preact/hooks';
 
 interface GroupNameDialogProps {
   title: string;
@@ -26,6 +26,8 @@ const GroupNameDialog = ({
   const titleId = useId();
   const [name, setName] = useState(initialName);
   const [isLoading, setIsLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, { onClose: isLoading ? undefined : onCancel });
   const trimmedName = name.trim();
   const isDuplicate = useMemo(
     () =>
@@ -56,6 +58,7 @@ const GroupNameDialog = ({
   return createPortal(
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog'
         role='dialog'
         aria-modal='true'
@@ -179,6 +182,8 @@ export const DeleteGroupDialog = ({
   const { t } = useLocale();
   const titleId = useId();
   const [isLoading, setIsLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, { onClose: isLoading ? undefined : onCancel });
 
   const handleConfirm = async () => {
     if (isLoading) return;
@@ -193,6 +198,7 @@ export const DeleteGroupDialog = ({
   return createPortal(
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog'
         role='dialog'
         aria-modal='true'

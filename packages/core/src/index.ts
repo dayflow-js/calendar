@@ -52,6 +52,8 @@ export { getCalendarColorsForHex } from './core/calendarRegistry';
 
 // Common Components
 export { LoadingButton } from './components/common/LoadingButton';
+export { useDialogFocus } from './hooks/useDialogFocus';
+export type { UseDialogFocusOptions } from './hooks/useDialogFocus';
 export { BlossomColorPicker } from './components/common/BlossomColorPicker';
 export { DefaultColorPicker } from './components/common/DefaultColorPicker';
 export { RangePicker as DayflowRangePicker } from '@dayflow/ui-range-picker';

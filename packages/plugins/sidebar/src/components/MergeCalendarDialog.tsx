@@ -1,5 +1,5 @@
-import { useLocale, LoadingButton } from '@dayflow/core';
-import { useId, useState } from 'preact/hooks';
+import { useLocale, LoadingButton, useDialogFocus } from '@dayflow/core';
+import { useId, useRef, useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
 
@@ -42,6 +42,8 @@ export const MergeCalendarDialog = ({
   const { t } = useLocale();
   const titleId = useId();
   const [isLoading, setIsLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, { onClose: isLoading ? undefined : onCancel });
   const source = { name: sourceName, color: sourceColor };
   const target = { name: targetName, color: targetColor };
 
@@ -64,6 +66,7 @@ export const MergeCalendarDialog = ({
   return (
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog'
         role='dialog'
         aria-modal='true'

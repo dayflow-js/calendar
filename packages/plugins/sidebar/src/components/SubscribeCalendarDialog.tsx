@@ -1,5 +1,5 @@
-import { useLocale } from '@dayflow/core';
-import { useId, useState } from 'preact/hooks';
+import { useDialogFocus, useLocale } from '@dayflow/core';
+import { useId, useRef, useState } from 'preact/hooks';
 
 interface SubscribeCalendarDialogProps {
   onSubscribe: (url: string) => Promise<void>;
@@ -39,12 +39,15 @@ export const SubscribeCalendarDialog = ({
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') handleSubmit();
-    if (e.key === 'Escape') onCancel();
   };
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, { onClose: loading ? undefined : onCancel });
 
   return (
     <div className='df-sidebar-overlay'>
       <div
+        ref={dialogRef}
         className='df-sidebar-dialog df-sidebar-dialog-wide'
         role='dialog'
         aria-modal='true'

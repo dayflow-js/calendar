@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, useRef } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { dialogContainer } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
@@ -165,6 +166,12 @@ const DefaultEventDetailDialog = ({
   const shouldShowNotes =
     !isSubscribed || (editedEvent.description || '').trim() !== '';
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, {
+    onClose: isPending ? undefined : onClose,
+    active: isOpen && isViewable,
+  });
+
   if (!isOpen || !isViewable) return null;
 
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -194,6 +201,7 @@ const DefaultEventDetailDialog = ({
 
       {/* Dialog */}
       <div
+        ref={dialogRef}
         className={dialogContainer}
         role='dialog'
         aria-modal='true'
