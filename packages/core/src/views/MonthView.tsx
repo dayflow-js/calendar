@@ -8,6 +8,12 @@ import {
   useCallback,
 } from 'preact/hooks';
 
+import {
+  CalendarSystem,
+  dateToCalendarDate,
+  calendarDateToDate,
+  startOfCalendarMonth,
+} from '@/calendar/calendarSystem';
 import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
@@ -44,8 +50,12 @@ import {
 import { expandRecurringEvents } from '@/utils/recurrence';
 
 /** Compute the 6 weeks that fill a month-view grid for the given date. */
-const getMonthWeeks = (date: Date, startOfWeek: number): WeeksData[] => {
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+const getMonthWeeks = (
+  date: Date,
+  startOfWeek: number,
+  calendarSystem: CalendarSystem
+): WeeksData[] => {
+  const firstDay = startOfCalendarMonth(date, calendarSystem);
   const diff = (firstDay.getDay() - startOfWeek + 7) % 7;
   const gridStart = new Date(firstDay);
   gridStart.setDate(firstDay.getDate() - diff);
@@ -55,7 +65,7 @@ const getMonthWeeks = (date: Date, startOfWeek: number): WeeksData[] => {
   for (let i = 0; i < 6; i++) {
     const weekStart = new Date(gridStart);
     weekStart.setDate(gridStart.getDate() + i * 7);
-    weeks.push(generateWeekData(weekStart));
+    weeks.push(generateWeekData(weekStart, calendarSystem));
   }
   return weeks;
 };
@@ -136,6 +146,7 @@ const MonthView = ({
 }: MonthViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
   const { t, getWeekDaysLabels, getMonthLabels, locale } = useLocale();
   const currentDate = app.getCurrentDate();
+  const calendarSystem = app.state.calendarSystem;
   const rawEvents = app.getEvents();
   const startOfWeek = config.startOfWeek ?? 1;
   const timeFormat = app.state.timeFormat ?? config.timeFormat ?? '24h';
@@ -151,14 +162,17 @@ const MonthView = ({
   );
   const prevFadeDateRef = useRef(currentDate);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentDateYear = currentDate.getFullYear();
-  const currentDateMonth = currentDate.getMonth();
+  const currentParts = dateToCalendarDate(currentDate, calendarSystem);
+  const currentDateYear = currentParts.year;
+  const currentDateMonth = currentParts.month - 1;
 
   useEffect(() => {
     if (!isFadeMode) return;
     if (
-      currentDateYear === prevFadeDateRef.current.getFullYear() &&
-      currentDateMonth === prevFadeDateRef.current.getMonth()
+      currentDateYear ===
+        dateToCalendarDate(prevFadeDateRef.current, calendarSystem).year &&
+      currentDateMonth ===
+        dateToCalendarDate(prevFadeDateRef.current, calendarSystem).month - 1
     )
       return;
 
@@ -182,8 +196,11 @@ const MonthView = ({
   }, [currentDateYear, currentDateMonth, isFadeMode]);
 
   const fadeWeeks = useMemo(
-    () => (isFadeMode ? getMonthWeeks(fadeDisplayDate, startOfWeek) : []),
-    [isFadeMode, fadeDisplayDate, startOfWeek]
+    () =>
+      isFadeMode
+        ? getMonthWeeks(fadeDisplayDate, startOfWeek, calendarSystem)
+        : [],
+    [isFadeMode, fadeDisplayDate, startOfWeek, calendarSystem]
   );
 
   // Slight horizontal nudge in the direction of navigation, fades alongside opacity
@@ -218,8 +235,16 @@ const MonthView = ({
   }, [rawEvents]);
 
   const recurrenceRange = useMemo(() => {
-    const start = new Date(currentDateYear, currentDateMonth - 18, 1);
-    const end = new Date(currentDateYear, currentDateMonth + 19, 0);
+    const start = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 18,
+      1
+    );
+    const end = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 19,
+      0
+    );
     end.setHours(23, 59, 59, 999);
     return { start, end };
   }, [currentDateMonth, currentDateYear]);
@@ -555,6 +580,7 @@ const MonthView = ({
     setScrollTop,
   } = useVirtualMonthScroll({
     currentDate,
+    calendarSystem,
     weekHeight,
     onCurrentMonthChange: (monthName: string, year: number) => {
       const isAsian = locale.startsWith('zh') || locale.startsWith('ja');
@@ -565,13 +591,18 @@ const MonthView = ({
       const monthIndex = localizedMonths.indexOf(monthName);
 
       if (monthIndex >= 0) {
-        app.setVisibleMonth(new Date(year, monthIndex, 1));
+        app.setVisibleMonth(
+          calendarDateToDate(
+            { year, month: monthIndex + 1, day: 1 },
+            calendarSystem
+          )
+        );
       }
     },
     initialWeeksToLoad: 156,
     locale: locale,
     startOfWeek: startOfWeek,
-    isEnabled: isWeekHeightInitialized,
+    isEnabled: isWeekHeightInitialized && !isFadeMode,
     snapToMonth: config.snapToMonth,
     skipScrollOnDateChange: isGridDateClickRef,
   });
@@ -798,14 +829,17 @@ const MonthView = ({
 
     if (isFadeMode) {
       const labels = getMonthLabels(locale, isAsianLocale ? 'short' : 'long');
-      const monthName = labels[fadeDisplayDate.getMonth()];
-      const year = fadeDisplayDate.getFullYear();
-      return isAsianLocale ? `${year}年${monthName}` : `${monthName} ${year}`;
+      const parts = dateToCalendarDate(fadeDisplayDate, calendarSystem);
+      const monthName = labels[parts.month - 1];
+      const year = parts.year;
+      return isAsianLocale
+        ? `${year}年${monthName}`
+        : `${monthName} ${new Intl.NumberFormat(locale, { useGrouping: false }).format(year)}`;
     }
 
     return isAsianLocale
       ? `${currentYear}年${currentMonth}`
-      : `${currentMonth} ${currentYear}`;
+      : `${currentMonth} ${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
   const handleGridDateClick = useCallback(
@@ -956,9 +990,14 @@ const MonthView = ({
                       locale.startsWith('zh') || locale.startsWith('ja')
                         ? 'short'
                         : 'long'
-                    )[fadeDisplayDate.getMonth()]
+                    )[
+                      dateToCalendarDate(fadeDisplayDate, calendarSystem)
+                        .month - 1
+                    ]
                   }
-                  currentYear={fadeDisplayDate.getFullYear()}
+                  currentYear={
+                    dateToCalendarDate(fadeDisplayDate, calendarSystem).year
+                  }
                   screenSize={screenSize}
                   isScrolling={false}
                   calendarRef={calendarRef}

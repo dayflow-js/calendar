@@ -5,6 +5,7 @@
  * including days, weeks, and month/year metadata.
  */
 
+import { CalendarSystem, dateToCalendarDate } from '@/calendar/calendarSystem';
 import { DayData, WeeksData } from '@/types';
 
 import { monthNames, shortMonthNames } from './dateConstants';
@@ -19,11 +20,15 @@ import { getWeekRange } from './dateRangeUtils';
  * @param date Date to generate data for
  * @returns Day data with date, day, month, year, and isToday flag
  */
-export const generateDayData = (date: string | number | Date) => {
+export const generateDayData = (
+  date: string | number | Date,
+  calendarSystem: CalendarSystem = 'gregorian'
+) => {
   const clonedDate = new Date(date);
-  const day = clonedDate.getDate();
-  const month = clonedDate.getMonth();
-  const year = clonedDate.getFullYear();
+  const parts = dateToCalendarDate(clonedDate, calendarSystem);
+  const day = parts.day;
+  const month = parts.month - 1;
+  const year = parts.year;
   const today = new Date();
 
   return {
@@ -31,12 +36,17 @@ export const generateDayData = (date: string | number | Date) => {
     day,
     month,
     year,
-    monthName: monthNames[month],
-    shortMonthName: shortMonthNames[month],
-    isToday:
-      today.getDate() === day &&
-      today.getMonth() === month &&
-      today.getFullYear() === year,
+    monthName:
+      calendarSystem === 'jalali'
+        ? clonedDate.toLocaleDateString('en-US-u-ca-persian', { month: 'long' })
+        : monthNames[month],
+    shortMonthName:
+      calendarSystem === 'jalali'
+        ? clonedDate.toLocaleDateString('en-US-u-ca-persian', {
+            month: 'short',
+          })
+        : shortMonthNames[month],
+    isToday: today.toDateString() === clonedDate.toDateString(),
   };
 };
 
@@ -67,7 +77,9 @@ export const getMonthYearOfWeek = (days: DayData[]) => {
   const [monthIndex, year] = dominantMonthYear.split('-').map(Number);
 
   return {
-    month: monthNames[monthIndex],
+    month:
+      days.find(day => day.month === monthIndex && day.year === year)
+        ?.monthName ?? monthNames[monthIndex],
     monthIndex,
     year,
   };
@@ -78,13 +90,16 @@ export const getMonthYearOfWeek = (days: DayData[]) => {
  * @param startDate Week start date
  * @returns Week data with days array, startDate, and monthYear
  */
-export const generateWeekData = (startDate: string | number | Date) => {
+export const generateWeekData = (
+  startDate: string | number | Date,
+  calendarSystem: CalendarSystem = 'gregorian'
+) => {
   const week = [];
   const startDateClone = new Date(startDate);
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDateClone);
-    week.push(generateDayData(date));
+    week.push(generateDayData(date, calendarSystem));
     startDateClone.setDate(startDateClone.getDate() + 1);
   }
 
@@ -133,7 +148,8 @@ export const generateWeeksData = (centralDate: Date, monthsToLoad = 3) => {
 export function generateWeekRange(
   centerDate: Date,
   totalWeeks: number,
-  startOfWeek: number = 1
+  startOfWeek: number = 1,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): WeeksData[] {
   const weeks: WeeksData[] = [];
   const startOffset = Math.floor(totalWeeks / 2);
@@ -153,7 +169,7 @@ export function generateWeekRange(
   for (let i = 0; i < totalWeeks; i++) {
     const weekStart = new Date(startWeek);
     weekStart.setDate(weekStart.getDate() + i * 7);
-    weeks.push(generateWeekData(weekStart));
+    weeks.push(generateWeekData(weekStart, calendarSystem));
   }
   return weeks;
 }

@@ -5,6 +5,7 @@ const en: Locale = {
   messages: {
     allDay: 'All day',
     noEvents: 'No events for this day',
+    noEventsInRange: 'No events in this range.',
     more: 'more',
     eventTitle: 'Event Title',
     dateRange: 'Date Range',

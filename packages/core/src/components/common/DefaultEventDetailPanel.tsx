@@ -490,6 +490,7 @@ const DefaultEventDetailPanel = ({
             disabled={!isEditable || isLoading}
             onChange={handleAllDayRangeChange}
             locale={app?.state.locale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       ) : (
@@ -514,6 +515,7 @@ const DefaultEventDetailPanel = ({
               applyDraftEventUpdate({ ...draftEvent, start, end });
             }}
             locale={app?.state.locale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       )}

@@ -1,5 +1,10 @@
 import { useMemo, useState, useCallback, useEffect } from 'preact/hooks';
 
+import {
+  CalendarSystem,
+  createCalendarDate,
+  dateToCalendarDate,
+} from '@/calendar/calendarSystem';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useLocale } from '@/locale';
 import { monthViewContainer } from '@/styles/classNames';
@@ -38,13 +43,16 @@ function buildDayEventMap(
   events: Event[],
   year: number,
   showTimedEvents: boolean,
-  appTimeZone?: string
+  appTimeZone?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): Map<string, Event[]> {
   const map = new Map<string, Event[]>();
 
-  const yearStart = new Date(year, 0, 1);
+  const yearStart = createCalendarDate(year, 0, 1, calendarSystem);
   yearStart.setHours(0, 0, 0, 0);
-  const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+  const yearEnd = new Date(
+    createCalendarDate(year + 1, 0, 1, calendarSystem).getTime() - 1
+  );
 
   for (const event of events) {
     if (!event.start) continue;
@@ -61,7 +69,10 @@ function buildDayEventMap(
 
     const clampedStart =
       start < yearStart ? new Date(yearStart) : new Date(start);
-    const clampedEnd = end > yearEnd ? new Date(year, 11, 31) : new Date(end);
+    const clampedEnd =
+      end > yearEnd
+        ? createCalendarDate(year + 1, 0, 0, calendarSystem)
+        : new Date(end);
     clampedStart.setHours(0, 0, 0, 0);
     clampedEnd.setHours(0, 0, 0, 0);
 
@@ -109,7 +120,8 @@ function calcPopupPosition(anchorEl: HTMLElement): {
 export const GridYearView = ({ app, config }: GridYearViewProps) => {
   const { t: translate, locale, getWeekDaysLabels: getLabels } = useLocale();
   const currentDate = app.getCurrentDate();
-  const currentYear = currentDate.getFullYear();
+  const calendarSystem = app.state.calendarSystem;
+  const currentYear = dateToCalendarDate(currentDate, calendarSystem).year;
   const rawEvents = app.getEvents();
   const startOfWeek = config?.startOfWeek ?? 1;
   const showTimedEvents = config?.showTimedEventsInYearView ?? false;
@@ -147,14 +159,27 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
   // Heatmap event map (respects showTimedEvents filter)
   const heatmapEventMap = useMemo(
     () =>
-      buildDayEventMap(rawEvents, currentYear, showTimedEvents, appTimeZone),
-    [rawEvents, currentYear, showTimedEvents, appTimeZone]
+      buildDayEventMap(
+        rawEvents,
+        currentYear,
+        showTimedEvents,
+        appTimeZone,
+        calendarSystem
+      ),
+    [rawEvents, currentYear, showTimedEvents, appTimeZone, calendarSystem]
   );
 
   // Full event map for popup (shows all events regardless of filter)
   const fullEventMap = useMemo(
-    () => buildDayEventMap(rawEvents, currentYear, true, appTimeZone),
-    [rawEvents, currentYear, appTimeZone]
+    () =>
+      buildDayEventMap(
+        rawEvents,
+        currentYear,
+        true,
+        appTimeZone,
+        calendarSystem
+      ),
+    [rawEvents, currentYear, appTimeZone, calendarSystem]
   );
 
   // Week day header labels (narrow: M T W T F S S)
@@ -170,8 +195,11 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
   const monthsData = useMemo(() => {
     const months = [];
     for (let m = 0; m < 12; m++) {
-      const monthStart = new Date(currentYear, m, 1);
-      const daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+      const monthStart = createCalendarDate(currentYear, m, 1, calendarSystem);
+      const daysInMonth = dateToCalendarDate(
+        createCalendarDate(currentYear, m + 1, 0, calendarSystem),
+        calendarSystem
+      ).day;
       const firstDayOfWeek = monthStart.getDay();
       const paddingStart = (firstDayOfWeek - startOfWeek + 7) % 7;
 
@@ -180,19 +208,27 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       // Trailing days from previous month
       for (let i = paddingStart - 1; i >= 0; i--) {
         cells.push({
-          date: new Date(currentYear, m, -i),
+          date: createCalendarDate(currentYear, m, -i, calendarSystem),
           isCurrentMonth: false,
         });
       }
       // Current month days
       for (let d = 1; d <= daysInMonth; d++) {
-        cells.push({ date: new Date(currentYear, m, d), isCurrentMonth: true });
+        cells.push({
+          date: createCalendarDate(currentYear, m, d, calendarSystem),
+          isCurrentMonth: true,
+        });
       }
       // Leading days from next month to reach exactly 42
       let nextDay = 1;
       while (cells.length < 42) {
         cells.push({
-          date: new Date(currentYear, m + 1, nextDay++),
+          date: createCalendarDate(
+            currentYear,
+            m + 1,
+            nextDay++,
+            calendarSystem
+          ),
           isCurrentMonth: false,
         });
       }
@@ -206,7 +242,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       months.push({ monthIndex: m, monthName: formattedName, cells });
     }
     return months;
-  }, [currentYear, locale, startOfWeek]);
+  }, [currentYear, locale, startOfWeek, calendarSystem]);
 
   const handleDateClick = useCallback(
     (e: MouseEvent, date: Date, monthIndex: number) => {
@@ -291,7 +327,9 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
-    return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+    return isAsianLocale
+      ? `${currentYear}年`
+      : `${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
   const popupEvents = useMemo(() => {
@@ -314,14 +352,10 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
         currentDate={currentDate}
         customTitle={getCustomTitle()}
         onPrevious={() => {
-          const d = new Date(currentDate);
-          d.setFullYear(d.getFullYear() - 1);
-          app.setCurrentDate(d);
+          app.goToPrevious();
         }}
         onNext={() => {
-          const d = new Date(currentDate);
-          d.setFullYear(d.getFullYear() + 1);
-          app.setCurrentDate(d);
+          app.goToNext();
         }}
         onToday={() => app.goToToday()}
       />
@@ -389,7 +423,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                           data-has-events={eventCount > 0 ? 'true' : 'false'}
                           data-heat-level={String(heatLevel)}
                         >
-                          {date.getDate()}
+                          {date.toLocaleDateString(locale, { day: 'numeric' })}
                         </span>
                       </div>
                     </div>

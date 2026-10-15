@@ -63,6 +63,7 @@
     "tailwindcss": "catalog:",
     "temporal-polyfill": "catalog:",
     "tsc-alias": "^1.8.16",
+    "tslib": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {

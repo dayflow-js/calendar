@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import CalendarEvent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { monthTitle } from '@/styles/classNames';
 import { MonthEventDragState, Event, ViewType, ICalendarApp } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
@@ -435,7 +436,7 @@ const WeekComponent = memo(
 
     const localizedMonthYear = useMemo(() => {
       if (!firstDayOfMonth) return '';
-      return firstDayOfMonth.date.toLocaleDateString(locale, {
+      return formatDateLabel(firstDayOfMonth.date, locale, {
         month: 'long',
         year: 'numeric',
       });

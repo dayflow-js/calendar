@@ -7,6 +7,10 @@ import {
   useEffect,
 } from 'preact/hooks';
 
+import {
+  createCalendarDate,
+  dateToCalendarDate,
+} from '@/calendar/calendarSystem';
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
@@ -61,7 +65,8 @@ export const FixedWeekYearView = ({
 }: FixedWeekYearViewProps) => {
   const { t, locale, getWeekDaysLabels } = useLocale();
   const currentDate = app.getCurrentDate();
-  const currentYear = currentDate.getFullYear();
+  const calendarSystem = app.state.calendarSystem;
+  const currentYear = dateToCalendarDate(currentDate, calendarSystem).year;
   const rawEvents = app.getEvents();
   const appTimeZone = app.timeZone;
   const startOfWeek = config?.startOfWeek ?? 1;
@@ -286,8 +291,8 @@ export const FixedWeekYearView = ({
 
   // Calculate the maximum number of columns required for the current year
   const totalColumns = useMemo(
-    () => getFixedWeekTotalColumns(currentYear, startOfWeek),
-    [currentYear, startOfWeek]
+    () => getFixedWeekTotalColumns(currentYear, startOfWeek, calendarSystem),
+    [currentYear, startOfWeek, calendarSystem]
   );
 
   // Drag and Drop Hook
@@ -429,8 +434,14 @@ export const FixedWeekYearView = ({
 
   // Filter events for the current year (uses per-event cache via getEventDayRange)
   const yearEvents = useMemo(() => {
-    const yearStartMs = new Date(currentYear, 0, 1).getTime();
-    const yearEndMs = new Date(currentYear, 11, 31, 23, 59, 59).getTime();
+    const yearStartMs = createCalendarDate(
+      currentYear,
+      0,
+      1,
+      calendarSystem
+    ).getTime();
+    const yearEndMs =
+      createCalendarDate(currentYear + 1, 0, 1, calendarSystem).getTime() - 1;
 
     const result: Event[] = [];
     for (let i = 0; i < rawEvents.length; i++) {
@@ -443,12 +454,13 @@ export const FixedWeekYearView = ({
       }
     }
     return result;
-  }, [rawEvents, currentYear, showTimedEvents, appTimeZone]);
+  }, [rawEvents, currentYear, showTimedEvents, appTimeZone, calendarSystem]);
 
   // Generate data for all 12 months with event segments
   const monthsData = useMemo<FixedWeekMonthData[]>(
     () =>
       buildFixedWeekMonthsData({
+        calendarSystem,
         currentYear,
         locale,
         totalColumns,
@@ -456,7 +468,15 @@ export const FixedWeekYearView = ({
         startOfWeek,
         appTimeZone,
       }),
-    [currentYear, locale, totalColumns, yearEvents, startOfWeek, appTimeZone]
+    [
+      currentYear,
+      locale,
+      totalColumns,
+      yearEvents,
+      startOfWeek,
+      appTimeZone,
+      calendarSystem,
+    ]
   );
 
   const dragPreviewEvent = useMemo(
@@ -485,6 +505,7 @@ export const FixedWeekYearView = ({
         currentYear,
         startOfWeek,
         appTimeZone,
+        calendarSystem,
       }),
     [
       monthsData,
@@ -493,6 +514,7 @@ export const FixedWeekYearView = ({
       currentYear,
       startOfWeek,
       appTimeZone,
+      calendarSystem,
     ]
   );
 
@@ -521,7 +543,9 @@ export const FixedWeekYearView = ({
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
-    return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+    return isAsianLocale
+      ? `${currentYear}年`
+      : `${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
   return (
@@ -534,14 +558,10 @@ export const FixedWeekYearView = ({
           currentDate={currentDate}
           customTitle={getCustomTitle()}
           onPrevious={() => {
-            const newDate = new Date(currentDate);
-            newDate.setFullYear(newDate.getFullYear() - 1);
-            app.setCurrentDate(newDate);
+            app.goToPrevious();
           }}
           onNext={() => {
-            const newDate = new Date(currentDate);
-            newDate.setFullYear(newDate.getFullYear() + 1);
-            app.setCurrentDate(newDate);
+            app.goToNext();
           }}
           onToday={() => {
             app.goToToday();

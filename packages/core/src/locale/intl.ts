@@ -1,3 +1,50 @@
+import { calendarDateToDate } from '@/calendar/calendarSystem';
+
+function formatDateParts(
+  formatter: Intl.DateTimeFormat,
+  parts: Intl.DateTimeFormatPart[]
+): string {
+  // Intl adds a Persian era even when none was requested. Remove its adjacent
+  // separator as well, without relying on a language-specific suffix like AP.
+  if (formatter.resolvedOptions().calendar === 'persian') {
+    return parts
+      .filter(
+        (part, index) =>
+          part.type !== 'era' &&
+          !(
+            part.type === 'literal' &&
+            (parts[index - 1]?.type === 'era' ||
+              parts[index + 1]?.type === 'era')
+          )
+      )
+      .map(part => part.value)
+      .join('')
+      .trim();
+  }
+  return parts.map(part => part.value).join('');
+}
+
+/** Localized display dates omit the redundant Jalali era label. */
+export function formatDateLabel(
+  date: Date,
+  locale: string,
+  options: Intl.DateTimeFormatOptions
+): string {
+  const formatter = new Intl.DateTimeFormat(locale, options);
+  return formatDateParts(formatter, formatter.formatToParts(date));
+}
+
+/** Keep localized range punctuation while omitting the Jalali era label. */
+export function formatDateRangeLabel(
+  start: Date,
+  end: Date,
+  locale: string,
+  options: Intl.DateTimeFormatOptions
+): string {
+  const formatter = new Intl.DateTimeFormat(locale, options);
+  return formatDateParts(formatter, formatter.formatRangeToParts(start, end));
+}
+
 /**
  * Encapsulates Intl API calls for standard calendar terms.
  */
@@ -67,7 +114,10 @@ export const getMonthLabels = (
 ): string[] => {
   const labels: string[] = [];
   for (let i = 0; i < 12; i++) {
-    const date = new Date(2024, i, 1);
+    const date =
+      new Intl.Locale(locale).calendar === 'persian'
+        ? calendarDateToDate({ year: 1403, month: i + 1, day: 1 }, 'jalali')
+        : new Date(2024, i, 1);
     try {
       labels.push(date.toLocaleDateString(locale, { month: format }));
     } catch {

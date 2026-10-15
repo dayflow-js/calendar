@@ -1,6 +1,7 @@
 import { ComponentChild, RefObject } from 'preact';
 import { useMemo, useRef } from 'preact/hooks';
 
+import { dateToCalendarDate } from '@/calendar/calendarSystem';
 import CalendarEvent from '@/components/calendarEvent';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import {
@@ -126,7 +127,8 @@ const WeekDayCell = ({
   });
 
   const belongsToCurrentMonth =
-    dayMonthName === currentMonth && day.year === currentYear;
+    dayMonthName === currentMonth &&
+    dateToCalendarDate(day.date, app.state.calendarSystem).year === currentYear;
 
   const {
     hasMore: hasMoreEvents,
@@ -384,7 +386,7 @@ const WeekDayCell = ({
                 month: 'short',
                 day: 'numeric',
               })
-            : day.day}
+            : new Intl.NumberFormat(locale).format(day.day)}
         </span>
       </div>
 
