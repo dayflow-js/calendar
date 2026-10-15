@@ -576,4 +576,80 @@
   .dark .df-month-segment-event-tail-dot {
     background-color: rgb(255 255 255 / 0.8);
   }
+
+  /* ===================================================================
+   * Tasks
+   * =================================================================== */
+
+  .df-task-checkbox {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 0.8125rem;
+    height: 0.8125rem;
+    margin-right: 0.3125rem;
+    vertical-align: -0.125rem;
+    border-radius: 9999px;
+    cursor: default;
+  }
+
+  .df-task-checkbox[data-interactive='true'] {
+    cursor: pointer;
+  }
+
+  .df-task-checkbox:focus-visible {
+    outline: 2px solid var(--df-color-ring);
+    outline-offset: 1px;
+  }
+
+  .df-task-checkbox svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .df-task-checkbox circle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .df-task-checkbox path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .df-task-checkbox[data-completed='true'] circle {
+    fill: currentColor;
+  }
+
+  /* A selected event is filled with its calendar color, so draw in its text color. */
+  [data-event-id][data-selected='true'] .df-task-checkbox {
+    color: inherit !important;
+  }
+
+  [data-event-id][data-selected='true']
+    .df-task-checkbox[data-completed='true']
+    circle {
+    fill: none;
+  }
+
+  [data-event-id][data-selected='true'] .df-task-checkbox path {
+    stroke: currentColor;
+  }
+
+  .df-task-priority-mark {
+    margin-right: 0.25rem;
+    font-weight: 700;
+  }
+
+  [data-task-completed='true'] .df-event-title,
+  [data-task-completed='true'] .df-event-month-title,
+  [data-task-completed='true'] .df-agenda-title {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
 }

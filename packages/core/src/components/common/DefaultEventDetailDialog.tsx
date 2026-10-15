@@ -10,6 +10,7 @@ import { ICalendarApp } from '@/types';
 import { EventDetailDialogProps } from '@/types/eventDetail';
 import { isEventDeepEqual } from '@/utils/eventUtils';
 import { getEventConference, setEventConference } from '@/utils/meetingUtils';
+import { convertEventKind, isTask } from '@/utils/taskUtils';
 import { isPlainDate } from '@/utils/temporal';
 import {
   restoreVisualEventToCanonical,
@@ -18,9 +19,11 @@ import {
 
 import { CalendarPicker, CalendarOption } from './CalendarPicker';
 import { EventConferenceField } from './EventConferenceField';
+import { EventKindSwitch } from './EventKindSwitch';
 import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
+import { TaskPriorityField } from './TaskPriorityField';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: ICalendarApp;
@@ -91,6 +94,7 @@ const DefaultEventDetailDialog = ({
     () => !isEventDeepEqual(event, editedEvent),
     [event, editedEvent]
   );
+  const isEditedTask = isTask(editedEvent);
 
   const convertToAllDay = () => {
     const plainDate = isPlainDate(editedEvent.start)
@@ -125,7 +129,12 @@ const DefaultEventDetailDialog = ({
       minute: 0,
       timeZone: tz,
     });
-    setEditedEvent({ ...editedEvent, allDay: false, start, end });
+    setEditedEvent({
+      ...editedEvent,
+      allDay: false,
+      start,
+      end: isEditedTask ? start : end,
+    });
   };
 
   const eventTimeZone = useMemo(
@@ -210,7 +219,18 @@ const DefaultEventDetailDialog = ({
         </button>
 
         <div>
-          <span className='df-form-label'>{t('eventTitle')}</span>
+          {isEditable && (
+            <EventKindSwitch
+              value={editedEvent.kind ?? 'event'}
+              disabled={isPending}
+              onChange={kind =>
+                setEditedEvent(convertEventKind(editedEvent, kind))
+              }
+            />
+          )}
+          <span className='df-form-label'>
+            {t(isEditedTask ? 'taskTitle' : 'eventTitle')}
+          </span>
           <div className='df-form-row'>
             <div className='df-form-field'>
               <input
@@ -244,9 +264,12 @@ const DefaultEventDetailDialog = ({
 
           {editedEvent.allDay ? (
             <div className='df-event-dialog-time-row'>
-              <div className='df-form-label'>{t('dateRange')}</div>
+              <div className='df-form-label'>
+                {t(isEditedTask ? 'due' : 'dateRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
+                mode={isEditedTask ? 'single' : 'range'}
                 format='YYYY-MM-DD'
                 showTime={false}
                 timeZone={eventTimeZone}
@@ -260,9 +283,12 @@ const DefaultEventDetailDialog = ({
             </div>
           ) : (
             <div className='df-event-dialog-time-row'>
-              <div className='df-form-label'>{t('timeRange')}</div>
+              <div className='df-form-label'>
+                {t(isEditedTask ? 'due' : 'timeRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
+                mode={isEditedTask ? 'single' : 'range'}
                 timeZone={eventTimeZone}
                 startOfWeek={startOfWeek}
                 showTimeFormat={
@@ -293,15 +319,23 @@ const DefaultEventDetailDialog = ({
             onChange={setEditedEvent}
           />
 
-          <EventConferenceField
-            key={editedEvent.id}
-            value={getEventConference(editedEvent)}
-            editable={isEditable}
-            disabled={isPending}
-            onChange={conference =>
-              setEditedEvent(setEventConference(editedEvent, conference))
-            }
-          />
+          {isEditedTask ? (
+            <TaskPriorityField
+              event={editedEvent}
+              disabled={!isEditable || isPending}
+              onChange={setEditedEvent}
+            />
+          ) : (
+            <EventConferenceField
+              key={editedEvent.id}
+              value={getEventConference(editedEvent)}
+              editable={isEditable}
+              disabled={isPending}
+              onChange={conference =>
+                setEditedEvent(setEventConference(editedEvent, conference))
+              }
+            />
+          )}
 
           {shouldShowNotes && (
             <EventNotesField
@@ -326,7 +360,7 @@ const DefaultEventDetailDialog = ({
                   className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToRegular}
                 >
-                  {t('setAsTimed')}
+                  {t(isEditedTask ? 'addDueTime' : 'setAsTimed')}
                 </button>
               ) : (
                 <button
@@ -335,7 +369,7 @@ const DefaultEventDetailDialog = ({
                   className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToAllDay}
                 >
-                  {t('setAsAllDay')}
+                  {t(isEditedTask ? 'removeDueTime' : 'setAsAllDay')}
                 </button>
               )}
 

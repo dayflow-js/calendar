@@ -449,6 +449,8 @@ const CalendarEvent = ({
       <div
         ref={eventRef}
         data-event-id={event.id}
+        data-kind={event.kind ?? 'event'}
+        data-task-completed={String(!!event.task?.completed)}
         data-detail-panel-key={detailPanelKey}
         data-view={viewType}
         data-all-day={String(isAllDay)}

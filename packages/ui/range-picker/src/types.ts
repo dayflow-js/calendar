@@ -33,4 +33,9 @@ export interface RangePickerProps {
   getPopupContainer?: () => HTMLElement;
   matchTriggerWidth?: boolean;
   locale?: string | Locale;
+  /**
+   * `'single'` shows one field for a single date/time. `onChange` and `onOk`
+   * still receive a tuple, with both entries set to the chosen value.
+   */
+  mode?: 'range' | 'single';
 }

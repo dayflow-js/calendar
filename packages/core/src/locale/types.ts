@@ -115,7 +115,23 @@ export type TranslationKey =
   | 'weekly'
   | 'monthly'
   | 'yearly'
-  | 'on';
+  | 'on'
+  | 'event'
+  | 'task'
+  | 'taskTitle'
+  | 'due'
+  | 'priority'
+  | 'priorityNone'
+  | 'priorityLow'
+  | 'priorityMedium'
+  | 'priorityHigh'
+  | 'markComplete'
+  | 'markIncomplete'
+  | 'newTask'
+  | 'editTask'
+  | 'viewTask'
+  | 'addDueTime'
+  | 'removeDueTime';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

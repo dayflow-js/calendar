@@ -6,6 +6,7 @@ import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingStore } from '@/renderer/CustomRenderingStore';
 import { ViewType, Event, ICalendarApp, EventLayout } from '@/types';
+import { isTask } from '@/utils/taskUtils';
 
 import AllDayContent from './AllDayContent';
 import MonthAllDayContent from './MonthAllDayContent';
@@ -109,6 +110,8 @@ export const EventContent = ({
 }: EventContentProps) => {
   const isMonthView = viewType === ViewType.MONTH;
   const isYearView = viewType === ViewType.YEAR;
+  // A task is a point in time, so it can be moved but not stretched.
+  const resizeStart = isTask(event) ? undefined : onResizeStart;
 
   const generatorName = resolveGeneratorName(
     customRenderingStore,
@@ -133,7 +136,7 @@ export const EventContent = ({
         isSelected={isEventSelected}
         isResizing={isBeingResized}
         onMoveStart={onMoveStart}
-        onResizeStart={onResizeStart}
+        onResizeStart={resizeStart}
         isMobile={isMobile}
         isDraggable={isDraggable}
         isEditable={isEditable}
@@ -160,7 +163,7 @@ export const EventContent = ({
         segment={yearSegment}
         isEditable={isEditable}
         onMoveStart={onMoveStart}
-        onResizeStart={onResizeStart}
+        onResizeStart={resizeStart}
         renderSlot={defaultContent => (
           <ContentSlot
             store={customRenderingStore}
@@ -177,7 +180,9 @@ export const EventContent = ({
     const defaultContent = isAllDay ? (
       <MonthAllDayContent
         event={event}
+        app={app}
         isEventSelected={isEventSelected}
+        isEditable={isEditable}
         isMobile={isMobile}
       />
     ) : (
@@ -185,6 +190,7 @@ export const EventContent = ({
         event={event}
         app={app}
         isEventSelected={isEventSelected}
+        isEditable={isEditable}
         hideTime={hideTime}
         isMobile={isMobile}
         timeFormat={timeFormat}
@@ -216,8 +222,9 @@ export const EventContent = ({
     return (
       <AllDayContent
         event={event}
+        app={app}
         isEditable={isEditable}
-        onResizeStart={onResizeStart}
+        onResizeStart={resizeStart}
         isMultiDay={isMultiDay}
         segment={segment}
         isSlidingView={isSlidingView}
@@ -236,7 +243,7 @@ export const EventContent = ({
       isEventSelected={isEventSelected}
       isBeingDragged={isBeingDragged}
       isBeingResized={isBeingResized}
-      onResizeStart={onResizeStart}
+      onResizeStart={resizeStart}
       timeFormat={timeFormat}
       resizeHandleOrientation={resizeHandleOrientation}
       renderSlot={slotRenderer}

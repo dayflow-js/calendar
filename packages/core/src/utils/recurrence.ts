@@ -158,6 +158,12 @@ const addRecurrenceDuration = (
     overflow,
   }) as EventTemporal;
 
+// Completion is stored on the series master and only applies to its own date.
+const getOccurrenceTask = (event: Event): Event['task'] =>
+  event.task?.completed
+    ? { ...event.task, completed: false, completedAt: undefined }
+    : event.task;
+
 const createOccurrence = (
   event: Event,
   recurrence: EventRecurrence,
@@ -180,6 +186,7 @@ const createOccurrence = (
       id: `${event.id}::repeat-${recurrenceKey}`,
       start,
       end,
+      task: getOccurrenceTask(event),
       _recurrenceMasterId: event.id,
       _recurrenceKey: recurrenceKey,
     };
@@ -200,6 +207,7 @@ const createDayShiftedOccurrence = (event: Event, dayOffset: number): Event => {
     id: `${event.id}::repeat-${recurrenceKey}`,
     start,
     end,
+    task: getOccurrenceTask(event),
     _recurrenceMasterId: event.id,
     _recurrenceKey: recurrenceKey,
   };

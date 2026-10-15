@@ -21,6 +21,19 @@ export interface EventConference {
   meta?: Record<string, unknown>;
 }
 
+/** Whether a calendar item is a regular event or a task. */
+export type EventKind = 'event' | 'task';
+
+export type TaskPriority = 'none' | 'low' | 'medium' | 'high';
+
+/** Task-only state. Ignored unless `kind` is `'task'`. */
+export interface EventTask {
+  completed?: boolean;
+  /** When the task was marked complete. Cleared when it is reopened. */
+  completedAt?: Temporal.ZonedDateTime;
+  priority?: TaskPriority;
+}
+
 /**
  * Calendar event interface (using Temporal API)
  * Unified event data structure supporting single-day, cross-day, and all-day events
@@ -29,6 +42,14 @@ export interface Event {
   id: string;
   title: string;
   description?: string;
+
+  /**
+   * Item kind, `'event'` when omitted.
+   * A task is due at `start` and keeps `end` equal to `start`; an all-day task has no due time.
+   */
+  kind?: EventKind;
+  /** Task state, used when `kind` is `'task'`. */
+  task?: EventTask;
 
   /** Optional video-conference details for the event. */
   conference?: EventConference;

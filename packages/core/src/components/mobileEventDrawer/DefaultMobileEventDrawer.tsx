@@ -6,10 +6,12 @@ import {
   CalendarPicker,
   CalendarOption,
 } from '@/components/common/CalendarPicker';
+import { EventKindSwitch } from '@/components/common/EventKindSwitch';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
 import { useLocale } from '@/locale';
 import {
   Event as CalendarEvent,
+  EventKind,
   MobileEventProps,
   CalendarType,
 } from '@/types';
@@ -51,6 +53,7 @@ export const MobileEventDrawer = ({
   const shouldShowNotes = !isSubscribed || notes.trim() !== '';
 
   const [title, setTitle] = useState('');
+  const [kind, setKind] = useState<EventKind>('event');
   const [calendarId, setCalendarId] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
@@ -153,6 +156,7 @@ export const MobileEventDrawer = ({
   useEffect(() => {
     if (isOpen && draftEvent) {
       setTitle(draftEvent.title || '');
+      setKind(draftEvent.kind ?? 'event');
       setCalendarId(draftEvent.calendarId || calendars[0]?.id || 'blue');
       setIsAllDay(draftEvent.allDay || false);
       setNotes(draftEvent.description || '');
@@ -184,6 +188,7 @@ export const MobileEventDrawer = ({
       }
     } else if (isOpen && !draftEvent) {
       // Default init if no draft event (fallback)
+      setKind('event');
       setCalendarId(calendars[0]?.id || 'blue');
       setNotes('');
       const now = new Date();
@@ -195,14 +200,15 @@ export const MobileEventDrawer = ({
     }
   }, [isOpen, draftEvent]);
 
-  const hasChanges = useMemo(() => {
-    if (!isOpen || !draftEvent) return false;
+  const isTaskKind = kind === 'task';
 
+  const buildEditedEvent = (baseEvent: CalendarEvent): CalendarEvent => {
     const finalStart = new Date(startDate);
-    const finalEnd = new Date(endDate);
+    // A task is due at its start, so it has no separate end.
+    const finalEnd = isTaskKind ? finalStart : new Date(endDate);
 
-    const currentEvent: CalendarEvent = {
-      ...draftEvent,
+    const edited: CalendarEvent = {
+      ...baseEvent,
       title,
       calendarId,
       allDay: isAllDay,
@@ -213,16 +219,22 @@ export const MobileEventDrawer = ({
       end: isAllDay
         ? dateToPlainDate(finalEnd)
         : dateToZonedDateTime(finalEnd, app.timeZone),
+      ...(isTaskKind
+        ? { kind: 'task' as const }
+        : { kind: undefined, task: undefined }),
     };
 
-    return !isEventDeepEqual(
-      draftEvent,
-      restoreVisualEventToCanonical(draftEvent, currentEvent, app.timeZone)
-    );
+    return restoreVisualEventToCanonical(baseEvent, edited, app.timeZone);
+  };
+
+  const hasChanges = useMemo(() => {
+    if (!isOpen || !draftEvent) return false;
+    return !isEventDeepEqual(draftEvent, buildEditedEvent(draftEvent));
   }, [
     isOpen,
     draftEvent,
     title,
+    kind,
     calendarId,
     isAllDay,
     startDate,
@@ -234,29 +246,21 @@ export const MobileEventDrawer = ({
 
   const handleSave = () => {
     if (!draftEvent) return;
+    onSave(buildEditedEvent(draftEvent));
+  };
 
-    const finalStart = new Date(startDate);
-    const finalEnd = new Date(endDate);
-
-    const updated = {
-      ...draftEvent,
-      title,
-      calendarId,
-      allDay: isAllDay,
-      start: isAllDay
-        ? dateToPlainDate(finalStart)
-        : dateToZonedDateTime(finalStart, app.timeZone),
-      end: isAllDay
-        ? dateToPlainDate(finalEnd)
-        : dateToZonedDateTime(finalEnd, app.timeZone),
-    };
-    onSave(
-      restoreVisualEventToCanonical(
-        draftEvent,
-        updated as CalendarEvent,
-        app.timeZone
-      )
-    );
+  const handleKindChange = (nextKind: EventKind) => {
+    setKind(nextKind);
+    setExpandedPicker(null);
+    // Leaving task mode: give the event a duration again.
+    if (
+      nextKind === 'event' &&
+      !isAllDay &&
+      endDate.getTime() <= startDate.getTime()
+    ) {
+      setEndDate(new Date(startDate.getTime() + 60 * 60 * 1000));
+      setEndVisibleMonth(startDate);
+    }
   };
 
   const toggleExpand = (
@@ -345,10 +349,10 @@ export const MobileEventDrawer = ({
           </button>
           <span className='df-mobile-event-drawer-title'>
             {!isEditable && isEditing
-              ? t('viewEvent')
+              ? t(isTaskKind ? 'viewTask' : 'viewEvent')
               : isEditing
-                ? t('editEvent')
-                : t('newEvent')}
+                ? t(isTaskKind ? 'editTask' : 'editEvent')
+                : t(isTaskKind ? 'newTask' : 'newEvent')}
           </span>
           {isEditable && (
             <button
@@ -366,6 +370,9 @@ export const MobileEventDrawer = ({
         </div>
 
         <div className='df-mobile-event-drawer-body'>
+          {isEditable && (
+            <EventKindSwitch value={kind} onChange={handleKindChange} />
+          )}
           <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
             <input
               type='text'
@@ -426,7 +433,7 @@ export const MobileEventDrawer = ({
           <div className='df-mobile-event-drawer-section'>
             <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
               <span className='df-mobile-event-drawer-label'>
-                {t('starts')}
+                {t(isTaskKind ? 'due' : 'starts')}
               </span>
               <div className='df-mobile-event-drawer-controls'>
                 <button
@@ -491,71 +498,75 @@ export const MobileEventDrawer = ({
             </div>
           </div>
 
-          <div className='df-mobile-event-drawer-section'>
-            <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
-              <span className='df-mobile-event-drawer-label'>{t('ends')}</span>
-              <div className='df-mobile-event-drawer-controls'>
-                <button
-                  type='button'
-                  className='df-mobile-event-drawer-picker-trigger'
-                  data-active={String(expandedPicker === 'end-date')}
-                  onClick={() => isEditable && toggleExpand('end-date')}
-                  disabled={!isEditable}
-                  aria-expanded={expandedPicker === 'end-date'}
-                >
-                  {formatDate(endDate)}
-                </button>
-                {!isAllDay && (
+          {!isTaskKind && (
+            <div className='df-mobile-event-drawer-section'>
+              <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
+                <span className='df-mobile-event-drawer-label'>
+                  {t('ends')}
+                </span>
+                <div className='df-mobile-event-drawer-controls'>
                   <button
                     type='button'
                     className='df-mobile-event-drawer-picker-trigger'
-                    data-active={String(expandedPicker === 'end-time')}
-                    onClick={() => isEditable && toggleExpand('end-time')}
+                    data-active={String(expandedPicker === 'end-date')}
+                    onClick={() => isEditable && toggleExpand('end-date')}
                     disabled={!isEditable}
-                    aria-expanded={expandedPicker === 'end-time'}
+                    aria-expanded={expandedPicker === 'end-date'}
                   >
-                    {formatTime(
-                      endDate.getHours() + endDate.getMinutes() / 60,
-                      0,
-                      timeFormat
-                    )}
+                    {formatDate(endDate)}
                   </button>
-                )}
+                  {!isAllDay && (
+                    <button
+                      type='button'
+                      className='df-mobile-event-drawer-picker-trigger'
+                      data-active={String(expandedPicker === 'end-time')}
+                      onClick={() => isEditable && toggleExpand('end-time')}
+                      disabled={!isEditable}
+                      aria-expanded={expandedPicker === 'end-time'}
+                    >
+                      {formatTime(
+                        endDate.getHours() + endDate.getMinutes() / 60,
+                        0,
+                        timeFormat
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div
-              className='df-mobile-event-drawer-expander'
-              data-kind='calendar'
-              data-expanded={String(expandedPicker === 'end-date')}
-            >
-              <div className='df-mobile-event-drawer-expander-content'>
-                <MiniCalendar
-                  currentDate={endDate}
-                  visibleMonth={endVisibleMonth}
-                  onDateSelect={d => handleDateChange('end', d)}
-                  onMonthChange={offset => handleMonthChange('end', offset)}
-                  showHeader
-                  events={app.getEvents()}
-                  calendarRegistry={app.getCalendarRegistry()}
-                  timeZone={app.timeZone}
-                />
+              <div
+                className='df-mobile-event-drawer-expander'
+                data-kind='calendar'
+                data-expanded={String(expandedPicker === 'end-date')}
+              >
+                <div className='df-mobile-event-drawer-expander-content'>
+                  <MiniCalendar
+                    currentDate={endDate}
+                    visibleMonth={endVisibleMonth}
+                    onDateSelect={d => handleDateChange('end', d)}
+                    onMonthChange={offset => handleMonthChange('end', offset)}
+                    showHeader
+                    events={app.getEvents()}
+                    calendarRegistry={app.getCalendarRegistry()}
+                    timeZone={app.timeZone}
+                  />
+                </div>
+              </div>
+              <div
+                className='df-mobile-event-drawer-expander'
+                data-kind='time'
+                data-expanded={String(expandedPicker === 'end-time')}
+              >
+                <div className='df-mobile-event-drawer-expander-content'>
+                  <TimePickerWheel
+                    date={endDate}
+                    onChange={handleEndTimeChange}
+                    timeFormat={timeFormat}
+                  />
+                </div>
               </div>
             </div>
-            <div
-              className='df-mobile-event-drawer-expander'
-              data-kind='time'
-              data-expanded={String(expandedPicker === 'end-time')}
-            >
-              <div className='df-mobile-event-drawer-expander-content'>
-                <TimePickerWheel
-                  date={endDate}
-                  onChange={handleEndTimeChange}
-                  timeFormat={timeFormat}
-                />
-              </div>
-            </div>
-          </div>
+          )}
 
           {shouldShowNotes && (
             <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>

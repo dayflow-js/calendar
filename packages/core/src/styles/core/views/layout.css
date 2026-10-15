@@ -310,6 +310,12 @@
     flex-shrink: 0;
   }
 
+  .df-agenda-event .df-task-checkbox {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-right: 0;
+  }
+
   .df-agenda-title {
     min-width: 0;
     font-size: 1rem;

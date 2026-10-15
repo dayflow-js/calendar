@@ -9,6 +9,7 @@ import {
 } from 'preact/hooks';
 
 import { EventDetailPanel } from '@/components/calendarEvent/components/EventDetailPanel';
+import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale';
@@ -26,6 +27,7 @@ import {
   getPrimaryCalendarId,
   temporalToVisualDate,
 } from '@/utils';
+import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
 
 type AgendaEntry = {
   event: Event;
@@ -157,6 +159,14 @@ const formatAgendaTimeLabel = (
       timeLabel: 'All day',
       renderAsBadge: true,
       sortMs: day.getTime() - DAY_MS,
+    };
+  }
+
+  if (isTask(event)) {
+    return {
+      timeLabel: formatTime(start.getHours(), start.getMinutes(), timeFormat),
+      renderAsBadge: false,
+      sortMs: start.getTime(),
     };
   }
 
@@ -676,10 +686,34 @@ const AgendaView = ({
     [app, config?.gridDateDoubleClick]
   );
 
+  const renderAgendaTask = (entry: AgendaEntry) => {
+    const priorityMark = getTaskPriorityMark(entry.event);
+    return (
+      <>
+        <TaskCheckbox
+          event={entry.event}
+          app={app}
+          isEditable={app.canMutateFromUI(
+            entry.event._recurrenceMasterId ?? entry.event.id
+          )}
+          color={entry.color}
+        />
+        <span className='df-agenda-title'>
+          {priorityMark && (
+            <span className='df-task-priority-mark'>{priorityMark}</span>
+          )}
+          {entry.event.title}
+        </span>
+      </>
+    );
+  };
+
   const renderAgendaEventButton = (entry: AgendaEntry) => (
     <button
       type='button'
       className='df-agenda-event'
+      data-kind={entry.event.kind ?? 'event'}
+      data-task-completed={String(!!entry.event.task?.completed)}
       data-selected={selectedEventId === entry.event.id ? 'true' : 'false'}
       onClick={e => {
         e.stopPropagation();
@@ -690,7 +724,9 @@ const AgendaView = ({
         handleEventDoubleClick(entry.event, e as unknown as MouseEvent);
       }}
     >
-      {entry.renderAsBadge ? (
+      {isTask(entry.event) ? (
+        renderAgendaTask(entry)
+      ) : entry.renderAsBadge ? (
         <span
           className='df-agenda-badge'
           data-continued-left={
@@ -710,7 +746,7 @@ const AgendaView = ({
           style={{ backgroundColor: entry.color }}
         />
       )}
-      {!entry.renderAsBadge && (
+      {!entry.renderAsBadge && !isTask(entry.event) && (
         <span className='df-agenda-title'>{entry.event.title}</span>
       )}
     </button>

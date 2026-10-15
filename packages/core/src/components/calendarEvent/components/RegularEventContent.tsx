@@ -20,6 +20,9 @@ import {
   getEventEndHour,
   formatTimeRangeFormatted,
 } from '@/utils';
+import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
+
+import { TaskCheckbox } from './TaskCheckbox';
 
 interface RegularEventContentProps {
   event: Event;
@@ -82,6 +85,7 @@ const RegularEventContent = ({
   const lineColors = getCalendarLineColors(event, app?.getCalendarRegistry());
   const colorBarValue = buildDiagonalColorBarGradient(lineColors);
   const hideColorBar = isEventSelected && lineColors.length > 1;
+  const priorityMark = getTaskPriorityMark(event);
   const colorBarContent = hideColorBar ? null : lineColors.length > 1 ? (
     <div
       className='df-event-color-bar-overlay'
@@ -104,6 +108,17 @@ const RegularEventContent = ({
         <div
           className={`${eventTitleSmall} ${duration <= 0.25 ? 'df-event-title-tight' : ''}`}
         >
+          {isTask(event) && (
+            <TaskCheckbox
+              event={event}
+              app={app}
+              isEditable={isEditable}
+              color={lineColors[0]}
+            />
+          )}
+          {priorityMark && (
+            <span className='df-task-priority-mark'>{priorityMark}</span>
+          )}
           {event.title}
         </div>
         {duration > 0.5 && (
