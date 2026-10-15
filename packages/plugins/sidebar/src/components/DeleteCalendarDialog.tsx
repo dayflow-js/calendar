@@ -8,6 +8,7 @@ import {
 import { useId, useMemo, useRef, useState } from 'preact/hooks';
 
 import { CalendarChip } from './CalendarChip';
+import { useListbox } from './useListbox';
 
 const CAL_SENTINEL = '\u0001C\u0001';
 
@@ -56,14 +57,13 @@ export const DeleteCalendarDialog = ({
     [calendars, calendarId]
   );
 
-  const { ungroupedCalendars, groupedCalendars, hasGroups } = useMemo(() => {
+  const { ungroupedCalendars, groupedCalendars } = useMemo(() => {
     const hasAnyGroup =
       availableCalendars.some(c => !!c.source) || (groups && groups.length > 0);
     if (!hasAnyGroup) {
       return {
         ungroupedCalendars: availableCalendars,
         groupedCalendars: [],
-        hasGroups: false,
       };
     }
 
@@ -93,7 +93,6 @@ export const DeleteCalendarDialog = ({
     return {
       ungroupedCalendars: ungrouped,
       groupedCalendars: grouped,
-      hasGroups: true,
     };
   }, [availableCalendars, groups]);
 
@@ -107,6 +106,41 @@ export const DeleteCalendarDialog = ({
       setIsLoading(false);
     }
   };
+
+  // Options in the order they're rendered, so arrow keys follow the list.
+  const mergeOptions = useMemo(
+    () => [
+      ...ungroupedCalendars,
+      ...groupedCalendars.flatMap(([, groupCals]) => groupCals),
+    ],
+    [ungroupedCalendars, groupedCalendars]
+  );
+
+  const { triggerProps, listboxProps, getOptionProps, idPrefix } = useListbox({
+    count: mergeOptions.length,
+    selectedIndex: -1,
+    isOpen: showMergeDropdown,
+    setIsOpen: setShowMergeDropdown,
+    onSelect: index => handleMergeSelect(mergeOptions[index].id),
+    disabled: isLoading,
+  });
+
+  const renderMergeOption = (calendar: CalendarType) => (
+    <div
+      key={calendar.id}
+      {...getOptionProps(mergeOptions.indexOf(calendar))}
+      className='df-sidebar-dropdown-item'
+    >
+      <div
+        className='df-sidebar-swatch'
+        style={{ backgroundColor: calendar.colors.lineColor }}
+        aria-hidden='true'
+      />
+      <span className='df-sidebar-dropdown-label'>
+        {calendar.name || calendar.id}
+      </span>
+    </div>
+  );
 
   const dialogRef = useRef<HTMLDivElement>(null);
   // Escape closes the merge dropdown first, then the dialog.
@@ -152,87 +186,40 @@ export const DeleteCalendarDialog = ({
             <div className='df-sidebar-dialog-split-actions'>
               <div className='df-sidebar-field'>
                 <button
+                  {...triggerProps}
                   type='button'
                   disabled={isLoading}
-                  onClick={() => setShowMergeDropdown(!showMergeDropdown)}
                   className='df-sidebar-button df-sidebar-button-secondary'
                 >
                   {t('merge')}
                 </button>
                 {showMergeDropdown && (
-                  <div className='df-sidebar-dropdown'>
-                    {hasGroups ? (
-                      <>
-                        {ungroupedCalendars.map(calendar => (
-                          <div
-                            key={calendar.id}
-                            className='df-sidebar-dropdown-item'
-                            onClick={() => {
-                              handleMergeSelect(calendar.id);
-                            }}
-                          >
-                            <div
-                              className='df-sidebar-swatch'
-                              style={{
-                                backgroundColor: calendar.colors.lineColor,
-                              }}
-                            />
-                            <span className='df-sidebar-dropdown-label'>
-                              {calendar.name || calendar.id}
-                            </span>
-                          </div>
-                        ))}
-                        {groupedCalendars.map(([groupName, groupCals]) => (
-                          <div
-                            key={groupName}
-                            className='df-sidebar-dropdown-group'
-                          >
-                            <div className='df-sidebar-dropdown-group-label'>
-                              {groupName}
-                            </div>
-                            {groupCals.map(calendar => (
-                              <div
-                                key={calendar.id}
-                                className='df-sidebar-dropdown-item'
-                                onClick={() => {
-                                  handleMergeSelect(calendar.id);
-                                }}
-                              >
-                                <div
-                                  className='df-sidebar-swatch'
-                                  style={{
-                                    backgroundColor: calendar.colors.lineColor,
-                                  }}
-                                />
-                                <span className='df-sidebar-dropdown-label'>
-                                  {calendar.name || calendar.id}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                      </>
-                    ) : (
-                      availableCalendars.map(calendar => (
+                  <div
+                    {...listboxProps}
+                    className='df-sidebar-dropdown'
+                    aria-label={t('merge')}
+                  >
+                    {ungroupedCalendars.map(renderMergeOption)}
+                    {groupedCalendars.map(([groupName, groupCals], i) => {
+                      const groupLabelId = `${idPrefix}-group-${i}`;
+                      return (
                         <div
-                          key={calendar.id}
-                          className='df-sidebar-dropdown-item'
-                          onClick={() => {
-                            handleMergeSelect(calendar.id);
-                          }}
+                          key={groupName}
+                          role='group'
+                          aria-labelledby={groupLabelId}
+                          className='df-sidebar-dropdown-group'
                         >
                           <div
-                            className='df-sidebar-swatch'
-                            style={{
-                              backgroundColor: calendar.colors.lineColor,
-                            }}
-                          />
-                          <span className='df-sidebar-dropdown-label'>
-                            {calendar.name || calendar.id}
-                          </span>
+                            id={groupLabelId}
+                            role='presentation'
+                            className='df-sidebar-dropdown-group-label'
+                          >
+                            {groupName}
+                          </div>
+                          {groupCals.map(renderMergeOption)}
                         </div>
-                      ))
-                    )}
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -8,6 +8,8 @@ import {
 } from '@dayflow/core';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 
+import { useListbox } from './useListbox';
+
 interface ImportCalendarDialogProps {
   calendars: CalendarType[];
   filename: string;
@@ -33,34 +35,17 @@ export const ImportCalendarDialog = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !triggerRef.current?.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
 
   const selectedCalendar = calendars.find(c => c.id === selectedCalendarId);
   const isNewSelected = selectedCalendarId === NEW_CALENDAR_ID;
 
-  const { ungroupedCalendars, groupedCalendars, hasGroups } = useMemo(() => {
+  const { ungroupedCalendars, groupedCalendars } = useMemo(() => {
     const hasAnyGroup =
       calendars.some(c => !!c.source) || (groups && groups.length > 0);
     if (!hasAnyGroup) {
       return {
         ungroupedCalendars: calendars,
         groupedCalendars: [],
-        hasGroups: false,
       };
     }
 
@@ -90,14 +75,46 @@ export const ImportCalendarDialog = ({
     return {
       ungroupedCalendars: ungrouped,
       groupedCalendars: grouped,
-      hasGroups: true,
     };
   }, [calendars, groups]);
 
-  const handleSelect = (id: string) => {
-    setSelectedCalendarId(id);
-    setIsOpen(false);
-  };
+  // Option ids in the order they're rendered, so arrow keys follow the list.
+  const optionIds = useMemo(
+    () => [
+      ...ungroupedCalendars.map(c => c.id),
+      ...groupedCalendars.flatMap(([, groupCals]) => groupCals.map(c => c.id)),
+      NEW_CALENDAR_ID,
+    ],
+    [ungroupedCalendars, groupedCalendars]
+  );
+
+  const { triggerRef, triggerProps, listboxProps, getOptionProps, idPrefix } =
+    useListbox({
+      count: optionIds.length,
+      selectedIndex: optionIds.indexOf(selectedCalendarId),
+      isOpen,
+      setIsOpen,
+      onSelect: index => {
+        setSelectedCalendarId(optionIds[index]);
+        setIsOpen(false);
+      },
+      disabled: isLoading,
+    });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !triggerRef.current?.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   const handleConfirm = async () => {
     if (isLoading) return;
@@ -112,13 +129,14 @@ export const ImportCalendarDialog = ({
   const renderCalendarItem = (calendar: CalendarType) => (
     <div
       key={calendar.id}
+      {...getOptionProps(optionIds.indexOf(calendar.id))}
       className='df-sidebar-dropdown-item'
       data-selected={selectedCalendarId === calendar.id ? 'true' : undefined}
-      onClick={() => handleSelect(calendar.id)}
     >
       <div
         className='df-sidebar-swatch'
         style={{ backgroundColor: calendar.colors.lineColor }}
+        aria-hidden='true'
       />
       <span className='df-sidebar-dropdown-label'>
         {calendar.name || calendar.id}
@@ -144,27 +162,33 @@ export const ImportCalendarDialog = ({
         className='df-sidebar-dropdown'
         style={{ overscrollBehavior: 'none' }}
       >
-        <div>
-          {hasGroups ? (
-            <>
-              {ungroupedCalendars.map(calendar => renderCalendarItem(calendar))}
-              {groupedCalendars.map(([groupName, groupCals]) => (
-                <div key={groupName} className='df-sidebar-dropdown-group'>
-                  <div className='df-sidebar-dropdown-group-label'>
-                    {groupName}
-                  </div>
-                  {groupCals.map(calendar => renderCalendarItem(calendar))}
+        <div {...listboxProps} aria-label={t('calendar')}>
+          {ungroupedCalendars.map(renderCalendarItem)}
+          {groupedCalendars.map(([groupName, groupCals], i) => {
+            const groupLabelId = `${idPrefix}-group-${i}`;
+            return (
+              <div
+                key={groupName}
+                role='group'
+                aria-labelledby={groupLabelId}
+                className='df-sidebar-dropdown-group'
+              >
+                <div
+                  id={groupLabelId}
+                  role='presentation'
+                  className='df-sidebar-dropdown-group-label'
+                >
+                  {groupName}
                 </div>
-              ))}
-            </>
-          ) : (
-            calendars.map(calendar => renderCalendarItem(calendar))
-          )}
-          <div className='df-sidebar-dropdown-divider' />
+                {groupCals.map(renderCalendarItem)}
+              </div>
+            );
+          })}
+          <div className='df-sidebar-dropdown-divider' role='presentation' />
           <div
+            {...getOptionProps(optionIds.length - 1)}
             className='df-sidebar-dropdown-item'
             data-selected={isNewSelected ? 'true' : undefined}
-            onClick={() => handleSelect(NEW_CALENDAR_ID)}
           >
             <span className='df-sidebar-dropdown-label'>
               {t('newCalendar') || 'New Calendar'}: {filename}
@@ -195,16 +219,16 @@ export const ImportCalendarDialog = ({
 
         <div className='df-sidebar-field'>
           <button
-            ref={triggerRef}
+            {...triggerProps}
             type='button'
             disabled={isLoading}
             className='df-sidebar-select-trigger'
-            onClick={() => setIsOpen(!isOpen)}
           >
             {!isNewSelected && selectedCalendar && (
               <div
                 className='df-sidebar-swatch'
                 style={{ backgroundColor: selectedCalendar.colors.lineColor }}
+                aria-hidden='true'
               />
             )}
             <span className='df-sidebar-select-value'>
