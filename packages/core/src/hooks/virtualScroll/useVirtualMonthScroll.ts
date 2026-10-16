@@ -118,7 +118,7 @@ export const useResponsiveMonthConfig = () => {
 
 // Virtual scroll main Hook
 export const useVirtualMonthScroll = ({
-  currentDate,
+  currentDate: currentDateProp,
   calendarSystem = 'gregorian',
   weekHeight,
   onCurrentMonthChange,
@@ -129,6 +129,15 @@ export const useVirtualMonthScroll = ({
   snapToMonth = false,
   skipScrollOnDateChange,
 }: UseVirtualMonthScrollProps): UseVirtualMonthScrollReturn => {
+  // Callers pass a fresh Date on every render (app.getCurrentDate() clones), so
+  // key memos and effects on its value; otherwise the initial week range is
+  // regenerated on every scroll frame.
+  const currentDateTime = currentDateProp.getTime();
+  const currentDate = useMemo(
+    () => new Date(currentDateTime),
+    [currentDateTime]
+  );
+
   const targetNavigationRef = useRef<{ month: string; year: number } | null>(
     null
   );
