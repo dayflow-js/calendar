@@ -119,6 +119,7 @@ const es: DayflowLocale = {
     fetchingCalendar: 'Obteniendo calendario...',
     subscribeError:
       'No se pudo obtener el calendario. Comprueba la URL e inténtalo de nuevo.',
+    calendarAlreadySubscribed: 'Esta URL ya está suscrita',
     appointmentScheduler: 'Horario de citas',
     newAppointmentSchedule: 'Nuevo horario de citas',
     editAppointmentSchedule: 'Editar horario de citas',
@@ -135,6 +136,10 @@ const es: DayflowLocale = {
     after: 'Después de',
     occurrences: 'repeticiones',
     every: 'Cada',
+    days: 'días',
+    weeks: 'semanas',
+    months: 'meses',
+    years: 'años',
     customRepeat: 'Repetición personalizada',
     frequency: 'Frecuencia',
     daily: 'Diaria',

@@ -120,6 +120,7 @@ const fr: DayflowLocale = {
     fetchingCalendar: 'Récupération du calendrier...',
     subscribeError:
       "Impossible de récupérer le calendrier. Vérifiez l'URL et réessayez.",
+    calendarAlreadySubscribed: 'Cette URL est déjà abonnée',
     appointmentScheduler: 'Planning des rendez-vous',
     newAppointmentSchedule: 'Nouveau planning des rendez-vous',
     editAppointmentSchedule: 'Modifier le planning des rendez-vous',
@@ -136,6 +137,10 @@ const fr: DayflowLocale = {
     after: 'Après',
     occurrences: 'occurrences',
     every: 'Tous les',
+    days: 'jours',
+    weeks: 'semaines',
+    months: 'mois',
+    years: 'ans',
     customRepeat: 'Répétition personnalisée',
     frequency: 'Fréquence',
     daily: 'Quotidienne',

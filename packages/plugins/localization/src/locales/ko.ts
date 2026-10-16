@@ -117,6 +117,7 @@ const ko: DayflowLocale = {
     fetchingCalendar: '캘린더를 가져오는 중...',
     subscribeError:
       '캘린더를 가져오지 못했습니다. URL을 확인하고 다시 시도하세요.',
+    calendarAlreadySubscribed: '이 URL은 이미 구독되어 있습니다',
     appointmentScheduler: '예약 일정',
     newAppointmentSchedule: '새 예약 일정',
     editAppointmentSchedule: '예약 일정 편집',
@@ -133,6 +134,10 @@ const ko: DayflowLocale = {
     after: '횟수 지정',
     occurrences: '회',
     every: '매',
+    days: '일',
+    weeks: '주',
+    months: '개월',
+    years: '년',
     customRepeat: '사용자 지정 반복',
     frequency: '빈도',
     daily: '매일',

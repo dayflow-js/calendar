@@ -119,6 +119,7 @@ const ja: DayflowLocale = {
     fetchingCalendar: 'カレンダーを取得中...',
     subscribeError:
       'カレンダーの取得に失敗しました。URLを確認して再試行してください。',
+    calendarAlreadySubscribed: 'このURLはすでに購読済みです',
     appointmentScheduler: '予約スケジュール',
     newAppointmentSchedule: '新しい予約スケジュール',
     editAppointmentSchedule: '予約スケジュールを編集',
@@ -135,6 +136,10 @@ const ja: DayflowLocale = {
     after: '回数',
     occurrences: '回',
     every: '間隔',
+    days: '日',
+    weeks: '週間',
+    months: 'か月',
+    years: '年',
     customRepeat: '繰り返しをカスタマイズ',
     frequency: '頻度',
     daily: '毎日',

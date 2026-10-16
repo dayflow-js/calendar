@@ -119,6 +119,7 @@ const en: Locale = {
     fetchingCalendar: 'Fetching calendar...',
     subscribeError:
       'Failed to fetch calendar. Please check the URL and try again.',
+    calendarAlreadySubscribed: 'This URL is already subscribed',
     appointmentScheduler: 'Appointment schedule',
     newAppointmentSchedule: 'New Appointment Schedule',
     editAppointmentSchedule: 'Edit Appointment Schedule',
