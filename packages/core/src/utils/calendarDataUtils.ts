@@ -15,6 +15,18 @@ import { getWeekRange } from './dateRangeUtils';
 // Calendar Data Generation Tools
 // ============================================================================
 
+let jalaliMonthFormatters: {
+  long: Intl.DateTimeFormat;
+  short: Intl.DateTimeFormat;
+} | null = null;
+
+/** Reused across calls: `toLocaleDateString` builds a new formatter every time. */
+const getJalaliMonthFormatters = () =>
+  (jalaliMonthFormatters ??= {
+    long: new Intl.DateTimeFormat('en-US-u-ca-persian', { month: 'long' }),
+    short: new Intl.DateTimeFormat('en-US-u-ca-persian', { month: 'short' }),
+  });
+
 /**
  * Generate day data object from a date
  * @param date Date to generate data for
@@ -25,28 +37,37 @@ export const generateDayData = (
   calendarSystem: CalendarSystem = 'gregorian'
 ) => {
   const clonedDate = new Date(date);
-  const parts = dateToCalendarDate(clonedDate, calendarSystem);
-  const day = parts.day;
-  const month = parts.month - 1;
-  const year = parts.year;
   const today = new Date();
+  const isToday =
+    today.getFullYear() === clonedDate.getFullYear() &&
+    today.getMonth() === clonedDate.getMonth() &&
+    today.getDate() === clonedDate.getDate();
 
+  // Gregorian reads local Date fields directly; this runs for every day the
+  // month view renders, so it skips the Temporal conversion.
+  if (calendarSystem === 'gregorian') {
+    const month = clonedDate.getMonth();
+    return {
+      date: clonedDate,
+      day: clonedDate.getDate(),
+      month,
+      year: clonedDate.getFullYear(),
+      monthName: monthNames[month],
+      shortMonthName: shortMonthNames[month],
+      isToday,
+    };
+  }
+
+  const parts = dateToCalendarDate(clonedDate, calendarSystem);
+  const formatters = getJalaliMonthFormatters();
   return {
     date: clonedDate,
-    day,
-    month,
-    year,
-    monthName:
-      calendarSystem === 'jalali'
-        ? clonedDate.toLocaleDateString('en-US-u-ca-persian', { month: 'long' })
-        : monthNames[month],
-    shortMonthName:
-      calendarSystem === 'jalali'
-        ? clonedDate.toLocaleDateString('en-US-u-ca-persian', {
-            month: 'short',
-          })
-        : shortMonthNames[month],
-    isToday: today.toDateString() === clonedDate.toDateString(),
+    day: parts.day,
+    month: parts.month - 1,
+    year: parts.year,
+    monthName: formatters.long.format(clonedDate),
+    shortMonthName: formatters.short.format(clonedDate),
+    isToday,
   };
 };
 

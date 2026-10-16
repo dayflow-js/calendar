@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, useRef } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { dialogContainer } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
@@ -21,6 +22,7 @@ import { EventConferenceField } from './EventConferenceField';
 import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
+import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: ICalendarApp;
@@ -42,6 +44,7 @@ const DefaultEventDetailDialog = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const previousEventIdRef = useRef(event.id);
   const { t } = useLocale();
+  const rangePickerLocale = useRangePickerLocale(app?.state.locale);
 
   useEffect(() => {
     setEditedEvent(event);
@@ -163,6 +166,12 @@ const DefaultEventDetailDialog = ({
   const shouldShowNotes =
     !isSubscribed || (editedEvent.description || '').trim() !== '';
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, {
+    onClose: isPending ? undefined : onClose,
+    active: isOpen && isViewable,
+  });
+
   if (!isOpen || !isViewable) return null;
 
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -191,15 +200,26 @@ const DefaultEventDetailDialog = ({
       />
 
       {/* Dialog */}
-      <div className={dialogContainer}>
+      <div
+        ref={dialogRef}
+        className={dialogContainer}
+        role='dialog'
+        aria-modal='true'
+        aria-label={editedEvent.title || t('editEvent')}
+      >
         <button
           type='button'
           onClick={onClose}
           disabled={isPending}
           className='df-event-dialog-close'
-          aria-label='Close'
+          aria-label={t('close')}
         >
-          <svg fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <svg
+            aria-hidden='true'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path
               strokeLinecap='round'
               strokeLinejoin='round'
@@ -255,7 +275,7 @@ const DefaultEventDetailDialog = ({
                 disabled={!isEditable || isPending}
                 onChange={handleAllDayRangeChange}
                 onOk={handleAllDayRangeChange}
-                locale={app?.state.locale}
+                locale={rangePickerLocale}
                 calendarSystem={app?.state.calendarSystem}
               />
             </div>
@@ -282,7 +302,7 @@ const DefaultEventDetailDialog = ({
                   const [start, end] = nextRange;
                   setEditedEvent({ ...editedEvent, start, end });
                 }}
-                locale={app?.state.locale}
+                locale={rangePickerLocale}
                 calendarSystem={app?.state.calendarSystem}
               />
             </div>

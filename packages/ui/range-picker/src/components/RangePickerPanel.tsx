@@ -1,4 +1,5 @@
 import type { ZonedRange } from '@ui-range-picker/types';
+import type { RangePickerLabels } from '@ui-range-picker/utils/labels';
 import type { RefObject, JSX } from 'preact';
 import { Temporal } from 'temporal-polyfill';
 
@@ -19,6 +20,7 @@ interface RangePickerPanelProps {
   disabled?: boolean;
   timeFormat?: string;
   matchTriggerWidth?: boolean;
+  labels: RangePickerLabels;
   popupRef: RefObject<HTMLDivElement>;
   timeListRefs: RefObject<{
     start: { hour: HTMLDivElement | null; minute: HTMLDivElement | null };
@@ -46,6 +48,7 @@ const RangePickerPanel = ({
   disabled,
   timeFormat,
   matchTriggerWidth,
+  labels,
   popupRef,
   timeListRefs,
   onMonthChange,
@@ -81,6 +84,7 @@ const RangePickerPanel = ({
               visibleMonth={visibleMonth}
               monthLabels={monthLabels}
               disabled={disabled}
+              labels={labels}
               onMonthChange={onMonthChange}
               onYearChange={onYearChange}
             />
@@ -104,6 +108,7 @@ const RangePickerPanel = ({
                 draftRange={draftRange}
                 disabled={disabled}
                 timeFormat={timeFormat}
+                labels={labels}
                 onHourSelect={onHourSelect}
                 onMinuteSelect={onMinuteSelect}
                 timeListRefs={timeListRefs}
@@ -119,7 +124,7 @@ const RangePickerPanel = ({
             disabled={disabled}
             className='df-range-picker-confirm-button'
           >
-            OK
+            {labels.ok}
           </button>
         </div>
       </div>

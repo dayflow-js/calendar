@@ -407,7 +407,8 @@
   }
 
   .df-calendar-picker-option:hover,
-  .df-calendar-picker-option-mobile:hover {
+  .df-calendar-picker-option-mobile:hover,
+  .df-calendar-picker-option[data-active='true'] {
     background-color: var(--df-color-primary);
     color: var(--df-color-primary-foreground);
   }
@@ -438,7 +439,8 @@
   }
 
   .df-calendar-picker-option[data-selected='true']:hover,
-  .df-calendar-picker-option-mobile[data-selected='true']:hover {
+  .df-calendar-picker-option-mobile[data-selected='true']:hover,
+  .df-calendar-picker-option[data-selected='true'][data-active='true'] {
     background-color: var(--df-color-primary);
     color: var(--df-color-primary-foreground);
   }
@@ -481,6 +483,11 @@
     box-shadow: 0 10px 20px rgb(0 0 0 / 0.12);
     transition: all 200ms;
     transform-origin: top right;
+  }
+
+  /* The listbox takes focus; the active option is highlighted instead. */
+  .df-calendar-picker-dropdown:focus {
+    outline: none;
   }
 
   /* Icon sizing inside trigger */

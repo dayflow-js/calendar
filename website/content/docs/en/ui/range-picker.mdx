@@ -101,6 +101,31 @@ Pass a BCP 47 locale string to localize month names and weekday labels.
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+To translate the picker's own labels (navigation buttons, start/end inputs, hour/minute lists and the OK button), pass a locale object with `messages`. Missing keys fall back to English. The calendar's built-in event panel and dialog fill these in from the calendar locale automatically.
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'fr-FR',
+    messages: {
+      previousYear: 'Année précédente',
+      previousMonth: 'Mois précédent',
+      nextMonth: 'Mois suivant',
+      nextYear: 'Année suivante',
+      startDate: 'Date de début',
+      endDate: 'Date de fin',
+      hour: 'Heure',
+      minute: 'Minute',
+      ok: 'OK',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+Set `calendarSystem='jalali'` to display and type dates in the Persian calendar. `onChange` and `onOk` still return ISO Temporal values.
+
 ## Match Trigger Width
 
 ```tsx
@@ -129,7 +154,8 @@ Pass a BCP 47 locale string to localize month names and weekday labels.
 | `autoAdjustOverflow` | `boolean`                                                       | `true`         | Flip placement automatically when the popup would overflow the viewport    |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —              | Mount the popup inside a custom container instead of `document.body`       |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`        | Set the popup width to match the trigger input width                       |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 locale code for month/weekday labels                                |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 locale code; an object's `messages` translate the picker labels     |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | Calendar used to display and parse dates                                   |
 
 ### `ZonedRange`
 

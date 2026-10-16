@@ -1,5 +1,5 @@
-import { useLocale } from '@dayflow/core';
-import { useState } from 'preact/hooks';
+import { useDialogFocus, useLocale } from '@dayflow/core';
+import { useId, useRef, useState } from 'preact/hooks';
 
 interface SubscribeCalendarDialogProps {
   onSubscribe: (url: string) => Promise<void>;
@@ -11,6 +11,8 @@ export const SubscribeCalendarDialog = ({
   onCancel,
 }: SubscribeCalendarDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
+  const urlInputId = useId();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,22 +39,31 @@ export const SubscribeCalendarDialog = ({
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') handleSubmit();
-    if (e.key === 'Escape') onCancel();
   };
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, { onClose: loading ? undefined : onCancel });
 
   return (
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog df-sidebar-dialog-wide'>
-        <h2 className='df-sidebar-dialog-title'>
+      <div
+        ref={dialogRef}
+        className='df-sidebar-dialog df-sidebar-dialog-wide'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
           {t('subscribeCalendarTitle')}
         </h2>
 
         <div>
           <div className='df-sidebar-subscribe-row'>
-            <label className='df-sidebar-subscribe-label'>
+            <label className='df-sidebar-subscribe-label' htmlFor={urlInputId}>
               {t('calendarUrl')}
             </label>
             <input
+              id={urlInputId}
               type='url'
               value={url}
               onInput={e => setUrl((e.target as HTMLInputElement).value)}

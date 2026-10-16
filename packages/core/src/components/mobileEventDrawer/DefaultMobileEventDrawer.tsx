@@ -1,6 +1,6 @@
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
-import { useState, useEffect, useMemo } from 'preact/hooks';
+import { useState, useEffect, useMemo, useRef, useId } from 'preact/hooks';
 
 import { addCalendarMonths } from '@/calendar/calendarSystem';
 import {
@@ -8,6 +8,7 @@ import {
   CalendarOption,
 } from '@/components/common/CalendarPicker';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
 import {
@@ -232,6 +233,21 @@ export const MobileEventDrawer = ({
     notes,
   ]);
 
+  const drawerRef = useRef<HTMLDivElement>(null);
+  // Keyed on isOpen (not isVisible) so focus goes back as soon as the close
+  // animation starts.
+  useDialogFocus(drawerRef, { onClose, active: isOpen && isViewable });
+
+  // Name the date/time triggers by their row ("Starts Oct 15") rather than by
+  // their value alone.
+  const idPrefix = useId();
+  const startsLabelId = `${idPrefix}-starts`;
+  const endsLabelId = `${idPrefix}-ends`;
+  const startDateId = `${idPrefix}-start-date`;
+  const startTimeId = `${idPrefix}-start-time`;
+  const endDateId = `${idPrefix}-end-date`;
+  const endTimeId = `${idPrefix}-end-time`;
+
   if (!isVisible || !isViewable) return null;
 
   const handleSave = () => {
@@ -324,7 +340,13 @@ export const MobileEventDrawer = ({
   };
 
   return createPortal(
-    <div className='df-portal df-mobile-event-drawer'>
+    <div
+      ref={drawerRef}
+      className='df-portal df-mobile-event-drawer'
+      role='dialog'
+      aria-modal='true'
+      aria-label={title || t('newEvent')}
+    >
       <div
         className='df-mobile-event-drawer-backdrop'
         data-closing={String(isClosing)}
@@ -370,6 +392,7 @@ export const MobileEventDrawer = ({
             <input
               type='text'
               placeholder={t('titlePlaceholder')}
+              aria-label={t('eventTitle')}
               value={title}
               onChange={(
                 e: JSX.TargetedEvent<HTMLInputElement, globalThis.Event>
@@ -410,6 +433,7 @@ export const MobileEventDrawer = ({
                 {t('allDay')}
               </span>
               <Switch
+                label={t('allDay')}
                 checked={isAllDay}
                 onChange={
                   isEditable
@@ -425,7 +449,7 @@ export const MobileEventDrawer = ({
 
           <div className='df-mobile-event-drawer-section'>
             <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
-              <span className='df-mobile-event-drawer-label'>
+              <span id={startsLabelId} className='df-mobile-event-drawer-label'>
                 {t('starts')}
               </span>
               <div className='df-mobile-event-drawer-controls'>
@@ -436,6 +460,8 @@ export const MobileEventDrawer = ({
                   onClick={() => isEditable && toggleExpand('start-date')}
                   disabled={!isEditable}
                   aria-expanded={expandedPicker === 'start-date'}
+                  id={startDateId}
+                  aria-labelledby={`${startsLabelId} ${startDateId}`}
                 >
                   {formatDate(startDate)}
                 </button>
@@ -447,6 +473,8 @@ export const MobileEventDrawer = ({
                     onClick={() => isEditable && toggleExpand('start-time')}
                     disabled={!isEditable}
                     aria-expanded={expandedPicker === 'start-time'}
+                    id={startTimeId}
+                    aria-labelledby={`${startsLabelId} ${startTimeId}`}
                   >
                     {formatTime(
                       startDate.getHours() + startDate.getMinutes() / 60,
@@ -493,7 +521,9 @@ export const MobileEventDrawer = ({
 
           <div className='df-mobile-event-drawer-section'>
             <div className='df-mobile-event-drawer-row df-mobile-event-drawer-row-padded'>
-              <span className='df-mobile-event-drawer-label'>{t('ends')}</span>
+              <span id={endsLabelId} className='df-mobile-event-drawer-label'>
+                {t('ends')}
+              </span>
               <div className='df-mobile-event-drawer-controls'>
                 <button
                   type='button'
@@ -502,6 +532,8 @@ export const MobileEventDrawer = ({
                   onClick={() => isEditable && toggleExpand('end-date')}
                   disabled={!isEditable}
                   aria-expanded={expandedPicker === 'end-date'}
+                  id={endDateId}
+                  aria-labelledby={`${endsLabelId} ${endDateId}`}
                 >
                   {formatDate(endDate)}
                 </button>
@@ -513,6 +545,8 @@ export const MobileEventDrawer = ({
                     onClick={() => isEditable && toggleExpand('end-time')}
                     disabled={!isEditable}
                     aria-expanded={expandedPicker === 'end-time'}
+                    id={endTimeId}
+                    aria-labelledby={`${endsLabelId} ${endTimeId}`}
                   >
                     {formatTime(
                       endDate.getHours() + endDate.getMinutes() / 60,
@@ -561,6 +595,7 @@ export const MobileEventDrawer = ({
             <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
               <textarea
                 placeholder={t('notesPlaceholder')}
+                aria-label={t('notes')}
                 value={notes}
                 onChange={(
                   e: JSX.TargetedEvent<HTMLTextAreaElement, globalThis.Event>

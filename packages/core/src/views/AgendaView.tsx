@@ -753,6 +753,7 @@ const AgendaView = ({
       <ViewHeader
         calendar={app}
         viewType='month'
+        navigationUnit='period'
         currentDate={rangeStart}
         customTitle={title}
         onPrevious={() => app.goToPrevious()}

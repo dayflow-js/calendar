@@ -1,4 +1,10 @@
-import { useMemo, useState, useCallback, useEffect } from 'preact/hooks';
+import {
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'preact/hooks';
 
 import {
   CalendarSystem,
@@ -7,6 +13,7 @@ import {
 } from '@/calendar/calendarSystem';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { monthViewContainer } from '@/styles/classNames';
 import { Event, ICalendarApp, ViewType, YearViewConfig } from '@/types';
 import {
@@ -22,6 +29,19 @@ interface GridYearViewProps {
   app: ICalendarApp;
   config?: YearViewConfig;
 }
+
+/** Local `YYYY-MM-DD` key for a day cell. */
+function toDayKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Day offset each arrow key moves the focused day cell by. */
+const ARROW_DAY_OFFSETS: Record<string, number> = {
+  ArrowLeft: -1,
+  ArrowRight: 1,
+  ArrowUp: -7,
+  ArrowDown: 7,
+};
 
 /** Returns inline background color for event concentration using CSS variables */
 function getIntensityStyle(
@@ -81,7 +101,7 @@ function buildDayEventMap(
     const days = Math.round((clampedEnd.getTime() - startMs) / DAY_MS);
     for (let i = 0; i <= days; i++) {
       const d = new Date(startMs + i * DAY_MS);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const key = toDayKey(d);
       const existing = map.get(key);
       if (existing) {
         existing.push(event);
@@ -142,6 +162,38 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
     anchorEl: HTMLElement;
     position: { top: number; left: number };
   } | null>(null);
+
+  // Roving tabindex: the year grid is one Tab stop, and the arrow keys move
+  // between days of the current year.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  const isInCurrentYear = (date: Date) =>
+    dateToCalendarDate(date, calendarSystem).year === currentYear;
+  let tabStopDate = createCalendarDate(currentYear, 0, 1, calendarSystem);
+  if (focusedDate && isInCurrentYear(focusedDate)) tabStopDate = focusedDate;
+  else if (isInCurrentYear(currentDate)) tabStopDate = currentDate;
+  const tabStopKey = toDayKey(tabStopDate);
+  const gridClickOpensPopup = (config?.gridDateClick ?? 'popup') === 'popup';
+
+  const handleDayKeyDown = (e: KeyboardEvent, date: Date) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).click();
+      return;
+    }
+    const offset = ARROW_DAY_OFFSETS[e.key];
+    if (offset === undefined) return;
+    e.preventDefault();
+    const next = new Date(date);
+    next.setDate(next.getDate() + offset);
+    if (!isInCurrentYear(next)) return;
+    setFocusedDate(next);
+    gridRef.current
+      ?.querySelector<HTMLElement>(
+        `[data-day-key='${toDayKey(next)}'][data-current-month='true']`
+      )
+      ?.focus();
+  };
 
   // Click-outside handler for popup (also used by cells to close on outside click)
   useEffect(() => {
@@ -249,7 +301,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       const clickAction = config?.gridDateClick ?? 'popup';
 
       if (typeof clickAction === 'function') {
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const key = toDayKey(date);
         clickAction(date, fullEventMap.get(key) ?? [], e);
         return;
       }
@@ -285,7 +337,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const key = toDayKey(date);
         dblClickAction(date, fullEventMap.get(key) ?? [], e);
         return;
       }
@@ -334,7 +386,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
   const popupEvents = useMemo(() => {
     if (!popup) return [];
-    const key = `${popup.date.getFullYear()}-${String(popup.date.getMonth() + 1).padStart(2, '0')}-${String(popup.date.getDate()).padStart(2, '0')}`;
+    const key = toDayKey(popup.date);
     const events = fullEventMap.get(key) ?? [];
     return [...events].toSorted((a, b) => {
       const aAllDay = !!a.allDay;
@@ -362,6 +414,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
       {/* 4-col × 3-row grid that fills all remaining space — no scroll */}
       <div
+        ref={gridRef}
         className='df-year-grid'
         style={{
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -394,7 +447,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
                 {/* Day cells — exactly 42 cells (6 rows × 7 cols) */}
                 {month.cells.map(({ date, isCurrentMonth }, i) => {
-                  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                  const key = toDayKey(date);
                   const eventCount = isCurrentMonth
                     ? (heatmapEventMap.get(key)?.length ?? 0)
                     : 0;
@@ -407,9 +460,47 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                     <div
                       key={`${month.monthIndex}-${i}`}
                       data-grid-day-cell
+                      data-day-key={key}
                       className='df-year-grid-day'
                       data-current-month={isCurrentMonth ? 'true' : 'false'}
                       style={intensityStyle}
+                      // Overflow days repeat a neighbouring month's cells, so
+                      // only current-month days are exposed and focusable.
+                      aria-hidden={isCurrentMonth ? undefined : 'true'}
+                      role={isCurrentMonth ? 'button' : undefined}
+                      tabIndex={
+                        isCurrentMonth
+                          ? key === tabStopKey
+                            ? 0
+                            : -1
+                          : undefined
+                      }
+                      aria-label={
+                        isCurrentMonth
+                          ? formatDateLabel(date, locale, {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                          : undefined
+                      }
+                      aria-current={
+                        isCurrentMonth && isToday ? 'date' : undefined
+                      }
+                      aria-haspopup={
+                        isCurrentMonth && gridClickOpensPopup
+                          ? 'dialog'
+                          : undefined
+                      }
+                      onKeyDown={
+                        isCurrentMonth
+                          ? (e: KeyboardEvent) => handleDayKeyDown(e, date)
+                          : undefined
+                      }
+                      onFocus={
+                        isCurrentMonth ? () => setFocusedDate(date) : undefined
+                      }
                       onClick={e => handleDateClick(e, date, month.monthIndex)}
                       onDblClick={e =>
                         handleDateDoubleClick(e as unknown as MouseEvent, date)
