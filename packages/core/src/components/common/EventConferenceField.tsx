@@ -1,5 +1,11 @@
 import type { JSX } from 'preact';
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import { useLocale } from '@/locale';
 import type { EventConference, KnownMeetingProviderId } from '@/types';
@@ -148,6 +154,17 @@ export const EventConferenceField = ({
   const { t } = useLocale();
   const [isEditing, setIsEditing] = useState(!value);
   const [draftUrl, setDraftUrl] = useState(value?.joinUrl ?? '');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const focusInputRef = useRef(false);
+
+  // The edit button disappears when it is clicked, so hand focus to the link
+  // field instead of letting it fall back to the page.
+  useLayoutEffect(() => {
+    if (!isEditing || !focusInputRef.current) return;
+    focusInputRef.current = false;
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [isEditing]);
 
   useEffect(() => {
     if (!isEditing) setDraftUrl(value?.joinUrl ?? '');
@@ -204,9 +221,14 @@ export const EventConferenceField = ({
 
       {showEditor ? (
         <div>
-          <div className='df-event-conference-editor'>
-            {provider && <ProviderIcon provider={provider.id} />}
+          <div
+            className='df-event-conference-editor'
+            data-invalid={isInvalid ? 'true' : undefined}
+          >
+            {/* Same slot as the summary's icon so nothing shifts on edit. */}
+            <ProviderIcon provider={provider?.id ?? 'custom'} />
             <input
+              ref={inputRef}
               type='url'
               inputMode='url'
               value={draftUrl}
@@ -261,7 +283,10 @@ export const EventConferenceField = ({
               disabled={disabled}
               aria-label={t('editMeetingUrl')}
               title={t('editMeetingUrl')}
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                focusInputRef.current = true;
+                setIsEditing(true);
+              }}
             >
               <svg viewBox='0 0 24 24' aria-hidden='true'>
                 <path d='m14.7 5.3 4 4M4 20l3.8-.8L19 8a1.4 1.4 0 0 0 0-2l-1-1a1.4 1.4 0 0 0-2 0L4.8 16.2Z' />

@@ -11,7 +11,8 @@ export function fitNotesToViewport(
   const naturalHeight = content.scrollHeight;
   content.style.height = `${naturalHeight}px`;
 
-  const otherHeight = container.scrollHeight - content.offsetHeight;
+  const borders = container.offsetHeight - container.clientHeight;
+  const otherHeight = container.scrollHeight - content.offsetHeight + borders;
   const availableHeight = Math.max(48, window.innerHeight - 16 - otherHeight);
   content.style.maxHeight = `${availableHeight}px`;
   content.style.height = `${Math.min(preferredHeight ?? naturalHeight, availableHeight)}px`;

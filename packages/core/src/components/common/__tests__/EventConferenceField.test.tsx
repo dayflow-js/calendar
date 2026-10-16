@@ -111,4 +111,34 @@ describe('EventConferenceField', () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it('keeps the provider icon slot while editing so the row does not shift', () => {
+    const { container } = render(<Harness />);
+
+    const editor = container.querySelector('.df-event-conference-editor');
+    expect(
+      editor?.firstElementChild?.classList.contains(
+        'df-event-conference-provider-icon'
+      )
+    ).toBe(true);
+  });
+
+  it('moves focus into the link field when editing starts', () => {
+    render(
+      <Harness
+        initialValue={{
+          provider: 'google-meet',
+          joinUrl: 'https://meet.google.com/abc-defg-hij',
+        }}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'editMeetingUrl' }));
+    const input = screen.getByRole('textbox', {
+      name: 'meetingUrl',
+    }) as HTMLInputElement;
+    expect(document.activeElement).toBe(input);
+    expect(input.selectionStart).toBe(0);
+    expect(input.selectionEnd).toBe(input.value.length);
+  });
 });

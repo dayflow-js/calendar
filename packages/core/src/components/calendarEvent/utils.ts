@@ -212,3 +212,27 @@ export const getEventSegmentShape = (
 
   return 'full';
 };
+
+/**
+ * Re-observe a floating detail panel as it grows (e.g. a dragged notes field)
+ * and nudge it up just enough to keep its bottom inside the viewport.
+ */
+export const observePanelInViewport = (
+  panel: HTMLElement,
+  setTop: (update: (top: number) => number) => void
+): (() => void) => {
+  if (typeof ResizeObserver === 'undefined') {
+    return () => {
+      /* nothing to stop */
+    };
+  }
+  const observer = new ResizeObserver(() => {
+    const height = panel.getBoundingClientRect().height;
+    const bottomLimit = window.innerHeight - 8;
+    setTop(top =>
+      top + height > bottomLimit ? Math.max(8, bottomLimit - height) : top
+    );
+  });
+  observer.observe(panel);
+  return () => observer.disconnect();
+};
