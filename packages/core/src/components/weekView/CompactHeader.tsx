@@ -1,4 +1,5 @@
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { ICalendarApp } from '@/types';
 
 interface CompactHeaderProps {
@@ -37,8 +38,8 @@ export const CompactHeader = ({
   const { locale } = useLocale();
   return (
     <div className='df-compact-header'>
-      {/* Weekday labels row */}
-      <div className='df-compact-header-labels'>
+      {/* Weekday labels row (decorative: each date button names its full date) */}
+      <div className='df-compact-header-labels' aria-hidden='true'>
         {fullWeekDates.map((day, index) => (
           <div key={`label-${index}`} className='df-compact-header-label-cell'>
             <span
@@ -87,16 +88,25 @@ export const CompactHeader = ({
                   index >= startIndex && index < startIndex + columnsPerPage;
 
                 return (
-                  <div
+                  <button
+                    type='button'
                     key={`date-${index}`}
                     className='df-compact-header-date-button'
                     style={{ height: '32px' }}
+                    aria-label={formatDateLabel(day.fullDate, locale, {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                    aria-current={day.isToday ? 'date' : undefined}
+                    aria-pressed={isSelected}
                     onClick={() => {
                       app.setCurrentDate(day.fullDate);
                       onDateChange?.(day.fullDate);
                     }}
                   >
-                    <div
+                    <span
                       className='df-compact-header-date-pill'
                       data-selected={isSelected ? 'true' : 'false'}
                       data-today={day.isToday ? 'true' : 'false'}
@@ -104,10 +114,10 @@ export const CompactHeader = ({
                     >
                       {new Intl.NumberFormat(locale).format(day.date)}
                       {day.isToday && !isSelected && (
-                        <div className='df-compact-header-today-dot' />
+                        <span className='df-compact-header-today-dot' />
                       )}
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 );
               })}
             </>
