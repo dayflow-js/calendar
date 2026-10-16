@@ -118,6 +118,7 @@ title: 'useCalendarApp'
 | `defaultCalendar`      | `string`                    | 可选 | 第一个可见日历                 | 创建新事件时使用的 ID                                                                                                     |
 | `theme`                | `ThemeConfig`               | 可选 | `{ mode: 'light' }`            | 设置全局主题模式和可选的令牌覆盖                                                                                          |
 | `locale`               | `string \| Locale`          | 可选 | `'en-US'`                      | 设置国际化（i18n）的语言环境。支持语言代码（如 'zh'）或 Locale 对象。                                                     |
+| `calendarSystem`       | `'gregorian' \| 'jalali'`   | 可选 | `'gregorian'`                  | 用于显示和导航日期的历法。`'jalali'` 为波斯太阳历（贾拉利历）。见 [calendarSystem](#calendarsystem)。                     |
 | `useEventDetailDialog` | `boolean`                   | 可选 | `false`                        | 启用默认模态详情对话框而不是内联面板                                                                                      |
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | 可选 | `'dbClick'`                    | 控制桌面端事件详情通过单击还是双击打开。触摸端始终单击/轻触打开详情                                                       |
 | `useCalendarHeader`    | `boolean`                   | 可选 | `true`                         | 启用默认页眉（`true`）或隐藏页眉（`false`）。自定义页眉请使用 `DayFlowCalendar` 上的 `calendarHeader` 插槽                |
@@ -316,6 +317,28 @@ const calendar = useCalendarApp({
   locale: customLocale,
 });
 ```
+
+### calendarSystem
+
+`calendarSystem` 决定显示和导航日期所用的历法：`'gregorian'`（默认，公历）或 `'jalali'`（波斯太阳历）。它与 `locale`、`timeZone`、`startOfWeek` 互相独立，因此可以用英文界面显示贾拉利历日期，也可以用波斯语界面显示公历日期。
+
+```tsx
+import { createLocalizationPlugin, fa } from '@dayflow/plugin-localization';
+
+const calendar = useCalendarApp({
+  calendarSystem: 'jalali',
+  locale: 'fa-IR',
+  timeZone: 'Asia/Tehran',
+  plugins: [createLocalizationPlugin({ locales: [fa] })],
+  views: [
+    createMonthView({ startOfWeek: 6 }), // 每周从周六开始
+    createWeekView({ startOfWeek: 6 }),
+    createYearView({ mode: 'grid', startOfWeek: 6 }),
+  ],
+});
+```
+
+它只改变显示和导航。事件数据、回调、ICS 导入和重复规则仍使用 ISO 日期，切换历法不会修改任何事件。
 
 ### useEventDetailDialog
 

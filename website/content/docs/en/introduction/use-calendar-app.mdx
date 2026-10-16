@@ -118,6 +118,7 @@ title: useCalendarApp
 | `defaultCalendar`      | `string`                    | Optional | First visible calendar                                   | ID used when new events are created.                                                                                                    |
 | `theme`                | `ThemeConfig`               | Optional | `{ mode: 'light' }`                                      | Sets global theme mode and optional token overrides.                                                                                    |
 | `locale`               | `string \| Locale`          | Optional | `'en-US'`                                                | Sets the locale for internationalization (i18n). Supports language codes (e.g., 'ja') or Locale objects.                                |
+| `calendarSystem`       | `'gregorian' \| 'jalali'`   | Optional | `'gregorian'`                                            | Calendar used to display and navigate dates. `'jalali'` is the Persian solar calendar. See [calendarSystem](#calendarsystem).           |
 | `useEventDetailDialog` | `boolean`                   | Optional | `false`                                                  | Enables the default modal detail dialog instead of inline panels.                                                                       |
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | Optional | `'dbClick'`                                              | Controls whether desktop event details open on single click or double click. Touch input always opens details with a single tap.        |
 | `useCalendarHeader`    | `boolean`                   | Optional | `true`                                                   | Enables the default header (`true`) or hides it (`false`). For a custom header, use the `calendarHeader` slot on `DayFlowCalendar`.     |
@@ -295,6 +296,28 @@ const calendar = useCalendarApp({
   locale: customLocale,
 });
 ```
+
+### calendarSystem
+
+`calendarSystem` selects the calendar used to display and navigate dates: `'gregorian'` (default) or `'jalali'` (Persian solar calendar). It is independent of `locale`, `timeZone` and `startOfWeek`, so you can show Jalali dates with English labels, or Gregorian dates with Persian labels.
+
+```tsx
+import { createLocalizationPlugin, fa } from '@dayflow/plugin-localization';
+
+const calendar = useCalendarApp({
+  calendarSystem: 'jalali',
+  locale: 'fa-IR',
+  timeZone: 'Asia/Tehran',
+  plugins: [createLocalizationPlugin({ locales: [fa] })],
+  views: [
+    createMonthView({ startOfWeek: 6 }), // weeks start on Saturday
+    createWeekView({ startOfWeek: 6 }),
+    createYearView({ mode: 'grid', startOfWeek: 6 }),
+  ],
+});
+```
+
+Only display and navigation change. Event data, callbacks, ICS imports and recurrence rules keep their ISO dates, and switching calendars does not modify any event.
 
 ### useEventDetailDialog
 

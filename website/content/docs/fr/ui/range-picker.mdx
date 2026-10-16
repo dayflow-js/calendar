@@ -101,6 +101,31 @@ Passez une chaîne de locale BCP 47 pour traduire les noms de mois et les libell
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+Pour traduire les libellés propres au sélecteur (boutons de navigation, champs de début et de fin, listes des heures et minutes et bouton OK), passez un objet locale avec `messages`. Les clés absentes reviennent à l'anglais. Le panneau et la boîte de dialogue d'événement intégrés au calendrier les remplissent automatiquement à partir de la locale du calendrier.
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'fr-FR',
+    messages: {
+      previousYear: 'Année précédente',
+      previousMonth: 'Mois précédent',
+      nextMonth: 'Mois suivant',
+      nextYear: 'Année suivante',
+      startDate: 'Date de début',
+      endDate: 'Date de fin',
+      hour: 'Heure',
+      minute: 'Minute',
+      ok: 'OK',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+Avec `calendarSystem='jalali'`, les dates sont affichées et saisies dans le calendrier persan. `onChange` et `onOk` renvoient toujours des valeurs Temporal ISO.
+
 ## Aligner sur la largeur du champ
 
 ```tsx
@@ -129,7 +154,8 @@ Passez une chaîne de locale BCP 47 pour traduire les noms de mois et les libell
 | `autoAdjustOverflow` | `boolean`                                                       | `true`         | Inverse automatiquement le placement si le popup débordait de la fenêtre                |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —              | Monte le popup dans un conteneur personnalisé plutôt que dans `document.body`           |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`        | Aligne la largeur du popup sur celle du champ déclencheur                               |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | Code de locale BCP 47 pour les libellés de mois et de jours                             |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | Code de locale BCP 47 ; avec un objet, `messages` traduit les libellés du sélecteur     |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | Calendrier utilisé pour afficher et analyser les dates                                  |
 
 ### `ZonedRange`
 

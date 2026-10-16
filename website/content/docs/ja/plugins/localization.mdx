@@ -160,6 +160,7 @@ interface LocalizationConfig {
 | `fr`         | フランス語 | `fr-FR`                  |
 | `de`         | ドイツ語   | `de-DE`                  |
 | `es`         | スペイン語 | `es-ES`                  |
+| `fa`         | ペルシャ語 | `fa-IR`                  |
 | `en`         | 英語       | `en-US` (コアに内蔵済み) |
 
 `locale` プロパティを設定する際、以下のいずれかを渡すことができます：
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // カスタム Locale オブジェクト直接（またはコード文字列 'pt-BR'）を渡せます
 });
 ```
+
+### アクセシブルラベル
+
+ロケールの `messages` は、アイコンのみのボタンやラベルのない入力欄をスクリーンリーダーが読み上げる名前にも使われます。表示テキストと一緒に翻訳してください。カスタムロケールに無いキーは英語にフォールバックします。
+
+| キー                                        | 用途                                                         |
+| :------------------------------------------ | :----------------------------------------------------------- |
+| `previousDay` / `nextDay`                   | 日ビューのヘッダーの移動ボタン                               |
+| `previousWeek` / `nextWeek`                 | 週ビューのヘッダーの移動ボタン                               |
+| `previousMonth` / `nextMonth`               | 月ビューのヘッダー、ミニカレンダー、範囲ピッカーの移動ボタン |
+| `previousYear` / `nextYear`                 | 年ビューのヘッダーと範囲ピッカーの移動ボタン                 |
+| `previousPeriod` / `nextPeriod`             | アジェンダビューのヘッダーの移動ボタン                       |
+| `clearSearch` / `closeSearch`               | 検索のクリアボタンとモバイル検索の戻るボタン                 |
+| `close`                                     | ダイアログとドロワーの閉じるボタン                           |
+| `startDate` / `endDate` / `hour` / `minute` | 範囲ピッカーの入力欄と時刻リスト                             |
