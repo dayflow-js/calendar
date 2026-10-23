@@ -8,30 +8,25 @@ Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@d
 
 ### New Features & Enhancements
 
-- **Tasks in Your Calendar (`@dayflow/core`)**: Add tasks alongside events with a single due date or time (`kind: 'task'`). The new `enableTasks` option shows the Event / Task switch in the built-in desktop and mobile editors; it defaults to `false` to preserve the existing event creation interface. `setTaskCompleted` and `setTaskPriority` update tasks from code.
-- **Complete Tasks in Place (`@dayflow/core`)**: Click the circle to complete or reopen a task, with strike-through styling and a completion timestamp. Tasks can be moved, but cannot be resized.
-- **Visual Priorities (`@dayflow/core`)**: Low, medium, and high priorities use green, amber, and red diagonal backgrounds and matching text. Calendar-colored completion circles turn white when selected.
-- **All-Day Tasks (`@dayflow/core`)**: Switch between a timed deadline and an all-day task. Month view keeps both in a consistent task row, with aligned completion circles; Day and Week tasks omit event color bars.
-- **Compact Task Editors (`@dayflow/core`)**: Narrower detail panels, priority controls on mobile, and the existing notes and calendar selectors keep task editing familiar.
-- **Single-Date Range Picker (`@dayflow/ui-range-picker`)**: New `mode: 'single'` shows one field for a single date or time, used for task due dates. `onChange` and `onOk` still receive a tuple, with both entries set to the chosen value.
-- **Task Labels (`@dayflow/plugin-localization`)**: Task, priority and due-time labels in every bundled language.
+- **Tasks (`@dayflow/core`)**: Add items with `kind: 'task'` and a single due date or time. Click the circle to complete a task; priorities show as colored stripes. Set `enableTasks: true` to add the Event / Task switch to the built-in editors (off by default). `setTaskCompleted` and `setTaskPriority` update tasks from code.
+- **Single-Date Picker (`@dayflow/ui-range-picker`)**: `mode: 'single'` picks one date or time.
+- **Task Labels (`@dayflow/plugin-localization`)**: Task and priority labels for every bundled language.
 
 ### Fixed
 
-- **Mobile Event Drawer Times (`@dayflow/core`)**: Saving in the mobile drawer no longer shifts the event time when the device's time zone differs from the calendar's `timeZone`. The drawer now shows and edits times in the calendar's time zone.
-
-### Changed
-
-- **Preact Peer Range (`@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: The packages now import `preact/jsx-runtime` and require `preact` 10.5 or later.
+- **Mobile Event Drawer (`@dayflow/core`)**: Saving no longer shifts the event time when the device and calendar time zones differ.
 
 ### Performance
 
-- **Smaller Bundles When Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Unused component initialization can now be removed by your bundler, and the Preact JSX runtime is shared instead of embedded. In consumer probes, a standalone `isTask` import is 94% smaller (1.7 KiB gzip) and a Month-only calendar about 4% smaller, with external runtime dependencies excluded. A calendar using every view is effectively unchanged.
+- **Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Bundlers can now drop unused components, and the Preact JSX runtime is shared instead of bundled. A Month-only calendar is about 4% smaller.
+
+### Changed
+
+- `@dayflow/ui-context-menu` and `@dayflow/ui-range-picker` now require `preact` 10.5 or later.
 
 ### Documentation
 
-- Added a task guide in all seven documentation languages, task fields in the `Event` and `useCalendarApp` references, and a Tasks switch in the interactive demo.
-- The website changelog now shows screenshots taken from the live demo, compact entries for fix-only releases, and an RSS feed.
+- Task guide in all documentation languages.
 
 ## [3.7.5] - 2026-10-17
 
