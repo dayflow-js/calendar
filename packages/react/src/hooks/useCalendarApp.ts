@@ -35,6 +35,10 @@ export function useCalendarApp(
     if (!app) {
       return;
     }
+    // StrictMode and Fast Refresh replay this effect on the same app, so the
+    // plugins torn down by the cleanup below have to be re-armed. No-op on the
+    // first run.
+    app.restore();
     // Subscribe to state changes to trigger React re-renders
     const unsubscribe = app.subscribe(() => {
       setTick((tick: number) => tick + 1);
@@ -42,6 +46,7 @@ export function useCalendarApp(
 
     return () => {
       unsubscribe();
+      app.destroy();
     };
   }, [app]);
 

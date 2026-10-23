@@ -497,12 +497,12 @@ export function createKeyboardShortcutsPlugin(
           }
         }
       };
-      if (typeof window !== 'undefined') {
-        window.addEventListener('keydown', handleKeyDown);
-      }
+      if (typeof window === 'undefined') return;
 
-      // Cleanup is tricky for plugins as there's no uninstall yet in DayFlow core,
-      // but we can store it or just let it live with the app instance.
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     },
   };
 }

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": [],
+    "paths": {
+      "@dayflow/svelte": ["../index.d.ts"],
+      "@dayflow/core": ["../../core/dist/index.d.ts"]
+    }
+  },
+  "files": ["consumer.ts"]
+}

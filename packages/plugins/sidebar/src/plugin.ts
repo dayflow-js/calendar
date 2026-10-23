@@ -132,6 +132,212 @@ export interface SidebarService {
   isCollapsed: () => boolean;
 }
 
+/**
+ * One control handle per app. The bridge below is registered once for the
+ * whole page, so anything instance-specific has to be looked up from the app
+ * it is called with — never captured from the plugin that registered it.
+ */
+const controlRefs = new WeakMap<ICalendarApp, SidebarControlRef>();
+
+const getSidebarConfig = (app: ICalendarApp): SidebarPluginConfig =>
+  app.getPluginConfig('sidebar') as SidebarPluginConfig;
+
+function useSidebar(app: ICalendarApp): SidebarBridgeReturn {
+  const { t } = useLocale();
+
+  const [isCollapsed, setIsCollapsed] = useState(
+    () => getSidebarConfig(app).initialCollapsed ?? false
+  );
+
+  // Keep the programmatic API in sync with the current render state.
+  const controlRef = controlRefs.get(app);
+  if (controlRef) {
+    controlRef.setCollapsed = setIsCollapsed;
+    controlRef.currentCollapsed = isCollapsed;
+  }
+
+  const [sidebarVersion, setSidebarVersion] = useState(0);
+  const [editingCalendarId, setEditingCalendarId] = useState<string | null>(
+    null
+  );
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [createCalendarSource, setCreateCalendarSource] = useState<
+    string | undefined
+  >();
+  const isEditable = app.canMutateFromUI();
+
+  const refreshSidebar = useCallback(() => {
+    setSidebarVersion(prev => prev + 1);
+  }, []);
+
+  useEffect(
+    () =>
+      app.subscribe(() => {
+        refreshSidebar();
+      }),
+    [app, refreshSidebar]
+  );
+
+  const calendars = useMemo(() => app.getCalendars(), [app, sidebarVersion]);
+
+  const handleToggleCalendarVisibility = useCallback(
+    (calendarId: string, visible: boolean) => {
+      app.setCalendarVisibility(calendarId, visible);
+      refreshSidebar();
+    },
+    [app, refreshSidebar]
+  );
+
+  const handleToggleAllCalendars = useCallback(
+    (visible: boolean) => {
+      app.setAllCalendarsVisibility(visible);
+      refreshSidebar();
+    },
+    [app, refreshSidebar]
+  );
+
+  const handleCreateCalendar = useCallback(
+    (source?: string) => {
+      if (!isEditable) return;
+
+      const createMode = getSidebarConfig(app).createCalendarMode || 'inline';
+
+      if (createMode === 'modal') {
+        setCreateCalendarSource(source);
+        setShowCreateDialog(true);
+        return;
+      }
+
+      const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const { colors, darkColors } = getCalendarColorsForHex(randomColor);
+      const newId = generateUniKey();
+
+      const newCalendar: CalendarType = {
+        id: newId,
+        name: t('untitled'),
+        colors,
+        darkColors,
+        isVisible: true,
+        isDefault: false,
+        ...(source ? { source } : {}),
+      };
+
+      app.createCalendar(newCalendar);
+      setEditingCalendarId(newId);
+      refreshSidebar();
+    },
+    [app, isEditable, t, refreshSidebar]
+  );
+
+  useEffect(() => {
+    if (isEditable) return;
+
+    setShowCreateDialog(false);
+    setCreateCalendarSource(undefined);
+    setEditingCalendarId(null);
+  }, [isEditable]);
+
+  const sidebarProps: CalendarSidebarRenderProps = useMemo(() => {
+    const currentConfig = getSidebarConfig(app);
+    return {
+      app,
+      calendars,
+      toggleCalendarVisibility: handleToggleCalendarVisibility,
+      toggleAll: handleToggleAllCalendars,
+      isCollapsed,
+      setCollapsed: setIsCollapsed,
+      showEventDots: currentConfig.showEventDots,
+      renderCalendarContextMenu: currentConfig.renderCalendarContextMenu,
+      renderSidebarHeader: currentConfig.renderSidebarHeader,
+      createCalendarMode: currentConfig.createCalendarMode,
+      renderCreateCalendarDialog: currentConfig.renderCreateCalendarDialog,
+      editingCalendarId,
+      setEditingCalendarId,
+      onCreateCalendar: handleCreateCalendar,
+      onSubscribeCalendar: currentConfig.onSubscribeCalendar,
+      onLoadSubscription: currentConfig.onLoadSubscription,
+      onReorder: currentConfig.onReorder,
+      groups: currentConfig.groups,
+      onGroupCreate: currentConfig.onGroupCreate,
+      onGroupRename: currentConfig.onGroupRename,
+      onGroupDelete: currentConfig.onGroupDelete,
+      onGroupReorder: currentConfig.onGroupReorder,
+      componentsOrder: currentConfig.componentsOrder,
+      groupStatus: currentConfig.groupStatus,
+    };
+  }, [
+    app,
+    calendars,
+    handleToggleCalendarVisibility,
+    handleToggleAllCalendars,
+    isCollapsed,
+    handleCreateCalendar,
+    editingCalendarId,
+    sidebarVersion, // Depend on sidebarVersion to refresh when config updates trigger notify()
+  ]);
+
+  const renderContent = () => {
+    const currentConfig = getSidebarConfig(app);
+    if (currentConfig.render || app.state.overrides.includes('sidebar')) {
+      return h(ContentSlot, {
+        generatorName: 'sidebar',
+        generatorArgs: sidebarProps,
+      });
+    }
+    return h(DefaultCalendarSidebar, {
+      ...sidebarProps,
+    });
+  };
+
+  const renderExtraContent = () => {
+    if (!isEditable || !showCreateDialog) return null;
+
+    const onClose = () => {
+      setShowCreateDialog(false);
+      setCreateCalendarSource(undefined);
+    };
+    const onCreate = async (newCalendar: unknown) => {
+      const calendar = newCalendar as CalendarType;
+      await app.createCalendar(
+        createCalendarSource
+          ? { ...calendar, source: createCalendarSource }
+          : calendar
+      );
+      setShowCreateDialog(false);
+      setCreateCalendarSource(undefined);
+      refreshSidebar();
+    };
+
+    const generatorArgs = {
+      onClose,
+      onCreate,
+      app,
+    };
+
+    return h(ContentSlot, {
+      generatorName: 'createCalendarDialog',
+      generatorArgs,
+      defaultContent: h(CreateCalendarDialog, {
+        onClose,
+        onCreate,
+        app,
+      }),
+    });
+  };
+
+  const currentConfig = getSidebarConfig(app);
+  return {
+    enabled: true,
+    width: normalizeCssWidth(currentConfig.width, DEFAULT_SIDEBAR_WIDTH),
+    isCollapsed,
+    toggleCollapsed: () => setIsCollapsed(prev => !prev),
+    miniWidth: currentConfig.miniWidth ?? '50px',
+    content: renderContent(),
+    extraContent: renderExtraContent(),
+    safeAreaLeft: 0,
+  };
+}
+
 export function createSidebarPlugin(
   config: SidebarPluginConfig = {}
 ): CalendarPlugin {
@@ -151,222 +357,9 @@ export function createSidebarPlugin(
     name: 'sidebar',
     config,
     api: sidebarService,
-    install(_app: ICalendarApp) {
-      const sidebarWidth = normalizeCssWidth(
-        config.width,
-        DEFAULT_SIDEBAR_WIDTH
-      );
-
-      registerSidebarImplementation(
-        (app: ICalendarApp): SidebarBridgeReturn => {
-          const { t } = useLocale();
-
-          const [isCollapsed, setIsCollapsed] = useState(
-            config.initialCollapsed ?? false
-          );
-
-          // Keep the programmatic API in sync with the current render state.
-          controlRef.setCollapsed = setIsCollapsed;
-          controlRef.currentCollapsed = isCollapsed;
-
-          const [sidebarVersion, setSidebarVersion] = useState(0);
-          const [editingCalendarId, setEditingCalendarId] = useState<
-            string | null
-          >(null);
-          const [showCreateDialog, setShowCreateDialog] = useState(false);
-          const [createCalendarSource, setCreateCalendarSource] = useState<
-            string | undefined
-          >();
-          const isEditable = app.canMutateFromUI();
-
-          const refreshSidebar = useCallback(() => {
-            setSidebarVersion(prev => prev + 1);
-          }, []);
-
-          useEffect(
-            () =>
-              app.subscribe(() => {
-                refreshSidebar();
-              }),
-            [app, refreshSidebar]
-          );
-
-          const calendars = useMemo(
-            () => app.getCalendars(),
-            [app, sidebarVersion]
-          );
-
-          const handleToggleCalendarVisibility = useCallback(
-            (calendarId: string, visible: boolean) => {
-              app.setCalendarVisibility(calendarId, visible);
-              refreshSidebar();
-            },
-            [app, refreshSidebar]
-          );
-
-          const handleToggleAllCalendars = useCallback(
-            (visible: boolean) => {
-              app.setAllCalendarsVisibility(visible);
-              refreshSidebar();
-            },
-            [app, refreshSidebar]
-          );
-
-          const handleCreateCalendar = useCallback(
-            (source?: string) => {
-              if (!isEditable) return;
-
-              const createMode = config.createCalendarMode || 'inline';
-
-              if (createMode === 'modal') {
-                setCreateCalendarSource(source);
-                setShowCreateDialog(true);
-                return;
-              }
-
-              const randomColor =
-                COLORS[Math.floor(Math.random() * COLORS.length)];
-              const { colors, darkColors } =
-                getCalendarColorsForHex(randomColor);
-              const newId = generateUniKey();
-
-              const newCalendar: CalendarType = {
-                id: newId,
-                name: t('untitled'),
-                colors,
-                darkColors,
-                isVisible: true,
-                isDefault: false,
-                ...(source ? { source } : {}),
-              };
-
-              app.createCalendar(newCalendar);
-              setEditingCalendarId(newId);
-              refreshSidebar();
-            },
-            [app, isEditable, t, refreshSidebar]
-          );
-
-          useEffect(() => {
-            if (isEditable) return;
-
-            setShowCreateDialog(false);
-            setCreateCalendarSource(undefined);
-            setEditingCalendarId(null);
-          }, [isEditable]);
-
-          const sidebarProps: CalendarSidebarRenderProps = useMemo(() => {
-            const currentConfig = app.getPluginConfig(
-              'sidebar'
-            ) as SidebarPluginConfig;
-            return {
-              app,
-              calendars,
-              toggleCalendarVisibility: handleToggleCalendarVisibility,
-              toggleAll: handleToggleAllCalendars,
-              isCollapsed,
-              setCollapsed: setIsCollapsed,
-              showEventDots: currentConfig.showEventDots,
-              renderCalendarContextMenu:
-                currentConfig.renderCalendarContextMenu,
-              renderSidebarHeader: currentConfig.renderSidebarHeader,
-              createCalendarMode: currentConfig.createCalendarMode,
-              renderCreateCalendarDialog:
-                currentConfig.renderCreateCalendarDialog,
-              editingCalendarId,
-              setEditingCalendarId,
-              onCreateCalendar: handleCreateCalendar,
-              onSubscribeCalendar: currentConfig.onSubscribeCalendar,
-              onLoadSubscription: currentConfig.onLoadSubscription,
-              onReorder: currentConfig.onReorder,
-              groups: currentConfig.groups,
-              onGroupCreate: currentConfig.onGroupCreate,
-              onGroupRename: currentConfig.onGroupRename,
-              onGroupDelete: currentConfig.onGroupDelete,
-              onGroupReorder: currentConfig.onGroupReorder,
-              componentsOrder: currentConfig.componentsOrder,
-              groupStatus: currentConfig.groupStatus,
-            };
-          }, [
-            app,
-            calendars,
-            handleToggleCalendarVisibility,
-            handleToggleAllCalendars,
-            isCollapsed,
-            handleCreateCalendar,
-            editingCalendarId,
-            sidebarVersion, // Depend on sidebarVersion to refresh when config updates trigger notify()
-          ]);
-
-          const renderContent = () => {
-            const currentConfig = app.getPluginConfig(
-              'sidebar'
-            ) as SidebarPluginConfig;
-            if (
-              currentConfig.render ||
-              app.state.overrides.includes('sidebar')
-            ) {
-              return h(ContentSlot, {
-                generatorName: 'sidebar',
-                generatorArgs: sidebarProps,
-              });
-            }
-            return h(DefaultCalendarSidebar, {
-              ...sidebarProps,
-            });
-          };
-
-          const renderExtraContent = () => {
-            if (!isEditable || !showCreateDialog) return null;
-
-            const onClose = () => {
-              setShowCreateDialog(false);
-              setCreateCalendarSource(undefined);
-            };
-            const onCreate = async (newCalendar: unknown) => {
-              const calendar = newCalendar as CalendarType;
-              await app.createCalendar(
-                createCalendarSource
-                  ? { ...calendar, source: createCalendarSource }
-                  : calendar
-              );
-              setShowCreateDialog(false);
-              setCreateCalendarSource(undefined);
-              refreshSidebar();
-            };
-
-            const generatorArgs = {
-              onClose,
-              onCreate,
-              app,
-            };
-
-            return h(ContentSlot, {
-              generatorName: 'createCalendarDialog',
-              generatorArgs,
-              defaultContent: h(CreateCalendarDialog, {
-                onClose,
-                onCreate,
-                app,
-              }),
-            });
-          };
-
-          const currentConfig = app.getPluginConfig(
-            'sidebar'
-          ) as SidebarPluginConfig;
-          return {
-            enabled: true,
-            width: sidebarWidth,
-            isCollapsed,
-            toggleCollapsed: () => setIsCollapsed(prev => !prev),
-            miniWidth: currentConfig.miniWidth ?? '50px',
-            content: renderContent(),
-            extraContent: renderExtraContent(),
-            safeAreaLeft: 0,
-          };
-        }
-      );
+    install(app: ICalendarApp) {
+      controlRefs.set(app, controlRef);
+      registerSidebarImplementation(useSidebar);
     },
   };
 }

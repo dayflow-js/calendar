@@ -1,41 +1,53 @@
 import {
   CalendarApp,
+  createConfigSyncSnapshot,
   createNormalizedCalendarAppConfigGetter,
+  syncCalendarAppConfig,
 } from '@dayflow/core';
 import type { CalendarAppConfig, UseCalendarAppReturn } from '@dayflow/core';
 import { onDestroy } from 'svelte';
-import { get, writable } from 'svelte/store';
 
+/**
+ * Pass a getter (`() => ({ ... })`) or a `$state` object to have later config
+ * changes synced onto the app. A plain object is read once.
+ */
 export function useCalendarApp(
-  config: CalendarAppConfig
+  config: CalendarAppConfig | (() => CalendarAppConfig)
 ): UseCalendarAppReturn {
-  const getNormalizedConfig = createNormalizedCalendarAppConfigGetter(
-    () => config
-  );
+  const getConfig = typeof config === 'function' ? config : () => config;
+  const getNormalizedConfig =
+    createNormalizedCalendarAppConfigGetter(getConfig);
 
   const app = new CalendarApp(getNormalizedConfig());
+  let syncSnapshot = createConfigSyncSnapshot(getNormalizedConfig());
 
-  // Create a store for the parts of state we want to be reactive in Svelte
-  const stateStore = writable({
+  // The parts of app state that should be reactive in Svelte templates.
+  let state = $state.raw({
     currentView: app.state.currentView,
     currentDate: app.state.currentDate,
     events: app.getEvents(),
   });
 
-  const syncState = () => {
-    stateStore.set({
+  const unsubscribe = app.subscribe(() => {
+    state = {
       currentView: app.state.currentView,
       currentDate: app.state.currentDate,
       events: app.getEvents(),
-    });
-  };
+    };
+  });
 
-  const unsubscribe = app.subscribe(() => {
-    syncState();
+  // Re-runs whenever reactive state read by the config changes.
+  $effect(() => {
+    syncSnapshot = syncCalendarAppConfig(
+      app,
+      syncSnapshot,
+      getNormalizedConfig()
+    );
   });
 
   onDestroy(() => {
     unsubscribe();
+    app.destroy();
   });
 
   // Proxy the state properties
@@ -44,13 +56,13 @@ export function useCalendarApp(
       return app;
     },
     get currentView() {
-      return get(stateStore).currentView;
+      return state.currentView;
     },
     get currentDate() {
-      return get(stateStore).currentDate;
+      return state.currentDate;
     },
     get events() {
-      return get(stateStore).events;
+      return state.events;
     },
 
     applyEventsChanges: (...args: Parameters<typeof app.applyEventsChanges>) =>
