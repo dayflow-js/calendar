@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.6] - 2026-10-23
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.6 · `@dayflow/plugin-localization` 1.6.4 · `@dayflow/ui-context-menu` 1.2.2 · `@dayflow/ui-range-picker` 1.2.2. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Tasks (`@dayflow/core`)**: Add items with `kind: 'task'` and a single due date or time. Click the circle to complete a task; priorities show as colored stripes. Set `enableTasks: true` to add the Event / Task switch to the built-in editors (off by default). `setTaskCompleted` and `setTaskPriority` update tasks from code.
+- **Single-Date Picker (`@dayflow/ui-range-picker`)**: `mode: 'single'` picks one date or time.
+- **Task Labels (`@dayflow/plugin-localization`)**: Task and priority labels for every bundled language.
+
+### Fixed
+
+- **Mobile Event Drawer (`@dayflow/core`)**: Saving no longer shifts the event time when the device and calendar time zones differ.
+
+### Performance
+
+- **Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Bundlers can now drop unused components, and the Preact JSX runtime is shared instead of bundled. A Month-only calendar is about 4% smaller.
+
+### Changed
+
+- `@dayflow/ui-context-menu` and `@dayflow/ui-range-picker` now require `preact` 10.5 or later.
+
+### Documentation
+
+- Task guide in all documentation languages.
+
 ## [3.7.5] - 2026-10-17
 
 Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.5 · `@dayflow/plugin-localization` 1.6.3 · `@dayflow/plugin-sidebar` 1.6.5 · `@dayflow/ui-range-picker` 1.2.1. All other packages are unchanged.

@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import ts from 'typescript';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const coreRoot = path.resolve(__dirname, '..');
@@ -170,12 +172,6 @@ export function isDayFlowSelector(selector) {
   );
 }
 
-function stripComments(source) {
-  return source
-    .replaceAll(/\/\*[\s\S]*?\*\//g, ' ')
-    .replaceAll(/(^|[^:])\/\/.*$/gm, '$1');
-}
-
 function shouldSkipSourceFile(filePath) {
   return EXCLUDED_SOURCE_PATTERNS.some(pattern => pattern.test(filePath));
 }
@@ -295,54 +291,42 @@ function collectForbiddenTokens({
 }
 
 function scanStringLiterals(filePath, content) {
-  const stripped = stripComments(content);
+  // Parse literals instead of stripping comments with regex: URLs, regex literals,
+  // and PURE annotations in minified output can otherwise unbalance quotes and
+  // trigger excessive regex backtracking.
+  const scriptKind = filePath.endsWith('.tsx')
+    ? ts.ScriptKind.TSX
+    : filePath.endsWith('.ts')
+      ? ts.ScriptKind.TS
+      : ts.ScriptKind.JS;
+  const source = ts.createSourceFile(
+    filePath,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    scriptKind
+  );
   const matches = [];
-  const stringLiteralPattern = /(["'`])((?:\\.|(?!\1)[\s\S])*?)\1/g;
-
-  for (const match of stripped.matchAll(stringLiteralPattern)) {
-    const [fullMatch, quote, inner] = match;
-    if (!inner) continue;
-
-    matches.push(
-      ...collectForbiddenTokens({
-        filePath,
-        source: stripped,
-        literalContent: inner,
-        snippet: fullMatch,
-        index: match.index ?? 0,
-      })
-    );
-
-    if (quote === '`') {
-      const expressionPattern = /\$\{([\s\S]*?)\}/g;
-      for (const expressionMatch of inner.matchAll(expressionPattern)) {
-        const expression = expressionMatch[1];
-        if (!expression) continue;
-
-        for (const nestedMatch of expression.matchAll(stringLiteralPattern)) {
-          const [nestedFullMatch, , nestedInner] = nestedMatch;
-          if (!nestedInner) continue;
-
-          const nestedIndex =
-            (match.index ?? 0) +
-            (expressionMatch.index ?? 0) +
-            2 +
-            (nestedMatch.index ?? 0);
-
-          matches.push(
-            ...collectForbiddenTokens({
-              filePath,
-              source: stripped,
-              literalContent: nestedInner,
-              snippet: nestedFullMatch,
-              index: nestedIndex,
-            })
-          );
-        }
-      }
+  const visit = node => {
+    if (
+      ts.isStringLiteralLike(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      matches.push(
+        ...collectForbiddenTokens({
+          filePath,
+          source: content,
+          literalContent: node.text,
+          snippet: node.getText(source),
+          index: node.getStart(source),
+        })
+      );
     }
-  }
-
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
   return matches;
 }
 

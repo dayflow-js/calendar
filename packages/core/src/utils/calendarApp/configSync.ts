@@ -7,6 +7,7 @@ export type SyncableCalendarAppConfig = Pick<
   | 'calendars'
   | 'calendarSystem'
   | 'eventDetailTrigger'
+  | 'enableTasks'
   | 'locale'
   | 'readOnly'
   | 'switcherMode'
@@ -33,6 +34,7 @@ export function pickSyncableConfig(
   return {
     allDaySortComparator: config.allDaySortComparator,
     calendars: config.calendars,
+    enableTasks: config.enableTasks,
     calendarSystem: config.calendarSystem ?? 'gregorian',
     locale: config.locale,
     readOnly: config.readOnly,
@@ -75,6 +77,9 @@ export function getSyncConfigUpdates(
   if (previous.calendarSystem !== next.calendarSystem)
     updates.calendarSystem = next.calendarSystem;
 
+  if (previous.enableTasks !== next.enableTasks) {
+    updates.enableTasks = next.enableTasks ?? false;
+  }
   if (previous.views !== next.views) updates.views = next.views;
   if (!isDeepEqual(previous.calendars, next.calendars)) {
     updates.calendars = next.calendars;

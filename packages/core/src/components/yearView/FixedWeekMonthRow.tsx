@@ -1,9 +1,9 @@
-import { memo } from 'preact/compat';
 import { useMemo } from 'preact/hooks';
 
 import { useLocale } from '@/locale';
 import { Event, ICalendarApp } from '@/types';
 import { getTodayInTimeZone } from '@/utils';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 import { FixedWeekMonthData, MonthEventSegment } from './utils';
 import { YearEventBar } from './YearEventBar';
@@ -21,7 +21,8 @@ interface StaticEventsLayerProps {
 
 // Renders the non-dragged events for a month using lightweight YearEventBars.
 // every drag cell crossing.
-const StaticEventsLayer = memo(
+const StaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
+  'FixedWeekStaticEventsLayer',
   ({
     segments,
     totalColumns,
@@ -52,9 +53,6 @@ const StaticEventsLayer = memo(
   )
 );
 
-(StaticEventsLayer as { displayName?: string }).displayName =
-  'FixedWeekStaticEventsLayer';
-
 interface FixedWeekMonthRowProps {
   monthData: FixedWeekMonthData;
   startOfWeek: number;
@@ -73,7 +71,8 @@ interface FixedWeekMonthRowProps {
   isDraggable: boolean;
 }
 
-export const FixedWeekMonthRow = memo(
+export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
+  'FixedWeekMonthRow',
   ({
     monthData,
     startOfWeek,
@@ -178,6 +177,3 @@ export const FixedWeekMonthRow = memo(
     );
   }
 );
-
-(FixedWeekMonthRow as { displayName?: string }).displayName =
-  'FixedWeekMonthRow';

@@ -1,6 +1,11 @@
 import { CalendarDays } from '@/components/common/Icons';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { monthAllDayContent, eventIcon } from '@/styles/classNames';
-import { Event } from '@/types';
+import { Event, ICalendarApp } from '@/types';
+import { getLineColor, getPrimaryCalendarId } from '@/utils';
+import { isTask } from '@/utils/taskUtils';
+
+import { TaskCheckbox } from './TaskCheckbox';
 
 const mobileFadeStyle = {
   overflow: 'hidden',
@@ -14,13 +19,17 @@ const mobileFadeStyle = {
 
 interface MonthAllDayContentProps {
   event: Event;
+  app?: ICalendarApp;
   isEventSelected: boolean;
+  isEditable?: boolean;
   isMobile: boolean;
 }
 
 const MonthAllDayContent = ({
   event,
+  app,
   isEventSelected: _isEventSelected,
+  isEditable = false,
   isMobile,
 }: MonthAllDayContentProps) => {
   const showIcon = event.icon !== false;
@@ -28,7 +37,18 @@ const MonthAllDayContent = ({
 
   return (
     <div className={monthAllDayContent}>
-      {showIcon &&
+      {isTask(event) ? (
+        <TaskCheckbox
+          event={event}
+          app={app}
+          isEditable={isEditable}
+          color={getLineColor(
+            getPrimaryCalendarId(event),
+            app?.getCalendarRegistry()
+          )}
+        />
+      ) : (
+        showIcon &&
         (customIcon ? (
           <div className='df-event-icon-slot'>{customIcon}</div>
         ) : event.title.toLowerCase().includes('easter') ||
@@ -38,11 +58,13 @@ const MonthAllDayContent = ({
           <span className='df-event-icon-slot'>
             <CalendarDays className={eventIcon} />
           </span>
-        ))}
+        ))
+      )}
       <span
         className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
         style={isMobile ? mobileFadeStyle : undefined}
       >
+        <TaskPriorityIndicator event={event} />
         {event.title}
       </span>
     </div>

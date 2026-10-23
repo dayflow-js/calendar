@@ -42,8 +42,10 @@ const RangePicker = ({
   getPopupContainer,
   matchTriggerWidth = false,
   locale = 'en-US',
+  mode = 'range',
   calendarSystem = 'gregorian',
 }: RangePickerProps) => {
+  const isSingle = mode === 'single';
   const calendarId = calendarSystem === 'jalali' ? 'persian' : 'iso8601';
   const localeCode = useMemo(
     () =>
@@ -282,32 +284,40 @@ const RangePicker = ({
     committedRef.current = false;
   }, [isOpen, normalizedValue]);
 
+  const toOutputRange = useCallback(
+    (range: ZonedRange): ZonedRange =>
+      isSingle ? [range[0], range[0]] : range,
+    [isSingle]
+  );
+
   const emitChange = useCallback(
     (range: ZonedRange) => {
       if (!onChange) return;
+      const output = toOutputRange(range);
       onChange(
-        [range[0].withCalendar('iso8601'), range[1].withCalendar('iso8601')],
+        [output[0].withCalendar('iso8601'), output[1].withCalendar('iso8601')],
         [
-          formatTemporal(range[0], format, effectiveTimeFormat),
-          formatTemporal(range[1], format, effectiveTimeFormat),
+          formatTemporal(output[0], format, effectiveTimeFormat),
+          formatTemporal(output[1], format, effectiveTimeFormat),
         ]
       );
     },
-    [effectiveTimeFormat, format, onChange]
+    [effectiveTimeFormat, format, onChange, toOutputRange]
   );
 
   const emitOk = useCallback(
     (range: ZonedRange) => {
       if (!onOk) return;
+      const output = toOutputRange(range);
       onOk(
-        [range[0].withCalendar('iso8601'), range[1].withCalendar('iso8601')],
+        [output[0].withCalendar('iso8601'), output[1].withCalendar('iso8601')],
         [
-          formatTemporal(range[0], format, effectiveTimeFormat),
-          formatTemporal(range[1], format, effectiveTimeFormat),
+          formatTemporal(output[0], format, effectiveTimeFormat),
+          formatTemporal(output[1], format, effectiveTimeFormat),
         ]
       );
     },
-    [effectiveTimeFormat, format, onOk]
+    [effectiveTimeFormat, format, onOk, toOutputRange]
   );
 
   const buildValueWithDate = useCallback(
@@ -555,7 +565,7 @@ const RangePicker = ({
         updateRange(field, parsed);
         const month = parsed.toPlainDate().with({ day: 1 });
         setVisibleMonth(month);
-        if (field === 'start') setFocusedField('end');
+        if (field === 'start' && !isSingle) setFocusedField('end');
         return true;
       }
 
@@ -570,7 +580,14 @@ const RangePicker = ({
       });
       return false;
     },
-    [draftRange, effectiveTimeFormat, format, parseRegExp, updateRange]
+    [
+      draftRange,
+      effectiveTimeFormat,
+      format,
+      isSingle,
+      parseRegExp,
+      updateRange,
+    ]
   );
 
   const handleInputChange = useCallback(
@@ -815,27 +832,31 @@ const RangePicker = ({
           />
         </div>
 
-        <MoveRight className='df-range-picker-separator-icon' />
+        {!isSingle && (
+          <>
+            <MoveRight className='df-range-picker-separator-icon' />
 
-        <div className='df-range-picker-field-group'>
-          <input
-            type='text'
-            name='range-end'
-            aria-label={labels.endDate}
-            value={inputValues[1]}
-            onChange={handleInputChange('end')}
-            onFocus={() => openPanelForField('end')}
-            onClick={() => openPanelForField('end')}
-            onBlur={handleInputBlur('end')}
-            onKeyDown={handleInputKeyDown('end')}
-            className='df-range-picker-input'
-            data-disabled={disabled}
-            data-focused={focusedField === 'end' && isOpen}
-            placeholder={formatTemplate}
-            autoComplete='off'
-            disabled={disabled}
-          />
-        </div>
+            <div className='df-range-picker-field-group'>
+              <input
+                type='text'
+                name='range-end'
+                aria-label={labels.endDate}
+                value={inputValues[1]}
+                onChange={handleInputChange('end')}
+                onFocus={() => openPanelForField('end')}
+                onClick={() => openPanelForField('end')}
+                onBlur={handleInputBlur('end')}
+                onKeyDown={handleInputKeyDown('end')}
+                className='df-range-picker-input'
+                data-disabled={disabled}
+                data-focused={focusedField === 'end' && isOpen}
+                placeholder={formatTemplate}
+                autoComplete='off'
+                disabled={disabled}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {isOpen &&
@@ -846,7 +867,7 @@ const RangePicker = ({
                 monthLabels={monthLabels}
                 weekDayLabels={weekDayLabels}
                 calendarDays={calendarDays}
-                draftRange={draftRange}
+                draftRange={toOutputRange(draftRange)}
                 minDate={normalizedMinDate}
                 maxDate={normalizedMaxDate}
                 focusedField={focusedField}
@@ -873,7 +894,7 @@ const RangePicker = ({
                 monthLabels={monthLabels}
                 weekDayLabels={weekDayLabels}
                 calendarDays={calendarDays}
-                draftRange={draftRange}
+                draftRange={toOutputRange(draftRange)}
                 minDate={normalizedMinDate}
                 maxDate={normalizedMaxDate}
                 focusedField={focusedField}

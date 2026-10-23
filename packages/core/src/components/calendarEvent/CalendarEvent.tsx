@@ -21,6 +21,10 @@ import {
   buildDiagonalPatternBackground,
   temporalToVisualTemporal,
 } from '@/utils';
+import {
+  getTaskPriorityBackground,
+  getTaskPriorityTextColor,
+} from '@/utils/taskUtils';
 
 import { EventContent } from './components/EventContent';
 import { useClickOutside } from './hooks/useClickOutside';
@@ -449,6 +453,8 @@ const CalendarEvent = ({
       <div
         ref={eventRef}
         data-event-id={event.id}
+        data-kind={event.kind ?? 'event'}
+        data-task-completed={String(!!event.task?.completed)}
         data-detail-panel-key={detailPanelKey}
         data-view={viewType}
         data-all-day={String(isAllDay)}
@@ -489,6 +495,12 @@ const CalendarEvent = ({
                   ),
                   color: getEventTextColor(calendarId, calendarRegistry),
                 }),
+          ...(event.kind === 'task'
+            ? {
+                background: getTaskPriorityBackground(event, isEventSelected),
+                color: getTaskPriorityTextColor(event, isEventSelected),
+              }
+            : {}),
           ...styleOverride,
           // Prevent the browser from handling this touch as a scroll or zoom
           // gesture. CSS touch-action is evaluated before any JS runs, so it
@@ -594,4 +606,4 @@ const CalendarEvent = ({
   );
 };
 
-export default memo(CalendarEvent);
+export default /* @__PURE__ */ memo(CalendarEvent);

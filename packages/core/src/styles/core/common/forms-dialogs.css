@@ -842,8 +842,8 @@
   .df-event-detail-panel {
     position: fixed;
     box-sizing: border-box;
-    width: min(28rem, calc(100vw - 16px));
-    max-width: min(28rem, calc(100vw - 16px));
+    width: min(25rem, calc(100vw - 16px));
+    max-width: min(25rem, calc(100vw - 16px));
     max-height: calc(100dvh - 16px);
     overflow: hidden;
     border-width: 1px;
@@ -874,21 +874,21 @@
     border-style: solid;
     border-radius: 0.5rem;
     padding: 1.5rem;
-    max-width: 28rem;
-    width: min(28rem, calc(100vw - 32px));
+    max-width: 25rem;
+    width: min(25rem, calc(100vw - 32px));
     margin-inline: 1rem;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   }
 
   /* Set once on open by EventNotesField when the notes would wrap or scroll. */
   .df-event-detail-panel[data-notes-wide='true'] {
-    width: min(calc(28rem + 30px), calc(100vw - 16px));
-    max-width: min(calc(28rem + 30px), calc(100vw - 16px));
+    width: min(calc(25rem + 30px), calc(100vw - 16px));
+    max-width: min(calc(25rem + 30px), calc(100vw - 16px));
   }
 
   .df-dialog-container[data-notes-wide='true'] {
-    max-width: calc(28rem + 30px);
-    width: min(calc(28rem + 30px), calc(100vw - 32px));
+    max-width: calc(25rem + 30px);
+    width: min(calc(25rem + 30px), calc(100vw - 32px));
   }
 
   /* Close button icon sizing */
@@ -950,5 +950,52 @@
   .df-default-color-picker {
     display: flex;
     justify-content: center;
+  }
+
+  /* Event / Task switch */
+  .df-kind-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.125rem;
+    margin-bottom: 0.75rem;
+    padding: 0.125rem;
+    border-radius: 0.5rem;
+    background-color: var(--df-color-muted);
+  }
+
+  .df-kind-switch-option {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--df-color-muted-foreground);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    cursor: pointer;
+  }
+
+  .df-kind-switch-option[data-active='true'] {
+    background-color: var(--df-color-card);
+    color: var(--df-color-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+  }
+
+  .df-kind-switch-option:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .df-kind-switch-option:focus-visible {
+    outline: 2px solid var(--df-color-ring);
+    outline-offset: -2px;
+  }
+
+  .df-mobile-event-drawer-body > .df-kind-switch {
+    margin-bottom: 0;
+  }
+
+  .df-task-priority-field {
+    margin-bottom: 1rem;
   }
 }

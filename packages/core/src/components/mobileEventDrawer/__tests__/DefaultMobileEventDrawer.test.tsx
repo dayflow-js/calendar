@@ -3,11 +3,13 @@ import { Temporal } from 'temporal-polyfill';
 
 import { MobileEventDrawer } from '@/components/mobileEventDrawer/DefaultMobileEventDrawer';
 import { CalendarApp } from '@/core/CalendarApp';
+import { LocaleProvider } from '@/locale';
 import { ViewType } from '@/types';
 
 const createApp = () =>
   new CalendarApp({
     views: [],
+    enableTasks: true,
     plugins: [],
     defaultView: ViewType.MONTH,
     events: [
@@ -138,5 +140,101 @@ describe('MobileEventDrawer', () => {
     );
 
     expect(document.querySelector('.df-mobile-event-drawer')).toBeNull();
+  });
+
+  it('saves a task without an end time, keeping edited notes', () => {
+    const app = createApp();
+    const onSave = vi.fn();
+
+    render(
+      <LocaleProvider>
+        <MobileEventDrawer
+          isOpen
+          onClose={vi.fn()}
+          onSave={onSave}
+          onEventDelete={vi.fn()}
+          draftEvent={app.getEvents()[0]}
+          app={app}
+        />
+      </LocaleProvider>
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Task' }));
+    expect(screen.queryByText('Ends')).toBeNull();
+    expect(screen.getByText('Due')).toBeInTheDocument();
+    expect(screen.getByText('Edit Task')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Priority'));
+    fireEvent.click(screen.getByRole('option', { name: 'High' }));
+
+    fireEvent.input(screen.getByDisplayValue('Saved notes'), {
+      target: { value: 'Bring slides' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    const saved = onSave.mock.calls[0][0];
+    expect(saved.kind).toBe('task');
+    expect(saved.end.toString()).toBe(saved.start.toString());
+    expect(saved.description).toBe('Bring slides');
+    expect(saved.task.priority).toBe('high');
+  });
+
+  it('gives a task an hour again when switched back to an event', () => {
+    const app = createApp();
+    const onSave = vi.fn();
+    const stored = app.getEvents()[0];
+
+    render(
+      <LocaleProvider>
+        <MobileEventDrawer
+          isOpen
+          onClose={vi.fn()}
+          onSave={onSave}
+          onEventDelete={vi.fn()}
+          draftEvent={{ ...stored, kind: 'task', end: stored.start }}
+          app={app}
+        />
+      </LocaleProvider>
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Event' }));
+    expect(screen.getByText('Ends')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+
+    const saved = onSave.mock.calls[0][0];
+    expect(saved.kind).toBeUndefined();
+    expect(saved.task).toBeUndefined();
+    expect(saved.end.toString()).toBe(stored.end.toString());
+  });
+
+  // Times are edited in the calendar time zone, whatever the system zone is
+  // (CI runs in UTC, the calendar here in Sydney).
+  it('keeps the event time when only the title changes', () => {
+    const app = createApp();
+    const onSave = vi.fn();
+    const stored = app.getEvents()[0];
+
+    render(
+      <LocaleProvider>
+        <MobileEventDrawer
+          isOpen
+          onClose={vi.fn()}
+          onSave={onSave}
+          onEventDelete={vi.fn()}
+          draftEvent={stored}
+          app={app}
+        />
+      </LocaleProvider>
+    );
+
+    fireEvent.input(screen.getByDisplayValue('Existing event'), {
+      target: { value: 'Renamed' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+
+    const saved = onSave.mock.calls[0][0];
+    expect(saved.title).toBe('Renamed');
+    expect(saved.start.toString()).toBe(stored.start.toString());
+    expect(saved.end.toString()).toBe(stored.end.toString());
   });
 });

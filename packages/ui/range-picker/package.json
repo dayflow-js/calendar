@@ -60,7 +60,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "preact": ">=10",
+    "preact": ">=10.5",
     "temporal-polyfill": ">=0.2"
   }
 }

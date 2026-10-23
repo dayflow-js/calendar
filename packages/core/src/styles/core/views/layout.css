@@ -310,6 +310,12 @@
     flex-shrink: 0;
   }
 
+  .df-agenda-event .df-task-checkbox {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-right: 0;
+  }
+
   .df-agenda-title {
     min-width: 0;
     font-size: 1rem;
@@ -965,6 +971,21 @@
 
   .df-right-panel-event-item {
     margin-bottom: 0.5rem;
+  }
+
+  .df-right-panel-task-content {
+    padding: 0.375rem 0.5rem;
+    min-width: 0;
+  }
+
+  .df-right-panel-event-card[data-kind='task'] .df-event-all-day-shell {
+    position: static;
+    padding: 0;
+  }
+
+  .df-right-panel-task-content .df-event-time {
+    padding-left: 1.125rem;
+    margin-top: 0.125rem;
   }
 
   .df-week-time-grid {

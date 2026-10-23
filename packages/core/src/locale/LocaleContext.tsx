@@ -20,7 +20,7 @@ export interface LocaleContextValue {
   isDefault?: boolean;
 }
 
-export const LocaleContext = createContext<LocaleContextValue>({
+export const LocaleContext = /* @__PURE__ */ createContext<LocaleContextValue>({
   locale: 'en-US',
   t: key => key,
   getWeekDaysLabels: () => [],

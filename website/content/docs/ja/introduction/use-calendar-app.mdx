@@ -123,6 +123,7 @@ title: 'useCalendarApp'
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | 任意 | `'dbClick'`                              | デスクトップでイベント詳細をシングルクリックまたはダブルクリックのどちらで開くかを制御します。タッチ入力では常にタップで開きます。           |
 | `useCalendarHeader`    | `boolean`                   | 任意 | `true`                                   | デフォルトヘッダーの有効化（`true`）または非表示（`false`）。カスタムヘッダーは `DayFlowCalendar` の `calendarHeader` スロットを使用します。 |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | 任意 | `false`                                  | 組み込みの変更 UI を無効化。真偽値、または詳細制御（ドラッグ/表示）用の設定オブジェクト。プログラム API は引き続き利用可能。                 |
+| `enableTasks`          | `boolean`                   | 任意 | `false`                                  | 組み込みエディターに「予定 / タスク」の切り替えを表示。オフでも既存タスクは編集可能。[タスク](/docs-ja/features/tasks)。                     |
 | `allDaySortComparator` | `AllDaySortComparator`      | 任意 | カレンダーグループ順（複数日終日は先頭） | 全ビューでの終日イベントの行順を制御するカスタム比較関数。指定するとデフォルト順を完全に上書きします。                                       |
 
 ## それぞれのポイント

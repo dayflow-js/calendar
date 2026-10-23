@@ -1,5 +1,6 @@
 import { ComponentChildren } from 'preact';
 
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import {
   eventColorBar,
   eventTitleSmall,
@@ -20,6 +21,9 @@ import {
   getEventEndHour,
   formatTimeRangeFormatted,
 } from '@/utils';
+import { isTask } from '@/utils/taskUtils';
+
+import { TaskCheckbox } from './TaskCheckbox';
 
 interface RegularEventContentProps {
   event: Event;
@@ -81,7 +85,8 @@ const RegularEventContent = ({
 
   const lineColors = getCalendarLineColors(event, app?.getCalendarRegistry());
   const colorBarValue = buildDiagonalColorBarGradient(lineColors);
-  const hideColorBar = isEventSelected && lineColors.length > 1;
+  const hideColorBar =
+    isTask(event) || (isEventSelected && lineColors.length > 1);
   const colorBarContent = hideColorBar ? null : lineColors.length > 1 ? (
     <div
       className='df-event-color-bar-overlay'
@@ -104,6 +109,15 @@ const RegularEventContent = ({
         <div
           className={`${eventTitleSmall} ${duration <= 0.25 ? 'df-event-title-tight' : ''}`}
         >
+          {isTask(event) && (
+            <TaskCheckbox
+              event={event}
+              app={app}
+              isEditable={isEditable}
+              color={lineColors[0]}
+            />
+          )}
+          <TaskPriorityIndicator event={event} />
           {event.title}
         </div>
         {duration > 0.5 && (

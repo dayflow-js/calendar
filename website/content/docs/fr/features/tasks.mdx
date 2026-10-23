@@ -1,0 +1,143 @@
+---
+title: Tâches
+description: Ajoutez au calendrier des tâches avec une échéance, un état terminé et une priorité.
+---
+
+# Tâches
+
+Les tâches partagent le modèle de données `Event` et l'attribution à un calendrier avec les événements classiques.
+Au lieu d'une durée, une tâche a une seule date ou heure d'échéance. Son cercle bascule l'état
+terminé ; son fond rayé et la couleur du texte indiquent la priorité.
+
+## Activer la création de tâches
+
+Définissez `enableTasks: true` pour afficher le sélecteur Événement / Tâche dans le panneau de
+bureau, la boîte de dialogue et l'éditeur mobile intégrés. La valeur par défaut est `false`, ce
+qui conserve l'interface actuelle de création d'événements. Les tâches existantes restent
+visibles et modifiables lorsque l'option est désactivée.
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+L'option fait partie de `CalendarAppConfig` et fonctionne avec tous les adaptateurs de framework.
+Pour la modifier sur une instance core existante :
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+Il s'agit d'une option d'exécution de l'éditeur ; la désactiver ne retire pas le code des tâches
+du bundle.
+
+## Créer une tâche horaire ou sur la journée entière
+
+Utilisez `kind: 'task'`. `start` et `end` doivent contenir la même valeur d'échéance.
+Pour une tâche sans heure, définissez `allDay: true` et utilisez `Temporal.PlainDate`.
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+Transmettez ces éléments via la configuration `events`, ou utilisez les API d'événements
+habituelles pour les ajouter, les mettre à jour ou les supprimer. Ajoutez `calendarId` pour les
+attribuer à un calendrier précis.
+
+| Champ              | Type                                    | Signification                                             |
+| ------------------ | --------------------------------------- | --------------------------------------------------------- |
+| `kind`             | `'event' \| 'task'`                     | Vaut `'event'` s'il est omis.                             |
+| `task.completed`   | `boolean`                               | Par défaut : `false`.                                     |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | Horodatage de fin ; effacé lorsque la tâche est rouverte. |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | Par défaut : `'none'`.                                    |
+
+## Terminer des tâches et changer la priorité
+
+Cliquez sur le cercle à gauche pour terminer ou rouvrir une tâche. Cela n'ouvre pas le panneau de
+détails et ne lance pas de glisser-déposer. Au clavier, placez le focus sur le cercle et appuyez
+sur Espace ou Entrée. Les titres terminés sont barrés.
+
+Ouvrez les détails de la tâche pour modifier son titre, sa date ou son heure d'échéance, ses
+notes ou sa priorité. **Définir comme toute la journée** retire l'heure ; **Ajouter une heure**
+la rétablit. Les tâches peuvent être déplacées, mais pas redimensionnées.
+
+| Priorité | Couleur du fond et du texte |
+| -------- | --------------------------- |
+| `none`   | Ardoise                     |
+| `low`    | Vert                        |
+| `medium` | Ambre                       |
+| `high`   | Rouge                       |
+
+La priorité remplit toute la tâche de rayures diagonales. Le cercle reprend la couleur du
+calendrier et devient blanc lorsque la tâche est sélectionnée. La priorité ne modifie pas l'ordre
+chronologique. Dans la vue Mois, les tâches sur la journée entière gardent le style de ligne de
+tâche, sans libellé d'heure. Dans les vues Jour et Semaine, les tâches n'ont pas la barre de
+couleur des événements.
+
+La [démo interactive](/demo) comporte un interrupteur **Tasks** et une infobulle **Preview** qui
+illustre la fin d'une tâche et le changement de priorité dans le panneau de détails.
+
+## Mises à jour programmatiques et persistance
+
+Les modifications de tâches utilisent le même callback `onEventUpdate` que celles des événements.
+Enregistrez `kind` et les métadonnées `task` avec les dates de l'événement dans votre source de
+données.
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+Les fonctions utilitaires renvoient les valeurs mises à jour ; elles n'enregistrent rien
+elles-mêmes. Le [mode lecture seule](/docs-fr/features/read-only) désactive la fin et l'édition
+des tâches dans l'interface intégrée, tandis que les mises à jour programmatiques fonctionnent
+toujours.
+
+Les occurrences générées d'événements récurrents ne peuvent pas être terminées indépendamment.
+La synchronisation des tâches CalDAV externes (`VTODO`) n'est pas implémentée ; ne supposez pas
+que la synchronisation des événements conserve les champs propres aux tâches.

@@ -1,6 +1,7 @@
 import { ComponentChildren } from 'preact';
 
 import { CalendarDays } from '@/components/common/Icons';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { MultiDayEventSegment } from '@/components/monthView/util';
 import {
   eventIcon,
@@ -8,10 +9,15 @@ import {
   resizeHandleLeft,
   resizeHandleRight,
 } from '@/styles/classNames';
-import { Event } from '@/types';
+import { Event, ICalendarApp } from '@/types';
+import { getLineColor, getPrimaryCalendarId } from '@/utils';
+import { isTask } from '@/utils/taskUtils';
+
+import { TaskCheckbox } from './TaskCheckbox';
 
 interface AllDayContentProps {
   event: Event;
+  app?: ICalendarApp;
   isEditable: boolean;
   onResizeStart?: (e: MouseEvent, event: Event, direction: string) => void;
   isMultiDay?: boolean;
@@ -23,6 +29,7 @@ interface AllDayContentProps {
 
 const AllDayContent = ({
   event,
+  app,
   isEditable,
   onResizeStart,
   isMultiDay,
@@ -61,15 +68,28 @@ const AllDayContent = ({
 
   const innerContent = (
     <div className='df-event-content-row'>
-      {showIcon &&
+      {isTask(event) ? (
+        <TaskCheckbox
+          event={event}
+          app={app}
+          isEditable={isEditable}
+          color={getLineColor(
+            getPrimaryCalendarId(event),
+            app?.getCalendarRegistry()
+          )}
+        />
+      ) : (
+        showIcon &&
         (customIcon ? (
           <div className='df-event-icon-slot'>{customIcon}</div>
         ) : (
           <span className='df-event-icon-slot'>
             <CalendarDays className={eventIcon} />
           </span>
-        ))}
+        ))
+      )}
       <div className={`${eventTitleSmall} df-event-title-tight`}>
+        <TaskPriorityIndicator event={event} />
         {event.title}
       </div>
     </div>

@@ -9,6 +9,7 @@ export interface CalendarFeatures {
   showSidebar: boolean;
   showHeader: boolean;
   enableDrag: boolean;
+  enableTasks: boolean;
   enableShortcuts: boolean;
   showEventDots: boolean;
   showCalendarGroups: boolean;

@@ -123,6 +123,7 @@ title: 'useCalendarApp'
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | 可选 | `'dbClick'`                    | 控制桌面端事件详情通过单击还是双击打开。触摸端始终单击/轻触打开详情                                                       |
 | `useCalendarHeader`    | `boolean`                   | 可选 | `true`                         | 启用默认页眉（`true`）或隐藏页眉（`false`）。自定义页眉请使用 `DayFlowCalendar` 上的 `calendarHeader` 插槽                |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | 可选 | `false`                        | 禁用内置修改 UI。可以是布尔值，也可以是用于细粒度控制（拖拽/查看）的配置对象。程序化事件 API 仍然可用                     |
+| `enableTasks`          | `boolean`                   | 可选 | `false`                        | 在内置编辑器中显示 Event / Task 切换。关闭后已有任务仍可编辑。[任务文档](/docs-zh/features/tasks)。                       |
 | `allDaySortComparator` | `AllDaySortComparator`      | 可选 | 按日历分组，且跨天全天事件优先 | 控制所有视图中全天事件行顺序的自定义比较函数。传入后会完全覆盖默认顺序                                                    |
 
 ## 核心选项说明

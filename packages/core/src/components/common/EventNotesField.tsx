@@ -180,7 +180,7 @@ const availableNotesHeight = (container: HTMLElement, frame: HTMLElement) => {
   return Math.max(48, window.innerHeight - 16 - otherHeight);
 };
 
-/** Extra width (px) the wide layout adds on top of 28rem. */
+/** Extra width (px) the wide layout adds on top of 25rem. */
 const WIDE_EXTRA = 30;
 
 /** Unwrapped width of each line, measured from the content box's left edge. */
@@ -225,7 +225,7 @@ function measureLineWidths(content: HTMLElement): number[] {
 }
 
 /**
- * Whether the notes need the wide layout: some line wraps at 28rem but would
+ * Whether the notes need the wide layout: some line wraps at 25rem but would
  * fit on one line with the extra width, or the notes are too tall to fit.
  */
 function needsWideLayout(

@@ -317,6 +317,9 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useEventDetailDialog?: boolean;
   useEventDetailPanel?: boolean;
+  /** Enable task creation/type switching in the built-in editors. Defaults to false.
+   * Existing task data remains visible and editable when disabled. */
+  enableTasks?: boolean;
   /**
    * Gesture that opens the event detail panel/dialog on desktop.
    * - 'dbClick' (default): single-click selects, double-click opens (Mac Calendar style).
@@ -504,6 +507,7 @@ export interface ICalendarApp {
 
   // Get whether to use event detail panel
   getUseEventDetailPanel: () => boolean;
+  getTasksEnabled: () => boolean;
 
   // Whether any event-detail UI (panel or dialog) is enabled. Behavior gates
   // (e.g. open-on-double-click) should use this instead of the per-UI flags.

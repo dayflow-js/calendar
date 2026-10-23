@@ -123,6 +123,7 @@ title: useCalendarApp
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | Optional | `'dbClick'`                                              | Controls whether desktop event details open on single click or double click. Touch input always opens details with a single tap.        |
 | `useCalendarHeader`    | `boolean`                   | Optional | `true`                                                   | Enables the default header (`true`) or hides it (`false`). For a custom header, use the `calendarHeader` slot on `DayFlowCalendar`.     |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | Optional | `false`                                                  | Disables built-in mutation UI. Can be a boolean or a config for fine-grained control (drag/view). Programmatic event APIs still work.   |
+| `enableTasks`          | `boolean`                   | Optional | `false`                                                  | Shows the Event / Task switch in built-in editors. Existing tasks remain editable when off. [Task guide](/docs/features/tasks).         |
 | `allDaySortComparator` | `AllDaySortComparator`      | Optional | Calendar-group order with multi-day all-day events first | Custom comparator controlling the row order of all-day events across all views. When provided, it fully overrides the default order.    |
 
 ## Key Options

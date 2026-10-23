@@ -14,7 +14,7 @@ export default [
       },
     ],
     plugins: [resolve({ extensions: ['.js', '.jsx'] }), commonjs()],
-    external: ['preact', 'preact/hooks', 'preact/compat'],
+    external: ['preact', 'preact/hooks', 'preact/compat', 'preact/jsx-runtime'],
   },
   {
     input: 'dist/types/index.d.ts',

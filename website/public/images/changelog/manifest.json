@@ -1,0 +1,67 @@
+{
+  "agenda-view": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Events grouped by day in Agenda view"
+  },
+  "appointments": {
+    "width": 1440,
+    "height": 826,
+    "alt": "The appointment schedule editor beside a week calendar"
+  },
+  "calendar-picker-groups": {
+    "width": 1032,
+    "height": 1192,
+    "alt": "The calendar picker grouped by Google and iCloud"
+  },
+  "calendar-sources": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Sidebar calendars grouped by source"
+  },
+  "meeting-links": {
+    "width": 1206,
+    "height": 1192,
+    "alt": "A Google Meet link with a Join button in the event details"
+  },
+  "month-view": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Month view with the sidebar and mini calendar"
+  },
+  "multi-calendar": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Events shared across calendars with striped colors in Month view"
+  },
+  "recurrence": {
+    "width": 960,
+    "height": 768,
+    "alt": "The custom repeat dialog"
+  },
+  "rich-notes": {
+    "width": 1212,
+    "height": 1192,
+    "alt": "Formatted notes with a Join button detected from a Zoom link"
+  },
+  "tasks": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Tasks with priorities beside events in Day view"
+  },
+  "tasks-priority": {
+    "width": 1206,
+    "height": 1124,
+    "alt": "Choosing a task priority in the detail panel"
+  },
+  "time-zones": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Week view with a secondary London timeline"
+  },
+  "year-grid": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Grid Year view with event density colors"
+  }
+}

@@ -1,5 +1,4 @@
 import { RefObject } from 'preact';
-import { memo } from 'preact/compat';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import CalendarEvent from '@/components/calendarEvent';
@@ -10,6 +9,7 @@ import { monthTitle } from '@/styles/classNames';
 import { MonthEventDragState, Event, ViewType, ICalendarApp } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { scrollbarTakesSpace, temporalToVisualDate } from '@/utils';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 import {
   analyzeMultiDayEventsForWeek,
@@ -77,7 +77,8 @@ interface WeekComponentProps {
 const MULTI_DAY_TOP_OFFSET = 33;
 const MORE_TEXT_HEIGHT = 20; // Height reserved for the "+ x more" indicator
 
-const WeekComponent = memo(
+const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
+  'WeekComponent',
   ({
     currentMonth,
     currentYear,
@@ -657,7 +658,5 @@ const WeekComponent = memo(
     prevProps.enableTouch === nextProps.enableTouch &&
     prevProps.appTimeZone === nextProps.appTimeZone
 );
-
-(WeekComponent as { displayName?: string }).displayName = 'WeekComponent';
 
 export default WeekComponent;

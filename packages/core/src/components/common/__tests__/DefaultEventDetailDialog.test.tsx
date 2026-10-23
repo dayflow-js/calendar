@@ -1,4 +1,4 @@
-import { render } from '@testing-library/preact';
+import { fireEvent, render, screen } from '@testing-library/preact';
 import { Temporal } from 'temporal-polyfill';
 
 import DefaultEventDetailDialog from '@/components/common/DefaultEventDetailDialog';
@@ -22,6 +22,7 @@ const event: Event = {
 const createApp = () =>
   new CalendarApp({
     views: [],
+    enableTasks: true,
     plugins: [],
     defaultView: ViewType.MONTH,
     events: [event],
@@ -40,14 +41,14 @@ const createApp = () =>
     timeZone: 'Australia/Sydney',
   });
 
-const renderDialog = (app?: CalendarApp) =>
+const renderDialog = (app?: CalendarApp, onEventUpdate = vi.fn()) =>
   render(
     <LocaleProvider>
       <DefaultEventDetailDialog
         event={event}
         isOpen
         isAllDay={false}
-        onEventUpdate={vi.fn()}
+        onEventUpdate={onEventUpdate}
         onEventDelete={vi.fn()}
         onClose={vi.fn()}
         app={app}
@@ -83,5 +84,53 @@ describe('DefaultEventDetailDialog', () => {
     vi.spyOn(app, 'getReadOnlyConfig').mockReturnValue({ viewable: false });
     renderDialog(app);
     expect(dialogIsShown()).toBe(false);
+  });
+
+  it('keeps task creation opt-in and supports enabling it at runtime', () => {
+    const app = new CalendarApp({ views: [], events: [event] });
+    expect(app.getTasksEnabled()).toBe(false);
+    renderDialog(app);
+    expect(screen.queryByRole('radio', { name: 'Task' })).toBeNull();
+    app.updateConfig({ enableTasks: true });
+    expect(app.getTasksEnabled()).toBe(true);
+  });
+
+  it('sets a task to all day with a date-only due value', async () => {
+    const onEventUpdate = vi.fn();
+    renderDialog(createApp(), onEventUpdate);
+    fireEvent.click(screen.getByRole('radio', { name: 'Task' }));
+    expect(screen.queryByRole('button', { name: 'Remove time' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Set as All-day' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await vi.waitFor(() => expect(onEventUpdate).toHaveBeenCalledTimes(1));
+    const saved = onEventUpdate.mock.calls[0][0] as Event;
+    expect(saved.allDay).toBe(true);
+    expect(saved.start).toBeInstanceOf(Temporal.PlainDate);
+    expect(saved.end.toString()).toBe(saved.start.toString());
+  });
+
+  it('switches to a task with a single due time and saves it', async () => {
+    const onEventUpdate = vi.fn();
+    renderDialog(createApp(), onEventUpdate);
+
+    expect(document.querySelector('.df-event-conference-field')).not.toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: 'Task' }));
+
+    expect(screen.getByRole('radio', { name: 'Task' })).toHaveAttribute(
+      'aria-checked',
+      'true'
+    );
+    expect(screen.getByText('Due')).toBeInTheDocument();
+    expect(screen.getByLabelText('Priority')).toBeInTheDocument();
+    expect(document.querySelector('.df-event-conference-field')).toBeNull();
+    expect(document.querySelector('input[name="range-start"]')).not.toBeNull();
+    expect(document.querySelector('input[name="range-end"]')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await vi.waitFor(() => expect(onEventUpdate).toHaveBeenCalledTimes(1));
+    const saved = onEventUpdate.mock.calls[0][0] as Event;
+    expect(saved.kind).toBe('task');
+    expect(saved.end.toString()).toBe(saved.start.toString());
   });
 });

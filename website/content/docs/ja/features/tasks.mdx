@@ -1,0 +1,135 @@
+---
+title: タスク
+description: 期限・完了状態・優先度を持つタスクをカレンダーに追加します。
+---
+
+# タスク
+
+タスクは通常の予定と同じ `Event` データモデルとカレンダー割り当てを使います。
+期間ではなく、期限となる日付または日時を 1 つだけ持ちます。左側の円で完了状態を切り替え、
+ストライプの背景と文字色で優先度を表します。
+
+## タスク作成を有効にする
+
+`enableTasks: true` を設定すると、組み込みのデスクトップパネル、ダイアログ、モバイルエディターに
+「予定 / タスク」の切り替えが表示されます。既定値は `false` で、既存の予定作成 UI はそのまま維持されます。
+このオプションがオフでも、既存のタスクは表示・編集できます。
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+このオプションは `CalendarAppConfig` の一部で、すべてのフレームワークアダプターで使えます。
+既存の core インスタンスで変更するには次のようにします。
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+これはエディターの実行時オプションです。無効にしても、タスク関連のコードはバンドルから除かれません。
+
+## 時刻付き・終日のタスクを作成する
+
+`kind: 'task'` を指定します。`start` と `end` には同じ期限の値を入れてください。
+時刻のないタスクは `allDay: true` を設定し、`Temporal.PlainDate` を使います。
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+これらは `events` 設定で渡すか、通常のイベント API で追加・更新・削除します。
+特定のカレンダーに割り当てるには `calendarId` を追加します。
+
+| フィールド         | 型                                      | 意味                                   |
+| ------------------ | --------------------------------------- | -------------------------------------- |
+| `kind`             | `'event' \| 'task'`                     | 省略時は `'event'`。                   |
+| `task.completed`   | `boolean`                               | 既定値は `false`。                     |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | 完了日時。未完了に戻すと消去されます。 |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | 既定値は `'none'`。                    |
+
+## タスクの完了と優先度の変更
+
+左側の円をクリックすると、タスクを完了にしたり未完了に戻したりできます。詳細パネルは開かず、
+ドラッグも始まりません。キーボードでは円にフォーカスして Space または Enter を押します。
+完了したタスクのタイトルには取り消し線が付きます。
+
+タスクの詳細を開くと、タイトル、期限の日付・時刻、メモ、優先度を変更できます。
+**終日予定に設定** で時刻を外し、**時刻を指定** で時刻を戻します。タスクは移動できますが、
+長さの変更はできません。
+
+| 優先度   | 背景色と文字色 |
+| -------- | -------------- |
+| `none`   | スレート       |
+| `low`    | 緑             |
+| `medium` | アンバー       |
+| `high`   | 赤             |
+
+優先度はタスク全体を斜めのストライプで塗ります。円はカレンダーの色を使い、選択中は白になります。
+優先度によって時系列の並び順は変わりません。月ビューでは終日タスクも時刻ラベルのないタスク行の
+スタイルで表示されます。日・週ビューのタスクには予定のカラーバーがありません。
+
+[インタラクティブデモ](/demo)には **Tasks** スイッチと **Preview** ツールチップがあり、
+完了操作と詳細パネルでの優先度変更を確認できます。
+
+## プログラムからの更新と永続化
+
+タスクの変更は、予定の変更と同じ `onEventUpdate` コールバックを使います。
+`kind` と `task` のメタデータを、予定の日時と一緒にデータソースへ保存してください。
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+ヘルパーは更新後の値を返すだけで、変更を保存はしません。
+[読み取り専用モード](/docs-ja/features/read-only)では組み込み UI からの完了・編集が無効になりますが、
+プログラムからの更新は引き続き動作します。
+
+繰り返し予定から生成された各回を個別に完了にすることはできません。外部の CalDAV タスク（`VTODO`）の
+同期は未実装です。予定の同期でタスク固有のフィールドが保持されるとは考えないでください。
