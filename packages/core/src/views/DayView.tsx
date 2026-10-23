@@ -8,6 +8,10 @@ import {
   useLayoutEffect,
 } from 'preact/hooks';
 
+import {
+  addCalendarMonths,
+  startOfCalendarMonth,
+} from '@/calendar/calendarSystem';
 import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import { DayContent } from '@/components/dayView/DayContent';
 import { RightPanel } from '@/components/dayView/RightPanel';
@@ -149,7 +153,11 @@ const DayView = ({
   const handleMonthChange = useCallback(
     (offset: number) => {
       setVisibleMonth(prev => {
-        const next = new Date(prev.getFullYear(), prev.getMonth() + offset, 1);
+        const next = addCalendarMonths(
+          startOfCalendarMonth(prev, app.state.calendarSystem),
+          offset,
+          app.state.calendarSystem
+        );
         app.setVisibleMonth(next);
         return next;
       });
@@ -492,7 +500,7 @@ const DayView = ({
         date.getDate()
       );
       app.setCurrentDate(nextDate);
-      setVisibleMonth(new Date(nextDate.getFullYear(), nextDate.getMonth(), 1));
+      setVisibleMonth(startOfCalendarMonth(nextDate, app.state.calendarSystem));
     },
     [app]
   );

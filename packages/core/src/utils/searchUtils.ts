@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill';
 
+import { formatDateLabel } from '@/locale/intl';
 import { TranslationKey } from '@/locale/types';
 import { CalendarSearchEvent } from '@/types/search';
 
@@ -72,7 +73,7 @@ export const getSearchHeaderInfo = (
     }
   } else {
     // Others
-    title = groupDate.toLocaleDateString(locale, {
+    title = formatDateLabel(groupDate, locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

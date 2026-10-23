@@ -516,7 +516,8 @@
     font-weight: 500;
   }
 
-  .df-sidebar-dropdown-item:hover {
+  .df-sidebar-dropdown-item:hover,
+  .df-sidebar-dropdown-item[data-active='true'] {
     background-color: var(--df-color-primary);
     color: var(--df-color-primary-foreground);
   }
@@ -549,7 +550,8 @@
     color: var(--df-color-primary);
   }
 
-  .df-sidebar-dropdown-item:hover .df-sidebar-dropdown-check {
+  .df-sidebar-dropdown-item:hover .df-sidebar-dropdown-check,
+  .df-sidebar-dropdown-item[data-active='true'] .df-sidebar-dropdown-check {
     color: var(--df-color-primary-foreground);
   }
 

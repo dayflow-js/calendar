@@ -152,15 +152,16 @@ interface LocalizationConfig {
 
 `@dayflow/plugin-localization` 패키지에서 현재 제공하는 로케일은 다음과 같습니다:
 
-| Export | 언어     | 로케일 코드                  |
-| :----- | :------- | :--------------------------- |
-| `zh`   | 중국어   | `zh-CN`                      |
-| `ja`   | 일본어   | `ja-JP`                      |
-| `ko`   | 한국어   | `ko-KR`                      |
-| `fr`   | 프랑스어 | `fr-FR`                      |
-| `de`   | 독일어   | `de-DE`                      |
-| `es`   | 스페인어 | `es-ES`                      |
-| `en`   | 영어     | `en-US` (코어에도 기본 포함) |
+| Export | 언어       | 로케일 코드                  |
+| :----- | :--------- | :--------------------------- |
+| `zh`   | 중국어     | `zh-CN`                      |
+| `ja`   | 일본어     | `ja-JP`                      |
+| `ko`   | 한국어     | `ko-KR`                      |
+| `fr`   | 프랑스어   | `fr-FR`                      |
+| `de`   | 독일어     | `de-DE`                      |
+| `es`   | 스페인어   | `es-ES`                      |
+| `fa`   | 페르시아어 | `fa-IR`                      |
+| `en`   | 영어       | `en-US` (코어에도 기본 포함) |
 
 `locale` 속성에는 다음 중 하나를 전달할 수 있습니다:
 
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // Pass the custom Locale object directly (or code string 'pt-BR')
 });
 ```
+
+### 접근성 레이블
+
+로케일의 `messages`는 아이콘만 있는 버튼과 레이블이 없는 입력란을 스크린 리더가 읽어 줄 이름으로도 사용됩니다. 화면에 보이는 텍스트와 함께 번역하세요. 사용자 정의 로케일에 없는 키는 영어로 대체됩니다.
+
+| 키                                          | 용도                                             |
+| :------------------------------------------ | :----------------------------------------------- |
+| `previousDay` / `nextDay`                   | 일 보기 헤더의 이동 버튼                         |
+| `previousWeek` / `nextWeek`                 | 주 보기 헤더의 이동 버튼                         |
+| `previousMonth` / `nextMonth`               | 월 보기 헤더, 미니 달력, 범위 선택기의 이동 버튼 |
+| `previousYear` / `nextYear`                 | 연 보기 헤더와 범위 선택기의 이동 버튼           |
+| `previousPeriod` / `nextPeriod`             | 일정(Agenda) 보기 헤더의 이동 버튼               |
+| `clearSearch` / `closeSearch`               | 검색 지우기 버튼과 모바일 검색 뒤로 가기 버튼    |
+| `close`                                     | 대화상자와 드로어의 닫기 버튼                    |
+| `startDate` / `endDate` / `hour` / `minute` | 범위 선택기의 입력란과 시간 목록                 |

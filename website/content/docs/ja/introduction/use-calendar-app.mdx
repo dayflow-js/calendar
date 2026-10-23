@@ -118,6 +118,7 @@ title: 'useCalendarApp'
 | `defaultCalendar`      | `string`                    | 任意 | 最初の可視カレンダー                     | 新規イベント作成時の既定カレンダー ID。                                                                                                      |
 | `theme`                | `ThemeConfig`               | 任意 | `{ mode: 'light' }`                      | テーマモード（`light`/`dark`/`auto`）やトークン上書き。                                                                                      |
 | `locale`               | `string \| Locale`          | 任意 | `'en-US'`                                | 国際化（i18n）のためのロケール設定。言語コード（'ja'など）またはLocaleオブジェクト。                                                         |
+| `calendarSystem`       | `'gregorian' \| 'jalali'`   | 任意 | `'gregorian'`                            | 日付の表示と移動に使う暦。`'jalali'` はペルシャ太陽暦（ジャラーリー暦）。[calendarSystem](#calendarsystem) を参照。                          |
 | `useEventDetailDialog` | `boolean`                   | 任意 | `false`                                  | 詳細表示をモーダルダイアログに切り替える。                                                                                                   |
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | 任意 | `'dbClick'`                              | デスクトップでイベント詳細をシングルクリックまたはダブルクリックのどちらで開くかを制御します。タッチ入力では常にタップで開きます。           |
 | `useCalendarHeader`    | `boolean`                   | 任意 | `true`                                   | デフォルトヘッダーの有効化（`true`）または非表示（`false`）。カスタムヘッダーは `DayFlowCalendar` の `calendarHeader` スロットを使用します。 |
@@ -272,6 +273,28 @@ const calendar = useCalendarApp({
   locale: customLocale,
 });
 ```
+
+### calendarSystem
+
+`calendarSystem` は日付の表示と移動に使う暦を選びます。`'gregorian'`（デフォルト、グレゴリオ暦）または `'jalali'`（ペルシャ太陽暦）です。`locale`・`timeZone`・`startOfWeek` とは独立しているため、英語の UI でジャラーリー暦を表示したり、ペルシャ語の UI でグレゴリオ暦を表示したりできます。
+
+```tsx
+import { createLocalizationPlugin, fa } from '@dayflow/plugin-localization';
+
+const calendar = useCalendarApp({
+  calendarSystem: 'jalali',
+  locale: 'fa-IR',
+  timeZone: 'Asia/Tehran',
+  plugins: [createLocalizationPlugin({ locales: [fa] })],
+  views: [
+    createMonthView({ startOfWeek: 6 }), // 週の始まりを土曜日に
+    createWeekView({ startOfWeek: 6 }),
+    createYearView({ mode: 'grid', startOfWeek: 6 }),
+  ],
+});
+```
+
+変わるのは表示と移動だけです。イベントデータ、コールバック、ICS インポート、繰り返しルールは ISO 日付のままで、暦を切り替えてもイベントは変更されません。
 
 ### useEventDetailDialog
 

@@ -39,13 +39,15 @@ describe('EventNotesField', () => {
     expect(
       screen.getByText('Reschedule').closest('a')?.getAttribute('href')
     ).toBe('https://example.com/reschedule');
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Event' }));
+    fireEvent.focus(screen.getByRole('textbox', { name: 'Note' }));
     const readable =
       'Join: https://meet.google.com/zfc-scqu-jrz\nReschedule <https://example.com/reschedule>';
-    expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe(
-      readable
-    );
-    fireEvent.input(screen.getByRole('textbox'), {
+    const editor = screen.getByRole('textbox', {
+      name: 'Note',
+    }) as HTMLTextAreaElement;
+    expect(editor.tagName).toBe('TEXTAREA');
+    expect(editor.value).toBe(readable);
+    fireEvent.input(editor, {
       target: { value: `${readable}\nAgenda` },
     });
     expect(onChange).toHaveBeenCalledWith(`${readable}\nAgenda`);
@@ -63,5 +65,66 @@ describe('EventNotesField', () => {
     expect(container.querySelector('script')).toBeNull();
     expect(container.textContent).not.toContain('<br');
     expect(container.textContent).not.toContain('alert(1)');
+  });
+
+  it('switches between the formatted note and the editor on focus', () => {
+    const onChange = vi.fn();
+    renderNotes('Bring comfortable shoes.', onChange);
+
+    expect(screen.queryByRole('button')).toBeNull();
+    const preview = screen.getByRole('textbox', { name: 'Note' });
+    expect(preview.tagName).toBe('DIV');
+    expect(preview.tabIndex).toBe(0);
+
+    fireEvent.focus(preview);
+    const editor = screen.getByRole('textbox', { name: 'Note' });
+    expect(editor.tagName).toBe('TEXTAREA');
+    expect(document.activeElement).toBe(editor);
+
+    // Typing a link stays in the editor until it loses focus.
+    fireEvent.input(editor, { target: { value: 'See https://example.com' } });
+    expect(onChange).toHaveBeenCalledWith('See https://example.com');
+    expect(screen.getByRole('textbox', { name: 'Note' })).toBe(editor);
+
+    fireEvent.blur(editor);
+    expect(screen.getByRole('textbox', { name: 'Note' }).tagName).toBe('DIV');
+  });
+
+  it('opens links in the note instead of starting to edit', () => {
+    renderNotes('Join: https://meet.google.com/abc-defg-hij');
+
+    const link = screen.getByRole('link');
+    expect(fireEvent.mouseDown(link)).toBe(false);
+    expect(screen.getByRole('textbox', { name: 'Note' }).tagName).toBe('DIV');
+  });
+
+  it('keeps read-only notes out of the tab order', () => {
+    render(
+      <LocaleProvider locale='en-US'>
+        <div className='df-event-detail-panel'>
+          <EventNotesField
+            id='note'
+            value='Read only'
+            editable={false}
+            disabled={false}
+            rows={3}
+            onChange={vi.fn()}
+          />
+        </div>
+      </LocaleProvider>
+    );
+
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('note').tabIndex).toBe(-1);
+  });
+
+  it('clears the wide-layout flag when the field unmounts', () => {
+    const { container, unmount } = renderNotes('Plain note');
+    const surface = container.querySelector<HTMLElement>(
+      '.df-event-detail-panel'
+    )!;
+    surface.dataset.notesWide = 'true';
+    unmount();
+    expect(surface.dataset.notesWide).toBeUndefined();
   });
 });

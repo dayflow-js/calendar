@@ -160,6 +160,7 @@ Les locales suivantes sont actuellement disponibles dans le paquet `@dayflow/plu
 | `fr`   | Français | `fr-FR`                              |
 | `de`   | Allemand | `de-DE`                              |
 | `es`   | Espagnol | `es-ES`                              |
+| `fa`   | Persan   | `fa-IR`                              |
 | `en`   | Anglais  | `en-US` (également intégrée au cœur) |
 
 Pour la propriété `locale`, vous pouvez passer :
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // Pass the custom Locale object directly (or code string 'pt-BR')
 });
 ```
+
+### Libellés accessibles
+
+Les `messages` d'une locale fournissent aussi les noms que les lecteurs d'écran annoncent pour les boutons composés d'une seule icône et les champs sans libellé : traduisez-les avec le texte visible. Les clés absentes d'une locale personnalisée reviennent à l'anglais.
+
+| Clé                                         | Utilisée pour                                                       |
+| :------------------------------------------ | :------------------------------------------------------------------ |
+| `previousDay` / `nextDay`                   | Flèches de navigation de l'en-tête en vue jour                      |
+| `previousWeek` / `nextWeek`                 | Flèches de navigation de l'en-tête en vue semaine                   |
+| `previousMonth` / `nextMonth`               | Flèches de la vue mois, du mini-calendrier et du sélecteur de plage |
+| `previousYear` / `nextYear`                 | Flèches de la vue année et du sélecteur de plage                    |
+| `previousPeriod` / `nextPeriod`             | Flèches de navigation de l'en-tête en vue agenda                    |
+| `clearSearch` / `closeSearch`               | Bouton d'effacement de la recherche et bouton retour sur mobile     |
+| `close`                                     | Boutons de fermeture des boîtes de dialogue et des tiroirs          |
+| `startDate` / `endDate` / `hour` / `minute` | Champs et listes d'heures du sélecteur de plage                     |

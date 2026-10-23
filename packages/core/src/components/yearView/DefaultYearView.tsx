@@ -8,6 +8,10 @@ import {
   useCallback,
 } from 'preact/hooks';
 
+import {
+  createCalendarDate,
+  dateToCalendarDate,
+} from '@/calendar/calendarSystem';
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
 import {
@@ -56,7 +60,8 @@ export const DefaultYearView = ({
 }: YearViewProps) => {
   const { t, locale } = useLocale();
   const currentDate = app.getCurrentDate();
-  const currentYear = currentDate.getFullYear();
+  const calendarSystem = app.state.calendarSystem;
+  const currentYear = dateToCalendarDate(currentDate, calendarSystem).year;
   const rawEvents = app.getEvents();
   const appTimeZone = app.timeZone;
   const scrollElementRef = useRef<HTMLDivElement>(null);
@@ -397,18 +402,18 @@ export const DefaultYearView = ({
   // Generate all days for the current year
   const yearDays = useMemo(() => {
     const days: Date[] = [];
-    const start = new Date(currentYear, 0, 1);
-    const end = new Date(currentYear, 11, 31);
+    const start = createCalendarDate(currentYear, 0, 1, calendarSystem);
+    const end = createCalendarDate(currentYear + 1, 0, 0, calendarSystem);
 
     for (
-      let time = start.getTime();
-      time <= end.getTime();
-      time += 24 * 60 * 60 * 1000
+      let day = new Date(start);
+      day <= end;
+      day = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1)
     ) {
-      days.push(new Date(time));
+      days.push(new Date(day));
     }
     return days;
-  }, [currentYear]);
+  }, [currentYear, calendarSystem]);
 
   // Group days into rows
   const rows = useMemo(
@@ -418,8 +423,14 @@ export const DefaultYearView = ({
 
   // Filter events for the current year (uses per-event cache via getEventDayRange)
   const yearEvents = useMemo(() => {
-    const yearStartMs = new Date(currentYear, 0, 1).getTime();
-    const yearEndMs = new Date(currentYear, 11, 31, 23, 59, 59).getTime();
+    const yearStartMs = createCalendarDate(
+      currentYear,
+      0,
+      1,
+      calendarSystem
+    ).getTime();
+    const yearEndMs =
+      createCalendarDate(currentYear + 1, 0, 1, calendarSystem).getTime() - 1;
 
     const result: Event[] = [];
     for (let i = 0; i < rawEvents.length; i++) {
@@ -432,7 +443,7 @@ export const DefaultYearView = ({
       }
     }
     return result;
-  }, [rawEvents, currentYear, showTimedEvents, appTimeZone]);
+  }, [rawEvents, currentYear, showTimedEvents, appTimeZone, calendarSystem]);
 
   // Bucket events into rows in a single O(N + R) pass instead of O(N x R).
   // Most events span 1-2 weeks; we walk forward through rows from the first
@@ -531,7 +542,9 @@ export const DefaultYearView = ({
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
-    return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+    return isAsianLocale
+      ? `${currentYear}年`
+      : `${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
   return (
@@ -542,14 +555,10 @@ export const DefaultYearView = ({
         currentDate={currentDate}
         customTitle={getCustomTitle()}
         onPrevious={() => {
-          const newDate = new Date(currentDate);
-          newDate.setFullYear(newDate.getFullYear() - 1);
-          app.setCurrentDate(newDate);
+          app.goToPrevious();
         }}
         onNext={() => {
-          const newDate = new Date(currentDate);
-          newDate.setFullYear(newDate.getFullYear() + 1);
-          app.setCurrentDate(newDate);
+          app.goToNext();
         }}
         onToday={() => {
           app.goToToday();

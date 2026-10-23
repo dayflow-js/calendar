@@ -171,6 +171,84 @@ function htmlToPlainText(root: HTMLElement): string {
     .trim();
 }
 
+const NOTES_CONTAINER = '.df-event-detail-panel, .df-dialog-container';
+
+/** Tallest the notes can get before the surface would exceed the viewport. */
+const availableNotesHeight = (container: HTMLElement, frame: HTMLElement) => {
+  const borders = container.offsetHeight - container.clientHeight;
+  const otherHeight = container.scrollHeight - frame.offsetHeight + borders;
+  return Math.max(48, window.innerHeight - 16 - otherHeight);
+};
+
+/** Extra width (px) the wide layout adds on top of 25rem. */
+const WIDE_EXTRA = 30;
+
+/** Unwrapped width of each line, measured from the content box's left edge. */
+function measureLineWidths(content: HTMLElement): number[] {
+  const style = getComputedStyle(content);
+  if (content instanceof HTMLTextAreaElement) {
+    const mirror = document.createElement('div');
+    mirror.style.cssText =
+      'position:absolute;visibility:hidden;left:-9999px;top:0;white-space:pre';
+    mirror.style.font = style.font;
+    mirror.style.letterSpacing = style.letterSpacing;
+    for (const line of content.value.split('\n')) {
+      const span = document.createElement('span');
+      span.style.display = 'inline-block';
+      span.textContent = line;
+      mirror.append(span, document.createElement('br'));
+    }
+    document.body.append(mirror);
+    const widths = Array.from(mirror.querySelectorAll('span')).map(
+      span => span.offsetWidth
+    );
+    mirror.remove();
+    return widths;
+  }
+
+  const range = document.createRange();
+  if (typeof range.getClientRects !== 'function') return [];
+  const { whiteSpace } = content.style;
+  content.style.whiteSpace = 'nowrap';
+  range.selectNodeContents(content);
+  const left =
+    content.getBoundingClientRect().left +
+    content.clientLeft +
+    Number.parseFloat(style.paddingLeft);
+  const rightByLine = new Map<number, number>();
+  for (const rect of Array.from(range.getClientRects())) {
+    const line = Math.round(rect.top);
+    rightByLine.set(line, Math.max(rightByLine.get(line) ?? 0, rect.right));
+  }
+  content.style.whiteSpace = whiteSpace;
+  return Array.from(rightByLine.values(), right => right - left);
+}
+
+/**
+ * Whether the notes need the wide layout: some line wraps at 25rem but would
+ * fit on one line with the extra width, or the notes are too tall to fit.
+ */
+function needsWideLayout(
+  container: HTMLElement,
+  frame: HTMLElement,
+  content: HTMLElement
+): boolean {
+  const style = getComputedStyle(content);
+  const lineSpace =
+    content.clientWidth -
+    Number.parseFloat(style.paddingLeft) -
+    Number.parseFloat(style.paddingRight);
+  const fitsWhenWide = measureLineWidths(content).some(
+    width => width > lineSpace + 0.5 && width <= lineSpace + WIDE_EXTRA
+  );
+
+  const { height } = content.style;
+  content.style.height = 'auto';
+  const scrolls = content.scrollHeight > availableNotesHeight(container, frame);
+  content.style.height = height;
+  return fitsWhenWide || scrolls;
+}
+
 export const EventNotesField = ({
   id,
   value,
@@ -180,80 +258,118 @@ export const EventNotesField = ({
   onChange,
 }: EventNotesFieldProps) => {
   const { t } = useLocale();
-  const [editing, setEditing] = useState(!value);
+  // Notes read as formatted text; clicking or tabbing into them edits them.
+  const [editing, setEditing] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement | HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
-  const startedEmptyRef = useRef(!value);
+  const sizedRef = useRef(false);
+  const lastValueRef = useRef(value);
+
+  const canEdit = editable && !disabled;
+  const showEditor = !value || (editing && canEdit);
+
+  // The surface width is fixed when it opens: wide only if the notes need it.
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    const frame = frameRef.current;
+    const container = frame?.closest<HTMLElement>(NOTES_CONTAINER);
+    if (!content || !frame || !container) return;
+    if (needsWideLayout(container, frame, content)) {
+      container.dataset.notesWide = 'true';
+    }
+    return () => {
+      delete container.dataset.notesWide;
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const fit = () => {
       const content = contentRef.current;
       const frame = frameRef.current;
-      const container = frame?.closest<HTMLElement>(
-        '.df-event-detail-panel, .df-dialog-container'
-      );
+      const container = frame?.closest<HTMLElement>(NOTES_CONTAINER);
       if (!content || !frame || !container) return;
 
-      if (!frame.style.height || (startedEmptyRef.current && editing)) {
+      const availableHeight = availableNotesHeight(container, frame);
+      const typed = lastValueRef.current !== value;
+      lastValueRef.current = value;
+
+      if (!sizedRef.current) {
+        sizedRef.current = true;
         content.style.height = 'auto';
         fitNotesToViewport(container, content);
         frame.style.height = `${content.offsetHeight}px`;
       }
 
-      const otherHeight = container.scrollHeight - frame.offsetHeight;
-      const availableHeight = Math.max(
-        48,
-        window.innerHeight - 16 - otherHeight
-      );
-      frame.style.maxHeight = `${availableHeight}px`;
-      frame.style.height = `${Math.min(frame.offsetHeight, availableHeight)}px`;
-      content.style.maxHeight = editing ? `${availableHeight}px` : '100%';
-      content.style.height = '100%';
+      if (content instanceof HTMLTextAreaElement) {
+        // The frame follows the textarea so dragging it grows the surface,
+        // which is capped at the viewport and never scrolls. Typing past the
+        // bottom grows it too; switching from the preview keeps its height.
+        const borders = content.offsetHeight - content.clientHeight;
+        const height = Math.max(
+          frame.offsetHeight,
+          typed && content.scrollHeight > content.clientHeight
+            ? content.scrollHeight + borders
+            : 0
+        );
+        frame.style.height = '';
+        frame.style.maxHeight = '';
+        content.style.maxHeight = `${availableHeight}px`;
+        content.style.height = `${Math.min(height, availableHeight)}px`;
+      } else {
+        frame.style.maxHeight = `${availableHeight}px`;
+        frame.style.height = `${Math.min(frame.offsetHeight, availableHeight)}px`;
+        content.style.maxHeight = '100%';
+        content.style.height = '100%';
+      }
     };
     fit();
     window.addEventListener('resize', fit);
     return () => window.removeEventListener('resize', fit);
-  }, [value, editing]);
+  }, [value, showEditor]);
 
-  const finishResize = () => {
+  // Keep the field's current height when switching between view and edit.
+  const holdHeight = () => {
     const frame = frameRef.current;
-    const content = contentRef.current;
-    if (!frame || !content || !(content instanceof HTMLTextAreaElement)) return;
-    if (content.offsetHeight !== frame.offsetHeight) {
-      frame.style.height = `${content.offsetHeight}px`;
-    }
+    if (frame) frame.style.height = `${frame.offsetHeight}px`;
   };
 
-  const showEditor = !value || (editing && editable);
+  const startEditing = () => {
+    if (!canEdit || editing) return;
+    holdHeight();
+    setEditing(true);
+  };
+
+  const stopEditing = () => {
+    if (!editing) return;
+    holdHeight();
+    setEditing(false);
+  };
+
+  // Move focus into the editor that replaced the preview, caret at the end.
+  const focusEditorRef = useRef(false);
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    if (!focusEditorRef.current || !(content instanceof HTMLTextAreaElement)) {
+      return;
+    }
+    focusEditorRef.current = false;
+    content.focus();
+    content.setSelectionRange(content.value.length, content.value.length);
+  }, [showEditor]);
+
   const htmlRoot = containsHtml(value) ? parseHtml(value) : null;
   const editorValue = htmlRoot ? htmlToPlainText(htmlRoot) : value;
 
   return (
     <div className='df-event-dialog-notes-row df-event-notes-field'>
       <div className='df-event-notes-header'>
-        <span className='df-form-label'>{t('note')}</span>
-        {editable && value && (
-          <button
-            type='button'
-            className={`df-event-notes-action ${
-              editing
-                ? 'df-event-conference-done'
-                : 'df-event-conference-icon-button'
-            }`}
-            disabled={disabled}
-            aria-label={editing ? t('done') : t('editEvent')}
-            title={editing ? t('done') : t('editEvent')}
-            onClick={() => setEditing(current => !current)}
-          >
-            {editing ? (
-              t('done')
-            ) : (
-              <svg viewBox='0 0 24 24' aria-hidden='true'>
-                <path d='m14.7 5.3 4 4M4 20l3.8-.8L19 8a1.4 1.4 0 0 0 0-2l-1-1a1.4 1.4 0 0 0-2 0L4.8 16.2Z' />
-              </svg>
-            )}
-          </button>
-        )}
+        <label
+          id={`${id}-label`}
+          className='df-form-label'
+          htmlFor={showEditor ? id : undefined}
+        >
+          {t('note')}
+        </label>
       </div>
       <div ref={frameRef} className='df-event-notes-frame'>
         {showEditor ? (
@@ -267,7 +383,8 @@ export const EventNotesField = ({
             readOnly={!editable || disabled}
             disabled={!editable || disabled}
             onInput={event => onChange(event.currentTarget.value)}
-            onPointerUp={finishResize}
+            onFocus={() => setEditing(true)}
+            onBlur={stopEditing}
             rows={rows}
             className='df-form-textarea'
             placeholder={t('addNotePlaceholder')}
@@ -278,7 +395,20 @@ export const EventNotesField = ({
               contentRef.current = element;
             }}
             className='df-event-notes-preview'
-            role='note'
+            role={canEdit ? 'textbox' : 'note'}
+            aria-multiline={canEdit ? true : undefined}
+            aria-labelledby={`${id}-label`}
+            tabIndex={canEdit ? 0 : undefined}
+            data-editable={canEdit ? 'true' : undefined}
+            onMouseDown={event => {
+              // Clicking a link opens it instead of switching to the editor.
+              if ((event.target as Element).closest('a'))
+                event.preventDefault();
+            }}
+            onFocus={() => {
+              focusEditorRef.current = true;
+              startEditing();
+            }}
           >
             {htmlRoot
               ? Array.from(htmlRoot.childNodes).map(renderHtmlNode)

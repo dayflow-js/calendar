@@ -7,6 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { observePanelInViewport } from '@/components/calendarEvent/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import {
@@ -193,10 +194,19 @@ export const EventDetailPanelHost = ({
     const onLayoutChange = () => updatePosition();
     window.addEventListener('resize', onLayoutChange);
     window.addEventListener('scroll', onLayoutChange, true);
+    const stopObserving = panelRef.current
+      ? observePanelInViewport(panelRef.current, update =>
+          setPosition(prev => {
+            const top = update(prev.top);
+            return top === prev.top ? prev : { ...prev, top };
+          })
+        )
+      : undefined;
 
     return () => {
       window.removeEventListener('resize', onLayoutChange);
       window.removeEventListener('scroll', onLayoutChange, true);
+      stopObserving?.();
     };
   }, [showPanel, updatePosition]);
 

@@ -14,6 +14,7 @@ import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator
 import ViewHeader from '@/components/common/ViewHeader';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale';
+import { formatDateLabel, formatDateRangeLabel } from '@/locale/intl';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import { AgendaViewProps, Event, ICalendarApp } from '@/types';
@@ -134,6 +135,13 @@ const formatAgendaTitle = (
   locale: string
 ): string => {
   const endInclusive = addDays(endExclusive, -1);
+  if (new Intl.Locale(locale).calendar === 'persian') {
+    return formatDateRangeLabel(start, endInclusive, locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
   const sameYear = start.getFullYear() === endInclusive.getFullYear();
   const sameMonth = sameYear && start.getMonth() === endInclusive.getMonth();
 
@@ -405,7 +413,7 @@ const AgendaView = ({
   onEventSelect,
   onDetailPanelToggle,
 }: AgendaViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
   const customRenderingStore = useContext(CustomRenderingContext);
@@ -795,6 +803,7 @@ const AgendaView = ({
       <ViewHeader
         calendar={app}
         viewType='month'
+        navigationUnit='period'
         currentDate={rangeStart}
         customTitle={title}
         onPrevious={() => app.goToPrevious()}
@@ -804,7 +813,7 @@ const AgendaView = ({
 
       <div className='df-agenda-scroll'>
         {groups.length === 0 ? (
-          <div className='df-agenda-empty'>No events in this range.</div>
+          <div className='df-agenda-empty'>{t('noEventsInRange')}</div>
         ) : (
           groups.map(group => (
             <section
@@ -829,11 +838,11 @@ const AgendaView = ({
                   className='df-agenda-day-number'
                   data-today={isSameDate(group.date, today) ? 'true' : 'false'}
                 >
-                  {group.date.getDate()}
+                  {group.date.toLocaleDateString(locale, { day: 'numeric' })}
                 </div>
                 <div className='df-agenda-day-meta'>
                   <div className='df-agenda-day-month'>
-                    {group.date.toLocaleDateString(locale, {
+                    {formatDateLabel(group.date, locale, {
                       month: 'short',
                       year: 'numeric',
                     })}
@@ -847,12 +856,12 @@ const AgendaView = ({
               <div className='df-agenda-day-content'>
                 {group.allDayEntries.length === 0 &&
                 group.timedEntries.length === 0 ? (
-                  <div className='df-agenda-empty-row'>No events</div>
+                  <div className='df-agenda-empty-row'>{t('noEvents')}</div>
                 ) : (
                   <>
                     {group.allDayEntries.length > 0 && (
                       <div className='df-agenda-item df-agenda-item-all-day'>
-                        <div className='df-agenda-time'>All day</div>
+                        <div className='df-agenda-time'>{t('allDay')}</div>
                         <div className='df-agenda-all-day-events'>
                           {group.allDayEntries.map(entry => (
                             <div

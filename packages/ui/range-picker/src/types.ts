@@ -38,4 +38,6 @@ export interface RangePickerProps {
    * still receive a tuple, with both entries set to the chosen value.
    */
   mode?: 'range' | 'single';
+  /** Display/edit calendar; returned Temporal values retain ISO calendar fields. */
+  calendarSystem?: 'gregorian' | 'jalali';
 }

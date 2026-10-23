@@ -13,6 +13,7 @@ import RangePickerPanel from './components/RangePickerPanel';
 import { DEFAULT_FORMAT, DEFAULT_TIME_FORMAT } from './constants';
 import { MoveRight } from './icons';
 import type { RangePickerProps, ZonedRange } from './types';
+import { resolveLabels } from './utils/labels';
 import { getMonthLabels, getWeekDaysLabels } from './utils/locale';
 import {
   mergeFormatTemplate,
@@ -42,12 +43,20 @@ const RangePicker = ({
   matchTriggerWidth = false,
   locale = 'en-US',
   mode = 'range',
+  calendarSystem = 'gregorian',
 }: RangePickerProps) => {
   const isSingle = mode === 'single';
+  const calendarId = calendarSystem === 'jalali' ? 'persian' : 'iso8601';
   const localeCode = useMemo(
-    () => (typeof locale === 'string' ? locale : locale?.code || 'en-US'),
-    [locale]
+    () =>
+      new Intl.Locale(
+        typeof locale === 'string' ? locale : locale?.code || 'en-US',
+        { calendar: calendarSystem === 'jalali' ? 'persian' : 'gregory' }
+      ).toString(),
+    [locale, calendarSystem]
   );
+
+  const labels = useMemo(() => resolveLabels(locale), [locale]);
 
   const isTimeEnabled = useMemo(() => {
     if (showTime === undefined) return true;
@@ -91,10 +100,14 @@ const RangePicker = ({
           : getZoneId(value[1] as Temporal.ZonedDateTime)
         : getZoneId(value[0] as Temporal.ZonedDateTime));
 
-    const start = normalizeToZoned(value[0], zone).withTimeZone(zone);
-    const end = normalizeToZoned(value[1], zone, start).withTimeZone(zone);
+    const start = normalizeToZoned(value[0], zone)
+      .withTimeZone(zone)
+      .withCalendar(calendarId);
+    const end = normalizeToZoned(value[1], zone, start)
+      .withTimeZone(zone)
+      .withCalendar(calendarId);
     return [start, end];
-  }, [value, timeZone]);
+  }, [value, timeZone, calendarId]);
 
   const normalizedMinDate = useMemo(() => {
     if (!minDate) return;
@@ -152,10 +165,12 @@ const RangePicker = ({
     const previous = lastNormalizedRef.current;
     const startChanged =
       Temporal.ZonedDateTime.compare(previous[0], normalizedValue[0]) !== 0 ||
-      previous[0].timeZoneId !== normalizedValue[0].timeZoneId;
+      previous[0].timeZoneId !== normalizedValue[0].timeZoneId ||
+      previous[0].calendarId !== normalizedValue[0].calendarId;
     const endChanged =
       Temporal.ZonedDateTime.compare(previous[1], normalizedValue[1]) !== 0 ||
-      previous[1].timeZoneId !== normalizedValue[1].timeZoneId;
+      previous[1].timeZoneId !== normalizedValue[1].timeZoneId ||
+      previous[1].calendarId !== normalizedValue[1].calendarId;
 
     if (startChanged || endChanged) {
       setDraftRange(normalizedValue);
@@ -279,10 +294,13 @@ const RangePicker = ({
     (range: ZonedRange) => {
       if (!onChange) return;
       const output = toOutputRange(range);
-      onChange(output, [
-        formatTemporal(output[0], format, effectiveTimeFormat),
-        formatTemporal(output[1], format, effectiveTimeFormat),
-      ]);
+      onChange(
+        [output[0].withCalendar('iso8601'), output[1].withCalendar('iso8601')],
+        [
+          formatTemporal(output[0], format, effectiveTimeFormat),
+          formatTemporal(output[1], format, effectiveTimeFormat),
+        ]
+      );
     },
     [effectiveTimeFormat, format, onChange, toOutputRange]
   );
@@ -291,10 +309,13 @@ const RangePicker = ({
     (range: ZonedRange) => {
       if (!onOk) return;
       const output = toOutputRange(range);
-      onOk(output, [
-        formatTemporal(output[0], format, effectiveTimeFormat),
-        formatTemporal(output[1], format, effectiveTimeFormat),
-      ]);
+      onOk(
+        [output[0].withCalendar('iso8601'), output[1].withCalendar('iso8601')],
+        [
+          formatTemporal(output[0], format, effectiveTimeFormat),
+          formatTemporal(output[1], format, effectiveTimeFormat),
+        ]
+      );
     },
     [effectiveTimeFormat, format, onOk, toOutputRange]
   );
@@ -306,6 +327,7 @@ const RangePicker = ({
     ): Temporal.ZonedDateTime =>
       Temporal.ZonedDateTime.from({
         timeZone: getZoneId(base),
+        calendar: day.calendarId,
         year: day.year,
         month: day.month,
         day: day.day,
@@ -794,6 +816,7 @@ const RangePicker = ({
           <input
             type='text'
             name='range-start'
+            aria-label={labels.startDate}
             value={inputValues[0]}
             onChange={handleInputChange('start')}
             onFocus={() => openPanelForField('start')}
@@ -817,6 +840,7 @@ const RangePicker = ({
               <input
                 type='text'
                 name='range-end'
+                aria-label={labels.endDate}
                 value={inputValues[1]}
                 onChange={handleInputChange('end')}
                 onFocus={() => openPanelForField('end')}
@@ -851,6 +875,7 @@ const RangePicker = ({
                 disabled={disabled}
                 timeFormat={effectiveTimeFormat}
                 matchTriggerWidth={matchTriggerWidth}
+                labels={labels}
                 popupRef={popupRef}
                 timeListRefs={timeListRefs}
                 onMonthChange={changeMonth}
@@ -877,6 +902,7 @@ const RangePicker = ({
                 disabled={disabled}
                 timeFormat={effectiveTimeFormat}
                 matchTriggerWidth={matchTriggerWidth}
+                labels={labels}
                 popupRef={popupRef}
                 timeListRefs={timeListRefs}
                 onMonthChange={changeMonth}

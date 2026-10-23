@@ -75,6 +75,7 @@ export class CalendarApp implements ICalendarApp {
       allDaySortComparator: config.allDaySortComparator,
       timeZone: resolvedTimeZone,
       timeFormat: config.timeFormat,
+      calendarSystem: config.calendarSystem ?? 'gregorian',
     };
 
     this.callbacks = config.callbacks || {};
@@ -411,6 +412,16 @@ export class CalendarApp implements ICalendarApp {
       config.enableTasks !== this.enableTasks
     ) {
       this.enableTasks = config.enableTasks;
+      hasChanged = true;
+    }
+
+    if (
+      config.calendarSystem !== undefined &&
+      config.calendarSystem !== this.state.calendarSystem
+    ) {
+      this.state.calendarSystem = config.calendarSystem;
+      this.navigation.setVisibleMonth(this.state.currentDate);
+      this.navigation.handleVisibleRangeChange('viewChange');
       hasChanged = true;
     }
 

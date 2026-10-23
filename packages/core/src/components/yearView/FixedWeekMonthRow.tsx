@@ -1,5 +1,6 @@
 import { useMemo } from 'preact/hooks';
 
+import { useLocale } from '@/locale';
 import { Event, ICalendarApp } from '@/types';
 import { getTodayInTimeZone } from '@/utils';
 import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
@@ -89,6 +90,7 @@ export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
     appTimeZone,
     isDraggable,
   }: FixedWeekMonthRowProps) => {
+    const { locale } = useLocale();
     const today = useMemo(() => {
       const now = getTodayInTimeZone(appTimeZone);
       now.setHours(0, 0, 0, 0);
@@ -148,7 +150,7 @@ export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
                   className='df-year-fixed-day-number'
                   data-today={isToday ? 'true' : 'false'}
                 >
-                  {date.getDate()}
+                  {date.toLocaleDateString(locale, { day: 'numeric' })}
                 </span>
               </div>
             );

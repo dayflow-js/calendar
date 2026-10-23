@@ -75,6 +75,7 @@ export const RightPanel = ({
                 handlePreviousMonth={() => app.goToPrevious()}
                 handleNextMonth={() => app.goToNext()}
                 handleToday={() => app.goToToday()}
+                navigationUnit='day'
               />
             </div>
             <MiniCalendar

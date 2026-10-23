@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-sidebar",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Sidebar plugin for DayFlow calendar",
   "keywords": [
     "calendar",
@@ -63,6 +63,7 @@
     "tailwindcss": "catalog:",
     "temporal-polyfill": "catalog:",
     "tsc-alias": "^1.8.16",
+    "tslib": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {

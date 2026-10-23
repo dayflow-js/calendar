@@ -40,6 +40,7 @@ import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
 import { TaskPriorityField } from './TaskPriorityField';
+import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
   app?: ICalendarApp;
@@ -64,6 +65,7 @@ const DefaultEventDetailPanel = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
+  const rangePickerLocale = useRangePickerLocale(app?.state.locale);
 
   usePanelHandoffAnimation({
     panelRef,
@@ -507,7 +509,8 @@ const DefaultEventDetailPanel = ({
             matchTriggerWidth
             disabled={!isEditable || isLoading}
             onChange={handleAllDayRangeChange}
-            locale={app?.state.locale}
+            locale={rangePickerLocale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       ) : (
@@ -534,7 +537,8 @@ const DefaultEventDetailPanel = ({
               const [start, end] = nextRange;
               applyDraftEventUpdate({ ...draftEvent, start, end });
             }}
-            locale={app?.state.locale}
+            locale={rangePickerLocale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       )}

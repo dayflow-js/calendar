@@ -18,12 +18,32 @@ Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@d
 
 ### Performance
 
-- **Smaller Bundles When Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Unused component initialization can now be removed by your bundler, and the Preact JSX runtime is shared instead of embedded. Consumer probes reduced a standalone `isTask` import from 28.9 KiB to 1.7 KiB gzip and a Month-only calendar from 75.5 KiB to 72.6 KiB gzip, with external runtime dependencies excluded. A calendar using every view is effectively unchanged.
+- **Smaller Bundles When Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Unused component initialization can now be removed by your bundler, and the Preact JSX runtime is shared instead of embedded. In consumer probes, a standalone `isTask` import is 94% smaller (1.7 KiB gzip) and a Month-only calendar about 4% smaller, with external runtime dependencies excluded. A calendar using every view is effectively unchanged.
 
 ### Documentation
 
 - Added a task guide in all seven documentation languages, task fields in the `Event` and `useCalendarApp` references, and a Tasks switch in the interactive demo.
 - The website changelog now shows screenshots taken from the live demo, compact entries for fix-only releases, and an RSS feed.
+
+## [3.7.5] - 2026-10-17
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.5 · `@dayflow/plugin-localization` 1.6.3 · `@dayflow/plugin-sidebar` 1.6.5 · `@dayflow/ui-range-picker` 1.2.1. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Jalali Calendar (`@dayflow/core`, `@dayflow/ui-range-picker`)**: New `calendarSystem: 'gregorian' | 'jalali'` option displays and navigates every view, the mini calendar and the range picker in the Persian solar calendar. Event data, callbacks, ICS and recurrence rules keep their ISO dates. Gregorian remains the default and keeps the existing locale behavior.
+- **Persian Locale (`@dayflow/plugin-localization`)**: Added `fa` (`fa-IR`).
+- **Accessibility (`@dayflow/core`, `@dayflow/plugin-sidebar`, `@dayflow/ui-range-picker`)**:
+  - Navigation arrows, search controls and other icon-only buttons have translated accessible names, with new locale keys such as `previousDay`/`nextWeek`/`previousPeriod`, `clearSearch` and `close`. The arrows now name the unit they move by in each view.
+  - Dialogs have dialog semantics, close on Escape, trap focus and restore it when closed. `useDialogFocus` is exported for custom dialogs.
+  - The calendar picker, the sidebar's merge and import dropdowns, Year view grid days and the compact week header dates are keyboard-operable.
+  - The range picker reads its labels (navigation, inputs, hour/minute, OK) from `locale.messages`.
+- **Event Notes (`@dayflow/core`)**: Click a note to edit it in place; links in the note still open. The event detail panel has a fixed width, stays inside the viewport while the notes field grows, and the meeting row no longer shifts when editing.
+
+### Fixed
+
+- **Month View Scrolling (`@dayflow/core`)**: Scrolling no longer rebuilds the loaded weeks on every frame, so the scrolling month view stays smooth (especially in Jalali mode).
+- **Locale Packs (`@dayflow/plugin-localization`)**: All packs now cover the same keys. Labels that were missing in some languages (such as "days"/"weeks" and the "already subscribed" message) no longer fall back to English.
 
 ## [3.7.4] - 2026-10-14
 

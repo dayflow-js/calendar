@@ -423,14 +423,6 @@
     gap: 0.5rem;
   }
 
-  .df-event-notes-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 2rem;
-    min-height: 2rem;
-  }
-
   .df-event-notes-frame {
     width: 100%;
     min-height: 3rem;
@@ -469,6 +461,15 @@
     line-height: 1.5;
     overflow-y: auto;
     overflow-wrap: anywhere;
+  }
+
+  .df-event-notes-preview[data-editable='true'] {
+    cursor: text;
+    transition: border-color 150ms;
+  }
+
+  .df-event-notes-preview[data-editable='true']:hover {
+    border-color: var(--df-color-ring);
   }
 
   .df-event-notes-preview a {
@@ -525,6 +526,9 @@
     min-width: 0;
   }
 
+  /* The editor is the summary's box with the link field inside it, so the
+     provider icon and the Done/Join button keep their place on edit. */
+  .df-event-conference-editor,
   .df-event-conference-summary {
     box-sizing: border-box;
     height: 2.25rem;
@@ -542,8 +546,37 @@
     color: var(--df-color-muted-foreground);
   }
 
-  .df-event-conference-input {
+  .df-event-conference-editor {
+    transition:
+      border-color 150ms,
+      box-shadow 150ms;
+  }
+
+  .df-event-conference-editor:focus-within {
+    border-color: var(--df-color-ring);
+    box-shadow:
+      0 0 0 0px var(--df-color-background),
+      0 0 0 2px var(--df-color-ring);
+  }
+
+  .df-event-conference-editor[data-invalid='true'] {
+    border-color: var(--df-color-destructive);
+  }
+
+  .df-event-conference-editor .df-event-conference-input {
+    flex: 1 1 auto;
     min-width: 0;
+    min-height: 0;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .df-event-conference-editor .df-event-conference-input:focus {
+    box-shadow: none;
   }
 
   .df-event-conference-info {
@@ -579,7 +612,8 @@
 
   .df-event-conference-error {
     margin-top: 0.25rem;
-    padding-left: 2rem;
+    /* Line up with the link text: box border + padding + icon + gap. */
+    padding-left: calc(1px + 0.625rem + 1.5rem + 0.5rem);
   }
 
   .df-event-conference-error {
@@ -626,23 +660,28 @@
     stroke-linejoin: round;
   }
 
+  /* Same box as the Join button (.df-btn-sm). */
   .df-event-conference-done {
-    min-height: 2.25rem;
-    border-radius: 0.375rem;
-    padding-inline: 0.625rem;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
     color: var(--df-color-primary);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 500;
-  }
-
-  .df-event-notes-action.df-event-conference-done {
-    height: 2rem;
-    min-height: 2rem;
+    line-height: inherit;
   }
 
   .df-event-conference-join {
     flex: 0 0 auto;
     text-decoration: none;
+  }
+
+  /* Done and Join share one size so the row doesn't shift between them. */
+  .df-event-conference-done,
+  .df-event-conference-join {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
   }
 
   .df-event-repeat-editor {
@@ -839,6 +878,17 @@
     width: min(25rem, calc(100vw - 32px));
     margin-inline: 1rem;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  }
+
+  /* Set once on open by EventNotesField when the notes would wrap or scroll. */
+  .df-event-detail-panel[data-notes-wide='true'] {
+    width: min(calc(25rem + 30px), calc(100vw - 16px));
+    max-width: min(calc(25rem + 30px), calc(100vw - 16px));
+  }
+
+  .df-dialog-container[data-notes-wide='true'] {
+    max-width: calc(25rem + 30px);
+    width: min(calc(25rem + 30px), calc(100vw - 32px));
   }
 
   /* Close button icon sizing */

@@ -101,6 +101,31 @@ Das Popup erscheint standardmäßig bei `bottomLeft` und weicht automatisch aus,
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+Um die Beschriftungen des Pickers selbst zu übersetzen (Navigationsschaltflächen, Start-/Endfeld, Stunden-/Minutenlisten und die OK-Schaltfläche), übergeben Sie ein Locale-Objekt mit `messages`. Fehlende Schlüssel fallen auf Englisch zurück. Das eingebaute Terminpanel und der Termindialog des Kalenders befüllen sie automatisch aus der Kalender-Locale.
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'de-DE',
+    messages: {
+      previousYear: 'Vorheriges Jahr',
+      previousMonth: 'Vorheriger Monat',
+      nextMonth: 'Nächster Monat',
+      nextYear: 'Nächstes Jahr',
+      startDate: 'Startdatum',
+      endDate: 'Enddatum',
+      hour: 'Stunde',
+      minute: 'Minute',
+      ok: 'OK',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+Mit `calendarSystem='jalali'` werden Daten im persischen Kalender angezeigt und eingegeben. `onChange` und `onOk` liefern weiterhin ISO-Temporal-Werte.
+
 ## An Auslöserbreite anpassen
 
 ```tsx
@@ -129,7 +154,8 @@ Das Popup erscheint standardmäßig bei `bottomLeft` und weicht automatisch aus,
 | `autoAdjustOverflow` | `boolean`                                                       | `true`         | Kippt die Platzierung automatisch, wenn das Popup aus dem sichtbaren Bereich liefe       |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —              | Hängt das Popup in einen eigenen Container statt in `document.body`                      |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`        | Setzt die Popup-Breite auf die Breite des auslösenden Eingabefelds                       |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP-47-Locale für Monats- und Wochentagsbeschriftungen                                   |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP-47-Locale; bei einem Objekt übersetzen `messages` die Picker-Beschriftungen          |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | Kalender zum Anzeigen und Parsen von Datumswerten                                        |
 
 ### `ZonedRange`
 

@@ -15,6 +15,7 @@ import {
   ContentSlot,
   DefaultColorPicker,
   MiniCalendar,
+  addCalendarMonths,
   useLocale,
   importICSFile,
   downloadICS,
@@ -120,11 +121,7 @@ const DefaultCalendarSidebar = ({
   const handleMonthChange = useCallback(
     (offset: number) => {
       const current = app.getVisibleMonth();
-      const next = new Date(
-        current.getFullYear(),
-        current.getMonth() + offset,
-        1
-      );
+      const next = addCalendarMonths(current, offset, app.state.calendarSystem);
       app.setVisibleMonth(next);
     },
     [app]

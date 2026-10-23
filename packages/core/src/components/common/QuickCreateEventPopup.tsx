@@ -292,6 +292,7 @@ export const QuickCreateEventPopup = ({
             ref={inputRef}
             type='text'
             className='df-form-input'
+            aria-label={t('quickCreateEvent')}
             placeholder={
               t('quickCreatePlaceholder') || 'Enter title (e.g. Code review)'
             }

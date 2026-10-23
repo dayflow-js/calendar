@@ -3,6 +3,7 @@
 import { AnyComponent, ComponentChildren } from 'preact';
 import { Temporal } from 'temporal-polyfill';
 
+import { CalendarSystem } from '@/calendar/calendarSystem';
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import { CalendarRegistry } from '@/core/calendarRegistry';
 import { Locale } from '@/locale/types';
@@ -343,6 +344,8 @@ export interface CalendarAppConfig {
    * When set, takes highest priority and overrides view-level or search-level format configs.
    */
   timeFormat?: '12h' | '24h';
+  /** Calendar used for display and calendar navigation. Event instants remain ISO/Gregorian. */
+  calendarSystem?: CalendarSystem;
 }
 
 /**
@@ -375,6 +378,7 @@ export interface CalendarAppState {
   timeZone: string;
   /** Global time format override ('12h' or '24h'). */
   timeFormat?: '12h' | '24h';
+  calendarSystem: CalendarSystem;
 }
 
 /**

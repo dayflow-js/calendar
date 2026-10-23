@@ -1,6 +1,8 @@
 import { ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { CalendarSystem, calendarLocale } from '@/calendar/calendarSystem';
+
 import { getWeekDaysLabels, getMonthLabels } from './intl';
 import { LocaleContext } from './LocaleContext';
 import { t as translate } from './translator';
@@ -16,12 +18,14 @@ export interface LocaleProviderProps {
   locale?: LocaleCode | Locale;
   messages?: LocaleMessages;
   children?: ComponentChildren;
+  calendarSystem?: CalendarSystem;
 }
 
 export const LocaleProvider = ({
   locale = 'en-US',
   messages,
   children,
+  calendarSystem = 'gregorian',
 }: LocaleProviderProps) => {
   const resolvedLocale = useMemo(() => {
     if (typeof locale === 'string') {
@@ -42,10 +46,11 @@ export const LocaleProvider = ({
   }, [locale]);
 
   const value = useMemo(() => {
-    const currentCode = resolvedLocale.code;
+    const currentCode = calendarLocale(resolvedLocale.code, calendarSystem);
 
     return {
       locale: currentCode,
+      calendarSystem,
       t: (key: TranslationKey, vars?: Record<string, string>) => {
         // Resolve text: 1. Custom messages -> 2. Locale object messages -> 3. Global fallback
         let text =
@@ -66,7 +71,7 @@ export const LocaleProvider = ({
       getMonthLabels,
       isDefault: false,
     };
-  }, [resolvedLocale, messages]);
+  }, [resolvedLocale, messages, calendarSystem]);
 
   return (
     <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>

@@ -1488,6 +1488,20 @@
 
   .df-compact-header-date-button {
     cursor: pointer;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+  }
+
+  .df-compact-header-date-button:focus-visible {
+    outline: none;
+  }
+
+  .df-compact-header-date-button:focus-visible .df-compact-header-date-pill {
+    outline: 2px solid var(--df-color-primary);
+    outline-offset: -2px;
   }
 
   .df-compact-header-label {
@@ -1905,6 +1919,11 @@
 
   .df-year-grid-day:hover {
     opacity: 0.8;
+  }
+
+  .df-year-grid-day:focus-visible {
+    outline: 2px solid var(--df-color-primary);
+    outline-offset: -1px;
   }
 
   .df-year-grid-day-inner {
