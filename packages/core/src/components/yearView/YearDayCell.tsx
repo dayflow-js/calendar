@@ -1,6 +1,5 @@
-import { memo } from 'preact/compat';
-
 import { useLocale } from '@/locale';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 interface YearDayCellProps {
   date: Date;
@@ -13,7 +12,8 @@ interface YearDayCellProps {
   onContextMenu?: (e: MouseEvent, date: Date) => void;
 }
 
-export const YearDayCell = memo(
+export const YearDayCell = /* @__PURE__ */ memoWithDisplayName(
+  'YearDayCell',
   ({
     date,
     isToday,
@@ -75,5 +75,3 @@ export const YearDayCell = memo(
     );
   }
 );
-
-(YearDayCell as { displayName?: string }).displayName = 'YearDayCell';

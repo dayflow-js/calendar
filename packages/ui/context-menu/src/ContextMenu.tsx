@@ -36,87 +36,90 @@ interface ContextMenuProps {
   style?: Record<string, number | string>;
 }
 
-export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
-  ({ x, y, onClose, children, className, style: customStyle }, ref) => {
-    const internalRef = useRef<HTMLDivElement>(null);
+export const ContextMenu = /* @__PURE__ */ (() => {
+  const component = forwardRef<HTMLDivElement, ContextMenuProps>(
+    ({ x, y, onClose, children, className, style: customStyle }, ref) => {
+      const internalRef = useRef<HTMLDivElement>(null);
 
-    const setRefs = (node: HTMLDivElement | null) => {
-      internalRef.current = node;
-      if (typeof ref === 'function') {
-        ref(node);
-      } else if (ref && 'current' in ref) {
-        ref.current = node;
-      }
-    };
-
-    useEffect(() => {
-      const handleCloseAll = () => onClose();
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          internalRef.current &&
-          !internalRef.current.contains(event.target as Node)
-        ) {
-          const target = event.target as HTMLElement;
-          if (target.closest('[data-submenu-content]')) return;
-          onClose();
+      const setRefs = (node: HTMLDivElement | null) => {
+        internalRef.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref && 'current' in ref) {
+          ref.current = node;
         }
       };
 
-      window.dispatchEvent(new CustomEvent('dayflow-close-all-menus'));
-      window.addEventListener('dayflow-close-all-menus', handleCloseAll);
-      document.body.addEventListener('mousedown', handleClickOutside, {
-        capture: true,
-      });
-      document.body.addEventListener('contextmenu', handleClickOutside, {
-        capture: true,
-      });
+      useEffect(() => {
+        const handleCloseAll = () => onClose();
+        const handleClickOutside = (event: MouseEvent) => {
+          if (
+            internalRef.current &&
+            !internalRef.current.contains(event.target as Node)
+          ) {
+            const target = event.target as HTMLElement;
+            if (target.closest('[data-submenu-content]')) return;
+            onClose();
+          }
+        };
 
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') onClose();
-      };
-      window.addEventListener('keydown', handleKeyDown);
-
-      const handleScrollOrResize = () => onClose();
-      window.addEventListener('scroll', handleScrollOrResize, true);
-      window.addEventListener('resize', handleScrollOrResize);
-
-      return () => {
-        window.removeEventListener('dayflow-close-all-menus', handleCloseAll);
-        document.body.removeEventListener('mousedown', handleClickOutside, {
+        window.dispatchEvent(new CustomEvent('dayflow-close-all-menus'));
+        window.addEventListener('dayflow-close-all-menus', handleCloseAll);
+        document.body.addEventListener('mousedown', handleClickOutside, {
           capture: true,
         });
-        document.body.removeEventListener('contextmenu', handleClickOutside, {
+        document.body.addEventListener('contextmenu', handleClickOutside, {
           capture: true,
         });
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('scroll', handleScrollOrResize, true);
-        window.removeEventListener('resize', handleScrollOrResize);
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+
+        const handleScrollOrResize = () => onClose();
+        window.addEventListener('scroll', handleScrollOrResize, true);
+        window.addEventListener('resize', handleScrollOrResize);
+
+        return () => {
+          window.removeEventListener('dayflow-close-all-menus', handleCloseAll);
+          document.body.removeEventListener('mousedown', handleClickOutside, {
+            capture: true,
+          });
+          document.body.removeEventListener('contextmenu', handleClickOutside, {
+            capture: true,
+          });
+          window.removeEventListener('keydown', handleKeyDown);
+          window.removeEventListener('scroll', handleScrollOrResize, true);
+          window.removeEventListener('resize', handleScrollOrResize);
+        };
+      }, [onClose]);
+
+      const style: Record<string, number | string> = {
+        top: y,
+        left: x,
+        ...customStyle,
       };
-    }, [onClose]);
 
-    const style: Record<string, number | string> = {
-      top: y,
-      left: x,
-      ...customStyle,
-    };
+      return createPortal(
+        <div
+          ref={setRefs}
+          className={`df-portal df-context-menu df-context-menu-content${className ? ` ${className}` : ''}`}
+          style={style}
+          onContextMenu={e => e.preventDefault()}
+          data-context-menu-root='true'
+          role='menu'
+        >
+          {children}
+        </div>,
+        document.body
+      );
+    }
+  );
 
-    return createPortal(
-      <div
-        ref={setRefs}
-        className={`df-portal df-context-menu df-context-menu-content${className ? ` ${className}` : ''}`}
-        style={style}
-        onContextMenu={e => e.preventDefault()}
-        data-context-menu-root='true'
-        role='menu'
-      >
-        {children}
-      </div>,
-      document.body
-    );
-  }
-);
-
-ContextMenu.displayName = 'ContextMenu';
+  component.displayName = 'ContextMenu';
+  return component;
+})();
 
 // ContextMenuItem
 export const ContextMenuItem = ({

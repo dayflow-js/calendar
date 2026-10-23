@@ -626,19 +626,46 @@
     fill: currentColor;
   }
 
-  /* A selected event is filled with its calendar color, so draw in its text color. */
-  [data-event-id][data-selected='true'] .df-task-checkbox {
-    color: inherit !important;
+  [data-event-id][data-selected='true'] .df-task-checkbox,
+  .df-agenda-event[data-selected='true'] .df-task-checkbox {
+    color: #fff !important;
   }
 
   [data-event-id][data-selected='true']
+    .df-task-checkbox[data-completed='true']
+    circle,
+  .df-agenda-event[data-selected='true']
     .df-task-checkbox[data-completed='true']
     circle {
     fill: none;
   }
 
-  [data-event-id][data-selected='true'] .df-task-checkbox path {
-    stroke: currentColor;
+  /* Match the timed cell inset after accounting for the segment offset. */
+  .df-month-segment-event[data-kind='task'] {
+    padding-inline: 0.125rem;
+  }
+
+  .dark,
+  [data-df-theme='dark'] {
+    --df-task-text-none: #cbd5e1;
+    --df-task-text-low: #86efac;
+    --df-task-text-medium: #fcd34d;
+    --df-task-text-high: #fca5a5;
+  }
+
+  /* The full event background carries priority; keep its text label accessible. */
+  .df-task-priority-indicator {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .df-event[data-kind='task'] .df-event-timed-content {
+    padding-left: 0.25rem;
   }
 
   .df-task-priority-mark {

@@ -1,5 +1,6 @@
 import { ComponentChildren } from 'preact';
 
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import {
   eventColorBar,
   eventTitleSmall,
@@ -20,7 +21,7 @@ import {
   getEventEndHour,
   formatTimeRangeFormatted,
 } from '@/utils';
-import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
+import { isTask } from '@/utils/taskUtils';
 
 import { TaskCheckbox } from './TaskCheckbox';
 
@@ -84,8 +85,8 @@ const RegularEventContent = ({
 
   const lineColors = getCalendarLineColors(event, app?.getCalendarRegistry());
   const colorBarValue = buildDiagonalColorBarGradient(lineColors);
-  const hideColorBar = isEventSelected && lineColors.length > 1;
-  const priorityMark = getTaskPriorityMark(event);
+  const hideColorBar =
+    isTask(event) || (isEventSelected && lineColors.length > 1);
   const colorBarContent = hideColorBar ? null : lineColors.length > 1 ? (
     <div
       className='df-event-color-bar-overlay'
@@ -116,9 +117,7 @@ const RegularEventContent = ({
               color={lineColors[0]}
             />
           )}
-          {priorityMark && (
-            <span className='df-task-priority-mark'>{priorityMark}</span>
-          )}
+          <TaskPriorityIndicator event={event} />
           {event.title}
         </div>
         {duration > 0.5 && (

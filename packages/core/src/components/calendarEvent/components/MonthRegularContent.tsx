@@ -1,3 +1,4 @@
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { monthRegularContent, monthEventColorBar } from '@/styles/classNames';
 import { Event, ICalendarApp } from '@/types';
 import {
@@ -6,7 +7,7 @@ import {
   extractHourFromDate,
   formatTime,
 } from '@/utils';
-import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
+import { isTask } from '@/utils/taskUtils';
 
 import { TaskCheckbox } from './TaskCheckbox';
 
@@ -53,7 +54,6 @@ const MonthRegularContent = ({
       ? { background: colorBarValue }
       : { backgroundColor: colorBarValue };
   const hideColorBar = _isEventSelected && lineColors.length > 1;
-  const priorityMark = getTaskPriorityMark(event);
 
   return (
     <div className={monthRegularContent} data-mobile={String(!!isMobile)}>
@@ -74,9 +74,7 @@ const MonthRegularContent = ({
           className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
           style={isMobile ? mobileFadeStyle : undefined}
         >
-          {priorityMark && (
-            <span className='df-task-priority-mark'>{priorityMark}</span>
-          )}
+          <TaskPriorityIndicator event={event} />
           {event.title}
         </span>
       </div>

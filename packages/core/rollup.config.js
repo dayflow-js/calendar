@@ -38,7 +38,15 @@ export default [
           '**/*.spec.tsx',
         ],
       }),
-      terser({ compress: { passes: 2, drop_console: true } }),
+      terser({
+        compress: {
+          passes: 3,
+          drop_console: true,
+          hoist_funs: true,
+          hoist_vars: true,
+        },
+        format: { preserve_annotations: true },
+      }),
       visualizer({
         filename: 'bundle-analysis.html',
         open: false,
@@ -51,6 +59,8 @@ export default [
       'preact',
       'preact/hooks',
       'preact/compat',
+      'preact/jsx-runtime',
+      'preact/jsx-dev-runtime',
       'temporal-polyfill',
       'tslib',
       '@dayflow/blossom-color-picker',

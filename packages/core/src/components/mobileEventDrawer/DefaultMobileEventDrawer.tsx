@@ -8,10 +8,12 @@ import {
 } from '@/components/common/CalendarPicker';
 import { EventKindSwitch } from '@/components/common/EventKindSwitch';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
+import { TaskPriorityField } from '@/components/common/TaskPriorityField';
 import { useLocale } from '@/locale';
 import {
   Event as CalendarEvent,
   EventKind,
+  TaskPriority,
   MobileEventProps,
   CalendarType,
 } from '@/types';
@@ -53,6 +55,7 @@ export const MobileEventDrawer = ({
   const shouldShowNotes = !isSubscribed || notes.trim() !== '';
 
   const [title, setTitle] = useState('');
+  const [priority, setPriority] = useState<TaskPriority>('none');
   const [kind, setKind] = useState<EventKind>('event');
   const [calendarId, setCalendarId] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
@@ -157,6 +160,7 @@ export const MobileEventDrawer = ({
     if (isOpen && draftEvent) {
       setTitle(draftEvent.title || '');
       setKind(draftEvent.kind ?? 'event');
+      setPriority(draftEvent.task?.priority ?? 'none');
       setCalendarId(draftEvent.calendarId || calendars[0]?.id || 'blue');
       setIsAllDay(draftEvent.allDay || false);
       setNotes(draftEvent.description || '');
@@ -189,6 +193,7 @@ export const MobileEventDrawer = ({
     } else if (isOpen && !draftEvent) {
       // Default init if no draft event (fallback)
       setKind('event');
+      setPriority('none');
       setCalendarId(calendars[0]?.id || 'blue');
       setNotes('');
       const now = new Date();
@@ -220,7 +225,7 @@ export const MobileEventDrawer = ({
         ? dateToPlainDate(finalEnd)
         : dateToZonedDateTime(finalEnd, app.timeZone),
       ...(isTaskKind
-        ? { kind: 'task' as const }
+        ? { kind: 'task' as const, task: { ...baseEvent.task, priority } }
         : { kind: undefined, task: undefined }),
     };
 
@@ -235,6 +240,7 @@ export const MobileEventDrawer = ({
     draftEvent,
     title,
     kind,
+    priority,
     calendarId,
     isAllDay,
     startDate,
@@ -370,7 +376,7 @@ export const MobileEventDrawer = ({
         </div>
 
         <div className='df-mobile-event-drawer-body'>
-          {isEditable && (
+          {isEditable && (app.getTasksEnabled?.() || isTaskKind) && (
             <EventKindSwitch value={kind} onChange={handleKindChange} />
           )}
           <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
@@ -566,6 +572,14 @@ export const MobileEventDrawer = ({
                 </div>
               </div>
             </div>
+          )}
+
+          {isTaskKind && draftEvent && (
+            <TaskPriorityField
+              event={{ ...draftEvent, task: { ...draftEvent.task, priority } }}
+              disabled={!isEditable}
+              onChange={event => setPriority(event.task?.priority ?? 'none')}
+            />
           )}
 
           {shouldShowNotes && (

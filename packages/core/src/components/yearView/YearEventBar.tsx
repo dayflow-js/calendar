@@ -1,5 +1,3 @@
-import { memo } from 'preact/compat';
-
 import { getEventIcon } from '@/components/monthView/util';
 import { Event, ICalendarApp } from '@/types';
 import {
@@ -11,6 +9,7 @@ import {
   getPrimaryCalendarId,
   getSelectedBgColor,
 } from '@/utils';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 import { YearMultiDaySegment } from './utils';
 
@@ -28,7 +27,8 @@ interface YearEventBarProps {
 }
 
 // Lightweight year-view event bar
-export const YearEventBar = memo(
+export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
+  'YearEventBar',
   ({
     event,
     segment,
@@ -162,5 +162,3 @@ export const YearEventBar = memo(
     );
   }
 );
-
-(YearEventBar as { displayName?: string }).displayName = 'YearEventBar';

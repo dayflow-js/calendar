@@ -149,7 +149,21 @@ export const EventContent = ({
             store={customRenderingStore}
             generatorName={generatorName}
             generatorArgs={eventContentSlotArgs}
-            defaultContent={applyVisualWrapper(defaultContent)}
+            defaultContent={applyVisualWrapper(
+              isTask(event) ? (
+                <MonthRegularContent
+                  event={event}
+                  app={app}
+                  isEventSelected={isEventSelected}
+                  isEditable={isEditable}
+                  hideTime={isAllDay || hideTime}
+                  isMobile={isMobile}
+                  timeFormat={timeFormat}
+                />
+              ) : (
+                defaultContent
+              )
+            )}
           />
         )}
       />
@@ -177,25 +191,26 @@ export const EventContent = ({
   }
 
   if (isMonthView) {
-    const defaultContent = isAllDay ? (
-      <MonthAllDayContent
-        event={event}
-        app={app}
-        isEventSelected={isEventSelected}
-        isEditable={isEditable}
-        isMobile={isMobile}
-      />
-    ) : (
-      <MonthRegularContent
-        event={event}
-        app={app}
-        isEventSelected={isEventSelected}
-        isEditable={isEditable}
-        hideTime={hideTime}
-        isMobile={isMobile}
-        timeFormat={timeFormat}
-      />
-    );
+    const defaultContent =
+      isAllDay && !isTask(event) ? (
+        <MonthAllDayContent
+          event={event}
+          app={app}
+          isEventSelected={isEventSelected}
+          isEditable={isEditable}
+          isMobile={isMobile}
+        />
+      ) : (
+        <MonthRegularContent
+          event={event}
+          app={app}
+          isEventSelected={isEventSelected}
+          isEditable={isEditable}
+          hideTime={hideTime || isAllDay}
+          isMobile={isMobile}
+          timeFormat={timeFormat}
+        />
+      );
     return (
       <ContentSlot
         store={customRenderingStore}

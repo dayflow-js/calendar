@@ -1,8 +1,9 @@
 import { CalendarDays } from '@/components/common/Icons';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { monthAllDayContent, eventIcon } from '@/styles/classNames';
 import { Event, ICalendarApp } from '@/types';
 import { getLineColor, getPrimaryCalendarId } from '@/utils';
-import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
+import { isTask } from '@/utils/taskUtils';
 
 import { TaskCheckbox } from './TaskCheckbox';
 
@@ -33,7 +34,6 @@ const MonthAllDayContent = ({
 }: MonthAllDayContentProps) => {
   const showIcon = event.icon !== false;
   const customIcon = typeof event.icon === 'boolean' ? null : event.icon;
-  const priorityMark = getTaskPriorityMark(event);
 
   return (
     <div className={monthAllDayContent}>
@@ -64,9 +64,7 @@ const MonthAllDayContent = ({
         className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
         style={isMobile ? mobileFadeStyle : undefined}
       >
-        {priorityMark && (
-          <span className='df-task-priority-mark'>{priorityMark}</span>
-        )}
+        <TaskPriorityIndicator event={event} />
         {event.title}
       </span>
     </div>

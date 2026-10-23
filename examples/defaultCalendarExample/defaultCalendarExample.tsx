@@ -70,6 +70,7 @@ const DefaultCalendarExample: React.FC<{
   // Secondary timezone — only adds a second timeline label column in Day/Week
   const [secondaryTz, setSecondaryTz] = useState<string>('');
 
+  const [enableTasks, setEnableTasks] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -243,6 +244,7 @@ const DefaultCalendarExample: React.FC<{
 
   const calendar = useCalendarApp({
     timeZone: appTz || undefined,
+    enableTasks,
     views,
     theme: { mode: themeMode },
     events: events,
@@ -289,6 +291,14 @@ const DefaultCalendarExample: React.FC<{
             )}
           </button>
         )}
+        <label className='flex items-center gap-2 text-sm'>
+          <input
+            type='checkbox'
+            checked={enableTasks}
+            onChange={e => setEnableTasks(e.target.checked)}
+          />
+          Enable tasks
+        </label>
         {/* Global calendar timezone */}
         <div className='flex min-w-[18rem] items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-700 shadow-sm md:min-w-88 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200'>
           <Globe size={16} className='text-gray-400' />

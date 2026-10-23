@@ -1,4 +1,3 @@
-import { memo } from 'preact/compat';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { getEventIcon } from '@/components/monthView/util';
@@ -9,6 +8,7 @@ import {
   getSelectedBgColor,
   getTodayInTimeZone,
 } from '@/utils';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 import {
   analyzeMultiDayEventsForRow,
@@ -121,7 +121,8 @@ interface YearStaticEventsLayerProps {
 
 // Lightweight static layer: renders all non-dragged events as bare
 // YearEventBars. Memoized — does not re-render during drag.
-const YearStaticEventsLayer = memo(
+const YearStaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
+  'YearStaticEventsLayer',
   ({
     segments,
     columnsPerRow,
@@ -151,9 +152,6 @@ const YearStaticEventsLayer = memo(
     </>
   )
 );
-
-(YearStaticEventsLayer as { displayName?: string }).displayName =
-  'YearStaticEventsLayer';
 
 interface YearRowComponentProps {
   rowDays: Date[];
@@ -260,7 +258,8 @@ const createPreviewRowSegment = (
   };
 };
 
-export const YearRowComponent = memo(
+export const YearRowComponent = /* @__PURE__ */ memoWithDisplayName(
+  'YearRowComponent',
   ({
     rowDays,
     events,
@@ -486,5 +485,3 @@ export const YearRowComponent = memo(
     );
   }
 );
-
-(YearRowComponent as { displayName?: string }).displayName = 'YearRowComponent';

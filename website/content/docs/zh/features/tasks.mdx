@@ -1,0 +1,131 @@
+---
+title: 任务
+description: 在日历中添加带截止日期、完成状态和优先级的任务。
+---
+
+# 任务
+
+任务与普通事件共用 `Event` 数据模型和日历归属。任务只有一个截止日期或时间，
+不表示持续时长。左侧圆圈用于切换完成状态，整条斜纹背景和文字颜色用于区分优先级。
+
+## 启用任务创建
+
+设置 `enableTasks: true`，即可在内置桌面详情面板、弹窗和移动端编辑器中显示
+Event / Task 切换选项。默认值为 `false`，保持原有事件创建界面。
+关闭此选项后，已有任务仍可显示和编辑。
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+该选项属于 `CalendarAppConfig`，适用于所有框架适配器。已有 core 实例也可动态修改：
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+这是运行时的编辑器选项，关闭它不会从构建产物中移除任务代码。
+
+## 创建定时或全天任务
+
+使用 `kind: 'task'`，并将 `start` 和 `end` 设为相同的截止值。
+没有截止时间的任务使用 `allDay: true` 和 `Temporal.PlainDate`。
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: '审阅设计反馈',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: '发送发布清单',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+通过 `events` 配置传入这些任务，或使用普通事件 API 添加、更新和删除。
+可设置 `calendarId`，指定任务所属的日历。
+
+| 字段               | 类型                                    | 含义                           |
+| ------------------ | --------------------------------------- | ------------------------------ |
+| `kind`             | `'event' \| 'task'`                     | 省略时默认为 `'event'`。       |
+| `task.completed`   | `boolean`                               | 默认未完成。                   |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | 完成时间；重新打开任务时清除。 |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | 默认为 `'none'`。              |
+
+## 完成任务与修改优先级
+
+点击左侧圆圈即可完成或重新打开任务，不会打开详情面板或触发拖拽。
+键盘用户可聚焦圆圈后按空格或 Enter。已完成任务的标题会显示删除线。
+
+打开任务详情，可编辑标题、截止日期与时间、备注和优先级。
+**设为全天**会移除截止时间，**添加时间**则恢复截止时间。任务可以移动，但不能拉伸调整时长。
+
+| 优先级   | 斜纹背景和文字颜色 |
+| -------- | ------------------ |
+| `none`   | 灰色               |
+| `low`    | 绿色               |
+| `medium` | 橙色               |
+| `high`   | 红色               |
+
+斜纹覆盖整条任务。圆圈使用所属日历的颜色，选中任务时变为白色。
+优先级不改变日历按时间排列的顺序。月视图中的全天任务保留任务行样式，
+不显示时间；日视图和周视图中的任务不显示事件色条。
+
+[交互 Demo](/demo) 提供 **Tasks** 开关，旁边的 **Preview** 提示会演示完成任务、
+打开详情面板和切换优先级。
+
+## 程序更新与持久化
+
+任务变更使用与普通事件相同的 `onEventUpdate` 回调。
+保存数据时，应同时保留 `kind`、`task` 元数据和日期字段。
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// taskEvent 是已有的 kind: 'task' 的 Event。
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+辅助函数只返回更新后的值，不会自动保存。
+[只读模式](/docs-zh/features/read-only) 禁止通过内置 UI 完成或编辑任务，
+但仍允许程序调用更新 API。
+
+自动生成的重复任务实例暂不支持独立完成。外部 CalDAV 任务（`VTODO`）同步尚未实现，
+不要假定普通事件同步会保留任务专属字段。

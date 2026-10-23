@@ -803,8 +803,8 @@
   .df-event-detail-panel {
     position: fixed;
     box-sizing: border-box;
-    width: min(calc(28rem + 30px), calc(100vw - 16px));
-    max-width: min(calc(28rem + 30px), calc(100vw - 16px));
+    width: min(25rem, calc(100vw - 16px));
+    max-width: min(25rem, calc(100vw - 16px));
     max-height: calc(100dvh - 16px);
     overflow: hidden;
     border-width: 1px;
@@ -835,8 +835,8 @@
     border-style: solid;
     border-radius: 0.5rem;
     padding: 1.5rem;
-    max-width: calc(28rem + 30px);
-    width: min(calc(28rem + 30px), calc(100vw - 32px));
+    max-width: 25rem;
+    width: min(25rem, calc(100vw - 32px));
     margin-inline: 1rem;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   }

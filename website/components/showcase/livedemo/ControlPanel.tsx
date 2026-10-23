@@ -30,6 +30,7 @@ import {
 } from './FeaturePreviews';
 import { MiniDotsFeature } from './MiniDotsFeature';
 import { MultiCalFeature } from './MultiCalFeature';
+import { TaskFeature } from './TaskFeature';
 import { ThemeColorColumn } from './ThemeColorColumn';
 import {
   CalendarFeatures,
@@ -337,6 +338,10 @@ export function ControlPanel({
                 </div>
               )}
 
+              <TaskFeature
+                checked={features.enableTasks}
+                onUpdateFeatures={onUpdateFeatures}
+              />
               <MultiCalFeature
                 checked={features.showMultiCalendar}
                 onUpdateFeatures={onUpdateFeatures}

@@ -35,7 +35,7 @@ import React, {
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getWebsiteCalendars } from '@/utils/palette';
-import { generateSampleEvents } from '@/utils/sampleData';
+import { generateSampleEvents, generateSampleTasks } from '@/utils/sampleData';
 
 import { CalendarViewer } from './livedemo/CalendarViewer';
 import { ControlPanelV2 } from './livedemo/ControlPanelV2';
@@ -43,6 +43,7 @@ import {
   CalendarFeatures,
   CalendarSelections,
   DEFAULT_THEME_COLOR,
+  YearMode,
 } from './livedemo/types';
 
 const calendarTypes = getWebsiteCalendars();
@@ -81,6 +82,7 @@ export function InteractiveCalendar() {
     showSidebar: false,
     showHeader: true,
     enableDrag: true,
+    enableTasks: false,
     enableShortcuts: true,
     showEventDots: true,
     showCalendarGroups: true,
@@ -120,10 +122,34 @@ export function InteractiveCalendar() {
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
-      setFeatures(prev => ({ ...prev, showSidebar: true }));
-      setShowControls(true);
-    }
+    const isDesktop = window.innerWidth >= 1024;
+    // URL parameters open the demo in a given state, e.g. for changelog
+    // screenshots: /demo?view=week&enableTasks=1&controls=0
+    const params = new URLSearchParams(window.location.search);
+    setFeatures(prev => {
+      const next = { ...prev, showSidebar: isDesktop };
+      for (const key of Object.keys(prev) as Array<keyof CalendarFeatures>) {
+        const value = params.get(key);
+        if (value !== null && typeof prev[key] === 'boolean') {
+          (next as Record<string, unknown>)[key] =
+            value === '1' || value === 'true';
+        }
+      }
+      return next;
+    });
+    setSelections(prev => ({
+      ...prev,
+      ...(params.get('view') && { activeView: params.get('view') as ViewType }),
+      ...(params.get('yearMode') && {
+        yearMode: params.get('yearMode') as YearMode,
+      }),
+      ...(params.get('timeZone') && { timeZone: params.get('timeZone')! }),
+      ...(params.get('secondaryTimeZone') && {
+        secondaryTimeZone: params.get('secondaryTimeZone')!,
+      }),
+      ...(params.get('locale') && { locale: params.get('locale')! }),
+    }));
+    setShowControls(isDesktop && params.get('controls') !== '0');
   }, []);
 
   const updateFeatures = useCallback(
@@ -234,10 +260,20 @@ export function InteractiveCalendar() {
   );
 
   const allEvents = useMemo(() => generateSampleEvents(), []);
+  const sampleTasks = useMemo(() => generateSampleTasks(), []);
   const events = useMemo(() => {
-    if (features.showMultiCalendar) return allEvents;
-    return allEvents.filter(e => !e.calendarIds);
-  }, [allEvents, features.showMultiCalendar]);
+    const visibleEvents = features.showMultiCalendar
+      ? allEvents
+      : allEvents.filter(e => !e.calendarIds);
+    return features.enableTasks
+      ? [...sampleTasks, ...visibleEvents]
+      : visibleEvents;
+  }, [
+    allEvents,
+    sampleTasks,
+    features.showMultiCalendar,
+    features.enableTasks,
+  ]);
 
   const calendarsWithGroups = useMemo(() => {
     const googleIds = new Set(['team', 'personal', 'learning', 'travel']);
@@ -371,6 +407,7 @@ export function InteractiveCalendar() {
       calendars: features.showCalendarGroups
         ? calendarsWithGroups
         : calendarTypes,
+      enableTasks: features.enableTasks,
       useCalendarHeader: features.showHeader,
       eventDetailTrigger: 'click',
       switcherMode: selections.switcherMode,

@@ -524,7 +524,7 @@ export class CalendarRegistry {
  * This is used when helper functions are called outside of CalendarApp context
  * CalendarApp will set this registry when initialized
  */
-let defaultRegistry = new CalendarRegistry();
+let defaultRegistry = /* @__PURE__ */ new CalendarRegistry();
 
 /**
  * Get the default calendar registry

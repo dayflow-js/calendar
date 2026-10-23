@@ -47,6 +47,7 @@ export class CalendarApp implements ICalendarApp {
   private pluginManager: PluginManager;
   private useEventDetailDialog: boolean;
   private useEventDetailPanel: boolean;
+  private enableTasks: boolean;
   private eventDetailTrigger: EventDetailTrigger;
   private useCalendarHeader: boolean;
   private themeColors?: ThemeColors;
@@ -106,6 +107,7 @@ export class CalendarApp implements ICalendarApp {
 
     this.pluginManager = new PluginManager(this.state, this.notify);
 
+    this.enableTasks = config.enableTasks ?? false;
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
     // Dialog and panel are mutually exclusive renderings of the same selection
     // state — dialog wins when both are requested.
@@ -385,6 +387,7 @@ export class CalendarApp implements ICalendarApp {
 
   getCalendarRegistry = (): CalendarRegistry => this.calendarRegistry;
   getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
+  getTasksEnabled = (): boolean => this.enableTasks;
   getUseEventDetailPanel = (): boolean => this.useEventDetailPanel;
   getEventDetailEnabled = (): boolean =>
     this.useEventDetailDialog || this.useEventDetailPanel;
@@ -402,6 +405,14 @@ export class CalendarApp implements ICalendarApp {
 
   updateConfig = (config: Partial<CalendarAppConfig>): void => {
     let hasChanged = false;
+
+    if (
+      config.enableTasks !== undefined &&
+      config.enableTasks !== this.enableTasks
+    ) {
+      this.enableTasks = config.enableTasks;
+      hasChanged = true;
+    }
 
     if (
       config.useEventDetailDialog !== undefined ||

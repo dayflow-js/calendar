@@ -72,3 +72,25 @@ If you find a bug, please file an issue on [GitHub Issues](https://github.com/da
 ## Support
 
 For questions and support, please open an issue on GitHub or go to discord.
+
+### Optional tasks
+
+Set `enableTasks: true` in your calendar configuration to show the Event / Task
+switch in the built-in desktop and mobile editors. It defaults to `false` to
+preserve the existing event creation interface. This option can also be changed
+with `app.updateConfig({ enableTasks: true })`. Existing task data remains visible
+and editable when the option is off.
+
+Tasks use `kind: 'task'`, a single due date/time (`start` and `end` are equal),
+and optional `task: { completed, completedAt, priority }` metadata. Priority is
+`'none'`, `'low'`, `'medium'`, or `'high'`; the calendar uses a striped background for tasks: low is green, medium is amber, high is red,
+and no priority is slate. Priority does not change chronological calendar ordering.
+Use `allDay: true` and `Temporal.PlainDate` values for a date-only task.
+
+### Checking bundle size (repository development)
+
+After building, run `pnpm --filter @dayflow/core size` for raw/gzip/Brotli asset
+sizes, and `pnpm --filter @dayflow/core check:tree-shaking` for consumer import
+probes and the utility-import size budget. Import only the view factories you use;
+`enableTasks` controls the editor interface at runtime, rather than removing task
+code from the package.

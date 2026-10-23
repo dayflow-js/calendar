@@ -7,6 +7,7 @@
     "event-dialog",
     "multi-calendar-event",
     "read-only",
-    "switcher-mode"
+    "switcher-mode",
+    "tasks"
   ]
 }

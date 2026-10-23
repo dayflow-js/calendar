@@ -27,6 +27,8 @@ import { Event } from '@dayflow/core';
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | 事件结束日期/时间                                                                                                       | 必填 |
 | `description` | `string`                                                                 | 可选的事件描述或备注                                                                                                    | 可选 |
 | `conference`  | `EventConference`                                                        | 可选的视频会议入会信息。内建详情 UI 会根据 `joinUrl` 识别已知服务商。                                                   | 可选 |
+| `kind`        | `'event' \| 'task'`                                                      | 条目类型，省略时为普通事件。                                                                                            | 可选 |
+| `task`        | `EventTask`                                                              | 任务完成状态、完成时间和优先级，参见[任务文档](/docs-zh/features/tasks)。                                               | 可选 |
 | `allDay`      | `boolean`                                                                | 是否为全天事件（默认：`false`）                                                                                         | 可选 |
 | `icon`        | `boolean \| Node`                                                        | 事件的自定义图标。`true`（默认）：显示默认，`false`：隐藏，`Node`：自定义图标                                           | 可选 |
 | `calendarId`  | `string`                                                                 | 单日历归属的日历类型引用                                                                                                | 可选 |

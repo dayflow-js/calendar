@@ -31,6 +31,7 @@ import {
 } from './FeaturePreviews';
 import { MiniDotsFeature } from './MiniDotsFeature';
 import { MultiCalFeature } from './MultiCalFeature';
+import { TaskFeature } from './TaskFeature';
 import { ThemeColorColumn } from './ThemeColorColumn';
 import type {
   CalendarFeatures,
@@ -317,6 +318,10 @@ export function ControlPanelV2(props: Props) {
                         label='Read only'
                         checked={features.readOnly}
                         onChange={readOnly => updateFeatures({ readOnly })}
+                      />
+                      <TaskFeature
+                        checked={features.enableTasks}
+                        onUpdateFeatures={updateFeatures}
                       />
                       <MultiCalFeature
                         checked={features.showMultiCalendar}

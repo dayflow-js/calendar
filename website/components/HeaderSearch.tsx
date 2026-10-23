@@ -24,7 +24,8 @@ function DocsLink() {
       href='/docs/introduction'
       className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center p-2 text-sm whitespace-nowrap transition-colors'
     >
-      Documentation
+      <span className='hidden sm:inline'>Documentation</span>
+      <span className='sm:hidden'>Docs</span>
     </Link>
   );
 }
@@ -35,6 +36,16 @@ export function HeaderSearchLarge() {
 
   return (
     <>
+      <Link
+        href='/changelog'
+        className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center gap-1.5 p-2 text-sm whitespace-nowrap transition-colors'
+      >
+        Changelog
+        <span
+          aria-hidden='true'
+          className='h-1.5 w-1.5 rounded-full bg-emerald-500'
+        />
+      </Link>
       <DocsLink />
       {enabled && (
         <button
@@ -68,6 +79,16 @@ export function HeaderSearchCompact() {
 
   return (
     <>
+      <Link
+        href='/changelog'
+        className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center gap-1.5 p-2 text-sm whitespace-nowrap transition-colors'
+      >
+        Changelog
+        <span
+          aria-hidden='true'
+          className='h-1.5 w-1.5 rounded-full bg-emerald-500'
+        />
+      </Link>
       <DocsLink />
       {enabled && (
         <button

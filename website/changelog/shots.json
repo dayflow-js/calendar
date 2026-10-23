@@ -1,0 +1,106 @@
+[
+  {
+    "name": "tasks",
+    "alt": "Tasks with priorities beside events in Day view",
+    "path": "/demo?view=day&enableTasks=1&showSidebar=0&controls=0",
+    "steps": [
+      {
+        "eval": "document.querySelector('.df-calendar-container [data-event-id=\"demo-task-1\"]').scrollIntoView({ block: 'center' })"
+      }
+    ]
+  },
+  {
+    "name": "tasks-priority",
+    "alt": "Choosing a task priority in the detail panel",
+    "path": "/demo?view=week&enableTasks=1&showSidebar=0&controls=0",
+    "steps": [
+      { "click": ".df-calendar-container [data-event-id=\"demo-task-1\"]" }
+    ],
+    "clip": [
+      ".df-event-detail-panel",
+      ".df-calendar-container [data-event-id=\"demo-task-1\"]"
+    ],
+    "padding": 32
+  },
+  {
+    "name": "rich-notes",
+    "alt": "Formatted notes with a Join button detected from a Zoom link",
+    "path": "/demo?view=week&showSidebar=0&controls=0",
+    "steps": [
+      { "click": ".df-calendar-container [data-event-id=\"demo-notes\"]" }
+    ],
+    "clip": [
+      ".df-event-detail-panel",
+      ".df-calendar-container [data-event-id=\"demo-notes\"]"
+    ],
+    "padding": 32
+  },
+  {
+    "name": "calendar-picker-groups",
+    "alt": "The calendar picker grouped by Google and iCloud",
+    "path": "/demo?view=week&showSidebar=0&controls=0",
+    "steps": [
+      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" },
+      { "click": ".df-event-detail-panel .df-calendar-picker-trigger" }
+    ],
+    "clip": [".df-event-detail-panel", ".df-calendar-picker-group-label"],
+    "padding": 32
+  },
+  {
+    "name": "meeting-links",
+    "alt": "A Google Meet link with a Join button in the event details",
+    "path": "/demo?view=week&showSidebar=0&controls=0",
+    "steps": [
+      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" }
+    ],
+    "clip": [
+      ".df-event-detail-panel",
+      ".df-calendar-container [data-event-id=\"demo-meeting\"]"
+    ],
+    "padding": 32
+  },
+  {
+    "name": "recurrence",
+    "alt": "The custom repeat dialog",
+    "path": "/demo?view=week&showSidebar=0&controls=0",
+    "steps": [
+      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" },
+      { "click": ".df-event-repeat-field .df-form-select-trigger" },
+      {
+        "click": ".df-event-repeat-field .df-view-switcher-select-option:last-child"
+      }
+    ],
+    "clip": ".df-repeat-dialog",
+    "padding": 48
+  },
+  {
+    "name": "agenda-view",
+    "alt": "Events grouped by day in Agenda view",
+    "path": "/demo?view=agenda&showSidebar=0&controls=0"
+  },
+  {
+    "name": "multi-calendar",
+    "alt": "Events shared across calendars with striped colors in Month view",
+    "path": "/demo?view=month&showMultiCalendar=1&showSidebar=0&controls=0"
+  },
+  {
+    "name": "time-zones",
+    "alt": "Week view with a secondary London timeline",
+    "path": "/demo?view=week&secondaryTimeZone=Europe/London&showSidebar=0&controls=0"
+  },
+  {
+    "name": "year-grid",
+    "alt": "Grid Year view with event density colors",
+    "path": "/demo?view=year&yearMode=grid&showSidebar=0&controls=0"
+  },
+  {
+    "name": "calendar-sources",
+    "alt": "Sidebar calendars grouped by source",
+    "path": "/demo?view=week&controls=0"
+  },
+  {
+    "name": "month-view",
+    "alt": "Month view with the sidebar and mini calendar",
+    "path": "/demo?view=month&controls=0"
+  }
+]

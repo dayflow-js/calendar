@@ -219,7 +219,7 @@ const DefaultEventDetailDialog = ({
         </button>
 
         <div>
-          {isEditable && (
+          {isEditable && (app?.getTasksEnabled?.() || isTask(editedEvent)) && (
             <EventKindSwitch
               value={editedEvent.kind ?? 'event'}
               disabled={isPending}
@@ -369,7 +369,7 @@ const DefaultEventDetailDialog = ({
                   className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToAllDay}
                 >
-                  {t(isEditedTask ? 'removeDueTime' : 'setAsAllDay')}
+                  {t('setAsAllDay')}
                 </button>
               )}
 

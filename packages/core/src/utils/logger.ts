@@ -59,4 +59,4 @@ class Logger {
   }
 }
 
-export const logger = new Logger();
+export const logger = /* @__PURE__ */ new Logger();

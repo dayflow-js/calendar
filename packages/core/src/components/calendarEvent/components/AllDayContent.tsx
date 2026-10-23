@@ -1,6 +1,7 @@
 import { ComponentChildren } from 'preact';
 
 import { CalendarDays } from '@/components/common/Icons';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { MultiDayEventSegment } from '@/components/monthView/util';
 import {
   eventIcon,
@@ -10,7 +11,7 @@ import {
 } from '@/styles/classNames';
 import { Event, ICalendarApp } from '@/types';
 import { getLineColor, getPrimaryCalendarId } from '@/utils';
-import { getTaskPriorityMark, isTask } from '@/utils/taskUtils';
+import { isTask } from '@/utils/taskUtils';
 
 import { TaskCheckbox } from './TaskCheckbox';
 
@@ -38,7 +39,6 @@ const AllDayContent = ({
 }: AllDayContentProps) => {
   const showIcon = event.icon !== false;
   const customIcon = typeof event.icon === 'boolean' ? null : event.icon;
-  const priorityMark = getTaskPriorityMark(event);
 
   // Calculate title offset for mobile sliding mode
   const titleOffsetStyle = (() => {
@@ -89,9 +89,7 @@ const AllDayContent = ({
         ))
       )}
       <div className={`${eventTitleSmall} df-event-title-tight`}>
-        {priorityMark && (
-          <span className='df-task-priority-mark'>{priorityMark}</span>
-        )}
+        <TaskPriorityIndicator event={event} />
         {event.title}
       </div>
     </div>

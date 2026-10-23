@@ -437,7 +437,7 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      {isEditable && (
+      {isEditable && (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
         <EventKindSwitch
           value={draftEvent.kind ?? 'event'}
           disabled={isLoading}
@@ -596,7 +596,7 @@ const DefaultEventDetailPanel = ({
               onClick={convertToAllDay}
               loading={isLoading}
             >
-              {t(isDraftTask ? 'removeDueTime' : 'setAsAllDay')}
+              {t('setAsAllDay')}
             </LoadingButton>
           )}
 

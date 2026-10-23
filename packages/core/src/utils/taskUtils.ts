@@ -69,3 +69,32 @@ export const setTaskPriority = (
   ...event,
   task: { ...event.task, priority },
 });
+
+/** Full-row priority stripes; selected tasks use softened priority tones. */
+export const getTaskPriorityBackground = (
+  event: Pick<Event, 'task'>,
+  selected = false
+): string => {
+  const colors: Record<TaskPriority, [string, string]> = {
+    none: ['100, 116, 139', '51, 65, 85'],
+    low: ['22, 163, 74', '22, 101, 52'],
+    medium: ['217, 119, 6', '146, 64, 14'],
+    high: ['220, 38, 38', '153, 27, 27'],
+  };
+  const color = colors[getTaskPriority(event)][selected ? 1 : 0];
+  return `repeating-linear-gradient(-45deg, rgba(${color}, ${selected ? 0.8 : 0.18}) 0px, rgba(${color}, ${selected ? 0.8 : 0.18}) 6px, rgba(${color}, ${selected ? 0.65 : 0.05}) 6px, rgba(${color}, ${selected ? 0.65 : 0.05}) 12px)`;
+};
+
+/** Priority controls task text independently of its calendar-colored circle. */
+export const getTaskPriorityTextColor = (
+  event: Pick<Event, 'task'>,
+  selected = false
+): string => {
+  const colors: Record<TaskPriority, [string, string]> = {
+    none: ['var(--df-task-text-none, #475569)', '#e2e8f0'],
+    low: ['var(--df-task-text-low, #15803d)', '#bbf7d0'],
+    medium: ['var(--df-task-text-medium, #92400e)', '#fde68a'],
+    high: ['var(--df-task-text-high, #b91c1c)', '#fecaca'],
+  };
+  return colors[getTaskPriority(event)][selected ? 1 : 0];
+};

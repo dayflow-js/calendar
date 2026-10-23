@@ -973,6 +973,21 @@
     margin-bottom: 0.5rem;
   }
 
+  .df-right-panel-task-content {
+    padding: 0.375rem 0.5rem;
+    min-width: 0;
+  }
+
+  .df-right-panel-event-card[data-kind='task'] .df-event-all-day-shell {
+    position: static;
+    padding: 0;
+  }
+
+  .df-right-panel-task-content .df-event-time {
+    padding-left: 1.125rem;
+    margin-top: 0.125rem;
+  }
+
   .df-week-time-grid {
     position: relative;
     display: flex;

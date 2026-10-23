@@ -9,6 +9,7 @@ import { ViewType } from '@/types';
 const createApp = () =>
   new CalendarApp({
     views: [],
+    enableTasks: true,
     plugins: [],
     defaultView: ViewType.MONTH,
     events: [
@@ -162,6 +163,8 @@ describe('MobileEventDrawer', () => {
     expect(screen.queryByText('Ends')).toBeNull();
     expect(screen.getByText('Due')).toBeInTheDocument();
     expect(screen.getByText('Edit Task')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Priority'));
+    fireEvent.click(screen.getByRole('option', { name: 'High' }));
 
     fireEvent.input(screen.getByDisplayValue('Saved notes'), {
       target: { value: 'Bring slides' },
@@ -173,6 +176,7 @@ describe('MobileEventDrawer', () => {
     expect(saved.kind).toBe('task');
     expect(saved.end.toString()).toBe(saved.start.toString());
     expect(saved.description).toBe('Bring slides');
+    expect(saved.task.priority).toBe('high');
   });
 
   it('gives a task an hour again when switched back to an event', () => {

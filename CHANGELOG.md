@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.6] - 2026-10-23
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.6 · `@dayflow/plugin-localization` 1.6.4 · `@dayflow/ui-context-menu` 1.2.2 · `@dayflow/ui-range-picker` 1.2.2. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Tasks in Your Calendar (`@dayflow/core`)**: Add tasks alongside events with a single due date or time (`kind: 'task'`). The new `enableTasks` option shows the Event / Task switch in the built-in desktop and mobile editors; it defaults to `false` to preserve the existing event creation interface. `setTaskCompleted` and `setTaskPriority` update tasks from code.
+- **Complete Tasks in Place (`@dayflow/core`)**: Click the circle to complete or reopen a task, with strike-through styling and a completion timestamp. Tasks can be moved, but cannot be resized.
+- **Visual Priorities (`@dayflow/core`)**: Low, medium, and high priorities use green, amber, and red diagonal backgrounds and matching text. Calendar-colored completion circles turn white when selected.
+- **All-Day Tasks (`@dayflow/core`)**: Switch between a timed deadline and an all-day task. Month view keeps both in a consistent task row, with aligned completion circles; Day and Week tasks omit event color bars.
+- **Compact Task Editors (`@dayflow/core`)**: Narrower detail panels, priority controls on mobile, and the existing notes and calendar selectors keep task editing familiar.
+- **Single-Date Range Picker (`@dayflow/ui-range-picker`)**: New `mode: 'single'` shows one field for a single date or time, used for task due dates. `onChange` and `onOk` still receive a tuple, with both entries set to the chosen value.
+- **Task Labels (`@dayflow/plugin-localization`)**: Task, priority and due-time labels in every bundled language.
+
+### Performance
+
+- **Smaller Bundles When Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Unused component initialization can now be removed by your bundler, and the Preact JSX runtime is shared instead of embedded. Consumer probes reduced a standalone `isTask` import from 28.9 KiB to 1.7 KiB gzip and a Month-only calendar from 75.5 KiB to 72.6 KiB gzip, with external runtime dependencies excluded. A calendar using every view is effectively unchanged.
+
+### Documentation
+
+- Added a task guide in all seven documentation languages, task fields in the `Event` and `useCalendarApp` references, and a Tasks switch in the interactive demo.
+- The website changelog now shows screenshots taken from the live demo, compact entries for fix-only releases, and an RSS feed.
+
 ## [3.7.4] - 2026-10-14
 
 Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.4 · `@dayflow/plugin-sidebar` 1.6.4. All other packages are unchanged.
