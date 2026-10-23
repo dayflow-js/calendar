@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/react",
-  "version": "3.7.5",
+  "version": "3.7.6",
   "description": "React adapter for DayFlow calendar",
   "files": [
     "dist",

@@ -48,6 +48,15 @@ const createConfig = ssr => ({
     ) {
       return;
     }
+    // Server output drops $effect bodies, so helpers used only inside them
+    // (such as untrack) are unused there. Rollup already removes the import.
+    if (
+      ssr &&
+      warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
+      (warning.exporter === 'svelte' || warning.exporter?.startsWith('svelte/'))
+    ) {
+      return;
+    }
     warn(warning);
   },
 });
