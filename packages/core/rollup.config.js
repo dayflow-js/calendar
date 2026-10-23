@@ -43,7 +43,6 @@ export default [
           passes: 3,
           drop_console: true,
           hoist_funs: true,
-          hoist_vars: true,
         },
         format: { preserve_annotations: true },
       }),

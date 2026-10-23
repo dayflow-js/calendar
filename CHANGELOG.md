@@ -16,6 +16,14 @@ Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@d
 - **Single-Date Range Picker (`@dayflow/ui-range-picker`)**: New `mode: 'single'` shows one field for a single date or time, used for task due dates. `onChange` and `onOk` still receive a tuple, with both entries set to the chosen value.
 - **Task Labels (`@dayflow/plugin-localization`)**: Task, priority and due-time labels in every bundled language.
 
+### Fixed
+
+- **Mobile Event Drawer Times (`@dayflow/core`)**: Saving in the mobile drawer no longer shifts the event time when the device's time zone differs from the calendar's `timeZone`. The drawer now shows and edits times in the calendar's time zone.
+
+### Changed
+
+- **Preact Peer Range (`@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: The packages now import `preact/jsx-runtime` and require `preact` 10.5 or later.
+
 ### Performance
 
 - **Smaller Bundles When Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Unused component initialization can now be removed by your bundler, and the Preact JSX runtime is shared instead of embedded. In consumer probes, a standalone `isTask` import is 94% smaller (1.7 KiB gzip) and a Month-only calendar about 4% smaller, with external runtime dependencies excluded. A calendar using every view is effectively unchanged.

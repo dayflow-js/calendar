@@ -57,7 +57,7 @@ const mountCalendar = (
       },
     ],
     defaultView: viewType,
-    initialDate: new Date('2026-10-14T12:00:00+11:00'),
+    initialDate: new Date(2026, 9, 14, 12),
     timeZone: TZ,
     timeFormat,
     useCalendarHeader: false,

@@ -206,4 +206,35 @@ describe('MobileEventDrawer', () => {
     expect(saved.task).toBeUndefined();
     expect(saved.end.toString()).toBe(stored.end.toString());
   });
+
+  // Times are edited in the calendar time zone, whatever the system zone is
+  // (CI runs in UTC, the calendar here in Sydney).
+  it('keeps the event time when only the title changes', () => {
+    const app = createApp();
+    const onSave = vi.fn();
+    const stored = app.getEvents()[0];
+
+    render(
+      <LocaleProvider>
+        <MobileEventDrawer
+          isOpen
+          onClose={vi.fn()}
+          onSave={onSave}
+          onEventDelete={vi.fn()}
+          draftEvent={stored}
+          app={app}
+        />
+      </LocaleProvider>
+    );
+
+    fireEvent.input(screen.getByDisplayValue('Existing event'), {
+      target: { value: 'Renamed' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+
+    const saved = onSave.mock.calls[0][0];
+    expect(saved.title).toBe('Renamed');
+    expect(saved.start.toString()).toBe(stored.start.toString());
+    expect(saved.end.toString()).toBe(stored.end.toString());
+  });
 });

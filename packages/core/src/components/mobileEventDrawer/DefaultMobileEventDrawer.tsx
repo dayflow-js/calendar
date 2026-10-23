@@ -1,6 +1,7 @@
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
 import { useState, useEffect, useMemo, useRef, useId } from 'preact/hooks';
+import { Temporal } from 'temporal-polyfill';
 
 import { addCalendarMonths } from '@/calendar/calendarSystem';
 import {
@@ -20,16 +21,57 @@ import {
   MobileEventProps,
   CalendarType,
 } from '@/types';
+import { formatTime, isEventDeepEqual } from '@/utils';
+import { temporalToDate } from '@/utils/temporal';
 import {
-  formatTime,
-  isEventDeepEqual,
-  restoreVisualEventToCanonical,
-} from '@/utils';
-import { temporalToDate, dateToZonedDateTime } from '@/utils/temporal';
-import { dateToPlainDate } from '@/utils/temporalTypeGuards';
+  dateToPlainDate,
+  isPlainDateTime,
+  isZonedDateTime,
+} from '@/utils/temporalTypeGuards';
 
 import { Switch } from './components/Switch';
 import { TimePickerWheel } from './components/TimePickerWheel';
+
+/*
+ * The drawer edits wall-clock times in the calendar's time zone, held in Date
+ * fields (getHours() etc.), so the result does not depend on the system zone.
+ */
+type DrawerTemporal = CalendarEvent['start'];
+
+/** Wall-clock time of `temporal` in `timeZone`, as Date fields. */
+const toWallClockDate = (temporal: DrawerTemporal, timeZone: string): Date => {
+  if (!isZonedDateTime(temporal)) return temporalToDate(temporal);
+  const zoned = temporal.withTimeZone(timeZone);
+  return new Date(
+    zoned.year,
+    zoned.month - 1,
+    zoned.day,
+    zoned.hour,
+    zoned.minute,
+    zoned.second
+  );
+};
+
+/** Inverse of toWallClockDate, keeping the original value's type and zone. */
+const fromWallClockDate = (
+  date: Date,
+  timeZone: string,
+  original?: DrawerTemporal
+): Temporal.PlainDateTime | Temporal.ZonedDateTime => {
+  const wallClock = Temporal.PlainDateTime.from({
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes(),
+    second: date.getSeconds(),
+  });
+  if (isPlainDateTime(original)) return wallClock;
+  const zoned = wallClock.toZonedDateTime(timeZone);
+  return isZonedDateTime(original)
+    ? zoned.withTimeZone(original.timeZoneId)
+    : zoned;
+};
 
 export const MobileEventDrawer = ({
   isOpen,
@@ -170,7 +212,7 @@ export const MobileEventDrawer = ({
 
       if (draftEvent.start) {
         try {
-          const start = temporalToDate(draftEvent.start);
+          const start = toWallClockDate(draftEvent.start, app.timeZone);
           setStartDate(start);
           setStartVisibleMonth(start);
         } catch (e) {
@@ -183,7 +225,7 @@ export const MobileEventDrawer = ({
 
       if (draftEvent.end) {
         try {
-          const end = temporalToDate(draftEvent.end);
+          const end = toWallClockDate(draftEvent.end, app.timeZone);
           setEndDate(end);
           setEndVisibleMonth(end);
         } catch (e) {
@@ -215,7 +257,7 @@ export const MobileEventDrawer = ({
     // A task is due at its start, so it has no separate end.
     const finalEnd = isTaskKind ? finalStart : new Date(endDate);
 
-    const edited: CalendarEvent = {
+    return {
       ...baseEvent,
       title,
       calendarId,
@@ -223,16 +265,22 @@ export const MobileEventDrawer = ({
       description: notes,
       start: isAllDay
         ? dateToPlainDate(finalStart)
-        : dateToZonedDateTime(finalStart, app.timeZone),
+        : fromWallClockDate(
+            finalStart,
+            app.timeZone,
+            baseEvent.allDay ? undefined : baseEvent.start
+          ),
       end: isAllDay
         ? dateToPlainDate(finalEnd)
-        : dateToZonedDateTime(finalEnd, app.timeZone),
+        : fromWallClockDate(
+            finalEnd,
+            app.timeZone,
+            baseEvent.allDay ? undefined : baseEvent.end
+          ),
       ...(isTaskKind
         ? { kind: 'task' as const, task: { ...baseEvent.task, priority } }
         : { kind: undefined, task: undefined }),
     };
-
-    return restoreVisualEventToCanonical(baseEvent, edited, app.timeZone);
   };
 
   const hasChanges = useMemo(() => {
