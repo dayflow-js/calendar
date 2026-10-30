@@ -8,6 +8,8 @@ export type SyncableCalendarAppConfig = Pick<
   | 'calendarSystem'
   | 'eventDetailTrigger'
   | 'enableTasks'
+  | 'taskStatuses'
+  | 'taskMembers'
   | 'locale'
   | 'readOnly'
   | 'switcherMode'
@@ -35,6 +37,8 @@ export function pickSyncableConfig(
     allDaySortComparator: config.allDaySortComparator,
     calendars: config.calendars,
     enableTasks: config.enableTasks,
+    taskStatuses: config.taskStatuses,
+    taskMembers: config.taskMembers,
     calendarSystem: config.calendarSystem ?? 'gregorian',
     locale: config.locale,
     readOnly: config.readOnly,
@@ -79,6 +83,13 @@ export function getSyncConfigUpdates(
 
   if (previous.enableTasks !== next.enableTasks) {
     updates.enableTasks = next.enableTasks ?? false;
+  }
+  // Undefined restores the defaults, which `updateConfig` reads as "unchanged".
+  if (!isDeepEqual(previous.taskStatuses, next.taskStatuses)) {
+    updates.taskStatuses = next.taskStatuses ?? [];
+  }
+  if (!isDeepEqual(previous.taskMembers, next.taskMembers)) {
+    updates.taskMembers = next.taskMembers ?? [];
   }
   if (previous.views !== next.views) updates.views = next.views;
   if (!isDeepEqual(previous.calendars, next.calendars)) {

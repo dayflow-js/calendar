@@ -163,6 +163,12 @@ const ja: DayflowLocale = {
     viewTask: 'タスクを表示',
     addDueTime: '時刻を指定',
     removeDueTime: '時刻を解除',
+    taskStatus: '列',
+    taskStatusTodo: '未着手',
+    taskStatusInProgress: '進行中',
+    taskStatusDone: '完了',
+    assignees: '担当者',
+    unassigned: '未割り当て',
   },
   packages: {
     scheduler: {

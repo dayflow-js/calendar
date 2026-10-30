@@ -161,6 +161,12 @@ const ko: DayflowLocale = {
     viewTask: '할 일 보기',
     addDueTime: '시간 지정',
     removeDueTime: '시간 해제',
+    taskStatus: '열',
+    taskStatusTodo: '할 일',
+    taskStatusInProgress: '진행 중',
+    taskStatusDone: '완료',
+    assignees: '담당자',
+    unassigned: '미지정',
   },
   packages: {
     scheduler: {

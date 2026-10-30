@@ -35,11 +35,11 @@ import {
 
 import { CalendarOption, CalendarPicker } from './CalendarPicker';
 import { EventConferenceField } from './EventConferenceField';
-import { EventKindSwitch } from './EventKindSwitch';
+import { canSwitchEventKind, EventKindSwitch } from './EventKindSwitch';
 import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
-import { TaskPriorityField } from './TaskPriorityField';
+import { TaskDetailsFields } from './TaskDetailsFields';
 import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
@@ -439,15 +439,17 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      {isEditable && (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
-        <EventKindSwitch
-          value={draftEvent.kind ?? 'event'}
-          disabled={isLoading}
-          onChange={kind =>
-            applyDraftEventUpdate(convertEventKind(draftEvent, kind))
-          }
-        />
-      )}
+      {isEditable &&
+        canSwitchEventKind(app) &&
+        (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
+          <EventKindSwitch
+            value={draftEvent.kind ?? 'event'}
+            disabled={isLoading}
+            onChange={kind =>
+              applyDraftEventUpdate(convertEventKind(draftEvent, kind))
+            }
+          />
+        )}
       <span className='df-form-label'>
         {t(isDraftTask ? 'taskTitle' : 'eventTitle')}
       </span>
@@ -551,7 +553,8 @@ const DefaultEventDetailPanel = ({
       />
 
       {isDraftTask ? (
-        <TaskPriorityField
+        <TaskDetailsFields
+          app={app}
           event={draftEvent}
           disabled={!isEditable || isLoading}
           onChange={applyDraftEventUpdate}

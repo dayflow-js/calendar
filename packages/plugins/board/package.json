@@ -1,0 +1,49 @@
+{
+  "name": "@dayflow/plugin-board",
+  "version": "0.1.0",
+  "description": "Task board view plugin for DayFlow Calendar",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup -c && cp src/styles.css dist/styles.css",
+    "clean": "rimraf dist node_modules",
+    "postbuild": "rimraf dist/types",
+    "prebuild": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayflow/blossom-color-picker": "catalog:",
+    "preact": "catalog:",
+    "temporal-polyfill": "catalog:"
+  },
+  "devDependencies": {
+    "@dayflow/core": "workspace:^",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@testing-library/preact": "catalog:",
+    "rimraf": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-dts": "catalog:",
+    "rollup-plugin-esbuild": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@dayflow/core": "workspace:^"
+  }
+}

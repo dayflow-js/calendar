@@ -1,22 +1,14 @@
 import { RefObject } from 'preact';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
 
-import { EventDetailPanel } from '@/components/calendarEvent/components/EventDetailPanel';
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
 import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
+import { useEventActivation } from '@/components/common/useEventActivation';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale';
 import { formatDateLabel, formatDateRangeLabel } from '@/locale/intl';
-import { ContentSlot } from '@/renderer/ContentSlot';
-import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import { AgendaViewProps, Event, ICalendarApp } from '@/types';
 import {
   compareAllDayDisplayPriority,
@@ -416,7 +408,6 @@ const AgendaView = ({
   const { locale, t } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
-  const customRenderingStore = useContext(CustomRenderingContext);
   const currentDate = app.getCurrentDate();
   const events = app.getEvents();
 
@@ -451,218 +442,31 @@ const AgendaView = ({
     [locale, rangeEnd, rangeStart]
   );
   const today = useMemo(() => getTodayInTimeZone(app.timeZone), [app.timeZone]);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const detailPanelRef = useRef<HTMLDivElement>(null);
-  const selectedEventElementRef = useRef<HTMLElement | null>(null);
-  const [detailPanelPosition, setDetailPanelPosition] = useState<{
-    top: number;
-    left: number;
-    eventHeight: number;
-    eventMiddleY: number;
-    isSunday?: boolean;
-  } | null>(null);
-
-  useEffect(
-    () => () => {
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-      }
-    },
-    []
+  // Clicks follow `eventDetailTrigger` like the other views; the panel is
+  // positioned by EventDetailPanelHost next to the clicked row.
+  const activateEvent = useEventActivation(
+    app,
+    isMobile,
+    id => onEventSelect?.(id),
+    key => onDetailPanelToggle?.(key)
   );
 
+  // Pressing anywhere but an event or its editor closes the panel.
   useEffect(() => {
-    if (!detailPanelEventId) {
-      setDetailPanelPosition(null);
-    }
-  }, [detailPanelEventId]);
-
-  useEffect(() => {
-    if (!detailPanelEventId || !detailPanelPosition) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const clickedInsideEvent =
-        selectedEventElementRef.current?.contains(target) ?? false;
-      const clickedOnSameEvent =
-        target.closest(
-          `[data-event-id="${detailPanelEventId.split('::')[0]}"]`
-        ) !== null;
-      const clickedInsidePanel =
-        detailPanelRef.current?.contains(target) ?? false;
-      const clickedInsideDetailDialog = target.closest(
-        '[data-event-detail-dialog]'
-      );
-      const clickedInsideRangePickerPopup = target.closest(
-        '[data-range-picker-popup]'
-      );
-      const clickedInsideCalendarPickerDropdown = target.closest(
-        '[data-calendar-picker-dropdown]'
-      );
-
+    if (!detailPanelEventId) return;
+    const handleMouseDown = (e: MouseEvent) => {
       if (
-        !clickedInsideEvent &&
-        !clickedOnSameEvent &&
-        !clickedInsidePanel &&
-        !clickedInsideDetailDialog &&
-        !clickedInsideRangePickerPopup &&
-        !clickedInsideCalendarPickerDropdown
-      ) {
-        setDetailPanelPosition(null);
-        onDetailPanelToggle?.(null);
-        onEventSelect?.(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [
-    detailPanelEventId,
-    detailPanelPosition,
-    onDetailPanelToggle,
-    onEventSelect,
-  ]);
-
-  const handleEventClick = useCallback(
-    (event: Event, nativeEvent?: MouseEvent) => {
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-        clickTimerRef.current = null;
-      }
-
-      if (isMobile) {
-        app.onEventClick(event, nativeEvent);
-        onEventSelect?.(event.id);
-        if (app.getReadOnlyConfig(event.id).viewable !== false) {
-          onDetailPanelToggle?.(event.id);
-        }
+        (e.target as Element | null)?.closest(
+          '[data-event-id], [data-event-detail-panel], [data-event-detail-dialog], [data-range-picker-popup], [data-calendar-picker-dropdown], .df-context-menu'
+        )
+      )
         return;
-      }
-
-      clickTimerRef.current = setTimeout(() => {
-        app.onEventClick(event, nativeEvent);
-        onEventSelect?.(event.id);
-        if (
-          app.getEventDetailEnabled() &&
-          app.getEventDetailTrigger() === 'click' &&
-          nativeEvent?.currentTarget &&
-          useEventDetailPanel !== false
-        ) {
-          const target = nativeEvent.currentTarget as HTMLElement;
-          const rect = target.getBoundingClientRect();
-          const panelWidth = 320;
-          const gap = 12;
-          const viewportPadding = 16;
-          const placeLeft =
-            rect.right + gap + panelWidth > window.innerWidth - viewportPadding;
-          selectedEventElementRef.current = target;
-          setDetailPanelPosition({
-            top: Math.min(
-              Math.max(viewportPadding, rect.top + rect.height / 2 - 180),
-              window.innerHeight - 380
-            ),
-            left: placeLeft
-              ? Math.max(viewportPadding, rect.left - panelWidth - gap)
-              : Math.min(
-                  window.innerWidth - panelWidth - viewportPadding,
-                  rect.right + gap
-                ),
-            eventHeight: rect.height,
-            eventMiddleY: rect.top + rect.height / 2,
-            isSunday: placeLeft,
-          });
-          onDetailPanelToggle?.(event.id);
-        }
-        clickTimerRef.current = null;
-      }, 180);
-    },
-    [app, isMobile, onDetailPanelToggle, onEventSelect, useEventDetailPanel]
-  );
-
-  const handleEventDoubleClick = useCallback(
-    (event: Event, nativeEvent: MouseEvent) => {
-      if (clickTimerRef.current) {
-        clearTimeout(clickTimerRef.current);
-        clickTimerRef.current = null;
-      }
+      onDetailPanelToggle?.(null);
       onEventSelect?.(null);
-      selectedEventElementRef.current =
-        nativeEvent.currentTarget as HTMLElement;
-      Promise.resolve(app.onEventDoubleClick(event, nativeEvent))
-        .then(result => {
-          if (result === false) return;
-          if (app.getReadOnlyConfig(event.id).viewable !== false) {
-            const target = selectedEventElementRef.current;
-            if (target && useEventDetailPanel !== false) {
-              const rect = target.getBoundingClientRect();
-              const panelWidth = 320;
-              const gap = 12;
-              const viewportPadding = 16;
-              const viewportHeight = window.innerHeight;
-              const viewportWidth = window.innerWidth;
-              const placeLeft =
-                rect.right + gap + panelWidth > viewportWidth - viewportPadding;
-              const left = placeLeft
-                ? Math.max(viewportPadding, rect.left - panelWidth - gap)
-                : Math.min(
-                    viewportWidth - panelWidth - viewportPadding,
-                    rect.right + gap
-                  );
-              const top = Math.min(
-                Math.max(viewportPadding, rect.top + rect.height / 2 - 180),
-                viewportHeight - 380
-              );
-
-              setDetailPanelPosition({
-                top,
-                left,
-                eventHeight: rect.height,
-                eventMiddleY: rect.top + rect.height / 2,
-                isSunday: placeLeft,
-              });
-            }
-            onDetailPanelToggle?.(event.id);
-          }
-        })
-        .catch(() => {
-          if (app.getReadOnlyConfig(event.id).viewable !== false) {
-            const target = selectedEventElementRef.current;
-            if (target && useEventDetailPanel !== false) {
-              const rect = target.getBoundingClientRect();
-              const panelWidth = 320;
-              const gap = 12;
-              const viewportPadding = 16;
-              const viewportHeight = window.innerHeight;
-              const viewportWidth = window.innerWidth;
-              const placeLeft =
-                rect.right + gap + panelWidth > viewportWidth - viewportPadding;
-              const left = placeLeft
-                ? Math.max(viewportPadding, rect.left - panelWidth - gap)
-                : Math.min(
-                    viewportWidth - panelWidth - viewportPadding,
-                    rect.right + gap
-                  );
-              const top = Math.min(
-                Math.max(viewportPadding, rect.top + rect.height / 2 - 180),
-                viewportHeight - 380
-              );
-
-              setDetailPanelPosition({
-                top,
-                left,
-                eventHeight: rect.height,
-                eventMiddleY: rect.top + rect.height / 2,
-                isSunday: placeLeft,
-              });
-            }
-            onDetailPanelToggle?.(event.id);
-          }
-        });
-    },
-    [app, onDetailPanelToggle, onEventSelect, useEventDetailPanel]
-  );
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [detailPanelEventId, onDetailPanelToggle, onEventSelect]);
 
   const handleGridDateClick = useCallback(
     (date: Date, dayEvents: Event[], e?: MouseEvent) => {
@@ -716,10 +520,14 @@ const AgendaView = ({
     </>
   );
 
-  const renderAgendaEventButton = (entry: AgendaEntry) => (
+  const renderAgendaEventButton = (entry: AgendaEntry, day: Date) => (
     <button
       type='button'
       className='df-agenda-event'
+      data-event-id={entry.event.id}
+      // A multi-day event shows on several days; the panel anchors to the
+      // row that was clicked.
+      data-detail-panel-key={`${entry.event.id}::agenda-${day.getTime()}`}
       data-kind={entry.event.kind ?? 'event'}
       style={
         isTask(entry.event)
@@ -739,11 +547,21 @@ const AgendaView = ({
       data-selected={selectedEventId === entry.event.id ? 'true' : 'false'}
       onClick={e => {
         e.stopPropagation();
-        handleEventClick(entry.event, e as unknown as MouseEvent);
+        activateEvent(
+          entry.event.id,
+          e.currentTarget.dataset.detailPanelKey!,
+          e as unknown as MouseEvent,
+          'click'
+        );
       }}
       onDblClick={e => {
         e.stopPropagation();
-        handleEventDoubleClick(entry.event, e as unknown as MouseEvent);
+        activateEvent(
+          entry.event.id,
+          e.currentTarget.dataset.detailPanelKey!,
+          e as unknown as MouseEvent,
+          'dblclick'
+        );
       }}
     >
       {isTask(entry.event) ? (
@@ -772,30 +590,6 @@ const AgendaView = ({
         <span className='df-agenda-title'>{entry.event.title}</span>
       )}
     </button>
-  );
-
-  const detailPanelEvent =
-    detailPanelPosition && detailPanelEventId
-      ? (events.find(event => event.id === detailPanelEventId.split('::')[0]) ??
-        null)
-      : null;
-
-  const contentSlotRenderer = useCallback(
-    (contentProps: {
-      event: Event;
-      isAllDay: boolean;
-      onEventUpdate: (updatedEvent: Event) => void | Promise<void>;
-      onEventDelete: (eventId: string) => void | Promise<void>;
-      onClose?: () => void;
-      app?: ICalendarApp;
-    }) => (
-      <ContentSlot
-        store={customRenderingStore}
-        generatorName='eventDetailContent'
-        generatorArgs={contentProps}
-      />
-    ),
-    [customRenderingStore]
   );
 
   return (
@@ -868,7 +662,7 @@ const AgendaView = ({
                               key={`${group.date.toISOString()}-${entry.event.id}`}
                               className='df-agenda-all-day-event'
                             >
-                              {renderAgendaEventButton(entry)}
+                              {renderAgendaEventButton(entry, group.date)}
                             </div>
                           ))}
                         </div>
@@ -883,7 +677,7 @@ const AgendaView = ({
                         <div className='df-agenda-time'>
                           {renderAgendaTimeLabel(entry.timeLabel, timeFormat)}
                         </div>
-                        {renderAgendaEventButton(entry)}
+                        {renderAgendaEventButton(entry, group.date)}
                       </div>
                     ))}
                   </>
@@ -894,41 +688,18 @@ const AgendaView = ({
         )}
       </div>
 
-      {detailPanelEvent && useEventDetailPanel !== false && (
-        <>
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 9998,
-              pointerEvents: 'none',
-            }}
-          />
-          <EventDetailPanel
-            showDetailPanel={true}
-            detailPanelPosition={detailPanelPosition}
-            event={detailPanelEvent}
-            detailPanelRef={detailPanelRef}
-            isAllDay={detailPanelEvent.allDay === true}
-            eventVisibility='standard'
-            calendarRef={calendarRef}
-            selectedEventElementRef={selectedEventElementRef}
-            onEventUpdate={event => app.updateEvent(event.id, event)}
-            onEventDelete={id => app.deleteEvent(id)}
-            handlePanelClose={() => {
-              setDetailPanelPosition(null);
-              onDetailPanelToggle?.(null);
-              onEventSelect?.(null);
-            }}
-            customRenderingStore={customRenderingStore}
-            contentSlotRenderer={contentSlotRenderer}
-            app={app}
-          />
-        </>
-      )}
+      <EventDetailPanelHost
+        app={app}
+        events={events}
+        calendarRef={calendarRef}
+        detailPanelEventId={detailPanelEventId ?? null}
+        useEventDetailPanel={useEventDetailPanel}
+        isMobile={isMobile}
+        onEventUpdate={event => app.updateEvent(event.id, event)}
+        onEventDelete={id => app.deleteEvent(id)}
+        onEventSelect={onEventSelect}
+        onDetailPanelToggle={onDetailPanelToggle}
+      />
     </div>
   );
 };

@@ -1,15 +1,8 @@
 import { RefObject } from 'preact';
-import { useContext, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
-import { EventDetailPanel } from '@/components/calendarEvent/components/EventDetailPanel';
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
 import { EventContextMenu } from '@/components/contextMenu';
-import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
-import {
-  Event,
-  ICalendarApp,
-  EventDetailPosition,
-  EventDetailContentProps,
-} from '@/types';
+import { Event, ICalendarApp } from '@/types';
 
 interface YearEventOverlayHostProps {
   app: ICalendarApp;
@@ -25,9 +18,9 @@ interface YearEventOverlayHostProps {
   calendarRef: RefObject<HTMLDivElement>;
 }
 
-const contentSlotRenderer = (_props: EventDetailContentProps) => null;
-
 // Centralized host for year view's event detail panel + event context menu.
+// The shared panel host anchors to the clicked bar (via its
+// `data-detail-panel-key`) and keeps the panel inside the viewport.
 export const YearEventOverlayHost = ({
   app,
   events,
@@ -39,91 +32,32 @@ export const YearEventOverlayHost = ({
   useEventDetailPanel,
   isEditable,
   calendarRef,
-}: YearEventOverlayHostProps) => {
-  const customRenderingStore = useContext(CustomRenderingContext);
-  const detailPanelRef = useRef<HTMLDivElement>(null);
-  const selectedEventElementRef = useRef<HTMLElement | null>(null);
-  const [detailPanelPosition, setDetailPanelPosition] =
-    useState<EventDetailPosition | null>(null);
-
-  const panelEnabled = useEventDetailPanel !== false;
-  const showDetailPanel = panelEnabled && !!detailPanelEventId;
-
-  // Compute panel position from the clicked bar's DOM rect.
-  useLayoutEffect(() => {
-    if (!showDetailPanel || !detailPanelEventId) {
-      setDetailPanelPosition(null);
-      selectedEventElementRef.current = null;
-      return;
-    }
-    const eventId = detailPanelEventId.split('::')[0];
-    const el =
-      calendarRef.current?.querySelector<HTMLElement>(
-        `[data-event-id="${eventId}"]`
-      ) ?? null;
-    if (!el) {
-      setDetailPanelPosition(null);
-      return;
-    }
-    selectedEventElementRef.current = el;
-    const rect = el.getBoundingClientRect();
-    setDetailPanelPosition({
-      top: rect.top,
-      left: rect.right + 8,
-      eventHeight: rect.height,
-      eventMiddleY: rect.top + rect.height / 2,
-      isSunday: false,
-    });
-  }, [showDetailPanel, detailPanelEventId, calendarRef]);
-
-  const selectedEvent =
-    detailPanelEventId === null
-      ? null
-      : events.find(e => e.id === detailPanelEventId.split('::')[0]);
-
-  const handlePanelClose = () => {
-    onDetailPanelToggle(null);
-    onEventSelect(null);
-  };
-
-  const handleEventUpdate = (updated: Event) =>
-    app.updateEvent(updated.id, updated);
-  const handleEventDelete = (id: string) => {
-    app.deleteEvent(id);
-    onDetailPanelToggle(null);
-  };
-
-  return (
-    <>
-      {selectedEvent && (
-        <EventDetailPanel
-          showDetailPanel={showDetailPanel}
-          detailPanelPosition={detailPanelPosition}
-          event={selectedEvent}
-          detailPanelRef={detailPanelRef}
-          isAllDay={!!selectedEvent.allDay}
-          eventVisibility='standard'
-          calendarRef={calendarRef}
-          selectedEventElementRef={selectedEventElementRef}
-          onEventUpdate={handleEventUpdate}
-          onEventDelete={handleEventDelete}
-          handlePanelClose={handlePanelClose}
-          customRenderingStore={customRenderingStore}
-          contentSlotRenderer={contentSlotRenderer}
-          app={app}
-        />
-      )}
-      {isEditable && eventContextMenu && (
-        <EventContextMenu
-          event={eventContextMenu.event}
-          x={eventContextMenu.x}
-          y={eventContextMenu.y}
-          onClose={onCloseContextMenu}
-          app={app}
-          onDetailPanelToggle={onDetailPanelToggle}
-          detailPanelKey={eventContextMenu.event.id}
-        />
-      )}
-    </>
-  );
-};
+}: YearEventOverlayHostProps) => (
+  <>
+    <EventDetailPanelHost
+      app={app}
+      events={events}
+      calendarRef={calendarRef}
+      detailPanelEventId={detailPanelEventId}
+      useEventDetailPanel={useEventDetailPanel}
+      onEventUpdate={updated => app.updateEvent(updated.id, updated)}
+      onEventDelete={id => {
+        app.deleteEvent(id);
+        onDetailPanelToggle(null);
+      }}
+      onEventSelect={onEventSelect}
+      onDetailPanelToggle={onDetailPanelToggle}
+    />
+    {isEditable && eventContextMenu && (
+      <EventContextMenu
+        event={eventContextMenu.event}
+        x={eventContextMenu.x}
+        y={eventContextMenu.y}
+        onClose={onCloseContextMenu}
+        app={app}
+        onDetailPanelToggle={onDetailPanelToggle}
+        detailPanelKey={eventContextMenu.event.id}
+      />
+    )}
+  </>
+);

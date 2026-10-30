@@ -80,6 +80,14 @@ export default defineConfig({
         replacement: resolve(__dirname, '../plugins/drag/src/index.ts'),
       },
       {
+        find: '@dayflow/plugin-board/styles.css',
+        replacement: resolve(__dirname, '../plugins/board/src/styles.css'),
+      },
+      {
+        find: '@dayflow/plugin-board',
+        replacement: resolve(__dirname, '../plugins/board/src/index.ts'),
+      },
+      {
         find: '@dayflow/plugin-localization',
         replacement: resolve(__dirname, '../plugins/localization/src/index.ts'),
       },

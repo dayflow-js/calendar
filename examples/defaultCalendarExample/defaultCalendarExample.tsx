@@ -5,6 +5,7 @@ import {
   TimeZone,
   ViewType,
 } from '@dayflow/core';
+import { createBoardView } from '@dayflow/plugin-board';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import { createLocalizationPlugin, zh, fr } from '@dayflow/plugin-localization';
 import {
@@ -19,6 +20,10 @@ import {
 } from '@dayflow/react';
 import { getWebsiteCalendars } from '@examples/utils/palette';
 import { generateSampleEvents } from '@examples/utils/sampleData';
+import {
+  generateSampleTasks,
+  sampleTaskMembers,
+} from '@examples/utils/sampleTasks';
 import { createKeyboardShortcutsPlugin } from '@keyboard-shortcuts/plugin';
 import { createSidebarPlugin, SidebarService } from '@sidebar/plugin';
 import {
@@ -30,6 +35,8 @@ import {
   PanelLeftOpen,
 } from 'lucide-react';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+
+import '@dayflow/plugin-board/styles.css';
 
 const TZ_OPTIONS = Object.entries(TimeZone).map(([key, value]) => ({
   label: `${key.replaceAll('_', ' ')} (${value})`,
@@ -63,14 +70,17 @@ const getInitialThemeMode = (): ExampleThemeMode => {
 const DefaultCalendarExample: React.FC<{
   themeMode: ExampleThemeMode;
 }> = ({ themeMode }) => {
-  const [events] = useState<Event[]>(generateSampleEvents());
+  const [events] = useState<Event[]>(() => [
+    ...generateSampleEvents(),
+    ...generateSampleTasks(),
+  ]);
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
   // Global calendar timezone — affects all views' event bucketing and editing
   const [appTz, setAppTz] = useState<string>('');
   // Secondary timezone — only adds a second timeline label column in Day/Week
   const [secondaryTz, setSecondaryTz] = useState<string>('');
 
-  const [enableTasks, setEnableTasks] = useState(false);
+  const [enableTasks, setEnableTasks] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -170,8 +180,12 @@ const DefaultCalendarExample: React.FC<{
         showTimedEventsInYearView: true,
         startOfWeek: 7,
         showEventDots: true,
+        fixedWeekColumnWidth: 160,
       }),
       createAgendaView({}),
+      createBoardView({
+        onViewStateChange: state => console.log('board state:', state),
+      }),
     ],
     [secondaryTz]
   );
@@ -186,7 +200,7 @@ const DefaultCalendarExample: React.FC<{
         });
         console.log('create event:', event);
       },
-      onEventClick: (event: Event, e: MouseEvent) => {
+      onEventClick: (event: Event, e?: MouseEvent) => {
         console.log('click event:', event, e);
       },
       onEventDoubleClick: (event: Event) => {
@@ -245,6 +259,7 @@ const DefaultCalendarExample: React.FC<{
   const calendar = useCalendarApp({
     timeZone: appTz || undefined,
     enableTasks,
+    taskMembers: sampleTaskMembers,
     views,
     theme: { mode: themeMode },
     events: events,

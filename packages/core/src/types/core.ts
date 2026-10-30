@@ -9,7 +9,7 @@ import { CalendarRegistry } from '@/core/calendarRegistry';
 import { Locale } from '@/locale/types';
 
 import { CalendarType, ThemeConfig, ThemeMode } from './calendarTypes';
-import { Event } from './event';
+import { Event, TaskMember, TaskStatus } from './event';
 import { EventLayout } from './layout';
 import { TimeZoneValue } from './timezone';
 
@@ -161,6 +161,12 @@ export interface CalendarView {
   label?: string;
   component: TComponent;
   config?: Record<string, unknown>;
+  /** Hide the Event / Task switch in the detail editors while this view is
+   * active, for views that only show one kind (e.g. a task board). */
+  lockEventKind?: boolean;
+  /** This view places tasks by `task.status`, as a board's columns do. The
+   * task editors show the Column field only when a registered view sets it. */
+  usesTaskStatus?: boolean;
 }
 
 export type RangeChangeReason =
@@ -201,6 +207,8 @@ export type VisibleRangePayload = {
  */
 export interface CalendarCallbacks {
   onEventBatchChange?: (changes: EventChange[]) => void | Promise<void>;
+  /** Task statuses were added, renamed, recolored, reordered or removed from the UI. */
+  onTaskStatusesChange?: (statuses: TaskStatus[]) => void | Promise<void>;
   onViewChange?: (view: CalendarViewType) => void | Promise<void>;
   onEventCreate?: (event: Event) => void | Promise<void>;
   onEventUpdate?: (event: Event) => void | Promise<void>;
@@ -327,6 +335,11 @@ export interface CalendarAppConfig {
   /** Enable task creation/type switching in the built-in editors. Defaults to false.
    * Existing task data remains visible and editable when disabled. */
   enableTasks?: boolean;
+  /** Workflow stages tasks move through. Defaults to To do, In progress and Done.
+   * Needs at least one completed and one open status. */
+  taskStatuses?: TaskStatus[];
+  /** People tasks can be assigned to. The assignee field is hidden when empty. */
+  taskMembers?: TaskMember[];
   /**
    * Gesture that opens the event detail panel/dialog on desktop.
    * - 'dbClick' (default): single-click selects, double-click opens (Mac Calendar style).
@@ -523,6 +536,10 @@ export interface ICalendarApp {
   // Get whether to use event detail panel
   getUseEventDetailPanel: () => boolean;
   getTasksEnabled: () => boolean;
+  getTaskStatuses: () => readonly TaskStatus[];
+  /** Replace the task statuses and notify `onTaskStatusesChange`. */
+  setTaskStatuses: (statuses: TaskStatus[]) => void;
+  getTaskMembers: () => readonly TaskMember[];
 
   // Whether any event-detail UI (panel or dialog) is enabled. Behavior gates
   // (e.g. open-on-double-click) should use this instead of the per-UI flags.

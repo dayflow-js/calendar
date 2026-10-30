@@ -16,12 +16,16 @@ import {
   ICalendarApp,
   RangeChangeReason,
   ReadOnlyConfig,
+  TaskMember,
+  TaskStatus,
   ViewType,
   VisibleRangePayload,
 } from '@/types';
 import { ThemeColors, ThemeMode } from '@/types/calendarTypes';
 import { compareViews } from '@/utils/calendarApp';
 import { isDeepEqual } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
+import { normalizeTaskStatuses } from '@/utils/taskUtils';
 import { normalizeTimeZoneValue } from '@/utils/timeZoneUtils';
 
 import {
@@ -48,6 +52,8 @@ export class CalendarApp implements ICalendarApp {
   private useEventDetailDialog: boolean;
   private useEventDetailPanel: boolean;
   private enableTasks: boolean;
+  private taskStatuses: readonly TaskStatus[];
+  private taskMembers: readonly TaskMember[];
   private eventDetailTrigger: EventDetailTrigger;
   private useCalendarHeader: boolean;
   private themeColors?: ThemeColors;
@@ -109,6 +115,8 @@ export class CalendarApp implements ICalendarApp {
     this.pluginManager = new PluginManager(this.state, this.notify);
 
     this.enableTasks = config.enableTasks ?? false;
+    this.taskStatuses = normalizeTaskStatuses(config.taskStatuses);
+    this.taskMembers = config.taskMembers ?? [];
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
     // Dialog and panel are mutually exclusive renderings of the same selection
     // state — dialog wins when both are requested.
@@ -393,6 +401,17 @@ export class CalendarApp implements ICalendarApp {
   getCalendarRegistry = (): CalendarRegistry => this.calendarRegistry;
   getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
   getTasksEnabled = (): boolean => this.enableTasks;
+  getTaskStatuses = (): readonly TaskStatus[] => this.taskStatuses;
+  setTaskStatuses = (statuses: TaskStatus[]): void => {
+    const next = normalizeTaskStatuses(statuses);
+    if (next !== statuses) return;
+    this.taskStatuses = next;
+    this.triggerRender();
+    Promise.resolve(this.callbacks.onTaskStatusesChange?.(statuses)).catch(
+      error => logger.error('onTaskStatusesChange failed', error)
+    );
+  };
+  getTaskMembers = (): readonly TaskMember[] => this.taskMembers;
   getUseEventDetailPanel = (): boolean => this.useEventDetailPanel;
   getEventDetailEnabled = (): boolean =>
     this.useEventDetailDialog || this.useEventDetailPanel;
@@ -416,6 +435,16 @@ export class CalendarApp implements ICalendarApp {
       config.enableTasks !== this.enableTasks
     ) {
       this.enableTasks = config.enableTasks;
+      hasChanged = true;
+    }
+
+    if (config.taskStatuses !== undefined) {
+      this.taskStatuses = normalizeTaskStatuses(config.taskStatuses);
+      hasChanged = true;
+    }
+
+    if (config.taskMembers !== undefined) {
+      this.taskMembers = config.taskMembers;
       hasChanged = true;
     }
 

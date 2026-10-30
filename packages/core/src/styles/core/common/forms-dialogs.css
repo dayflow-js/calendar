@@ -995,7 +995,101 @@
     margin-bottom: 0;
   }
 
-  .df-task-priority-field {
+  .df-task-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     margin-bottom: 1rem;
+  }
+
+  .df-task-fields-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .df-task-fields-row > .df-task-field:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .df-task-field {
+    min-width: 0;
+  }
+
+  .df-task-fields .df-form-select-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .df-task-status-dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--df-color-muted-foreground);
+  }
+
+  .df-view-switcher-select-option:has(> .df-task-status-dot),
+  .df-task-member-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .df-task-member-option {
+    padding-block: 0.375rem;
+  }
+
+  .df-task-member-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .df-task-placeholder {
+    color: var(--df-color-muted-foreground);
+  }
+
+  .df-task-avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--df-color-primary);
+    color: #fff;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0;
+    user-select: none;
+  }
+
+  .df-task-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .df-task-avatar-stack {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+  }
+
+  .df-task-avatar-stack > .df-task-avatar {
+    box-shadow: 0 0 0 2px var(--df-color-background);
+  }
+
+  .df-task-avatar-stack > .df-task-avatar + .df-task-avatar {
+    margin-left: -0.3rem;
+  }
+
+  .df-task-avatar-more {
+    background-color: var(--df-color-muted);
+    color: var(--df-color-muted-foreground);
   }
 }
