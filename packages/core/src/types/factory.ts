@@ -217,6 +217,14 @@ export interface YearViewConfig extends ViewFactoryConfig {
   scroll?: MonthScrollConfig;
   showEventDots?: boolean;
   /**
+   * Fixed-week mode: minimum width of one day column in px. Wider columns
+   * give event bars more room; the grid scrolls sideways when it does not
+   * fit. Can also be set in CSS with `--df-year-fixed-column-width` on the
+   * calendar or `.df-year-fixed`.
+   * @default about 36.5 (the year fills at least 1352px)
+   */
+  fixedWeekColumnWidth?: number;
+  /**
    * Grid mode: action when a date cell is clicked.
    */
   gridDateClick?:

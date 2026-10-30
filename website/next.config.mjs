@@ -26,6 +26,7 @@ const config = {
   transpilePackages: [
     '@dayflow/core',
     '@dayflow/react',
+    '@dayflow/plugin-board',
     '@dayflow/plugin-drag',
     '@dayflow/plugin-keyboard-shortcuts',
     '@dayflow/plugin-localization',

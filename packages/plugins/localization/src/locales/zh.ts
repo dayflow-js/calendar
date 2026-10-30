@@ -158,6 +158,12 @@ const zh: DayflowLocale = {
     viewTask: '查看任务',
     addDueTime: '设置时间',
     removeDueTime: '取消时间',
+    taskStatus: '列',
+    taskStatusTodo: '待办',
+    taskStatusInProgress: '进行中',
+    taskStatusDone: '已完成',
+    assignees: '负责人',
+    unassigned: '未分配',
   },
   packages: {
     scheduler: {

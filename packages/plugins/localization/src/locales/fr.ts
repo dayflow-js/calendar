@@ -164,6 +164,12 @@ const fr: DayflowLocale = {
     viewTask: 'Afficher la tâche',
     addDueTime: 'Ajouter une heure',
     removeDueTime: "Retirer l'heure",
+    taskStatus: 'Colonne',
+    taskStatusTodo: 'À faire',
+    taskStatusInProgress: 'En cours',
+    taskStatusDone: 'Terminé',
+    assignees: 'Responsables',
+    unassigned: 'Non assigné',
   },
   packages: {
     scheduler: {

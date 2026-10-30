@@ -7,6 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { clearPanelHandoffStartPosition } from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
 import { observePanelInViewport } from '@/components/calendarEvent/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
@@ -168,6 +169,15 @@ export const EventDetailPanelHost = ({
     : null;
   const enabled = useEventDetailPanel !== false && !isMobile;
   const showPanel = enabled && !!detailPanelEventId && !!event;
+
+  // The panel leaves a clone behind for a moment so switching events can
+  // animate between them. A plain dismissal has nothing to hand off to, and
+  // the lingering clone would read as a slow close.
+  const wasShown = useRef(false);
+  if (wasShown.current && !detailPanelEventId) {
+    clearPanelHandoffStartPosition(calendarRef);
+  }
+  wasShown.current = showPanel;
 
   const updatePosition = useCallback(() => {
     if (!detailPanelEventId || !panelRef.current || !calendarRef.current) {

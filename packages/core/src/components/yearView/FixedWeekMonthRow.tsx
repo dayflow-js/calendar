@@ -1,5 +1,6 @@
 import { useMemo } from 'preact/hooks';
 
+import type { EventActivateHandler } from '@/components/common/useEventActivation';
 import { useLocale } from '@/locale';
 import { Event, ICalendarApp } from '@/types';
 import { getTodayInTimeZone } from '@/utils';
@@ -13,7 +14,7 @@ interface StaticEventsLayerProps {
   totalColumns: number;
   app: ICalendarApp;
   selectedEventId: string | null;
-  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onSelectEvent: EventActivateHandler;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   isDraggable: boolean;
@@ -61,7 +62,7 @@ interface FixedWeekMonthRowProps {
   excludedEventId: string | null;
   isDragging: boolean;
   selectedEventId: string | null;
-  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onSelectEvent: EventActivateHandler;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   onSelectDate: (date: Date) => void;

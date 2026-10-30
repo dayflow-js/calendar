@@ -453,14 +453,15 @@ Die Jahresansicht bietet einen vollst채ndigen Jahres체berblick. DayFlow unterst�
 
 #### Konfiguration
 
-| Eigenschaft                 | Typ                                                  | Standard         | Beschreibung                                                                                                                        |
-| :-------------------------- | :--------------------------------------------------- | :--------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | Anzeigemodus der Jahresansicht.                                                                                                     |
-| `startOfWeek`               | `number`                                             | `1`              | Erster Tag der Woche (0 = Sonntag, 1 = Montag usw.). Wird in den Modi `fixed-week` und `grid` verwendet.                            |
-| `showTimedEventsInYearView` | `boolean`                                            | `false`          | Legt fest, ob Termine mit Uhrzeit in der Jahresansicht erscheinen (Punkte, Indikatoren oder Intensit채t).                            |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Modus grid) Aktion beim Klick auf eine Datumszelle.                                                                                |
-| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Modus grid) Aktion beim Doppelklick auf eine Datumszelle. `'create-event'` (Standard) legt einen Termin von 9:00 bis 10:00 Uhr an. |
-| `gridHeatmapLevels`         | `number`                                             | `5`              | (Modus grid) Anzahl der Intensit채tsstufen der Heatmap.                                                                              |
+| Eigenschaft                 | Typ                                                  | Standard         | Beschreibung                                                                                                                                                                             |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | Anzeigemodus der Jahresansicht.                                                                                                                                                          |
+| `startOfWeek`               | `number`                                             | `1`              | Erster Tag der Woche (0 = Sonntag, 1 = Montag usw.). Wird in den Modi `fixed-week` und `grid` verwendet.                                                                                 |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | Legt fest, ob Termine mit Uhrzeit in der Jahresansicht erscheinen (Punkte, Indikatoren oder Intensit채t).                                                                                 |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Modus grid) Aktion beim Klick auf eine Datumszelle.                                                                                                                                     |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Modus grid) Aktion beim Doppelklick auf eine Datumszelle. `'create-event'` (Standard) legt einen Termin von 9:00 bis 10:00 Uhr an.                                                      |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (Modus grid) Anzahl der Intensit채tsstufen der Heatmap.                                                                                                                                   |
+| `fixedWeekColumnWidth`      | `number`                                             | ca. `36.5`       | (Modus fixed-week) Mindestbreite einer Tagesspalte in px; ist das Raster breiter als die Ansicht, scrollt es seitlich. Auch per CSS-Variable `--df-year-fixed-column-width` einstellbar. |
 
 #### Heatmap anpassen (Modus grid)
 

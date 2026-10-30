@@ -455,14 +455,15 @@ The year view provides a comprehensive annual overview. DayFlow's Year View supp
 
 #### Configuration
 
-| Property                    | Type                                                 | Default          | Description                                                                                                                 |
-| :-------------------------- | :--------------------------------------------------- | :--------------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | The display mode for the year view.                                                                                         |
-| `startOfWeek`               | `number`                                             | `1`              | The start day of the week (0 for Sunday, 1 for Monday, etc.). Used in `fixed-week` and `grid` modes.                        |
-| `showTimedEventsInYearView` | `boolean`                                            | `false`          | Whether to show timed events (dots/indicators/intensity) in the year view.                                                  |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid mode) Action when a date cell is clicked.                                                                             |
-| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid mode) Action when a date cell is double-clicked. `'create-event'` (default) creates a timed event from 9:00 to 10:00. |
-| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid mode) Number of heatmap intensity levels to use.                                                                      |
+| Property                    | Type                                                 | Default          | Description                                                                                                                                                                    |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | The display mode for the year view.                                                                                                                                            |
+| `startOfWeek`               | `number`                                             | `1`              | The start day of the week (0 for Sunday, 1 for Monday, etc.). Used in `fixed-week` and `grid` modes.                                                                           |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | Whether to show timed events (dots/indicators/intensity) in the year view.                                                                                                     |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid mode) Action when a date cell is clicked.                                                                                                                                |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid mode) Action when a date cell is double-clicked. `'create-event'` (default) creates a timed event from 9:00 to 10:00.                                                    |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid mode) Number of heatmap intensity levels to use.                                                                                                                         |
+| `fixedWeekColumnWidth`      | `number`                                             | about `36.5`     | (Fixed-week mode) Minimum width of a day column in px; the grid scrolls sideways when wider than the view. Also settable with the CSS variable `--df-year-fixed-column-width`. |
 
 #### Heatmap Customization (Grid Mode)
 

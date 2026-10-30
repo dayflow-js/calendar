@@ -455,14 +455,15 @@ Agenda 视图会按天分组，以时间顺序列表的方式展示事件。它�
 
 #### 配置
 
-| 属性                        | 类型                                                 | 默认值           | 描述                                                                                                              |
-| :-------------------------- | :--------------------------------------------------- | :--------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | 年视图的显示模式。                                                                                                |
-| `startOfWeek`               | `number`                                             | `1`              | 设置周起始日（0 为周日，1 为周一等）。用于 `fixed-week` 和 `grid` 模式。                                          |
-| `showTimedEventsInYearView` | `boolean`                                            | `false`          | 是否在年视图中显示定时事件（圆点/指示器/热力强度）。                                                              |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid 模式) 点击日期单元格时的操作。                                                                              |
-| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid 模式) 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的日期创建一个 9:00 至 10:00 的 Timed Event。 |
-| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid 模式) 热力图的强度层级数量。                                                                                |
+| 属性                        | 类型                                                 | 默认值           | 描述                                                                                                                            |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | 年视图的显示模式。                                                                                                              |
+| `startOfWeek`               | `number`                                             | `1`              | 设置周起始日（0 为周日，1 为周一等）。用于 `fixed-week` 和 `grid` 模式。                                                        |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | 是否在年视图中显示定时事件（圆点/指示器/热力强度）。                                                                            |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid 模式) 点击日期单元格时的操作。                                                                                            |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid 模式) 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的日期创建一个 9:00 至 10:00 的 Timed Event。               |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid 模式) 热力图的强度层级数量。                                                                                              |
+| `fixedWeekColumnWidth`      | `number`                                             | 约 `36.5`        | (Fixed-week 模式) 每个日期列的最小宽度（px），超出视图宽度时可横向滚动。也可以用 CSS 变量 `--df-year-fixed-column-width` 设置。 |
 
 #### 热力图自定义 (Grid 模式)
 

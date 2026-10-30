@@ -106,4 +106,31 @@ describe('EventDetailPanelHost', () => {
     const panelLeft = Number.parseFloat(panel.style.left);
     expect(panelLeft).toBe(290);
   });
+
+  it('closes at once when dismissed, leaving no handoff clone behind', () => {
+    document
+      .querySelectorAll('[data-event-detail-panel-handoff]')
+      .forEach(node => node.remove());
+    const anchor = document.createElement('div');
+    anchor.dataset.eventId = 'evt-1';
+    calendarDiv.append(anchor);
+    const ui = (detailPanelEventId: string | null) => (
+      <ThemeProvider initialTheme='light'>
+        <LocaleProvider>
+          <EventDetailPanelHost
+            detailPanelEventId={detailPanelEventId}
+            events={[mockEvent]}
+            calendarRef={{ current: calendarDiv }}
+            onEventUpdate={vi.fn()}
+            onEventDelete={vi.fn()}
+          />
+        </LocaleProvider>
+      </ThemeProvider>
+    );
+
+    const { rerender } = render(ui('evt-1'));
+    expect(document.querySelector('[data-event-detail-panel]')).toBeTruthy();
+    rerender(ui(null));
+    expect(document.querySelector('[data-event-detail-panel]')).toBeNull();
+  });
 });

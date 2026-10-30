@@ -1,3 +1,4 @@
+import { RefObject } from 'preact';
 import {
   useMemo,
   useState,
@@ -11,6 +12,8 @@ import {
   createCalendarDate,
   dateToCalendarDate,
 } from '@/calendar/calendarSystem';
+import { EventDetailPanelHost } from '@/components/calendarEvent/components/EventDetailPanelHost';
+import { useEventActivation } from '@/components/common/useEventActivation';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
@@ -28,6 +31,12 @@ import { GridDayPopup } from './GridDayPopup';
 interface GridYearViewProps {
   app: ICalendarApp;
   config?: YearViewConfig;
+  calendarRef?: RefObject<HTMLDivElement>;
+  useEventDetailPanel?: boolean;
+  selectedEventId?: string | null;
+  onEventSelect?: (eventId: string | null) => void;
+  detailPanelEventId?: string | null;
+  onDetailPanelToggle?: (eventId: string | null) => void;
 }
 
 /** Local `YYYY-MM-DD` key for a day cell. */
@@ -137,7 +146,16 @@ function calcPopupPosition(anchorEl: HTMLElement): {
   return { top, left };
 }
 
-export const GridYearView = ({ app, config }: GridYearViewProps) => {
+export const GridYearView = ({
+  app,
+  config,
+  calendarRef,
+  useEventDetailPanel,
+  selectedEventId: propSelectedEventId,
+  onEventSelect,
+  detailPanelEventId: propDetailPanelEventId,
+  onDetailPanelToggle,
+}: GridYearViewProps) => {
   const { t: translate, locale, getWeekDaysLabels: getLabels } = useLocale();
   const currentDate = app.getCurrentDate();
   const calendarSystem = app.state.calendarSystem;
@@ -153,6 +171,54 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
     t.setHours(0, 0, 0, 0);
     return t;
   }, [appTimeZone]);
+
+  // Selection and the detail panel are controlled by the calendar when it
+  // passes them, and kept here otherwise.
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null
+  );
+  const [internalDetailId, setInternalDetailId] = useState<string | null>(null);
+  const selectedEventId =
+    propSelectedEventId === undefined
+      ? internalSelectedId
+      : propSelectedEventId;
+  const detailPanelEventId =
+    propDetailPanelEventId === undefined
+      ? internalDetailId
+      : propDetailPanelEventId;
+  const setSelectedEventId = useCallback(
+    (id: string | null) => (onEventSelect ?? setInternalSelectedId)(id),
+    [onEventSelect]
+  );
+  const setDetailPanelEventId = useCallback(
+    (id: string | null) => (onDetailPanelToggle ?? setInternalDetailId)(id),
+    [onDetailPanelToggle]
+  );
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  // Events in the day popup open like events in the other views.
+  const activateEvent = useEventActivation(
+    app,
+    isMobile,
+    setSelectedEventId,
+    setDetailPanelEventId
+  );
+  const fallbackCalendarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!detailPanelEventId) return;
+    const handleMouseDown = (e: MouseEvent) => {
+      if (
+        (e.target as Element | null)?.closest(
+          '[data-event-id], [data-event-detail-panel], [data-event-detail-dialog], [data-range-picker-popup], [data-calendar-picker-dropdown], .df-context-menu'
+        )
+      )
+        return;
+      setSelectedEventId(null);
+      setDetailPanelEventId(null);
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [detailPanelEventId, setSelectedEventId, setDetailPanelEventId]);
 
   // Popup state — position is pre-calculated on click so the popup renders
   // at the correct coordinates on its very first frame (no flash).
@@ -202,6 +268,13 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       const target = e.target as HTMLElement;
       if (target.closest('[data-grid-day-popup]')) return;
       if (target.closest('[data-grid-day-cell]')) return;
+      // The detail panel opened from the popup keeps it open.
+      if (
+        target.closest(
+          '[data-event-detail-panel], [data-event-detail-dialog], [data-range-picker-popup], [data-calendar-picker-dropdown]'
+        )
+      )
+        return;
       setPopup(null);
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -536,8 +609,25 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
           locale={locale}
           app={app}
           appTimeZone={appTimeZone}
+          selectedEventId={selectedEventId}
+          onActivateEvent={activateEvent}
         />
       )}
+      <EventDetailPanelHost
+        app={app}
+        events={rawEvents}
+        calendarRef={calendarRef ?? fallbackCalendarRef}
+        detailPanelEventId={detailPanelEventId}
+        useEventDetailPanel={useEventDetailPanel}
+        isMobile={isMobile}
+        onEventUpdate={event => app.updateEvent(event.id, event)}
+        onEventDelete={id => {
+          app.deleteEvent(id);
+          setDetailPanelEventId(null);
+        }}
+        onEventSelect={setSelectedEventId}
+        onDetailPanelToggle={setDetailPanelEventId}
+      />
     </div>
   );
 };

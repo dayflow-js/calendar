@@ -12,6 +12,7 @@ import {
   createCalendarDate,
   dateToCalendarDate,
 } from '@/calendar/calendarSystem';
+import { useEventActivation } from '@/components/common/useEventActivation';
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
 import {
@@ -151,12 +152,11 @@ export const DefaultYearView = ({
     event: Event;
   } | null>(null);
 
-  const handleSelectEvent = useCallback(
-    (eventId: string, segmentId: string) => {
-      setSelectedEventId(eventId);
-      setDetailPanelEventId(segmentId);
-    },
-    [setSelectedEventId, setDetailPanelEventId]
+  const handleSelectEvent = useEventActivation(
+    app,
+    isMobile,
+    setSelectedEventId,
+    setDetailPanelEventId
   );
 
   const handleEventContextMenu = useCallback(

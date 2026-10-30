@@ -11,7 +11,7 @@ const YearView = (props: YearViewProps) => {
   }
 
   if (mode === 'grid') {
-    return <GridYearView app={props.app} config={props.config} />;
+    return <GridYearView {...props} />;
   }
 
   return <DefaultYearView {...props} />;

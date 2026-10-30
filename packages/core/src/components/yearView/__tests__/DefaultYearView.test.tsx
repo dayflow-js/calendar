@@ -1,4 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/preact';
+import { Temporal } from 'temporal-polyfill';
 
 import { DefaultYearView } from '@/components/yearView/DefaultYearView';
 import { FixedWeekYearView } from '@/components/yearView/FixedWeekYearView';
@@ -166,5 +167,87 @@ describe('DefaultYearView', () => {
       new Date(2026, 0, 1)
     );
     expect(onGridDateDoubleClick.mock.calls[0][1]).toEqual([]);
+  });
+
+  describe('fixed-week event clicks follow eventDetailTrigger', () => {
+    const setup = (eventDetailTrigger?: 'click' | 'dbClick') => {
+      const onEventClick = vi.fn();
+      const onEventDoubleClick = vi.fn();
+      const app = new CalendarApp({
+        views: [],
+        plugins: [],
+        defaultView: ViewType.YEAR,
+        initialDate: new Date(2026, 0, 1),
+        useEventDetailPanel: true,
+        eventDetailTrigger,
+        callbacks: { onEventClick, onEventDoubleClick },
+        events: [
+          {
+            id: 'trip',
+            title: 'Trip',
+            start: Temporal.PlainDate.from('2026-01-05'),
+            end: Temporal.PlainDate.from('2026-01-06'),
+            allDay: true,
+          },
+        ],
+      });
+      const onDetailPanelToggle = vi.fn();
+      const { container } = render(
+        <FixedWeekYearView
+          app={app}
+          calendarRef={{ current: document.createElement('div') }}
+          config={{ mode: 'fixed-week', fixedWeekColumnWidth: 48 }}
+          onEventSelect={vi.fn()}
+          onDetailPanelToggle={onDetailPanelToggle}
+        />
+      );
+      const bar = () =>
+        container.querySelector<HTMLElement>('[data-event-id="trip"]')!;
+      return {
+        container,
+        bar,
+        onDetailPanelToggle,
+        onEventClick,
+        onEventDoubleClick,
+      };
+    };
+
+    it('opens the panel on a single click in click mode', async () => {
+      const { bar, onDetailPanelToggle, onEventClick } = setup('click');
+      await waitFor(() => expect(bar()).not.toBeNull());
+      fireEvent.click(bar());
+      expect(onEventClick).toHaveBeenCalledOnce();
+      expect(onDetailPanelToggle).toHaveBeenLastCalledWith(
+        bar().dataset.segmentId
+      );
+    });
+
+    it('selects on click and opens on double click by default', async () => {
+      const { bar, onDetailPanelToggle, onEventDoubleClick } = setup();
+      await waitFor(() => expect(bar()).not.toBeNull());
+      fireEvent.click(bar());
+      expect(onDetailPanelToggle).not.toHaveBeenCalledWith(
+        bar().dataset.segmentId
+      );
+      fireEvent.dblClick(bar());
+      expect(onEventDoubleClick).toHaveBeenCalledOnce();
+      await waitFor(() =>
+        expect(onDetailPanelToggle).toHaveBeenLastCalledWith(
+          bar().dataset.segmentId
+        )
+      );
+    });
+
+    it('widens day columns with fixedWeekColumnWidth', () => {
+      const { container } = setup('click');
+      const root = container.querySelector<HTMLElement>('.df-year-fixed')!;
+      expect(root.style.getPropertyValue('--df-year-fixed-column-width')).toBe(
+        '48px'
+      );
+      expect(
+        container.querySelector<HTMLElement>('.df-year-fixed-content-inner')!
+          .style.minWidth
+      ).toContain('var(--df-year-fixed-column-width');
+    });
   });
 });

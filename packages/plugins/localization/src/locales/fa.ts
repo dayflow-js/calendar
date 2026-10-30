@@ -159,6 +159,12 @@ const fa: DayflowLocale = {
     viewTask: 'مشاهده کار',
     addDueTime: 'افزودن زمان',
     removeDueTime: 'حذف زمان',
+    taskStatus: 'ستون',
+    taskStatusTodo: 'برای انجام',
+    taskStatusInProgress: 'در حال انجام',
+    taskStatusDone: 'انجام شد',
+    assignees: 'مسئولان',
+    unassigned: 'بدون مسئول',
   },
   packages: {
     scheduler: {
