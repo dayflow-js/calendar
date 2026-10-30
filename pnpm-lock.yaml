@@ -590,6 +590,9 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: 'catalog:'
         version: 16.0.3(rollup@4.57.1)
+      '@testing-library/jest-dom':
+        specifier: 'catalog:'
+        version: 6.9.1
       '@testing-library/preact':
         specifier: 'catalog:'
         version: 3.2.4(preact@10.28.4)

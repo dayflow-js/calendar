@@ -36,6 +36,7 @@
   "devDependencies": {
     "@dayflow/core": "workspace:^",
     "@rollup/plugin-node-resolve": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
     "@testing-library/preact": "catalog:",
     "rimraf": "catalog:",
     "rollup": "catalog:",
