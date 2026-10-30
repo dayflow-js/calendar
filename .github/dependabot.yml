@@ -1,0 +1,34 @@
+# Security updates only. Version updates are off (limit 0); these entries exist
+# so security fixes land as one grouped PR per lockfile instead of one PR per
+# dependency.
+version: 2
+
+updates:
+  # pnpm workspace: owns pnpm-lock.yaml and updates the workspace manifests
+  # (packages/*, examples/*) from the root.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: fix(deps)
+    groups:
+      security:
+        applies-to: security-updates
+        patterns:
+          - '*'
+
+  # The docs site is outside the workspace and has its own package-lock.json.
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: fix(deps)
+    groups:
+      security:
+        applies-to: security-updates
+        patterns:
+          - '*'
