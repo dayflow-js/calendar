@@ -79,7 +79,7 @@ case $choice in
     ;;
   2)
     echo "Selected: Install All"
-    BUILD_FILTER_STAGE2="--filter @dayflow/react --filter @dayflow/angular --filter @dayflow/svelte --filter @dayflow/vue --filter @dayflow/plugin-drag --filter @dayflow/plugin-keyboard-shortcuts --filter @dayflow/plugin-localization --filter @dayflow/plugin-sidebar"
+    BUILD_FILTER_STAGE2="--filter @dayflow/react --filter @dayflow/angular --filter @dayflow/svelte --filter @dayflow/vue --filter @dayflow/plugin-drag --filter @dayflow/plugin-keyboard-shortcuts --filter @dayflow/plugin-localization --filter @dayflow/plugin-sidebar --filter @dayflow/plugin-board"
     PACK_DIRS=(
       "packages/ui/context-menu"
       "packages/ui/range-picker"
@@ -92,6 +92,7 @@ case $choice in
       "packages/plugins/keyboard-shortcuts"
       "packages/plugins/localization"
       "packages/plugins/sidebar"
+      "packages/plugins/board"
     )
     ;;
   *)
@@ -170,6 +171,7 @@ case $choice in
     add_to_install_list "dayflow-plugin-keyboard-shortcuts-*.tgz"
     add_to_install_list "dayflow-plugin-localization-*.tgz"
     add_to_install_list "dayflow-plugin-sidebar-*.tgz"
+    add_to_install_list "dayflow-plugin-board-*.tgz"
     ;;
 esac
 
