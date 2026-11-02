@@ -474,6 +474,9 @@
 
   /* CalendarPicker dropdown container (used by both mobile and desktop variants) */
   .df-calendar-picker-dropdown {
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - 16px);
     overflow-y: auto;
     max-height: 18rem;
     border-radius: 0.5rem;
