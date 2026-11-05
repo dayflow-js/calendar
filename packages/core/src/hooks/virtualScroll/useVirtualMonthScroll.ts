@@ -127,6 +127,7 @@ export const useVirtualMonthScroll = ({
   startOfWeek = 1,
   isEnabled = true,
   snapToMonth = false,
+  instantNavigation = false,
   skipScrollOnDateChange,
 }: UseVirtualMonthScrollProps): UseVirtualMonthScrollReturn => {
   // Callers pass a fresh Date on every render (app.getCurrentDate() clones), so
@@ -474,16 +475,31 @@ export const useVirtualMonthScroll = ({
   const scrollToDate = useCallback(
     (targetDate: Date, smooth = true) => {
       if (!scrollElementRef.current) return;
+      const shouldSmooth = smooth && !instantNavigation;
 
       setIsNavigating(true);
       isNavigatingRef.current = true;
 
       const resetNavigatingState = () => {
-        const delay = smooth ? 500 : 200;
-        setTimeout(() => {
+        const reset = () => {
           setIsNavigating(false);
           isNavigatingRef.current = false;
-        }, delay);
+        };
+        if (instantNavigation) {
+          requestAnimationFrame(reset);
+        } else {
+          setTimeout(reset, shouldSmooth ? 500 : 200);
+        }
+      };
+
+      const scrollToTarget = (top: number) => {
+        scrollElementRef.current?.scrollTo({
+          top,
+          behavior: shouldSmooth ? 'smooth' : 'auto',
+        });
+        if (instantNavigation && scrollElementRef.current) {
+          setScrollTop(scrollElementRef.current.scrollTop);
+        }
       };
 
       const targetWeekIndex = weeksData.findIndex(week =>
@@ -495,10 +511,7 @@ export const useVirtualMonthScroll = ({
       if (targetWeekIndex !== -1) {
         const targetTop = targetWeekIndex * weekHeight;
 
-        scrollElementRef.current.scrollTo({
-          top: targetTop,
-          behavior: smooth ? 'smooth' : 'auto',
-        });
+        scrollToTarget(targetTop);
         resetNavigatingState();
         return;
       }
@@ -558,14 +571,11 @@ export const useVirtualMonthScroll = ({
             scrollElementRef.current.scrollTop += addedHeight;
             setScrollTop(prev => prev + addedHeight);
 
-            setTimeout(() => {
-              if (scrollElementRef.current) {
-                scrollElementRef.current.scrollTo({
-                  top: targetTop,
-                  behavior: smooth ? 'smooth' : 'auto',
-                });
-              }
-            }, 50);
+            if (instantNavigation) {
+              scrollToTarget(targetTop);
+            } else {
+              setTimeout(() => scrollToTarget(targetTop), 50);
+            }
           }
           resetNavigatingState();
         });
@@ -589,10 +599,7 @@ export const useVirtualMonthScroll = ({
 
           if (scrollElementRef.current && newTargetIndex !== -1) {
             const targetTop = newTargetIndex * weekHeight;
-            scrollElementRef.current.scrollTo({
-              top: targetTop,
-              behavior: smooth ? 'smooth' : 'auto',
-            });
+            scrollToTarget(targetTop);
           }
           resetNavigatingState();
         });
@@ -600,7 +607,7 @@ export const useVirtualMonthScroll = ({
         resetNavigatingState();
       }
     },
-    [weeksData, weekHeight, getCachedWeekData]
+    [weeksData, weekHeight, getCachedWeekData, instantNavigation]
   );
 
   // Navigation functions
@@ -680,6 +687,11 @@ export const useVirtualMonthScroll = ({
     setCurrentYear(todayYear);
     onCurrentMonthChange?.(todayMonth, todayYear);
 
+    if (instantNavigation) {
+      scrollToDate(firstDayOfMonth, false);
+      return;
+    }
+
     // Find week containing first day of current month
     const targetWeekIndex = weeksData.findIndex(week =>
       week.days.some(
@@ -734,6 +746,7 @@ export const useVirtualMonthScroll = ({
     scrollToDate,
     getMonthName,
     calendarSystem,
+    instantNavigation,
   ]);
 
   // Detect current month change
