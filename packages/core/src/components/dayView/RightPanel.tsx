@@ -67,21 +67,26 @@ export const RightPanel = ({
         {/* Mini calendar */}
         <div className={miniCalendarContainer}>
           <div className='df-right-panel-calendar-shell'>
-            <div className='df-right-panel-calendar-header'>
-              <div className='df-right-panel-header-spacer' aria-hidden='true'>
-                &nbsp;
+            {app.state.useViewHeader !== false && (
+              <div className='df-right-panel-calendar-header'>
+                <div
+                  className='df-right-panel-header-spacer'
+                  aria-hidden='true'
+                >
+                  &nbsp;
+                </div>
+                <TodayBox
+                  handlePreviousMonth={() => app.goToPrevious()}
+                  handleNextMonth={() => app.goToNext()}
+                  handleToday={() => app.goToToday()}
+                  navigationUnit='day'
+                />
               </div>
-              <TodayBox
-                handlePreviousMonth={() => app.goToPrevious()}
-                handleNextMonth={() => app.goToNext()}
-                handleToday={() => app.goToToday()}
-                navigationUnit='day'
-              />
-            </div>
+            )}
             <MiniCalendar
               visibleMonth={visibleMonth}
               currentDate={currentDate}
-              showHeader={true}
+              showHeader={app.state.useViewHeader !== false}
               onMonthChange={handleMonthChange}
               onDateSelect={handleDateSelect}
               events={app.getEvents()}

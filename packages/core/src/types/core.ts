@@ -335,6 +335,8 @@ export interface CalendarAppConfig {
    */
   eventDetailTrigger?: EventDetailTrigger;
   useCalendarHeader?: boolean;
+  /** Render per-view date/navigation headers. Defaults to true. */
+  useViewHeader?: boolean;
   locale?: string | Locale;
   readOnly?: boolean | ReadOnlyConfig;
   /** Custom sort comparator for all-day events, applied in day/week/month/year views. */
@@ -374,6 +376,7 @@ export interface CalendarAppState {
   plugins: Map<string, CalendarPlugin>;
   views: Map<CalendarViewType, CalendarView>;
   switcherMode?: ViewSwitcherMode;
+  useViewHeader?: boolean;
 
   locale: string | Locale;
   highlightedEventId?: string | null;
