@@ -12,6 +12,7 @@ export interface UseVirtualMonthScrollProps {
   startOfWeek?: number;
   isEnabled?: boolean;
   snapToMonth?: boolean;
+  instantNavigation?: boolean;
   skipScrollOnDateChange?: RefObject<boolean>;
 }
 
