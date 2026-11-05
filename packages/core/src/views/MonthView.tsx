@@ -5,7 +5,6 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useCallback,
 } from 'preact/hooks';
 
 import {
@@ -23,6 +22,7 @@ import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
 } from '@/hooks/virtualScroll';
+import { useStableMonthCallback } from '@/hooks/virtualScroll/useStableMonthCallback';
 import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
 import {
@@ -379,27 +379,21 @@ const MonthView = ({
       ? internalDetailPanelEventId
       : propDetailPanelEventId;
 
-  const setSelectedEventId = useCallback(
-    (id: string | null) => {
-      if (propOnEventSelect) {
-        propOnEventSelect(id);
-      } else {
-        setInternalSelectedId(id);
-      }
-    },
-    [propOnEventSelect]
-  );
+  const setSelectedEventId = useStableMonthCallback((id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  });
 
-  const setDetailPanelEventId = useCallback(
-    (id: string | null) => {
-      if (propOnDetailPanelToggle) {
-        propOnDetailPanelToggle(id);
-      } else {
-        setInternalDetailPanelEventId(id);
-      }
-    },
-    [propOnDetailPanelToggle]
-  );
+  const setDetailPanelEventId = useStableMonthCallback((id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  });
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -527,7 +521,7 @@ const MonthView = ({
     appTimeZone,
   ]);
 
-  const getWeekEventsWithPreview = useCallback(
+  const getWeekEventsWithPreview = useStableMonthCallback(
     (weekStartDate: Date) => {
       const baseEvents =
         eventsByWeek.get(weekStartDate.getTime()) ?? EMPTY_WEEK_EVENTS;
@@ -559,8 +553,7 @@ const MonthView = ({
       }
 
       return adjustedEvents;
-    },
-    [eventsByWeek, dragPreviewEvent, startOfWeek, appTimeZone]
+    }
   );
 
   const isGridDateClickRef = useRef(false);
@@ -781,14 +774,12 @@ const MonthView = ({
     };
   }, [isFadeMode, scrollDisabled, scrollElementRef]);
 
-  const handleEventUpdate = useCallback(
-    (updatedEvent: Event) => app.updateEvent(updatedEvent.id, updatedEvent),
-    [app]
+  const handleEventUpdate = useStableMonthCallback((updatedEvent: Event) =>
+    app.updateEvent(updatedEvent.id, updatedEvent)
   );
 
-  const handleEventDelete = useCallback(
-    (eventId: string) => app.deleteEvent(eventId),
-    [app]
+  const handleEventDelete = useStableMonthCallback((eventId: string) =>
+    app.deleteEvent(eventId)
   );
 
   const handleChangeView = (view: ViewType) => {
@@ -796,12 +787,11 @@ const MonthView = ({
   };
 
   // Stable callbacks for WeekComponent props so memo() can bail out during scroll
-  const handleDetailPanelOpen = useCallback(
-    () => setNewlyCreatedEventId(null),
-    []
+  const handleDetailPanelOpen = useStableMonthCallback(() =>
+    setNewlyCreatedEventId(null)
   );
 
-  const handleWeekEventSelect = useCallback(
+  const handleWeekEventSelect = useStableMonthCallback(
     (eventId: string | null) => {
       const isViewable = app.getReadOnlyConfig().viewable;
       if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
@@ -813,16 +803,12 @@ const MonthView = ({
         }
       }
       setSelectedEventId(eventId);
-    },
-    [screenSize, isTouch, events, setSelectedEventId, app]
+    }
   );
 
-  const handleWeekEventLongPress = useCallback(
-    (eventId: string) => {
-      if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
-    },
-    [screenSize, isTouch, setSelectedEventId]
-  );
+  const handleWeekEventLongPress = useStableMonthCallback((eventId: string) => {
+    if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
+  });
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
@@ -842,7 +828,7 @@ const MonthView = ({
       : `${currentMonth} ${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
-  const handleGridDateClick = useCallback(
+  const handleGridDateClick = useStableMonthCallback(
     (date: Date, dayEvents: Event[], e?: MouseEvent) => {
       isGridDateClickRef.current = true;
       const clickAction = config?.gridDateClick;
@@ -864,19 +850,15 @@ const MonthView = ({
         app.changeView(ViewType.DAY);
       }
       // 'none' → do nothing
-    },
-    [config.gridDateClick, app]
+    }
   );
 
-  const handleSelectDate = useCallback(
-    (date: Date) => {
-      isGridDateClickRef.current = true;
-      app.selectDate(date);
-    },
-    [app]
-  );
+  const handleSelectDate = useStableMonthCallback((date: Date) => {
+    isGridDateClickRef.current = true;
+    app.selectDate(date);
+  });
 
-  const handleGridDateDoubleClick = useCallback(
+  const handleGridDateDoubleClick = useStableMonthCallback(
     (e: MouseEvent | TouchEvent, date: Date, dayEvents: Event[]) => {
       const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
@@ -922,8 +904,7 @@ const MonthView = ({
         app.changeView(ViewType.DAY);
       }
       // 'none' → do nothing
-    },
-    [config.gridDateDoubleClick, app, screenSize, t, appTimeZone]
+    }
   );
 
   return (
