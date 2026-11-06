@@ -1,17 +1,11 @@
 import { RefObject } from 'preact';
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import CalendarEvent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
-import { cn, monthMoreEvents, monthTitle } from '@/styles/classNames';
+import { monthTitle } from '@/styles/classNames';
 import { MonthEventDragState, Event, ViewType, ICalendarApp } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { scrollbarTakesSpace, temporalToVisualDate } from '@/utils';
@@ -38,6 +32,7 @@ interface WeekComponentProps {
   item: VirtualWeekItem;
   weekHeight: number; // Use this instead of item.height to avoid sync issues
   eventHeight?: number;
+  moreHeight: number;
   events: Event[];
   dragState: MonthEventDragState;
   calendarRef: RefObject<HTMLDivElement>;
@@ -96,6 +91,7 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     item,
     weekHeight,
     eventHeight = 16,
+    moreHeight,
     events,
     dragState,
     calendarRef,
@@ -124,8 +120,6 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     timeFormat = '24h',
   }: WeekComponentProps) => {
     const { t, locale } = useLocale();
-    const moreMeasureRef = useRef<HTMLSpanElement>(null);
-    const [moreHeight, setMoreHeight] = useState(0);
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
       null
@@ -137,20 +131,6 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
       date: Date;
     } | null>(null);
     const isEditable = app.canMutateFromUI();
-
-    useLayoutEffect(() => {
-      const element = moreMeasureRef.current;
-      if (!element) return;
-
-      const measure = () => {
-        const height = element.getBoundingClientRect().height;
-        if (height > 0) setMoreHeight(height);
-      };
-      measure();
-      const observer = new ResizeObserver(measure);
-      observer.observe(element);
-      return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
       if (isEditable) return;
@@ -477,13 +457,6 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
 
     return (
       <div className='df-month-week' style={{ height: weekHeightPx }}>
-        <span
-          ref={moreMeasureRef}
-          className={cn(monthMoreEvents, 'df-month-more-events-measure')}
-          aria-hidden='true'
-        >
-          {t('more')}
-        </span>
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
         {showMonthIndicator && firstDayOfMonth && (
           <div
@@ -673,6 +646,7 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     prevProps.item.weekData === nextProps.item.weekData &&
     prevProps.weekHeight === nextProps.weekHeight &&
     prevProps.eventHeight === nextProps.eventHeight &&
+    prevProps.moreHeight === nextProps.moreHeight &&
     prevProps.events === nextProps.events &&
     prevProps.calendarRef === nextProps.calendarRef &&
     prevProps.onEventUpdate === nextProps.onEventUpdate &&
