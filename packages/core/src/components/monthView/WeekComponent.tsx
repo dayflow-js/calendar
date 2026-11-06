@@ -1,11 +1,17 @@
 import { RefObject } from 'preact';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import CalendarEvent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
-import { monthTitle } from '@/styles/classNames';
+import { cn, monthMoreEvents, monthTitle } from '@/styles/classNames';
 import { MonthEventDragState, Event, ViewType, ICalendarApp } from '@/types';
 import { VirtualWeekItem } from '@/types/monthView';
 import { scrollbarTakesSpace, temporalToVisualDate } from '@/utils';
@@ -75,7 +81,6 @@ interface WeekComponentProps {
 }
 
 const MULTI_DAY_TOP_OFFSET = 33;
-const MORE_TEXT_HEIGHT = 20; // Height reserved for the "+ x more" indicator
 
 const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
   'WeekComponent',
@@ -119,6 +124,8 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     timeFormat = '24h',
   }: WeekComponentProps) => {
     const { t, locale } = useLocale();
+    const moreMeasureRef = useRef<HTMLSpanElement>(null);
+    const [moreHeight, setMoreHeight] = useState(0);
     const [shouldShowMonthTitle, setShouldShowMonthTitle] = useState(false);
     const hideTitleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
       null
@@ -130,6 +137,20 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
       date: Date;
     } | null>(null);
     const isEditable = app.canMutateFromUI();
+
+    useLayoutEffect(() => {
+      const element = moreMeasureRef.current;
+      if (!element) return;
+
+      const measure = () => {
+        const height = element.getBoundingClientRect().height;
+        if (height > 0) setMoreHeight(height);
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(element);
+      return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
       if (isEditable) return;
@@ -147,11 +168,12 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     // Calculate layout parameters once per week render
     const layoutParams = useMemo(() => {
       const availableHeight = weekHeight - MULTI_DAY_TOP_OFFSET;
-      if (availableHeight <= 0) return { maxSlots: 0, maxSlotsWithMore: 0 };
+      if (availableHeight <= 0)
+        return { maxSlots: 0, maxSlotsWithMore: 0, maxTimedSlotsWithMore: 0 };
 
       const maxSlots = Math.floor(availableHeight / rowSpacing);
 
-      const spaceForMore = availableHeight - MORE_TEXT_HEIGHT;
+      const spaceForMore = availableHeight - moreHeight;
       const maxSlotsWithMoreRaw = Math.max(
         0,
         Math.floor(spaceForMore / rowSpacing)
@@ -163,8 +185,14 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
           ? Math.min(maxSlotsWithMoreRaw, maxSlots - 1)
           : maxSlotsWithMoreRaw;
 
-      return { maxSlots, maxSlotsWithMore };
-    }, [weekHeight, rowSpacing]);
+      // Stacked timed events have a 2px bottom margin, including before more.
+      const maxTimedSlotsWithMore = Math.min(
+        maxSlotsWithMore,
+        Math.max(0, Math.floor(spaceForMore / (eventHeight + 2)))
+      );
+
+      return { maxSlots, maxSlotsWithMore, maxTimedSlotsWithMore };
+    }, [weekHeight, rowSpacing, eventHeight, moreHeight]);
 
     useEffect(() => {
       if (isScrolling) {
@@ -330,7 +358,8 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
     }, [organizedMultiDaySegments]);
 
     const dayLayoutData = useMemo<MonthDayLayoutData[]>(() => {
-      const { maxSlots, maxSlotsWithMore } = layoutParams;
+      const { maxSlots, maxSlotsWithMore, maxTimedSlotsWithMore } =
+        layoutParams;
 
       // 1. Initial pass: calculate total slots and basic "more" check for each day
       const initialResults = weekData.days.map((day, dayIndex) => {
@@ -364,7 +393,9 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
           Math.max(maxOccupiedLayer + 1, 0) + eventsAfterMultiDay;
 
         const hasMore = totalSlotsNeeded > maxSlots;
-        const limit = hasMore ? maxSlotsWithMore : maxSlots;
+        const moreLimit =
+          timedEventsOnly.length > 0 ? maxTimedSlotsWithMore : maxSlotsWithMore;
+        const limit = hasMore ? moreLimit : maxSlots;
 
         return {
           totalSlotsNeeded,
@@ -374,6 +405,7 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
           gapLayers,
           occupiedLayers,
           maxOccupiedLayer,
+          moreLimit,
         };
       });
 
@@ -405,7 +437,7 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
         });
 
         const finalHasMore = res.hasMore || hasHiddenSegment;
-        const finalLimit = finalHasMore ? maxSlotsWithMore : maxSlots;
+        const finalLimit = finalHasMore ? res.moreLimit : maxSlots;
 
         return {
           ...res,
@@ -445,6 +477,13 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
 
     return (
       <div className='df-month-week' style={{ height: weekHeightPx }}>
+        <span
+          ref={moreMeasureRef}
+          className={cn(monthMoreEvents, 'df-month-more-events-measure')}
+          aria-hidden='true'
+        >
+          {t('more')}
+        </span>
         {/* Month title: displayed when scrolling, hidden after scrolling stops */}
         {showMonthIndicator && firstDayOfMonth && (
           <div
@@ -496,6 +535,7 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
                   isDragging={isDragging}
                   locale={locale}
                   moreLabel={t('more')}
+                  moreHeight={moreHeight}
                   newlyCreatedEventId={newlyCreatedEventId}
                   onChangeView={onChangeView}
                   onContextMenu={handleContextMenu}
