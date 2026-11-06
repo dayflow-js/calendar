@@ -1,13 +1,20 @@
-import { act, render, within } from '@testing-library/preact';
+import { act, fireEvent, render, within } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { CalendarApp } from '@/core/CalendarApp';
+import { LocaleProvider } from '@/locale';
+import { MonthViewConfig } from '@/types';
 import { generateWeekData } from '@/utils/calendarDataUtils';
+import MonthView from '@/views/MonthView';
 
-const mount = (allDay = false) => {
+const mount = (
+  allDay = false,
+  monthConfig?: MonthViewConfig,
+  screenSize: 'desktop' | 'mobile' = 'desktop',
+  locale: 'en-US' | 'fr-FR' = 'en-US'
+) => {
   const events = Array.from({ length: 6 }, (_, index) => ({
     id: `event-${index}`,
     title: `Event ${index}`,
@@ -19,26 +26,33 @@ const mount = (allDay = false) => {
       ? Temporal.PlainDate.from('2026-03-12')
       : Temporal.PlainDateTime.from(`2026-03-12T${index + 11}:00`),
   }));
-  const app = new CalendarApp({ views: [], events });
+  const app = new CalendarApp({
+    views: [],
+    events,
+    initialDate: new Date(2026, 2, 12),
+  });
   const onMoreEventsClick = vi.fn();
   const onGridDateClick = vi.fn();
   const onSelectDate = vi.fn();
   const onChangeView = vi.fn();
-  const Harness = () => {
-    const [open, setOpen] = useState(false);
-    return (
-      <form
-        onSubmit={event => event.preventDefault()}
-        onKeyDown={event => {
-          if (event.key === 'Escape') setOpen(false);
-        }}
-      >
-        <button type='button'>Before calendar</button>
+  const Harness = () => (
+    <LocaleProvider
+      locale={locale}
+      messages={locale === 'fr-FR' ? { more: 'plus' } : undefined}
+    >
+      <button type='button'>Before calendar</button>
+      {monthConfig ? (
+        <MonthView
+          app={app}
+          config={monthConfig}
+          calendarRef={{ current: null }}
+        />
+      ) : (
         <WeekComponent
           currentMonth='March'
           currentYear={2026}
           newlyCreatedEventId={null}
-          screenSize='desktop'
+          screenSize={screenSize}
           isScrolling={false}
           isDragging={false}
           showMonthIndicator={false}
@@ -49,6 +63,7 @@ const mount = (allDay = false) => {
             height: 121,
           }}
           weekHeight={121}
+          moreHeight={32}
           events={events}
           dragState={{
             active: false,
@@ -68,18 +83,15 @@ const mount = (allDay = false) => {
           onGridDateClick={onGridDateClick}
           onSelectDate={onSelectDate}
           onChangeView={onChangeView}
-          onMoreEventsClick={(date, event) => {
-            onMoreEventsClick(date, event);
-            setOpen(true);
-          }}
+          onMoreEventsClick={onMoreEventsClick}
           app={app}
         />
-        {open && <aside role='dialog'>Hidden events (Escape to close)</aside>}
-      </form>
-    );
-  };
+      )}
+    </LocaleProvider>
+  );
   return {
     ...render(<Harness />),
+    app,
     events,
     onMoreEventsClick,
     onGridDateClick,
@@ -91,38 +103,67 @@ const mount = (allDay = false) => {
 describe('month more continuation', () => {
   const observers: {
     notify: () => void;
+    targets: Element[];
     disconnect: ReturnType<typeof vi.fn>;
   }[] = [];
   let originalFontSize: string;
   let lineHeight = 1;
+  let measured = true;
+  let initialHeight: number | undefined;
+  const rowHeight = () =>
+    measured
+      ? Number.parseFloat(document.documentElement.style.fontSize) * lineHeight
+      : 0;
 
   beforeEach(() => {
     originalFontSize = document.documentElement.style.fontSize;
     lineHeight = 1;
+    measured = true;
+    initialHeight = undefined;
     document.documentElement.style.fontSize = '32px';
-    // jsdom has no layout engine. Supply the font-relative row measurement
-    // at the DOM boundary, leaving slot selection and event rendering real.
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+    vi.stubGlobal('innerHeight', 876); // Six 121px weeks below the header.
+    // jsdom has no layout engine. Stub layout size, leaving slot selection
+    // and event rendering real. Client rects deliberately stay unmeasured.
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(
       function (this: HTMLElement) {
-        return {
-          height: this.classList.contains('df-month-more-events')
-            ? Number.parseFloat(document.documentElement.style.fontSize) *
-              lineHeight
-            : 0,
-        } as DOMRect;
+        return this.classList.contains('df-month-more-events')
+          ? (initialHeight ?? rowHeight())
+          : 0;
       }
     );
     vi.stubGlobal(
       'ResizeObserver',
       class {
-        observe = vi.fn();
+        targets: Element[] = [];
+        observe = vi.fn((target: Element) => this.targets.push(target));
         disconnect = vi.fn();
-        constructor(notify: () => void) {
-          observers.push({ notify, disconnect: this.disconnect });
+        constructor(callback: ResizeObserverCallback) {
+          observers.push({
+            targets: this.targets,
+            disconnect: this.disconnect,
+            notify: () =>
+              callback(
+                this.targets.map(target => ({
+                  target,
+                  borderBoxSize: [{ blockSize: rowHeight(), inlineSize: 100 }],
+                  contentBoxSize: [],
+                  devicePixelContentBoxSize: [],
+                  contentRect: new DOMRectReadOnly(0, 0, 100, rowHeight()),
+                })),
+                this as unknown as ResizeObserver
+              ),
+          });
         }
       }
     );
   });
+
+  const rowObservers = () =>
+    observers.filter(observer =>
+      observer.targets.some(target =>
+        target.classList.contains('df-month-more-events-measure')
+      )
+    );
 
   afterEach(() => {
     document.documentElement.style.fontSize = originalFontSize;
@@ -142,7 +183,7 @@ describe('month more continuation', () => {
       .filter(
         node => !node.classList.contains('df-month-day-cell-overlay-mask')
       ).length;
-    const height = more.getBoundingClientRect().height;
+    const height = rowHeight();
     const spacing = cell.querySelector('[data-event-id]') ? 18 : 17;
     expect(33 + slotCount * spacing + height).toBeLessThanOrEqual(
       Number.parseFloat(cell.style.height)
@@ -158,64 +199,119 @@ describe('month more continuation', () => {
   it.each([false, true])(
     'fits the continuation at a 32px root font and counts hidden events (allDay=%s)',
     allDay => {
-      const { container, events } = mount(allDay);
+      const { container, events } = mount(allDay, {});
       expect(expectFits(container, events.length)).toBe(3);
-      expect(container.querySelector('.df-month-title')).toBeNull();
     }
   );
 
   it.each([false, true])(
-    'fits a taller inherited line height at a 32px root font (allDay=%s)',
+    'fits a taller row height at a 32px root font (allDay=%s)',
     allDay => {
       lineHeight = 1.125;
-      const { container, events } = mount(allDay);
+      const { container, events } = mount(allDay, {});
       expect(expectFits(container, events.length)).toBe(allDay ? 3 : 2);
     }
   );
 
   it('remeasures after a font/container resize and disconnects on unmount', () => {
     document.documentElement.style.fontSize = '16px';
-    const { container, events, unmount } = mount();
+    const { container, events, unmount } = mount(false, {});
     expect(expectFits(container, events.length)).toBe(4);
     document.documentElement.style.fontSize = '32px';
-    act(() => observers.forEach(observer => observer.notify()));
+    act(() => rowObservers().forEach(observer => observer.notify()));
     expect(expectFits(container, events.length)).toBe(3);
     unmount();
-    expect(observers.length).toBeGreaterThan(0);
+    expect(rowObservers()).toHaveLength(1);
     expect(
       observers.every(observer => observer.disconnect.mock.calls.length > 0)
     ).toBe(true);
   });
 
+  it('uses observer border-box layout size under a scaled ancestor', () => {
+    initialHeight = 16;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(
+      () => ({ height: rowHeight() / 2 }) as DOMRect
+    );
+    const { container, events } = mount(false, {});
+    (container as HTMLElement).style.transform = 'scale(0.5)';
+    act(() => rowObservers().forEach(observer => observer.notify()));
+    expect(expectFits(container, events.length)).toBe(3);
+  });
+
+  it('keeps the shared measurement when scrolling mounts more weeks', async () => {
+    const heightRead = vi.mocked(
+      Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight')!
+        .get!
+    );
+    const { container } = mount(false, {});
+    const reads = heightRead.mock.calls.length;
+    const observer = rowObservers()[0];
+    const firstWeek = container.querySelector('.df-month-week');
+    const scroller = container.querySelector('.df-scroll-container')!;
+    fireEvent.scroll(scroller, { target: { scrollTop: 121 * 55 } });
+    await vi.waitFor(() => expect(firstWeek).not.toBeInTheDocument());
+    expect(rowObservers()).toEqual([observer]);
+    expect(heightRead).toHaveBeenCalledTimes(reads);
+  });
+
+  it('reserves 20px before a positive layout measurement is available', () => {
+    measured = false;
+    const { container } = mount(false, {});
+    const cell = container.querySelector('[data-date="2026-03-12"]')!;
+    const more = within(cell as HTMLElement).getByText(/\+\d+ more/);
+    expect(more).toHaveStyle({ height: '20px' });
+    expect(cell.querySelectorAll('[data-event-id]')).toHaveLength(3);
+    act(() => rowObservers().forEach(observer => observer.notify()));
+    expect(more).toHaveStyle({ height: '20px' });
+  });
+
+  it.each([{}, { scroll: { disabled: true, transition: 'fade' } }] as const)(
+    'shares one layout measurement across weeks with config %j',
+    config => {
+      const { container } = mount(false, config);
+      expect(
+        container.querySelectorAll('.df-month-week').length
+      ).toBeGreaterThan(1);
+      const measures = container.querySelectorAll(
+        '.df-month-more-events-measure'
+      );
+      expect(measures).toHaveLength(1);
+      expect(measures[0].parentElement).toHaveClass('df-scroll-container');
+      expect(rowObservers()).toHaveLength(1);
+    }
+  );
+
+  it.each(['desktop', 'mobile'] as const)(
+    'includes the visible text and full localized date in the %s accessible name',
+    screenSize => {
+      const { container } = mount(false, undefined, screenSize, 'fr-FR');
+      const more = container.querySelector('.df-month-day-cell-more-events')!;
+      expect(more).toHaveAccessibleName('+3 plus, jeudi 12 mars 2026');
+      expect(
+        more.getAttribute('aria-label')!.startsWith(more.textContent!)
+      ).toBe(true);
+    }
+  );
+
   it.each(['{Enter}', ' '])(
-    'tabs to the continuation and opens the click callback with %s, retaining focus after close',
+    'tabs to the continuation and fires the click callback once with %s',
     async key => {
       const user = userEvent.setup();
       const result = mount();
       const more = result.getByText(/\+\d+ more/);
-      await user.click(more);
-      const clickDate = result.onMoreEventsClick.mock.calls[0][0];
-      await user.keyboard('{Escape}');
-      result.onMoreEventsClick.mockClear();
-
       result.getByRole('button', { name: 'Before calendar' }).focus();
       await user.tab();
       expect(more).toHaveFocus();
       expect(more).toHaveAttribute('type', 'button');
       await user.keyboard(key);
-      expect(result.getByRole('dialog')).toBeInTheDocument();
       expect(result.onMoreEventsClick).toHaveBeenCalledOnce();
       expect(result.onMoreEventsClick).toHaveBeenCalledWith(
-        clickDate,
+        new Date(2026, 2, 12),
         expect.objectContaining({ type: 'click' })
       );
-      await user.keyboard('{Escape}');
-      expect(result.queryByRole('dialog')).toBeNull();
-      expect(more).toHaveFocus();
       expect(result.onGridDateClick).not.toHaveBeenCalled();
       expect(result.onSelectDate).not.toHaveBeenCalled();
       expect(result.onChangeView).not.toHaveBeenCalled();
-      expect(clickDate).toEqual(new Date(2026, 2, 12));
     }
   );
 });

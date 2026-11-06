@@ -31,6 +31,8 @@ import {
   weekGrid,
   dayLabel,
   scrollContainer,
+  cn,
+  monthMoreEvents,
 } from '@/styles/classNames';
 import {
   Event,
@@ -130,6 +132,7 @@ const eventOverlapsWeek = (
   return targetWeek >= eventWeekStart && targetWeek <= eventWeekEnd;
 };
 
+const MORE_TEXT_HEIGHT = 20;
 const STATIC_TRANSITION_DURATION = 300;
 const EMPTY_WEEK_EVENTS: Event[] = [];
 
@@ -154,6 +157,27 @@ const MonthView = ({
 
   const scrollDisabled = config.scroll?.disabled === true;
   const isFadeMode = scrollDisabled && config.scroll?.transition === 'fade';
+
+  const moreMeasureRef = useRef<HTMLSpanElement>(null);
+  const [moreHeight, setMoreHeight] = useState(MORE_TEXT_HEIGHT);
+
+  useLayoutEffect(() => {
+    const element = moreMeasureRef.current;
+    if (!element) return;
+
+    // Read layout height so scaled ancestors do not shrink the reservation.
+    const initialHeight =
+      element.offsetHeight ||
+      Number.parseFloat(getComputedStyle(element).height);
+    if (initialHeight > 0) setMoreHeight(initialHeight);
+
+    const observer = new ResizeObserver(entries => {
+      const height = entries[0]?.borderBoxSize?.[0]?.blockSize ?? 0;
+      if (height > 0) setMoreHeight(height);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isFadeMode]);
 
   const [fadeDisplayDate, setFadeDisplayDate] = useState(currentDate);
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -944,6 +968,13 @@ const MonthView = ({
           className={`${scrollContainer} df-month-view-fade-scroller`}
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
         >
+          <span
+            ref={moreMeasureRef}
+            className={cn(monthMoreEvents, 'df-month-more-events-measure')}
+            aria-hidden='true'
+          >
+            {t('more')}
+          </span>
           <div className='df-month-view-fade-body' style={fadeStyle}>
             {fadeWeeks.map((weekData, index) => {
               const weekEvents = getWeekEventsWithPreview(weekData.startDate);
@@ -963,6 +994,7 @@ const MonthView = ({
                   item={adjustedItem}
                   weekHeight={weekHeight}
                   eventHeight={config.eventHeight}
+                  moreHeight={moreHeight}
                   showWeekNumbers={config.showWeekNumbers}
                   showMonthIndicator={false}
                   currentMonth={
@@ -1023,6 +1055,13 @@ const MonthView = ({
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
           onScroll={handleScroll}
         >
+          <span
+            ref={moreMeasureRef}
+            className={cn(monthMoreEvents, 'df-month-more-events-measure')}
+            aria-hidden='true'
+          >
+            {t('more')}
+          </span>
           <div style={{ height: topSpacerHeight }} />
           {visibleWeeks.map((item, index) => {
             const weekEvents = getWeekEventsWithPreview(
@@ -1046,6 +1085,7 @@ const MonthView = ({
                 item={adjustedItem}
                 weekHeight={weekHeight}
                 eventHeight={config.eventHeight}
+                moreHeight={moreHeight}
                 showWeekNumbers={config.showWeekNumbers}
                 showMonthIndicator={config.showMonthIndicator}
                 currentMonth={currentMonth}
