@@ -110,6 +110,7 @@ describe('month more continuation', () => {
   let lineHeight = 1;
   let measured = true;
   let initialHeight: number | undefined;
+  let hasBorderBoxSize = true;
   const rowHeight = () =>
     measured
       ? Number.parseFloat(document.documentElement.style.fontSize) * lineHeight
@@ -120,6 +121,7 @@ describe('month more continuation', () => {
     lineHeight = 1;
     measured = true;
     initialHeight = undefined;
+    hasBorderBoxSize = true;
     document.documentElement.style.fontSize = '32px';
     vi.stubGlobal('innerHeight', 876); // Six 121px weeks below the header.
     // jsdom has no layout engine. Stub layout size, leaving slot selection
@@ -143,13 +145,24 @@ describe('month more continuation', () => {
             disconnect: this.disconnect,
             notify: () =>
               callback(
-                this.targets.map(target => ({
-                  target,
-                  borderBoxSize: [{ blockSize: rowHeight(), inlineSize: 100 }],
-                  contentBoxSize: [],
-                  devicePixelContentBoxSize: [],
-                  contentRect: new DOMRectReadOnly(0, 0, 100, rowHeight()),
-                })),
+                this.targets.map(target => {
+                  const entry = {
+                    target,
+                    borderBoxSize: [
+                      { blockSize: rowHeight(), inlineSize: 100 },
+                    ],
+                    contentBoxSize: [],
+                    devicePixelContentBoxSize: [],
+                    contentRect: new DOMRectReadOnly(0, 0, 100, rowHeight()),
+                  };
+                  // Older Safari omits borderBoxSize from observer entries.
+                  return hasBorderBoxSize
+                    ? entry
+                    : ({
+                        ...entry,
+                        borderBoxSize: undefined,
+                      } as unknown as ResizeObserverEntry);
+                }),
                 this as unknown as ResizeObserver
               ),
           });
@@ -225,6 +238,16 @@ describe('month more continuation', () => {
     expect(
       observers.every(observer => observer.disconnect.mock.calls.length > 0)
     ).toBe(true);
+  });
+
+  it('falls back to layout height when the observer omits borderBoxSize', () => {
+    hasBorderBoxSize = false;
+    document.documentElement.style.fontSize = '16px';
+    const { container, events } = mount(false, {});
+    expect(expectFits(container, events.length)).toBe(4);
+    document.documentElement.style.fontSize = '32px';
+    act(() => rowObservers().forEach(observer => observer.notify()));
+    expect(expectFits(container, events.length)).toBe(3);
   });
 
   it('uses observer border-box layout size under a scaled ancestor', () => {

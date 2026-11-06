@@ -172,7 +172,9 @@ const MonthView = ({
     if (initialHeight > 0) setMoreHeight(initialHeight);
 
     const observer = new ResizeObserver(entries => {
-      const height = entries[0]?.borderBoxSize?.[0]?.blockSize ?? 0;
+      // Safari before 15.4 omits borderBoxSize; fall back to layout height.
+      const height =
+        entries[0]?.borderBoxSize?.[0]?.blockSize ?? element.offsetHeight;
       if (height > 0) setMoreHeight(height);
     });
     observer.observe(element);
