@@ -5,7 +5,6 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useCallback,
 } from 'preact/hooks';
 
 import {
@@ -14,6 +13,7 @@ import {
   startOfCalendarMonth,
   addCalendarMonths,
 } from '@/calendar/calendarSystem';
+import { useStableMonthCallback } from '@/hooks/virtualScroll/useStableMonthCallback';
 import { WeeksData } from '@/types';
 import {
   UseVirtualMonthScrollProps,
@@ -142,7 +142,7 @@ export const useVirtualMonthScroll = ({
     null
   );
 
-  const getMonthName = useCallback(
+  const getMonthName = useStableMonthCallback(
     (monthIndex: number, year: number) => {
       const date = calendarDateToDate(
         { year, month: monthIndex + 1, day: 1 },
@@ -152,8 +152,7 @@ export const useVirtualMonthScroll = ({
       return date.toLocaleDateString(locale, {
         month: isAsian ? 'short' : 'long',
       });
-    },
-    [locale, calendarSystem]
+    }
   );
 
   const initialWeeksData = useMemo(() => {
@@ -207,19 +206,18 @@ export const useVirtualMonthScroll = ({
   const loadingRef = useRef(false);
 
   // Callback ref for scroll element
-  const scrollElementRefCallback = useCallback(
+  const scrollElementRefCallback = useStableMonthCallback(
     (element: HTMLDivElement | null) => {
       if (element) {
         (
           scrollElementRef as React.MutableRefObject<HTMLDivElement | null>
         ).current = element;
       }
-    },
-    []
+    }
   );
 
   // Cached week data retrieval
-  const getCachedWeekData = useCallback(
+  const getCachedWeekData = useStableMonthCallback(
     (weekStartDate: Date): WeeksData => {
       let weekData = weekDataCache.current.get(weekStartDate);
 
@@ -229,8 +227,7 @@ export const useVirtualMonthScroll = ({
       }
 
       return weekData;
-    },
-    [calendarSystem]
+    }
   );
 
   const previousCalendarSystemRef = useRef(calendarSystem);
@@ -257,7 +254,7 @@ export const useVirtualMonthScroll = ({
   ]);
 
   // Dynamically load more week data
-  const loadMoreWeeks = useCallback(
+  const loadMoreWeeks = useStableMonthCallback(
     (direction: 'past' | 'future', count: number = 26) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
@@ -301,8 +298,7 @@ export const useVirtualMonthScroll = ({
           }, 200);
         }
       }, 0);
-    },
-    [weeksData, getCachedWeekData, weekHeight]
+    }
   );
 
   // Virtual scroll calculation - fixed 6 weeks display
@@ -345,7 +341,7 @@ export const useVirtualMonthScroll = ({
   }, [scrollTop, containerHeight, weekHeight, weeksData]);
 
   // Detect currently displayed main month
-  const detectCurrentMonth = useCallback(
+  const detectCurrentMonth = useStableMonthCallback(
     (visibleItems: VirtualWeekItem[]) => {
       if (
         isNavigating ||
@@ -412,22 +408,11 @@ export const useVirtualMonthScroll = ({
           onCurrentMonthChange?.(weekDominantMonth, weekDominantYear);
         }
       }
-    },
-    [
-      containerHeight,
-      currentMonth,
-      currentYear,
-      isNavigating,
-      isScrolling,
-      onCurrentMonthChange,
-      scrollTop,
-      isInitialized,
-      getMonthName,
-    ]
+    }
   );
 
   // Scroll handler
-  const handleScroll = useCallback(
+  const handleScroll = useStableMonthCallback(
     (e: JSX.TargetedEvent<HTMLDivElement, globalThis.Event>) => {
       const now = performance.now();
       if (
@@ -466,12 +451,11 @@ export const useVirtualMonthScroll = ({
       scrollTimeoutRef.current = setTimeout(() => {
         setIsScrolling(false);
       }, VIRTUAL_MONTH_SCROLL_CONFIG.SCROLL_DEBOUNCE);
-    },
-    [weekHeight, loadMoreWeeks, isNavigating]
+    }
   );
 
   // Scroll to specified date
-  const scrollToDate = useCallback(
+  const scrollToDate = useStableMonthCallback(
     (targetDate: Date, smooth = true) => {
       if (!scrollElementRef.current) return;
 
@@ -599,12 +583,11 @@ export const useVirtualMonthScroll = ({
       } else {
         resetNavigatingState();
       }
-    },
-    [weeksData, weekHeight, getCachedWeekData]
+    }
   );
 
   // Navigation functions
-  const handlePreviousMonth = useCallback(() => {
+  const handlePreviousMonth = useStableMonthCallback(() => {
     const startIdx = virtualData.displayStartIndex;
     const endIdx = Math.min(weeksData.length - 1, startIdx + 5);
     const counts: Record<string, number> = {};
@@ -632,9 +615,9 @@ export const useVirtualMonthScroll = ({
       calendarSystem
     );
     scrollToDate(targetDate);
-  }, [virtualData.displayStartIndex, weeksData, scrollToDate, calendarSystem]);
+  });
 
-  const handleNextMonth = useCallback(() => {
+  const handleNextMonth = useStableMonthCallback(() => {
     // Use the dominant month of the visible range so navigation is correct
     // even when the display week's first day falls in the prior month.
     const startIdx = virtualData.displayStartIndex;
@@ -664,9 +647,9 @@ export const useVirtualMonthScroll = ({
       calendarSystem
     );
     scrollToDate(targetDate);
-  }, [virtualData.displayStartIndex, weeksData, scrollToDate, calendarSystem]);
+  });
 
-  const handleToday = useCallback(() => {
+  const handleToday = useStableMonthCallback(() => {
     const today = new Date();
     const todayParts = dateToCalendarDate(today, calendarSystem);
     const todayMonth = getMonthName(todayParts.month - 1, todayParts.year);
@@ -727,19 +710,25 @@ export const useVirtualMonthScroll = ({
         });
       }
     }
-  }, [
-    weeksData,
-    weekHeight,
-    onCurrentMonthChange,
-    scrollToDate,
-    getMonthName,
-    calendarSystem,
-  ]);
+  });
 
   // Detect current month change
   useEffect(() => {
     detectCurrentMonth(virtualData.visibleItems);
-  }, [virtualData.visibleItems, detectCurrentMonth]);
+  }, [
+    virtualData.visibleItems,
+    detectCurrentMonth,
+    containerHeight,
+    currentMonth,
+    currentYear,
+    isNavigating,
+    isScrolling,
+    onCurrentMonthChange,
+    scrollTop,
+    isInitialized,
+    locale,
+    calendarSystem,
+  ]);
 
   useEffect(() => {
     const previousDate = previousDateRef.current;
@@ -828,6 +817,10 @@ export const useVirtualMonthScroll = ({
     weeksData,
     getMonthName,
     skipScrollOnDateChange,
+    weekHeight,
+    startOfWeek,
+    locale,
+    calendarSystem,
   ]);
 
   // Container size listener
@@ -914,6 +907,7 @@ export const useVirtualMonthScroll = ({
     weeksData,
     scrollToDate,
     calendarSystem,
+    startOfWeek,
   ]);
 
   // Cleanup
