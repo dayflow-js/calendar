@@ -44,6 +44,7 @@ interface ViewHeaderProps {
 }
 
 const ViewHeader = ({
+  calendar,
   viewType,
   currentDate,
   onPrevious,
@@ -60,6 +61,7 @@ const ViewHeader = ({
   nextYearOffset = 0,
 }: ViewHeaderProps) => {
   const { locale } = useLocale();
+  if (calendar.state.useViewHeader === false) return null;
   const shouldShowTodayBox = showTodayBox === undefined ? true : showTodayBox;
 
   const getDefaultTitle = (): string => {
