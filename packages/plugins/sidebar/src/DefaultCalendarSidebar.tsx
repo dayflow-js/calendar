@@ -37,6 +37,7 @@ import {
   ImportCalendarDialog,
   NEW_CALENDAR_ID,
 } from './components/ImportCalendarDialog';
+import { InlineCalendarColorPicker } from './components/InlineCalendarColorPicker';
 import { MergeCalendarDialog } from './components/MergeCalendarDialog';
 import { MergeMenuItem } from './components/MergeMenuItem';
 import { SidebarHeader } from './components/SidebarHeader';
@@ -803,6 +804,22 @@ const DefaultCalendarSidebar = ({
                     }
                     onSelect={handleColorSelect}
                     onCustomColor={handleCustomColor}
+                    customColorLabel={t('customColor')}
+                    // Blossom opens in place inside the menu; a framework
+                    // color picker slot still opens beside the calendar row.
+                    customPicker={
+                      hasCustomPicker ? undefined : (
+                        <InlineCalendarColorPicker
+                          app={app}
+                          calendarId={contextMenu.calendarId}
+                          color={
+                            calendars.find(c => c.id === contextMenu.calendarId)
+                              ?.colors.lineColor ?? '#6ea8f7'
+                          }
+                          label={t('customColor')}
+                        />
+                      )
+                    }
                   />
                 </>
               )

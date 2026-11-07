@@ -163,6 +163,12 @@ const en: Locale = {
     viewTask: 'View Task',
     addDueTime: 'Add Time',
     removeDueTime: 'Remove Time',
+    taskStatus: 'Column',
+    taskStatusTodo: 'To do',
+    taskStatusInProgress: 'In progress',
+    taskStatusDone: 'Done',
+    assignees: 'Assignees',
+    unassigned: 'Unassigned',
   },
 };
 

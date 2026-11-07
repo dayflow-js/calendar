@@ -277,13 +277,16 @@
     white-space: nowrap;
   }
 
+  /* Events, all-day badges and task pills share one row height. */
   .df-agenda-event {
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     gap: 0.875rem;
     width: fit-content;
     max-width: 100%;
-    padding: 0.125rem 0;
+    min-height: 1.75rem;
+    padding: 0;
     border: none;
     background: transparent;
     color: inherit;
@@ -316,6 +319,17 @@
     margin-right: 0;
   }
 
+  /* Task pills: inset like the month and week task bars, and let the
+   * priority text color (incl. its selected tone) reach the title. */
+  .df-agenda-event[data-kind='task'] {
+    gap: 0.5rem;
+    padding: 0 0.75rem 0 0.5rem;
+  }
+
+  .df-agenda-event[data-kind='task'] .df-agenda-title {
+    color: inherit;
+  }
+
   .df-agenda-title {
     min-width: 0;
     font-size: 1rem;
@@ -324,11 +338,12 @@
   }
 
   .df-agenda-badge {
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     max-width: 100%;
-    min-height: 1rem;
-    padding: 0.3rem 0.875rem;
+    min-height: 1.75rem;
+    padding: 0 0.875rem;
     border: none;
     border-radius: 0.35rem;
     font-size: 0.95rem;
@@ -1754,12 +1769,47 @@
     );
   }
 
+  .df-year-popup-event[role='button'] {
+    cursor: pointer;
+  }
+
+  .df-year-popup-event[data-selected='true'] {
+    background-color: color-mix(
+      in srgb,
+      var(--df-color-primary) 12%,
+      var(--df-color-background)
+    );
+  }
+
+  .df-year-popup-event:focus-visible {
+    outline: 2px solid var(--df-color-ring, var(--df-color-primary));
+    outline-offset: -2px;
+  }
+
   .df-year-popup-dot {
     margin-top: 0.375rem;
     height: 0.5rem;
     width: 0.5rem;
     flex-shrink: 0;
     border-radius: 9999px;
+  }
+
+  .df-year-popup-event .df-task-checkbox {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin: 0.125rem 0 0;
+  }
+
+  .df-year-popup-event[data-task-completed='true'] .df-year-popup-event-title {
+    color: var(--df-color-muted-foreground);
+    text-decoration: line-through;
+  }
+
+  .df-year-event-bar[data-kind='task'] .df-task-checkbox {
+    flex: none;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin: 0;
   }
 
   .df-year-popup-event-main {

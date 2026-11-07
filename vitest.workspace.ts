@@ -8,6 +8,7 @@ export default defineWorkspace([
   'packages/plugins/drag/vitest.config.ts',
   'packages/plugins/keyboard-shortcuts/vitest.config.ts',
   'packages/plugins/sidebar/vitest.config.ts',
+  'packages/plugins/board/vitest.config.ts',
   'packages/caldav/core/vitest.config.ts',
   'packages/caldav/google-sync/vitest.config.ts',
   'packages/caldav/outlook-sync/vitest.config.ts',

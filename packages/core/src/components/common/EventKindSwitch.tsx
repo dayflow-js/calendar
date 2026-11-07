@@ -1,5 +1,9 @@
 import { useLocale } from '@/locale';
-import type { EventKind } from '@/types';
+import type { EventKind, ICalendarApp } from '@/types';
+
+/** Whether the detail editors may turn an event into a task or back. */
+export const canSwitchEventKind = (app?: ICalendarApp) =>
+  app?.state?.views?.get(app.state.currentView)?.lockEventKind !== true;
 
 interface EventKindSwitchProps {
   value: EventKind;

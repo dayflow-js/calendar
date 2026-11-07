@@ -1,3 +1,5 @@
+import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
+import type { EventActivateHandler } from '@/components/common/useEventActivation';
 import { getEventIcon } from '@/components/monthView/util';
 import { Event, ICalendarApp } from '@/types';
 import {
@@ -10,6 +12,11 @@ import {
   getSelectedBgColor,
 } from '@/utils';
 import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
+import {
+  getTaskPriorityBackground,
+  getTaskPriorityTextColor,
+  isTask,
+} from '@/utils/taskUtils';
 
 import { YearMultiDaySegment } from './utils';
 
@@ -21,7 +28,7 @@ interface YearEventBarProps {
   isBeingDragged: boolean;
   isDraggable: boolean;
   app: ICalendarApp;
-  onSelect: (eventId: string, segmentId: string) => void;
+  onSelect: EventActivateHandler;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenu?: (e: MouseEvent, event: Event) => void;
 }
@@ -42,14 +49,22 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
     onContextMenu,
   }: YearEventBarProps) => {
     const isAllDay = !!event.allDay;
+    const task = isTask(event);
     const calendarId = getPrimaryCalendarId(event);
     const registry = app.getCalendarRegistry();
-    const bgColor = isSelected
-      ? getSelectedBgColor(calendarId, registry)
-      : getEventBgColor(calendarId, registry);
-    const textColor = isSelected
-      ? '#fff'
-      : getEventTextColor(calendarId, registry);
+    // Tasks use the same priority stripes as the month and week views.
+    const background = task
+      ? { background: getTaskPriorityBackground(event, isSelected) }
+      : {
+          backgroundColor: isSelected
+            ? getSelectedBgColor(calendarId, registry)
+            : getEventBgColor(calendarId, registry),
+        };
+    const textColor = task
+      ? getTaskPriorityTextColor(event, isSelected)
+      : isSelected
+        ? '#fff'
+        : getEventTextColor(calendarId, registry);
     const lineColors = getCalendarLineColors(event, registry);
     const indicatorBackground = buildColorBarGradient(lineColors);
     const indicatorIsGradient = lineColors.length > 1;
@@ -68,7 +83,12 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
 
     const handleClick = (e: MouseEvent) => {
       e.stopPropagation();
-      onSelect(event.id, segmentId);
+      onSelect(event.id, segmentId, e, 'click');
+    };
+
+    const handleDoubleClick = (e: MouseEvent) => {
+      e.stopPropagation();
+      onSelect(event.id, segmentId, e, 'dblclick');
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -89,10 +109,13 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
       <div
         data-event-id={event.id}
         data-segment-id={segmentId}
+        data-detail-panel-key={segmentId}
+        data-kind={task ? 'task' : undefined}
         data-selected={String(isSelected)}
         data-dragging={String(isBeingDragged)}
         className='df-year-event-bar'
         onClick={handleClick}
+        onDblClick={handleDoubleClick}
         onMouseDown={handleMouseDown}
         onContextMenu={handleContextMenuEvent}
         style={{
@@ -101,7 +124,7 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
           top: `${visualRowIndex * 18}px`,
           width: `calc(${widthPercent}% - 4px)`,
           height: '16px',
-          backgroundColor: bgColor,
+          ...background,
           color: textColor,
           borderTopLeftRadius: isFirstSegment ? '4px' : '0',
           borderBottomLeftRadius: isFirstSegment ? '4px' : '0',
@@ -112,7 +135,7 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
           padding: '0 4px',
           display: 'flex',
           alignItems: 'center',
-          gap: isAllDay ? '0' : '4px',
+          gap: isAllDay && !task ? '0' : '4px',
           overflow: 'hidden',
           cursor: isDraggable ? 'pointer' : 'default',
           opacity: isBeingDragged ? 0.5 : 1,
@@ -123,7 +146,16 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
           pointerEvents: 'auto',
         }}
       >
-        {isAllDay ? (
+        {task ? (
+          isFirstSegment && (
+            <TaskCheckbox
+              event={event}
+              app={app}
+              isEditable={isDraggable}
+              color={getLineColor(calendarId, registry)}
+            />
+          )
+        ) : isAllDay ? (
           eventIcon && (
             <div
               className='df-event-year-icon-badge'

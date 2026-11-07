@@ -1,6 +1,13 @@
 import { JSX } from 'preact';
 import { createPortal } from 'preact/compat';
-import { useState, useRef, useEffect, useMemo, useId } from 'preact/hooks';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useId,
+} from 'preact/hooks';
 
 import {
   getDefaultCalendarRegistry,
@@ -53,25 +60,36 @@ export const CalendarPicker = ({
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       const isMobile = variant === 'mobile';
+      const margin = 8;
+      const availableWidth = Math.max(0, window.innerWidth - margin * 2);
+      const minWidth = Math.min(
+        isMobile
+          ? 12 *
+              Number.parseFloat(
+                getComputedStyle(document.documentElement).fontSize || '16'
+              )
+          : rect.width,
+        availableWidth
+      );
+      const width = Math.min(
+        Math.max(listboxRef.current?.offsetWidth ?? 0, minWidth),
+        availableWidth
+      );
+      const preferredLeft = isMobile ? rect.right - width : rect.left;
 
       const style: JSX.CSSProperties = {
         position: 'fixed',
         zIndex: 10001,
-        minWidth: isMobile ? '12rem' : `${rect.width}px`,
+        minWidth: `${minWidth}px`,
+        left: `${Math.max(margin, Math.min(preferredLeft, window.innerWidth - margin - width))}px`,
         top: `${rect.bottom + 4}px`,
       };
-
-      if (isMobile) {
-        style.right = `${window.innerWidth - rect.right}px`;
-      } else {
-        style.left = `${rect.left}px`;
-      }
 
       setDropdownStyle(style);
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         pickerRef.current &&
@@ -94,7 +112,7 @@ export const CalendarPicker = ({
       window.removeEventListener('scroll', updatePosition, true);
       window.removeEventListener('resize', updatePosition);
     };
-  }, [isOpen]);
+  }, [isOpen, variant, options]);
 
   const getColorForCalendarId = (calendarId: string): string => {
     const reg = registry || getDefaultCalendarRegistry();
@@ -298,7 +316,7 @@ export const CalendarPicker = ({
         }
         onKeyDown={handleListboxKeyDown}
         data-calendar-picker-dropdown='true'
-        style={dropdownStyle}
+        style={{ position: 'fixed', ...dropdownStyle }}
         className={calendarPickerDropdown}
       >
         {renderSections(mobile)}

@@ -26,12 +26,37 @@ export type EventKind = 'event' | 'task';
 
 export type TaskPriority = 'none' | 'low' | 'medium' | 'high';
 
+/** A workflow stage a task moves through, such as "In progress". */
+export interface TaskStatus {
+  id: string;
+  /** Display name. Built-in status IDs fall back to a translated name. */
+  title?: string;
+  color?: string;
+  /** Tasks in this status are complete. */
+  completed?: boolean;
+}
+
+/** Someone a task can be assigned to. */
+export interface TaskMember {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  color?: string;
+}
+
 /** Task-only state. Ignored unless `kind` is `'task'`. */
 export interface EventTask {
   completed?: boolean;
   /** When the task was marked complete. Cleared when it is reopened. */
   completedAt?: Temporal.ZonedDateTime;
   priority?: TaskPriority;
+  /**
+   * Status ID from the `taskStatuses` config. `completed` stays authoritative:
+   * a status that disagrees with it resolves to the first matching status.
+   */
+  status?: string;
+  /** Member IDs from the `taskMembers` config. */
+  assigneeIds?: string[];
 }
 
 /**
