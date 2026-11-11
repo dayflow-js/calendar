@@ -17,6 +17,22 @@ const calendar = useCalendarApp({
 });
 ```
 
+## Hiding Per-View Headers
+
+Set `useViewHeader: false` to hide the date/navigation bars inside Day, Week, Month, Agenda and Year views, including Day's mini-calendar navigation. It defaults to `true` and can be changed with `calendar.updateConfig()`.
+
+This option is independent of `useCalendarHeader`. To supply your own navigation for the entire calendar, disable both:
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  useCalendarHeader: false,
+  useViewHeader: false,
+});
+```
+
+The calendar's navigation methods remain available for your custom controls.
+
 ## Custom Header
 
 <Callout title='Breaking change from v3.4.1' type='warn'>

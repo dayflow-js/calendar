@@ -65,6 +65,7 @@ export class CalendarApp implements ICalendarApp {
       currentDate: config.initialDate || defaultCurrentDate,
       events: config.events || [],
       switcherMode: config.switcherMode || 'buttons',
+      useViewHeader: config.useViewHeader ?? true,
       plugins: new Map(),
       views: new Map(),
       locale: CalendarApp.resolveLocale(config.locale),
@@ -460,6 +461,13 @@ export class CalendarApp implements ICalendarApp {
       config.useCalendarHeader !== this.useCalendarHeader
     ) {
       this.useCalendarHeader = config.useCalendarHeader;
+      hasChanged = true;
+    }
+    if (
+      config.useViewHeader !== undefined &&
+      config.useViewHeader !== this.state.useViewHeader
+    ) {
+      this.state.useViewHeader = config.useViewHeader;
       hasChanged = true;
     }
     if (
