@@ -132,6 +132,8 @@ export interface WeekViewConfig extends ViewFactoryConfig {
  * Month scroll / navigation configuration
  */
 export interface MonthScrollConfig {
+  /** Month view only: skip smooth scrolling and navigation delays for Prev/Next/Today/date navigation. Snap-to-month stays smooth. Keeps continuous scrolling enabled. Default false. */
+  instantNavigation?: boolean;
   /** Disable continuous scrolling; only Prev/Next buttons switch months */
   disabled?: boolean;
   /**

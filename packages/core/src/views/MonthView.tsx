@@ -597,6 +597,7 @@ const MonthView = ({
     startOfWeek: startOfWeek,
     isEnabled: isWeekHeightInitialized && !isFadeMode,
     snapToMonth: config.snapToMonth,
+    instantNavigation: config.scroll?.instantNavigation,
     skipScrollOnDateChange: isGridDateClickRef,
   });
 
