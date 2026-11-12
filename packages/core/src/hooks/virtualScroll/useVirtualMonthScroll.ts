@@ -457,9 +457,9 @@ export const useVirtualMonthScroll = ({
 
   // Scroll to specified date
   const scrollToDate = useStableMonthCallback(
-    (targetDate: Date, smooth = true) => {
+    (targetDate: Date, smooth = true, instant = instantNavigation) => {
       if (!scrollElementRef.current) return;
-      const shouldSmooth = smooth && !instantNavigation;
+      const shouldSmooth = smooth && !instant;
 
       setIsNavigating(true);
       isNavigatingRef.current = true;
@@ -469,7 +469,7 @@ export const useVirtualMonthScroll = ({
           setIsNavigating(false);
           isNavigatingRef.current = false;
         };
-        if (instantNavigation) {
+        if (instant) {
           requestAnimationFrame(reset);
         } else {
           setTimeout(reset, shouldSmooth ? 500 : 200);
@@ -479,9 +479,9 @@ export const useVirtualMonthScroll = ({
       const scrollToTarget = (top: number) => {
         scrollElementRef.current?.scrollTo({
           top,
-          behavior: shouldSmooth ? 'smooth' : 'auto',
+          behavior: shouldSmooth ? 'smooth' : instant ? 'instant' : 'auto',
         });
-        if (instantNavigation && scrollElementRef.current) {
+        if (instant && scrollElementRef.current) {
           setScrollTop(scrollElementRef.current.scrollTop);
         }
       };
@@ -555,7 +555,7 @@ export const useVirtualMonthScroll = ({
             scrollElementRef.current.scrollTop += addedHeight;
             setScrollTop(prev => prev + addedHeight);
 
-            if (instantNavigation) {
+            if (instant) {
               scrollToTarget(targetTop);
             } else {
               setTimeout(() => scrollToTarget(targetTop), 50);
@@ -905,7 +905,7 @@ export const useVirtualMonthScroll = ({
     if (Math.abs(targetTop - scrollTop) > 5) {
       // Small additional delay on top of SCROLL_DEBOUNCE for a natural feel
       const snapTimeout = setTimeout(() => {
-        scrollToDate(targetDate, true);
+        scrollToDate(targetDate, true, false);
       }, 200);
       return () => clearTimeout(snapTimeout);
     }

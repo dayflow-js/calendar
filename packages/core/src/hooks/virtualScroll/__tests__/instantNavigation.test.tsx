@@ -82,7 +82,7 @@ describe('instant month navigation', () => {
         if (instant) {
           expect(month.element.scrollTo).toHaveBeenLastCalledWith({
             top: expect.any(Number),
-            behavior: 'auto',
+            behavior: 'instant',
           });
           expect(navigationTimers(timers)).toHaveLength(0);
           expect(month.current.isNavigating).toBe(false);
@@ -132,7 +132,7 @@ describe('instant month navigation', () => {
       });
       expect(month.element.scrollTo).toHaveBeenLastCalledWith({
         top: expect.any(Number),
-        behavior: 'auto',
+        behavior: 'instant',
       });
       expect(navigationTimers(timers)).toHaveLength(0);
       expect(month.current.isNavigating).toBe(false);
@@ -152,7 +152,7 @@ describe('instant month navigation', () => {
     });
     expect(month.element.scrollTo).toHaveBeenLastCalledWith({
       top: expect.any(Number),
-      behavior: 'auto',
+      behavior: 'instant',
     });
     expect(navigationTimers(timers)).toHaveLength(0);
     expect(month.current.currentMonth).toBe('December');
@@ -182,7 +182,7 @@ describe('instant month navigation', () => {
     month.unmount();
   });
 
-  it('also uses auto positioning for snap-to-month after the scroll debounce', () => {
+  it('keeps snap-to-month smooth after the user scrolls', () => {
     const month = mount(true, true);
     act(() => {
       vi.advanceTimersByTime(32);
@@ -197,8 +197,36 @@ describe('instant month navigation', () => {
     });
     expect(month.element.scrollTo).toHaveBeenLastCalledWith({
       top: expect.any(Number),
-      behavior: 'auto',
+      behavior: 'smooth',
     });
+    month.unmount();
+  });
+
+  it('lands immediately when the host sets smooth scroll-behavior', () => {
+    const month = mount(true);
+    const startTop = month.element.scrollTop;
+    month.element.style.scrollBehavior = 'smooth';
+    // Behave like a browser: unless the call asks for 'instant', a smooth
+    // host animates, so scrollTop keeps its old value until a later frame.
+    const scrollTo = vi.fn((options: ScrollToOptions) => {
+      const animates =
+        options.behavior === 'smooth' ||
+        (options.behavior !== 'instant' &&
+          month.element.style.scrollBehavior === 'smooth');
+      if (animates) {
+        setTimeout(() => {
+          month.element.scrollTop = options.top ?? 0;
+        }, 300);
+      } else {
+        month.element.scrollTop = options.top ?? 0;
+      }
+    });
+    Object.defineProperty(month.element, 'scrollTo', { value: scrollTo });
+    act(() => month.current.handleNextMonth());
+    const target = scrollTo.mock.calls.at(-1)![0].top;
+    expect(target).not.toBe(startTop);
+    expect(month.element.scrollTop).toBe(target);
+    expect(month.current.scrollTop).toBe(target);
     month.unmount();
   });
 

@@ -49,7 +49,7 @@ describe('MonthView instant navigation configuration', () => {
         });
         expect(scroller.scrollTo).toHaveBeenLastCalledWith({
           top: expect.any(Number),
-          behavior: instantNavigation ? 'auto' : 'smooth',
+          behavior: instantNavigation ? 'instant' : 'smooth',
         });
         expect(
           fireEvent.wheel(scroller, { cancelable: true, deltaY: 100 })
