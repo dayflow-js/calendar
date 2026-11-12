@@ -766,20 +766,9 @@ export const useVirtualMonthScroll = ({
         startIndex + FIXED_WEEKS_TO_SHOW - 1
       );
 
-      // Check if the target date is already visible within the currently displayed weeks
-      // and is not the 1st day of a new month being navigated to.
-      const isDateVisible =
-        nextParts.day !== 1 &&
-        weeksData
-          .slice(startIndex, endIndex + 1)
-          .some(week =>
-            week?.days.some(
-              day =>
-                day.date.getFullYear() === currentDate.getFullYear() &&
-                day.date.getMonth() === currentDate.getMonth() &&
-                day.date.getDate() === currentDate.getDate()
-            )
-          );
+      // Grid clicks on out-of-month dates opt out via skipScrollOnDateChange.
+      // Programmatic changes must still scroll, even when the target date is
+      // already visible in the trailing row of the current month's grid.
 
       // Check if nextMonth/nextYear is already the dominant displayed month.
       // Using dominant-month logic instead of raw date presence avoids a false
@@ -805,7 +794,7 @@ export const useVirtualMonthScroll = ({
       }
       const isVisible = dominantKey === `${nextMonth}-${nextYear}`;
 
-      if (!isVisible && !isDateVisible) {
+      if (!isVisible) {
         const firstDayOfMonth = startOfCalendarMonth(
           currentDate,
           calendarSystem
