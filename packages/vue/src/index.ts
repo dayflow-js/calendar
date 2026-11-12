@@ -1,5 +1,6 @@
 import DayFlowCalendarComponent from './DayFlowCalendar';
 export { DayFlowCalendarComponent as DayFlowCalendar };
+export type { DayFlowCalendarSlots } from './DayFlowCalendar';
 export { useCalendarApp } from './composables/useCalendarApp';
 export default DayFlowCalendarComponent;
 

@@ -14,13 +14,14 @@ Day Flow は 5 つの異なるビュータイプをサポートしており、�
 
 #### 設定
 
-| プロパティ            | 型               | デフォルト  | 説明                                               |
-| :-------------------- | :--------------- | :---------- | :------------------------------------------------- |
-| `showAllDay`          | `boolean`        | `true`      | 終日イベント行を表示するかどうか。                 |
-| `scrollToCurrentTime` | `boolean`        | `true`      | 初回ロード時に現在時刻までスクロールするかどうか。 |
-| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 時間軸の時間形式。                                 |
-| `secondaryTimeZone`   | `string`         | `undefined` | 日ビューだけに表示される補助タイムライン。         |
-| `hourHeight`          | `number`         | `72`        | 時間グリッドの 1 時間あたりの行の高さ（px）。      |
+| プロパティ            | 型               | デフォルト  | 説明                                                         |
+| :-------------------- | :--------------- | :---------- | :----------------------------------------------------------- |
+| `showAllDay`          | `boolean`        | `true`      | 終日イベント行を表示するかどうか。                           |
+| `scrollToCurrentTime` | `boolean`        | `true`      | 初回ロード時に現在時刻までスクロールするかどうか。           |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 時間軸の時間形式。                                           |
+| `secondaryTimeZone`   | `string`         | `undefined` | 日ビューだけに表示される補助タイムライン。                   |
+| `hourHeight`          | `number`         | `72`        | 時間グリッドの 1 時間あたりの行の高さ（px）。                |
+| `showHalfHourLines`   | `boolean`        | `false`     | タイムグリッドの各時間の30分位置に破線の区切りを表示します。 |
 
 <FrameworkTabs>
   <Tab>
@@ -123,6 +124,7 @@ Day Flow は 5 つの異なるビュータイプをサポートしており、�
 | `gridDateClick`       | `'day-view' \| 'none' \| function`                   | `undefined`      | 日付セルをクリックした際のアクション。                                                                                                                 |
 | `gridDateDoubleClick` | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | 日付セルをダブルクリックした際のアクション。`'create-event'` (デフォルト) を指定すると、クリックした位置（時間）に 1 時間の Timed Event を作成します。 |
 | `hourHeight`          | `number`                                             | `72`             | 時間グリッドの 1 時間あたりの行の高さ（px）。                                                                                                          |
+| `showHalfHourLines`   | `boolean`                                            | `false`          | タイムグリッドの各時間の30分位置に破線の区切りを表示します。                                                                                           |
 
 <FrameworkTabs>
   <Tab>

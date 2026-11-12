@@ -62,20 +62,45 @@ export default function Layout({ children }: LayoutProps<'/'>) {
     <html lang='en' className={inter.className} suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === 'production' && (
-          <>
-            <Script
-              src='https://www.googletagmanager.com/gtag/js?id=G-QEXJYTSEME'
-              strategy='afterInteractive'
-            />
-            <Script id='google-analytics' strategy='afterInteractive'>
-              {`
+          <Script id='google-analytics' strategy='afterInteractive'>
+            {`
+              const measurementId = 'G-QEXJYTSEME';
+              const isLocalHostname = (hostname) =>
+                hostname === 'localhost' ||
+                hostname.endsWith('.localhost') ||
+                hostname === '0.0.0.0' ||
+                hostname === '::1' ||
+                hostname === '[::1]' ||
+                hostname.startsWith('127.');
+
+              if (isLocalHostname(window.location.hostname)) {
+                window['ga-disable-' + measurementId] = true;
+              } else {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-QEXJYTSEME');
-              `}
-            </Script>
-          </>
+
+                let isLocalReferrer = false;
+                if (document.referrer) {
+                  try {
+                    isLocalReferrer = isLocalHostname(
+                      new URL(document.referrer).hostname,
+                    );
+                  } catch {}
+                }
+
+                gtag('config', measurementId, {
+                  ...(isLocalReferrer ? { ignore_referrer: 'true' } : {}),
+                });
+
+                const script = document.createElement('script');
+                script.async = true;
+                script.src =
+                  'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
+                document.head.appendChild(script);
+              }
+            `}
+          </Script>
         )}
       </head>
       <body className='flex min-h-screen flex-col'>

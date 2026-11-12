@@ -101,6 +101,31 @@ BCP 47 로케일 문자열을 전달하면 월 이름과 요일 레이블이 해
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+선택기 자체의 레이블(이동 버튼, 시작/종료 입력란, 시/분 목록, 확인 버튼)을 번역하려면 `messages`가 있는 locale 객체를 전달하세요. 없는 키는 영어로 대체됩니다. 캘린더에 내장된 이벤트 패널과 대화상자는 캘린더 로케일에서 자동으로 채웁니다.
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'ko-KR',
+    messages: {
+      previousYear: '이전 연도',
+      previousMonth: '이전 달',
+      nextMonth: '다음 달',
+      nextYear: '다음 연도',
+      startDate: '시작 날짜',
+      endDate: '종료 날짜',
+      hour: '시',
+      minute: '분',
+      ok: '확인',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+`calendarSystem='jalali'`를 지정하면 페르시아력으로 날짜를 표시하고 입력합니다. `onChange`와 `onOk`는 여전히 ISO Temporal 값을 반환합니다.
+
 ## 트리거 너비에 맞추기
 
 ```tsx
@@ -129,7 +154,8 @@ BCP 47 로케일 문자열을 전달하면 월 이름과 요일 레이블이 해
 | `autoAdjustOverflow` | `boolean`                                                       | `true`         | 팝업이 화면 밖으로 넘칠 경우 배치를 자동으로 반대편으로 뒤집습니다                |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —              | 팝업을 `document.body` 대신 지정한 컨테이너 안에 마운트합니다                     |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`        | 팝업 너비를 트리거 입력 필드의 너비에 맞춥니다                                    |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | 월·요일 레이블에 사용할 BCP 47 로케일 코드입니다                                  |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 로케일 코드입니다. 객체의 `messages`로 선택기 레이블을 번역합니다          |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | 날짜 표시와 해석에 사용할 달력입니다                                              |
 
 ### `ZonedRange`
 

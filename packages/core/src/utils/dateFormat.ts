@@ -3,6 +3,9 @@
 
 import { Temporal } from 'temporal-polyfill';
 
+import { calendarLocale, CalendarSystem } from '@/calendar/calendarSystem';
+import { formatDateLabel } from '@/locale/intl';
+
 import { isPlainDate, isZonedDateTime } from './temporal';
 
 /**
@@ -14,9 +17,26 @@ export const formatDateConsistent = (
     | Date
     | Temporal.PlainDate
     | Temporal.PlainDateTime
-    | Temporal.ZonedDateTime
+    | Temporal.ZonedDateTime,
+  locale?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): string => {
   if (!date) return '';
+
+  if (locale) {
+    const localDate =
+      date instanceof Date
+        ? date
+        : (() => {
+            const iso = date.withCalendar('iso8601');
+            return new Date(iso.year, iso.month - 1, iso.day);
+          })();
+    return formatDateLabel(localDate, calendarLocale(locale, calendarSystem), {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  }
 
   let day: number, month: number, year: number;
 

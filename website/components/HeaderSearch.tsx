@@ -24,7 +24,8 @@ function DocsLink() {
       href='/docs/introduction'
       className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center p-2 text-sm whitespace-nowrap transition-colors'
     >
-      Documentation
+      <span className='hidden sm:inline'>Documentation</span>
+      <span className='sm:hidden'>Docs</span>
     </Link>
   );
 }
@@ -35,12 +36,22 @@ export function HeaderSearchLarge() {
 
   return (
     <>
+      <Link
+        href='/changelog'
+        className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center gap-1.5 p-2 text-sm whitespace-nowrap transition-colors'
+      >
+        Changelog
+        <span
+          aria-hidden='true'
+          className='h-1.5 w-1.5 rounded-full bg-emerald-500'
+        />
+      </Link>
       <DocsLink />
       {enabled && (
         <button
           type='button'
           data-search-full=''
-          aria-label='Open Search'
+          aria-label={t('Open Search')}
           onClick={() => setOpenSearch(true)}
           className='bg-fd-secondary/50 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground inline-flex w-full max-w-[240px] items-center gap-2 rounded-full border p-1.5 ps-2.5 text-sm transition-colors'
         >
@@ -64,15 +75,26 @@ export function HeaderSearchLarge() {
 
 export function HeaderSearchCompact() {
   const { setOpenSearch, enabled } = useSearchContext();
+  const t = useTranslations({ note: 'search trigger' });
 
   return (
     <>
+      <Link
+        href='/changelog'
+        className='text-fd-muted-foreground hover:text-fd-accent-foreground inline-flex items-center gap-1.5 p-2 text-sm whitespace-nowrap transition-colors'
+      >
+        Changelog
+        <span
+          aria-hidden='true'
+          className='h-1.5 w-1.5 rounded-full bg-emerald-500'
+        />
+      </Link>
       <DocsLink />
       {enabled && (
         <button
           type='button'
           data-search=''
-          aria-label='Open Search'
+          aria-label={t('Open Search')}
           onClick={() => setOpenSearch(true)}
           className={cn(
             buttonVariants({ size: 'icon-sm', color: 'ghost' }),

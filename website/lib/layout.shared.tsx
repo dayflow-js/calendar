@@ -9,7 +9,7 @@ import {
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Badge } from '@/components/ui/badge';
 import type { LanguageCode } from '@/lib/i18n';
-import { brandUrl, proUrl, schedulerUrl } from '@/lib/site';
+import { proUrl, schedulerUrl } from '@/lib/site';
 
 export const gitConfig = {
   user: 'dayflow-js',
@@ -18,7 +18,6 @@ export const gitConfig = {
 };
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
-const BRAND_URL = brandUrl('nav');
 const PRO_URL = proUrl('nav');
 const SCHEDULER_URL = schedulerUrl('nav');
 const SCHEDULER_SIDEBAR_URL = schedulerUrl('docs_sidebar');
@@ -190,16 +189,6 @@ const BlossomLink = (
   </a>
 );
 
-const BrandLink = (
-  <a
-    href={BRAND_URL}
-    aria-label='Visit the DayFlow main site'
-    className='inline-flex items-center text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-  >
-    DayFlow
-  </a>
-);
-
 const ProLink = (
   <a
     href={PRO_URL}
@@ -254,10 +243,6 @@ export function baseOptions(): BaseLayoutProps {
       title: NavTitle,
     },
     links: [
-      {
-        type: 'custom',
-        children: BrandLink,
-      },
       {
         type: 'custom',
         children: ProLink,

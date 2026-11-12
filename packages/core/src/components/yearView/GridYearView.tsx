@@ -1,7 +1,19 @@
-import { useMemo, useState, useCallback, useEffect } from 'preact/hooks';
+import {
+  useMemo,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'preact/hooks';
 
+import {
+  CalendarSystem,
+  createCalendarDate,
+  dateToCalendarDate,
+} from '@/calendar/calendarSystem';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { monthViewContainer } from '@/styles/classNames';
 import { Event, ICalendarApp, ViewType, YearViewConfig } from '@/types';
 import {
@@ -17,6 +29,19 @@ interface GridYearViewProps {
   app: ICalendarApp;
   config?: YearViewConfig;
 }
+
+/** Local `YYYY-MM-DD` key for a day cell. */
+function toDayKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Day offset each arrow key moves the focused day cell by. */
+const ARROW_DAY_OFFSETS: Record<string, number> = {
+  ArrowLeft: -1,
+  ArrowRight: 1,
+  ArrowUp: -7,
+  ArrowDown: 7,
+};
 
 /** Returns inline background color for event concentration using CSS variables */
 function getIntensityStyle(
@@ -38,13 +63,16 @@ function buildDayEventMap(
   events: Event[],
   year: number,
   showTimedEvents: boolean,
-  appTimeZone?: string
+  appTimeZone?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): Map<string, Event[]> {
   const map = new Map<string, Event[]>();
 
-  const yearStart = new Date(year, 0, 1);
+  const yearStart = createCalendarDate(year, 0, 1, calendarSystem);
   yearStart.setHours(0, 0, 0, 0);
-  const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+  const yearEnd = new Date(
+    createCalendarDate(year + 1, 0, 1, calendarSystem).getTime() - 1
+  );
 
   for (const event of events) {
     if (!event.start) continue;
@@ -61,7 +89,10 @@ function buildDayEventMap(
 
     const clampedStart =
       start < yearStart ? new Date(yearStart) : new Date(start);
-    const clampedEnd = end > yearEnd ? new Date(year, 11, 31) : new Date(end);
+    const clampedEnd =
+      end > yearEnd
+        ? createCalendarDate(year + 1, 0, 0, calendarSystem)
+        : new Date(end);
     clampedStart.setHours(0, 0, 0, 0);
     clampedEnd.setHours(0, 0, 0, 0);
 
@@ -70,7 +101,7 @@ function buildDayEventMap(
     const days = Math.round((clampedEnd.getTime() - startMs) / DAY_MS);
     for (let i = 0; i <= days; i++) {
       const d = new Date(startMs + i * DAY_MS);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const key = toDayKey(d);
       const existing = map.get(key);
       if (existing) {
         existing.push(event);
@@ -109,7 +140,8 @@ function calcPopupPosition(anchorEl: HTMLElement): {
 export const GridYearView = ({ app, config }: GridYearViewProps) => {
   const { t: translate, locale, getWeekDaysLabels: getLabels } = useLocale();
   const currentDate = app.getCurrentDate();
-  const currentYear = currentDate.getFullYear();
+  const calendarSystem = app.state.calendarSystem;
+  const currentYear = dateToCalendarDate(currentDate, calendarSystem).year;
   const rawEvents = app.getEvents();
   const startOfWeek = config?.startOfWeek ?? 1;
   const showTimedEvents = config?.showTimedEventsInYearView ?? false;
@@ -131,6 +163,38 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
     position: { top: number; left: number };
   } | null>(null);
 
+  // Roving tabindex: the year grid is one Tab stop, and the arrow keys move
+  // between days of the current year.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  const isInCurrentYear = (date: Date) =>
+    dateToCalendarDate(date, calendarSystem).year === currentYear;
+  let tabStopDate = createCalendarDate(currentYear, 0, 1, calendarSystem);
+  if (focusedDate && isInCurrentYear(focusedDate)) tabStopDate = focusedDate;
+  else if (isInCurrentYear(currentDate)) tabStopDate = currentDate;
+  const tabStopKey = toDayKey(tabStopDate);
+  const gridClickOpensPopup = (config?.gridDateClick ?? 'popup') === 'popup';
+
+  const handleDayKeyDown = (e: KeyboardEvent, date: Date) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).click();
+      return;
+    }
+    const offset = ARROW_DAY_OFFSETS[e.key];
+    if (offset === undefined) return;
+    e.preventDefault();
+    const next = new Date(date);
+    next.setDate(next.getDate() + offset);
+    if (!isInCurrentYear(next)) return;
+    setFocusedDate(next);
+    gridRef.current
+      ?.querySelector<HTMLElement>(
+        `[data-day-key='${toDayKey(next)}'][data-current-month='true']`
+      )
+      ?.focus();
+  };
+
   // Click-outside handler for popup (also used by cells to close on outside click)
   useEffect(() => {
     if (!popup) return;
@@ -147,14 +211,27 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
   // Heatmap event map (respects showTimedEvents filter)
   const heatmapEventMap = useMemo(
     () =>
-      buildDayEventMap(rawEvents, currentYear, showTimedEvents, appTimeZone),
-    [rawEvents, currentYear, showTimedEvents, appTimeZone]
+      buildDayEventMap(
+        rawEvents,
+        currentYear,
+        showTimedEvents,
+        appTimeZone,
+        calendarSystem
+      ),
+    [rawEvents, currentYear, showTimedEvents, appTimeZone, calendarSystem]
   );
 
   // Full event map for popup (shows all events regardless of filter)
   const fullEventMap = useMemo(
-    () => buildDayEventMap(rawEvents, currentYear, true, appTimeZone),
-    [rawEvents, currentYear, appTimeZone]
+    () =>
+      buildDayEventMap(
+        rawEvents,
+        currentYear,
+        true,
+        appTimeZone,
+        calendarSystem
+      ),
+    [rawEvents, currentYear, appTimeZone, calendarSystem]
   );
 
   // Week day header labels (narrow: M T W T F S S)
@@ -170,8 +247,11 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
   const monthsData = useMemo(() => {
     const months = [];
     for (let m = 0; m < 12; m++) {
-      const monthStart = new Date(currentYear, m, 1);
-      const daysInMonth = new Date(currentYear, m + 1, 0).getDate();
+      const monthStart = createCalendarDate(currentYear, m, 1, calendarSystem);
+      const daysInMonth = dateToCalendarDate(
+        createCalendarDate(currentYear, m + 1, 0, calendarSystem),
+        calendarSystem
+      ).day;
       const firstDayOfWeek = monthStart.getDay();
       const paddingStart = (firstDayOfWeek - startOfWeek + 7) % 7;
 
@@ -180,19 +260,27 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       // Trailing days from previous month
       for (let i = paddingStart - 1; i >= 0; i--) {
         cells.push({
-          date: new Date(currentYear, m, -i),
+          date: createCalendarDate(currentYear, m, -i, calendarSystem),
           isCurrentMonth: false,
         });
       }
       // Current month days
       for (let d = 1; d <= daysInMonth; d++) {
-        cells.push({ date: new Date(currentYear, m, d), isCurrentMonth: true });
+        cells.push({
+          date: createCalendarDate(currentYear, m, d, calendarSystem),
+          isCurrentMonth: true,
+        });
       }
       // Leading days from next month to reach exactly 42
       let nextDay = 1;
       while (cells.length < 42) {
         cells.push({
-          date: new Date(currentYear, m + 1, nextDay++),
+          date: createCalendarDate(
+            currentYear,
+            m + 1,
+            nextDay++,
+            calendarSystem
+          ),
           isCurrentMonth: false,
         });
       }
@@ -206,14 +294,14 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       months.push({ monthIndex: m, monthName: formattedName, cells });
     }
     return months;
-  }, [currentYear, locale, startOfWeek]);
+  }, [currentYear, locale, startOfWeek, calendarSystem]);
 
   const handleDateClick = useCallback(
     (e: MouseEvent, date: Date, monthIndex: number) => {
       const clickAction = config?.gridDateClick ?? 'popup';
 
       if (typeof clickAction === 'function') {
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const key = toDayKey(date);
         clickAction(date, fullEventMap.get(key) ?? [], e);
         return;
       }
@@ -249,7 +337,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
       const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
       if (typeof dblClickAction === 'function') {
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const key = toDayKey(date);
         dblClickAction(date, fullEventMap.get(key) ?? [], e);
         return;
       }
@@ -291,12 +379,14 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
-    return isAsianLocale ? `${currentYear}年` : `${currentYear}`;
+    return isAsianLocale
+      ? `${currentYear}年`
+      : `${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
   const popupEvents = useMemo(() => {
     if (!popup) return [];
-    const key = `${popup.date.getFullYear()}-${String(popup.date.getMonth() + 1).padStart(2, '0')}-${String(popup.date.getDate()).padStart(2, '0')}`;
+    const key = toDayKey(popup.date);
     const events = fullEventMap.get(key) ?? [];
     return [...events].toSorted((a, b) => {
       const aAllDay = !!a.allDay;
@@ -314,20 +404,17 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
         currentDate={currentDate}
         customTitle={getCustomTitle()}
         onPrevious={() => {
-          const d = new Date(currentDate);
-          d.setFullYear(d.getFullYear() - 1);
-          app.setCurrentDate(d);
+          app.goToPrevious();
         }}
         onNext={() => {
-          const d = new Date(currentDate);
-          d.setFullYear(d.getFullYear() + 1);
-          app.setCurrentDate(d);
+          app.goToNext();
         }}
         onToday={() => app.goToToday()}
       />
 
       {/* 4-col × 3-row grid that fills all remaining space — no scroll */}
       <div
+        ref={gridRef}
         className='df-year-grid'
         style={{
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -360,7 +447,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
 
                 {/* Day cells — exactly 42 cells (6 rows × 7 cols) */}
                 {month.cells.map(({ date, isCurrentMonth }, i) => {
-                  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                  const key = toDayKey(date);
                   const eventCount = isCurrentMonth
                     ? (heatmapEventMap.get(key)?.length ?? 0)
                     : 0;
@@ -373,9 +460,47 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                     <div
                       key={`${month.monthIndex}-${i}`}
                       data-grid-day-cell
+                      data-day-key={key}
                       className='df-year-grid-day'
                       data-current-month={isCurrentMonth ? 'true' : 'false'}
                       style={intensityStyle}
+                      // Overflow days repeat a neighbouring month's cells, so
+                      // only current-month days are exposed and focusable.
+                      aria-hidden={isCurrentMonth ? undefined : 'true'}
+                      role={isCurrentMonth ? 'button' : undefined}
+                      tabIndex={
+                        isCurrentMonth
+                          ? key === tabStopKey
+                            ? 0
+                            : -1
+                          : undefined
+                      }
+                      aria-label={
+                        isCurrentMonth
+                          ? formatDateLabel(date, locale, {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                          : undefined
+                      }
+                      aria-current={
+                        isCurrentMonth && isToday ? 'date' : undefined
+                      }
+                      aria-haspopup={
+                        isCurrentMonth && gridClickOpensPopup
+                          ? 'dialog'
+                          : undefined
+                      }
+                      onKeyDown={
+                        isCurrentMonth
+                          ? (e: KeyboardEvent) => handleDayKeyDown(e, date)
+                          : undefined
+                      }
+                      onFocus={
+                        isCurrentMonth ? () => setFocusedDate(date) : undefined
+                      }
                       onClick={e => handleDateClick(e, date, month.monthIndex)}
                       onDblClick={e =>
                         handleDateDoubleClick(e as unknown as MouseEvent, date)
@@ -389,7 +514,7 @@ export const GridYearView = ({ app, config }: GridYearViewProps) => {
                           data-has-events={eventCount > 0 ? 'true' : 'false'}
                           data-heat-level={String(heatLevel)}
                         >
-                          {date.getDate()}
+                          {date.toLocaleDateString(locale, { day: 'numeric' })}
                         </span>
                       </div>
                     </div>

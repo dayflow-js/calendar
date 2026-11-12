@@ -120,21 +120,40 @@ Installez le paquet du plugin :
 
 ## Configuration
 
-| Propriété                    | Type                                                   | Par défaut                         | Description                                                          |
-| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :------------------------------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`                          | Largeur de la barre latérale (par exemple `280` ou `'20rem'`)        |
-| `miniWidth`                  | `string`                                               | `'50px'`                           | Largeur de la barre latérale repliée                                 |
-| `initialCollapsed`           | `boolean`                                              | `false`                            | Indique si la barre latérale démarre repliée                         |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | Mode d'affichage du formulaire de création de calendrier             |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | Composant de sélection de couleur utilisé                            |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | Callback déclenché après la création d'un abonnement                 |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | Chargeur personnalisé pour les abonnements existants                 |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | Callback déclenché après réorganisation des calendriers              |
-| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | Ordre d'affichage des composants de la barre latérale                |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | Remplacement complet de l'interface de la barre latérale             |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | Rendu personnalisé de l'en-tête de la barre latérale                 |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | Rendu personnalisé du menu contextuel des calendriers                |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | Rendu personnalisé de la boîte de dialogue de création de calendrier |
+| Propriété                    | Type                                                           | Par défaut                         | Description                                                          |
+| :--------------------------- | :------------------------------------------------------------- | :--------------------------------- | :------------------------------------------------------------------- |
+| `width`                      | `number \| string`                                             | `'240px'`                          | Largeur de la barre latérale (par exemple `280` ou `'20rem'`)        |
+| `miniWidth`                  | `string`                                                       | `'50px'`                           | Largeur de la barre latérale repliée                                 |
+| `initialCollapsed`           | `boolean`                                                      | `false`                            | Indique si la barre latérale démarre repliée                         |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                          | `'inline'`                         | Mode d'affichage du formulaire de création de calendrier             |
+| `colorPickerMode`            | `'blossom' \| 'default'`                                       | `'default'`                        | Composant de sélection de couleur utilisé                            |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                          | `undefined`                        | Callback déclenché après la création d'un abonnement                 |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                                  | `undefined`                        | Chargeur personnalisé pour les abonnements existants                 |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>`         | `undefined`                        | Callback déclenché après réorganisation des calendriers              |
+| `groups`                     | `string[]`                                                     | `[]`                               | Restaure les noms et l'ordre des groupes                             |
+| `onGroupCreate`              | `(groupName: string) => void \| Promise<void>`                 | `undefined`                        | Callback appelé lors de la création d'un groupe                      |
+| `onGroupRename`              | `(previousName, nextName, calendars) => void \| Promise<void>` | `undefined`                        | Callback appelé lors du renommage d'un groupe                        |
+| `onGroupDelete`              | `(groupName, calendars) => void \| Promise<void>`              | `undefined`                        | Callback appelé lors de la suppression d'un groupe                   |
+| `onGroupReorder`             | `(groups: string[]) => void \| Promise<void>`                  | `undefined`                        | Callback appelé lors du changement d'ordre des groupes               |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                         | `['calendarList', 'miniCalendar']` | Ordre d'affichage des composants de la barre latérale                |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`                 | `undefined`                        | Remplacement complet de l'interface de la barre latérale             |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`                       | `undefined`                        | Rendu personnalisé de l'en-tête de la barre latérale                 |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                                 | `undefined`                        | Rendu personnalisé du menu contextuel des calendriers                |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                             | `undefined`                        | Rendu personnalisé de la boîte de dialogue de création de calendrier |
+
+Les callbacks de groupe sont attendus avant l'application d'une modification. Si une Promise est rejetée, le groupe ou son ordre reste inchangé et les boîtes de dialogue de modification restent ouvertes. L'argument `calendars` contient les calendriers actuellement affectés ; `onGroupReorder` reçoit la liste complète et ordonnée des noms de groupes.
+
+```ts
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
 
 ## API programmatique
 
@@ -182,6 +201,8 @@ Fonctionnalités intégrées :
 - **Créer un calendrier** : ajoutez des calendriers avec un nom et une couleur personnalisés
 - **Renommer / recolorer** : faites un clic droit sur un calendrier pour le renommer ou changer sa couleur
 - **Réorganiser les calendriers** : glissez-déposez les calendriers dans la liste pour les réordonner. Utilisez le callback `onReorder` pour enregistrer le nouvel ordre côté backend.
+- **Groupes de calendriers** : faites un clic droit sur la barre latérale pour créer un groupe ; faites un clic droit sur un groupe pour le renommer, le supprimer après confirmation ou y créer un calendrier.
+- **Réorganiser les groupes** : faites glisser les en-têtes de groupe pour modifier leur ordre. Utilisez `groups` pour restaurer l'ordre enregistré et `onGroupReorder` pour persister les changements.
 - **Fusionner des calendriers** : déplacez tous les événements d'un calendrier vers un autre
 - **Supprimer un calendrier** : supprimez un calendrier avec une étape de confirmation (ou fusionnez-le au préalable)
 - **Importer / exporter** : importez des fichiers `.ics` ou exportez des calendriers au format `.ics`
@@ -238,9 +259,7 @@ const calendar = useCalendarApp({
       },
       // Override default protections:
       readOnly: false, // Enables both UI mutations and drag-and-drop
-      colors: {
-        /* ... */
-      },
+      colors: {/* ... */},
     },
   ],
 });

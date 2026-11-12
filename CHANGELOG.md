@@ -2,6 +2,127 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.7.6] - 2026-10-23
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.6 · `@dayflow/plugin-keyboard-shortcuts` 1.6.2 · `@dayflow/plugin-localization` 1.6.4 · `@dayflow/plugin-sidebar` 1.6.6 · `@dayflow/ui-context-menu` 1.2.2 · `@dayflow/ui-range-picker` 1.2.2. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Tasks (`@dayflow/core`)**: Add items with `kind: 'task'` and a single due date or time. Click the circle to complete a task; priorities show as colored stripes. Set `enableTasks: true` to add the Event / Task switch to the built-in editors (off by default). `setTaskCompleted` and `setTaskPriority` update tasks from code.
+- **Single-Date Picker (`@dayflow/ui-range-picker`)**: `mode: 'single'` picks one date or time.
+- **Task Labels (`@dayflow/plugin-localization`)**: Task and priority labels for every bundled language.
+- **Plugin Cleanup (`@dayflow/core`)**: `install()` may return a cleanup function, which `app.destroy()` runs. The React, Vue and Angular `useCalendarApp` destroy the app they create.
+
+### Fixed
+
+- **Mobile Event Drawer (`@dayflow/core`)**: Saving no longer shifts the event time when the device and calendar time zones differ.
+- **Keyboard Shortcuts (`@dayflow/plugin-keyboard-shortcuts`)**: The window listener is removed when the app is destroyed.
+- **Sidebar (`@dayflow/plugin-sidebar`)**: Two calendars on one page keep their own sidebar config and collapse state.
+- **Svelte (`@dayflow/svelte`)**: Complete typings, and config changes now sync to the app.
+- **React and Vue (`@dayflow/react`, `@dayflow/vue`)**: Typed slot props; a removed Vue slot no longer passes its content to another slot.
+
+### Performance
+
+- **Tree Shaking (`@dayflow/core`, `@dayflow/ui-context-menu`, `@dayflow/ui-range-picker`)**: Bundlers can now drop unused components, and the Preact JSX runtime is shared instead of bundled. A Month-only calendar is about 4% smaller.
+
+### Changed
+
+- `@dayflow/svelte` now requires Svelte 5. It never worked with Svelte 4.
+- `@dayflow/ui-context-menu` and `@dayflow/ui-range-picker` now require `preact` 10.5 or later.
+
+### Documentation
+
+- Task guide in all documentation languages.
+
+## [3.7.5] - 2026-10-17
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.5 · `@dayflow/plugin-localization` 1.6.3 · `@dayflow/plugin-sidebar` 1.6.5 · `@dayflow/ui-range-picker` 1.2.1. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Jalali Calendar (`@dayflow/core`, `@dayflow/ui-range-picker`)**: New `calendarSystem: 'gregorian' | 'jalali'` option displays and navigates every view, the mini calendar and the range picker in the Persian solar calendar. Event data, callbacks, ICS and recurrence rules keep their ISO dates. Gregorian remains the default and keeps the existing locale behavior.
+- **Persian Locale (`@dayflow/plugin-localization`)**: Added `fa` (`fa-IR`).
+- **Accessibility (`@dayflow/core`, `@dayflow/plugin-sidebar`, `@dayflow/ui-range-picker`)**:
+  - Navigation arrows, search controls and other icon-only buttons have translated accessible names, with new locale keys such as `previousDay`/`nextWeek`/`previousPeriod`, `clearSearch` and `close`. The arrows now name the unit they move by in each view.
+  - Dialogs have dialog semantics, close on Escape, trap focus and restore it when closed. `useDialogFocus` is exported for custom dialogs.
+  - The calendar picker, the sidebar's merge and import dropdowns, Year view grid days and the compact week header dates are keyboard-operable.
+  - The range picker reads its labels (navigation, inputs, hour/minute, OK) from `locale.messages`.
+- **Event Notes (`@dayflow/core`)**: Click a note to edit it in place; links in the note still open. The event detail panel has a fixed width, stays inside the viewport while the notes field grows, and the meeting row no longer shifts when editing.
+
+### Fixed
+
+- **Month View Scrolling (`@dayflow/core`)**: Scrolling no longer rebuilds the loaded weeks on every frame, so the scrolling month view stays smooth (especially in Jalali mode).
+- **Locale Packs (`@dayflow/plugin-localization`)**: All packs now cover the same keys. Labels that were missing in some languages (such as "days"/"weeks" and the "already subscribed" message) no longer fall back to English.
+
+## [3.7.4] - 2026-10-14
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.4 · `@dayflow/plugin-sidebar` 1.6.4. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Rich Event Notes (`@dayflow/core`)**: Notes in the default event detail panel and dialog now show as formatted text with clickable links, including HTML notes from providers such as Outlook. An edit button switches to a plain-text editor; saving an edited HTML note stores it as plain text.
+- **Meeting Links Detected in Notes (`@dayflow/core`)**: Events without a `conference` now show the "Join" button when their notes contain a Google Meet, Zoom, Teams, Webex, Whereby or Jitsi link. This also applies to ICS imports, and is available as `extractConferenceFromDescription`.
+
+### Fixed
+
+- **Month View (`@dayflow/core`)**: Clicking a day from the previous or next month now selects it, and selecting a date that is already visible no longer scrolls the view.
+- **Event Detail Panel (`@dayflow/core`)**: The panel stays inside the viewport when its content is tall.
+- **Sidebar with No Calendars (`@dayflow/plugin-sidebar`)**: The mini calendar keeps its position when the calendar list is empty.
+
+## [3.7.3] - 2026-09-19
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.3 · `@dayflow/plugin-drag` 1.6.2 · `@dayflow/plugin-sidebar` 1.6.3 · `@dayflow/ui-context-menu` 1.2.1 · `@dayflow/sync-core` 1.1.2. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Grouped Calendar Selectors (`@dayflow/core`, `@dayflow/plugin-sidebar`)**:
+  - Calendar pickers in the event detail panel, detail dialog and mobile drawer, the event context menu, and the sidebar's import and delete-calendar dialogs now group calendars under headers by their `source` (for example "Google Calendar" or "iCloud").
+  - Calendars without a `source` are listed ungrouped, and the lists look the same as before when no calendar has one. The sidebar's dialogs list groups in the sidebar's own group order.
+- **Theme-Aware Context Menus (`@dayflow/core`, `@dayflow/ui-context-menu`)**:
+  - Context menus take their colors from the calendar theme tokens (`--df-color-*`, with `--df-color-card` for the surface) instead of a built-in palette, so custom theme colors now apply to them.
+  - `ContextMenu` accepts a `style` prop, merged with its computed position.
+  - Used on its own, the menu falls back to the light palette. Its built-in dark palette has been removed, so define the `--df-color-*` tokens to style it for dark mode.
+
+### Fixed
+
+- **Event Detail Panel for Multi-Day Events (`@dayflow/core`)**: In Month view the panel now anchors to the day that was clicked rather than the whole multi-day segment, so events in the last column (for example Sunday) open the panel to the left instead of past the edge of the calendar.
+- **Plugins No Longer Require Preact in Your App (`@dayflow/plugin-drag`, `@dayflow/plugin-sidebar`)**: Since 3.7.1 these plugins declared `preact`, `temporal-polyfill` and `@dayflow/blossom-color-picker` as peer dependencies. Yarn then reported that the app "doesn't provide preact", and Yarn PnP refused to resolve them, so apps had to install Preact themselves. They are regular dependencies again and share the single copy `@dayflow/core` uses. If you added `preact` to your own `package.json` for this, you can remove it.
+- **Missing Types for Context Menu and Range Picker Exports (`@dayflow/core`)**: 3.7.1 and 3.7.2 re-exported `ContextMenu`, `ContextMenuItem`, `DayflowRangePicker`, `RangePickerProps`, `ZonedRange` and related types from packages that were no longer installed with core. TypeScript reported "Cannot find module", or, with `skipLibCheck` enabled, silently typed them as `any`. Those packages are core dependencies again.
+- **Sync Result Types (`@dayflow/sync-core`)**: The `changes` field returned by `reconcileProviderCalendars` and `reconcileProviderEvents` referenced an internal path alias that consumers cannot resolve, so it was typed as `any` or failed with "Cannot find module". The types are now bundled correctly. This affected every release since 1.0.2.
+- **React and Vue Adapter Types with `node16` / `nodenext` Resolution (`@dayflow/react`, `@dayflow/vue`)**: Under `moduleResolution: "node16"` or `"nodenext"`, TypeScript could not find `DayFlowCalendar` or `useCalendarApp`. The declarations are now bundled into a single file. `bundler` resolution was not affected.
+- **Loading `@dayflow/core` in Node (`@dayflow/core`)**: The package now declares `"type": "module"`, so Node loads it as ES modules directly. Node versions without ESM syntax detection — Node 18, 20 before 20.19, and 22 before 22.7 — previously failed to load it, which affected server-side rendering and test runners.
+
+## [3.7.2] - 2026-09-16
+
+### New Features & Enhancements
+
+- **Video Conference Integration (`@dayflow/core`)**:
+  - Added native video conference support on calendar events via `event.conference` (`EventConference`), supporting Google Meet, Zoom, Microsoft Teams, Webex, Whereby, Jitsi, and custom meeting URLs.
+  - Added utility functions (`createEventConference`, `detectMeetingProvider`, `extractMeetingId`, `normalizeMeetingUrl`, `getEventConference`, `setEventConference`) for provider auto-detection, URL normalization, meeting ID extraction, and backwards compatibility with legacy `meta.meetingUrl`.
+  - Added `EventConferenceField` in the default event detail dialog and panel, featuring platform icons, a quick "Join" button, and 1-click meeting link copying with status feedback.
+  - Added full localization keys for conference labels and actions.
+- **Sidebar Group Management & Reordering (`@dayflow/plugin-sidebar`)**:
+  - Added sidebar and group context-menu actions for creating, renaming, and deleting calendar groups.
+  - Added the ability to create calendars directly inside a specific group.
+  - Added drag-and-drop group reordering, persisting ordering through `groups`, and the asynchronous `onGroupReorder(groups)` callback.
+- **Calendar Sync Video Meeting Support (`@dayflow/google-sync` & `@dayflow/outlook-sync`)**:
+  - `@dayflow/google-sync`: Maps Google Calendar `conferenceData` (Google Meet entries, meeting codes, passcodes) and `hangoutLink` into DayFlow `event.conference`.
+  - `@dayflow/outlook-sync`: Queries online meeting metadata from Microsoft Graph (`isOnlineMeeting`, `onlineMeetingProvider`, `onlineMeeting`, `onlineMeetingUrl`) and maps Teams/Skype meetings into `event.conference`.
+- **Half-Hour Grid Lines (`@dayflow/core`)**:
+  - Added `showHalfHourLines` configuration option to `DayViewConfig` and `WeekViewConfig` (`createDayView`, `createWeekView`) to display dashed divider lines at every half-hour interval.
+
+### Performance
+
+- **AgendaView Rendering Optimizations (`@dayflow/core`)**:
+  - Added WeakMap-based per-event range caching (`agendaRangeCache`) and coarse year/month pre-filtering to prevent redundant date calculations and accelerate rendering on large event collections.
+  - Added event click and detail panel interaction support in `AgendaView`, with intelligent panel positioning and viewport boundary clamping.
+
+### Fixed
+
+- **Time Axis Boundary Labels (`@dayflow/core`)**:
+  - Fixed Day and Week view midnight and last-hour label calculation (`LAST_HOUR % 24`) to ensure consistent time-axis rendering across 12-hour and 24-hour formats.
+  - Aligned secondary timezone labels in Day view with the primary time-axis.
+
 ## [3.7.1] - 2026-08-28
 
 ### New Features & Enhancements

@@ -103,6 +103,7 @@ const CalendarHeader = ({
               id='dayflow-search-input'
               type='text'
               placeholder={t('search') || 'Search'}
+              aria-label={t('search')}
               value={searchValue}
               onChange={handleSearchChange}
               className='df-search-group-input'
@@ -113,8 +114,11 @@ const CalendarHeader = ({
                 type='button'
                 onClick={handleClearSearch}
                 className='df-search-group-clear'
+                aria-label={t('clearSearch')}
               >
                 <svg
+                  aria-hidden='true'
+                  focusable='false'
                   width='14'
                   height='14'
                   viewBox='0 0 24 24'

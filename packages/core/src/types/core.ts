@@ -3,6 +3,7 @@
 import { AnyComponent, ComponentChildren } from 'preact';
 import { Temporal } from 'temporal-polyfill';
 
+import { CalendarSystem } from '@/calendar/calendarSystem';
 import { ViewSwitcherMode } from '@/components/common/ViewHeader';
 import { CalendarRegistry } from '@/core/calendarRegistry';
 import { Locale } from '@/locale/types';
@@ -27,6 +28,7 @@ export enum ViewType {
   YEAR = 'year',
   AGENDA = 'agenda',
   RESOURCE = 'resource',
+  GANTT = 'gantt',
 }
 
 export type CalendarViewType = ViewType | string;
@@ -126,7 +128,14 @@ export interface QuickCreatePopupContext {
  */
 export interface CalendarPlugin {
   name: string;
-  install: (app: ICalendarApp) => void;
+  /**
+   * May return a cleanup function. It runs on `app.destroy()` and should undo
+   * anything `install` attached outside the app (global listeners, timers).
+   * A plugin that returns one must tolerate `install` running again on the
+   * same app: adapters re-arm it via `app.restore()`.
+   */
+  // oxlint-disable-next-line typescript/no-invalid-void-type
+  install: (app: ICalendarApp) => void | (() => void);
   updateConfig?: (config: Record<string, unknown>) => void;
   config?: any;
   api?: unknown;
@@ -315,6 +324,9 @@ export interface CalendarAppConfig {
   theme?: ThemeConfig;
   useEventDetailDialog?: boolean;
   useEventDetailPanel?: boolean;
+  /** Enable task creation/type switching in the built-in editors. Defaults to false.
+   * Existing task data remains visible and editable when disabled. */
+  enableTasks?: boolean;
   /**
    * Gesture that opens the event detail panel/dialog on desktop.
    * - 'dbClick' (default): single-click selects, double-click opens (Mac Calendar style).
@@ -323,6 +335,8 @@ export interface CalendarAppConfig {
    */
   eventDetailTrigger?: EventDetailTrigger;
   useCalendarHeader?: boolean;
+  /** Render per-view date/navigation headers. Defaults to true. */
+  useViewHeader?: boolean;
   locale?: string | Locale;
   readOnly?: boolean | ReadOnlyConfig;
   /** Custom sort comparator for all-day events, applied in day/week/month/year views. */
@@ -339,6 +353,8 @@ export interface CalendarAppConfig {
    * When set, takes highest priority and overrides view-level or search-level format configs.
    */
   timeFormat?: '12h' | '24h';
+  /** Calendar used for display and calendar navigation. Event instants remain ISO/Gregorian. */
+  calendarSystem?: CalendarSystem;
 }
 
 /**
@@ -360,6 +376,7 @@ export interface CalendarAppState {
   plugins: Map<string, CalendarPlugin>;
   views: Map<CalendarViewType, CalendarView>;
   switcherMode?: ViewSwitcherMode;
+  useViewHeader?: boolean;
 
   locale: string | Locale;
   highlightedEventId?: string | null;
@@ -371,6 +388,7 @@ export interface CalendarAppState {
   timeZone: string;
   /** Global time format override ('12h' or '24h'). */
   timeFormat?: '12h' | '24h';
+  calendarSystem: CalendarSystem;
 }
 
 /**
@@ -485,6 +503,14 @@ export interface ICalendarApp {
     config: Record<string, unknown>
   ) => void;
 
+  /**
+   * Run every plugin's cleanup. Call it when the app is no longer needed;
+   * `useCalendarApp` in the framework adapters does so on unmount.
+   */
+  destroy: () => void;
+  /** Re-install the plugins `destroy()` tore down. No-op otherwise. */
+  restore: () => void;
+
   // Calendar Header
   getCalendarHeaderConfig: () => boolean;
 
@@ -499,6 +525,7 @@ export interface ICalendarApp {
 
   // Get whether to use event detail panel
   getUseEventDetailPanel: () => boolean;
+  getTasksEnabled: () => boolean;
 
   // Whether any event-detail UI (panel or dialog) is enabled. Behavior gates
   // (e.g. open-on-double-click) should use this instead of the per-UI flags.

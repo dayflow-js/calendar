@@ -1,3 +1,4 @@
+import { createEventConference } from '@dayflow/core';
 import type { Event } from '@dayflow/core';
 import type { OutlookEvent } from '@outlook-sync/types/api';
 import { Temporal } from 'temporal-polyfill';
@@ -256,6 +257,12 @@ export function mapOutlookEventToDayFlow(
     outlookEvent.type === 'occurrence' ||
     outlookEvent.type === 'exception';
 
+  const onlineMeetingUrl =
+    outlookEvent.onlineMeeting?.joinUrl ?? outlookEvent.onlineMeetingUrl;
+  const conference = onlineMeetingUrl
+    ? createEventConference(onlineMeetingUrl)
+    : null;
+
   return {
     id: outlookEvent.id,
     title: outlookEvent.subject,
@@ -266,6 +273,16 @@ export function mapOutlookEventToDayFlow(
     end,
     allDay: isAllDay,
     calendarId,
+    ...(conference
+      ? {
+          conference: {
+            ...conference,
+            ...(outlookEvent.onlineMeeting?.conferenceId
+              ? { meetingId: outlookEvent.onlineMeeting.conferenceId }
+              : {}),
+          },
+        }
+      : {}),
     meta: {
       ...(outlookEvent.location?.displayName
         ? { location: outlookEvent.location.displayName }

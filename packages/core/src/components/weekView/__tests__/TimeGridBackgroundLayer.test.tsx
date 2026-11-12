@@ -5,6 +5,7 @@ import {
   calculateAnchoredRange,
   TimeGridBackgroundLayer,
 } from '@/components/weekView/TimeGridBackgroundLayer';
+import { LocaleProvider } from '@/locale';
 import { ViewType } from '@/types';
 import type {
   CalendarPlugin,
@@ -51,18 +52,20 @@ function setup(sourceUpdates: Partial<TimeGridBackgroundSource> = {}) {
   } as unknown as ICalendarApp;
 
   render(
-    <TimeGridBackgroundLayer
-      app={app}
-      view={ViewType.WEEK}
-      visibleDates={Array.from({ length: 7 }, (_, index) =>
-        Temporal.PlainDate.from('2026-08-03').add({ days: index })
-      )}
-      timeZone='Australia/Sydney'
-      hourHeight={60}
-      firstHour={0}
-      lastHour={24}
-      sources={[source]}
-    />
+    <LocaleProvider>
+      <TimeGridBackgroundLayer
+        app={app}
+        view={ViewType.WEEK}
+        visibleDates={Array.from({ length: 7 }, (_, index) =>
+          Temporal.PlainDate.from('2026-08-03').add({ days: index })
+        )}
+        timeZone='Australia/Sydney'
+        hourHeight={60}
+        firstHour={0}
+        lastHour={24}
+        sources={[source]}
+      />
+    </LocaleProvider>
   );
   return { app, source };
 }
@@ -105,7 +108,7 @@ describe('TimeGridBackgroundLayer', () => {
     const onRangeDelete = vi.fn();
     setup({ onRangeDelete });
     fireEvent.click(
-      screen.getByRole('button', { name: 'Remove 09:00 · Available slot' })
+      screen.getByRole('button', { name: 'Remove slot: 09:00 · Available' })
     );
     expect(onRangeDelete).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'range-1' })

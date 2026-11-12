@@ -101,6 +101,31 @@ function MyComponent() {
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+如需翻译选择器自身的标签（导航按钮、开始/结束输入框、时/分列表和确认按钮），请传入带 `messages` 的 locale 对象，缺失的 key 会回退为英文。日历内置的事件面板和对话框会自动从日历的语言设置中填充这些标签。
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'zh-CN',
+    messages: {
+      previousYear: '上一年',
+      previousMonth: '上个月',
+      nextMonth: '下个月',
+      nextYear: '下一年',
+      startDate: '开始日期',
+      endDate: '结束日期',
+      hour: '时',
+      minute: '分',
+      ok: '确定',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+设置 `calendarSystem='jalali'` 即可按波斯历显示和输入日期，`onChange` 和 `onOk` 返回的仍是 ISO Temporal 值。
+
 ## 与触发器同宽
 
 ```tsx
@@ -115,21 +140,22 @@ function MyComponent() {
 
 ### `RangePicker`
 
-| 属性                 | 类型                                                            | 默认值         | 说明                                                      |
-| :------------------- | :-------------------------------------------------------------- | :------------- | :-------------------------------------------------------- |
-| `value`              | `[Temporal.PlainDate \| PlainDateTime \| ZonedDateTime, ...]`   | —              | 受控的范围值，支持任意 Temporal 类型组合                  |
-| `format`             | `string`                                                        | `"YYYY-MM-DD"` | 日期部分的显示和解析格式                                  |
-| `showTime`           | `boolean \| { format?: string }`                                | `true`         | 启用时间选择。传入对象可自定义时间格式                    |
-| `showTimeFormat`     | `string`                                                        | `"HH:mm"`      | `showTime` 为 `true` 时的默认时间格式                     |
-| `onChange`           | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 每次选择变化时触发                                        |
-| `onOk`               | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 用户点击确认按钮时触发                                    |
-| `timeZone`           | `string`                                                        | —              | IANA 时区字符串（如 `"Asia/Shanghai"`），默认使用系统时区 |
-| `disabled`           | `boolean`                                                       | `false`        | 禁用所有交互                                              |
-| `placement`          | `'bottomLeft' \| 'bottomRight' \| 'topLeft' \| 'topRight'`      | `'bottomLeft'` | 弹出层的首选位置                                          |
-| `autoAdjustOverflow` | `boolean`                                                       | `true`         | 超出视口时自动翻转弹出层位置                              |
-| `getPopupContainer`  | `() => HTMLElement`                                             | —              | 将弹出层挂载到自定义容器，而非 `document.body`            |
-| `matchTriggerWidth`  | `boolean`                                                       | `false`        | 将弹出层宽度设置为与触发器输入框宽度一致                  |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 语言标签，用于本地化月份和星期名称                 |
+| 属性                 | 类型                                                            | 默认值         | 说明                                                       |
+| :------------------- | :-------------------------------------------------------------- | :------------- | :--------------------------------------------------------- |
+| `value`              | `[Temporal.PlainDate \| PlainDateTime \| ZonedDateTime, ...]`   | —              | 受控的范围值，支持任意 Temporal 类型组合                   |
+| `format`             | `string`                                                        | `"YYYY-MM-DD"` | 日期部分的显示和解析格式                                   |
+| `showTime`           | `boolean \| { format?: string }`                                | `true`         | 启用时间选择。传入对象可自定义时间格式                     |
+| `showTimeFormat`     | `string`                                                        | `"HH:mm"`      | `showTime` 为 `true` 时的默认时间格式                      |
+| `onChange`           | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 每次选择变化时触发                                         |
+| `onOk`               | `(value: ZonedRange, dateString: [string, string]) => void`     | —              | 用户点击确认按钮时触发                                     |
+| `timeZone`           | `string`                                                        | —              | IANA 时区字符串（如 `"Asia/Shanghai"`），默认使用系统时区  |
+| `disabled`           | `boolean`                                                       | `false`        | 禁用所有交互                                               |
+| `placement`          | `'bottomLeft' \| 'bottomRight' \| 'topLeft' \| 'topRight'`      | `'bottomLeft'` | 弹出层的首选位置                                           |
+| `autoAdjustOverflow` | `boolean`                                                       | `true`         | 超出视口时自动翻转弹出层位置                               |
+| `getPopupContainer`  | `() => HTMLElement`                                             | —              | 将弹出层挂载到自定义容器，而非 `document.body`             |
+| `matchTriggerWidth`  | `boolean`                                                       | `false`        | 将弹出层宽度设置为与触发器输入框宽度一致                   |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 语言标签；传入对象时，`messages` 用于翻译选择器标签 |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | 用于显示和解析日期的历法                                   |
 
 ### `ZonedRange`
 

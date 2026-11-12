@@ -17,6 +17,9 @@ import type {
   CalendarHeaderProps,
   CalendarSearchProps,
   MobileEventProps,
+  CalendarSidebarRenderProps,
+  SidebarHeaderSlotArgs,
+  CalendarContextMenuSlotArgs,
 } from '@dayflow/core';
 import { useRef, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 
@@ -73,6 +76,15 @@ export interface DayFlowCalendarProps {
   monthDateNumberContent?: (args: MonthDateNumberSlotArgs) => ReactNode;
   /** Custom mobile event detail drawer (React) */
   mobileEventDetail?: (args: MobileEventProps) => ReactNode;
+  /**
+   * Custom sidebar (needs the sidebar plugin). Takes precedence over the
+   * plugin's own `render` option.
+   */
+  sidebar?: (args: CalendarSidebarRenderProps) => ReactNode;
+  /** Custom header of the default sidebar (needs the sidebar plugin) */
+  sidebarHeader?: (args: SidebarHeaderSlotArgs) => ReactNode;
+  /** Custom right-click menu for a calendar in the default sidebar */
+  calendarContextMenu?: (args: CalendarContextMenuSlotArgs) => ReactNode;
   /** Search configuration */
   search?: CalendarSearchProps;
 }

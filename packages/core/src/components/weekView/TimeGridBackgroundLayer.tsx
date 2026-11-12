@@ -2,6 +2,7 @@ import { Fragment } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
+import { useLocale } from '@/locale';
 import type {
   TimeGridBackgroundChangeReason,
   TimeGridBackgroundRange,
@@ -115,6 +116,7 @@ export function TimeGridBackgroundLayer({
   lastHour,
   sources,
 }: TimeGridBackgroundLayerProps) {
+  const { t } = useLocale();
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const interactionRef = useRef<Interaction | null>(null);
   const setActiveInteraction = (next: Interaction | null) => {
@@ -366,7 +368,6 @@ export function TimeGridBackgroundLayer({
       onPointerMove={updatePointer}
       onPointerUp={endPointer}
       onPointerCancel={() => setActiveInteraction(null)}
-      aria-label='Time grid background ranges'
     >
       {positioned.map(item => {
         const preview =
@@ -416,9 +417,7 @@ export function TimeGridBackgroundLayer({
               }}
               tabIndex={0}
               aria-label={
-                item.range.ariaLabel ??
-                item.range.title ??
-                'Background time range'
+                item.range.ariaLabel ?? item.range.title ?? t('timeRange')
               }
               aria-pressed={item.range.selected}
               onClick={event => {
@@ -514,8 +513,12 @@ export function TimeGridBackgroundLayer({
                   left: `calc(${dayLeft + dayWidth}% - 1.9rem)`,
                   top: `${top + 4}px`,
                 }}
-                aria-label={`Remove ${item.range.title} slot`}
-                title='Remove slot'
+                aria-label={
+                  item.range.title
+                    ? `${t('removeSlot')}: ${item.range.title}`
+                    : t('removeSlot')
+                }
+                title={t('removeSlot')}
                 onPointerDown={event => {
                   event.preventDefault();
                   event.stopPropagation();

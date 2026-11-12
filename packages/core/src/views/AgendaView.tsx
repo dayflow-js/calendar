@@ -9,9 +9,12 @@ import {
 } from 'preact/hooks';
 
 import { EventDetailPanel } from '@/components/calendarEvent/components/EventDetailPanel';
+import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import ViewHeader from '@/components/common/ViewHeader';
 import { useResponsiveMonthConfig } from '@/hooks/virtualScroll';
 import { useLocale } from '@/locale';
+import { formatDateLabel, formatDateRangeLabel } from '@/locale/intl';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import { AgendaViewProps, Event, ICalendarApp } from '@/types';
@@ -26,6 +29,11 @@ import {
   getPrimaryCalendarId,
   temporalToVisualDate,
 } from '@/utils';
+import {
+  getTaskPriorityBackground,
+  getTaskPriorityTextColor,
+  isTask,
+} from '@/utils/taskUtils';
 
 type AgendaEntry = {
   event: Event;
@@ -72,7 +80,26 @@ const isMidnight = (date: Date): boolean =>
   date.getSeconds() === 0 &&
   date.getMilliseconds() === 0;
 
-const getEventRangeForAgenda = (event: Event, appTimeZone: string) => {
+interface AgendaEventRange {
+  start: Date;
+  end: Date;
+  startDay: Date;
+  effectiveEndDay: Date;
+}
+
+const agendaRangeCache = new WeakMap<Event, Map<string, AgendaEventRange>>();
+
+const getEventRangeForAgenda = (
+  event: Event,
+  appTimeZone: string
+): AgendaEventRange => {
+  const tzKey = appTimeZone ?? '';
+  let perEvent = agendaRangeCache.get(event);
+  if (perEvent) {
+    const cached = perEvent.get(tzKey);
+    if (cached) return cached;
+  }
+
   const start = temporalToVisualDate(event.start, appTimeZone);
   const end = event.end ? temporalToVisualDate(event.end, appTimeZone) : start;
   const startDay = normalizeDate(start);
@@ -87,12 +114,19 @@ const getEventRangeForAgenda = (event: Event, appTimeZone: string) => {
     effectiveEndDay = new Date(startDay);
   }
 
-  return {
+  const result: AgendaEventRange = {
     start,
     end,
     startDay,
     effectiveEndDay,
   };
+
+  if (!perEvent) {
+    perEvent = new Map();
+    agendaRangeCache.set(event, perEvent);
+  }
+  perEvent.set(tzKey, result);
+  return result;
 };
 
 const formatAgendaTitle = (
@@ -101,6 +135,13 @@ const formatAgendaTitle = (
   locale: string
 ): string => {
   const endInclusive = addDays(endExclusive, -1);
+  if (new Intl.Locale(locale).calendar === 'persian') {
+    return formatDateRangeLabel(start, endInclusive, locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
   const sameYear = start.getFullYear() === endInclusive.getFullYear();
   const sameMonth = sameYear && start.getMonth() === endInclusive.getMonth();
 
@@ -119,12 +160,11 @@ const formatAgendaTimeLabel = (
   event: Event,
   day: Date,
   appTimeZone: string,
-  timeFormat: '12h' | '24h'
+  timeFormat: '12h' | '24h',
+  range?: AgendaEventRange
 ): { timeLabel: string; renderAsBadge: boolean; sortMs: number } => {
-  const { start, end, startDay, effectiveEndDay } = getEventRangeForAgenda(
-    event,
-    appTimeZone
-  );
+  const { start, end, startDay, effectiveEndDay } =
+    range ?? getEventRangeForAgenda(event, appTimeZone);
   const multiDay = effectiveEndDay.getTime() > startDay.getTime();
 
   if (event.allDay) {
@@ -132,6 +172,14 @@ const formatAgendaTimeLabel = (
       timeLabel: 'All day',
       renderAsBadge: true,
       sortMs: day.getTime() - DAY_MS,
+    };
+  }
+
+  if (isTask(event)) {
+    return {
+      timeLabel: formatTime(start.getHours(), start.getMinutes(), timeFormat),
+      renderAsBadge: false,
+      sortMs: start.getTime(),
     };
   }
 
@@ -201,6 +249,37 @@ const renderAgendaTimeLabel = (label: string, timeFormat?: string) => {
   );
 };
 
+const getCoarseYearMonth = (
+  val: unknown
+): { year: number; month: number } | null => {
+  if (!val) return null;
+  if (
+    typeof val === 'object' &&
+    val !== null &&
+    'year' in val &&
+    'month' in val
+  ) {
+    const candidate = val as { year: unknown; month: unknown };
+    if (
+      typeof candidate.year === 'number' &&
+      typeof candidate.month === 'number'
+    ) {
+      return { year: candidate.year, month: candidate.month };
+    }
+  }
+  if (val instanceof Date) {
+    return { year: val.getFullYear(), month: val.getMonth() + 1 };
+  }
+  if (typeof val === 'string' && val.length >= 7) {
+    const y = Number.parseInt(val.slice(0, 4), 10);
+    const m = Number.parseInt(val.slice(5, 7), 10);
+    if (Number.isFinite(y) && Number.isFinite(m)) {
+      return { year: y, month: m };
+    }
+  }
+  return null;
+};
+
 const buildAgendaGroups = (
   app: ICalendarApp,
   events: Event[],
@@ -213,29 +292,53 @@ const buildAgendaGroups = (
   const appTimeZone = app.timeZone;
   const groups: AgendaDayGroup[] = [];
 
+  const agendaStart = normalizeDate(startDate);
+  const agendaEnd = addDays(agendaStart, daysToShow);
+
+  const startYear = agendaStart.getFullYear();
+  const startMonth = agendaStart.getMonth() + 1;
+  const endYear = agendaEnd.getFullYear();
+  const endMonth = agendaEnd.getMonth() + 1;
+  const minYearMonth = startYear * 12 + (startMonth - 1);
+  const maxYearMonth = endYear * 12 + (endMonth + 1);
+
+  const candidateEvents: { event: Event; range: AgendaEventRange }[] = [];
+  for (let i = 0; i < events.length; i += 1) {
+    const event = events[i];
+    const s = getCoarseYearMonth(event.start);
+    const e = getCoarseYearMonth(event.end ?? event.start);
+    if (s && e) {
+      const sYM = s.year * 12 + s.month;
+      const eYM = e.year * 12 + e.month;
+      if (eYM < minYearMonth || sYM > maxYearMonth) {
+        continue;
+      }
+    }
+
+    const range = getEventRangeForAgenda(event, appTimeZone);
+    if (range.startDay < agendaEnd && range.effectiveEndDay >= agendaStart) {
+      candidateEvents.push({ event, range });
+    }
+  }
+
   for (let index = 0; index < daysToShow; index += 1) {
     const day = addDays(startDate, index);
     const dayStart = normalizeDate(day);
     const dayEnd = addDays(dayStart, 1);
 
-    const entries = events
-      .filter(event => {
-        const { startDay, effectiveEndDay } = getEventRangeForAgenda(
-          event,
-          appTimeZone
-        );
-        return startDay < dayEnd && effectiveEndDay >= dayStart;
-      })
-      .map(event => {
-        const { startDay, effectiveEndDay } = getEventRangeForAgenda(
-          event,
-          appTimeZone
-        );
+    const entries = candidateEvents
+      .filter(
+        ({ range }) =>
+          range.startDay < dayEnd && range.effectiveEndDay >= dayStart
+      )
+      .map(({ event, range }) => {
+        const { startDay, effectiveEndDay } = range;
         const { timeLabel, renderAsBadge, sortMs } = formatAgendaTimeLabel(
           event,
           dayStart,
           appTimeZone,
-          timeFormat
+          timeFormat,
+          range
         );
         const calendarId = getPrimaryCalendarId(event);
         const isMultiDayAllDay =
@@ -310,7 +413,7 @@ const AgendaView = ({
   onEventSelect,
   onDetailPanelToggle,
 }: AgendaViewProps & { calendarRef: RefObject<HTMLDivElement> }) => {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const { screenSize } = useResponsiveMonthConfig();
   const isMobile = screenSize !== 'desktop';
   const customRenderingStore = useContext(CustomRenderingContext);
@@ -441,8 +544,36 @@ const AgendaView = ({
       clickTimerRef.current = setTimeout(() => {
         app.onEventClick(event, nativeEvent);
         onEventSelect?.(event.id);
-        if (app.getEventDetailEnabled()) {
-          onDetailPanelToggle?.(null);
+        if (
+          app.getEventDetailEnabled() &&
+          app.getEventDetailTrigger() === 'click' &&
+          nativeEvent?.currentTarget &&
+          useEventDetailPanel !== false
+        ) {
+          const target = nativeEvent.currentTarget as HTMLElement;
+          const rect = target.getBoundingClientRect();
+          const panelWidth = 320;
+          const gap = 12;
+          const viewportPadding = 16;
+          const placeLeft =
+            rect.right + gap + panelWidth > window.innerWidth - viewportPadding;
+          selectedEventElementRef.current = target;
+          setDetailPanelPosition({
+            top: Math.min(
+              Math.max(viewportPadding, rect.top + rect.height / 2 - 180),
+              window.innerHeight - 380
+            ),
+            left: placeLeft
+              ? Math.max(viewportPadding, rect.left - panelWidth - gap)
+              : Math.min(
+                  window.innerWidth - panelWidth - viewportPadding,
+                  rect.right + gap
+                ),
+            eventHeight: rect.height,
+            eventMiddleY: rect.top + rect.height / 2,
+            isSunday: placeLeft,
+          });
+          onDetailPanelToggle?.(event.id);
         }
         clickTimerRef.current = null;
       }, 180);
@@ -568,10 +699,43 @@ const AgendaView = ({
     [app, config?.gridDateDoubleClick]
   );
 
+  const renderAgendaTask = (entry: AgendaEntry) => (
+    <>
+      <TaskCheckbox
+        event={entry.event}
+        app={app}
+        isEditable={app.canMutateFromUI(
+          entry.event._recurrenceMasterId ?? entry.event.id
+        )}
+        color={entry.color}
+      />
+      <span className='df-agenda-title'>
+        <TaskPriorityIndicator event={entry.event} />
+        {entry.event.title}
+      </span>
+    </>
+  );
+
   const renderAgendaEventButton = (entry: AgendaEntry) => (
     <button
       type='button'
       className='df-agenda-event'
+      data-kind={entry.event.kind ?? 'event'}
+      style={
+        isTask(entry.event)
+          ? {
+              background: getTaskPriorityBackground(
+                entry.event,
+                selectedEventId === entry.event.id
+              ),
+              color: getTaskPriorityTextColor(
+                entry.event,
+                selectedEventId === entry.event.id
+              ),
+            }
+          : undefined
+      }
+      data-task-completed={String(!!entry.event.task?.completed)}
       data-selected={selectedEventId === entry.event.id ? 'true' : 'false'}
       onClick={e => {
         e.stopPropagation();
@@ -582,7 +746,9 @@ const AgendaView = ({
         handleEventDoubleClick(entry.event, e as unknown as MouseEvent);
       }}
     >
-      {entry.renderAsBadge ? (
+      {isTask(entry.event) ? (
+        renderAgendaTask(entry)
+      ) : entry.renderAsBadge ? (
         <span
           className='df-agenda-badge'
           data-continued-left={
@@ -602,7 +768,7 @@ const AgendaView = ({
           style={{ backgroundColor: entry.color }}
         />
       )}
-      {!entry.renderAsBadge && (
+      {!entry.renderAsBadge && !isTask(entry.event) && (
         <span className='df-agenda-title'>{entry.event.title}</span>
       )}
     </button>
@@ -637,6 +803,7 @@ const AgendaView = ({
       <ViewHeader
         calendar={app}
         viewType='month'
+        navigationUnit='period'
         currentDate={rangeStart}
         customTitle={title}
         onPrevious={() => app.goToPrevious()}
@@ -646,7 +813,7 @@ const AgendaView = ({
 
       <div className='df-agenda-scroll'>
         {groups.length === 0 ? (
-          <div className='df-agenda-empty'>No events in this range.</div>
+          <div className='df-agenda-empty'>{t('noEventsInRange')}</div>
         ) : (
           groups.map(group => (
             <section
@@ -671,11 +838,11 @@ const AgendaView = ({
                   className='df-agenda-day-number'
                   data-today={isSameDate(group.date, today) ? 'true' : 'false'}
                 >
-                  {group.date.getDate()}
+                  {group.date.toLocaleDateString(locale, { day: 'numeric' })}
                 </div>
                 <div className='df-agenda-day-meta'>
                   <div className='df-agenda-day-month'>
-                    {group.date.toLocaleDateString(locale, {
+                    {formatDateLabel(group.date, locale, {
                       month: 'short',
                       year: 'numeric',
                     })}
@@ -689,12 +856,12 @@ const AgendaView = ({
               <div className='df-agenda-day-content'>
                 {group.allDayEntries.length === 0 &&
                 group.timedEntries.length === 0 ? (
-                  <div className='df-agenda-empty-row'>No events</div>
+                  <div className='df-agenda-empty-row'>{t('noEvents')}</div>
                 ) : (
                   <>
                     {group.allDayEntries.length > 0 && (
                       <div className='df-agenda-item df-agenda-item-all-day'>
-                        <div className='df-agenda-time'>All day</div>
+                        <div className='df-agenda-time'>{t('allDay')}</div>
                         <div className='df-agenda-all-day-events'>
                           {group.allDayEntries.map(entry => (
                             <div

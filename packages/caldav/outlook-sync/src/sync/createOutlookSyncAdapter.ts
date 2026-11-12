@@ -179,7 +179,7 @@ export function createOutlookSyncAdapter(
       // Request only the fields we use to minimize response size
       params.set(
         '$select',
-        'id,subject,body,start,end,isAllDay,isCancelled,isOrganizer,type,seriesMasterId,changeKey,location,recurrence'
+        'id,subject,body,start,end,isAllDay,isCancelled,isOrganizer,type,seriesMasterId,changeKey,location,recurrence,isOnlineMeeting,onlineMeetingProvider,onlineMeeting,onlineMeetingUrl'
       );
 
       return listAllPages<OutlookEventList>(

@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/vue",
-  "version": "3.7.1",
+  "version": "3.7.6",
   "description": "Vue adapter for DayFlow calendar",
   "files": [
     "dist",
@@ -19,6 +19,7 @@
   "scripts": {
     "build": "rollup -c",
     "clean": "rimraf dist node_modules",
+    "postbuild": "rimraf dist/types",
     "prebuild": "rimraf dist",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -37,6 +38,7 @@
     "jsdom": "catalog:",
     "rimraf": "catalog:",
     "rollup": "catalog:",
+    "rollup-plugin-dts": "catalog:",
     "rollup-plugin-peer-deps-external": "catalog:",
     "rollup-plugin-vue": "catalog:",
     "typescript": "catalog:",

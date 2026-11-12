@@ -63,6 +63,26 @@ https://github.com/user-attachments/assets/726a5232-35a8-4fe3-8e7b-4de07c455353
 
 https://github.com/user-attachments/assets/957317e5-02d8-4419-a74b-62b7d191e347
 
+## Sidebar Group Management
+
+`@dayflow/plugin-sidebar` lets users create groups from the sidebar context menu and rename, delete, or create calendars inside a group from the group context menu. Group headers can be dragged to change their order.
+
+Use `groups` to restore persisted group names and order, including empty groups. Group callbacks may return a Promise; DayFlow waits for it before applying the change.
+
+```ts
+import { createSidebarPlugin } from '@dayflow/plugin-sidebar';
+
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

@@ -40,12 +40,37 @@
   --color-fd-background: #ffffff;
   --color-fd-card: #ffffff;
   --color-fd-secondary: #ffffff;
+  --df-color-primary: #6786e6;
+  --df-color-primary-foreground: #ffffff;
 }
 
 .dark {
   --color-fd-background: hsl(0, 0%, 7.04%);
   --color-fd-card: hsl(0, 0%, 9.8%);
   --color-fd-secondary: hsl(0, 0%, 12.9%);
+}
+
+.media-loading-pending {
+  background: linear-gradient(100deg, #f2f2f3 20%, #e7e7e9 40%, #f2f2f3 60%);
+  background-size: 200% 100%;
+  animation: media-shimmer 1.6s ease-in-out infinite;
+}
+
+.dark .media-loading-pending {
+  background: linear-gradient(100deg, #242730 20%, #343842 40%, #242730 60%);
+  background-size: 200% 100%;
+}
+
+@keyframes media-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-loading-pending {
+    animation: none;
+  }
 }
 
 .landing-root {
@@ -209,6 +234,35 @@
 }
 #nd-sidebar a[data-active='true']::before {
   background-color: #307efe;
+}
+
+/* Demo fallback while the website consumes the last published core package. */
+.demo-half-hour-lines .df-time-grid-row {
+  position: relative;
+}
+
+.demo-half-hour-lines .df-time-grid-row::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  border-top: 1px dashed var(--df-color-border);
+  content: '';
+  pointer-events: none;
+}
+
+.live-demo-container input:focus-visible,
+.live-demo-container button[role='combobox']:focus-visible {
+  border-color: #000;
+  outline: 1px solid #000;
+  outline-offset: 0;
+  box-shadow: none;
+}
+
+.dark .live-demo-container input:focus-visible,
+.dark .live-demo-container button[role='combobox']:focus-visible {
+  border-color: #fff;
+  outline-color: #fff;
 }
 .dark #nd-sidebar a[data-active='true'] {
   background-color: #272b2f;

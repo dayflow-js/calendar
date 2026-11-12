@@ -1,3 +1,4 @@
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import { monthRegularContent, monthEventColorBar } from '@/styles/classNames';
 import { Event, ICalendarApp } from '@/types';
 import {
@@ -6,6 +7,9 @@ import {
   extractHourFromDate,
   formatTime,
 } from '@/utils';
+import { isTask } from '@/utils/taskUtils';
+
+import { TaskCheckbox } from './TaskCheckbox';
 
 const mobileFadeStyle = {
   overflow: 'hidden',
@@ -21,6 +25,7 @@ interface MonthRegularContentProps {
   event: Event;
   app?: ICalendarApp;
   isEventSelected: boolean;
+  isEditable?: boolean;
   hideTime?: boolean;
   isMobile?: boolean;
   timeFormat?: '12h' | '24h';
@@ -30,6 +35,7 @@ const MonthRegularContent = ({
   event,
   app,
   isEventSelected: _isEventSelected,
+  isEditable = false,
   hideTime,
   isMobile,
   timeFormat = '24h',
@@ -52,13 +58,23 @@ const MonthRegularContent = ({
   return (
     <div className={monthRegularContent} data-mobile={String(!!isMobile)}>
       <div className='df-event-month-main'>
-        {!hideColorBar && (
-          <div style={colorBarStyle} className={monthEventColorBar} />
+        {isTask(event) ? (
+          <TaskCheckbox
+            event={event}
+            app={app}
+            isEditable={isEditable}
+            color={lineColors[0]}
+          />
+        ) : (
+          !hideColorBar && (
+            <div style={colorBarStyle} className={monthEventColorBar} />
+          )
         )}
         <span
           className={`df-event-month-title ${isMobile ? 'df-mobile-mask-fade' : ''}`}
           style={isMobile ? mobileFadeStyle : undefined}
         >
+          <TaskPriorityIndicator event={event} />
           {event.title}
         </span>
       </div>

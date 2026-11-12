@@ -1,5 +1,6 @@
 import { HOURS, MINUTES } from '@ui-range-picker/constants';
 import type { ZonedRange } from '@ui-range-picker/types';
+import type { RangePickerLabels } from '@ui-range-picker/utils/labels';
 import { pad } from '@ui-range-picker/utils/rangePicker';
 import type { RefObject } from 'preact';
 
@@ -10,6 +11,7 @@ interface TimeSelectorProps {
   draftRange: ZonedRange;
   disabled?: boolean;
   timeFormat?: string;
+  labels: RangePickerLabels;
   onHourSelect: (field: 'start' | 'end', hour: number) => void;
   onMinuteSelect: (field: 'start' | 'end', minute: number) => void;
   timeListRefs: RefObject<{
@@ -23,6 +25,7 @@ const TimeSelector = ({
   draftRange,
   disabled,
   timeFormat,
+  labels,
   onHourSelect,
   onMinuteSelect,
   timeListRefs,
@@ -68,7 +71,7 @@ const TimeSelector = ({
           <div
             className={`df-range-picker-time-list ${scrollbarHide}`}
             role='listbox'
-            aria-label='Hour'
+            aria-label={labels.hour}
             ref={element => {
               if (timeListRefs.current && timeListRefs.current[field]) {
                 timeListRefs.current[field].hour = element;
@@ -111,7 +114,7 @@ const TimeSelector = ({
           <div
             className={`df-range-picker-time-list ${scrollbarHide}`}
             role='listbox'
-            aria-label='Minute'
+            aria-label={labels.minute}
             ref={element => {
               if (timeListRefs.current && timeListRefs.current[field]) {
                 timeListRefs.current[field].minute = element;

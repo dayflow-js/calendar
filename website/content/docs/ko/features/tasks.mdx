@@ -1,0 +1,135 @@
+---
+title: 할 일
+description: 마감일, 완료 상태, 우선순위가 있는 할 일을 캘린더에 추가합니다.
+---
+
+# 할 일
+
+할 일은 일반 이벤트와 같은 `Event` 데이터 모델과 캘린더 지정을 사용합니다.
+기간 대신 마감 날짜 또는 시간 하나만 가집니다. 왼쪽 원으로 완료 상태를 전환하고,
+줄무늬 배경과 글자 색으로 우선순위를 표시합니다.
+
+## 할 일 만들기 활성화
+
+`enableTasks: true`를 설정하면 내장 데스크톱 패널, 대화상자, 모바일 편집기에 일정 / 할 일 전환이
+표시됩니다. 기본값은 `false`이며, 기존 이벤트 생성 화면은 그대로 유지됩니다. 이 옵션이 꺼져 있어도
+기존 할 일은 계속 표시되고 편집할 수 있습니다.
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+이 옵션은 `CalendarAppConfig`에 속하며 모든 프레임워크 어댑터에서 동작합니다.
+기존 core 인스턴스에서 변경하려면 다음과 같이 합니다.
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+이는 편집기의 런타임 옵션입니다. 꺼도 할 일 관련 코드가 번들에서 제거되지는 않습니다.
+
+## 시간 지정 또는 종일 할 일 만들기
+
+`kind: 'task'`를 사용합니다. `start`와 `end`에는 같은 마감 값을 넣어야 합니다.
+시간이 없는 할 일은 `allDay: true`를 설정하고 `Temporal.PlainDate`를 사용합니다.
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+이 항목들은 `events` 설정으로 전달하거나, 일반 이벤트 API로 추가·수정·삭제할 수 있습니다.
+특정 캘린더에 지정하려면 `calendarId`를 추가합니다.
+
+| 필드               | 타입                                    | 의미                                 |
+| ------------------ | --------------------------------------- | ------------------------------------ |
+| `kind`             | `'event' \| 'task'`                     | 생략하면 `'event'`입니다.            |
+| `task.completed`   | `boolean`                               | 기본값은 `false`입니다.              |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | 완료 시각이며, 다시 열면 지워집니다. |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | 기본값은 `'none'`입니다.             |
+
+## 할 일 완료와 우선순위 변경
+
+왼쪽 원을 클릭하면 할 일을 완료하거나 다시 열 수 있습니다. 이때 상세 패널이 열리거나 드래그가
+시작되지 않습니다. 키보드로는 원에 포커스를 두고 Space 또는 Enter를 누릅니다. 완료된 제목에는
+취소선이 표시됩니다.
+
+할 일의 상세 정보를 열면 제목, 마감 날짜/시간, 메모, 우선순위를 바꿀 수 있습니다.
+**종일 일정으로 설정**은 마감 시간을 없애고, **시간 지정**은 다시 시간을 추가합니다.
+할 일은 이동할 수 있지만 크기를 조절할 수는 없습니다.
+
+| 우선순위 | 배경 및 글자 색 |
+| -------- | --------------- |
+| `none`   | 슬레이트        |
+| `low`    | 초록            |
+| `medium` | 호박색          |
+| `high`   | 빨강            |
+
+우선순위는 할 일 전체를 대각선 줄무늬로 채웁니다. 원은 캘린더 색을 사용하며, 할 일이 선택된 동안에는
+흰색이 됩니다. 우선순위는 시간 순서에 영향을 주지 않습니다. 월 보기에서 종일 할 일은 시간 라벨 없이
+할 일 행 스타일을 유지합니다. 일·주 보기의 할 일에는 이벤트 색상 막대가 없습니다.
+
+[인터랙티브 데모](/demo)에는 **Tasks** 스위치와 **Preview** 툴팁이 있어 완료 동작과 상세 패널에서의
+우선순위 변경을 보여 줍니다.
+
+## 코드로 업데이트하고 저장하기
+
+할 일 변경은 이벤트 변경과 같은 `onEventUpdate` 콜백을 사용합니다. `kind`와 `task` 메타데이터를
+이벤트 날짜와 함께 데이터 소스에 저장하세요.
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+헬퍼 함수는 업데이트된 값을 반환할 뿐, 직접 저장하지는 않습니다.
+[읽기 전용 모드](/docs-ko/features/read-only)는 내장 UI에서의 완료와 편집을 비활성화하지만,
+코드로 하는 업데이트는 계속 동작합니다.
+
+반복 이벤트에서 생성된 각 회차는 개별적으로 완료할 수 없습니다. 외부 CalDAV 할 일(`VTODO`) 동기화는
+구현되어 있지 않으므로, 이벤트 동기화가 할 일 전용 필드를 유지한다고 가정하지 마세요.

@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/ui-range-picker",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Standalone date/time range picker from the DayFlow UI ecosystem",
   "keywords": [
     "date-picker",
@@ -60,7 +60,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "preact": ">=10",
+    "preact": ">=10.5",
     "temporal-polyfill": ">=0.2"
   }
 }

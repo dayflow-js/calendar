@@ -100,6 +100,7 @@ interface TimeGridProps {
   useEventDetailPanel?: boolean;
   isCurrentWeek: boolean;
   currentTime: Date | null;
+  showHalfHourLines?: boolean;
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
   LAST_HOUR: number;
@@ -151,6 +152,7 @@ export const TimeGrid = ({
   useEventDetailPanel,
   isCurrentWeek,
   currentTime,
+  showHalfHourLines = false,
   HOUR_HEIGHT,
   FIRST_HOUR,
   LAST_HOUR,
@@ -429,12 +431,15 @@ export const TimeGrid = ({
                   )}
                 </span>
                 <span className='df-time-column-tz-value'>
-                  <TimeAxisLabel hour={0} timeFormat={timeFormat} />
+                  <TimeAxisLabel
+                    hour={LAST_HOUR % 24}
+                    timeFormat={timeFormat}
+                  />
                 </span>
               </div>
             ) : (
               <div className={timeLabel}>
-                <TimeAxisLabel hour={0} timeFormat={timeFormat} />
+                <TimeAxisLabel hour={LAST_HOUR % 24} timeFormat={timeFormat} />
               </div>
             )}
           </div>
@@ -597,6 +602,7 @@ export const TimeGrid = ({
                 <div
                   key={slotIndex}
                   className={timeGridRow}
+                  data-half-hour-lines={showHalfHourLines ? 'true' : undefined}
                   data-scrollbar-space={
                     isMobile || !hasScrollbarSpace ? 'false' : 'true'
                   }

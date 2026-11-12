@@ -14,6 +14,16 @@ const createConfig = ssr => ({
     },
   ],
   plugins: [
+    // Before svelte(): rune modules (*.svelte.ts) must be plain JS by the time
+    // the Svelte compiler sees them. It only strips types inside components.
+    esbuild({
+      sourceMap: true,
+      minify: false,
+      target: 'esnext',
+      loaders: {
+        '.ts': 'ts',
+      },
+    }),
     svelte({
       preprocess: sveltePreprocess(),
       emitCss: false,
@@ -26,14 +36,6 @@ const createConfig = ssr => ({
       dedupe: ['svelte'],
       extensions: ['.mjs', '.js', '.ts', '.svelte'],
     }),
-    esbuild({
-      sourceMap: true,
-      minify: false,
-      target: 'esnext',
-      loaders: {
-        '.ts': 'ts',
-      },
-    }),
     commonjs(),
   ],
   external: id =>
@@ -43,6 +45,15 @@ const createConfig = ssr => ({
       warning.code === 'CIRCULAR_DEPENDENCY' &&
       warning.ids &&
       warning.ids[0].includes('node_modules')
+    ) {
+      return;
+    }
+    // Server output drops $effect bodies, so helpers used only inside them
+    // (such as untrack) are unused there. Rollup already removes the import.
+    if (
+      ssr &&
+      warning.code === 'UNUSED_EXTERNAL_IMPORT' &&
+      (warning.exporter === 'svelte' || warning.exporter?.startsWith('svelte/'))
     ) {
       return;
     }

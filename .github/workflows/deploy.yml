@@ -4,16 +4,16 @@ on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: 'pages'
-  cancel-in-progress: false
+  # PR runs only build; keep them out of 'pages' so they can't queue behind or replace a pending deploy
+  group: ${{ github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.pull_request.number) || 'pages' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       - name: Install deps
         run: |
           cd website
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Build website
         run: |
@@ -59,6 +59,10 @@ jobs:
           path: website/out
 
   deploy:
+    if: github.event_name != 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

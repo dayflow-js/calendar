@@ -181,3 +181,115 @@ describe('PluginManager — config', () => {
     expect(notify).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('PluginManager — teardown', () => {
+  it('runs the cleanup a plugin returned from install', () => {
+    const manager = new PluginManager(makeState(), vi.fn());
+    const cleanup = vi.fn();
+    manager.install(makePlugin('keys', { install: () => cleanup }), fakeApp);
+
+    manager.destroy();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs cleanups last-installed first', () => {
+    // A later plugin may lean on an earlier one, so it has to let go first.
+    const manager = new PluginManager(makeState(), vi.fn());
+    const order: string[] = [];
+    manager.install(
+      makePlugin('a', { install: () => () => order.push('a') }),
+      fakeApp
+    );
+    manager.install(
+      makePlugin('b', { install: () => () => order.push('b') }),
+      fakeApp
+    );
+
+    manager.destroy();
+
+    expect(order).toEqual(['b', 'a']);
+  });
+
+  it('runs each cleanup once however often destroy is called', () => {
+    const manager = new PluginManager(makeState(), vi.fn());
+    const cleanup = vi.fn();
+    manager.install(makePlugin('keys', { install: () => cleanup }), fakeApp);
+
+    manager.destroy();
+    manager.destroy();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
+  it('still runs the remaining cleanups when one throws', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(noop);
+    const manager = new PluginManager(makeState(), vi.fn());
+    const cleanup = vi.fn();
+    manager.install(makePlugin('a', { install: () => cleanup }), fakeApp);
+    manager.install(
+      makePlugin('b', {
+        install: () => () => {
+          throw new Error('boom');
+        },
+      }),
+      fakeApp
+    );
+
+    expect(() => manager.destroy()).not.toThrow();
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    error.mockRestore();
+  });
+
+  it('keeps plugins registered after destroy', () => {
+    const manager = new PluginManager(makeState(), vi.fn());
+    const api = { start: vi.fn() };
+    manager.install(makePlugin('keys', { api, install: () => noop }), fakeApp);
+
+    manager.destroy();
+
+    expect(manager.hasPlugin('keys')).toBe(true);
+    expect(manager.getPlugin('keys')).toBe(api);
+  });
+});
+
+describe('PluginManager — restore', () => {
+  it('re-installs a plugin that was torn down, and can tear it down again', () => {
+    // React StrictMode replays effects on the same app: cleanup, then setup.
+    const manager = new PluginManager(makeState(), vi.fn());
+    const cleanup = vi.fn();
+    const install = vi.fn(() => cleanup);
+    manager.install(makePlugin('keys', { install }), fakeApp);
+
+    manager.destroy();
+    manager.restore(fakeApp);
+
+    expect(install).toHaveBeenCalledTimes(2);
+
+    manager.destroy();
+
+    expect(cleanup).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not re-install a plugin that has no cleanup', () => {
+    // It was never torn down, so a second install would double its effects.
+    const manager = new PluginManager(makeState(), vi.fn());
+    const plugin = makePlugin('legacy');
+    manager.install(plugin, fakeApp);
+
+    manager.destroy();
+    manager.restore(fakeApp);
+
+    expect(plugin.install).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing when nothing was destroyed', () => {
+    const manager = new PluginManager(makeState(), vi.fn());
+    const install = vi.fn(() => noop);
+    manager.install(makePlugin('keys', { install }), fakeApp);
+
+    manager.restore(fakeApp);
+
+    expect(install).toHaveBeenCalledTimes(1);
+  });
+});

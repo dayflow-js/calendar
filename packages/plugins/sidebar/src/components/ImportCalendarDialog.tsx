@@ -1,16 +1,19 @@
 import {
-  createPortal,
   CalendarType,
   useLocale,
   Check,
   ChevronsUpDown,
   LoadingButton,
+  useDialogFocus,
 } from '@dayflow/core';
-import { useState, useRef, useEffect } from 'preact/hooks';
+import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
+
+import { useListbox } from './useListbox';
 
 interface ImportCalendarDialogProps {
   calendars: CalendarType[];
   filename: string;
+  groups?: string[];
   onConfirm: (targetCalendarId: string) => void | Promise<void>;
   onCancel: () => void;
 }
@@ -20,29 +23,86 @@ export const NEW_CALENDAR_ID = 'new-calendar';
 export const ImportCalendarDialog = ({
   calendars,
   filename,
+  groups,
   onConfirm,
   onCancel,
 }: ImportCalendarDialogProps) => {
   const { t } = useLocale();
+  const titleId = useId();
   const [selectedCalendarId, setSelectedCalendarId] = useState<string>(
     calendars[0]?.id || NEW_CALENDAR_ID
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [shouldRender, setShouldRender] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      setShouldRender(true);
-    } else {
-      const timer = setTimeout(() => setShouldRender(false), 200);
-      return () => clearTimeout(timer);
+  const selectedCalendar = calendars.find(c => c.id === selectedCalendarId);
+  const isNewSelected = selectedCalendarId === NEW_CALENDAR_ID;
+
+  const { ungroupedCalendars, groupedCalendars } = useMemo(() => {
+    const hasAnyGroup =
+      calendars.some(c => !!c.source) || (groups && groups.length > 0);
+    if (!hasAnyGroup) {
+      return {
+        ungroupedCalendars: calendars,
+        groupedCalendars: [],
+      };
     }
-  }, [isOpen]);
+
+    const ungrouped: CalendarType[] = [];
+    const groupMap = new Map<string, CalendarType[]>();
+
+    if (groups) {
+      groups.forEach(groupName => {
+        if (!groupMap.has(groupName)) groupMap.set(groupName, []);
+      });
+    }
+
+    calendars.forEach(calendar => {
+      const source = calendar.source;
+      if (source) {
+        if (!groupMap.has(source)) groupMap.set(source, []);
+        groupMap.get(source)!.push(calendar);
+      } else {
+        ungrouped.push(calendar);
+      }
+    });
+
+    const grouped = Array.from(groupMap.entries()).filter(
+      ([, cals]) => cals.length > 0
+    );
+
+    return {
+      ungroupedCalendars: ungrouped,
+      groupedCalendars: grouped,
+    };
+  }, [calendars, groups]);
+
+  // Option ids in the order they're rendered, so arrow keys follow the list.
+  const optionIds = useMemo(
+    () => [
+      ...ungroupedCalendars.map(c => c.id),
+      ...groupedCalendars.flatMap(([, groupCals]) => groupCals.map(c => c.id)),
+      NEW_CALENDAR_ID,
+    ],
+    [ungroupedCalendars, groupedCalendars]
+  );
+
+  const { triggerRef, triggerProps, listboxProps, getOptionProps, idPrefix } =
+    useListbox({
+      count: optionIds.length,
+      selectedIndex: optionIds.indexOf(selectedCalendarId),
+      isOpen,
+      setIsOpen,
+      onSelect: index => {
+        setSelectedCalendarId(optionIds[index]);
+        setIsOpen(false);
+      },
+      disabled: isLoading,
+    });
 
   useEffect(() => {
+    if (!isOpen) return;
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -54,15 +114,7 @@ export const ImportCalendarDialog = ({
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const selectedCalendar = calendars.find(c => c.id === selectedCalendarId);
-  const isNewSelected = selectedCalendarId === NEW_CALENDAR_ID;
-
-  const handleSelect = (id: string) => {
-    setSelectedCalendarId(id);
-    setIsOpen(false);
-  };
+  }, [isOpen]);
 
   const handleConfirm = async () => {
     if (isLoading) return;
@@ -74,50 +126,69 @@ export const ImportCalendarDialog = ({
     }
   };
 
+  const renderCalendarItem = (calendar: CalendarType) => (
+    <div
+      key={calendar.id}
+      {...getOptionProps(optionIds.indexOf(calendar.id))}
+      className='df-sidebar-dropdown-item'
+      data-selected={selectedCalendarId === calendar.id ? 'true' : undefined}
+    >
+      <div
+        className='df-sidebar-swatch'
+        style={{ backgroundColor: calendar.colors.lineColor }}
+        aria-hidden='true'
+      />
+      <span className='df-sidebar-dropdown-label'>
+        {calendar.name || calendar.id}
+      </span>
+      {selectedCalendarId === calendar.id && (
+        <Check className='df-sidebar-dropdown-check' />
+      )}
+    </div>
+  );
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape closes the calendar dropdown first, then the dialog.
+  useDialogFocus(dialogRef, {
+    onClose: isOpen ? () => setIsOpen(false) : isLoading ? undefined : onCancel,
+  });
+
   const renderDropdown = () => {
-    if (!shouldRender) return null;
+    if (!isOpen) return null;
 
-    const rect = triggerRef.current?.getBoundingClientRect();
-    if (!rect) return null;
-
-    return createPortal(
+    return (
       <div
         ref={dropdownRef}
         className='df-sidebar-dropdown'
-        style={{
-          top: rect.bottom,
-          left: rect.left,
-          width: rect.width,
-          overscrollBehavior: 'none',
-        }}
+        style={{ overscrollBehavior: 'none' }}
       >
-        <div>
-          {calendars.map(calendar => (
-            <div
-              key={calendar.id}
-              className='df-sidebar-dropdown-item'
-              data-selected={
-                selectedCalendarId === calendar.id ? 'true' : undefined
-              }
-              onClick={() => handleSelect(calendar.id)}
-            >
+        <div {...listboxProps} aria-label={t('calendar')}>
+          {ungroupedCalendars.map(renderCalendarItem)}
+          {groupedCalendars.map(([groupName, groupCals], i) => {
+            const groupLabelId = `${idPrefix}-group-${i}`;
+            return (
               <div
-                className='df-sidebar-swatch'
-                style={{ backgroundColor: calendar.colors.lineColor }}
-              />
-              <span className='df-sidebar-dropdown-label'>
-                {calendar.name || calendar.id}
-              </span>
-              {selectedCalendarId === calendar.id && (
-                <Check className='df-sidebar-dropdown-check' />
-              )}
-            </div>
-          ))}
-          <div className='df-sidebar-dropdown-divider' />
+                key={groupName}
+                role='group'
+                aria-labelledby={groupLabelId}
+                className='df-sidebar-dropdown-group'
+              >
+                <div
+                  id={groupLabelId}
+                  role='presentation'
+                  className='df-sidebar-dropdown-group-label'
+                >
+                  {groupName}
+                </div>
+                {groupCals.map(renderCalendarItem)}
+              </div>
+            );
+          })}
+          <div className='df-sidebar-dropdown-divider' role='presentation' />
           <div
+            {...getOptionProps(optionIds.length - 1)}
             className='df-sidebar-dropdown-item'
             data-selected={isNewSelected ? 'true' : undefined}
-            onClick={() => handleSelect(NEW_CALENDAR_ID)}
           >
             <span className='df-sidebar-dropdown-label'>
               {t('newCalendar') || 'New Calendar'}: {filename}
@@ -125,15 +196,20 @@ export const ImportCalendarDialog = ({
             {isNewSelected && <Check className='df-sidebar-dropdown-check' />}
           </div>
         </div>
-      </div>,
-      document.body
+      </div>
     );
   };
 
   return (
     <div className='df-sidebar-overlay'>
-      <div className='df-sidebar-dialog'>
-        <h2 className='df-sidebar-dialog-title'>
+      <div
+        ref={dialogRef}
+        className='df-sidebar-dialog'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+      >
+        <h2 id={titleId} className='df-sidebar-dialog-title'>
           {t('addSchedule') || 'Add Schedule'}
         </h2>
         <p className='df-sidebar-dialog-text'>
@@ -143,16 +219,16 @@ export const ImportCalendarDialog = ({
 
         <div className='df-sidebar-field'>
           <button
-            ref={triggerRef}
+            {...triggerProps}
             type='button'
             disabled={isLoading}
             className='df-sidebar-select-trigger'
-            onClick={() => setIsOpen(!isOpen)}
           >
             {!isNewSelected && selectedCalendar && (
               <div
                 className='df-sidebar-swatch'
                 style={{ backgroundColor: selectedCalendar.colors.lineColor }}
+                aria-hidden='true'
               />
             )}
             <span className='df-sidebar-select-value'>

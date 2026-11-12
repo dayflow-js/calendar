@@ -16,6 +16,7 @@ describe('eventHelpers', () => {
         id: 'conference',
         title: 'Conference',
         description: undefined,
+        conference: undefined,
         start: Temporal.PlainDate.from('2026-06-07'),
         end: Temporal.PlainDate.from('2026-06-07'),
         allDay: true,

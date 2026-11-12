@@ -58,6 +58,47 @@ describe('slot rendering', () => {
     ).toHaveTextContent('the header');
   });
 
+  it('renders the sidebar slots from props, like the other adapters', () => {
+    const app = createFakeApp([{ name: 'sidebar', config: {} }]);
+    const { container } = render(
+      <DayFlowCalendar
+        calendar={app as never}
+        sidebar={() => <span>prop sidebar</span>}
+        sidebarHeader={() => <span>prop header</span>}
+        calendarContextMenu={() => <span>prop menu</span>}
+      />
+    );
+
+    expect(container.querySelector('[data-slot="sidebar"]')).toHaveTextContent(
+      'prop sidebar'
+    );
+    expect(
+      container.querySelector('[data-slot="sidebarHeader"]')
+    ).toHaveTextContent('prop header');
+    expect(
+      container.querySelector('[data-slot="calendarContextMenu"]')
+    ).toHaveTextContent('prop menu');
+  });
+
+  it('prefers the sidebar prop over the plugin render option', () => {
+    const app = createFakeApp([
+      {
+        name: 'sidebar',
+        config: { render: () => <span>plugin sidebar</span> },
+      },
+    ]);
+    const { container } = render(
+      <DayFlowCalendar
+        calendar={app as never}
+        sidebar={() => <span>prop sidebar</span>}
+      />
+    );
+
+    expect(container.querySelector('[data-slot="sidebar"]')).toHaveTextContent(
+      'prop sidebar'
+    );
+  });
+
   it('falls back to the sidebar plugin config when no prop matches', () => {
     // Sidebar content is configured on the plugin, not passed as a prop, so
     // the adapter has to look in two places to resolve a generator.

@@ -24,6 +24,8 @@ import {
 } from '@/types';
 import { isEventDeepEqual } from '@/utils/eventUtils';
 import { logger } from '@/utils/logger';
+import { getEventConference, setEventConference } from '@/utils/meetingUtils';
+import { convertEventKind, isTask } from '@/utils/taskUtils';
 import { isPlainDate } from '@/utils/temporal';
 import { resolveAppliedTheme } from '@/utils/themeUtils';
 import {
@@ -32,8 +34,13 @@ import {
 } from '@/utils/timeUtils';
 
 import { CalendarOption, CalendarPicker } from './CalendarPicker';
+import { EventConferenceField } from './EventConferenceField';
+import { EventKindSwitch } from './EventKindSwitch';
+import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
+import { TaskPriorityField } from './TaskPriorityField';
+import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
   app?: ICalendarApp;
@@ -58,6 +65,7 @@ const DefaultEventDetailPanel = ({
   const { effectiveTheme } = useTheme();
   const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
+  const rangePickerLocale = useRangePickerLocale(app?.state.locale);
 
   usePanelHandoffAnimation({
     panelRef,
@@ -71,6 +79,28 @@ const DefaultEventDetailPanel = ({
   const committedEventRef = useRef(event);
   const draftEventRef = useRef(event);
   const skipCommitRef = useRef(false);
+  const [panelTop, setPanelTop] = useState(position.top);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const fitInViewport = () => {
+      setPanelTop(
+        Math.max(
+          8,
+          Math.min(position.top, window.innerHeight - panel.offsetHeight - 8)
+        )
+      );
+    };
+    const observer = new ResizeObserver(fitInViewport);
+    observer.observe(panel);
+    window.addEventListener('resize', fitInViewport);
+    fitInViewport();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', fitInViewport);
+    };
+  }, [panelRef, position.top]);
 
   const commitDraftChanges = useCallback(() => {
     if (skipCommitRef.current) return;
@@ -169,6 +199,7 @@ const DefaultEventDetailPanel = ({
     return registry.getVisible().map((cal: CalendarType) => ({
       label: cal.name,
       value: cal.id,
+      group: cal.source,
     }));
   }, [app, app?.getCalendars()]); // Depend on app.getCalendars() to update when calendars change
 
@@ -178,12 +209,10 @@ const DefaultEventDetailPanel = ({
     (typeof document !== 'undefined' &&
       document.documentElement.classList.contains('dark'));
   const isEditable = app?.canMutateFromUI(event.id) ?? false;
-  const readOnlyConfig = app?.getReadOnlyConfig(event.id) as {
-    draggable: boolean;
-    viewable: boolean;
-  };
+  const readOnlyConfig = app?.getReadOnlyConfig(event.id);
   const isViewable = readOnlyConfig?.viewable !== false;
   const isDraftAllDay = !!draftEvent.allDay;
+  const isDraftTask = isTask(draftEvent);
 
   // Check if it's a subscribed calendar
   const isSubscribed = useMemo(() => {
@@ -245,7 +274,7 @@ const DefaultEventDetailPanel = ({
       ...draftEvent,
       allDay: false,
       start,
-      end,
+      end: isDraftTask ? start : end,
     });
   };
 
@@ -403,14 +432,25 @@ const DefaultEventDetailPanel = ({
       data-event-detail-panel='true'
       data-event-id={event.id}
       style={{
-        top: `${position.top}px`,
+        top: `${panelTop}px`,
         left: `${position.left}px`,
         zIndex: 9999,
         pointerEvents: 'auto',
       }}
     >
       <div style={arrowStyle}></div>
-      <span className='df-form-label'>{t('eventTitle')}</span>
+      {isEditable && (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
+        <EventKindSwitch
+          value={draftEvent.kind ?? 'event'}
+          disabled={isLoading}
+          onChange={kind =>
+            applyDraftEventUpdate(convertEventKind(draftEvent, kind))
+          }
+        />
+      )}
+      <span className='df-form-label'>
+        {t(isDraftTask ? 'taskTitle' : 'eventTitle')}
+      </span>
       <div className='df-form-row' style={{ marginBottom: '0.75rem' }}>
         <div className='df-form-field'>
           <input
@@ -456,9 +496,12 @@ const DefaultEventDetailPanel = ({
           className='df-event-dialog-time-row'
           style={{ marginBottom: '0.75rem' }}
         >
-          <div className='df-form-label'>{t('dateRange')}</div>
+          <div className='df-form-label'>
+            {t(isDraftTask ? 'due' : 'dateRange')}
+          </div>
           <RangePicker
             value={[draftEvent.start, draftEvent.end]}
+            mode={isDraftTask ? 'single' : 'range'}
             format='YYYY-MM-DD'
             showTime={false}
             timeZone={eventTimeZone}
@@ -466,7 +509,8 @@ const DefaultEventDetailPanel = ({
             matchTriggerWidth
             disabled={!isEditable || isLoading}
             onChange={handleAllDayRangeChange}
-            locale={app?.state.locale}
+            locale={rangePickerLocale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       ) : (
@@ -474,9 +518,12 @@ const DefaultEventDetailPanel = ({
           className='df-event-dialog-time-row'
           style={{ marginBottom: '0.75rem' }}
         >
-          <div className='df-form-label'>{t('timeRange')}</div>
+          <div className='df-form-label'>
+            {t(isDraftTask ? 'due' : 'timeRange')}
+          </div>
           <RangePicker
             value={[draftEvent.start, draftEvent.end]}
+            mode={isDraftTask ? 'single' : 'range'}
             timeZone={eventTimeZone}
             startOfWeek={startOfWeek}
             showTimeFormat={
@@ -490,7 +537,8 @@ const DefaultEventDetailPanel = ({
               const [start, end] = nextRange;
               applyDraftEventUpdate({ ...draftEvent, start, end });
             }}
-            locale={app?.state.locale}
+            locale={rangePickerLocale}
+            calendarSystem={app?.state.calendarSystem}
           />
         </div>
       )}
@@ -502,35 +550,36 @@ const DefaultEventDetailPanel = ({
         onChange={applyDraftEventUpdate}
       />
 
+      {isDraftTask ? (
+        <TaskPriorityField
+          event={draftEvent}
+          disabled={!isEditable || isLoading}
+          onChange={applyDraftEventUpdate}
+        />
+      ) : (
+        <EventConferenceField
+          key={draftEvent.id}
+          value={getEventConference(draftEvent)}
+          editable={isEditable}
+          disabled={isLoading}
+          onChange={conference =>
+            applyDraftEventUpdate(setEventConference(draftEvent, conference))
+          }
+        />
+      )}
+
       {shouldShowNotes && (
-        <div
-          className='df-event-dialog-notes-row'
-          style={{ marginBottom: '0.75rem' }}
-        >
-          <span className='df-form-label'>{t('note')}</span>
-          <textarea
-            id={`event-note-${draftEvent.id}`}
-            name='note'
-            value={draftEvent.description ?? ''}
-            readOnly={!isEditable || isLoading}
-            disabled={!isEditable || isLoading}
-            onChange={e =>
-              applyDraftEventUpdate({
-                ...draftEvent,
-                description: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-            onInput={e =>
-              applyDraftEventUpdate({
-                ...draftEvent,
-                description: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-            rows={3}
-            className='df-form-textarea'
-            placeholder={t('addNotePlaceholder')}
-          />
-        </div>
+        <EventNotesField
+          key={draftEvent.id}
+          id={`event-note-${draftEvent.id}`}
+          value={draftEvent.description ?? ''}
+          editable={isEditable}
+          disabled={isLoading}
+          rows={3}
+          onChange={description =>
+            applyDraftEventUpdate({ ...draftEvent, description })
+          }
+        />
       )}
 
       {isEditable && (
@@ -542,7 +591,7 @@ const DefaultEventDetailPanel = ({
               onClick={convertToRegular}
               loading={isLoading}
             >
-              {t('setAsTimed')}
+              {t(isDraftTask ? 'addDueTime' : 'setAsTimed')}
             </LoadingButton>
           ) : (
             <LoadingButton

@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/core",
-  "version": "3.7.1",
+  "version": "3.7.6",
   "description": "A flexible and feature-rich calendar engine powered by Preact with drag-and-drop support, multiple views (Day, Week, Month, Year), and plugin architecture",
   "keywords": [
     "calendar",
@@ -32,6 +32,7 @@
     "README.md",
     "LICENSE"
   ],
+  "type": "module",
   "sideEffects": [
     "*.css",
     "**/*.css"
@@ -53,11 +54,13 @@
     "check:css": "pnpm run check:css:source && pnpm run check:css:dist",
     "check:css:dist": "node ./scripts/check-dist-styling.mjs --package-root .",
     "check:css:source": "node ./scripts/check-semantic-css.mjs",
+    "check:tree-shaking": "node ./scripts/audit-tree-shaking.mjs --check",
     "clean": "rimraf dist node_modules",
     "dev": "vite --port 5529 --host",
     "postbuild": "rimraf dist/types",
     "prebuild": "rimraf dist",
     "prepublishOnly": "npm run typecheck && npm run check:css && npm run test && npm run build",
+    "size": "node ./scripts/report-bundle-size.mjs",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -65,13 +68,13 @@
   },
   "dependencies": {
     "@dayflow/blossom-color-picker": "catalog:",
+    "@dayflow/ui-context-menu": "workspace:^",
+    "@dayflow/ui-range-picker": "workspace:^",
     "preact": "catalog:",
     "temporal-polyfill": "catalog:",
     "tslib": "catalog:"
   },
   "devDependencies": {
-    "@dayflow/ui-context-menu": "workspace:^",
-    "@dayflow/ui-range-picker": "workspace:^",
     "@preact/preset-vite": "catalog:",
     "@rollup/plugin-commonjs": "catalog:",
     "@rollup/plugin-node-resolve": "catalog:",

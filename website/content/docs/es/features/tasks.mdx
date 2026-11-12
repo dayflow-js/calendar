@@ -1,0 +1,141 @@
+---
+title: Tareas
+description: Añade al calendario tareas con fecha de vencimiento, estado de completado y prioridad.
+---
+
+# Tareas
+
+Las tareas comparten el modelo de datos `Event` y la asignación de calendario con los eventos normales.
+En lugar de una duración, una tarea tiene una única fecha u hora de vencimiento. Su círculo
+alterna el estado de completado; el fondo a rayas y el color del texto indican la prioridad.
+
+## Activar la creación de tareas
+
+Configura `enableTasks: true` para mostrar el selector Evento / Tarea en el panel de escritorio,
+el diálogo y el editor móvil integrados. El valor predeterminado es `false`, lo que conserva la
+interfaz actual de creación de eventos. Las tareas existentes siguen visibles y editables aunque
+la opción esté desactivada.
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+La opción forma parte de `CalendarAppConfig` y funciona con todos los adaptadores de framework.
+Para cambiarla en una instancia de core existente:
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+Es una opción del editor en tiempo de ejecución; desactivarla no elimina el código de tareas
+del bundle.
+
+## Crear una tarea con hora o de día completo
+
+Usa `kind: 'task'`. `start` y `end` deben contener el mismo valor de vencimiento.
+Para una tarea sin hora, configura `allDay: true` y usa `Temporal.PlainDate`.
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+Pasa estos elementos mediante la configuración `events`, o usa las APIs de eventos habituales
+para añadirlos, actualizarlos o eliminarlos. Añade `calendarId` para asignarlos a un calendario
+concreto.
+
+| Campo              | Tipo                                    | Significado                                        |
+| ------------------ | --------------------------------------- | -------------------------------------------------- |
+| `kind`             | `'event' \| 'task'`                     | Si se omite, es `'event'`.                         |
+| `task.completed`   | `boolean`                               | Valor predeterminado: `false`.                     |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | Momento en que se completó; se borra al reabrirla. |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | Valor predeterminado: `'none'`.                    |
+
+## Completar tareas y cambiar la prioridad
+
+Haz clic en el círculo de la izquierda para completar o reabrir una tarea. No abre el panel de
+detalles ni inicia un arrastre. Con el teclado, enfoca el círculo y pulsa Espacio o Intro. Los
+títulos completados se muestran tachados.
+
+Abre los detalles de la tarea para cambiar el título, la fecha/hora de vencimiento, las notas o
+la prioridad. **Establecer como todo el día** quita la hora; **Añadir hora** la recupera. Las
+tareas se pueden mover, pero no redimensionar.
+
+| Prioridad | Color de fondo y de texto |
+| --------- | ------------------------- |
+| `none`    | Gris pizarra              |
+| `low`     | Verde                     |
+| `medium`  | Ámbar                     |
+| `high`    | Rojo                      |
+
+La prioridad rellena toda la tarea con rayas diagonales. El círculo usa el color del calendario
+y se vuelve blanco mientras la tarea está seleccionada. La prioridad no cambia el orden
+cronológico. En la vista Mes, las tareas de día completo mantienen el estilo de fila de tarea,
+sin etiqueta de hora. En las vistas Día y Semana, las tareas no tienen la barra de color de los
+eventos.
+
+La [demo interactiva](/demo) incluye un interruptor **Tasks** y un tooltip **Preview** que
+muestra cómo completar una tarea y cambiar su prioridad en el panel de detalles.
+
+## Actualizaciones programáticas y persistencia
+
+Los cambios en las tareas usan el mismo callback `onEventUpdate` que los cambios en eventos.
+Guarda `kind` y los metadatos de `task` junto con las fechas del evento en tu fuente de datos.
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+Las funciones auxiliares devuelven los valores actualizados; no guardan los cambios por sí
+mismas. El [modo de solo lectura](/docs-es/features/read-only) desactiva completar y editar desde
+la interfaz integrada, mientras que las actualizaciones programáticas siguen funcionando.
+
+Las ocurrencias generadas de eventos recurrentes no se pueden completar de forma independiente.
+La sincronización de tareas CalDAV externas (`VTODO`) no está implementada; no des por hecho que
+la sincronización de eventos conserva los campos específicos de las tareas.

@@ -20,6 +20,24 @@ export type GoogleCalendarEvent = {
   created?: string;
   updated?: string;
   colorId?: string;
+  hangoutLink?: string;
+  conferenceData?: {
+    entryPoints?: Array<{
+      entryPointType: string;
+      uri: string;
+      label?: string;
+      meetingCode?: string;
+      passcode?: string;
+      password?: string;
+      pin?: string;
+    }>;
+    conferenceSolution?: {
+      key?: { type?: string };
+      name?: string;
+      iconUri?: string;
+    };
+    conferenceId?: string;
+  };
 };
 
 export type GoogleEventInput = {

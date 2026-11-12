@@ -160,6 +160,7 @@ Estas son las locales disponibles actualmente en el paquete `@dayflow/plugin-loc
 | `fr`   | Francés | `fr-FR`                                 |
 | `de`   | Alemán  | `de-DE`                                 |
 | `es`   | Español | `es-ES`                                 |
+| `fa`   | Persa   | `fa-IR`                                 |
 | `en`   | Inglés  | `en-US` (también incluida en el núcleo) |
 
 Al asignar la propiedad `locale` puedes pasar:
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // Pass the custom Locale object directly (or code string 'pt-BR')
 });
 ```
+
+### Etiquetas accesibles
+
+Los `messages` de una locale también proporcionan los nombres que los lectores de pantalla anuncian para los botones de solo icono y los campos sin etiqueta, así que tradúcelos junto con el texto visible. Las claves que falten en una locale propia recurren al inglés.
+
+| Clave                                       | Se usa en                                                              |
+| :------------------------------------------ | :--------------------------------------------------------------------- |
+| `previousDay` / `nextDay`                   | Flechas de navegación de la cabecera en la vista de día                |
+| `previousWeek` / `nextWeek`                 | Flechas de navegación de la cabecera en la vista de semana             |
+| `previousMonth` / `nextMonth`               | Flechas de la vista de mes, del minicalendario y del selector de rango |
+| `previousYear` / `nextYear`                 | Flechas de la vista de año y del selector de rango                     |
+| `previousPeriod` / `nextPeriod`             | Flechas de navegación de la cabecera en la vista de agenda             |
+| `clearSearch` / `closeSearch`               | Botón para borrar la búsqueda y botón atrás de la búsqueda móvil       |
+| `close`                                     | Botones de cierre de diálogos y paneles laterales                      |
+| `startDate` / `endDate` / `hour` / `minute` | Campos y listas de hora del selector de rango                          |

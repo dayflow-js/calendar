@@ -47,6 +47,7 @@ export class CalendarApp implements ICalendarApp {
   private pluginManager: PluginManager;
   private useEventDetailDialog: boolean;
   private useEventDetailPanel: boolean;
+  private enableTasks: boolean;
   private eventDetailTrigger: EventDetailTrigger;
   private useCalendarHeader: boolean;
   private themeColors?: ThemeColors;
@@ -64,6 +65,7 @@ export class CalendarApp implements ICalendarApp {
       currentDate: config.initialDate || defaultCurrentDate,
       events: config.events || [],
       switcherMode: config.switcherMode || 'buttons',
+      useViewHeader: config.useViewHeader ?? true,
       plugins: new Map(),
       views: new Map(),
       locale: CalendarApp.resolveLocale(config.locale),
@@ -74,6 +76,7 @@ export class CalendarApp implements ICalendarApp {
       allDaySortComparator: config.allDaySortComparator,
       timeZone: resolvedTimeZone,
       timeFormat: config.timeFormat,
+      calendarSystem: config.calendarSystem ?? 'gregorian',
     };
 
     this.callbacks = config.callbacks || {};
@@ -106,6 +109,7 @@ export class CalendarApp implements ICalendarApp {
 
     this.pluginManager = new PluginManager(this.state, this.notify);
 
+    this.enableTasks = config.enableTasks ?? false;
     this.useEventDetailDialog = config.useEventDetailDialog ?? false;
     // Dialog and panel are mutually exclusive renderings of the same selection
     // state — dialog wins when both are requested.
@@ -353,6 +357,10 @@ export class CalendarApp implements ICalendarApp {
     config: Record<string, unknown>
   ): void => this.pluginManager.updatePluginConfig(pluginName, config);
 
+  destroy = (): void => this.pluginManager.destroy();
+
+  restore = (): void => this.pluginManager.restore(this);
+
   // Theme
 
   setTheme = (mode: ThemeMode): void => {
@@ -385,6 +393,7 @@ export class CalendarApp implements ICalendarApp {
 
   getCalendarRegistry = (): CalendarRegistry => this.calendarRegistry;
   getUseEventDetailDialog = (): boolean => this.useEventDetailDialog;
+  getTasksEnabled = (): boolean => this.enableTasks;
   getUseEventDetailPanel = (): boolean => this.useEventDetailPanel;
   getEventDetailEnabled = (): boolean =>
     this.useEventDetailDialog || this.useEventDetailPanel;
@@ -402,6 +411,24 @@ export class CalendarApp implements ICalendarApp {
 
   updateConfig = (config: Partial<CalendarAppConfig>): void => {
     let hasChanged = false;
+
+    if (
+      config.enableTasks !== undefined &&
+      config.enableTasks !== this.enableTasks
+    ) {
+      this.enableTasks = config.enableTasks;
+      hasChanged = true;
+    }
+
+    if (
+      config.calendarSystem !== undefined &&
+      config.calendarSystem !== this.state.calendarSystem
+    ) {
+      this.state.calendarSystem = config.calendarSystem;
+      this.navigation.setVisibleMonth(this.state.currentDate);
+      this.navigation.handleVisibleRangeChange('viewChange');
+      hasChanged = true;
+    }
 
     if (
       config.useEventDetailDialog !== undefined ||
@@ -434,6 +461,13 @@ export class CalendarApp implements ICalendarApp {
       config.useCalendarHeader !== this.useCalendarHeader
     ) {
       this.useCalendarHeader = config.useCalendarHeader;
+      hasChanged = true;
+    }
+    if (
+      config.useViewHeader !== undefined &&
+      config.useViewHeader !== this.state.useViewHeader
+    ) {
+      this.state.useViewHeader = config.useViewHeader;
       hasChanged = true;
     }
     if (

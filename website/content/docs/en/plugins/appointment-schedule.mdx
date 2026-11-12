@@ -190,21 +190,22 @@ The plugin also contributes an entry to the calendar's quick-create popup. Calen
 
 These fields form `AppointmentSchedulePluginConfig`.
 
-| Option                     | Default            | Purpose                                                   |
-| -------------------------- | ------------------ | --------------------------------------------------------- |
-| `schedules`                | Required           | Controlled list of appointment schedules.                 |
-| `activeScheduleId`         | None               | Opens the editor with a specific schedule selected.       |
-| `availabilitySnapMinutes`  | `15`               | Minute interval used when editing availability.           |
-| `drawerPlacement`          | `'viewport'`       | Mounts the editor against the viewport or calendar.       |
-| `drawerWidth`              | `420`              | Drawer width in pixels or any CSS length.                 |
-| `drawerTarget`             | First calendar     | Element or selector used by `calendar` placement.         |
-| `drawerRenderer`           | Built-in drawer    | Replaces the complete organiser editor.                   |
-| `timeFormat`               | Active view format | Uses either 12-hour or 24-hour time.                      |
-| `conferenceProviders`      | `[]`               | Adds named conferencing providers to the location picker. |
-| `onCreateSchedule`         | None               | Persists a newly created schedule in your application.    |
-| `onUpdateSchedule`         | None               | Persists changes to an existing schedule.                 |
-| `onDeleteScheduleRequest`  | None               | Asks the host to confirm and delete a schedule.           |
-| `onExternalUpdateConflict` | None               | Reports a controlled-data update received during editing. |
+| Option                     | Default            | Purpose                                                                                                                         |
+| -------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `schedules`                | Required           | Controlled list of appointment schedules.                                                                                       |
+| `activeScheduleId`         | None               | Opens the editor with a specific schedule selected.                                                                             |
+| `availabilitySnapMinutes`  | `15`               | Minute interval used when editing availability.                                                                                 |
+| `drawerPlacement`          | `'viewport'`       | Mounts the editor against the viewport or calendar.                                                                             |
+| `drawerWidth`              | `420`              | Drawer width in pixels or any CSS length.                                                                                       |
+| `drawerTarget`             | First calendar     | Element or selector used by `calendar` placement.                                                                               |
+| `drawerRenderer`           | Built-in drawer    | Replaces the complete organiser editor.                                                                                         |
+| `timeFormat`               | Active view format | Uses either 12-hour or 24-hour time.                                                                                            |
+| `unavailableDisplayMode`   | `'grid-overlay'`   | Display style for unavailable intervals on the time grid (`'grid-overlay'` diagonal stripe overlay or `'bar'` slim accent bar). |
+| `conferenceProviders`      | `[]`               | Adds named conferencing providers to the location picker.                                                                       |
+| `onCreateSchedule`         | None               | Persists a newly created schedule in your application.                                                                          |
+| `onUpdateSchedule`         | None               | Persists changes to an existing schedule.                                                                                       |
+| `onDeleteScheduleRequest`  | None               | Asks the host to confirm and delete a schedule.                                                                                 |
+| `onExternalUpdateConflict` | None               | Reports a controlled-data update received during editing.                                                                       |
 
 ### Plugin API
 

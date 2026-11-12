@@ -26,6 +26,9 @@ import { Event } from '@dayflow/core';
 | `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event start date/time. Use `PlainDate` for all-day, `PlainDateTime` for local, `ZonedDateTime` for timezone-aware                                                                                     | Required |
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Event end date/time                                                                                                                                                                                   | Required |
 | `description` | `string`                                                                 | Optional event description or notes                                                                                                                                                                   | Optional |
+| `conference`  | `EventConference`                                                        | Optional video meeting join details. The built-in detail UI detects known providers from `joinUrl`.                                                                                                   | Optional |
+| `kind`        | `'event' \| 'task'`                                                      | Item type; omitted means a regular event.                                                                                                                                                             | Optional |
+| `task`        | `EventTask`                                                              | Task completion state, completion timestamp, and priority. See [Tasks](/docs/features/tasks).                                                                                                         | Optional |
 | `allDay`      | `boolean`                                                                | Whether this is an all-day event (default: `false`)                                                                                                                                                   | Optional |
 | `icon`        | `boolean \| Node`                                                        | Custom icon for the event. `true` (default): show default, `false`: hide, `Node`: custom icon                                                                                                         | Optional |
 | `calendarId`  | `string`                                                                 | Calendar type reference for single-calendar assignment                                                                                                                                                | Optional |
@@ -834,6 +837,26 @@ const crossMidnightEvent: Event = {
 };
 ```
 
+## Video conferencing
+
+Attach a join link with the first-class `conference` field. The built-in event
+detail panel and dialog recognize Google Meet, Zoom, Microsoft Teams, Webex,
+Whereby, and Jitsi links, then show the provider, meeting ID, and a safe Join
+action. Other valid HTTP(S) links use a generic video-meeting presentation.
+
+```tsx
+const event: Event = {
+  // ...event fields
+  conference: {
+    joinUrl: 'https://meet.google.com/abc-defg-hij',
+    // provider and meetingId are optional; the built-in UI can derive them.
+  },
+};
+```
+
+Use `createEventConference(value)` when you want the normalized URL and detected
+provider in application code.
+
 ## Event Metadata
 
 Store additional information in the `meta` field:
@@ -847,10 +870,13 @@ const event: Event = {
   title: 'Project Kickoff',
   start: Temporal.ZonedDateTime.from('2024-10-15T10:00:00[America/New_York]'),
   end: Temporal.ZonedDateTime.from('2024-10-15T11:00:00[America/New_York]'),
+  conference: {
+    provider: 'zoom',
+    joinUrl: 'https://zoom.us/j/123456',
+  },
   meta: {
-    // Meeting details
+    // Location
     location: 'Conference Room A',
-    meetingUrl: 'https://zoom.us/j/123456',
 
     // Attendees
     organizer: 'john@example.com',

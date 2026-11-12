@@ -189,7 +189,32 @@
   }
 
   .df-sidebar-source-group {
+    position: relative;
     margin-top: 0.25rem;
+    transition: opacity 120ms ease;
+  }
+
+  .df-sidebar-source-group[data-dragging='true'] {
+    opacity: 0.5;
+  }
+
+  .df-sidebar-group-drop-indicator {
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--df-color-primary);
+  }
+
+  .df-sidebar-group-drop-indicator[data-position='top'] {
+    top: -0.125rem;
+  }
+
+  .df-sidebar-group-drop-indicator[data-position='bottom'] {
+    bottom: -0.125rem;
   }
 
   .df-sidebar-source-toggle {
@@ -210,8 +235,17 @@
       color 120ms ease;
   }
 
-  .df-sidebar-source-toggle:hover {
+  .df-sidebar-source-toggle:hover,
+  .df-sidebar-source-toggle[data-active='true'] {
     background: var(--df-color-hover);
+  }
+
+  .df-sidebar-source-toggle[data-draggable='true'] {
+    cursor: grab;
+  }
+
+  .df-sidebar-source-toggle[data-draggable='true']:active {
+    cursor: grabbing;
   }
 
   .df-sidebar-source-label {
@@ -332,6 +366,34 @@
     gap: 0.125rem;
   }
 
+  .df-sidebar-group-name-label {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.375rem;
+    color: var(--df-color-muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .df-sidebar-group-name-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 2.25rem;
+    border: 1px solid var(--df-color-border);
+    border-radius: 0.5rem;
+    background: var(--df-color-background);
+    color: var(--df-color-foreground);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+  }
+
+  .df-sidebar-group-name-input:focus {
+    border-color: var(--df-color-primary);
+    box-shadow: 0 0 0 2px var(--df-color-primary);
+  }
+
   .df-sidebar-dialog-actions,
   .df-sidebar-dialog-split-actions {
     margin-top: 1.5rem;
@@ -408,7 +470,7 @@
     position: absolute;
     top: calc(100% + 0.25rem);
     left: 0;
-    z-index: 10;
+    z-index: 50;
     min-width: 100%;
     max-height: 15rem;
     overflow-y: auto;
@@ -416,24 +478,48 @@
     border-radius: 0.5rem;
     background: var(--df-color-card);
     box-shadow: 0 10px 20px rgb(0 0 0 / 0.12);
+    padding: 0.25rem;
+  }
+
+  .df-sidebar-dropdown-group-label {
+    padding: 0.375rem 0.5rem 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--df-color-muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .df-sidebar-dropdown-item {
     display: flex;
+    cursor: pointer;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
-    color: color-mix(in srgb, var(--df-color-foreground) 88%, transparent);
+    color: var(--df-color-foreground);
     transition:
       background-color 120ms ease,
       color 120ms ease;
   }
 
-  .df-sidebar-dropdown-item:hover,
   .df-sidebar-dropdown-item[data-selected='true'] {
-    background: color-mix(in srgb, var(--df-color-primary) 10%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--df-color-primary) 12%,
+      transparent
+    );
+    color: var(--df-color-foreground);
+    font-weight: 500;
+  }
+
+  .df-sidebar-dropdown-item:hover,
+  .df-sidebar-dropdown-item[data-active='true'] {
+    background-color: var(--df-color-primary);
+    color: var(--df-color-primary-foreground);
   }
 
   .df-sidebar-dropdown-divider {
@@ -464,6 +550,11 @@
     color: var(--df-color-primary);
   }
 
+  .df-sidebar-dropdown-item:hover .df-sidebar-dropdown-check,
+  .df-sidebar-dropdown-item[data-active='true'] .df-sidebar-dropdown-check {
+    color: var(--df-color-primary-foreground);
+  }
+
   .df-sidebar-field {
     position: relative;
     margin-top: 0.75rem;
@@ -472,7 +563,9 @@
   .df-sidebar-select-trigger {
     display: flex;
     width: 100%;
+    cursor: pointer;
     align-items: center;
+    gap: 0.625rem;
     border: 1px solid var(--df-color-border);
     border-radius: 0.5rem;
     background: var(--df-color-background);
@@ -542,7 +635,7 @@
   .df-sidebar-subscribe-input:focus {
     border-color: var(--df-color-primary);
     box-shadow:
-      0 0 0 0px var(--df-color-background),
+      0 0 0 0 var(--df-color-background),
       0 0 0 2px var(--df-color-primary);
   }
 
@@ -603,6 +696,10 @@
 
   .df-sidebar-context-menu-calendar {
     min-width: 16rem;
+  }
+
+  .df-sidebar-context-menu-group {
+    min-width: 12rem;
   }
 
   .df-sidebar-context-menu-sidebar {

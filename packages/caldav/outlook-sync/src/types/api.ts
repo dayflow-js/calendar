@@ -84,6 +84,18 @@ export type OutlookEvent = {
   organizer?: {
     emailAddress: { name: string; address: string };
   };
+  isOnlineMeeting?: boolean;
+  onlineMeetingProvider?:
+    | 'unknown'
+    | 'teamsForBusiness'
+    | 'skypeForBusiness'
+    | 'skypeForConsumer';
+  onlineMeeting?: {
+    conferenceId?: string;
+    joinUrl?: string;
+  };
+  /** Legacy fallback; prefer onlineMeeting.joinUrl. */
+  onlineMeetingUrl?: string;
 };
 
 /**

@@ -13,6 +13,9 @@ export type { CustomRendering } from './renderer/CustomRenderingStore';
 // Types
 export * from './types';
 
+// Calendar systems
+export * from './calendar/calendarSystem';
+
 // Utils
 export * from './utils';
 export { subscribeCalendar } from './utils/subscriptionUtils';
@@ -52,6 +55,8 @@ export { getCalendarColorsForHex } from './core/calendarRegistry';
 
 // Common Components
 export { LoadingButton } from './components/common/LoadingButton';
+export { useDialogFocus } from './hooks/useDialogFocus';
+export type { UseDialogFocusOptions } from './hooks/useDialogFocus';
 export { BlossomColorPicker } from './components/common/BlossomColorPicker';
 export { DefaultColorPicker } from './components/common/DefaultColorPicker';
 export { RangePicker as DayflowRangePicker } from '@dayflow/ui-range-picker';
@@ -60,6 +65,7 @@ export { MiniCalendar } from './components/common/MiniCalendar';
 export { CreateCalendarDialog } from './components/common/CreateCalendarDialog';
 export { default as DefaultEventDetailPanel } from './components/common/DefaultEventDetailPanel';
 export { default as DefaultEventDetailDialog } from './components/common/DefaultEventDetailDialog';
+export { EventConferenceField } from './components/common/EventConferenceField';
 export { ContentSlot } from './renderer/ContentSlot';
 export { TimeGridBackgroundLayer } from './components/weekView/TimeGridBackgroundLayer';
 export type { TimeGridBackgroundLayerProps } from './components/weekView/TimeGridBackgroundLayer';

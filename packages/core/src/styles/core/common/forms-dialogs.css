@@ -416,8 +416,272 @@
     margin-bottom: 1rem;
   }
 
+  .df-event-notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .df-event-notes-frame {
+    width: 100%;
+    min-height: 3rem;
+    overflow: hidden;
+  }
+
+  .df-event-notes-frame:focus-within {
+    overflow: visible;
+  }
+
+  .df-event-notes-frame > .df-form-textarea,
+  .df-event-notes-frame > .df-event-notes-preview {
+    display: block;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .df-event-notes-frame > .df-form-textarea:focus {
+    outline: none;
+    border-color: var(--df-color-ring);
+    box-shadow:
+      0 0 0 0px var(--df-color-background),
+      0 0 0 2px var(--df-color-ring);
+  }
+
+  .df-event-notes-preview {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 3rem;
+    border: 1px solid var(--df-color-border);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--df-color-card);
+    color: var(--df-color-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+  }
+
+  .df-event-notes-preview[data-editable='true'] {
+    cursor: text;
+    transition: border-color 150ms;
+  }
+
+  .df-event-notes-preview[data-editable='true']:hover {
+    border-color: var(--df-color-ring);
+  }
+
+  .df-event-notes-preview a {
+    color: var(--df-color-primary);
+    text-decoration: underline;
+  }
+
+  .df-event-notes-preview ul,
+  .df-event-notes-preview ol {
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;
+  }
+
+  .df-event-notes-preview ul {
+    list-style: disc;
+  }
+  .df-event-notes-preview ol {
+    list-style: decimal;
+  }
+  .df-event-notes-preview li {
+    margin: 0.25rem 0;
+  }
+  .df-event-notes-preview p {
+    margin: 0.5rem 0;
+  }
+  .df-event-notes-heading {
+    display: block;
+    margin: 0.5rem 0;
+  }
+
+  .df-event-notes-preview hr {
+    border: 0;
+    border-top: 1px solid var(--df-color-border);
+    margin: 0.75rem 0;
+  }
+
+  .df-event-notes-gap {
+    height: 0.75rem;
+  }
+
   .df-event-dialog-time-row {
     margin-bottom: 1rem;
+  }
+
+  .df-event-conference-field {
+    margin-bottom: 1rem;
+  }
+
+  .df-event-conference-editor,
+  .df-event-conference-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  /* The editor is the summary's box with the link field inside it, so the
+     provider icon and the Done/Join button keep their place on edit. */
+  .df-event-conference-editor,
+  .df-event-conference-summary {
+    box-sizing: border-box;
+    height: 2.25rem;
+    border: 1px solid var(--df-color-border);
+    border-radius: 0.625rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.625rem;
+    background-color: var(--df-color-card);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .df-event-conference-provider-icon {
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--df-color-muted-foreground);
+  }
+
+  .df-event-conference-editor {
+    transition:
+      border-color 150ms,
+      box-shadow 150ms;
+  }
+
+  .df-event-conference-editor:focus-within {
+    border-color: var(--df-color-ring);
+    box-shadow:
+      0 0 0 0px var(--df-color-background),
+      0 0 0 2px var(--df-color-ring);
+  }
+
+  .df-event-conference-editor[data-invalid='true'] {
+    border-color: var(--df-color-destructive);
+  }
+
+  .df-event-conference-editor .df-event-conference-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .df-event-conference-editor .df-event-conference-input:focus {
+    box-shadow: none;
+  }
+
+  .df-event-conference-info {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  .df-event-conference-name,
+  .df-event-conference-id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .df-event-conference-name {
+    color: var(--df-color-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .df-event-conference-id,
+  .df-event-conference-error {
+    font-size: 0.75rem;
+  }
+
+  .df-event-conference-id {
+    color: var(--df-color-muted-foreground);
+  }
+
+  .df-event-conference-error {
+    margin-top: 0.25rem;
+    /* Line up with the link text: box border + padding + icon + gap. */
+    padding-left: calc(1px + 0.625rem + 1.5rem + 0.5rem);
+  }
+
+  .df-event-conference-error {
+    color: var(--df-color-destructive);
+  }
+
+  .df-event-conference-icon-button,
+  .df-event-conference-done {
+    flex: 0 0 auto;
+    border: 0;
+    cursor: pointer;
+    color: var(--df-color-muted-foreground);
+    background: transparent;
+  }
+
+  .df-event-conference-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+  }
+
+  .df-event-conference-icon-button:hover,
+  .df-event-conference-done:hover {
+    color: var(--df-color-foreground);
+    background-color: var(--df-color-hover);
+  }
+
+  .df-event-conference-icon-button:disabled,
+  .df-event-conference-done:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .df-event-conference-icon-button svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Same box as the Join button (.df-btn-sm). */
+  .df-event-conference-done {
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    color: var(--df-color-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: inherit;
+  }
+
+  .df-event-conference-join {
+    flex: 0 0 auto;
+    text-decoration: none;
+  }
+
+  /* Done and Join share one size so the row doesn't shift between them. */
+  .df-event-conference-done,
+  .df-event-conference-join {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
   }
 
   .df-event-repeat-editor {
@@ -577,6 +841,11 @@
 
   .df-event-detail-panel {
     position: fixed;
+    box-sizing: border-box;
+    width: min(25rem, calc(100vw - 16px));
+    max-width: min(25rem, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+    overflow: hidden;
     border-width: 1px;
     border-style: solid;
     border-radius: 0.5rem;
@@ -585,20 +854,41 @@
       0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
+  .df-event-detail-panel .df-form-textarea,
+  .df-dialog-container .df-form-textarea {
+    box-sizing: border-box;
+    resize: vertical;
+    overflow-y: auto;
+  }
+
   /* ===================================================================
    * Dialog container (centered modal content box)
    * =================================================================== */
 
   .df-dialog-container {
     position: relative;
+    box-sizing: border-box;
+    max-height: calc(100dvh - 16px);
+    overflow: hidden;
     border-width: 1px;
     border-style: solid;
     border-radius: 0.5rem;
     padding: 1.5rem;
-    max-width: 28rem;
-    width: 100%;
+    max-width: 25rem;
+    width: min(25rem, calc(100vw - 32px));
     margin-inline: 1rem;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  }
+
+  /* Set once on open by EventNotesField when the notes would wrap or scroll. */
+  .df-event-detail-panel[data-notes-wide='true'] {
+    width: min(calc(25rem + 30px), calc(100vw - 16px));
+    max-width: min(calc(25rem + 30px), calc(100vw - 16px));
+  }
+
+  .df-dialog-container[data-notes-wide='true'] {
+    max-width: calc(25rem + 30px);
+    width: min(calc(25rem + 30px), calc(100vw - 32px));
   }
 
   /* Close button icon sizing */
@@ -660,5 +950,52 @@
   .df-default-color-picker {
     display: flex;
     justify-content: center;
+  }
+
+  /* Event / Task switch */
+  .df-kind-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.125rem;
+    margin-bottom: 0.75rem;
+    padding: 0.125rem;
+    border-radius: 0.5rem;
+    background-color: var(--df-color-muted);
+  }
+
+  .df-kind-switch-option {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--df-color-muted-foreground);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    cursor: pointer;
+  }
+
+  .df-kind-switch-option[data-active='true'] {
+    background-color: var(--df-color-card);
+    color: var(--df-color-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+  }
+
+  .df-kind-switch-option:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .df-kind-switch-option:focus-visible {
+    outline: 2px solid var(--df-color-ring);
+    outline-offset: -2px;
+  }
+
+  .df-mobile-event-drawer-body > .df-kind-switch {
+    margin-bottom: 0;
+  }
+
+  .df-task-priority-field {
+    margin-bottom: 1rem;
   }
 }

@@ -16,7 +16,7 @@ import type { FakeApp } from '@test-kit';
  * `test-kit`); the slot plumbing is Vue-specific.
  */
 import { mount } from '@vue/test-utils';
-import { h, nextTick } from 'vue';
+import { defineComponent, h, nextTick } from 'vue';
 
 import { DayFlowCalendar } from '../DayFlowCalendar';
 
@@ -107,6 +107,69 @@ describe('DayFlowCalendar (Vue) — mount', () => {
     });
 
     expect((app as FakeApp).overrides).toEqual(['titleBarSlot']);
+    wrapper.unmount();
+  });
+});
+
+describe('DayFlowCalendar (Vue) — conditional slots', () => {
+  const Host = defineComponent({
+    props: {
+      calendar: { type: Object, required: true },
+      withHeader: { type: Boolean, default: false },
+    },
+    setup(props) {
+      return () =>
+        h(
+          DayFlowCalendar,
+          { calendar: props.calendar as never },
+          {
+            titleBarSlot: titleSlot,
+            ...(props.withHeader
+              ? { calendarHeader: () => h('span', 'the header') }
+              : {}),
+          }
+        );
+    },
+  });
+
+  it('adds an override when a slot appears after mount', async () => {
+    const app = createFakeApp();
+    const wrapper = mount(Host, { props: { calendar: app } });
+
+    await wrapper.setProps({ withHeader: true });
+
+    expect((app as FakeApp).overrides).toEqual([
+      'titleBarSlot',
+      'calendarHeader',
+    ]);
+    wrapper.unmount();
+  });
+
+  it('drops an override when its slot goes away', async () => {
+    const app = createFakeApp();
+    const wrapper = mount(Host, {
+      props: { calendar: app, withHeader: true },
+    });
+
+    await wrapper.setProps({ withHeader: false });
+
+    expect((app as FakeApp).overrides).toEqual(['titleBarSlot']);
+    wrapper.unmount();
+  });
+
+  it('leaves the overrides alone when the slot set is unchanged', async () => {
+    const app = createFakeApp();
+    const wrapper = mount(DayFlowCalendar, {
+      props: { calendar: app as never, collapsedSafeAreaLeft: 10 },
+      slots: { titleBarSlot: titleSlot },
+    });
+    const before = lifecycleLog.filter(e => e.type === 'setOverrides').length;
+
+    await wrapper.setProps({ collapsedSafeAreaLeft: 24 });
+
+    expect(lifecycleLog.filter(e => e.type === 'setOverrides')).toHaveLength(
+      before
+    );
     wrapper.unmount();
   });
 });

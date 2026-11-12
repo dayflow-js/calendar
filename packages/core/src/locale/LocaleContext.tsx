@@ -1,9 +1,12 @@
 import { createContext } from 'preact';
 
+import type { CalendarSystem } from '@/calendar/calendarSystem';
+
 import type { LocaleCode, TranslationKey } from './types';
 
 export interface LocaleContextValue {
   locale: LocaleCode;
+  calendarSystem?: CalendarSystem;
   t: (key: TranslationKey, vars?: Record<string, string>) => string;
   getWeekDaysLabels: (
     locale: string,
@@ -17,7 +20,7 @@ export interface LocaleContextValue {
   isDefault?: boolean;
 }
 
-export const LocaleContext = createContext<LocaleContextValue>({
+export const LocaleContext = /* @__PURE__ */ createContext<LocaleContextValue>({
   locale: 'en-US',
   t: key => key,
   getWeekDaysLabels: () => [],

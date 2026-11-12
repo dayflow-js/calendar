@@ -4,10 +4,11 @@ import {
   lightnessToSliderValue,
 } from '@dayflow/blossom-color-picker';
 import { createPortal } from 'preact/compat';
-import { useState, useMemo } from 'preact/hooks';
+import { useState, useMemo, useRef } from 'preact/hooks';
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { getCalendarColorsForHex } from '@/core/calendarRegistry';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CalendarType, CreateCalendarDialogProps } from '@/types';
@@ -161,12 +162,22 @@ export const CreateCalendarDialog = ({
     },
   };
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape dismisses the custom colour picker first, then the dialog.
+  useDialogFocus(dialogRef, {
+    onClose: showPicker ? handleCancel : isLoading ? undefined : onClose,
+  });
+
   if (typeof window === 'undefined') return null;
 
   return createPortal(
     <div className='df-portal df-create-calendar-dialog-backdrop'>
       <div
+        ref={dialogRef}
         className='df-animate-in df-fade-in df-zoom-in-95 df-create-calendar-dialog-panel'
+        role='dialog'
+        aria-modal='true'
+        aria-label={t('createCalendar')}
         onClick={e => e.stopPropagation()}
       >
         <h2
@@ -260,7 +271,7 @@ export const CreateCalendarDialog = ({
                                   onClick={handleAccept}
                                   className='df-fill-primary df-btn-sm'
                                 >
-                                  OK
+                                  {t('ok')}
                                 </button>
                               </div>
                             </div>

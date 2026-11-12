@@ -14,13 +14,14 @@ Day Flow 支持五种不同的视图类型，每种类型都针对不同的用�
 
 #### 配置
 
-| 属性                  | 类型             | 默认值      | 描述                               |
-| :-------------------- | :--------------- | :---------- | :--------------------------------- |
-| `showAllDay`          | `boolean`        | `true`      | 是否显示全天事件行。               |
-| `scrollToCurrentTime` | `boolean`        | `true`      | 初始加载时是否自动滚动到当前时间。 |
-| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 时间轴的时间格式。                 |
-| `secondaryTimeZone`   | `string`         | `undefined` | 仅在日视图中显示的辅助参考时间轴。 |
-| `hourHeight`          | `number`         | `72`        | 时间网格中每小时行的高度（px）。   |
+| 属性                  | 类型             | 默认值      | 描述                                             |
+| :-------------------- | :--------------- | :---------- | :----------------------------------------------- |
+| `showAllDay`          | `boolean`        | `true`      | 是否显示全天事件行。                             |
+| `scrollToCurrentTime` | `boolean`        | `true`      | 初始加载时是否自动滚动到当前时间。               |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | 时间轴的时间格式。                               |
+| `secondaryTimeZone`   | `string`         | `undefined` | 仅在日视图中显示的辅助参考时间轴。               |
+| `hourHeight`          | `number`         | `72`        | 时间网格中每小时行的高度（px）。                 |
+| `showHalfHourLines`   | `boolean`        | `false`     | 是否在时间网格中每小时的 30 分钟处显示虚线分隔。 |
 
 <FrameworkTabs>
   <Tab>
@@ -123,6 +124,7 @@ Day Flow 支持五种不同的视图类型，每种类型都针对不同的用�
 | `gridDateClick`       | `'day-view' \| 'none' \| function`                   | `undefined`      | 点击日期单元格时的操作。                                                                              |
 | `gridDateDoubleClick` | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | 双击日期单元格时的操作。`'create-event'` (默认) 会在点击的位置 (小时) 创建一个 1 小时的 Timed Event。 |
 | `hourHeight`          | `number`                                             | `72`             | 时间网格中每小时行的高度（px）。                                                                      |
+| `showHalfHourLines`   | `boolean`                                            | `false`          | 是否在时间网格中每小时的 30 分钟处显示虚线分隔。                                                      |
 
 <FrameworkTabs>
   <Tab>

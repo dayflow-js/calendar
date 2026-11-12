@@ -120,21 +120,40 @@ Install the plugin package:
 
 ## Configuration
 
-| Property                     | Type                                                   | Default                            | Description                                     |
-| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :---------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`                          | Width of the sidebar (e.g. `280` or `'20rem'`)  |
-| `miniWidth`                  | `string`                                               | `'50px'`                           | Width of the sidebar when collapsed             |
-| `initialCollapsed`           | `boolean`                                              | `false`                            | Whether the sidebar starts collapsed            |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | How the "create calendar" form is displayed     |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | Which color picker component to use             |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | Callback triggered after a new subscription     |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | Custom loader for existing subscriptions        |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | Callback triggered after calendar reordering    |
-| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | Display order of sidebar components             |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | Full override for the sidebar UI                |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | Custom sidebar header renderer                  |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | Custom context menu renderer for calendar items |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | Custom create-calendar dialog renderer          |
+| Property                     | Type                                                           | Default                            | Description                                     |
+| :--------------------------- | :------------------------------------------------------------- | :--------------------------------- | :---------------------------------------------- |
+| `width`                      | `number \| string`                                             | `'240px'`                          | Width of the sidebar (e.g. `280` or `'20rem'`)  |
+| `miniWidth`                  | `string`                                                       | `'50px'`                           | Width of the sidebar when collapsed             |
+| `initialCollapsed`           | `boolean`                                                      | `false`                            | Whether the sidebar starts collapsed            |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                          | `'inline'`                         | How the "create calendar" form is displayed     |
+| `colorPickerMode`            | `'blossom' \| 'default'`                                       | `'default'`                        | Which color picker component to use             |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                          | `undefined`                        | Callback triggered after a new subscription     |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                                  | `undefined`                        | Custom loader for existing subscriptions        |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>`         | `undefined`                        | Callback triggered after calendar reordering    |
+| `groups`                     | `string[]`                                                     | `[]`                               | Restores persisted group names and order        |
+| `onGroupCreate`              | `(groupName: string) => void \| Promise<void>`                 | `undefined`                        | Callback invoked when creating a group          |
+| `onGroupRename`              | `(previousName, nextName, calendars) => void \| Promise<void>` | `undefined`                        | Callback invoked when renaming a group          |
+| `onGroupDelete`              | `(groupName, calendars) => void \| Promise<void>`              | `undefined`                        | Callback invoked when deleting a group          |
+| `onGroupReorder`             | `(groups: string[]) => void \| Promise<void>`                  | `undefined`                        | Callback invoked when group order changes       |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                         | `['calendarList', 'miniCalendar']` | Display order of sidebar components             |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`                 | `undefined`                        | Full override for the sidebar UI                |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`                       | `undefined`                        | Custom sidebar header renderer                  |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                                 | `undefined`                        | Custom context menu renderer for calendar items |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                             | `undefined`                        | Custom create-calendar dialog renderer          |
+
+Group callbacks are awaited before the group mutation is applied. If a callback rejects, the group or its order remains unchanged; mutation dialogs stay open. The `calendars` argument contains the calendars currently assigned to that group. `onGroupReorder` receives the complete ordered group-name list.
+
+```ts
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
 
 ## Programmatic API
 
@@ -182,6 +201,8 @@ Built-in features include:
 - **Create Calendar** - Add new calendars with custom name and color
 - **Rename / Recolor** - Right-click a calendar to rename or change its color
 - **Calendar Reordering** - Drag and drop calendars in the list to reorder them. Use the `onReorder` callback to persist the new order to your backend.
+- **Calendar Groups** - Right-click the sidebar to create a group, or right-click a group to rename it, delete it with confirmation, or create a calendar inside it.
+- **Group Reordering** - Drag group headers to reorder groups. Use `groups` to restore the saved order and `onGroupReorder` to persist changes.
 - **Merge Calendars** - Move all events from one calendar into another
 - **Delete Calendar** - Remove a calendar with a confirmation step (or merge first)
 - **Import / Export** - Import `.ics` files or export calendars to `.ics`
@@ -238,9 +259,7 @@ const calendar = useCalendarApp({
       },
       // Override default protections:
       readOnly: false, // Enables both UI mutations and drag-and-drop
-      colors: {
-        /* ... */
-      },
+      colors: {/* ... */},
     },
   ],
 });

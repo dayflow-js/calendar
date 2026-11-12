@@ -303,6 +303,38 @@ export const generateSampleEvents = (): Event[] => {
   // Append multi-calendar demo events
   events.push(...generateMultiCalendarEvents());
 
+  // A meeting with a conference link and rich notes for the detail panel
+  const meetingStart = Temporal.ZonedDateTime.from({
+    timeZone: DEFAULT_TIME_ZONE,
+    year: today.year,
+    month: today.month,
+    day: today.day,
+    hour: 9,
+  });
+  events.push({
+    id: 'demo-meeting',
+    title: 'Launch Review',
+    calendarId: 'team',
+    start: meetingStart,
+    end: meetingStart.add({ minutes: 45 }),
+    description:
+      '<p><strong>Agenda</strong></p><ul><li>Walk through the launch checklist</li><li>Confirm the release date</li></ul><p>Read the <a href="https://dayflow.studio">launch brief</a> before we meet.</p>',
+    conference: {
+      provider: 'google-meet',
+      joinUrl: 'https://meet.google.com/abc-defg-hij',
+    },
+  });
+  // No conference set: the Join button comes from the Zoom link in the notes
+  events.push({
+    id: 'demo-notes',
+    title: 'Customer Interview',
+    calendarId: 'marketing',
+    start: meetingStart.add({ days: 1, hours: 4 }),
+    end: meetingStart.add({ days: 1, hours: 5 }),
+    description:
+      '<p><strong>Interview guide</strong></p><ol><li>How do you plan your week?</li><li>Where do tasks fall through the cracks?</li></ol><p>Join on Zoom: https://zoom.us/j/81234567890</p>',
+  });
+
   // Annual events for Year View demonstration
   const currentYear = today.year;
   const annualEvents = [
@@ -564,3 +596,37 @@ export const generateMinimalSampleEvents = (): Event[] => {
 
   return events;
 };
+
+/** Due-today examples make tasks easy to find in every demo view. */
+export function generateSampleTasks(): Event[] {
+  const today = Temporal.Now.plainDateISO();
+  const timeZone = Temporal.Now.timeZoneId();
+  return [
+    { title: 'Send launch checklist', priority: 'high', hour: null },
+    { title: 'Review design feedback', priority: 'medium', hour: 11 },
+    { title: 'Organize research notes', priority: 'low', hour: 15 },
+  ].map(({ title, priority, hour }, index) => {
+    const due =
+      hour === null
+        ? today
+        : today.toZonedDateTime({
+            timeZone,
+            plainTime: Temporal.PlainTime.from({ hour }),
+          });
+    return {
+      id: `demo-task-${index}`,
+      title,
+      kind: 'task',
+      calendarId: 'team',
+      start: due,
+      end: due,
+      allDay: hour === null,
+      task: {
+        completed: false,
+        priority: priority as 'low' | 'medium' | 'high',
+      },
+      description:
+        'Click the circle to complete this task. Open its details to change the priority.',
+    };
+  });
+}

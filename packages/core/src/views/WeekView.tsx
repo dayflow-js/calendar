@@ -84,6 +84,7 @@ const WeekView = ({
     lastHour: configLastHour = defaultDragConfig.LAST_HOUR,
     allDayHeight: configAllDayHeight = defaultDragConfig.ALL_DAY_HEIGHT,
     showAllDay = true,
+    showHalfHourLines = false,
     timeFormat: configTimeFormat = '24h',
     secondaryTimeZone,
   } = config;
@@ -394,6 +395,7 @@ const WeekView = ({
       displayDays,
       HOUR_HEIGHT,
       FIRST_HOUR,
+      LAST_HOUR,
     }),
     [
       calendarRef,
@@ -411,6 +413,7 @@ const WeekView = ({
       displayDays,
       HOUR_HEIGHT,
       FIRST_HOUR,
+      LAST_HOUR,
     ]
   );
 
@@ -748,6 +751,7 @@ const WeekView = ({
       />
 
       <TimeGrid
+        showHalfHourLines={showHalfHourLines}
         app={app}
         timeSlots={timeSlots}
         weekDaysLabels={weekDaysLabels}

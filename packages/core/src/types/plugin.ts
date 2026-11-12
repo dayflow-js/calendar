@@ -34,13 +34,25 @@ export interface CalendarSidebarRenderProps {
   renderCreateCalendarDialog?: (props: CreateCalendarDialogProps) => TNode;
   editingCalendarId?: string | null;
   setEditingCalendarId?: (id: string | null) => void;
-  onCreateCalendar?: () => void;
+  onCreateCalendar?: (source?: string) => void;
   onSubscribeCalendar?: (
     calendar: CalendarType,
     events: Event[]
   ) => Promise<void>;
   onLoadSubscription?: (calendar: CalendarType) => Promise<void>;
   onReorder?: (calendars: CalendarType[]) => void | Promise<void>;
+  groups?: string[];
+  onGroupCreate?: (groupName: string) => void | Promise<void>;
+  onGroupRename?: (
+    previousName: string,
+    nextName: string,
+    calendars: CalendarType[]
+  ) => void | Promise<void>;
+  onGroupDelete?: (
+    groupName: string,
+    calendars: CalendarType[]
+  ) => void | Promise<void>;
+  onGroupReorder?: (groups: string[]) => void | Promise<void>;
   componentsOrder?: ('calendarList' | 'miniCalendar')[];
   groupStatus?: Record<string, { isLoading: boolean }>;
 }

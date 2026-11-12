@@ -1,5 +1,4 @@
 import { ComponentChildren } from 'preact';
-import { memo } from 'preact/compat';
 import { useState, useRef, useMemo } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
@@ -8,6 +7,7 @@ import {
   MultiDayEventSegment,
   getEventIcon,
 } from '@/components/monthView/util';
+import { useLocale } from '@/locale';
 import {
   monthEventColorBar,
   resizeHandleLeft,
@@ -30,6 +30,11 @@ import {
   getEventEndHour,
   temporalToVisualTemporal,
 } from '@/utils';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
+import {
+  getTaskPriorityBackground,
+  getTaskPriorityTextColor,
+} from '@/utils/taskUtils';
 
 interface MultiDayEventProps {
   segment: MultiDayEventSegment;
@@ -68,7 +73,8 @@ const mobileFadeStyle = {
 } as const;
 
 // Render multi-day event component
-export const MultiDayEvent = memo(
+export const MultiDayEvent = /* @__PURE__ */ memoWithDisplayName(
+  'MultiDayEvent',
   ({
     segment,
     segmentIndex,
@@ -88,6 +94,7 @@ export const MultiDayEvent = memo(
     appTimeZone,
     timeFormat = '24h',
   }: MultiDayEventProps) => {
+    const { locale, calendarSystem = 'gregorian' } = useLocale();
     const [isPressed, setIsPressed] = useState(false);
     const HORIZONTAL_MARGIN = 2; // 2px spacing on left and right
     const rowSpacing = eventHeight + 1;
@@ -380,6 +387,9 @@ export const MultiDayEvent = memo(
     return (
       <div
         className='df-month-segment-event'
+        data-kind={segment.event.kind ?? 'event'}
+        data-start-day={segment.startDayIndex}
+        data-end-day={segment.endDayIndex}
         style={{
           left: adjustedLeft,
           width: adjustedWidth,
@@ -410,6 +420,12 @@ export const MultiDayEvent = memo(
                   backgroundColor: getEventBgColor(calendarId),
                   color: getEventTextColor(calendarId),
                 }),
+          ...(segment.event.kind === 'task'
+            ? {
+                background: getTaskPriorityBackground(segment.event, isActive),
+                color: getTaskPriorityTextColor(segment.event, isActive),
+              }
+            : {}),
           cursor: isDraggable ? 'pointer' : viewable ? 'pointer' : 'default',
           // Prevent browser scroll/zoom gestures on draggable multi-day events
           // on touch screens — CSS touch-action is resolved before JS runs.
@@ -428,7 +444,7 @@ export const MultiDayEvent = memo(
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        title={`${visualEvent.title} (${formatDateConsistent(visualEvent.start)} - ${formatDateConsistent(visualEvent.end)})`}
+        title={`${visualEvent.title} (${formatDateConsistent(visualEvent.start, locale, calendarSystem)} - ${formatDateConsistent(visualEvent.end, locale, calendarSystem)})`}
       >
         {renderResizeHandle('left')}
         <div
@@ -444,7 +460,5 @@ export const MultiDayEvent = memo(
     );
   }
 );
-
-(MultiDayEvent as { displayName?: string }).displayName = 'MultiDayEvent';
 
 export default MultiDayEvent;

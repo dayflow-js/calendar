@@ -11,6 +11,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 
 import { LandingRevealEffects } from '@/components/LandingRevealEffects';
+import { LoadingImage, LoadingVideo } from '@/components/LoadingMedia';
 import { proUrl, schedulerUrl, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -131,7 +132,7 @@ function VideoFrame({
     <div
       className={`group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950 ${className}`}
     >
-      <video
+      <LoadingVideo
         aria-label={label}
         autoPlay
         className='h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.025]'
@@ -139,9 +140,8 @@ function VideoFrame({
         muted
         playsInline
         preload='metadata'
-      >
-        <source src={`${mediaPath}${src}`} type='video/mp4' />
-      </video>
+        src={`${mediaPath}${src}`}
+      />
     </div>
   );
 }
@@ -341,7 +341,7 @@ export default function HomePage() {
 
             <div className='relative'>
               <div className='group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/70 dark:border-white/10 dark:bg-slate-900 dark:shadow-black/30'>
-                <Image
+                <LoadingImage
                   src={`${mediaPath}basic.png`}
                   alt='DayFlow week calendar with multiple calendars, events, sidebar, and search'
                   width={2524}
@@ -500,7 +500,7 @@ export default function HomePage() {
                 className='group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-950'
               >
                 {'video' in card ? (
-                  <video
+                  <LoadingVideo
                     aria-label={card.alt}
                     autoPlay
                     className='aspect-[16/9] w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.025]'
@@ -508,14 +508,10 @@ export default function HomePage() {
                     muted
                     playsInline
                     preload='metadata'
-                  >
-                    <source
-                      src={`${mediaPath}${card.video}`}
-                      type='video/mp4'
-                    />
-                  </video>
+                    src={`${mediaPath}${card.video}`}
+                  />
                 ) : (
-                  <Image
+                  <LoadingImage
                     src={`${mediaPath}${card.image}`}
                     alt={card.alt}
                     width={2618}

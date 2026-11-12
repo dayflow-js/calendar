@@ -1,3 +1,4 @@
+import { createEventConference } from '@dayflow/core';
 import type { Event } from '@dayflow/core';
 import type { GoogleCalendarEvent } from '@google-sync/types/api';
 import { Temporal } from 'temporal-polyfill';
@@ -108,6 +109,27 @@ export function mapGoogleEventToDayFlow(
       ...event.meta,
       location: googleEvent.location,
     };
+  }
+
+  const videoEntryPoint = googleEvent.conferenceData?.entryPoints?.find(
+    entryPoint => entryPoint.entryPointType === 'video'
+  );
+  const joinUrl = videoEntryPoint?.uri ?? googleEvent.hangoutLink;
+  if (joinUrl) {
+    const conference = createEventConference(joinUrl);
+    if (conference) {
+      event.conference = {
+        ...conference,
+        ...(videoEntryPoint?.meetingCode
+          ? { meetingId: videoEntryPoint.meetingCode }
+          : {}),
+        ...(videoEntryPoint?.password || videoEntryPoint?.passcode
+          ? {
+              password: videoEntryPoint.password ?? videoEntryPoint.passcode,
+            }
+          : {}),
+      };
+    }
   }
 
   return event;

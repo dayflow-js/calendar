@@ -120,21 +120,40 @@ import { SidebarCustomShowcase } from '@/components/showcase/SidebarShowcases';
 
 ## 설정
 
-| 속성                         | 타입                                                   | 기본값                             | 설명                                             |
-| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :----------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`                          | 사이드바의 너비입니다(예: `280` 또는 `'20rem'`)  |
-| `miniWidth`                  | `string`                                               | `'50px'`                           | 사이드바가 접혔을 때의 너비입니다                |
-| `initialCollapsed`           | `boolean`                                              | `false`                            | 사이드바를 접힌 상태로 시작할지 여부입니다       |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | 캘린더 생성 폼을 어떤 방식으로 표시할지 정합니다 |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | 사용할 색상 선택기 컴포넌트입니다                |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | 새 구독이 만들어진 뒤 호출되는 콜백입니다        |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | 기존 구독을 불러오는 사용자 정의 로더입니다      |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | 캘린더 순서를 바꾼 뒤 호출되는 콜백입니다        |
-| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | 사이드바 구성 요소의 표시 순서입니다             |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | 사이드바 UI 전체를 대체합니다                    |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | 사이드바 헤더를 직접 렌더링합니다                |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | 캘린더 항목의 컨텍스트 메뉴를 직접 렌더링합니다  |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | 캘린더 생성 대화상자를 직접 렌더링합니다         |
+| 속성                         | 타입                                                           | 기본값                             | 설명                                             |
+| :--------------------------- | :------------------------------------------------------------- | :--------------------------------- | :----------------------------------------------- |
+| `width`                      | `number \| string`                                             | `'240px'`                          | 사이드바의 너비입니다(예: `280` 또는 `'20rem'`)  |
+| `miniWidth`                  | `string`                                                       | `'50px'`                           | 사이드바가 접혔을 때의 너비입니다                |
+| `initialCollapsed`           | `boolean`                                                      | `false`                            | 사이드바를 접힌 상태로 시작할지 여부입니다       |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                          | `'inline'`                         | 캘린더 생성 폼을 어떤 방식으로 표시할지 정합니다 |
+| `colorPickerMode`            | `'blossom' \| 'default'`                                       | `'default'`                        | 사용할 색상 선택기 컴포넌트입니다                |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                          | `undefined`                        | 새 구독이 만들어진 뒤 호출되는 콜백입니다        |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                                  | `undefined`                        | 기존 구독을 불러오는 사용자 정의 로더입니다      |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>`         | `undefined`                        | 캘린더 순서를 바꾼 뒤 호출되는 콜백입니다        |
+| `groups`                     | `string[]`                                                     | `[]`                               | 저장된 그룹 이름과 순서를 복원합니다             |
+| `onGroupCreate`              | `(groupName: string) => void \| Promise<void>`                 | `undefined`                        | 그룹을 만들 때 호출되는 콜백입니다               |
+| `onGroupRename`              | `(previousName, nextName, calendars) => void \| Promise<void>` | `undefined`                        | 그룹 이름을 바꿀 때 호출되는 콜백입니다          |
+| `onGroupDelete`              | `(groupName, calendars) => void \| Promise<void>`              | `undefined`                        | 그룹을 삭제할 때 호출되는 콜백입니다             |
+| `onGroupReorder`             | `(groups: string[]) => void \| Promise<void>`                  | `undefined`                        | 그룹 순서를 바꿀 때 호출되는 콜백입니다          |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                         | `['calendarList', 'miniCalendar']` | 사이드바 구성 요소의 표시 순서입니다             |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`                 | `undefined`                        | 사이드바 UI 전체를 대체합니다                    |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`                       | `undefined`                        | 사이드바 헤더를 직접 렌더링합니다                |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                                 | `undefined`                        | 캘린더 항목의 컨텍스트 메뉴를 직접 렌더링합니다  |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                             | `undefined`                        | 캘린더 생성 대화상자를 직접 렌더링합니다         |
+
+그룹 변경은 해당 콜백이 완료된 뒤 적용됩니다. Promise가 거부되면 그룹이나 순서는 변경되지 않고 편집 대화상자도 열린 상태로 유지됩니다. `calendars` 인수에는 현재 그룹에 속한 캘린더가 포함되며, `onGroupReorder`에는 정렬된 전체 그룹 이름 목록이 전달됩니다.
+
+```ts
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
 
 ## 프로그래밍 API
 
@@ -182,6 +201,8 @@ window.addEventListener('keydown', e => {
 - **캘린더 만들기** – 원하는 이름과 색상으로 새 캘린더 추가
 - **이름·색상 변경** – 캘린더를 마우스 오른쪽 버튼으로 클릭해 이름이나 색상 변경
 - **캘린더 순서 변경** – 목록에서 캘린더를 끌어다 놓아 순서를 바꿉니다. `onReorder` 콜백으로 새 순서를 백엔드에 저장하세요.
+- **캘린더 그룹** – 사이드바를 마우스 오른쪽 버튼으로 클릭해 그룹을 만들 수 있습니다. 그룹을 마우스 오른쪽 버튼으로 클릭하면 이름 변경, 확인 후 삭제, 그룹 안에 캘린더 만들기를 할 수 있습니다.
+- **그룹 순서 변경** – 그룹 헤더를 끌어 순서를 바꿉니다. `groups`로 저장된 순서를 복원하고 `onGroupReorder`로 변경 사항을 저장하세요.
 - **캘린더 병합** – 한 캘린더의 모든 이벤트를 다른 캘린더로 옮기기
 - **캘린더 삭제** – 확인 단계를 거쳐 캘린더 삭제(또는 먼저 병합)
 - **가져오기 / 내보내기** – `.ics` 파일을 가져오거나 캘린더를 `.ics`로 내보내기
@@ -238,9 +259,7 @@ const calendar = useCalendarApp({
       },
       // Override default protections:
       readOnly: false, // Enables both UI mutations and drag-and-drop
-      colors: {
-        /* ... */
-      },
+      colors: {/* ... */},
     },
   ],
 });

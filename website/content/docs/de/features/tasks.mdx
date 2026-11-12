@@ -1,0 +1,141 @@
+---
+title: Aufgaben
+description: Fügen Sie dem Kalender Aufgaben mit Fälligkeitsdatum, Erledigt-Status und Priorität hinzu.
+---
+
+# Aufgaben
+
+Aufgaben nutzen dasselbe `Event`-Datenmodell und dieselbe Kalenderzuordnung wie normale Termine.
+Statt einer Dauer hat eine Aufgabe ein einzelnes Fälligkeitsdatum oder eine Fälligkeitszeit.
+Der Kreis schaltet den Erledigt-Status um; der gestreifte Hintergrund und die Textfarbe zeigen die Priorität.
+
+## Erstellen von Aufgaben aktivieren
+
+Setzen Sie `enableTasks: true`, um den Umschalter „Ereignis / Aufgabe“ im eingebauten
+Desktop-Panel, im Dialog und im mobilen Editor anzuzeigen. Standard ist `false`, damit die
+bisherige Oberfläche zum Erstellen von Terminen unverändert bleibt. Vorhandene Aufgaben bleiben
+auch bei deaktivierter Option sichtbar und bearbeitbar.
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+Die Option gehört zu `CalendarAppConfig` und funktioniert mit allen Framework-Adaptern.
+So ändern Sie sie an einer bestehenden Core-Instanz:
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+Es handelt sich um eine Laufzeitoption des Editors; wenn Sie sie deaktivieren, wird der
+Aufgaben-Code nicht aus dem Bundle entfernt.
+
+## Aufgabe mit Uhrzeit oder ganztägig erstellen
+
+Verwenden Sie `kind: 'task'`. `start` und `end` müssen denselben Fälligkeitswert enthalten.
+Für eine Aufgabe ohne Uhrzeit setzen Sie `allDay: true` und verwenden `Temporal.PlainDate`.
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+Übergeben Sie diese Einträge über die Konfiguration `events`, oder verwenden Sie die normalen
+Event-APIs, um sie hinzuzufügen, zu aktualisieren oder zu löschen. Mit `calendarId` ordnen Sie
+eine Aufgabe einem bestimmten Kalender zu.
+
+| Feld               | Typ                                     | Bedeutung                                                    |
+| ------------------ | --------------------------------------- | ------------------------------------------------------------ |
+| `kind`             | `'event' \| 'task'`                     | Ohne Angabe `'event'`.                                       |
+| `task.completed`   | `boolean`                               | Standard: `false`.                                           |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | Zeitpunkt der Erledigung; wird beim Wiedereröffnen gelöscht. |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | Standard: `'none'`.                                          |
+
+## Aufgaben erledigen und Priorität ändern
+
+Klicken Sie auf den Kreis links, um eine Aufgabe zu erledigen oder wieder zu öffnen. Dabei
+öffnet sich weder das Detail-Panel, noch startet ein Ziehvorgang. Mit der Tastatur fokussieren
+Sie den Kreis und drücken die Leertaste oder Enter. Erledigte Titel werden durchgestrichen.
+
+Öffnen Sie die Details einer Aufgabe, um Titel, Fälligkeitsdatum/-zeit, Notizen oder Priorität
+zu ändern. **Als ganztägig festlegen** entfernt die Uhrzeit, **Uhrzeit hinzufügen** stellt sie
+wieder her. Aufgaben lassen sich verschieben, aber nicht in der Größe ändern.
+
+| Priorität | Hintergrund- und Textfarbe |
+| --------- | -------------------------- |
+| `none`    | Schiefergrau               |
+| `low`     | Grün                       |
+| `medium`  | Bernstein                  |
+| `high`    | Rot                        |
+
+Die Priorität füllt die gesamte Aufgabe mit diagonalen Streifen. Der Kreis nutzt die
+Kalenderfarbe und wird weiß, solange die Aufgabe ausgewählt ist. Die Priorität ändert die
+chronologische Reihenfolge nicht. In der Monatsansicht behalten ganztägige Aufgaben den Stil der
+Aufgabenzeile, ohne Zeitangabe. In der Tages- und Wochenansicht haben Aufgaben keinen farbigen
+Terminbalken.
+
+Die [interaktive Demo](/demo) enthält einen Schalter **Tasks** und einen Tooltip **Preview**, der
+das Erledigen und das Ändern der Priorität im Detail-Panel zeigt.
+
+## Programmatische Änderungen und Speicherung
+
+Änderungen an Aufgaben lösen denselben Callback `onEventUpdate` aus wie Änderungen an Terminen.
+Speichern Sie `kind` und die `task`-Metadaten zusammen mit den Termindaten in Ihrer Datenquelle.
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+Die Hilfsfunktionen geben die geänderten Werte zurück; sie speichern selbst nichts.
+Der [Nur-Lese-Modus](/docs-de/features/read-only) deaktiviert das Erledigen und Bearbeiten über
+die eingebaute UI, programmatische Änderungen funktionieren weiterhin.
+
+Generierte Vorkommen wiederkehrender Termine lassen sich nicht einzeln erledigen. Die
+Synchronisierung externer CalDAV-Aufgaben (`VTODO`) ist nicht implementiert; gehen Sie nicht
+davon aus, dass die Terminsynchronisierung aufgabenspezifische Felder erhält.

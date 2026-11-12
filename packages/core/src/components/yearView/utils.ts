@@ -1,3 +1,8 @@
+import {
+  CalendarSystem,
+  createCalendarDate,
+  dateToCalendarDate,
+} from '@/calendar/calendarSystem';
 import { Event } from '@/types';
 import {
   dateToPlainDate,
@@ -267,32 +272,40 @@ export const eventOverlapsMonth = (
   event: Event | null | undefined,
   year: number,
   monthIndex: number,
-  appTimeZone?: string
+  appTimeZone?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ) => {
   if (!event) return false;
 
-  const monthStartMs = new Date(year, monthIndex, 1).getTime();
-  const monthEndMs = new Date(
+  const monthStartMs = createCalendarDate(
     year,
-    monthIndex + 1,
-    0,
-    23,
-    59,
-    59,
-    999
+    monthIndex,
+    1,
+    calendarSystem
   ).getTime();
+  const monthEndMs =
+    createCalendarDate(year, monthIndex + 1, 1, calendarSystem).getTime() - 1;
   const range = getEventDayRange(event, appTimeZone);
   return range.startMs <= monthEndMs && range.endMsEod >= monthStartMs;
 };
 
 export const getFixedWeekTotalColumns = (
   currentYear: number,
-  startOfWeek: number
+  startOfWeek: number,
+  calendarSystem: CalendarSystem = 'gregorian'
 ) => {
   let maxSlots = 0;
   for (let month = 0; month < 12; month++) {
-    const monthStart = new Date(currentYear, month, 1);
-    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+    const monthStart = createCalendarDate(
+      currentYear,
+      month,
+      1,
+      calendarSystem
+    );
+    const daysInMonth = dateToCalendarDate(
+      createCalendarDate(currentYear, month + 1, 0, calendarSystem),
+      calendarSystem
+    ).day;
     const monthStartDay = monthStart.getDay();
     const padding = (monthStartDay - startOfWeek + 7) % 7;
     const slots = padding + daysInMonth;
@@ -380,24 +393,17 @@ export const createPreviewMonthSegment = (
   monthIndex: number,
   year: number,
   startOfWeek: number = 1,
-  appTimeZone?: string
+  appTimeZone?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): MonthEventSegment | null => {
   if (!event) return null;
 
-  const monthStart = new Date(year, monthIndex, 1);
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const monthStart = createCalendarDate(year, monthIndex, 1, calendarSystem);
   const monthStartDay = monthStart.getDay();
   const paddingStart = (monthStartDay - startOfWeek + 7) % 7;
   const monthStartMs = monthStart.getTime();
-  const monthEndMs = new Date(
-    year,
-    monthIndex,
-    daysInMonth,
-    23,
-    59,
-    59,
-    999
-  ).getTime();
+  const monthEndMs =
+    createCalendarDate(year, monthIndex + 1, 1, calendarSystem).getTime() - 1;
 
   const range = getEventDayRange(event, appTimeZone);
 
@@ -411,10 +417,14 @@ export const createPreviewMonthSegment = (
   return {
     id: `${event.id}::preview-month-${monthIndex}`,
     event,
-    startCellIndex: paddingStart + (new Date(clampedStartMs).getDate() - 1),
-    endCellIndex: paddingStart + (new Date(clampedEndMs).getDate() - 1),
-    isFirstSegment: range.startMonth === monthIndex && range.startYear === year,
-    isLastSegment: range.endMonth === monthIndex && range.endYear === year,
+    startCellIndex:
+      paddingStart +
+      (dateToCalendarDate(new Date(clampedStartMs), calendarSystem).day - 1),
+    endCellIndex:
+      paddingStart +
+      (dateToCalendarDate(new Date(clampedEndMs), calendarSystem).day - 1),
+    isFirstSegment: range.startMs >= monthStartMs,
+    isLastSegment: range.endMs <= monthEndMs,
     visualRowIndex: 0,
     monthIndex,
   };
@@ -425,23 +435,16 @@ export function analyzeEventsForMonth(
   monthIndex: number,
   year: number,
   startOfWeek: number = 1,
-  appTimeZone?: string
+  appTimeZone?: string,
+  calendarSystem: CalendarSystem = 'gregorian'
 ): { segments: MonthEventSegment[]; maxVisualRow: number } {
-  const monthStart = new Date(year, monthIndex, 1);
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const monthStart = createCalendarDate(year, monthIndex, 1, calendarSystem);
   const monthStartDay = monthStart.getDay();
   const paddingStart = (monthStartDay - startOfWeek + 7) % 7;
 
   const monthStartMs = monthStart.getTime();
-  const monthEndMs = new Date(
-    year,
-    monthIndex,
-    daysInMonth,
-    23,
-    59,
-    59,
-    999
-  ).getTime();
+  const monthEndMs =
+    createCalendarDate(year, monthIndex + 1, 1, calendarSystem).getTime() - 1;
 
   const monthEventsWithDates: Array<{
     event: Event;
@@ -486,16 +489,20 @@ export function analyzeEventsForMonth(
     const clampedStartMs = Math.max(startMs, monthStartMs);
     const clampedEndMs = Math.min(endMs, monthEndMs);
 
-    const startDay = new Date(clampedStartMs).getDate();
-    const endDay = new Date(clampedEndMs).getDate();
+    const startDay = dateToCalendarDate(
+      new Date(clampedStartMs),
+      calendarSystem
+    ).day;
+    const endDay = dateToCalendarDate(
+      new Date(clampedEndMs),
+      calendarSystem
+    ).day;
 
     const startCellIndex = paddingStart + (startDay - 1);
     const endCellIndex = paddingStart + (endDay - 1);
 
-    const isFirstSegment =
-      range.startMonth === monthIndex && range.startYear === year;
-    const isLastSegment =
-      range.endMonth === monthIndex && range.endYear === year;
+    const isFirstSegment = range.startMs >= monthStartMs;
+    const isLastSegment = range.endMs <= monthEndMs;
 
     let visualRowIndex = 0;
     while (true) {
@@ -568,15 +575,17 @@ export const buildFixedWeekMonthsData = ({
   yearEvents,
   startOfWeek,
   appTimeZone,
+  calendarSystem = 'gregorian',
 }: {
   currentYear: number;
   locale: string;
   totalColumns: number;
   yearEvents: Event[];
+  calendarSystem?: CalendarSystem;
   startOfWeek: number;
   appTimeZone?: string;
 }): FixedWeekMonthData[] => {
-  const contextKey = `${currentYear}|${startOfWeek}|${totalColumns}|${appTimeZone ?? ''}`;
+  const contextKey = `${calendarSystem}|${currentYear}|${startOfWeek}|${totalColumns}|${appTimeZone ?? ''}`;
   if (!monthSegmentCache || monthSegmentCache.contextKey !== contextKey) {
     monthSegmentCache = { contextKey, perMonth: new Map() };
   }
@@ -586,8 +595,14 @@ export const buildFixedWeekMonthsData = ({
   const monthStartMs: number[] = Array.from({ length: 12 });
   const monthEndMs: number[] = Array.from({ length: 12 });
   for (let m = 0; m < 12; m++) {
-    monthStartMs[m] = new Date(currentYear, m, 1).getTime();
-    monthEndMs[m] = new Date(currentYear, m + 1, 0, 23, 59, 59, 999).getTime();
+    monthStartMs[m] = createCalendarDate(
+      currentYear,
+      m,
+      1,
+      calendarSystem
+    ).getTime();
+    monthEndMs[m] =
+      createCalendarDate(currentYear, m + 1, 1, calendarSystem).getTime() - 1;
   }
 
   // Single O(N) pass: bucket events into the months they overlap
@@ -608,8 +623,16 @@ export const buildFixedWeekMonthsData = ({
   const data: FixedWeekMonthData[] = [];
 
   for (let month = 0; month < 12; month++) {
-    const monthStart = new Date(currentYear, month, 1);
-    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+    const monthStart = createCalendarDate(
+      currentYear,
+      month,
+      1,
+      calendarSystem
+    );
+    const daysInMonth = dateToCalendarDate(
+      createCalendarDate(currentYear, month + 1, 0, calendarSystem),
+      calendarSystem
+    ).day;
     const monthStartDay = monthStart.getDay();
     const paddingStart = (monthStartDay - startOfWeek + 7) % 7;
 
@@ -620,7 +643,7 @@ export const buildFixedWeekMonthsData = ({
     }
 
     for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(currentYear, month, i));
+      days.push(createCalendarDate(currentYear, month, i, calendarSystem));
     }
 
     while (days.length < totalColumns) {
@@ -648,7 +671,8 @@ export const buildFixedWeekMonthsData = ({
         month,
         currentYear,
         startOfWeek,
-        appTimeZone
+        appTimeZone,
+        calendarSystem
       );
       segCache.set(month, { sources: monthEvents, result: analysisResult });
     }
@@ -680,10 +704,12 @@ export const buildEffectiveFixedWeekMonthsData = ({
   currentYear,
   startOfWeek,
   appTimeZone,
+  calendarSystem = 'gregorian',
 }: {
   monthsData: FixedWeekMonthData[];
   dragPreviewEvent: Event | null;
   isMovePreviewActive: boolean;
+  calendarSystem?: CalendarSystem;
   currentYear: number;
   startOfWeek: number;
   appTimeZone?: string;
@@ -700,7 +726,8 @@ export const buildEffectiveFixedWeekMonthsData = ({
           dragPreviewEvent,
           currentYear,
           month.monthIndex,
-          appTimeZone
+          appTimeZone,
+          calendarSystem
         ));
 
     if (!monthIsAffectedByPreview) {
@@ -717,7 +744,8 @@ export const buildEffectiveFixedWeekMonthsData = ({
         dragPreviewEvent,
         currentYear,
         month.monthIndex,
-        appTimeZone
+        appTimeZone,
+        calendarSystem
       )
     ) {
       adjustedEvents.push(dragPreviewEvent);
@@ -728,7 +756,8 @@ export const buildEffectiveFixedWeekMonthsData = ({
       month.monthIndex,
       currentYear,
       startOfWeek,
-      appTimeZone
+      appTimeZone,
+      calendarSystem
     );
 
     return {

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
-import { maxVersion } from './semver-lite.mjs';
+import { isExactPin, maxVersion, satisfies } from './semver-lite.mjs';
 
 export const ROOT = path.resolve(fileURLToPath(import.meta.url), '../../..');
 
@@ -176,6 +176,78 @@ function walk(dir, acc = []) {
  * Bare module specifiers the built output actually imports at runtime.
  * Returns null when the package has not been built yet.
  */
+const DECLARATION_FILE = /\.d\.(m|c)?ts$/;
+
+function walkFiles(dir, acc = []) {
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const e of entries) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      if (e.name !== 'node_modules') walkFiles(p, acc);
+    } else acc.push(p);
+  }
+  return acc;
+}
+
+/**
+ * Bare specifiers the published declaration files reference.
+ *
+ * Kept separate from readDistImports because the two ship to different
+ * consumers: the JS bundle can inline a package whose types it still re-exports,
+ * and then only the declarations reach for it. @dayflow/core did exactly that in
+ * 3.7.1: its bundle inlined the ui-* packages, they were moved to
+ * devDependencies, and every consumer's TypeScript lost ContextMenu,
+ * DayflowRangePicker and RangePickerProps. Returns null when nothing is built.
+ */
+export function readDistTypeImports(pkg) {
+  const roots = [
+    pkg.name === '@dayflow/angular'
+      ? pkg.absPublishDir
+      : path.join(pkg.absDir, 'dist'),
+  ];
+  // A "types" entry that lives outside dist/ (the Svelte adapter) ships too.
+  for (const entry of [pkg.manifest.types, pkg.manifest.typings]) {
+    if (entry && !entry.startsWith('dist/') && !entry.startsWith('./dist/')) {
+      roots.push(path.join(pkg.absPublishDir, entry));
+    }
+  }
+
+  const files = roots
+    .flatMap(r => {
+      if (!fs.existsSync(r)) return [];
+      return fs.statSync(r).isDirectory() ? walkFiles(r) : [r];
+    })
+    .filter(f => DECLARATION_FILE.test(f));
+  if (files.length === 0) return null;
+
+  const specs = new Set();
+  const patterns = [
+    /\bfrom\s*["']([^"']+)["']/g,
+    /\bimport\s*["']([^"']+)["']/g,
+    /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g,
+    /<reference\s+types\s*=\s*["']([^"']+)["']/g,
+  ];
+  for (const file of files) {
+    const src = fs.readFileSync(file, 'utf8');
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(src)) !== null) {
+        const spec = m[1];
+        if (/^[./#]/.test(spec) || /^(data|https?):/.test(spec)) continue;
+        if (spec.endsWith('.css')) continue;
+        specs.add(spec);
+      }
+    }
+  }
+  return specs;
+}
+
 export function readDistImports(pkg) {
   const distDir =
     pkg.name === '@dayflow/angular'
@@ -608,17 +680,19 @@ function packageDirsTouched(sha) {
 }
 
 /**
- * Recent first-parent history, annotated with the packages each commit touches.
+ * Recent history, annotated with the packages each commit touches.
  * That annotation is what makes a commit list usable for deciding where to cut
  * a release — a subject line alone does not say what shipped.
  */
 export function recentCommits(limit = 20) {
+  // Deliberately not --first-parent. Work lands here through PR merges, so a
+  // first-parent walk hides every commit that describes what changed and
+  // leaves a list of "Merge pull request #NNN" rows you cannot choose between.
   const raw = git(
     [
       'log',
-      '--first-parent',
       `-n${limit}`,
-      `--format=%H${FIELD_SEP}%h${FIELD_SEP}%ad${FIELD_SEP}%s`,
+      `--format=%H${FIELD_SEP}%h${FIELD_SEP}%ad${FIELD_SEP}%s${FIELD_SEP}%P`,
       '--date=short',
     ],
     { allowFail: true }
@@ -627,15 +701,27 @@ export function recentCommits(limit = 20) {
     .split('\n')
     .filter(Boolean)
     .map(line => {
-      const [sha, short, date, subject] = line.split(FIELD_SEP);
+      const [sha, short, date, subject, parents] = line.split(FIELD_SEP);
       return {
         sha,
         short,
         date,
         subject,
+        isMerge: (parents ?? '').trim().split(/\s+/).filter(Boolean).length > 1,
         packageDirs: packageDirsTouched(sha),
       };
     });
+}
+
+/**
+ * Commit a release tag points at, so the picker can show where the previous
+ * release ended and which commits are still unreleased.
+ */
+export function latestReleaseTagCommit() {
+  const tag = latestReleaseTag();
+  if (!tag) return null;
+  const sha = resolveRef(tag);
+  return sha ? { tag, sha } : null;
 }
 
 /** Commits between two refs that touch a package's shipping source. */
@@ -717,49 +803,97 @@ export function dependencyDrift(pkg, packages) {
   const info = npmInfo(pkg.name);
   if (!info) return []; // never published: nothing to drift from
 
-  // ng-packagr injects deps (tslib) into the dist manifest that the source
-  // manifest never declares, so compare against the manifest we actually
-  // publish when the two differ.
+  // When a build tool generates the published manifest (ng-packagr injects
+  // tslib), deps it adds are not "removed" just because the authored manifest
+  // lacks them. Without that generated file we cannot tell, so skip removals.
   const generated = pkg.absPublishDir !== pkg.absDir;
-  const publishManifestPath = path.join(pkg.absPublishDir, 'package.json');
-  const haveGenerated = generated && fs.existsSync(publishManifestPath);
-  const source = haveGenerated
-    ? JSON.parse(fs.readFileSync(publishManifestPath, 'utf8'))
-    : pkg.manifest;
+  const generatedPath = path.join(pkg.absPublishDir, 'package.json');
+  const shippedManifest =
+    generated && fs.existsSync(generatedPath)
+      ? JSON.parse(fs.readFileSync(generatedPath, 'utf8'))
+      : null;
 
-  const versions = new Map(packages.map(p => [p.name, p.version]));
+  const localVersions = new Map(packages.map(dep => [dep.name, dep.version]));
   const catalog = loadCatalog();
   const drift = [];
 
   for (const section of DRIFT_SECTIONS) {
-    const local = source[section] ?? {};
+    const authored = pkg.manifest[section] ?? {};
+    const shipped = shippedManifest?.[section] ?? {};
     const published = info[section] ?? {};
 
-    for (const [dep, range] of Object.entries(local)) {
-      const resolved = resolvePublishRange(
+    for (const [dep, range] of Object.entries(authored)) {
+      const onNpm = published[dep];
+      const willPublish = resolvePublishRange(
         range,
         dep,
-        versions.get(dep),
+        localVersions.get(dep),
         catalog
       );
-      if (resolved === null) continue; // unresolvable, do not guess
-      if (published[dep] !== resolved) {
+
+      if (String(range).startsWith('workspace:')) {
+        const depVersion = latestPublished(dep) ?? localVersions.get(dep);
+        if (!workspaceRangeHolds(range, onNpm, depVersion)) {
+          drift.push({
+            section,
+            dep,
+            from: onNpm ?? '(absent)',
+            to: willPublish ?? range,
+          });
+        }
+        continue;
+      }
+
+      if (willPublish === null) continue; // unresolvable, do not guess
+      if (onNpm !== willPublish) {
         drift.push({
           section,
           dep,
-          from: published[dep] ?? '(absent)',
-          to: resolved,
+          from: onNpm ?? '(absent)',
+          to: willPublish,
         });
       }
     }
-    // Without the generated manifest we cannot tell a genuine removal from a
-    // dependency the build tool adds, so only report removals we can trust.
-    if (generated && !haveGenerated) continue;
+
+    if (generated && !shippedManifest) continue;
     for (const dep of Object.keys(published)) {
-      if (!(dep in local)) {
+      if (!(dep in authored) && !(dep in shipped)) {
         drift.push({ section, dep, from: published[dep], to: '(removed)' });
       }
     }
   }
   return drift;
+}
+
+/**
+ * Does a published range still honour a floating `workspace:` spec?
+ *
+ * `workspace:^` publishes as `^<dependency version at that moment>`, so the
+ * literal range on npm goes stale the moment the dependency moves: a package
+ * published with `^3.7.1` is not "drifted" because core is now 3.7.2 — that is
+ * the same authored intent, and it still admits 3.7.2. Comparing literals made
+ * every untouched dependent look changed after each core release.
+ *
+ * What does count: a different shape (an exact pin where a caret is declared
+ * now — the 3.7.0 -> 3.7.1 transition), or a range that no longer admits the
+ * dependency at all (a major bump).
+ */
+export function workspaceRangeHolds(spec, publishedRange, depVersion) {
+  if (publishedRange === undefined) return false; // newly declared
+  const kind = String(spec).slice('workspace:'.length);
+  const range = String(publishedRange).trim();
+
+  let shapeHolds;
+  if (kind === '^') shapeHolds = range.startsWith('^');
+  else if (kind === '~') shapeHolds = range.startsWith('~');
+  else if (kind === '*') shapeHolds = isExactPin(range);
+  else return range === kind; // workspace:<explicit range> publishes verbatim
+
+  if (!shapeHolds) return false;
+  if (!depVersion) return true;
+  try {
+    return satisfies(depVersion, range);
+  } catch {
+    return true; // a range we cannot model: do not invent drift
+  }
 }

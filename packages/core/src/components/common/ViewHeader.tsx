@@ -1,10 +1,12 @@
 import type { ComponentChild } from 'preact';
 
 import { useLocale } from '@/locale';
+import { formatDateLabel } from '@/locale/intl';
 import { headerTitle, headerSubtitle } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
 
 import TodayBox from './TodayBox';
+import type { NavigationUnit } from './TodayBox';
 
 export type ViewHeaderType = 'day' | 'week' | 'month' | 'year';
 export type ViewSwitcherMode = 'buttons' | 'select';
@@ -29,6 +31,8 @@ interface ViewHeaderProps {
   subtitleMeta?: ComponentChild;
   /** Whether to show TodayBox (default determined by viewType: day=false, week/month=true) */
   showTodayBox?: boolean;
+  /** Unit the previous/next arrows move by, used for their accessible names (defaults to viewType) */
+  navigationUnit?: NavigationUnit;
   /** Sticky year for Year view (optional, only for Year view) */
   stickyYear?: number | null;
   /** Push-away offset for sticky year (in pixels) */
@@ -40,6 +44,7 @@ interface ViewHeaderProps {
 }
 
 const ViewHeader = ({
+  calendar,
   viewType,
   currentDate,
   onPrevious,
@@ -49,30 +54,32 @@ const ViewHeader = ({
   customSubtitle,
   subtitleMeta,
   showTodayBox,
+  navigationUnit,
   stickyYear,
   stickyYearOffset = 0,
   nextYear,
   nextYearOffset = 0,
 }: ViewHeaderProps) => {
   const { locale } = useLocale();
+  if (calendar.state.useViewHeader === false) return null;
   const shouldShowTodayBox = showTodayBox === undefined ? true : showTodayBox;
 
   const getDefaultTitle = (): string => {
     switch (viewType) {
       case 'day':
-        return currentDate.toLocaleDateString(locale, {
+        return formatDateLabel(currentDate, locale, {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
         });
       case 'week':
       case 'month':
-        return currentDate.toLocaleDateString(locale, {
+        return formatDateLabel(currentDate, locale, {
           month: 'long',
           year: 'numeric',
         });
       case 'year':
-        return currentDate.getFullYear().toString();
+        return formatDateLabel(currentDate, locale, { year: 'numeric' });
       default:
         return '';
     }
@@ -142,6 +149,7 @@ const ViewHeader = ({
             handlePreviousMonth={onPrevious}
             handleNextMonth={onNext}
             handleToday={onToday}
+            navigationUnit={navigationUnit ?? viewType}
           />
         </div>
       )}

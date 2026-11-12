@@ -4,11 +4,14 @@ import { useMemo, useState, useEffect, useRef } from 'preact/hooks';
 import { Temporal } from 'temporal-polyfill';
 
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { dialogContainer } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
 import { EventDetailDialogProps } from '@/types/eventDetail';
 import { isEventDeepEqual } from '@/utils/eventUtils';
+import { getEventConference, setEventConference } from '@/utils/meetingUtils';
+import { convertEventKind, isTask } from '@/utils/taskUtils';
 import { isPlainDate } from '@/utils/temporal';
 import {
   restoreVisualEventToCanonical,
@@ -16,8 +19,13 @@ import {
 } from '@/utils/timeUtils';
 
 import { CalendarPicker, CalendarOption } from './CalendarPicker';
+import { EventConferenceField } from './EventConferenceField';
+import { EventKindSwitch } from './EventKindSwitch';
+import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
+import { TaskPriorityField } from './TaskPriorityField';
+import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
   app?: ICalendarApp;
@@ -39,6 +47,7 @@ const DefaultEventDetailDialog = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const previousEventIdRef = useRef(event.id);
   const { t } = useLocale();
+  const rangePickerLocale = useRangePickerLocale(app?.state.locale);
 
   useEffect(() => {
     setEditedEvent(event);
@@ -56,6 +65,7 @@ const DefaultEventDetailDialog = ({
     return registry.getVisible().map(cal => ({
       label: cal.name,
       value: cal.id,
+      group: cal.source,
     }));
   }, [app, app?.getCalendars()]);
 
@@ -87,6 +97,7 @@ const DefaultEventDetailDialog = ({
     () => !isEventDeepEqual(event, editedEvent),
     [event, editedEvent]
   );
+  const isEditedTask = isTask(editedEvent);
 
   const convertToAllDay = () => {
     const plainDate = isPlainDate(editedEvent.start)
@@ -121,7 +132,12 @@ const DefaultEventDetailDialog = ({
       minute: 0,
       timeZone: tz,
     });
-    setEditedEvent({ ...editedEvent, allDay: false, start, end });
+    setEditedEvent({
+      ...editedEvent,
+      allDay: false,
+      start,
+      end: isEditedTask ? start : end,
+    });
   };
 
   const eventTimeZone = useMemo(
@@ -146,10 +162,7 @@ const DefaultEventDetailDialog = ({
   };
 
   const isEditable = app?.canMutateFromUI(event.id) ?? false;
-  const readOnlyConfig = app?.getReadOnlyConfig(event.id) as {
-    draggable: boolean;
-    viewable: boolean;
-  };
+  const readOnlyConfig = app?.getReadOnlyConfig(event.id);
   const isViewable = readOnlyConfig?.viewable !== false;
   const isPending = isSaving || isDeleting;
 
@@ -161,6 +174,12 @@ const DefaultEventDetailDialog = ({
 
   const shouldShowNotes =
     !isSubscribed || (editedEvent.description || '').trim() !== '';
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, {
+    onClose: isPending ? undefined : onClose,
+    active: isOpen && isViewable,
+  });
 
   if (!isOpen || !isViewable) return null;
 
@@ -190,15 +209,26 @@ const DefaultEventDetailDialog = ({
       />
 
       {/* Dialog */}
-      <div className={dialogContainer}>
+      <div
+        ref={dialogRef}
+        className={dialogContainer}
+        role='dialog'
+        aria-modal='true'
+        aria-label={editedEvent.title || t('editEvent')}
+      >
         <button
           type='button'
           onClick={onClose}
           disabled={isPending}
           className='df-event-dialog-close'
-          aria-label='Close'
+          aria-label={t('close')}
         >
-          <svg fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <svg
+            aria-hidden='true'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path
               strokeLinecap='round'
               strokeLinejoin='round'
@@ -209,7 +239,18 @@ const DefaultEventDetailDialog = ({
         </button>
 
         <div>
-          <span className='df-form-label'>{t('eventTitle')}</span>
+          {isEditable && (app?.getTasksEnabled?.() || isTask(editedEvent)) && (
+            <EventKindSwitch
+              value={editedEvent.kind ?? 'event'}
+              disabled={isPending}
+              onChange={kind =>
+                setEditedEvent(convertEventKind(editedEvent, kind))
+              }
+            />
+          )}
+          <span className='df-form-label'>
+            {t(isEditedTask ? 'taskTitle' : 'eventTitle')}
+          </span>
           <div className='df-form-row'>
             <div className='df-form-field'>
               <input
@@ -243,9 +284,12 @@ const DefaultEventDetailDialog = ({
 
           {editedEvent.allDay ? (
             <div className='df-event-dialog-time-row'>
-              <div className='df-form-label'>{t('dateRange')}</div>
+              <div className='df-form-label'>
+                {t(isEditedTask ? 'due' : 'dateRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
+                mode={isEditedTask ? 'single' : 'range'}
                 format='YYYY-MM-DD'
                 showTime={false}
                 timeZone={eventTimeZone}
@@ -254,14 +298,18 @@ const DefaultEventDetailDialog = ({
                 disabled={!isEditable || isPending}
                 onChange={handleAllDayRangeChange}
                 onOk={handleAllDayRangeChange}
-                locale={app?.state.locale}
+                locale={rangePickerLocale}
+                calendarSystem={app?.state.calendarSystem}
               />
             </div>
           ) : (
             <div className='df-event-dialog-time-row'>
-              <div className='df-form-label'>{t('timeRange')}</div>
+              <div className='df-form-label'>
+                {t(isEditedTask ? 'due' : 'timeRange')}
+              </div>
               <RangePicker
                 value={[editedEvent.start, editedEvent.end]}
+                mode={isEditedTask ? 'single' : 'range'}
                 timeZone={eventTimeZone}
                 startOfWeek={startOfWeek}
                 showTimeFormat={
@@ -280,7 +328,8 @@ const DefaultEventDetailDialog = ({
                   const [start, end] = nextRange;
                   setEditedEvent({ ...editedEvent, start, end });
                 }}
-                locale={app?.state.locale}
+                locale={rangePickerLocale}
+                calendarSystem={app?.state.calendarSystem}
               />
             </div>
           )}
@@ -292,26 +341,36 @@ const DefaultEventDetailDialog = ({
             onChange={setEditedEvent}
           />
 
+          {isEditedTask ? (
+            <TaskPriorityField
+              event={editedEvent}
+              disabled={!isEditable || isPending}
+              onChange={setEditedEvent}
+            />
+          ) : (
+            <EventConferenceField
+              key={editedEvent.id}
+              value={getEventConference(editedEvent)}
+              editable={isEditable}
+              disabled={isPending}
+              onChange={conference =>
+                setEditedEvent(setEventConference(editedEvent, conference))
+              }
+            />
+          )}
+
           {shouldShowNotes && (
-            <div className='df-event-dialog-notes-row'>
-              <span className='df-form-label'>{t('note')}</span>
-              <textarea
-                id={`event-dialog-note-${editedEvent.id}`}
-                name='note'
-                value={editedEvent.description ?? ''}
-                readOnly={!isEditable || isPending}
-                disabled={!isEditable || isPending}
-                onChange={e =>
-                  setEditedEvent({
-                    ...editedEvent,
-                    description: (e.target as HTMLTextAreaElement).value,
-                  })
-                }
-                rows={4}
-                className='df-form-textarea'
-                placeholder={t('addNotePlaceholder')}
-              />
-            </div>
+            <EventNotesField
+              key={editedEvent.id}
+              id={`event-dialog-note-${editedEvent.id}`}
+              value={editedEvent.description ?? ''}
+              editable={isEditable}
+              disabled={isPending}
+              rows={4}
+              onChange={description =>
+                setEditedEvent({ ...editedEvent, description })
+              }
+            />
           )}
 
           {isEditable && (
@@ -323,7 +382,7 @@ const DefaultEventDetailDialog = ({
                   className='df-tint-primary df-hover-primary-md df-btn-sm'
                   onClick={convertToRegular}
                 >
-                  {t('setAsTimed')}
+                  {t(isEditedTask ? 'addDueTime' : 'setAsTimed')}
                 </button>
               ) : (
                 <button

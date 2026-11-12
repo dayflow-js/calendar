@@ -1,7 +1,10 @@
 import { RefObject } from 'preact';
 import { useState, useCallback, useEffect } from 'preact/hooks';
 
-import { getTimeColumnWidth } from '@/components/calendarEvent/utils';
+import {
+  getTimeColumnWidth,
+  observePanelInViewport,
+} from '@/components/calendarEvent/utils';
 import { MultiDayEventSegment } from '@/components/monthView/util';
 import { YearMultiDaySegment } from '@/components/yearView/utils';
 import { Event, ViewType, EventDetailPosition } from '@/types';
@@ -220,6 +223,19 @@ export const useDetailPanelPosition = ({
       requestAnimationFrame(() => updatePanelPosition());
     }
   }, [showDetailPanel, detailPanelPosition, updatePanelPosition, isMobile]);
+
+  const hasPosition = detailPanelPosition !== null;
+  useEffect(() => {
+    const panel = detailPanelRef.current;
+    if (!showDetailPanel || isMobile || !hasPosition || !panel) return;
+    return observePanelInViewport(panel, update =>
+      setDetailPanelPosition(prev => {
+        if (!prev) return prev;
+        const top = update(prev.top);
+        return top === prev.top ? prev : { ...prev, top };
+      })
+    );
+  }, [showDetailPanel, isMobile, hasPosition, detailPanelRef]);
 
   return {
     detailPanelPosition,

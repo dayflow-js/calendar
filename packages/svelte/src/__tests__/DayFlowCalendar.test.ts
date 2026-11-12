@@ -134,6 +134,39 @@ describe('DayFlowCalendar (Svelte) — teardown', () => {
   });
 });
 
+describe('DayFlowCalendar (Svelte) — calendar prop', () => {
+  it('rebuilds the renderer when the calendar prop is replaced', async () => {
+    const first = createFakeApp();
+    const second = createFakeApp();
+    const { rerender, unmount } = render(DayFlowCalendar, {
+      props: { calendar: first as never, titleBarSlot: TitleBar },
+    });
+    await whenMounted();
+
+    await rerender({ calendar: second as never });
+
+    await waitFor(() => {
+      expect(createdRenderers).toHaveLength(2);
+    });
+    expect(lifecycleLog.filter(e => e.type === 'unmount')).toHaveLength(1);
+    expect((second as FakeApp).overrides).toContain('titleBarSlot');
+    expectUnsubscribeBeforeUnmount(lifecycleLog);
+    unmount();
+  });
+
+  it('keeps the renderer when an unrelated prop changes', async () => {
+    const app = createFakeApp();
+    const { rerender } = render(DayFlowCalendar, {
+      props: { calendar: app as never },
+    });
+    await whenMounted();
+
+    await rerender({ calendar: app as never, collapsedSafeAreaLeft: 12 });
+
+    expect(createdRenderers).toHaveLength(1);
+  });
+});
+
 describe('Svelte adapter conformance', () => {
   it('satisfies the shared contract on mount and unmount', async () => {
     const app = createFakeApp();

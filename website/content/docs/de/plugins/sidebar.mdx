@@ -120,21 +120,40 @@ Installieren Sie das Plugin-Paket:
 
 ## Konfiguration
 
-| Eigenschaft                  | Typ                                                    | Standard                           | Beschreibung                                                |
-| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :---------------------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`                          | Breite der Seitenleiste (etwa `280` oder `'20rem'`)         |
-| `miniWidth`                  | `string`                                               | `'50px'`                           | Breite der eingeklappten Seitenleiste                       |
-| `initialCollapsed`           | `boolean`                                              | `false`                            | Legt fest, ob die Seitenleiste eingeklappt startet          |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | Darstellung des Formulars zum Anlegen eines Kalenders       |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | Welche Farbwähler-Komponente verwendet wird                 |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | Callback nach dem Anlegen eines Abonnements                 |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | Eigener Loader für bestehende Abonnements                   |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | Callback nach dem Umsortieren der Kalender                  |
-| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | Reihenfolge der Komponenten in der Seitenleiste             |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | Vollständiger Ersatz der Seitenleisten-Oberfläche           |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | Eigener Renderer für die Kopfzeile der Seitenleiste         |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | Eigener Renderer für das Kontextmenü der Kalendereinträge   |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | Eigener Renderer für den Dialog zum Anlegen eines Kalenders |
+| Eigenschaft                  | Typ                                                            | Standard                           | Beschreibung                                                |
+| :--------------------------- | :------------------------------------------------------------- | :--------------------------------- | :---------------------------------------------------------- |
+| `width`                      | `number \| string`                                             | `'240px'`                          | Breite der Seitenleiste (etwa `280` oder `'20rem'`)         |
+| `miniWidth`                  | `string`                                                       | `'50px'`                           | Breite der eingeklappten Seitenleiste                       |
+| `initialCollapsed`           | `boolean`                                                      | `false`                            | Legt fest, ob die Seitenleiste eingeklappt startet          |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                          | `'inline'`                         | Darstellung des Formulars zum Anlegen eines Kalenders       |
+| `colorPickerMode`            | `'blossom' \| 'default'`                                       | `'default'`                        | Welche Farbwähler-Komponente verwendet wird                 |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                          | `undefined`                        | Callback nach dem Anlegen eines Abonnements                 |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                                  | `undefined`                        | Eigener Loader für bestehende Abonnements                   |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>`         | `undefined`                        | Callback nach dem Umsortieren der Kalender                  |
+| `groups`                     | `string[]`                                                     | `[]`                               | Gespeicherte Gruppennamen und -reihenfolge                  |
+| `onGroupCreate`              | `(groupName: string) => void \| Promise<void>`                 | `undefined`                        | Callback beim Erstellen einer Gruppe                        |
+| `onGroupRename`              | `(previousName, nextName, calendars) => void \| Promise<void>` | `undefined`                        | Callback beim Umbenennen einer Gruppe                       |
+| `onGroupDelete`              | `(groupName, calendars) => void \| Promise<void>`              | `undefined`                        | Callback beim Löschen einer Gruppe                          |
+| `onGroupReorder`             | `(groups: string[]) => void \| Promise<void>`                  | `undefined`                        | Callback beim Ändern der Gruppenreihenfolge                 |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                         | `['calendarList', 'miniCalendar']` | Reihenfolge der Komponenten in der Seitenleiste             |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`                 | `undefined`                        | Vollständiger Ersatz der Seitenleisten-Oberfläche           |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`                       | `undefined`                        | Eigener Renderer für die Kopfzeile der Seitenleiste         |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                                 | `undefined`                        | Eigener Renderer für das Kontextmenü der Kalendereinträge   |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                             | `undefined`                        | Eigener Renderer für den Dialog zum Anlegen eines Kalenders |
+
+Gruppen-Callbacks werden abgewartet, bevor eine Änderung übernommen wird. Wird ein Promise abgelehnt, bleiben die Gruppe oder ihre Reihenfolge unverändert und Änderungsdialoge geöffnet. Das Argument `calendars` enthält die aktuell zugewiesenen Kalender; `onGroupReorder` erhält die vollständige, sortierte Liste der Gruppennamen.
+
+```ts
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
 
 ## Programmatische API
 
@@ -182,6 +201,8 @@ Enthaltene Funktionen:
 - **Kalender anlegen** – neue Kalender mit eigenem Namen und eigener Farbe hinzufügen
 - **Umbenennen / umfärben** – per Rechtsklick auf einen Kalender Namen oder Farbe ändern
 - **Kalender umsortieren** – Kalender per Drag-and-drop in der Liste neu anordnen. Über den Callback `onReorder` speichern Sie die neue Reihenfolge in Ihrem Backend.
+- **Kalendergruppen** – per Rechtsklick auf die Seitenleiste eine Gruppe erstellen; per Rechtsklick auf eine Gruppe können Sie sie umbenennen, nach Bestätigung löschen oder darin einen Kalender anlegen.
+- **Gruppen umsortieren** – ziehen Sie Gruppenüberschriften, um die Reihenfolge zu ändern. Mit `groups` stellen Sie die gespeicherte Reihenfolge wieder her und mit `onGroupReorder` speichern Sie Änderungen.
 - **Kalender zusammenführen** – alle Termine eines Kalenders in einen anderen verschieben
 - **Kalender löschen** – einen Kalender mit Bestätigungsschritt entfernen (oder ihn vorher zusammenführen)
 - **Importieren / exportieren** – `.ics`-Dateien einlesen oder Kalender als `.ics` ausgeben
@@ -238,9 +259,7 @@ const calendar = useCalendarApp({
       },
       // Override default protections:
       readOnly: false, // Enables both UI mutations and drag-and-drop
-      colors: {
-        /* ... */
-      },
+      colors: {/* ... */},
     },
   ],
 });

@@ -11,6 +11,13 @@ A flexible and feature-rich calendar component library for **React, Vue, Angular
 
 ## Features
 
+### Jalali (Persian) calendar
+
+Choose `calendarSystem: 'jalali'` for Persian date display and calendar
+navigation across day, week, month, agenda, and year views. Gregorian remains
+the default. See [calendar systems](docs/calendar-systems.md) for configuration,
+event/recurrence semantics, and the standalone `pnpm dev:jalali` preview.
+
 ### Daily, Weekly, Monthly and Yearly View Types
 
 #### Day View

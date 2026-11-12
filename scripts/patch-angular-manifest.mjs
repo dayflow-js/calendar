@@ -65,9 +65,21 @@ for (const section of [
 // Vite/esbuild resolve the ESM entry through the "import" condition, which
 // ng-packagr does not emit.
 const dot = pkg.exports?.['.'];
-if (dot && !dot.import && (dot.default || dot.esm2022)) {
-  dot.import = dot.default || dot.esm2022;
-  rewrites.push(`exports["."].import: added -> ${dot.import}`);
+if (dot && typeof dot === 'object') {
+  const target = dot.default || dot.esm2022;
+  if (!dot.import && target) {
+    dot.import = target;
+    rewrites.push(`exports["."].import: added -> ${target}`);
+  }
+  // Conditions are matched first to last, and "default" matches everything, so
+  // any key placed after it is dead. Appending "import" above would land it
+  // there; keep "default" last.
+  const keys = Object.keys(dot);
+  if ('default' in dot && keys.at(-1) !== 'default') {
+    const { default: fallback, ...rest } = dot;
+    pkg.exports['.'] = { ...rest, default: fallback };
+    rewrites.push('exports["."]: moved "default" to the end');
+  }
 }
 
 fs.writeFileSync(manifestPath, JSON.stringify(pkg, null, 2) + '\n');

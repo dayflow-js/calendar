@@ -123,6 +123,37 @@ describe('mapGoogleEventToDayFlow', () => {
     expect(meta.isRecurring).toBe(true);
   });
 
+  it('maps the video conference entry point', () => {
+    const google = makeGoogleEvent({
+      hangoutLink: 'https://meet.google.com/fallback-room',
+      conferenceData: {
+        entryPoints: [
+          { entryPointType: 'phone', uri: 'tel:+15551234567' },
+          {
+            entryPointType: 'video',
+            uri: 'https://meet.google.com/abc-defg-hij',
+            meetingCode: 'abc-defg-hij',
+          },
+        ],
+      },
+    });
+
+    expect(mapGoogleEventToDayFlow(google, 'cal-1')?.conference).toEqual({
+      provider: 'google-meet',
+      joinUrl: 'https://meet.google.com/abc-defg-hij',
+      meetingId: 'abc-defg-hij',
+    });
+  });
+
+  it('falls back to hangoutLink when conferenceData has no video URL', () => {
+    const google = makeGoogleEvent({
+      hangoutLink: 'https://meet.google.com/abc-defg-hij',
+    });
+    expect(mapGoogleEventToDayFlow(google, 'cal-1')?.conference?.provider).toBe(
+      'google-meet'
+    );
+  });
+
   it('returns null for cancelled events', () => {
     const google = makeGoogleEvent({ status: 'cancelled' });
     expect(mapGoogleEventToDayFlow(google, 'cal-1')).toBeNull();

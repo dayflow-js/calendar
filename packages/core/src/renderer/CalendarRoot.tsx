@@ -9,6 +9,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { calendarLocale } from '@/calendar/calendarSystem';
 import CalendarHeader from '@/components/common/CalendarHeader';
 import { CreateCalendarDialog } from '@/components/common/CreateCalendarDialog';
 import DefaultEventDetailDialog from '@/components/common/DefaultEventDetailDialog';
@@ -17,6 +18,7 @@ import { MobileEventDrawer } from '@/components/mobileEventDrawer';
 import MobileSearchDialog from '@/components/search/MobileSearchDialog';
 import SearchDrawer from '@/components/search/SearchDrawer';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { LocaleContext } from '@/locale/LocaleContext';
 import { LocaleProvider } from '@/locale/LocaleProvider';
 import { LocaleCode, Locale, LocaleMessages } from '@/locale/types';
 import { useLocale } from '@/locale/useLocale';
@@ -58,19 +60,37 @@ const CalendarInternalLocaleProvider = ({
   locale,
   messages,
   children,
+  calendarSystem,
 }: {
   locale: LocaleCode | Locale;
   messages?: LocaleMessages;
   children: ComponentChildren;
+  calendarSystem: import('@/calendar/calendarSystem').CalendarSystem;
 }) => {
   const context = useLocale();
+  const calendarContext = useMemo(
+    () => ({
+      ...context,
+      calendarSystem,
+      locale: calendarLocale(context.locale, calendarSystem),
+    }),
+    [context, calendarSystem]
+  );
 
   if (!context.isDefault) {
-    return children;
+    return (
+      <LocaleContext.Provider value={calendarContext}>
+        {children}
+      </LocaleContext.Provider>
+    );
   }
 
   return (
-    <LocaleProvider locale={locale} messages={messages}>
+    <LocaleProvider
+      locale={locale}
+      messages={messages}
+      calendarSystem={calendarSystem}
+    >
       {children}
     </LocaleProvider>
   );
@@ -330,6 +350,7 @@ export const CalendarRoot = ({
     >
       <CalendarInternalLocaleProvider
         locale={app.state.locale}
+        calendarSystem={app.state.calendarSystem}
         messages={customMessages}
       >
         <div className='df-calendar-container' style={themeColorStyle}>

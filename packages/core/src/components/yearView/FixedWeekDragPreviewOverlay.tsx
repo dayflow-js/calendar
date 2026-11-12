@@ -88,7 +88,8 @@ export const FixedWeekDragPreviewOverlay = ({
           dragPreviewEvent,
           currentYear,
           month.monthIndex,
-          appTimeZone
+          appTimeZone,
+          app.state.calendarSystem
         )
       ) {
         continue;
@@ -98,7 +99,8 @@ export const FixedWeekDragPreviewOverlay = ({
         month.monthIndex,
         currentYear,
         startOfWeek,
-        appTimeZone
+        appTimeZone,
+        app.state.calendarSystem
       );
       if (!segment) continue;
 

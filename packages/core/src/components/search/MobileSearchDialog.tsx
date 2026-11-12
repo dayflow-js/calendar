@@ -2,6 +2,7 @@ import { createPortal } from 'preact/compat';
 import { useRef, useEffect } from 'preact/hooks';
 
 import { ArrowLeft, X } from '@/components/common/Icons';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { mobileFullscreen } from '@/styles/classNames';
 import { ICalendarApp } from '@/types';
@@ -37,6 +38,11 @@ const MobileSearchDialog = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useLocale();
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Escape closes, Tab stays inside, focus returns to the opener on close.
+  // The search input is focused below, so skip the hook's own auto-focus.
+  useDialogFocus(dialogRef, { onClose, active: isOpen, autoFocus: false });
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -55,13 +61,20 @@ const MobileSearchDialog = ({
   if (!isOpen || typeof window === 'undefined') return null;
 
   return createPortal(
-    <div className={mobileFullscreen}>
+    <div
+      ref={dialogRef}
+      className={mobileFullscreen}
+      role='dialog'
+      aria-modal='true'
+      aria-label={t('search')}
+    >
       {/* Header with Back button and Search Input */}
       <div className='df-search-dialog-header'>
         <button
           type='button'
           onClick={onClose}
           className='df-search-dialog-back-btn'
+          aria-label={t('closeSearch')}
         >
           <ArrowLeft className='df-search-dialog-back-icon' />
         </button>
@@ -70,6 +83,7 @@ const MobileSearchDialog = ({
             ref={inputRef}
             type='text'
             placeholder={t('search') || 'Search'}
+            aria-label={t('search')}
             value={keyword}
             onChange={e => {
               const val = (e.target as HTMLInputElement).value;
@@ -84,6 +98,7 @@ const MobileSearchDialog = ({
                 if (keyword !== '') onSearchChange('');
               }}
               className='df-search-dialog-input-clear'
+              aria-label={t('clearSearch')}
             >
               <X className='df-search-dialog-clear-icon' />
             </button>

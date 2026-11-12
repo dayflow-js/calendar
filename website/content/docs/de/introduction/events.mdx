@@ -26,6 +26,8 @@ import { Event } from '@dayflow/core';
 | `start`       | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Startdatum bzw. -zeit des Termins. `PlainDate` für ganztägig, `PlainDateTime` für lokal, `ZonedDateTime` bei Zeitzonenbezug                                                                                                                                             | Erforderlich |
 | `end`         | `Temporal.PlainDate \| Temporal.PlainDateTime \| Temporal.ZonedDateTime` | Enddatum bzw. -zeit des Termins                                                                                                                                                                                                                                         | Erforderlich |
 | `description` | `string`                                                                 | Optionale Beschreibung oder Notizen zum Termin                                                                                                                                                                                                                          | Optional     |
+| `kind`        | `'event' \| 'task'`                                                      | Art des Eintrags; ohne Angabe ein normaler Termin.                                                                                                                                                                                                                      | Optional     |
+| `task`        | `EventTask`                                                              | Erledigt-Status, Erledigungszeitpunkt und Priorität der Aufgabe. Siehe [Aufgaben](/docs-de/features/tasks).                                                                                                                                                             | Optional     |
 | `allDay`      | `boolean`                                                                | Gibt an, ob der Termin ganztägig ist (Standard: `false`)                                                                                                                                                                                                                | Optional     |
 | `icon`        | `boolean \| Node`                                                        | Eigenes Symbol für den Termin. `true` (Standard): Standardsymbol anzeigen, `false`: ausblenden, `Node`: eigenes Symbol                                                                                                                                                  | Optional     |
 | `calendarId`  | `string`                                                                 | Verweis auf den Kalendertyp, wenn der Termin genau einem Kalender zugeordnet ist                                                                                                                                                                                        | Optional     |
@@ -847,10 +849,13 @@ const event: Event = {
   title: 'Project Kickoff',
   start: Temporal.ZonedDateTime.from('2024-10-15T10:00:00[America/New_York]'),
   end: Temporal.ZonedDateTime.from('2024-10-15T11:00:00[America/New_York]'),
+  conference: {
+    provider: 'zoom',
+    joinUrl: 'https://zoom.us/j/123456',
+  },
   meta: {
-    // Meeting details
+    // Location
     location: 'Conference Room A',
-    meetingUrl: 'https://zoom.us/j/123456',
 
     // Attendees
     organizer: 'john@example.com',

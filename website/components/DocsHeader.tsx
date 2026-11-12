@@ -7,13 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
-import { brandUrl, proUrl, schedulerUrl } from '@/lib/site';
+import { proUrl, schedulerUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
-const BRAND_URL = brandUrl('docs_nav');
 const PRO_URL = proUrl('docs_nav');
 const SCHEDULER_URL = schedulerUrl('docs_nav');
 
@@ -83,16 +82,6 @@ export function DocsHeader({ githubUrl }: DocsHeaderProps) {
 
             {/* Desktop right: language + discord + github */}
             <div className='flex flex-row items-center gap-1.5 max-lg:hidden'>
-              <a
-                href={BRAND_URL}
-                aria-label='Visit the DayFlow main site'
-                className={cn(
-                  buttonVariants({ color: 'ghost' }),
-                  'px-2 text-sm font-medium text-slate-600 dark:text-slate-400'
-                )}
-              >
-                DayFlow
-              </a>
               <a
                 href={PRO_URL}
                 target='_blank'
@@ -181,16 +170,6 @@ export function DocsHeader({ githubUrl }: DocsHeaderProps) {
 
             {/* Mobile right: language + sidebar trigger */}
             <div className='ms-auto flex flex-row items-center gap-1 lg:hidden'>
-              <a
-                href={BRAND_URL}
-                aria-label='Visit the DayFlow main site'
-                className={cn(
-                  buttonVariants({ color: 'ghost', size: 'sm' }),
-                  'px-2 text-xs font-semibold'
-                )}
-              >
-                DayFlow
-              </a>
               <a
                 href='https://blossom.dayflow.studio'
                 target='_blank'

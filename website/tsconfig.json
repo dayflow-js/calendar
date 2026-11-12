@@ -16,7 +16,9 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
-      "fumadocs-mdx:collections/*": ["./.source/*"]
+      "fumadocs-mdx:collections/*": ["./.source/*"],
+      "temporal-polyfill": ["./node_modules/temporal-polyfill"],
+      "temporal-spec": ["./node_modules/temporal-spec"]
     },
     "plugins": [
       {

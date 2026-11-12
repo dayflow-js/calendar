@@ -243,6 +243,22 @@ describe('mapOutlookEventToDayFlow', () => {
     expect(result!.meta?.location).toBe('Conference Room A');
   });
 
+  it('maps Teams online meeting details', () => {
+    const event = makeEvent({
+      isOnlineMeeting: true,
+      onlineMeetingProvider: 'teamsForBusiness',
+      onlineMeeting: {
+        conferenceId: '123 456 789',
+        joinUrl: 'https://teams.microsoft.com/l/meetup-join/abc',
+      },
+    });
+    expect(mapOutlookEventToDayFlow(event, 'cal-1')?.conference).toEqual({
+      provider: 'microsoft-teams',
+      joinUrl: 'https://teams.microsoft.com/l/meetup-join/abc',
+      meetingId: '123 456 789',
+    });
+  });
+
   it('returns null for invalid start date', () => {
     const event = makeEvent({
       start: { dateTime: 'INVALID', timeZone: 'UTC' },

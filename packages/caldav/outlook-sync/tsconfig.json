@@ -11,10 +11,14 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "declaration": true,
     "declarationMap": true,
     "types": ["vitest/globals"],
     "paths": {
+      "@/*": ["../../core/src/*"],
+      "@dayflow/core": ["../../core/src/caldav-entry.ts"],
       "@dayflow/sync-core": ["../sync-core/src/index.ts"],
       "@sync-core/*": ["../sync-core/src/*"],
       "@outlook-sync/*": ["./src/*"]

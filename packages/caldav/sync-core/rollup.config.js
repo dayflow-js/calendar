@@ -26,7 +26,17 @@ export default [
   {
     input: 'dist/types/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [dts()],
+    // Map the tsconfig alias so its types are bundled; left alone, dts() treats
+    // "@sync-core/..." as an external package and publishes an import that no
+    // consumer can resolve.
+    plugins: [
+      dts({
+        compilerOptions: {
+          baseUrl: '.',
+          paths: { '@sync-core/*': ['./dist/types/*'] },
+        },
+      }),
+    ],
     external: ['@dayflow/core'],
   },
 ];

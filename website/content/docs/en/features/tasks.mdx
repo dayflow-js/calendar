@@ -1,0 +1,138 @@
+---
+title: Tasks
+description: Add tasks with a due date, completion state, and priority to your calendar.
+---
+
+# Tasks
+
+Tasks share the `Event` data model and calendar assignment with regular events.
+A task has one due date or time instead of a duration. Its circle toggles completion;
+its striped background and text show priority.
+
+## Enable task creation
+
+Set `enableTasks: true` to show the Event / Task switch in the built-in desktop
+panel, dialog, and mobile editor. The default is `false`, preserving the existing
+event creation interface. Existing task data remains visible and editable when
+this option is off.
+
+```tsx
+import {
+  DayFlowCalendar,
+  createMonthView,
+  useCalendarApp,
+} from '@dayflow/react';
+import '@dayflow/core/dist/styles.css';
+
+export function TaskCalendar() {
+  const calendar = useCalendarApp({
+    views: [createMonthView()],
+    enableTasks: true,
+  });
+
+  return <DayFlowCalendar calendar={calendar} />;
+}
+```
+
+The option is part of `CalendarAppConfig` and works with all framework adapters.
+To change it on an existing core instance:
+
+```ts
+app.updateConfig({ enableTasks: true });
+```
+
+This is a runtime editor option; disabling it does not remove task code from the bundle.
+
+## Create a timed or all-day task
+
+Use `kind: 'task'`. Both `start` and `end` must contain the same due value.
+Set `allDay: true` and use `Temporal.PlainDate` for a task without a time.
+
+```ts
+import type { Event } from '@dayflow/core';
+import { Temporal } from 'temporal-polyfill';
+
+const due = Temporal.ZonedDateTime.from(
+  '2026-10-23T11:00:00[Australia/Sydney]'
+);
+const date = Temporal.PlainDate.from('2026-10-23');
+
+const tasks: Event[] = [
+  {
+    id: 'review',
+    title: 'Review design feedback',
+    kind: 'task',
+    start: due,
+    end: due,
+    task: { completed: false, priority: 'medium' },
+  },
+  {
+    id: 'launch',
+    title: 'Send launch checklist',
+    kind: 'task',
+    allDay: true,
+    start: date,
+    end: date,
+    task: { priority: 'high' },
+  },
+];
+```
+
+Pass these items through the `events` configuration, or use the regular event APIs
+to add, update, or delete them. Add `calendarId` to assign a specific calendar.
+
+| Field              | Type                                    | Meaning                                      |
+| ------------------ | --------------------------------------- | -------------------------------------------- |
+| `kind`             | `'event' \| 'task'`                     | Defaults to `'event'` when omitted.          |
+| `task.completed`   | `boolean`                               | Defaults to `false`.                         |
+| `task.completedAt` | `Temporal.ZonedDateTime`                | Completion timestamp; cleared when reopened. |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'` | Defaults to `'none'`.                        |
+
+## Complete tasks and change priority
+
+Click the circle on the left to complete or reopen a task. This does not open the
+detail panel or start a drag. Keyboard users can focus the circle and press Space
+or Enter. Completed titles receive a strike-through.
+
+Open the task's details to change its title, due date/time, notes, or priority.
+**Set as All-day** removes the due time; **Add Time** restores one. Tasks can be
+moved but cannot be resized.
+
+| Priority | Background and text color |
+| -------- | ------------------------- |
+| `none`   | Slate                     |
+| `low`    | Green                     |
+| `medium` | Amber                     |
+| `high`   | Red                       |
+
+Priority fills the entire task with diagonal stripes. The circle uses the calendar
+color, turning white while the task is selected. Priority does not change
+chronological ordering. Month view keeps all-day tasks in the task row style,
+without a time label. Day and Week tasks do not have an event color bar.
+
+The [interactive demo](/demo) includes a **Tasks** switch and a **Preview** tooltip
+that illustrates completion and changing priority in the detail panel.
+
+## Programmatic updates and persistence
+
+Task changes use the same `onEventUpdate` callback as event changes. Persist `kind`
+and the `task` metadata together with the event dates in your data source.
+
+```ts
+import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+
+// `taskEvent` is an existing Event with kind: 'task'.
+const completed = setTaskCompleted(taskEvent, true, app.timeZone);
+await app.updateEvent(taskEvent.id, { task: completed.task });
+
+const prioritized = setTaskPriority(taskEvent, 'high');
+await app.updateEvent(taskEvent.id, { task: prioritized.task });
+```
+
+The helpers return updated values; they do not persist changes themselves.
+[Read-only mode](/docs/features/read-only) disables completion and editing through
+the built-in UI, while programmatic updates still work.
+
+Generated recurring occurrences do not support independent completion. External
+CalDAV task (`VTODO`) synchronization is not implemented; do not assume that event
+synchronization preserves task-specific fields.

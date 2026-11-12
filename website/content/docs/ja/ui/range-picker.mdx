@@ -101,6 +101,31 @@ BCP 47 のロケールコードを渡すと月名・曜日名がローカライ�
 <RangePicker value={range} locale='ja-JP' onChange={value => setRange(value)} />
 ```
 
+ピッカー自体のラベル（移動ボタン、開始/終了の入力欄、時/分のリスト、OK ボタン）を翻訳するには、`messages` を持つ locale オブジェクトを渡します。無いキーは英語にフォールバックします。カレンダー内蔵のイベントパネルとダイアログでは、カレンダーのロケールから自動的に設定されます。
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'ja-JP',
+    messages: {
+      previousYear: '前年',
+      previousMonth: '前月',
+      nextMonth: '翌月',
+      nextYear: '翌年',
+      startDate: '開始日',
+      endDate: '終了日',
+      hour: '時',
+      minute: '分',
+      ok: 'OK',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+`calendarSystem='jalali'` を指定すると、ペルシャ暦で日付を表示・入力できます。`onChange` と `onOk` が返す値は引き続き ISO の Temporal 値です。
+
 ## トリガー幅に合わせる
 
 ```tsx
@@ -129,7 +154,8 @@ BCP 47 のロケールコードを渡すと月名・曜日名がローカライ�
 | `autoAdjustOverflow` | `boolean`                                                       | `true`         | ビューポートからはみ出す場合にポップアップ位置を自動反転する                |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —              | `document.body` の代わりにカスタムコンテナにポップアップをマウントする      |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`        | ポップアップの幅をトリガー入力欄の幅に合わせる                              |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | 月名・曜日名のローカライズに使用する BCP 47 ロケールコード                  |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`      | BCP 47 ロケールコード。オブジェクトの `messages` でピッカーのラベルを翻訳   |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`  | 日付の表示と解析に使う暦                                                    |
 
 ### `ZonedRange`
 

@@ -74,7 +74,10 @@ export const parseTemporalString = (
   reference: Temporal.ZonedDateTime,
   zoneId: string
 ): Temporal.ZonedDateTime | null => {
-  const trimmed = input.trim();
+  const trimmed = input
+    .trim()
+    .replaceAll(/[۰-۹]/g, digit => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+    .replaceAll(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)));
   if (!trimmed) return null;
 
   const match = trimmed.match(regExp);
@@ -86,7 +89,10 @@ export const parseTemporalString = (
   const resolvedYear = groups.YYYY
     ? Number(groups.YYYY)
     : groups.YY
-      ? Number(groups.YY) + 2000
+      ? Number(groups.YY) +
+        (reference.calendarId === 'persian'
+          ? Math.floor(reference.year / 100) * 100
+          : 2000)
       : reference.year;
 
   const resolvedMonth = groups.MM ? Number(groups.MM) : reference.month;
@@ -104,18 +110,22 @@ export const parseTemporalString = (
   const resolvedMinute = groups.mm ? Number(groups.mm) : reference.minute;
 
   try {
-    return Temporal.ZonedDateTime.from({
-      timeZone: zoneId,
-      year: resolvedYear,
-      month: resolvedMonth,
-      day: resolvedDay,
-      hour: resolvedHour,
-      minute: resolvedMinute,
-      second: reference.second,
-      millisecond: reference.millisecond,
-      microsecond: reference.microsecond,
-      nanosecond: reference.nanosecond,
-    });
+    return Temporal.ZonedDateTime.from(
+      {
+        timeZone: zoneId,
+        calendar: reference.calendarId,
+        year: resolvedYear,
+        month: resolvedMonth,
+        day: resolvedDay,
+        hour: resolvedHour,
+        minute: resolvedMinute,
+        second: reference.second,
+        millisecond: reference.millisecond,
+        microsecond: reference.microsecond,
+        nanosecond: reference.nanosecond,
+      },
+      { overflow: 'reject' }
+    );
   } catch {
     return null;
   }

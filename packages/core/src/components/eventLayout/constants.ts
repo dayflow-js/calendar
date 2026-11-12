@@ -1,5 +1,6 @@
 export const LAYOUT_CONFIG = {
   PARALLEL_THRESHOLD: 0.25, // 15 minutes, parallel layout threshold
+  MIN_VISUAL_DURATION: 0.25, // 15 minutes, matches the minimum rendered event height
   NESTED_THRESHOLD: 0.5, // 30 minutes, nested layout threshold
   INDENT_STEP_PERCENT: 2.5, // Indent step percentage (replaces pixel values)
   MIN_WIDTH: 25, // Minimum width percentage

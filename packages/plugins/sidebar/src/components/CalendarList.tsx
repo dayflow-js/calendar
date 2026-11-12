@@ -4,6 +4,7 @@ import {
   ChevronRight,
   AlertCircle,
   Loader2,
+  useLocale,
 } from '@dayflow/core';
 import { JSX } from 'preact';
 import {
@@ -20,12 +21,19 @@ interface CalendarListProps {
   onReorder: (fromIndex: number, toIndex: number) => void | Promise<void>;
   onRename: (id: string, newName: string) => void;
   onContextMenu: (e: JSX.TargetedMouseEvent<HTMLElement>, id: string) => void;
+  onGroupContextMenu: (
+    e: JSX.TargetedMouseEvent<HTMLElement>,
+    source: string
+  ) => void;
+  onGroupReorder: (groups: string[]) => void;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   activeContextMenuCalendarId?: string | null;
+  activeContextMenuGroup?: string | null;
   isDraggable?: boolean;
   isEditable?: boolean;
   groupStatus?: Record<string, { isLoading: boolean }>;
+  additionalGroups?: string[];
 }
 
 const getCalendarInitials = (calendar: CalendarType): string => {
@@ -86,6 +94,7 @@ const CalendarItem = ({
   onRenameSave,
   onRenameKeyDown,
 }: CalendarItemProps) => {
+  const { t } = useLocale();
   const isVisible = calendar.isVisible !== false;
   const calendarColor = calendar.colors?.lineColor || '#3b82f6';
   const showIcon = Boolean(calendar.icon);
@@ -132,6 +141,7 @@ const CalendarItem = ({
               } as Record<string, string | number>
             }
             checked={isVisible}
+            aria-label={calendar.name || calendar.id}
             onChange={event =>
               onToggleVisibility(
                 calendar.id,
@@ -159,6 +169,7 @@ const CalendarItem = ({
               onBlur={onRenameSave}
               onKeyDown={onRenameKeyDown}
               className='df-sidebar-rename-input'
+              aria-label={t('calendar')}
               onClick={e => e.stopPropagation()}
             />
           ) : (
@@ -174,7 +185,10 @@ const CalendarItem = ({
                   width={13}
                   height={13}
                   className='df-sidebar-status-icon df-sidebar-status-icon-error'
-                  title='Failed to load subscription'
+                  title={t('subscriptionLoadFailed')}
+                  role='img'
+                  aria-hidden={false}
+                  aria-label={t('subscriptionLoadFailed')}
                 />
               )}
               {calendar.subscription &&
@@ -202,12 +216,16 @@ export const CalendarList = ({
   onReorder,
   onRename,
   onContextMenu,
+  onGroupContextMenu,
+  onGroupReorder,
   editingId,
   setEditingId,
   activeContextMenuCalendarId,
+  activeContextMenuGroup,
   isDraggable = true,
   isEditable = true,
   groupStatus = {},
+  additionalGroups = [],
 }: CalendarListProps) => {
   const [editingName, setEditingName] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -219,6 +237,18 @@ export const CalendarList = ({
   );
   const [dropTarget, setDropTarget] = useState<{
     id: string;
+    position: 'top' | 'bottom';
+  } | null>(null);
+  const [draggedGroupSource, setDraggedGroupSource] = useState<string | null>(
+    null
+  );
+  const [groupDropTarget, setGroupDropTarget] = useState<{
+    source: string;
+    position: 'top' | 'bottom';
+  } | null>(null);
+  const draggedGroupSourceRef = useRef<string | null>(null);
+  const groupDropTargetRef = useRef<{
+    source: string;
     position: 'top' | 'bottom';
   } | null>(null);
 
@@ -259,6 +289,7 @@ export const CalendarList = ({
 
   const handleDragOver = useCallback(
     (e: JSX.TargetedDragEvent<HTMLElement>, targetId: string) => {
+      if (!draggedCalendarId) return;
       e.preventDefault();
       if (draggedCalendarId === targetId) {
         setDropTarget(null);
@@ -406,9 +437,14 @@ export const CalendarList = ({
   const groups = useMemo(() => {
     const next = new Map<string | null, CalendarType[]>();
 
+    // Persisted groups also define the preferred display order.
+    additionalGroups.forEach(source => {
+      if (!next.has(source)) next.set(source, []);
+    });
+
     // Initialize with expected groups from status
     Object.keys(groupStatus).forEach(source => {
-      next.set(source, []);
+      if (!next.has(source)) next.set(source, []);
     });
 
     for (const calendar of calendars) {
@@ -416,14 +452,117 @@ export const CalendarList = ({
       if (!next.has(key)) next.set(key, []);
       next.get(key)!.push(calendar);
     }
+
     return next;
-  }, [calendars, groupStatus]);
+  }, [additionalGroups, calendars, groupStatus]);
+
+  const groupEntries = useMemo(
+    () =>
+      Array.from(groups.entries()).filter(
+        (entry): entry is [string, CalendarType[]] => entry[0] !== null
+      ),
+    [groups]
+  );
+
+  const handleGroupDragStart = useCallback(
+    (source: string, e: JSX.TargetedDragEvent<HTMLButtonElement>) => {
+      if (editingId || !isDraggable) {
+        e.preventDefault();
+        return;
+      }
+
+      e.stopPropagation();
+      draggedGroupSourceRef.current = source;
+      groupDropTargetRef.current = null;
+      setDraggedGroupSource(source);
+      setGroupDropTarget(null);
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('application/x-dayflow-calendar-group', source);
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    },
+    [editingId, isDraggable]
+  );
+
+  const handleGroupDragEnd = useCallback(() => {
+    draggedGroupSourceRef.current = null;
+    groupDropTargetRef.current = null;
+    setDraggedGroupSource(null);
+    setGroupDropTarget(null);
+  }, []);
+
+  const handleGroupDragOver = useCallback(
+    (e: JSX.TargetedDragEvent<HTMLButtonElement>, targetSource: string) => {
+      const draggedSource = draggedGroupSourceRef.current;
+      if (!draggedSource) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      if (draggedSource === targetSource) {
+        groupDropTargetRef.current = null;
+        setGroupDropTarget(null);
+        return;
+      }
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const nextDropTarget: {
+        source: string;
+        position: 'top' | 'bottom';
+      } = {
+        source: targetSource,
+        position: e.clientY < rect.top + rect.height / 2 ? 'top' : 'bottom',
+      };
+      groupDropTargetRef.current = nextDropTarget;
+      setGroupDropTarget(nextDropTarget);
+    },
+    []
+  );
+
+  const handleGroupDragLeave = useCallback(
+    (e: JSX.TargetedDragEvent<HTMLButtonElement>) => {
+      const relatedTarget = e.relatedTarget as Node | null;
+      if (relatedTarget && e.currentTarget.contains(relatedTarget)) return;
+      groupDropTargetRef.current = null;
+      setGroupDropTarget(null);
+    },
+    []
+  );
+
+  const handleGroupDrop = useCallback(
+    (e: JSX.TargetedDragEvent<HTMLButtonElement>, targetSource: string) => {
+      const draggedSource = draggedGroupSourceRef.current;
+      const currentDropTarget = groupDropTargetRef.current;
+      if (!draggedSource || !currentDropTarget) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      const nextGroups = groupEntries.map(([source]) => source);
+      const fromIndex = nextGroups.indexOf(draggedSource);
+      let toIndex = nextGroups.indexOf(targetSource);
+
+      if (fromIndex === -1 || toIndex === -1) return;
+      if (currentDropTarget.position === 'bottom') toIndex += 1;
+      if (toIndex > fromIndex) toIndex -= 1;
+
+      if (fromIndex !== toIndex) {
+        const [movedGroup] = nextGroups.splice(fromIndex, 1);
+        nextGroups.splice(toIndex, 0, movedGroup);
+        onGroupReorder(nextGroups);
+      }
+
+      draggedGroupSourceRef.current = null;
+      groupDropTargetRef.current = null;
+      setDraggedGroupSource(null);
+      setGroupDropTarget(null);
+    },
+    [groupEntries, onGroupReorder]
+  );
 
   // Check if any calendar has a source or if we have expected groups
   const hasGroups = groups.size > (groups.has(null) ? 1 : 0);
 
   if (!hasGroups && !groups.has(null)) {
-    return null;
+    return <div className='df-sidebar-list-shell' />;
   }
 
   if (!hasGroups) {
@@ -459,54 +598,80 @@ export const CalendarList = ({
       )}
 
       {/* Sourced calendar groups */}
-      {Array.from(groups.entries())
-        .filter(([source]) => source !== null)
-        .map(([source, groupCalendars]) => {
-          const isCollapsed = collapsedSources[source!];
-          const isLoading = groupStatus[source!]?.isLoading;
+      {groupEntries.map(([source, groupCalendars]) => {
+        const isCollapsed = collapsedSources[source];
+        const isLoading = groupStatus[source]?.isLoading;
+        const isGroupDropTarget = groupDropTarget?.source === source;
 
-          return (
-            <div key={source} className='df-sidebar-source-group'>
-              <button
-                type='button'
-                className='df-sidebar-source-toggle'
-                onClick={() => toggleSource(source!)}
-              >
-                <span className='df-sidebar-source-label'>{source}</span>
-                {isLoading ? (
-                  <Loader2
-                    width={13}
-                    height={13}
-                    className='df-sidebar-source-loading'
-                  />
-                ) : (
-                  <ChevronRight
-                    width={13}
-                    height={13}
-                    className='df-sidebar-source-chevron'
-                    data-collapsed={isCollapsed ? 'true' : 'false'}
-                  />
-                )}
-              </button>
+        return (
+          <div
+            key={source}
+            className='df-sidebar-source-group'
+            data-dragging={draggedGroupSource === source ? 'true' : undefined}
+          >
+            {isGroupDropTarget && groupDropTarget.position === 'top' && (
               <div
-                className='df-sidebar-source-panel'
-                data-collapsed={isCollapsed ? 'true' : 'false'}
-              >
-                <div className='df-sidebar-source-panel-inner'>
-                  <ul className='df-sidebar-list'>
-                    {groupCalendars.map(calendar => (
-                      <CalendarItem
-                        key={calendar.id}
-                        calendar={calendar}
-                        {...sharedItemProps}
-                      />
-                    ))}
-                  </ul>
-                </div>
+                className='df-sidebar-group-drop-indicator'
+                data-position='top'
+              />
+            )}
+            <button
+              type='button'
+              className='df-sidebar-source-toggle'
+              draggable={isDraggable && !editingId}
+              data-draggable={isDraggable && !editingId ? 'true' : 'false'}
+              data-active={
+                activeContextMenuGroup === source ? 'true' : undefined
+              }
+              onClick={() => toggleSource(source)}
+              onContextMenu={event => onGroupContextMenu(event, source)}
+              onDragStart={event => handleGroupDragStart(source, event)}
+              onDragEnd={handleGroupDragEnd}
+              onDragOver={event => handleGroupDragOver(event, source)}
+              onDragLeave={handleGroupDragLeave}
+              onDrop={event => handleGroupDrop(event, source)}
+            >
+              <span className='df-sidebar-source-label'>{source}</span>
+              {isLoading ? (
+                <Loader2
+                  width={13}
+                  height={13}
+                  className='df-sidebar-source-loading'
+                />
+              ) : (
+                <ChevronRight
+                  width={13}
+                  height={13}
+                  className='df-sidebar-source-chevron'
+                  data-collapsed={isCollapsed ? 'true' : 'false'}
+                />
+              )}
+            </button>
+            <div
+              className='df-sidebar-source-panel'
+              data-collapsed={isCollapsed ? 'true' : 'false'}
+            >
+              <div className='df-sidebar-source-panel-inner'>
+                <ul className='df-sidebar-list'>
+                  {groupCalendars.map(calendar => (
+                    <CalendarItem
+                      key={calendar.id}
+                      calendar={calendar}
+                      {...sharedItemProps}
+                    />
+                  ))}
+                </ul>
               </div>
             </div>
-          );
-        })}
+            {isGroupDropTarget && groupDropTarget.position === 'bottom' && (
+              <div
+                className='df-sidebar-group-drop-indicator'
+                data-position='bottom'
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

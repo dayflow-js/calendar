@@ -12,4 +12,9 @@ export type {
   RangeChangeReason,
   VisibleRangePayload,
 } from './types/core';
-export type { Event } from './types/event';
+export type {
+  Event,
+  EventConference,
+  KnownMeetingProviderId,
+} from './types/event';
+export { createEventConference } from './utils/meetingUtils';

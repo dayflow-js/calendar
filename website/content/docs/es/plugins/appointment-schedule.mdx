@@ -190,21 +190,22 @@ El plugin también añade una entrada al popup de creación rápida del calendar
 
 Estos campos forman `AppointmentSchedulePluginConfig`.
 
-| Opción                     | Valor por defecto          | Para qué sirve                                                                 |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------------------ |
-| `schedules`                | Obligatorio                | Lista controlada de agendas de citas.                                          |
-| `activeScheduleId`         | Ninguno                    | Abre el editor con una agenda concreta seleccionada.                           |
-| `availabilitySnapMinutes`  | `15`                       | Intervalo en minutos al editar la disponibilidad.                              |
-| `drawerPlacement`          | `'viewport'`               | Ancla el editor a la ventana o al calendario.                                  |
-| `drawerWidth`              | `420`                      | Anchura del panel en píxeles o cualquier longitud CSS.                         |
-| `drawerTarget`             | Primer calendario          | Elemento o selector usado por el anclaje `calendar`.                           |
-| `drawerRenderer`           | Panel integrado            | Sustituye por completo el editor del organizador.                              |
-| `timeFormat`               | Formato de la vista activa | Usa formato de 12 o de 24 horas.                                               |
-| `conferenceProviders`      | `[]`                       | Añade proveedores de videollamada al selector de ubicación.                    |
-| `onCreateSchedule`         | Ninguno                    | Persiste en tu aplicación una agenda recién creada.                            |
-| `onUpdateSchedule`         | Ninguno                    | Persiste los cambios de una agenda existente.                                  |
-| `onDeleteScheduleRequest`  | Ninguno                    | Pide a la aplicación anfitriona que confirme y elimine una agenda.             |
-| `onExternalUpdateConflict` | Ninguno                    | Informa de una actualización de datos controlados recibida durante la edición. |
+| Opción                     | Valor por defecto          | Para qué sirve                                                                                                                        |
+| -------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `schedules`                | Obligatorio                | Lista controlada de agendas de citas.                                                                                                 |
+| `activeScheduleId`         | Ninguno                    | Abre el editor con una agenda concreta seleccionada.                                                                                  |
+| `availabilitySnapMinutes`  | `15`                       | Intervalo en minutos al editar la disponibilidad.                                                                                     |
+| `drawerPlacement`          | `'viewport'`               | Ancla el editor a la ventana o al calendario.                                                                                         |
+| `drawerWidth`              | `420`                      | Anchura del panel en píxeles o cualquier longitud CSS.                                                                                |
+| `drawerTarget`             | Primer calendario          | Elemento o selector usado por el anclaje `calendar`.                                                                                  |
+| `drawerRenderer`           | Panel integrado            | Sustituye por completo el editor del organizador.                                                                                     |
+| `timeFormat`               | Formato de la vista activa | Usa formato de 12 o de 24 horas.                                                                                                      |
+| `unavailableDisplayMode`   | `'grid-overlay'`           | Estilo de visualización para intervalos no disponibles (`'grid-overlay'` superposición con rayas diagonales o `'bar'` barra delgada). |
+| `conferenceProviders`      | `[]`                       | Añade proveedores de videollamada al selector de ubicación.                                                                           |
+| `onCreateSchedule`         | Ninguno                    | Persiste en tu aplicación una agenda recién creada.                                                                                   |
+| `onUpdateSchedule`         | Ninguno                    | Persiste los cambios de una agenda existente.                                                                                         |
+| `onDeleteScheduleRequest`  | Ninguno                    | Pide a la aplicación anfitriona que confirme y elimine una agenda.                                                                    |
+| `onExternalUpdateConflict` | Ninguno                    | Informa de una actualización de datos controlados recibida durante la edición.                                                        |
 
 ### API del plugin
 

@@ -37,6 +37,9 @@ export class FakeCalendarApp {
 
   updatedConfigs: Record<string, unknown>[] = [];
   overrides: string[] = [];
+  /** Mirrors the real app: destroy() tears plugins down, restore() re-arms. */
+  destroyed = false;
+  destroyCount = 0;
 
   constructor(config: Record<string, unknown>) {
     FakeCalendarApp.created += 1;
@@ -67,6 +70,15 @@ export class FakeCalendarApp {
 
   updateConfig = (config: Record<string, unknown>): void => {
     this.updatedConfigs.push(config);
+  };
+
+  destroy = (): void => {
+    this.destroyed = true;
+    this.destroyCount += 1;
+  };
+
+  restore = (): void => {
+    this.destroyed = false;
   };
 
   // The rest of the surface exists only so the hook's return object builds.

@@ -22,7 +22,7 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
 
-import { maxVersion } from './lib/semver-lite.mjs';
+import { gt, maxVersion } from './lib/semver-lite.mjs';
 import {
   autoBaseline,
   bundledWorkspaceDeps,
@@ -35,6 +35,7 @@ import {
   latestPublished,
   loadPackages,
   prefetchNpmInfo,
+  latestReleaseTagCommit,
   recentCommits,
   resolveRef,
   workingTreeChanges,
@@ -266,7 +267,14 @@ async function resolveBaseline() {
   const commits = recentCommits(COMMIT_LIMIT);
   if (commits.length === 0) fail('No commits found.');
 
-  const options = commits.map(c => {
+  // Everything at or below the last release tag is already shipped; dim it so
+  // the unreleased commits — the ones worth cutting at — stand out.
+  const release = latestReleaseTagCommit();
+  const releaseIndex = release
+    ? commits.findIndex(c => c.sha === release.sha)
+    : -1;
+
+  const options = commits.map((c, i) => {
     const names = c.packageDirs
       .map(d => dirToName.get(d))
       .filter(Boolean)
@@ -276,11 +284,22 @@ async function resolveBaseline() {
     const tag =
       names.length > 0 ? `[${shown}${more}]` : `${C.dim}[no packages]${C.off}`;
     const subject = (c.subject ?? '').slice(0, 44).padEnd(46);
-    return { label: `${c.short}  ${c.date}  ${subject}${tag}`, value: c };
+    const marker =
+      releaseIndex !== -1 && i === releaseIndex
+        ? `  ${C.cyan}<- ${release.tag}${C.off}`
+        : '';
+    const released = releaseIndex !== -1 && i >= releaseIndex;
+    const row = `${c.short}  ${c.date}  ${subject}${tag}${marker}`;
+    return { label: released ? `${C.dim}${row}${C.off}` : row, value: c };
   });
 
+  const unreleased = releaseIndex === -1 ? commits.length : releaseIndex;
+  const hint =
+    releaseIndex === -1
+      ? '(inclusive)'
+      : `(inclusive — ${unreleased} commit${unreleased === 1 ? '' : 's'} since ${release.tag})`;
   const chosen = await select(
-    `${C.bold}Release starts at which commit?${C.off} ${C.dim}(inclusive)${C.off}`,
+    `${C.bold}Release starts at which commit?${C.off} ${C.dim}${hint}${C.off}`,
     options
   );
   console.log(
@@ -408,14 +427,20 @@ for (const p of packages) {
   if (status.changed === true) reasons.push('own source changed');
   if (drift.length > 0) {
     reasons.push(
-      `published deps differ (${drift.map(d => d.dep.replace('@dayflow/', '')).join(', ')})`
+      `published deps differ (${[...new Set(drift.map(d => d.dep.replace('@dayflow/', '')))].join(', ')})`
     );
   }
+
+  // Local ahead of npm means this package was already bumped for the release
+  // being prepared. Bumping again on a second run would skip a version number
+  // and publish a hole, so treat it as staged rather than as more work.
+  const staged = Boolean(published) && gt(p.version, published);
 
   state.set(p.name, {
     pkg: p,
     published,
-    changed: status.changed === true || drift.length > 0,
+    staged,
+    changed: status.changed === true || drift.length > 0 || staged,
     unknown: status.changed === null && drift.length === 0,
     basis: status.basis,
     fileCount: status.files?.length ?? 0,
@@ -471,9 +496,15 @@ for (const f of families) {
   console.log(`${C.bold}${f.name}${C.off} — ${f.cfg.label} ${tag}`);
   for (const m of f.members) {
     const st = state.get(m.name);
-    const mark = st.changed ? `${C.yellow}*${C.off}` : `${C.dim}-${C.off}`;
+    const mark = st.staged
+      ? `${C.cyan}v${C.off}`
+      : st.changed
+        ? `${C.yellow}*${C.off}`
+        : `${C.dim}-${C.off}`;
     let note;
-    if (st.unknown) note = `${C.dim}no baseline${C.off}`;
+    if (st.staged) {
+      note = `${C.cyan}already bumped from ${st.published} — pending publish${C.off}`;
+    } else if (st.unknown) note = `${C.dim}no baseline${C.off}`;
     else if (st.changed) {
       const files = st.fileCount
         ? ` (${st.fileCount} file${st.fileCount > 1 ? 's' : ''})`
@@ -503,9 +534,12 @@ if (actionable.length === 0) {
 const plan = []; // { pkg, from, to }
 
 for (const f of actionable) {
-  const members = f.cfg.lockstep
+  const candidates = f.cfg.lockstep
     ? f.members
     : f.members.filter(m => state.get(m.name).changed);
+  // Whatever is already staged keeps the version it has.
+  const members = candidates.filter(m => !state.get(m.name).staged);
+  if (members.length === 0) continue;
 
   let type = CLI_BUMP;
   if (!type) {
@@ -527,8 +561,13 @@ for (const f of actionable) {
 
   // A lockstep family keeps one shared number line, so every member lands on
   // the same target even if one had drifted.
+  // If part of a lockstep family is already staged, the rest catches up to that
+  // version rather than the family jumping a release ahead of it.
+  const stagedPeak = maxVersion(
+    candidates.filter(m => state.get(m.name).staged).map(m => m.version)
+  );
   const target = f.cfg.lockstep
-    ? bump(maxVersion(members.map(m => m.version)), type)
+    ? (stagedPeak ?? bump(maxVersion(candidates.map(m => m.version)), type))
     : null;
 
   for (const m of members) {
@@ -537,7 +576,17 @@ for (const f of actionable) {
 }
 
 if (plan.length === 0) {
-  console.log(`\n${C.yellow}No families selected — nothing changed.${C.off}`);
+  const staged = packages.filter(p => state.get(p.name).staged);
+  if (staged.length > 0) {
+    console.log(
+      `\n${C.green}${staged.length} package(s) are already bumped and waiting to be published.${C.off}`
+    );
+    console.log(
+      `${C.dim}Next: pnpm run check:deps && pnpm run publish:all${C.off}`
+    );
+  } else {
+    console.log(`\n${C.yellow}No families selected — nothing changed.${C.off}`);
+  }
   process.exit(0);
 }
 

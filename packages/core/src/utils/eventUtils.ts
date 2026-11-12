@@ -424,6 +424,17 @@ export const isEventDeepEqual = (
     event1.title === event2.title &&
     event1.calendarId === event2.calendarId &&
     (event1.description || '') === (event2.description || '') &&
+    (event1.conference?.joinUrl || '') === (event2.conference?.joinUrl || '') &&
+    (event1.conference?.provider || '') ===
+      (event2.conference?.provider || '') &&
+    (event1.conference?.meetingId || '') ===
+      (event2.conference?.meetingId || '') &&
+    (event1.conference?.hostUrl || '') === (event2.conference?.hostUrl || '') &&
+    (event1.conference?.password || '') ===
+      (event2.conference?.password || '') &&
+    (event1.kind ?? 'event') === (event2.kind ?? 'event') &&
+    !!event1.task?.completed === !!event2.task?.completed &&
+    (event1.task?.priority ?? 'none') === (event2.task?.priority ?? 'none') &&
     !!event1.allDay === !!event2.allDay &&
     event1.start.toString() === event2.start.toString() &&
     event1.end.toString() === event2.end.toString() &&

@@ -6,6 +6,8 @@ import { createMonthView } from '@/factories/createMonthView';
 import { createWeekView } from '@/factories/createWeekView';
 import { EventChange, EventMutationSource, ViewType } from '@/types';
 
+const component = () => null;
+
 function makeEvent(id: string) {
   return {
     id,
@@ -45,6 +47,26 @@ function createWriteBackTracker(
 // ─── Visible Range Subscriptions ────────────────────────────────────────────
 
 describe('subscribeVisibleRangeChange', () => {
+  it('uses the eight-week Gantt window and navigates one week at a time', () => {
+    const ganttView = { type: ViewType.GANTT, label: 'Gantt', component };
+    const app = new CalendarApp({
+      views: [ganttView],
+      plugins: [],
+      events: [],
+      defaultView: ViewType.GANTT,
+      initialDate: new Date(2025, 0, 15),
+    });
+    const listener = vi.fn();
+    app.subscribeVisibleRangeChange(listener);
+
+    app.goToNext();
+
+    const { start, end, view } = listener.mock.calls[0][0];
+    expect(view).toBe(ViewType.GANTT);
+    expect(app.getCurrentDate()).toEqual(new Date(2025, 0, 22));
+    expect(end.getTime() - start.getTime()).toBe(56 * 24 * 60 * 60 * 1000);
+  });
+
   it('does not replay the initial visible range to late subscribers', () => {
     const listener = vi.fn();
     const app = new CalendarApp({

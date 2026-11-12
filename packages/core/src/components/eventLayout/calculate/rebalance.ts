@@ -118,8 +118,8 @@ export function rebalanceLoadByGroups(
   allNodes: LayoutNode[]
 ): void {
   for (let i = parallelGroups.length - 1; i >= 1; i--) {
-    const groupNodes = parallelGroups[i].events.map(
-      e => allNodes.find(node => node.event.id === e.id)!
+    const groupNodes = parallelGroups[i].events.map(e =>
+      allNodes.find(node => node.event.id === e.id)!
     );
 
     const parentLoads = calculateParentLoads(groupNodes, allNodes);

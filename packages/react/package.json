@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/react",
-  "version": "3.7.1",
+  "version": "3.7.6",
   "description": "React adapter for DayFlow calendar",
   "files": [
     "dist",
@@ -19,6 +19,7 @@
   "scripts": {
     "build": "rollup -c",
     "clean": "rimraf dist node_modules",
+    "postbuild": "rimraf dist/types",
     "prebuild": "rimraf dist",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -42,6 +43,7 @@
     "react-dom": "catalog:",
     "rimraf": "catalog:",
     "rollup": "catalog:",
+    "rollup-plugin-dts": "catalog:",
     "rollup-plugin-peer-deps-external": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

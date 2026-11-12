@@ -1,0 +1,178 @@
+.preview {
+  --task-preview-priority: #16a34a;
+  animation: priority-color 12s step-end infinite;
+}
+
+.task {
+  color: color-mix(in srgb, var(--task-preview-priority) 75%, #000);
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--task-preview-priority) 18%, transparent) 0 6px,
+    color-mix(in srgb, var(--task-preview-priority) 5%, transparent) 6px 12px
+  );
+}
+
+.circle {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #8b5cf6;
+  border-radius: 50%;
+  color: white;
+  animation: complete-circle 12s infinite;
+}
+
+.check {
+  opacity: 0;
+  animation: complete-check 12s infinite;
+}
+.title {
+  animation: complete-title 12s infinite;
+}
+.panel {
+  animation: panel-open 12s infinite;
+  transform-origin: top;
+}
+.priority {
+  height: 16px;
+}
+.low,
+.medium,
+.high {
+  position: absolute;
+  inset: 0;
+}
+.low {
+  animation: low-label 12s step-end infinite;
+}
+.medium {
+  opacity: 0;
+  animation: medium-label 12s step-end infinite;
+}
+.high {
+  opacity: 0;
+  animation: high-label 12s step-end infinite;
+}
+
+@keyframes priority-color {
+  0%,
+  49% {
+    --task-preview-priority: #16a34a;
+  }
+  50%,
+  69% {
+    --task-preview-priority: #d97706;
+  }
+  70%,
+  94% {
+    --task-preview-priority: #dc2626;
+  }
+  95%,
+  100% {
+    --task-preview-priority: #16a34a;
+  }
+}
+@keyframes complete-circle {
+  0%,
+  14%,
+  34%,
+  100% {
+    background: transparent;
+  }
+  18%,
+  30% {
+    background: #8b5cf6;
+  }
+}
+@keyframes complete-check {
+  0%,
+  14%,
+  34%,
+  100% {
+    opacity: 0;
+  }
+  18%,
+  30% {
+    opacity: 1;
+  }
+}
+@keyframes complete-title {
+  0%,
+  14%,
+  34%,
+  100% {
+    opacity: 1;
+    text-decoration: none;
+  }
+  18%,
+  30% {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+}
+@keyframes panel-open {
+  0%,
+  32%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(4px);
+  }
+  38%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes low-label {
+  0%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes medium-label {
+  0%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes high-label {
+  0%,
+  95%,
+  100% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview,
+  .circle,
+  .check,
+  .title,
+  .panel,
+  .low,
+  .medium,
+  .high {
+    animation: none;
+  }
+  .panel {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:global(.dark) .task {
+  color: color-mix(in srgb, var(--task-preview-priority) 60%, #fff);
+}

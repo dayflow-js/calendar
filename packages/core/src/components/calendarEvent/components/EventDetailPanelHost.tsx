@@ -7,6 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { observePanelInViewport } from '@/components/calendarEvent/utils';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
 import {
@@ -50,18 +51,30 @@ const escapeAttributeValue = (value: string) =>
 const findAnchorElement = (detailPanelEventId: string) => {
   const detailKey = escapeAttributeValue(detailPanelEventId);
   const baseId = escapeAttributeValue(getBaseEventId(detailPanelEventId));
+  const segmentKey = detailPanelEventId.includes('::day-')
+    ? escapeAttributeValue(detailPanelEventId.replace(/::day-\d+/, ''))
+    : null;
 
-  return (
+  const anchor =
     document.querySelector<HTMLElement>(
       `[data-detail-panel-key="${detailKey}"]`
-    ) ?? document.querySelector<HTMLElement>(`[data-event-id="${baseId}"]`)
-  );
+    ) ??
+    (segmentKey
+      ? document.querySelector<HTMLElement>(
+          `[data-detail-panel-key="${segmentKey}"]`
+        )
+      : null) ??
+    document.querySelector<HTMLElement>(`[data-event-id="${baseId}"]`);
+
+  if (!anchor) return null;
+  return anchor.querySelector<HTMLElement>('.df-month-segment-event') ?? anchor;
 };
 
 const calculatePosition = (
   anchorElement: HTMLElement,
   panelElement: HTMLElement,
-  calendarElement: HTMLElement
+  calendarElement: HTMLElement,
+  detailPanelEventId?: string | null
 ): EventDetailPosition => {
   const anchorRect = anchorElement.getBoundingClientRect();
   const panelRect = panelElement.getBoundingClientRect();
@@ -70,14 +83,42 @@ const calculatePosition = (
   const panelHeight = panelRect.height;
   const boundaryWidth = Math.min(window.innerWidth, calendarRect.right);
   const boundaryHeight = Math.min(window.innerHeight, calendarRect.bottom);
-  const spaceOnRight = boundaryWidth - anchorRect.right;
-  const spaceOnLeft = anchorRect.left - calendarRect.left;
+
+  let effectiveLeft = anchorRect.left;
+  let effectiveRight = anchorRect.right;
+
+  const dayMatch = detailPanelEventId?.match(/::day-(\d+)/);
+  let targetDayIndex: number | null = dayMatch
+    ? Number.parseInt(dayMatch[1], 10)
+    : null;
+
+  if (targetDayIndex === null && anchorElement.dataset.startDay !== undefined) {
+    const startDay = Number.parseInt(anchorElement.dataset.startDay, 10);
+    const endDay = Number.parseInt(
+      anchorElement.dataset.endDay ?? anchorElement.dataset.startDay,
+      10
+    );
+    if (startDay === endDay) {
+      targetDayIndex = startDay;
+    }
+  }
+
+  if (targetDayIndex !== null && calendarRect.width > 0) {
+    const dayColWidth = calendarRect.width / 7;
+    const dayColLeft = calendarRect.left + targetDayIndex * dayColWidth;
+    const dayColRight = dayColLeft + dayColWidth;
+    effectiveLeft = Math.max(anchorRect.left, dayColLeft);
+    effectiveRight = Math.min(anchorRect.right, dayColRight);
+  }
+
+  const spaceOnRight = boundaryWidth - effectiveRight;
+  const spaceOnLeft = effectiveLeft - calendarRect.left;
 
   let left: number;
   if (spaceOnRight >= panelWidth + 20) {
-    left = anchorRect.right + 10;
+    left = effectiveRight + 10;
   } else if (spaceOnLeft >= panelWidth + 20) {
-    left = anchorRect.left - panelWidth - 10;
+    left = effectiveLeft - panelWidth - 10;
   } else {
     left =
       spaceOnRight > spaceOnLeft
@@ -100,7 +141,7 @@ const calculatePosition = (
     left,
     eventHeight: anchorRect.height,
     eventMiddleY: anchorRect.top + anchorRect.height / 2,
-    isSunday: left < anchorRect.left,
+    isSunday: left < effectiveLeft,
   };
 };
 
@@ -138,7 +179,12 @@ export const EventDetailPanelHost = ({
 
     selectedEventElementRef.current = anchorElement;
     setPosition(
-      calculatePosition(anchorElement, panelRef.current, calendarRef.current)
+      calculatePosition(
+        anchorElement,
+        panelRef.current,
+        calendarRef.current,
+        detailPanelEventId
+      )
     );
   }, [calendarRef, detailPanelEventId]);
 
@@ -148,10 +194,19 @@ export const EventDetailPanelHost = ({
     const onLayoutChange = () => updatePosition();
     window.addEventListener('resize', onLayoutChange);
     window.addEventListener('scroll', onLayoutChange, true);
+    const stopObserving = panelRef.current
+      ? observePanelInViewport(panelRef.current, update =>
+          setPosition(prev => {
+            const top = update(prev.top);
+            return top === prev.top ? prev : { ...prev, top };
+          })
+        )
+      : undefined;
 
     return () => {
       window.removeEventListener('resize', onLayoutChange);
       window.removeEventListener('scroll', onLayoutChange, true);
+      stopObserving?.();
     };
   }, [showPanel, updatePosition]);
 

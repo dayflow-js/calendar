@@ -120,21 +120,40 @@ import { SidebarCustomShowcase } from '@/components/showcase/SidebarShowcases';
 
 ## 設定リファレンス
 
-| プロパティ                   | 型                                                     | デフォルト                         | 説明                                                   |
-| :--------------------------- | :----------------------------------------------------- | :--------------------------------- | :----------------------------------------------------- |
-| `width`                      | `number \| string`                                     | `'240px'`                          | サイドバーの幅（例: `280` または `'20rem'`）           |
-| `miniWidth`                  | `string`                                               | `'50px'`                           | 折りたたみ時のサイドバーの幅                           |
-| `initialCollapsed`           | `boolean`                                              | `false`                            | サイドバーを折りたたんだ状態で開始するかどうか         |
-| `createCalendarMode`         | `'inline' \| 'modal'`                                  | `'inline'`                         | カレンダー作成フォームの表示方法                       |
-| `colorPickerMode`            | `'blossom' \| 'default'`                               | `'default'`                        | 使用するカラーピッカーコンポーネント                   |
-| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                  | `undefined`                        | 新しい購読が追加された後のコールバック                 |
-| `onLoadSubscription`         | `(calendar) => Promise<void>`                          | `undefined`                        | 既存の購読用のカスタムローダー                         |
-| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>` | `undefined`                        | カレンダーの並べ替え後のコールバック                   |
-| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                 | `['calendarList', 'miniCalendar']` | サイドバーコンポーネントの表示順序                     |
-| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`         | `undefined`                        | サイドバー UI を完全にオーバーライドします             |
-| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`               | `undefined`                        | カスタムサイドバーヘッダーレンダラー                   |
-| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                         | `undefined`                        | カレンダー項目のカスタムコンテキストメニューレンダラー |
-| `renderCreateCalendarDialog` | `(props) => TNode`                                     | `undefined`                        | カスタムカレンダー作成ダイアログレンダラー             |
+| プロパティ                   | 型                                                             | デフォルト                         | 説明                                                   |
+| :--------------------------- | :------------------------------------------------------------- | :--------------------------------- | :----------------------------------------------------- |
+| `width`                      | `number \| string`                                             | `'240px'`                          | サイドバーの幅（例: `280` または `'20rem'`）           |
+| `miniWidth`                  | `string`                                                       | `'50px'`                           | 折りたたみ時のサイドバーの幅                           |
+| `initialCollapsed`           | `boolean`                                                      | `false`                            | サイドバーを折りたたんだ状態で開始するかどうか         |
+| `createCalendarMode`         | `'inline' \| 'modal'`                                          | `'inline'`                         | カレンダー作成フォームの表示方法                       |
+| `colorPickerMode`            | `'blossom' \| 'default'`                                       | `'default'`                        | 使用するカラーピッカーコンポーネント                   |
+| `onSubscribeCalendar`        | `(calendar, events) => Promise<void>`                          | `undefined`                        | 新しい購読が追加された後のコールバック                 |
+| `onLoadSubscription`         | `(calendar) => Promise<void>`                                  | `undefined`                        | 既存の購読用のカスタムローダー                         |
+| `onReorder`                  | `(calendars: CalendarType[]) => void \| Promise<void>`         | `undefined`                        | カレンダーの並べ替え後のコールバック                   |
+| `groups`                     | `string[]`                                                     | `[]`                               | 保存済みのグループ名と並び順を復元                     |
+| `onGroupCreate`              | `(groupName: string) => void \| Promise<void>`                 | `undefined`                        | グループ作成時のコールバック                           |
+| `onGroupRename`              | `(previousName, nextName, calendars) => void \| Promise<void>` | `undefined`                        | グループ名変更時のコールバック                         |
+| `onGroupDelete`              | `(groupName, calendars) => void \| Promise<void>`              | `undefined`                        | グループ削除時のコールバック                           |
+| `onGroupReorder`             | `(groups: string[]) => void \| Promise<void>`                  | `undefined`                        | グループの並び順変更時のコールバック                   |
+| `componentsOrder`            | `('calendarList' \| 'miniCalendar')[]`                         | `['calendarList', 'miniCalendar']` | サイドバーコンポーネントの表示順序                     |
+| `render`                     | `(props: CalendarSidebarRenderProps) => TNode`                 | `undefined`                        | サイドバー UI を完全にオーバーライドします             |
+| `renderSidebarHeader`        | `(args: SidebarHeaderSlotArgs) => TNode`                       | `undefined`                        | カスタムサイドバーヘッダーレンダラー                   |
+| `renderCalendarContextMenu`  | `(calendar, onClose) => TNode`                                 | `undefined`                        | カレンダー項目のカスタムコンテキストメニューレンダラー |
+| `renderCreateCalendarDialog` | `(props) => TNode`                                             | `undefined`                        | カスタムカレンダー作成ダイアログレンダラー             |
+
+グループの変更は、対応するコールバックの完了後に適用されます。Promise が拒否された場合、グループまたは並び順は変更されず、編集ダイアログも開いたままになります。`calendars` 引数には現在グループに属するカレンダーが含まれ、`onGroupReorder` には並べ替え後の完全なグループ名リストが渡されます。
+
+```ts
+const sidebarPlugin = createSidebarPlugin({
+  groups: savedGroups,
+  onGroupCreate: async groupName => saveGroup(groupName),
+  onGroupRename: async (previousName, nextName, calendars) =>
+    renameGroup(previousName, nextName, calendars),
+  onGroupDelete: async (groupName, calendars) =>
+    deleteGroup(groupName, calendars),
+  onGroupReorder: async groups => saveGroupOrder(groups),
+});
+```
 
 ## プログラマティック API
 
@@ -182,6 +201,8 @@ window.addEventListener('keydown', e => {
 - **カレンダー作成** - カスタム名と色で新しいカレンダーを追加
 - **名前変更 / 色変更** - カレンダーを右クリックして名前や色を変更
 - **カレンダーの並べ替え** - リスト内でカレンダーをドラッグ＆ドロップして並べ替えることができます。`onReorder` コールバックを使用して、新しい順序をバックエンドに保存できます。
+- **カレンダーグループ** - サイドバーを右クリックしてグループを作成できます。グループを右クリックすると、名前変更、確認後の削除、グループ内でのカレンダー作成ができます。
+- **グループの並べ替え** - グループ見出しをドラッグして順序を変更できます。保存済みの順序は `groups` で復元し、変更は `onGroupReorder` で永続化できます。
 - **カレンダー統合** - あるカレンダーの全イベントを別のカレンダーに移動
 - **カレンダー削除** - 確認ステップ付きでカレンダーを削除（事前に統合も可能）
 - **インポート / エクスポート** - `.ics` 文件のインポートまたはカレンダーを `.ics` にエクスポート
@@ -238,9 +259,7 @@ const calendar = useCalendarApp({
       },
       // デフォルトの保護を上書き：
       readOnly: false, // UI 操作とドラッグ＆ドロップの両方を有効化
-      colors: {
-        /* ... */
-      },
+      colors: {/* ... */},
     },
   ],
 });

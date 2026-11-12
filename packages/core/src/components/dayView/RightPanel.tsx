@@ -1,11 +1,16 @@
 import { RefObject } from 'preact';
 
 import { CalendarEvent } from '@/components/calendarEvent';
+import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
+import { TaskPriorityIndicator } from '@/components/common/TaskPriorityIndicator';
 import TodayBox from '@/components/common/TodayBox';
 import { useLocale } from '@/locale';
 import { miniCalendarContainer } from '@/styles/classNames';
 import { ICalendarApp, Event, ViewType } from '@/types';
+import { formatTime, getLineColor, getPrimaryCalendarId } from '@/utils';
+import { isTask } from '@/utils/taskUtils';
+import { isPlainDate } from '@/utils/temporal';
 import { temporalToVisualDate } from '@/utils/temporalTypeGuards';
 
 interface RightPanelProps {
@@ -62,20 +67,26 @@ export const RightPanel = ({
         {/* Mini calendar */}
         <div className={miniCalendarContainer}>
           <div className='df-right-panel-calendar-shell'>
-            <div className='df-right-panel-calendar-header'>
-              <div className='df-right-panel-header-spacer' aria-hidden='true'>
-                &nbsp;
+            {app.state.useViewHeader !== false && (
+              <div className='df-right-panel-calendar-header'>
+                <div
+                  className='df-right-panel-header-spacer'
+                  aria-hidden='true'
+                >
+                  &nbsp;
+                </div>
+                <TodayBox
+                  handlePreviousMonth={() => app.goToPrevious()}
+                  handleNextMonth={() => app.goToNext()}
+                  handleToday={() => app.goToToday()}
+                  navigationUnit='day'
+                />
               </div>
-              <TodayBox
-                handlePreviousMonth={() => app.goToPrevious()}
-                handleNextMonth={() => app.goToNext()}
-                handleToday={() => app.goToToday()}
-              />
-            </div>
+            )}
             <MiniCalendar
               visibleMonth={visibleMonth}
               currentDate={currentDate}
-              showHeader={true}
+              showHeader={app.state.useViewHeader !== false}
               onMonthChange={handleMonthChange}
               onDateSelect={handleDateSelect}
               events={app.getEvents()}
@@ -128,6 +139,45 @@ export const RightPanel = ({
                       firstHour={0}
                       disableDefaultStyle={true}
                       className='df-right-panel-event-card'
+                      renderVisualContent={
+                        isTask(event)
+                          ? () => {
+                              const due = temporalToVisualDate(
+                                event.start,
+                                appTimeZone ?? app.timeZone
+                              );
+                              return (
+                                <div className='df-right-panel-task-content'>
+                                  <div className='df-event-title'>
+                                    <TaskCheckbox
+                                      event={event}
+                                      app={app}
+                                      isEditable={app.canMutateFromUI(
+                                        event._recurrenceMasterId ?? event.id
+                                      )}
+                                      color={getLineColor(
+                                        getPrimaryCalendarId(event),
+                                        app.getCalendarRegistry()
+                                      )}
+                                    />
+                                    <TaskPriorityIndicator event={event} />
+                                    {event.title}
+                                  </div>
+                                  {!event.allDay &&
+                                    !isPlainDate(event.start) && (
+                                      <div className='df-event-time'>
+                                        {formatTime(
+                                          due.getHours(),
+                                          due.getMinutes(),
+                                          timeFormat
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                              );
+                            }
+                          : undefined
+                      }
                     />
                   </div>
                 ))}

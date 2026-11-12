@@ -1,5 +1,7 @@
 import { Temporal } from 'temporal-polyfill';
 
+import { dateToCalendarDate } from '@/calendar/calendarSystem';
+
 export interface WeekDateDisplay {
   date: number;
   month: string;
@@ -97,7 +99,10 @@ export const buildWeekDates = (
     date.setDate(displayStart.getDate() + index);
 
     return {
-      date: date.getDate(),
+      date: dateToCalendarDate(
+        date,
+        new Intl.Locale(locale).calendar === 'persian' ? 'jalali' : 'gregorian'
+      ).day,
       month: date.toLocaleString(locale, { month: 'short' }),
       fullDate: new Date(date),
       isToday: date.toDateString() === todayKey,
@@ -128,7 +133,10 @@ export const buildFullWeekDates = (
     );
 
     return {
-      date: date.getDate(),
+      date: dateToCalendarDate(
+        date,
+        new Intl.Locale(locale).calendar === 'persian' ? 'jalali' : 'gregorian'
+      ).day,
       month: date.toLocaleString(locale, { month: 'short' }),
       fullDate: new Date(date),
       isToday: date.toDateString() === todayKey,

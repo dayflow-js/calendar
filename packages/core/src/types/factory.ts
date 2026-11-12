@@ -87,6 +87,8 @@ export interface ViewFactoryConfig {
  * Day view factory configuration
  */
 export interface DayViewConfig extends ViewFactoryConfig {
+  /** Show a dashed divider at each half hour. Defaults to false. */
+  showHalfHourLines?: boolean;
   showAllDay?: boolean;
   scrollToCurrentTime?: boolean;
   secondaryTimeZone?: TimeZoneValue;
@@ -97,6 +99,8 @@ export interface DayViewConfig extends ViewFactoryConfig {
  * Week view factory configuration
  */
 export interface WeekViewConfig extends ViewFactoryConfig {
+  /** Show a dashed divider at each half hour. Defaults to false. */
+  showHalfHourLines?: boolean;
   showWeekends?: boolean;
   showAllDay?: boolean;
   startOfWeek?: number;
@@ -128,6 +132,8 @@ export interface WeekViewConfig extends ViewFactoryConfig {
  * Month scroll / navigation configuration
  */
 export interface MonthScrollConfig {
+  /** Month view only: skip smooth scrolling and navigation delays for Prev/Next/Today/date navigation. Snap-to-month stays smooth. Keeps continuous scrolling enabled. Default false. */
+  instantNavigation?: boolean;
   /** Disable continuous scrolling; only Prev/Next buttons switch months */
   disabled?: boolean;
   /**

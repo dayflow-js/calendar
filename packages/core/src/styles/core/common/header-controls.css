@@ -395,24 +395,54 @@
     display: flex;
     cursor: pointer;
     align-items: center;
+    gap: 0.5rem;
     padding: 0.25rem 0.5rem;
-    transition: background-color 150ms;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--df-color-foreground);
+    transition:
+      background-color 120ms ease,
+      color 120ms ease;
   }
 
-  .df-calendar-picker-option:hover {
-    background-color: var(--df-color-hover);
+  .df-calendar-picker-option:hover,
+  .df-calendar-picker-option-mobile:hover,
+  .df-calendar-picker-option[data-active='true'] {
+    background-color: var(--df-color-primary);
+    color: var(--df-color-primary-foreground);
   }
 
   .df-calendar-picker-option-mobile {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
   }
 
-  .df-calendar-picker-option[data-selected='true'] {
-    font-weight: 600;
-  }
-
+  .df-calendar-picker-option[data-selected='true'],
   .df-calendar-picker-option-mobile[data-selected='true'] {
-    background-color: var(--df-color-hover);
+    background-color: color-mix(
+      in srgb,
+      var(--df-color-primary) 12%,
+      transparent
+    );
+    color: var(--df-color-foreground);
+    font-weight: 500;
+  }
+
+  .dark .df-calendar-picker-option[data-selected='true'],
+  .dark .df-calendar-picker-option-mobile[data-selected='true'] {
+    background-color: color-mix(
+      in srgb,
+      var(--df-color-primary) 22%,
+      transparent
+    );
+    color: var(--df-color-foreground);
+  }
+
+  .df-calendar-picker-option[data-selected='true']:hover,
+  .df-calendar-picker-option-mobile[data-selected='true']:hover,
+  .df-calendar-picker-option[data-selected='true'][data-active='true'] {
+    background-color: var(--df-color-primary);
+    color: var(--df-color-primary-foreground);
   }
 
   .df-calendar-picker-option-inner {
@@ -420,48 +450,50 @@
     min-width: 0;
     flex: 1;
     align-items: center;
-    margin-right: 0.75rem;
-  }
-
-  .df-calendar-picker-check-area {
-    display: flex;
-    width: 1.25rem;
-    justify-content: center;
-    margin-right: 0.5rem;
-    flex-shrink: 0;
   }
 
   .df-calendar-picker-option-label {
+    min-width: 0;
+    flex: 1 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 0.875rem;
-    color: var(--df-color-foreground);
+    color: inherit;
+  }
+
+  .df-calendar-picker-group-label {
+    padding: 0.375rem 0.5rem 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--df-color-muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   /* CalendarPicker dropdown container (used by both mobile and desktop variants) */
   .df-calendar-picker-dropdown {
-    overflow: hidden;
-    border-radius: 0.375rem;
+    overflow-y: auto;
+    max-height: 18rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--df-color-border);
     background-color: var(--df-color-card);
-    box-shadow:
-      0 10px 15px -3px rgb(0 0 0 / 0.1),
-      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    padding: 0.25rem;
+    box-shadow: 0 10px 20px rgb(0 0 0 / 0.12);
     transition: all 200ms;
     transform-origin: top right;
   }
 
-  /* Icon sizing inside trigger and check-area */
-  .df-calendar-picker-trigger svg,
-  .df-calendar-picker-check-area svg {
-    width: 1rem;
-    height: 1rem;
+  /* The listbox takes focus; the active option is highlighted instead. */
+  .df-calendar-picker-dropdown:focus {
+    outline: none;
   }
 
-  /* Color swatch spacing when inside an option row */
-  .df-calendar-picker-option .df-calendar-picker-color-swatch-sm {
-    margin-right: 0.5rem;
+  /* Icon sizing inside trigger */
+  .df-calendar-picker-trigger svg {
+    width: 1rem;
+    height: 1rem;
   }
 
   /* ===================================================================

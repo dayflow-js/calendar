@@ -9,6 +9,7 @@ import {
   PackageTabs,
 } from '@/components/FrameworkInstall';
 import { FrameworkTabs, Tab } from '@/components/FrameworkTabs';
+import { LoadingDocImage } from '@/components/LoadingDocImage';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -22,8 +23,7 @@ function DocImg({
   [key: string]: unknown;
 }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <LoadingDocImage
       {...(props as React.ImgHTMLAttributes<HTMLImageElement>)}
       src={`${BASE}${src}`}
       alt={alt || ''}

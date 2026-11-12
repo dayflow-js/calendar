@@ -1,16 +1,32 @@
 import { Event } from '@/types';
 import { extractHourFromDate, getEventEndHour } from '@/utils/helpers';
 
+import { LAYOUT_CONFIG } from './constants';
 import { LayoutWeekEvent } from './types';
 
 export function toLayoutEvent(event: Event): LayoutWeekEvent {
+  if (event.allDay) {
+    return {
+      ...event,
+      parentId: undefined,
+      children: [],
+      _startHour: 0,
+      _endHour: 0,
+    };
+  }
+
+  const startHour = extractHourFromDate(event.start);
   return {
     ...event,
     parentId: undefined,
     children: [],
-    // Only calculate hour values for non-all-day events
-    _startHour: event.allDay ? 0 : extractHourFromDate(event.start),
-    _endHour: event.allDay ? 0 : getEventEndHour(event),
+    _startHour: startHour,
+    // Events are drawn at least MIN_VISUAL_DURATION tall, so lay them out with
+    // that span too; otherwise zero-length tasks at the same time stack.
+    _endHour: Math.max(
+      getEventEndHour(event),
+      startHour + LAYOUT_CONFIG.MIN_VISUAL_DURATION
+    ),
   };
 }
 
@@ -90,8 +106,6 @@ export function checkExtendedEventParallel(
 
   return false;
 }
-
-import { LAYOUT_CONFIG } from './constants';
 
 /**
  * Check if two events should be displayed in parallel

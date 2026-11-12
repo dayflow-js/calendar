@@ -49,6 +49,7 @@ interface UseEventActionsProps {
   setContextMenuPosition: (pos: { x: number; y: number } | null) => void;
   setActiveDayIndex: (index: number | null) => void;
   getClickedDayIdx: (clientX: number) => number | null;
+  getActiveDayIdx?: () => number;
   updatePanelPosition: () => void;
   selectedEventElementRef: RefObject<HTMLElement | null>;
 }
@@ -76,6 +77,7 @@ export const useEventActions = ({
   setContextMenuPosition,
   setActiveDayIndex,
   getClickedDayIdx,
+  getActiveDayIdx,
   updatePanelPosition,
   selectedEventElementRef,
 }: UseEventActionsProps) => {
@@ -420,7 +422,13 @@ export const useEventActions = ({
         );
       }
 
-      onDetailPanelToggle?.(detailPanelKey);
+      const activeDay = getActiveDayIdx?.();
+      const resolvedKey =
+        isMultiDay && segment && activeDay !== undefined && activeDay !== null
+          ? `${detailPanelKey}::day-${activeDay}`
+          : detailPanelKey;
+
+      onDetailPanelToggle?.(resolvedKey);
 
       if (useEventDetailPanel !== false) {
         requestAnimationFrame(() => updatePanelPosition());
@@ -434,6 +442,9 @@ export const useEventActions = ({
     isMobile,
     onDetailPanelToggle,
     detailPanelKey,
+    isMultiDay,
+    segment,
+    getActiveDayIdx,
     useEventDetailPanel,
     setDetailPanelPosition,
     updatePanelPosition,

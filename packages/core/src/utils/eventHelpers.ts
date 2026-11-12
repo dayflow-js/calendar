@@ -10,7 +10,7 @@
 
 import { Temporal } from 'temporal-polyfill';
 
-import { Event } from '@/types';
+import { Event, EventConference } from '@/types';
 
 import {
   dateToPlainDate,
@@ -30,6 +30,7 @@ export interface CreateEventParams {
   id: string;
   title: string;
   description?: string;
+  conference?: EventConference;
 
   // Flexible time input - accepts Date or Temporal types
   // - Date: Will be converted to PlainDateTime (for timed events) or PlainDate (for allDay events)
@@ -62,6 +63,7 @@ export interface CreateTimezoneEventParams {
   id: string;
   title: string;
   description?: string;
+  conference?: EventConference;
 
   // Flexible time input - accepts Date or ZonedDateTime
   // - Date: Will be converted to ZonedDateTime using the specified timezone
@@ -179,6 +181,7 @@ export function createEvent(params: CreateEventParams): Event {
     id: params.id,
     title: params.title,
     description: params.description,
+    conference: params.conference,
     start,
     end,
     allDay: params.allDay ?? false,
@@ -231,6 +234,7 @@ export function createTimezoneEvent(params: CreateTimezoneEventParams): Event {
     id: params.id,
     title: params.title,
     description: params.description,
+    conference: params.conference,
     start,
     end,
     allDay: false, // Timezone events are always timed events
@@ -330,6 +334,7 @@ export function createAllDayEvent(
     end: endDate,
     allDay: true,
     description: legacyOptions?.description,
+    conference: legacyOptions?.conference,
     calendarId,
     meta: legacyOptions?.meta,
   });

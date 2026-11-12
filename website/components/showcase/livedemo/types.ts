@@ -9,12 +9,21 @@ export interface CalendarFeatures {
   showSidebar: boolean;
   showHeader: boolean;
   enableDrag: boolean;
+  enableTasks: boolean;
   enableShortcuts: boolean;
   showEventDots: boolean;
   showCalendarGroups: boolean;
   showMultiCalendar: boolean;
   readOnly: boolean;
   collapsedSafeAreaLeft: boolean;
+  showHalfHourLines: boolean;
+  showAllDay: boolean;
+  scrollToCurrentTime: boolean;
+  showWeekends: boolean;
+  showWeekNumbers: boolean;
+  showMonthIndicator: boolean;
+  showTimedEventsInYearView: boolean;
+  showEmptyAgendaDays: boolean;
   sidebarOrder?: ('calendarList' | 'miniCalendar')[];
 }
 
@@ -27,4 +36,10 @@ export interface CalendarSelections {
   yearMode: YearMode;
   switcherMode: SwitcherMode;
   themeColor?: string;
+  timeFormat: '12h' | '24h';
+  firstHour: number;
+  lastHour: number;
+  hourHeight: number;
+  startOfWeek: number;
+  agendaDaysToShow: number;
 }

@@ -3,13 +3,30 @@ import type {
   CustomRendering,
   UseCalendarAppReturn,
   CalendarSearchProps,
+  EventContentSlotArgs,
+  EventContextMenuSlotArgs,
+  GridContextMenuSlotArgs,
+  GridPopupContentSlotArgs,
+  MonthDateNumberSlotArgs,
+  EventDetailContentProps,
+  EventDetailDialogProps,
+  CreateCalendarDialogProps,
+  TitleBarSlotProps,
+  ColorPickerProps,
+  CreateCalendarDialogColorPickerProps,
+  CalendarHeaderProps,
+  MobileEventProps,
+  CalendarSidebarRenderProps,
+  SidebarHeaderSlotArgs,
+  CalendarContextMenuSlotArgs,
 } from '@dayflow/core';
 import { CalendarRenderer } from '@dayflow/core';
-import type { PropType } from 'vue';
+import type { PropType, Slot, SlotsType } from 'vue';
 import {
   defineComponent,
   h,
   ref,
+  onBeforeUpdate,
   onMounted,
   onUnmounted,
   shallowRef,
@@ -17,6 +34,33 @@ import {
   computed,
   watch,
 } from 'vue';
+
+/** Slots of `DayFlowCalendar` and the args each one receives. */
+export interface DayFlowCalendarSlots {
+  eventContentDay?: EventContentSlotArgs;
+  eventContentWeek?: EventContentSlotArgs;
+  eventContentMonth?: EventContentSlotArgs;
+  eventContentYear?: EventContentSlotArgs;
+  eventContentAllDayDay?: EventContentSlotArgs;
+  eventContentAllDayWeek?: EventContentSlotArgs;
+  eventContentAllDayMonth?: EventContentSlotArgs;
+  eventContentAllDayYear?: EventContentSlotArgs;
+  eventDetailContent?: EventDetailContentProps;
+  eventDetailDialog?: EventDetailDialogProps;
+  createCalendarDialog?: CreateCalendarDialogProps;
+  titleBarSlot?: TitleBarSlotProps;
+  colorPicker?: ColorPickerProps;
+  createCalendarDialogColorPicker?: CreateCalendarDialogColorPickerProps;
+  calendarHeader?: CalendarHeaderProps;
+  eventContextMenu?: EventContextMenuSlotArgs;
+  gridContextMenu?: GridContextMenuSlotArgs;
+  gridPopupContent?: GridPopupContentSlotArgs;
+  monthDateNumberContent?: MonthDateNumberSlotArgs;
+  mobileEventDetail?: MobileEventProps;
+  sidebar?: CalendarSidebarRenderProps;
+  sidebarHeader?: SidebarHeaderSlotArgs;
+  calendarContextMenu?: CalendarContextMenuSlotArgs;
+}
 
 export const DayFlowCalendar = defineComponent({
   name: 'DayFlowCalendar',
@@ -34,6 +78,7 @@ export const DayFlowCalendar = defineComponent({
       default: undefined,
     },
   },
+  slots: Object as SlotsType<DayFlowCalendarSlots>,
   setup(props, { slots }) {
     const container = ref<HTMLElement | null>(null);
     const renderer = shallowRef<CalendarRenderer | null>(null);
@@ -41,6 +86,8 @@ export const DayFlowCalendar = defineComponent({
 
     // Store subscription cleanup so it can be replaced when the app changes.
     let storeUnsubscribe: (() => void) | null = null;
+    // Slot names the renderer currently treats as overridden.
+    let activeOverrides: string[] = [];
 
     // Extract underlying app instance
     const app = computed<ICalendarApp>(
@@ -64,7 +111,8 @@ export const DayFlowCalendar = defineComponent({
       storeUnsubscribe?.();
       renderer.value?.unmount();
 
-      const r = new CalendarRenderer(appInstance, Object.keys(slots));
+      activeOverrides = Object.keys(slots);
+      const r = new CalendarRenderer(appInstance, activeOverrides);
       renderer.value = r;
       r.setProps(extraProps.value);
 
@@ -95,6 +143,24 @@ export const DayFlowCalendar = defineComponent({
       }
     });
 
+    // Slots behind a v-if come and go after mount. A parent re-render with a
+    // different slot set updates this component, so resync the overrides here.
+    onBeforeUpdate(() => {
+      if (!renderer.value) {
+        return;
+      }
+      const next = Object.keys(slots);
+      if (
+        next.length === activeOverrides.length &&
+        next.every((name, i) => name === activeOverrides[i])
+      ) {
+        return;
+      }
+      activeOverrides = next;
+      renderer.value.getCustomRenderingStore().setOverrides(next);
+      app.value.setOverrides(next);
+    });
+
     onMounted(() => {
       initRenderer(app.value);
 
@@ -110,10 +176,14 @@ export const DayFlowCalendar = defineComponent({
       ...customRenderings.value.map(rendering =>
         h(
           Teleport,
-          { to: rendering.containerEl },
+          // Keyed like the other adapters: without it Vue patches by position
+          // and a removed placeholder hands its content to the next one.
+          { key: rendering.id, to: rendering.containerEl },
           {
             default: () =>
-              slots[rendering.generatorName]?.(rendering.generatorArgs),
+              (slots as Record<string, Slot | undefined>)[
+                rendering.generatorName
+              ]?.(rendering.generatorArgs),
           }
         )
       ),

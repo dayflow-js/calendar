@@ -1,6 +1,5 @@
-import { memo } from 'preact/compat';
-
 import { useLocale } from '@/locale';
+import { memoWithDisplayName } from '@/utils/memoWithDisplayName';
 
 interface YearDayCellProps {
   date: Date;
@@ -13,7 +12,8 @@ interface YearDayCellProps {
   onContextMenu?: (e: MouseEvent, date: Date) => void;
 }
 
-export const YearDayCell = memo(
+export const YearDayCell = /* @__PURE__ */ memoWithDisplayName(
+  'YearDayCell',
   ({
     date,
     isToday,
@@ -25,7 +25,12 @@ export const YearDayCell = memo(
     onContextMenu,
   }: YearDayCellProps) => {
     const { t } = useLocale();
-    const day = date.getDate();
+    const day = Number(
+      date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        calendar: new Intl.Locale(locale).calendar ?? 'gregory',
+      })
+    );
     const isFirstDay = day === 1;
     const monthLabel = date
       .toLocaleDateString(locale, { month: 'short' })
@@ -54,7 +59,7 @@ export const YearDayCell = memo(
             className='df-year-day-cell-date'
             data-today={isToday ? 'true' : 'false'}
           >
-            {day}
+            {date.toLocaleDateString(locale, { day: 'numeric' })}
           </span>
         </div>
 
@@ -75,5 +80,3 @@ export const YearDayCell = memo(
     );
   }
 );
-
-(YearDayCell as { displayName?: string }).displayName = 'YearDayCell';

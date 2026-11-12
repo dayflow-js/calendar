@@ -37,6 +37,25 @@ END:VEVENT
 END:VCALENDAR`;
 
   describe('parseICS', () => {
+    it('extracts a Teams link from an escaped, folded description', () => {
+      const ics = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:teams-meeting
+DTSTART:20260903T103000
+DTEND:20260903T111500
+SUMMARY:Kindred IT Sync
+DESCRIPTION:Microsoft Teams meeting\\nJoin: https://teams.microsoft.com/
+ meet/443033989017915?foo=bar\\nAgenda: sync
+END:VEVENT
+END:VCALENDAR`;
+      const event = parseICS(ics).events[0];
+      expect(event.conference?.provider).toBe('microsoft-teams');
+      expect(event.conference?.joinUrl).toBe(
+        'https://teams.microsoft.com/meet/443033989017915?foo=bar'
+      );
+      expect(event.description).toContain('Agenda: sync');
+    });
+
     it('should parse a simple ICS string correctly', () => {
       const result = parseICS(simpleICS, { generateNewIds: false });
 

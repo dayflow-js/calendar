@@ -9,6 +9,7 @@
     "check:deps": "node ./scripts/check-deps.mjs",
     "clean": "pnpm -r --parallel --if-present run clean && rimraf node_modules",
     "dev": "vite --config packages/core/vite.config.ts --host",
+    "dev:jalali": "vite --config packages/core/vite.jalali.config.ts --host 127.0.0.1 --port 5529 --open /jalali.html",
     "format": "oxfmt .",
     "format:check": "oxfmt . --check",
     "lint": "oxlint .",

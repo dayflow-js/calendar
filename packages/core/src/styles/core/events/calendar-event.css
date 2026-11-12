@@ -576,4 +576,107 @@
   .dark .df-month-segment-event-tail-dot {
     background-color: rgb(255 255 255 / 0.8);
   }
+
+  /* ===================================================================
+   * Tasks
+   * =================================================================== */
+
+  .df-task-checkbox {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 0.8125rem;
+    height: 0.8125rem;
+    margin-right: 0.3125rem;
+    vertical-align: -0.125rem;
+    border-radius: 9999px;
+    cursor: default;
+  }
+
+  .df-task-checkbox[data-interactive='true'] {
+    cursor: pointer;
+  }
+
+  .df-task-checkbox:focus-visible {
+    outline: 2px solid var(--df-color-ring);
+    outline-offset: 1px;
+  }
+
+  .df-task-checkbox svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .df-task-checkbox circle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .df-task-checkbox path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .df-task-checkbox[data-completed='true'] circle {
+    fill: currentColor;
+  }
+
+  [data-event-id][data-selected='true'] .df-task-checkbox,
+  .df-agenda-event[data-selected='true'] .df-task-checkbox {
+    color: #fff !important;
+  }
+
+  [data-event-id][data-selected='true']
+    .df-task-checkbox[data-completed='true']
+    circle,
+  .df-agenda-event[data-selected='true']
+    .df-task-checkbox[data-completed='true']
+    circle {
+    fill: none;
+  }
+
+  /* Match the timed cell inset after accounting for the segment offset. */
+  .df-month-segment-event[data-kind='task'] {
+    padding-inline: 0.125rem;
+  }
+
+  .dark,
+  [data-df-theme='dark'] {
+    --df-task-text-none: #cbd5e1;
+    --df-task-text-low: #86efac;
+    --df-task-text-medium: #fcd34d;
+    --df-task-text-high: #fca5a5;
+  }
+
+  /* The full event background carries priority; keep its text label accessible. */
+  .df-task-priority-indicator {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .df-event[data-kind='task'] .df-event-timed-content {
+    padding-left: 0.25rem;
+  }
+
+  .df-task-priority-mark {
+    margin-right: 0.25rem;
+    font-weight: 700;
+  }
+
+  [data-task-completed='true'] .df-event-title,
+  [data-task-completed='true'] .df-event-month-title,
+  [data-task-completed='true'] .df-agenda-title {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
 }

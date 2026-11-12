@@ -24,6 +24,7 @@ import {
   isBuiltin,
   packageNameOf,
   readDistImports,
+  readDistTypeImports,
   latestPublished,
   publishedVersions,
   latestPublishedInternalRanges,
@@ -241,19 +242,43 @@ function checkImportsVsManifest(p) {
       p.name,
       `dist imports "${depName}" but it is not in dependencies/peerDependencies`,
       inDev
-        ? `It is only a devDependency. Consumers on pnpm get "Cannot find module '${depName}'". Promote it to dependencies or peerDependencies.`
-        : `Consumers get "Cannot find module '${depName}'". Declare it.`
+        ? `It is only a devDependency. npm and pnpm resolve it by hoisting luck; yarn PnP refuses ("isn't declared in its dependencies"). Promote it to dependencies.`
+        : `It resolves only by hoisting luck, and yarn PnP refuses it outright. Declare it.`
     );
   }
 
-  // W01: declared as a runtime dependency but bundled in / unused.
+  // E08: the declaration files are shipped too, and the JS bundle says nothing
+  // about them — a package can be inlined into the JS yet still be imported by
+  // the .d.ts that re-exports its types.
+  const typeImports = readDistTypeImports(p) ?? new Set();
+  const typePkgs = new Set();
+  for (const spec of typeImports) {
+    if (isBuiltin(spec)) continue;
+    const name = packageNameOf(spec);
+    typePkgs.add(name);
+    if (name === p.name || declared.has(name)) continue;
+    const alias =
+      !byName.has(name) && p.manifest.devDependencies?.[name] === undefined;
+    error(
+      'E08',
+      p.name,
+      `declaration files import "${name}" but it is not in dependencies/peerDependencies`,
+      alias
+        ? `"${name}" looks like a tsconfig path alias that was never rewritten. Consumers get TS2307, or with skipLibCheck the affected types silently become any. Resolve the alias when bundling declarations.`
+        : `Consumers get TS2307 "Cannot find module", or with skipLibCheck the affected types silently become any. Declare it as a dependency.`
+    );
+  }
+
+  // W01: declared as a runtime dependency but neither the bundle nor the
+  // declaration files reach for it. A package the .d.ts imports is not dead,
+  // even when its code is inlined — the types still need it installed.
   for (const d of p.deps) {
     if (d.section !== 'dependencies') continue;
-    if (importedPkgs.has(d.name)) continue;
+    if (importedPkgs.has(d.name) || typePkgs.has(d.name)) continue;
     warn(
       'W01',
       p.name,
-      `declares dependency "${d.name}" that dist never imports (inlined at build time)`,
+      `declares dependency "${d.name}" that neither the bundle nor its declarations import`,
       'Consumers download a copy they never load, and shipping a fix to that package will not reach them without republishing this one. Move it to devDependencies, or mark it external.'
     );
   }
@@ -346,6 +371,56 @@ function checkPublishedDependents() {
   }
 }
 
+/**
+ * E07 / W07 — core's runtime re-declared by a package built on it.
+ *
+ * `@dayflow/core` ships its runtime (preact, temporal-polyfill, …) as plain
+ * dependencies, so consumers never install it themselves. Re-declaring one of
+ * those as a PEER hands it back to the consumer: yarn warns "doesn't provide
+ * preact", yarn PnP refuses to resolve it, and users end up adding Preact to
+ * their own package.json. That shipped in 3.7.1 and was reported by a user.
+ *
+ * A plain dependency is right, but only with core's range: a diverging range can
+ * install a second copy, and a second Preact breaks hooks while a second
+ * temporal-polyfill breaks brand checks on Temporal values passed to core.
+ */
+function checkSharedRuntime(p) {
+  const core = byName.get('@dayflow/core');
+  if (!core || p.name === core.name) return;
+  if (!p.deps.some(d => d.name === core.name)) return; // not built on core
+
+  const runtime = core.manifest.dependencies ?? {};
+  for (const d of p.deps) {
+    if (!(d.name in runtime) || WORKSPACE.has(d.name)) continue;
+    const coreRange = resolveRange(runtime[d.name], d.name, null);
+
+    if (d.section === 'peerDependencies') {
+      error(
+        'E07',
+        p.name,
+        `declares "${d.name}" as a peer, but @dayflow/core already ships it as a dependency`,
+        `That makes every consumer install ${d.name} themselves: yarn warns "doesn't provide ${d.name}" and yarn PnP will not resolve it. Move it to dependencies as "catalog:" (${coreRange}).`
+      );
+      continue;
+    }
+
+    const ownRange = resolveRange(d.range, d.name, null);
+    if (
+      d.section === 'dependencies' &&
+      coreRange &&
+      ownRange &&
+      ownRange !== coreRange
+    ) {
+      warn(
+        'W07',
+        p.name,
+        `depends on "${d.name}" ${ownRange} while @dayflow/core uses ${coreRange}`,
+        `Diverging ranges can install a second copy alongside core's. Use "catalog:" so both publish the same range.`
+      );
+    }
+  }
+}
+
 /** E06 / W02 — version bookkeeping against the registry. */
 function checkVersionBookkeeping(p) {
   if (OFFLINE) return;
@@ -396,6 +471,7 @@ for (const p of packages.filter(inMode)) {
   checkWorkspaceLeak(p);
   checkImportsVsManifest(p);
   checkInternalRanges(p);
+  checkSharedRuntime(p);
   checkVersionBookkeeping(p);
 }
 // This one is deliberately global: it asks what the packages we are *not*

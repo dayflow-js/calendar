@@ -1,6 +1,7 @@
 import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '@/types/event';
+import { extractConferenceFromDescription } from '@/utils/meetingUtils';
 import {
   isPlainDate,
   isPlainDateTime,
@@ -394,11 +395,13 @@ export function convertToDayFlowEvent(
   } else {
     finalEnd = endTemporal as Temporal.ZonedDateTime;
   }
+  const conference = extractConferenceFromDescription(icsEvent.description);
   return {
     id,
     calendarId,
     title: icsEvent.summary || '(No Title)',
     description: icsEvent.description,
+    ...(conference ? { conference } : {}),
     start: finalStart,
     end: finalEnd,
     allDay,

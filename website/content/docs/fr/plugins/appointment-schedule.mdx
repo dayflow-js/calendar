@@ -190,21 +190,22 @@ Le plugin ajoute également une entrée au popup de création rapide du calendri
 
 Ces champs constituent `AppointmentSchedulePluginConfig`.
 
-| Option                     | Par défaut              | Rôle                                                                    |
-| -------------------------- | ----------------------- | ----------------------------------------------------------------------- |
-| `schedules`                | Obligatoire             | Liste contrôlée des plannings de rendez-vous.                           |
-| `activeScheduleId`         | Aucun                   | Ouvre l'éditeur avec un planning donné déjà sélectionné.                |
-| `availabilitySnapMinutes`  | `15`                    | Pas en minutes utilisé lors de l'édition des disponibilités.            |
-| `drawerPlacement`          | `'viewport'`            | Ancre l'éditeur à la fenêtre ou au calendrier.                          |
-| `drawerWidth`              | `420`                   | Largeur du panneau en pixels ou toute longueur CSS.                     |
-| `drawerTarget`             | Premier calendrier      | Élément ou sélecteur utilisé par l'ancrage `calendar`.                  |
-| `drawerRenderer`           | Panneau intégré         | Remplace entièrement l'éditeur de l'organisateur.                       |
-| `timeFormat`               | Format de la vue active | Utilise le format 12 h ou 24 h.                                         |
-| `conferenceProviders`      | `[]`                    | Ajoute des fournisseurs de visioconférence au sélecteur de lieu.        |
-| `onCreateSchedule`         | Aucun                   | Persiste dans votre application un planning nouvellement créé.          |
-| `onUpdateSchedule`         | Aucun                   | Persiste les modifications d'un planning existant.                      |
-| `onDeleteScheduleRequest`  | Aucun                   | Demande à l'application hôte de confirmer et de supprimer un planning.  |
-| `onExternalUpdateConflict` | Aucun                   | Signale une mise à jour des données contrôlées reçue pendant l'édition. |
+| Option                     | Par défaut              | Rôle                                                                                                                |
+| -------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `schedules`                | Obligatoire             | Liste contrôlée des plannings de rendez-vous.                                                                       |
+| `activeScheduleId`         | Aucun                   | Ouvre l'éditeur avec un planning donné déjà sélectionné.                                                            |
+| `availabilitySnapMinutes`  | `15`                    | Pas en minutes utilisé lors de l'édition des disponibilités.                                                        |
+| `drawerPlacement`          | `'viewport'`            | Ancre l'éditeur à la fenêtre ou au calendrier.                                                                      |
+| `drawerWidth`              | `420`                   | Largeur du panneau en pixels ou toute longueur CSS.                                                                 |
+| `drawerTarget`             | Premier calendrier      | Élément ou sélecteur utilisé par l'ancrage `calendar`.                                                              |
+| `drawerRenderer`           | Panneau intégré         | Remplace entièrement l'éditeur de l'organisateur.                                                                   |
+| `timeFormat`               | Format de la vue active | Utilise le format 12 h ou 24 h.                                                                                     |
+| `unavailableDisplayMode`   | `'grid-overlay'`        | Style d'affichage des plages non disponibles (`'grid-overlay'` hachures diagonales ou `'bar'` fine barre d'accent). |
+| `conferenceProviders`      | `[]`                    | Ajoute des fournisseurs de visioconférence au sélecteur de lieu.                                                    |
+| `onCreateSchedule`         | Aucun                   | Persiste dans votre application un planning nouvellement créé.                                                      |
+| `onUpdateSchedule`         | Aucun                   | Persiste les modifications d'un planning existant.                                                                  |
+| `onDeleteScheduleRequest`  | Aucun                   | Demande à l'application hôte de confirmer et de supprimer un planning.                                              |
+| `onExternalUpdateConflict` | Aucun                   | Signale une mise à jour des données contrôlées reçue pendant l'édition.                                             |
 
 ### API du plugin
 

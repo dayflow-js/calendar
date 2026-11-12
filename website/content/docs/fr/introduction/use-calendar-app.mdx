@@ -118,10 +118,12 @@ title: useCalendarApp
 | `defaultCalendar`      | `string`                    | Facultatif  | Premier calendrier visible                                                | Identifiant utilisé lors de la création de nouveaux événements.                                                                                                                           |
 | `theme`                | `ThemeConfig`               | Facultatif  | `{ mode: 'light' }`                                                       | Définit le mode de thème global et, éventuellement, des surcharges de tokens.                                                                                                             |
 | `locale`               | `string \| Locale`          | Facultatif  | `'en-US'`                                                                 | Définit la locale pour l'internationalisation (i18n). Accepte des codes de langue (par exemple 'ja') ou des objets Locale.                                                                |
+| `calendarSystem`       | `'gregorian' \| 'jalali'`   | Facultatif  | `'gregorian'`                                                             | Calendrier utilisé pour afficher et parcourir les dates. `'jalali'` est le calendrier solaire persan. Voir [calendarSystem](#calendarsystem).                                             |
 | `useEventDetailDialog` | `boolean`                   | Facultatif  | `false`                                                                   | Active la boîte de dialogue modale de détail au lieu des panneaux en ligne.                                                                                                               |
 | `eventDetailTrigger`   | `'click' \| 'dbClick'`      | Facultatif  | `'dbClick'`                                                               | Détermine si le détail d'un événement s'ouvre au simple ou au double-clic sur ordinateur. Au toucher, un simple appui suffit toujours.                                                    |
 | `useCalendarHeader`    | `boolean`                   | Facultatif  | `true`                                                                    | Affiche l'en-tête par défaut (`true`) ou le masque (`false`). Pour un en-tête sur mesure, utilisez le slot `calendarHeader` de `DayFlowCalendar`.                                         |
 | `readOnly`             | `boolean \| ReadOnlyConfig` | Facultatif  | `false`                                                                   | Désactive l'interface de modification intégrée. Accepte un booléen ou une configuration pour un contrôle fin (glisser / consultation). Les API programmatiques continuent de fonctionner. |
+| `enableTasks`          | `boolean`                   | Facultatif  | `false`                                                                   | Affiche le sélecteur Événement / Tâche dans les éditeurs intégrés. Les tâches existantes restent modifiables s'il est désactivé. [Tâches](/docs-fr/features/tasks).                       |
 | `allDaySortComparator` | `AllDaySortComparator`      | Facultatif  | Ordre par groupe de calendrier, événements sur plusieurs jours en premier | Comparateur personnalisé contrôlant l'ordre des lignes d'événements sur la journée entière dans toutes les vues. Fourni, il remplace entièrement l'ordre par défaut.                      |
 
 ## Principales options
@@ -295,6 +297,28 @@ const calendar = useCalendarApp({
   locale: customLocale,
 });
 ```
+
+### calendarSystem
+
+`calendarSystem` choisit le calendrier utilisé pour afficher et parcourir les dates : `'gregorian'` (par défaut) ou `'jalali'` (calendrier solaire persan). Il est indépendant de `locale`, `timeZone` et `startOfWeek` : vous pouvez afficher des dates jalali avec des libellés en anglais, ou des dates grégoriennes avec des libellés en persan.
+
+```tsx
+import { createLocalizationPlugin, fa } from '@dayflow/plugin-localization';
+
+const calendar = useCalendarApp({
+  calendarSystem: 'jalali',
+  locale: 'fa-IR',
+  timeZone: 'Asia/Tehran',
+  plugins: [createLocalizationPlugin({ locales: [fa] })],
+  views: [
+    createMonthView({ startOfWeek: 6 }), // les semaines commencent le samedi
+    createWeekView({ startOfWeek: 6 }),
+    createYearView({ mode: 'grid', startOfWeek: 6 }),
+  ],
+});
+```
+
+Seuls l'affichage et la navigation changent. Les données des événements, les callbacks, les imports ICS et les règles de récurrence conservent leurs dates ISO, et changer de calendrier ne modifie aucun événement.
 
 ### useEventDetailDialog
 

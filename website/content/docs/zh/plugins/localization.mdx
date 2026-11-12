@@ -160,6 +160,7 @@ interface LocalizationConfig {
 | `fr`     | 法语     | `fr-FR`                |
 | `de`     | 德语     | `de-DE`                |
 | `es`     | 西班牙语 | `es-ES`                |
+| `fa`     | 波斯语   | `fa-IR`                |
 | `en`     | 英语     | `en-US` (核心库已内置) |
 
 设置 `locale` 属性时，你可以传递：
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // 可以直接传入自定义 Locale 对象（或语言代码 'pt-BR'）
 });
 ```
+
+### 无障碍标签
+
+语言包的 `messages` 同时提供读屏软件为纯图标按钮和无标签输入框朗读的名称，请与可见文案一起翻译。自定义语言包中缺失的 key 会回退为英文。
+
+| Key                                         | 用途                                       |
+| :------------------------------------------ | :----------------------------------------- |
+| `previousDay` / `nextDay`                   | 日视图头部的导航箭头                       |
+| `previousWeek` / `nextWeek`                 | 周视图头部的导航箭头                       |
+| `previousMonth` / `nextMonth`               | 月视图头部、迷你日历和日期范围选择器的箭头 |
+| `previousYear` / `nextYear`                 | 年视图头部和日期范围选择器的箭头           |
+| `previousPeriod` / `nextPeriod`             | 日程（Agenda）视图头部的导航箭头           |
+| `clearSearch` / `closeSearch`               | 搜索框清空按钮和移动端搜索返回按钮         |
+| `close`                                     | 对话框和抽屉的关闭按钮                     |
+| `startDate` / `endDate` / `hour` / `minute` | 日期范围选择器的输入框和时间列表           |

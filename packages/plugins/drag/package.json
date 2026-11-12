@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-drag",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Drag plugin for DayFlow calendar - event move, resize, and create via mouse/touch",
   "keywords": [
     "calendar",
@@ -34,6 +34,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "preact": "catalog:",
+    "temporal-polyfill": "catalog:"
+  },
   "devDependencies": {
     "@dayflow/core": "workspace:^",
     "@rollup/plugin-commonjs": "catalog:",
@@ -48,8 +52,6 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@dayflow/core": "workspace:^",
-    "preact": "catalog:",
-    "temporal-polyfill": "catalog:"
+    "@dayflow/core": "workspace:^"
   }
 }

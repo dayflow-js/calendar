@@ -14,13 +14,14 @@ The day view focuses on a single day with detailed time slots, perfect for manag
 
 #### Configuration
 
-| Property              | Type             | Default     | Description                                            |
-| :-------------------- | :--------------- | :---------- | :----------------------------------------------------- |
-| `showAllDay`          | `boolean`        | `true`      | Whether to show the all-day events row.                |
-| `scrollToCurrentTime` | `boolean`        | `true`      | Whether to scroll to the current time on initial load. |
-| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | The time format for the time axis.                     |
-| `secondaryTimeZone`   | `string`         | `undefined` | Secondary reference timeline shown in Day view only.   |
-| `hourHeight`          | `number`         | `72`        | Height in pixels of each hour row in the time grid.    |
+| Property              | Type             | Default     | Description                                                                |
+| :-------------------- | :--------------- | :---------- | :------------------------------------------------------------------------- |
+| `showAllDay`          | `boolean`        | `true`      | Whether to show the all-day events row.                                    |
+| `scrollToCurrentTime` | `boolean`        | `true`      | Whether to scroll to the current time on initial load.                     |
+| `timeFormat`          | `'12h' \| '24h'` | `'24h'`     | The time format for the time axis.                                         |
+| `secondaryTimeZone`   | `string`         | `undefined` | Secondary reference timeline shown in Day view only.                       |
+| `hourHeight`          | `number`         | `72`        | Height in pixels of each hour row in the time grid.                        |
+| `showHalfHourLines`   | `boolean`        | `false`     | Show a dashed divider at the 30-minute mark of each hour in the time grid. |
 
 <FrameworkTabs>
   <Tab>
@@ -123,6 +124,7 @@ The week view displays a 7-day grid with time slots, showing events with their e
 | `gridDateClick`       | `'day-view' \| 'none' \| function`                   | `undefined`      | Action when a date cell is clicked.                                                                                                |
 | `gridDateDoubleClick` | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | Action when a date cell is double-clicked. `'create-event'` (default) creates a 1-hour timed event at the clicked position (hour). |
 | `hourHeight`          | `number`                                             | `72`             | Height in pixels of each hour row in the time grid.                                                                                |
+| `showHalfHourLines`   | `boolean`                                            | `false`          | Show a dashed divider at the 30-minute mark of each hour in the time grid.                                                         |
 
 <FrameworkTabs>
   <Tab>
@@ -227,10 +229,11 @@ The month view displays a traditional calendar grid showing all days in a month.
 
 #### MonthScrollConfig
 
-| Property     | Type                    | Default     | Description                                                                                                                                                                                                                      |
-| :----------- | :---------------------- | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `disabled`   | `boolean`               | `false`     | Disables continuous scrolling. Months can only be changed via the Prev / Next navigation buttons.                                                                                                                                |
-| `transition` | `'fade'` \| `undefined` | `undefined` | Animation when switching months (only applies when `disabled: true`). `'fade'` fades the current month out with a horizontal slide and fades the next month in. When omitted, the original smooth-scroll animation is preserved. |
+| Property            | Type                    | Default     | Description                                                                                                                                                                                                                      |
+| :------------------ | :---------------------- | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `instantNavigation` | `boolean`               | `false`     | Skips smooth scrolling and navigation delays for programmatic month changes while keeping continuous scrolling enabled. Does not change the disabled-scroll fade transition.                                                     |
+| `disabled`          | `boolean`               | `false`     | Disables continuous scrolling. Months can only be changed via the Prev / Next navigation buttons.                                                                                                                                |
+| `transition`        | `'fade'` \| `undefined` | `undefined` | Animation when switching months (only applies when `disabled: true`). `'fade'` fades the current month out with a horizontal slide and fades the next month in. When omitted, the original smooth-scroll animation is preserved. |
 
 ```tsx
 createMonthView({
@@ -240,6 +243,14 @@ createMonthView({
   },
 });
 ```
+
+For immediate toolbar navigation with continuous wheel/touch scrolling, use:
+
+```tsx
+createMonthView({ scroll: { instantNavigation: true } });
+```
+
+Positioning waits only for layout animation frames when new weeks must be rendered. With `snapToMonth`, snapping after a user scroll stays smooth. This option applies only to Month view. Omitting the option or setting it to `false` preserves the existing navigation behavior.
 
 <FrameworkTabs>
   <Tab>

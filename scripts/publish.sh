@@ -94,7 +94,7 @@ fi
 MAIN_PKGS=(core react vue svelte)
 PLUGIN_DIRS=(drag keyboard-shortcuts localization sidebar)
 UI_DIRS=(context-menu range-picker)
-CALDAV_DIRS=(core google-sync outlook-sync sync-core)
+CALDAV_DIRS=(sync-core core google-sync outlook-sync)
 
 # Function to map directory names to package names
 get_plugin_package_name() {
@@ -273,7 +273,18 @@ if [[ "$MODE" == "cli" ]]; then
 fi
 
 # 2. Build Phase
+# Order is dependency order, in both phases: core inlines the ui-* bundles
+# when it builds and declares them as dependencies when it publishes, and the
+# caldav packages depend on sync-core. Building core first would inline stale
+# ui-* output; publishing it first would leave it briefly — or, if a later
+# step fails, lastingly — depending on versions that are not on npm yet.
 if [ "$SKIP_BUILD" = false ]; then
+    if [[ "$MODE" == "all" || "$MODE" == "ui" ]]; then
+        for dir in "${UI_DIRS[@]}"; do
+            pkg_name=$(get_ui_package_name "$dir")
+            build_pkg "$pkg_name" "packages/ui/$dir"
+        done
+    fi
     if [[ "$MODE" == "all" || "$MODE" == "main" ]]; then
         for pkg in "${MAIN_PKGS[@]}"; do build_pkg "$pkg" "packages/$pkg"; done
     fi
@@ -281,12 +292,6 @@ if [ "$SKIP_BUILD" = false ]; then
         for dir in "${PLUGIN_DIRS[@]}"; do
             pkg_name=$(get_plugin_package_name "$dir")
             build_pkg "$pkg_name" "packages/plugins/$dir"
-        done
-    fi
-    if [[ "$MODE" == "all" || "$MODE" == "ui" ]]; then
-        for dir in "${UI_DIRS[@]}"; do
-            pkg_name=$(get_ui_package_name "$dir")
-            build_pkg "$pkg_name" "packages/ui/$dir"
         done
     fi
     if [[ "$MODE" == "all" || "$MODE" == "caldav" ]]; then
@@ -334,6 +339,13 @@ if [ "$SKIP_CHECKS" = false ]; then
 fi
 
 # 3. Publish Phase
+if [[ "$MODE" == "all" || "$MODE" == "ui" ]]; then
+    for dir in "${UI_DIRS[@]}"; do
+        pkg_name=$(get_ui_package_name "$dir")
+        publish_pkg "$pkg_name" "$ROOT/packages/ui/$dir" || true
+    done
+fi
+
 if [[ "$MODE" == "all" || "$MODE" == "main" ]]; then
     for pkg in "${MAIN_PKGS[@]}"; do
         publish_pkg "$pkg" "$ROOT/packages/$pkg" || true
@@ -344,13 +356,6 @@ if [[ "$MODE" == "all" || "$MODE" == "plugins" ]]; then
     for dir in "${PLUGIN_DIRS[@]}"; do
         pkg_name=$(get_plugin_package_name "$dir")
         publish_pkg "$pkg_name" "$ROOT/packages/plugins/$dir" || true
-    done
-fi
-
-if [[ "$MODE" == "all" || "$MODE" == "ui" ]]; then
-    for dir in "${UI_DIRS[@]}"; do
-        pkg_name=$(get_ui_package_name "$dir")
-        publish_pkg "$pkg_name" "$ROOT/packages/ui/$dir" || true
     done
 fi
 

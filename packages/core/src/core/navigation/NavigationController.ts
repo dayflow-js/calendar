@@ -1,6 +1,12 @@
 import { Temporal } from 'temporal-polyfill';
 
 import {
+  startOfCalendarMonth,
+  addCalendarMonths,
+  dateToCalendarDate,
+  calendarDateToDate,
+} from '@/calendar/calendarSystem';
+import {
   CalendarAppState,
   CalendarCallbacks,
   CalendarView,
@@ -29,10 +35,9 @@ export class NavigationController {
     private notify: () => void,
     initialDate: Date
   ) {
-    this.visibleMonth = new Date(
-      initialDate.getFullYear(),
-      initialDate.getMonth(),
-      1
+    this.visibleMonth = startOfCalendarMonth(
+      initialDate,
+      this.state.calendarSystem
     );
   }
 
@@ -103,15 +108,24 @@ export class NavigationController {
         this.emitVisibleRange(start, end, reason);
         break;
       }
+      case ViewType.GANTT: {
+        const startOfWeek = (view?.config?.startOfWeek as number) ?? 1;
+        const { monday } = getWeekRange(this.state.currentDate, startOfWeek);
+        const start = new Date(monday);
+        start.setDate(start.getDate() - 14);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 56);
+        this.emitVisibleRange(start, end, reason);
+        break;
+      }
       case ViewType.MONTH: {
         if (reason === 'navigation') {
           // MonthView emits its own range based on virtual scroll position
           break;
         }
-        const firstDayOfMonth = new Date(
-          this.state.currentDate.getFullYear(),
-          this.state.currentDate.getMonth(),
-          1
+        const firstDayOfMonth = startOfCalendarMonth(
+          this.state.currentDate,
+          this.state.calendarSystem
         );
         const startOfWeek = (view?.config?.startOfWeek as number) ?? 1;
         const { monday } = getWeekRange(firstDayOfMonth, startOfWeek);
@@ -132,10 +146,19 @@ export class NavigationController {
         break;
       }
       case ViewType.YEAR: {
-        const start = new Date(this.state.currentDate.getFullYear(), 0, 1);
+        const year = dateToCalendarDate(
+          this.state.currentDate,
+          this.state.calendarSystem
+        ).year;
+        const start = calendarDateToDate(
+          { year, month: 1, day: 1 },
+          this.state.calendarSystem
+        );
         start.setHours(0, 0, 0, 0);
-        const end = new Date(this.state.currentDate.getFullYear(), 11, 31);
-        end.setDate(end.getDate() + 1);
+        const end = calendarDateToDate(
+          { year: year + 1, month: 1, day: 1 },
+          this.state.calendarSystem
+        );
         this.emitVisibleRange(start, end, reason);
         break;
       }
@@ -157,11 +180,8 @@ export class NavigationController {
   }
 
   setVisibleMonth(date: Date): void {
-    const next = new Date(date.getFullYear(), date.getMonth(), 1);
-    if (
-      this.visibleMonth.getFullYear() === next.getFullYear() &&
-      this.visibleMonth.getMonth() === next.getMonth()
-    ) {
+    const next = startOfCalendarMonth(date, this.state.calendarSystem);
+    if (this.visibleMonth.getTime() === next.getTime()) {
       return;
     }
     this.visibleMonth = next;
@@ -185,10 +205,13 @@ export class NavigationController {
         newDate.setDate(newDate.getDate() - 1);
         break;
       case ViewType.WEEK:
+      case ViewType.GANTT:
         newDate.setDate(newDate.getDate() - 7);
         break;
       case ViewType.MONTH:
-        newDate.setMonth(newDate.getMonth() - 1);
+        newDate.setTime(
+          addCalendarMonths(newDate, -1, this.state.calendarSystem).getTime()
+        );
         break;
       case ViewType.AGENDA: {
         const view = this.state.views.get(this.state.currentView);
@@ -198,7 +221,9 @@ export class NavigationController {
         break;
       }
       case ViewType.YEAR:
-        newDate.setFullYear(newDate.getFullYear() - 1);
+        newDate.setTime(
+          addCalendarMonths(newDate, -12, this.state.calendarSystem).getTime()
+        );
         break;
       default:
         break;
@@ -213,10 +238,13 @@ export class NavigationController {
         newDate.setDate(newDate.getDate() + 1);
         break;
       case ViewType.WEEK:
+      case ViewType.GANTT:
         newDate.setDate(newDate.getDate() + 7);
         break;
       case ViewType.MONTH:
-        newDate.setMonth(newDate.getMonth() + 1);
+        newDate.setTime(
+          addCalendarMonths(newDate, 1, this.state.calendarSystem).getTime()
+        );
         break;
       case ViewType.AGENDA: {
         const view = this.state.views.get(this.state.currentView);
@@ -226,7 +254,9 @@ export class NavigationController {
         break;
       }
       case ViewType.YEAR:
-        newDate.setFullYear(newDate.getFullYear() + 1);
+        newDate.setTime(
+          addCalendarMonths(newDate, 12, this.state.calendarSystem).getTime()
+        );
         break;
       default:
         break;

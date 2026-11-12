@@ -101,6 +101,31 @@ Pasa una cadena de locale BCP 47 para traducir los nombres de mes y las etiqueta
 <RangePicker value={range} locale='zh-CN' onChange={value => setRange(value)} />
 ```
 
+Para traducir las etiquetas propias del selector (botones de navegación, campos de inicio y fin, listas de horas y minutos y el botón de confirmar), pasa un objeto locale con `messages`. Las claves que falten recurren al inglés. El panel y el diálogo de eventos integrados en el calendario las rellenan automáticamente a partir de la locale del calendario.
+
+```tsx
+<RangePicker
+  value={range}
+  locale={{
+    code: 'es-ES',
+    messages: {
+      previousYear: 'Año anterior',
+      previousMonth: 'Mes anterior',
+      nextMonth: 'Mes siguiente',
+      nextYear: 'Año siguiente',
+      startDate: 'Fecha de inicio',
+      endDate: 'Fecha de fin',
+      hour: 'Hora',
+      minute: 'Minuto',
+      ok: 'Aceptar',
+    },
+  }}
+  onChange={value => setRange(value)}
+/>
+```
+
+Con `calendarSystem='jalali'` las fechas se muestran y escriben en el calendario persa. `onChange` y `onOk` siguen devolviendo valores Temporal ISO.
+
 ## Ajustar al ancho del disparador
 
 ```tsx
@@ -129,7 +154,8 @@ Pasa una cadena de locale BCP 47 para traducir los nombres de mes y las etiqueta
 | `autoAdjustOverflow` | `boolean`                                                       | `true`            | Invierte la posición automáticamente si el popup se saldría de la ventana                     |
 | `getPopupContainer`  | `() => HTMLElement`                                             | —                 | Monta el popup dentro de un contenedor propio en lugar de en `document.body`                  |
 | `matchTriggerWidth`  | `boolean`                                                       | `false`           | Ajusta el ancho del popup al del campo que lo abre                                            |
-| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`         | Código de locale BCP 47 para los nombres de mes y de día                                      |
+| `locale`             | `string \| { code: string; messages?: Record<string, string> }` | `'en-US'`         | Código de locale BCP 47; con un objeto, `messages` traduce las etiquetas del selector         |
+| `calendarSystem`     | `'gregorian' \| 'jalali'`                                       | `'gregorian'`     | Calendario usado para mostrar e interpretar las fechas                                        |
 
 ### `ZonedRange`
 

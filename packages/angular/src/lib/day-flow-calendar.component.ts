@@ -188,6 +188,7 @@ export class DayFlowCalendarComponent
 
   ngOnDestroy() {
     this.destroyCalendar();
+    this.internalApp?.destroy();
   }
 
   private getRendererProps(): Record<string, unknown> {
@@ -316,6 +317,8 @@ export class DayFlowCalendarComponent
   }
 
   private resetInternalCalendarState() {
+    // Only the app this component created is ours to destroy.
+    this.internalApp?.destroy();
     this.internalApp = undefined;
     this.getNormalizedInternalConfig = undefined;
     this.internalConfigSyncSnapshot = undefined;

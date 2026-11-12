@@ -248,3 +248,12 @@ describe('syncCalendarAppConfig', () => {
     expect(app.updateConfig).not.toHaveBeenCalled();
   });
 });
+
+describe('task configuration sync', () => {
+  it('syncs opt-in and removal of the option to an existing app', () => {
+    const off = pickSyncableConfig(baseConfig());
+    const on = pickSyncableConfig(baseConfig({ enableTasks: true }));
+    expect(getSyncConfigUpdates(off, on)).toEqual({ enableTasks: true });
+    expect(getSyncConfigUpdates(on, off)).toEqual({ enableTasks: false });
+  });
+});

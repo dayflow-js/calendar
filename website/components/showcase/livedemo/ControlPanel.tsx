@@ -23,8 +23,14 @@ import {
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
+import {
+  CalendarGroupsPreview,
+  KeyboardShortcutsPreview,
+  SecondaryTimeZonePreview,
+} from './FeaturePreviews';
 import { MiniDotsFeature } from './MiniDotsFeature';
 import { MultiCalFeature } from './MultiCalFeature';
+import { TaskFeature } from './TaskFeature';
 import { ThemeColorColumn } from './ThemeColorColumn';
 import {
   CalendarFeatures,
@@ -194,50 +200,9 @@ export function ControlPanel({
                         <CircleAlert className='h-3 w-3 text-slate-400' />
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side='top' className='w-56 p-3'>
+                    <TooltipContent side='top' className='w-60 p-3'>
                       <p className='mb-2 text-sm font-semibold'>Shortcuts</p>
-                      <ul className='space-y-1.5 text-xs'>
-                        <li className='flex justify-between gap-4'>
-                          <span>Search</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘F</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Today</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘T</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>New Event</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘N</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Undo</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘Z</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Event Switch</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘Tab</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Prev/Next</span>{' '}
-                          <kbd className='font-sans opacity-70'>← / →</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Copy Event</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘C</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Paste Event</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘V</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Cut Event</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌘X</kbd>
-                        </li>
-                        <li className='flex justify-between gap-4'>
-                          <span>Delete</span>{' '}
-                          <kbd className='font-sans opacity-70'>⌫</kbd>
-                        </li>
-                      </ul>
+                      <KeyboardShortcutsPreview />
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -278,6 +243,7 @@ export function ControlPanel({
                         Groups calendars by source in the sidebar. Each source
                         is shown as a collapsible section header.
                       </p>
+                      <CalendarGroupsPreview />
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -372,6 +338,10 @@ export function ControlPanel({
                 </div>
               )}
 
+              <TaskFeature
+                checked={features.enableTasks}
+                onUpdateFeatures={onUpdateFeatures}
+              />
               <MultiCalFeature
                 checked={features.showMultiCalendar}
                 onUpdateFeatures={onUpdateFeatures}
@@ -523,6 +493,9 @@ export function ControlPanel({
                   <p className='text-xs text-slate-500 dark:text-slate-400'>
                     Adds a second reference timeline in Day and Week views.
                   </p>
+                  <div className='mt-2'>
+                    <SecondaryTimeZonePreview />
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </div>

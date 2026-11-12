@@ -97,6 +97,7 @@ interface DayContentProps {
   setDraftEvent: (event: Event | null) => void;
   setIsDrawerOpen: (isOpen: boolean) => void;
   ALL_DAY_HEIGHT: number;
+  showHalfHourLines?: boolean;
   HOUR_HEIGHT: number;
   FIRST_HOUR: number;
   LAST_HOUR: number;
@@ -151,6 +152,7 @@ export const DayContent = ({
   setDraftEvent,
   setIsDrawerOpen,
   ALL_DAY_HEIGHT,
+  showHalfHourLines = false,
   HOUR_HEIGHT,
   FIRST_HOUR,
   LAST_HOUR,
@@ -459,11 +461,6 @@ export const DayContent = ({
                   {showSecondaryTz ? (
                     <div className='df-time-column-tz-row'>
                       <span className='df-time-column-tz-value'>
-                        {showStartOfDayLabel && slotIndex === 0
-                          ? ''
-                          : (secondaryTimeSlots?.[slotIndex] ?? '')}
-                      </span>
-                      <span className='df-time-column-tz-value'>
                         {showStartOfDayLabel && slotIndex === 0 ? (
                           ''
                         ) : secondaryTimeSlots?.[slotIndex] ? (
@@ -474,6 +471,16 @@ export const DayContent = ({
                           />
                         ) : (
                           ''
+                        )}
+                      </span>
+                      <span className='df-time-column-tz-value'>
+                        {showStartOfDayLabel && slotIndex === 0 ? (
+                          ''
+                        ) : (
+                          <TimeAxisLabel
+                            hour={slot.hour}
+                            timeFormat={timeFormat}
+                          />
                         )}
                       </span>
                     </div>
@@ -550,6 +557,9 @@ export const DayContent = ({
                   <div
                     key={slotIndex}
                     className={timeGridRow}
+                    data-half-hour-lines={
+                      showHalfHourLines ? 'true' : undefined
+                    }
                     data-scrollbar-space={
                       !isMobile && hasScrollbarSpace ? 'true' : 'false'
                     }
@@ -622,14 +632,20 @@ export const DayContent = ({
                         )}
                       </span>
                       <span>
-                        <TimeAxisLabel hour={0} timeFormat={timeFormat} />
+                        <TimeAxisLabel
+                          hour={LAST_HOUR % 24}
+                          timeFormat={timeFormat}
+                        />
                       </span>
                     </div>
                   ) : (
                     <div
                       className={cn(midnightLabel, 'df-midnight-label-offset')}
                     >
-                      <TimeAxisLabel hour={0} timeFormat={timeFormat} />
+                      <TimeAxisLabel
+                        hour={LAST_HOUR % 24}
+                        timeFormat={timeFormat}
+                      />
                     </div>
                   )}
                 </div>

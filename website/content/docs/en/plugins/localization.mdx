@@ -160,6 +160,7 @@ The following locales are currently available in the `@dayflow/plugin-localizati
 | `fr`   | French   | `fr-FR`                         |
 | `de`   | German   | `de-DE`                         |
 | `es`   | Spanish  | `es-ES`                         |
+| `fa`   | Persian  | `fa-IR`                         |
 | `en`   | English  | `en-US` (Also built-in to core) |
 
 When setting the `locale` property, you can pass either:
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // Pass the custom Locale object directly (or code string 'pt-BR')
 });
 ```
+
+### Accessible Labels
+
+A locale's `messages` also provide the names screen readers announce for icon-only buttons and unlabeled fields, so translate them together with the visible text. Keys missing from a custom locale fall back to English.
+
+| Key                                         | Used for                                                    |
+| :------------------------------------------ | :---------------------------------------------------------- |
+| `previousDay` / `nextDay`                   | Header navigation arrows in Day view                        |
+| `previousWeek` / `nextWeek`                 | Header navigation arrows in Week view                       |
+| `previousMonth` / `nextMonth`               | Header arrows in Month view, mini calendar and range picker |
+| `previousYear` / `nextYear`                 | Header arrows in Year view and range picker                 |
+| `previousPeriod` / `nextPeriod`             | Header navigation arrows in Agenda view                     |
+| `clearSearch` / `closeSearch`               | Search clear button and mobile search back button           |
+| `close`                                     | Close buttons of dialogs and drawers                        |
+| `startDate` / `endDate` / `hour` / `minute` | Range picker inputs and time lists                          |

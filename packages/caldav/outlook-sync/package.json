@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/outlook-sync",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Headless Microsoft Outlook Calendar sync engine for DayFlow - transport-agnostic, adapter-first",
   "keywords": [
     "calendar",

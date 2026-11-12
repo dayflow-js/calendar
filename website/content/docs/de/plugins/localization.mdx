@@ -160,6 +160,7 @@ Im Paket `@dayflow/plugin-localization` sind derzeit folgende Locales verfügbar
 | `fr`   | Französisch | `fr-FR`                          |
 | `de`   | Deutsch     | `de-DE`                          |
 | `es`   | Spanisch    | `es-ES`                          |
+| `fa`   | Persisch    | `fa-IR`                          |
 | `en`   | Englisch    | `en-US` (auch im Kern enthalten) |
 
 Für die Eigenschaft `locale` können Sie übergeben:
@@ -192,3 +193,18 @@ const calendar = useCalendarApp({
   locale: myCustomLocale, // Pass the custom Locale object directly (or code string 'pt-BR')
 });
 ```
+
+### Barrierefreie Beschriftungen
+
+Die `messages` einer Locale liefern auch die Namen, die Screenreader für reine Symbolschaltflächen und unbeschriftete Felder vorlesen. Übersetzen Sie sie daher zusammen mit dem sichtbaren Text. Fehlende Schlüssel einer eigenen Locale fallen auf Englisch zurück.
+
+| Schlüssel                                   | Verwendet für                                                      |
+| :------------------------------------------ | :----------------------------------------------------------------- |
+| `previousDay` / `nextDay`                   | Navigationspfeile im Kopf der Tagesansicht                         |
+| `previousWeek` / `nextWeek`                 | Navigationspfeile im Kopf der Wochenansicht                        |
+| `previousMonth` / `nextMonth`               | Pfeile der Monatsansicht, des Mini-Kalenders und des Range Pickers |
+| `previousYear` / `nextYear`                 | Pfeile der Jahresansicht und des Range Pickers                     |
+| `previousPeriod` / `nextPeriod`             | Navigationspfeile im Kopf der Agenda-Ansicht                       |
+| `clearSearch` / `closeSearch`               | Löschen-Schaltfläche der Suche und Zurück-Schaltfläche mobil       |
+| `close`                                     | Schließen-Schaltflächen von Dialogen und Drawern                   |
+| `startDate` / `endDate` / `hour` / `minute` | Eingabefelder und Zeitlisten des Range Pickers                     |
