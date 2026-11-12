@@ -16,7 +16,9 @@ const makeApp = (plugin = createKeyboardShortcutsPlugin()) =>
   });
 
 const keydownListeners = (spy: ReturnType<typeof vi.spyOn>) =>
-  spy.mock.calls.filter(([type]) => type === 'keydown').map(([, fn]) => fn);
+  spy.mock.calls
+    .filter(([type]: unknown[]) => type === 'keydown')
+    .map(([, fn]: unknown[]) => fn);
 
 describe('keyboard shortcuts plugin — lifecycle', () => {
   afterEach(() => {
