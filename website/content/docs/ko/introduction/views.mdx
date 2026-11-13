@@ -453,14 +453,15 @@ createMonthView({
 
 #### 설정
 
-| 속성                        | 타입                                                 | 기본값           | 설명                                                                                                          |
-| :-------------------------- | :--------------------------------------------------- | :--------------- | :------------------------------------------------------------------------------------------------------------ |
-| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | 연간 뷰의 표시 모드입니다.                                                                                    |
-| `startOfWeek`               | `number`                                             | `1`              | 한 주의 시작 요일입니다(0 = 일요일, 1 = 월요일 등). `fixed-week`와 `grid` 모드에서 사용됩니다.                |
-| `showTimedEventsInYearView` | `boolean`                                            | `false`          | 연간 뷰에 시간이 지정된 이벤트를 표시할지 여부입니다(점, 표시자, 농도).                                       |
-| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (grid 모드) 날짜 셀을 클릭했을 때의 동작입니다.                                                               |
-| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (grid 모드) 날짜 셀을 더블 클릭했을 때의 동작입니다. `'create-event'`(기본값)는 9:00~10:00 이벤트를 만듭니다. |
-| `gridHeatmapLevels`         | `number`                                             | `5`              | (grid 모드) 히트맵 농도 단계 수입니다.                                                                        |
+| 속성                        | 타입                                                 | 기본값           | 설명                                                                                                                                                                |
+| :-------------------------- | :--------------------------------------------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `mode`                      | `'year-canvas' \| 'fixed-week' \| 'grid'`            | `'year-canvas'`  | 연간 뷰의 표시 모드입니다.                                                                                                                                          |
+| `startOfWeek`               | `number`                                             | `1`              | 한 주의 시작 요일입니다(0 = 일요일, 1 = 월요일 등). `fixed-week`와 `grid` 모드에서 사용됩니다.                                                                      |
+| `showTimedEventsInYearView` | `boolean`                                            | `false`          | 연간 뷰에 시간이 지정된 이벤트를 표시할지 여부입니다(점, 표시자, 농도).                                                                                             |
+| `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (grid 모드) 날짜 셀을 클릭했을 때의 동작입니다.                                                                                                                     |
+| `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (grid 모드) 날짜 셀을 더블 클릭했을 때의 동작입니다. `'create-event'`(기본값)는 9:00~10:00 이벤트를 만듭니다.                                                       |
+| `gridHeatmapLevels`         | `number`                                             | `5`              | (grid 모드) 히트맵 농도 단계 수입니다.                                                                                                                              |
+| `fixedWeekColumnWidth`      | `number`                                             | 약 `36.5`        | (fixed-week 모드) 날짜 열 하나의 최소 너비(px)입니다. 그리드가 뷰보다 넓어지면 가로로 스크롤됩니다. CSS 변수 `--df-year-fixed-column-width`로도 설정할 수 있습니다. |
 
 #### 히트맵 커스터마이징 (grid 모드)
 

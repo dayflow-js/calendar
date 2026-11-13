@@ -152,7 +152,13 @@ export type TranslationKey =
   | 'editTask'
   | 'viewTask'
   | 'addDueTime'
-  | 'removeDueTime';
+  | 'removeDueTime'
+  | 'taskStatus'
+  | 'taskStatusTodo'
+  | 'taskStatusInProgress'
+  | 'taskStatusDone'
+  | 'assignees'
+  | 'unassigned';
 
 export type LocaleDict = Partial<Record<TranslationKey, string>>;
 export type LocaleMessages = Partial<Record<TranslationKey, string>>;

@@ -8,16 +8,19 @@ import {
   CalendarPicker,
   CalendarOption,
 } from '@/components/common/CalendarPicker';
-import { EventKindSwitch } from '@/components/common/EventKindSwitch';
+import {
+  canSwitchEventKind,
+  EventKindSwitch,
+} from '@/components/common/EventKindSwitch';
 import { MiniCalendar } from '@/components/common/MiniCalendar';
-import { TaskPriorityField } from '@/components/common/TaskPriorityField';
+import { TaskDetailsFields } from '@/components/common/TaskDetailsFields';
 import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
 import {
   Event as CalendarEvent,
   EventKind,
-  TaskPriority,
+  EventTask,
   MobileEventProps,
   CalendarType,
 } from '@/types';
@@ -100,7 +103,7 @@ export const MobileEventDrawer = ({
   const shouldShowNotes = !isSubscribed || notes.trim() !== '';
 
   const [title, setTitle] = useState('');
-  const [priority, setPriority] = useState<TaskPriority>('none');
+  const [task, setTask] = useState<EventTask>({});
   const [kind, setKind] = useState<EventKind>('event');
   const [calendarId, setCalendarId] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
@@ -205,7 +208,7 @@ export const MobileEventDrawer = ({
     if (isOpen && draftEvent) {
       setTitle(draftEvent.title || '');
       setKind(draftEvent.kind ?? 'event');
-      setPriority(draftEvent.task?.priority ?? 'none');
+      setTask(draftEvent.task ?? {});
       setCalendarId(draftEvent.calendarId || calendars[0]?.id || 'blue');
       setIsAllDay(draftEvent.allDay || false);
       setNotes(draftEvent.description || '');
@@ -238,7 +241,7 @@ export const MobileEventDrawer = ({
     } else if (isOpen && !draftEvent) {
       // Default init if no draft event (fallback)
       setKind('event');
-      setPriority('none');
+      setTask({});
       setCalendarId(calendars[0]?.id || 'blue');
       setNotes('');
       const now = new Date();
@@ -278,7 +281,7 @@ export const MobileEventDrawer = ({
             baseEvent.allDay ? undefined : baseEvent.end
           ),
       ...(isTaskKind
-        ? { kind: 'task' as const, task: { ...baseEvent.task, priority } }
+        ? { kind: 'task' as const, task: { ...baseEvent.task, ...task } }
         : { kind: undefined, task: undefined }),
     };
   };
@@ -291,7 +294,7 @@ export const MobileEventDrawer = ({
     draftEvent,
     title,
     kind,
-    priority,
+    task,
     calendarId,
     isAllDay,
     startDate,
@@ -446,9 +449,11 @@ export const MobileEventDrawer = ({
         </div>
 
         <div className='df-mobile-event-drawer-body'>
-          {isEditable && (app.getTasksEnabled?.() || isTaskKind) && (
-            <EventKindSwitch value={kind} onChange={handleKindChange} />
-          )}
+          {isEditable &&
+            canSwitchEventKind(app) &&
+            (app.getTasksEnabled?.() || isTaskKind) && (
+              <EventKindSwitch value={kind} onChange={handleKindChange} />
+            )}
           <div className='df-mobile-event-drawer-section df-mobile-event-drawer-section-framed'>
             <input
               type='text'
@@ -655,10 +660,11 @@ export const MobileEventDrawer = ({
           )}
 
           {isTaskKind && draftEvent && (
-            <TaskPriorityField
-              event={{ ...draftEvent, task: { ...draftEvent.task, priority } }}
+            <TaskDetailsFields
+              app={app}
+              event={{ ...draftEvent, kind: 'task', task }}
               disabled={!isEditable}
-              onChange={event => setPriority(event.task?.priority ?? 'none')}
+              onChange={event => setTask(event.task ?? {})}
             />
           )}
 

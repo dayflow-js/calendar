@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/preact';
+import { fireEvent, render, screen, waitFor } from '@testing-library/preact';
+import { Temporal } from 'temporal-polyfill';
 
 import { GridYearView } from '@/components/yearView/GridYearView';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CalendarApp } from '@/core/CalendarApp';
 import { LocaleProvider } from '@/locale';
 import { ViewType, YearViewConfig } from '@/types';
@@ -87,5 +89,64 @@ describe('GridYearView keyboard support', () => {
     fireEvent.keyDown(may12, { key: 'Enter' });
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick.mock.calls[0]?.[0]).toEqual(new Date(2026, 4, 12));
+  });
+});
+
+const popupRow = () =>
+  document.querySelector<HTMLElement>(
+    '[data-grid-day-popup] [data-event-id="launch"]'
+  )!;
+const detailPanel = () =>
+  document.querySelector(
+    '[data-event-detail-panel]:not([data-event-detail-panel-handoff])'
+  );
+
+describe('GridYearView event details', () => {
+  const setup = (eventDetailTrigger?: 'click' | 'dbClick') => {
+    const app = new CalendarApp({
+      views: [],
+      plugins: [],
+      defaultView: ViewType.YEAR,
+      initialDate: new Date(2026, 4, 12),
+      useEventDetailPanel: true,
+      eventDetailTrigger,
+      events: [
+        {
+          id: 'launch',
+          title: 'Launch',
+          start: Temporal.PlainDate.from('2026-05-12'),
+          end: Temporal.PlainDate.from('2026-05-12'),
+          allDay: true,
+        },
+      ],
+    });
+    const result = render(
+      <ThemeProvider initialTheme='light'>
+        <LocaleProvider>
+          <GridYearView app={app} />
+        </LocaleProvider>
+      </ThemeProvider>
+    );
+    fireEvent.click(dayCell(result.container, '2026-05-12'));
+    return { row: popupRow, panel: detailPanel };
+  };
+
+  it('opens the detail panel from the day popup on click in click mode', async () => {
+    const { row, panel } = setup('click');
+    fireEvent.click(row());
+    await waitFor(() => expect(panel()).not.toBeNull());
+    expect(row()).not.toBeNull();
+    // Working in the panel keeps the popup open.
+    fireEvent.mouseDown(panel()!);
+    expect(row()).not.toBeNull();
+  });
+
+  it('selects on click and opens on double click by default', async () => {
+    const { row, panel } = setup();
+    fireEvent.click(row());
+    expect(row()).toHaveAttribute('data-selected', 'true');
+    expect(panel()).toBeNull();
+    fireEvent.dblClick(row());
+    await waitFor(() => expect(panel()).not.toBeNull());
   });
 });

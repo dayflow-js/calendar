@@ -2,6 +2,9 @@ import { ViewType } from '@dayflow/react';
 
 export const DEFAULT_THEME_COLOR = '#6786e6';
 
+/** View type registered by `createBoardView()` from `@dayflow/plugin-board`. */
+export const BOARD_VIEW = 'board' as ViewType;
+
 export type YearMode = 'fixed-week' | 'canvas' | 'grid';
 export type SwitcherMode = 'buttons' | 'select';
 

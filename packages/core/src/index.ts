@@ -66,11 +66,17 @@ export { CreateCalendarDialog } from './components/common/CreateCalendarDialog';
 export { default as DefaultEventDetailPanel } from './components/common/DefaultEventDetailPanel';
 export { default as DefaultEventDetailDialog } from './components/common/DefaultEventDetailDialog';
 export { EventConferenceField } from './components/common/EventConferenceField';
+export {
+  TaskAvatarStack,
+  TaskMemberAvatar,
+} from './components/common/TaskMemberAvatar';
+export { TaskDetailsFields } from './components/common/TaskDetailsFields';
 export { ContentSlot } from './renderer/ContentSlot';
 export { TimeGridBackgroundLayer } from './components/weekView/TimeGridBackgroundLayer';
 export type { TimeGridBackgroundLayerProps } from './components/weekView/TimeGridBackgroundLayer';
 export { CalendarEvent } from './components/calendarEvent';
 export type { CalendarEventProps } from './components/calendarEvent/types';
+export { TaskCheckbox } from './components/calendarEvent/components/TaskCheckbox';
 export { EventDetailPanelHost } from './components/calendarEvent/components/EventDetailPanelHost';
 export type { EventDetailPanelHostProps } from './components/calendarEvent/components/EventDetailPanelHost';
 export { EventLayoutCalculator } from './components/eventLayout';

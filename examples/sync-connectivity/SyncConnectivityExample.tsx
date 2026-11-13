@@ -27,7 +27,7 @@ import {
 } from '@dayflow/react';
 import { createDragPlugin } from '@drag/plugin';
 import { createSidebarPlugin } from '@sidebar/plugin';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { createLocalStorage } from '../caldav-proxy/storage';
 

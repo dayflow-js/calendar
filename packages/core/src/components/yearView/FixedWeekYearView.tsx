@@ -11,6 +11,7 @@ import {
   createCalendarDate,
   dateToCalendarDate,
 } from '@/calendar/calendarSystem';
+import { useEventActivation } from '@/components/common/useEventActivation';
 import ViewHeader from '@/components/common/ViewHeader';
 import { GridContextMenu } from '@/components/contextMenu';
 import { useLocale } from '@/locale';
@@ -41,6 +42,9 @@ import {
   getFixedWeekTotalColumns,
 } from './utils';
 import { YearEventOverlayHost } from './YearEventOverlayHost';
+
+/** The grid's minimum width when no column width is configured. */
+const DEFAULT_FIXED_GRID_MIN_WIDTH = 1352;
 
 interface FixedWeekYearViewProps {
   app: ICalendarApp;
@@ -161,14 +165,11 @@ export const FixedWeekYearView = ({
     [isEditable]
   );
 
-  const handleSelectEvent = useCallback(
-    (eventId: string, segmentId: string) => {
-      setSelectedEventId(eventId);
-      // Detail-panel key matches the legacy CalendarEvent format for year
-      // segments: yearSegment.id (e.g., `${event.id}::year-${rowStartMs}`).
-      setDetailPanelEventId(segmentId);
-    },
-    [setSelectedEventId, setDetailPanelEventId]
+  const handleSelectEvent = useEventActivation(
+    app,
+    isMobile,
+    setSelectedEventId,
+    setDetailPanelEventId
   );
 
   const handleEventContextMenu = useCallback(
@@ -548,8 +549,24 @@ export const FixedWeekYearView = ({
       : `${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
+  // Day columns stretch to fill the view but never get narrower than this.
+  // The CSS variable lets themes or `fixedWeekColumnWidth` widen them.
+  const gridMinWidth = `calc(var(--df-year-fixed-column-width, ${
+    DEFAULT_FIXED_GRID_MIN_WIDTH / totalColumns
+  }px) * ${totalColumns})`;
+
   return (
-    <div className='df-year-fixed' onContextMenu={e => e.preventDefault()}>
+    <div
+      className='df-year-fixed'
+      style={
+        config?.fixedWeekColumnWidth
+          ? ({
+              '--df-year-fixed-column-width': `${config.fixedWeekColumnWidth}px`,
+            } as JSX.CSSProperties)
+          : undefined
+      }
+      onContextMenu={e => e.preventDefault()}
+    >
       {/* Year Header */}
       <div className='df-year-fixed-header-span'>
         <ViewHeader
@@ -576,13 +593,13 @@ export const FixedWeekYearView = ({
       <div ref={weekLabelsRef} className='df-year-fixed-week-header'>
         <div
           className='df-year-fixed-week-header-inner'
-          style={{ minWidth: `calc(1352px + ${scrollbarWidth}px)` }}
+          style={{ minWidth: `calc(${gridMinWidth} + ${scrollbarWidth}px)` }}
         >
           <div
             className='df-year-fixed-week-grid'
             style={{
               gridTemplateColumns: `repeat(${totalColumns}, minmax(0, 1fr))`,
-              minWidth: '1352px',
+              minWidth: gridMinWidth,
             }}
           >
             {weekLabels.map((label, i) => {
@@ -644,7 +661,7 @@ export const FixedWeekYearView = ({
       >
         <div
           className='df-year-fixed-content-inner'
-          style={{ minWidth: '1352px', position: 'relative' }}
+          style={{ minWidth: gridMinWidth, position: 'relative' }}
         >
           {effectiveMonthsData.map(monthData => (
             <FixedWeekMonthRow

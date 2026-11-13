@@ -72,12 +72,33 @@ function resolveImage(name: string): ReleaseImage {
   };
 }
 
+export interface Contributor {
+  /** GitHub username. */
+  login: string;
+  url: string;
+}
+
+/** "- [@login](https://github.com/login): …" lines of a Contributors section. */
+function parseContributors(markdown: string): Contributor[] {
+  return [
+    ...markdown.matchAll(
+      /\[@([\w-]+)\]\((https:\/\/github\.com\/[\w-]+)\/?\)/g
+    ),
+  ].map(([, login, url]) => ({ login, url }));
+}
+
 function parseSections(body: string) {
   const parts = body.split(/^### (.+)$/m);
   const sections: ReleaseSection[] = [];
+  const contributors: Contributor[] = [];
   for (let i = 1; i < parts.length; i += 2) {
     const heading = parts[i].trim();
     const markdown = parts[i + 1].trim();
+    // Credited on the page by name and avatar, not as a notes section.
+    if (/contributor/i.test(heading)) {
+      contributors.push(...parseContributors(markdown));
+      continue;
+    }
     sections.push({
       heading,
       markdown,
@@ -87,7 +108,7 @@ function parseSections(body: string) {
       count: (markdown.match(/^- /gm) ?? []).length,
     });
   }
-  return { intro: parts[0].trim(), sections };
+  return { intro: parts[0].trim(), sections, contributors };
 }
 
 /**
@@ -139,7 +160,7 @@ export function getChangelog() {
       )
       .trim()
       .replace(/\n---\s*$/, '');
-    const { intro, sections } = parseSections(body);
+    const { intro, sections, contributors } = parseSections(body);
     const isFeature =
       Boolean(meta) ||
       sections.some(({ kind }) => kind === 'new' || kind === 'breaking');
@@ -156,6 +177,8 @@ export function getChangelog() {
       packages: parsePackages(intro),
       intro,
       sections,
+      /** People credited in the release's Contributors section. */
+      contributors,
       tags: [...new Set(sections.map(section => SECTION_LABELS[section.kind]))],
       areas: areaTags(body),
     };

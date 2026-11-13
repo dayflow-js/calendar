@@ -407,6 +407,12 @@ await prefetchNpmInfo(
   progress('Fetching registry metadata')
 );
 
+// Unpublished packages keep their manifest version, so a registry outage that
+// makes every lookup fail would silently turn the whole run into a no-op.
+if (packages.every(p => !latestPublished(p.name))) {
+  fail('Could not read any package from npm. Check the network or registry.');
+}
+
 await checkWorkingTree();
 const chosenBase = await resolveBaseline();
 const baselines = await crossCheck(chosenBase);
@@ -434,12 +440,17 @@ for (const p of packages) {
   // Local ahead of npm means this package was already bumped for the release
   // being prepared. Bumping again on a second run would skip a version number
   // and publish a hole, so treat it as staged rather than as more work.
-  const staged = Boolean(published) && gt(p.version, published);
+  // A package that has never been published ships the version in its manifest;
+  // bumping it would skip that number (e.g. 1.0.0 -> 1.1.0 on its first release).
+  const neverPublished = !published;
+  const staged =
+    neverPublished || (Boolean(published) && gt(p.version, published));
 
   state.set(p.name, {
     pkg: p,
     published,
     staged,
+    neverPublished,
     changed: status.changed === true || drift.length > 0 || staged,
     unknown: status.changed === null && drift.length === 0,
     basis: status.basis,
@@ -502,7 +513,9 @@ for (const f of families) {
         ? `${C.yellow}*${C.off}`
         : `${C.dim}-${C.off}`;
     let note;
-    if (st.staged) {
+    if (st.neverPublished) {
+      note = `${C.cyan}not on npm yet — first publish at ${m.version}${C.off}`;
+    } else if (st.staged) {
       note = `${C.cyan}already bumped from ${st.published} — pending publish${C.off}`;
     } else if (st.unknown) note = `${C.dim}no baseline${C.off}`;
     else if (st.changed) {

@@ -1,5 +1,6 @@
 'use client';
 
+import { createBoardView } from '@dayflow/plugin-board';
 import { createDragPlugin } from '@dayflow/plugin-drag';
 import { createKeyboardShortcutsPlugin } from '@dayflow/plugin-keyboard-shortcuts';
 import {
@@ -35,11 +36,16 @@ import React, {
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getWebsiteCalendars } from '@/utils/palette';
-import { generateSampleEvents, generateSampleTasks } from '@/utils/sampleData';
+import {
+  generateSampleEvents,
+  generateSampleTasks,
+  sampleTaskMembers,
+} from '@/utils/sampleData';
 
 import { CalendarViewer } from './livedemo/CalendarViewer';
 import { ControlPanelV2 } from './livedemo/ControlPanelV2';
 import {
+  BOARD_VIEW,
   CalendarFeatures,
   CalendarSelections,
   DEFAULT_THEME_COLOR,
@@ -108,6 +114,7 @@ export function InteractiveCalendar() {
       ViewType.MONTH,
       ViewType.YEAR,
       ViewType.AGENDA,
+      BOARD_VIEW,
     ],
     activeView: ViewType.MONTH,
     yearMode: 'fixed-week',
@@ -261,19 +268,15 @@ export function InteractiveCalendar() {
 
   const allEvents = useMemo(() => generateSampleEvents(), []);
   const sampleTasks = useMemo(() => generateSampleTasks(), []);
+  // The board lays out tasks, so selecting it turns tasks on.
+  const tasksEnabled =
+    features.enableTasks || selections.selectedViews.includes(BOARD_VIEW);
   const events = useMemo(() => {
     const visibleEvents = features.showMultiCalendar
       ? allEvents
       : allEvents.filter(e => !e.calendarIds);
-    return features.enableTasks
-      ? [...sampleTasks, ...visibleEvents]
-      : visibleEvents;
-  }, [
-    allEvents,
-    sampleTasks,
-    features.showMultiCalendar,
-    features.enableTasks,
-  ]);
+    return tasksEnabled ? [...sampleTasks, ...visibleEvents] : visibleEvents;
+  }, [allEvents, sampleTasks, features.showMultiCalendar, tasksEnabled]);
 
   const calendarsWithGroups = useMemo(() => {
     const googleIds = new Set(['team', 'personal', 'learning', 'travel']);
@@ -377,6 +380,9 @@ export function InteractiveCalendar() {
         })
       );
     }
+    if (selections.selectedViews.includes(BOARD_VIEW)) {
+      v.push(createBoardView());
+    }
 
     const currentView = selections.selectedViews.includes(selections.activeView)
       ? selections.activeView
@@ -407,7 +413,8 @@ export function InteractiveCalendar() {
       calendars: features.showCalendarGroups
         ? calendarsWithGroups
         : calendarTypes,
-      enableTasks: features.enableTasks,
+      enableTasks: tasksEnabled,
+      taskMembers: sampleTaskMembers,
       useCalendarHeader: features.showHeader,
       eventDetailTrigger: 'click',
       switcherMode: selections.switcherMode,
@@ -450,6 +457,7 @@ export function InteractiveCalendar() {
     selections.startOfWeek,
     selections.agendaDaysToShow,
     events,
+    tasksEnabled,
     mounted,
     calendarsWithGroups,
     themeMode,

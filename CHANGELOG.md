@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.8.0] - 2026-11-13
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.8.0 · `@dayflow/plugin-board` 1.0.0 (new) · `@dayflow/plugin-localization` 1.7.0 · `@dayflow/plugin-sidebar` 1.7.0 · `@dayflow/ui-context-menu` 1.3.0 · `create-dayflow` 1.2.1. All other packages are unchanged.
+
+### New Features & Enhancements
+
+- **Task Board (`@dayflow/plugin-board`)**: A new view that lays out the Calendar's tasks in columns by status, priority or assignee. Drag cards between and within columns, reorder columns, add, rename, recolor or delete status columns, and filter by assignee. Register it with `createBoardView()` in `views`; tasks are read and saved through the regular `events` and callbacks.
+- **Task Statuses and Assignees (`@dayflow/core`)**: `taskStatuses` defines the stages a task moves through (default To do, In progress and Done) and `taskMembers` the people it can be assigned to. Tasks gain `task.status` and `task.assigneeIds`, the task editors show Column and Assignees fields, and `setTaskStatuses` with `onTaskStatusesChange` updates and persists the stages.
+- **Per-View Headers (`@dayflow/core`)**: `useViewHeader: false` hides the date and navigation bars inside Day, Week, Month, Agenda and Year views, for apps that supply their own navigation.
+- **Instant Month Navigation (`@dayflow/core`)**: `createMonthView({ scroll: { instantNavigation: true } })` jumps straight to the target month for Previous, Next, Today and date changes, while continuous scrolling and snap-to-month stay smooth.
+- **Year View Column Width (`@dayflow/core`)**: `fixedWeekColumnWidth` sets the minimum day column width in fixed-week mode; the grid scrolls sideways when it does not fit.
+- **Inline Calendar Color Picker (`@dayflow/plugin-sidebar`, `@dayflow/ui-context-menu`)**: The calendar context menu opens the Blossom color picker in place. The context menu gains `customPicker` and `customColorLabel`.
+- **Board Labels (`@dayflow/plugin-localization`)**: Column, assignee and board labels for every bundled language.
+
+### Fixed
+
+- **Month View "+N more" (`@dayflow/core`)**: No longer clipped at larger browser font sizes, and now a button that Tab, Enter and Space reach, with the full date in its accessible name.
+- **Month View Navigation (`@dayflow/core`)**: `goToNext`, `goToPrevious` and `setCurrentDate` now scroll even when the target date already shows in the last row of the current month.
+- **Month View Memory (`@dayflow/core`)**: Navigating months no longer keeps earlier event arrays alive.
+- **Calendar Picker (`@dayflow/core`)**: The dropdown stays inside the viewport, and themed detail panels keep their arrow.
+- **Agenda View (`@dayflow/core`)**: Clicking an event follows `eventDetailTrigger` like the other views, and the detail panel anchors to the clicked row.
+
+### Changed
+
+- Build and test toolchain upgraded (Vitest 4, jsdom 29, Angular 21 for building `@dayflow/angular`, oxfmt). Published peer ranges are unchanged.
+- `create-dayflow` uses `@clack/prompts` 1.x.
+
+### Contributors
+
+- [@allandelmare](https://github.com/allandelmare): Per-view headers ([#169](https://github.com/dayflow-js/calendar/pull/169)), instant Month navigation ([#170](https://github.com/dayflow-js/calendar/pull/170)), the Month view "+N more" fix ([#172](https://github.com/dayflow-js/calendar/pull/172)) and the Month view memory fix ([#168](https://github.com/dayflow-js/calendar/pull/168)).
+
 ## [3.7.6] - 2026-10-23
 
 Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.7.6 · `@dayflow/plugin-keyboard-shortcuts` 1.6.2 · `@dayflow/plugin-localization` 1.6.4 · `@dayflow/plugin-sidebar` 1.6.6 · `@dayflow/ui-context-menu` 1.2.2 · `@dayflow/ui-range-picker` 1.2.2. All other packages are unchanged.
@@ -53,6 +84,10 @@ Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@d
 
 - **Month View Scrolling (`@dayflow/core`)**: Scrolling no longer rebuilds the loaded weeks on every frame, so the scrolling month view stays smooth (especially in Jalali mode).
 - **Locale Packs (`@dayflow/plugin-localization`)**: All packs now cover the same keys. Labels that were missing in some languages (such as "days"/"weeks" and the "already subscribed" message) no longer fall back to English.
+
+### Contributors
+
+- [@armineslami](https://github.com/armineslami): Jalali calendar support and Persian localization ([#159](https://github.com/dayflow-js/calendar/pull/159)).
 
 ## [3.7.4] - 2026-10-14
 

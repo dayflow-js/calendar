@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, ComponentChildren } from 'preact';
+import { cloneElement, isValidElement, ComponentChildren, JSX } from 'preact';
 import { createPortal, forwardRef } from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
@@ -269,59 +269,66 @@ export const ContextMenuSubContent = ({
 
 // ContextMenuColorPicker
 
-const COLORS = [
-  '#ea426b',
-  '#f19a38',
-  '#f7cf46',
-  '#83d754',
-  '#51aaf2',
-  '#b672d0',
-  '#957e5e',
-];
+const COLORS = ['#f7c948', '#5ccf8f', '#6ea8f7', '#f584b1', '#b48bf5'];
 
 export const ContextMenuColorPicker = ({
   selectedColor,
   onSelect,
   onCustomColor,
   customColorLabel = 'Custom Color',
+  customPicker,
 }: {
   selectedColor?: string;
   onSelect: (color: string) => void;
+  /** Shows a rainbow swatch after the presets; clicking it calls this. */
   onCustomColor?: () => void;
+  /** Accessible name of the rainbow swatch. */
   customColorLabel?: string;
-}) => (
-  <div className='df-context-menu-color-picker'>
-    <div className='df-context-menu-color-grid'>
-      {COLORS.map(color => (
-        <button
-          key={color}
-          type='button'
-          className='df-context-menu-color-swatch'
-          data-selected={
-            selectedColor?.toLowerCase() === color.toLowerCase()
-              ? 'true'
-              : undefined
-          }
-          style={{ backgroundColor: color }}
-          onClick={e => {
-            e.stopPropagation();
-            onSelect(color);
-          }}
-          title={color}
-        />
-      ))}
+  /** Rendered in place of the rainbow swatch, e.g. an inline color picker
+   * that opens where it sits. Takes precedence over `onCustomColor`. */
+  customPicker?: ComponentChildren;
+}) => {
+  const isPreset = COLORS.some(
+    color => color.toLowerCase() === selectedColor?.toLowerCase()
+  );
+  return (
+    <div className='df-context-menu-color-picker'>
+      <div className='df-context-menu-color-row' role='group'>
+        {COLORS.map(color => (
+          <button
+            key={color}
+            type='button'
+            className='df-context-menu-color-swatch'
+            aria-pressed={selectedColor?.toLowerCase() === color.toLowerCase()}
+            style={{ '--df-swatch-color': color } as JSX.CSSProperties}
+            onClick={e => {
+              e.stopPropagation();
+              onSelect(color);
+            }}
+            title={color}
+            aria-label={color}
+          />
+        ))}
+        {customPicker ? (
+          <div className='df-context-menu-color-custom-slot'>
+            {customPicker}
+          </div>
+        ) : (
+          onCustomColor && (
+            <button
+              type='button'
+              className='df-context-menu-color-swatch df-context-menu-color-custom'
+              aria-pressed={!!selectedColor && !isPreset}
+              onClick={e => {
+                e.stopPropagation();
+                onCustomColor();
+              }}
+              title={customColorLabel}
+              aria-label={customColorLabel}
+            />
+          )
+        )}
+      </div>
     </div>
-    {onCustomColor && (
-      <button
-        type='button'
-        className='df-context-menu-custom-color'
-        onClick={e => {
-          e.stopPropagation();
-          onCustomColor();
-        }}
-      >
-        {customColorLabel}
-      </button>
-    )}
-  </div>
-);
+  );
+};

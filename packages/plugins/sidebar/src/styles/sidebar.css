@@ -706,6 +706,40 @@
     min-width: max-content;
   }
 
+  /* The rainbow swatch at the end of the context menu colors: Blossom's core
+   * drawn as a color wheel until it opens. */
+  /* Flex wrappers: an inline picker would sit on a taller text line. */
+  .df-sidebar-context-color,
+  .df-sidebar-context-color > div {
+    display: flex;
+  }
+
+  .df-sidebar-context-color .bcp-core {
+    border-radius: 9999px;
+    background-image: conic-gradient(
+      #ff6b6b,
+      #ffb86b,
+      #ffe66b,
+      #8ce99a,
+      #66d9e8,
+      #74a8ff,
+      #b197fc,
+      #f783ac,
+      #ff6b6b
+    );
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.6);
+    cursor: pointer;
+    transition: scale 120ms ease;
+  }
+
+  .df-sidebar-context-color .bcp-core:hover {
+    scale: 1.12;
+  }
+
+  .df-sidebar-context-color .bcp-core[aria-expanded='true'] {
+    background-image: none;
+  }
+
   .df-sidebar-color-picker-layer {
     position: fixed;
     inset: 0;

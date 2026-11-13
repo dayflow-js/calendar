@@ -463,6 +463,7 @@ Agenda ビューは、イベントを日ごとにグルーピングした時系�
 | `gridDateClick`             | `'popup' \| 'day-view' \| 'none' \| function`        | `'popup'`        | (Grid モード) 日付セルをクリックした際のアクション。                                                                                                                   |
 | `gridDateDoubleClick`       | `'create-event' \| 'day-view' \| 'none' \| function` | `'create-event'` | (Grid モード) 日付セルをダブルクリックした際のアクション。`'create-event'` (デフォルト) を指定すると、クリックした日付に 9:00 から 10:00 の Timed Event を作成します。 |
 | `gridHeatmapLevels`         | `number`                                             | `5`              | (Grid モード) 使用するヒートマップの強度の段階数。                                                                                                                     |
+| `fixedWeekColumnWidth`      | `number`                                             | 約 `36.5`        | (fixed-week モード) 日付列 1 列あたりの最小幅（px）。グリッドがビューより広くなる場合は横スクロールします。CSS 変数 `--df-year-fixed-column-width` でも設定できます。  |
 
 #### ヒートマップのカスタマイズ (Grid モード)
 

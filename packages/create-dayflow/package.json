@@ -1,6 +1,6 @@
 {
   "name": "create-dayflow",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Interactive CLI to add DayFlow calendar to your project",
   "keywords": [
     "angular",

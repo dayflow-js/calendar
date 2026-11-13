@@ -92,7 +92,7 @@ fi
 
 # ---------- Define Packages ----------
 MAIN_PKGS=(core react vue svelte)
-PLUGIN_DIRS=(drag keyboard-shortcuts localization sidebar)
+PLUGIN_DIRS=(drag keyboard-shortcuts localization sidebar board)
 UI_DIRS=(context-menu range-picker)
 CALDAV_DIRS=(sync-core core google-sync outlook-sync)
 

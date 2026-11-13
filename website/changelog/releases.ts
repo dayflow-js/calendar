@@ -16,6 +16,19 @@ export interface ReleaseMeta {
 }
 
 export const releaseMeta: Record<string, ReleaseMeta> = {
+  '3.8.0': {
+    title: 'Task board',
+    summary:
+      'Plan tasks in columns by status, priority or assignee, with custom columns and drag and drop.',
+    images: ['board', 'board-task-editor'],
+    links: [
+      { label: 'Try it in the demo', href: '/demo?view=board' },
+      {
+        label: 'Board plugin',
+        href: 'https://www.npmjs.com/package/@dayflow/plugin-board',
+      },
+    ],
+  },
   '3.7.6': {
     title: 'Tasks, right in your calendar',
     summary:
