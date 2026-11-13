@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'preact/hooks';
 
 import { dateToCalendarDate } from '@/calendar/calendarSystem';
 import CalendarEvent from '@/components/calendarEvent';
+import { formatDateLabel } from '@/locale/intl';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import {
   monthDayCell,
@@ -39,6 +40,7 @@ interface WeekDayCellProps {
   isDragging: boolean;
   locale: string;
   moreLabel: string;
+  moreHeight: number;
   newlyCreatedEventId: string | null;
   onChangeView?: (view: ViewType) => void;
   onContextMenu: (e: MouseEvent, date: Date) => void;
@@ -91,6 +93,7 @@ const WeekDayCell = ({
   isDragging,
   locale,
   moreLabel,
+  moreHeight,
   newlyCreatedEventId,
   onChangeView,
   onContextMenu,
@@ -403,8 +406,11 @@ const WeekDayCell = ({
         {renderElements}
 
         {hasMoreEvents && (
-          <div
+          <button
+            type='button'
+            aria-label={`+${hiddenEventsCount} ${moreLabel}, ${formatDateLabel(day.date, locale, { dateStyle: 'full' })}`}
             className={cn(monthMoreEvents, 'df-month-day-cell-more-events')}
+            style={{ height: `${moreHeight}px` }}
             data-layout={screenSize === 'desktop' ? 'desktop' : 'mobile'}
             onClick={event => {
               event.stopPropagation();
@@ -418,7 +424,7 @@ const WeekDayCell = ({
           >
             +{hiddenEventsCount}
             {screenSize === 'desktop' ? ` ${moreLabel}` : ''}
-          </div>
+          </button>
         )}
       </div>
     </div>

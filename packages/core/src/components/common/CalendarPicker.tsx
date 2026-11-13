@@ -65,9 +65,9 @@ export const CalendarPicker = ({
       const minWidth = Math.min(
         isMobile
           ? 12 *
-              Number.parseFloat(
-                getComputedStyle(document.documentElement).fontSize || '16'
-              )
+              (Number.parseFloat(
+                getComputedStyle(document.documentElement).fontSize
+              ) || 16)
           : rect.width,
         availableWidth
       );

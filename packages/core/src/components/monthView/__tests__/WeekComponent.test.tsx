@@ -120,6 +120,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 113,
         }}
+        moreHeight={20}
         weekHeight={113}
         events={[event]}
         dragState={{
@@ -200,6 +201,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 113,
         }}
+        moreHeight={20}
         weekHeight={113}
         events={events}
         dragState={{
@@ -271,6 +273,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 113,
         }}
+        moreHeight={20}
         weekHeight={113}
         events={[]}
         dragState={{
@@ -352,6 +355,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: weekHeight,
         }}
+        moreHeight={20}
         weekHeight={weekHeight}
         events={events}
         dragState={{
@@ -432,6 +436,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: weekHeight,
         }}
+        moreHeight={20}
         weekHeight={weekHeight}
         events={events}
         dragState={{
@@ -528,6 +533,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 119,
         }}
+        moreHeight={20}
         weekHeight={119}
         events={events}
         dragState={{
@@ -604,6 +610,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 140,
         }}
+        moreHeight={20}
         weekHeight={140}
         events={events}
         dragState={{
@@ -666,6 +673,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 140,
         }}
+        moreHeight={20}
         weekHeight={140}
         events={[]}
         dragState={{
@@ -733,6 +741,7 @@ describe('WeekComponent', () => {
           top: 0,
           height: 140,
         }}
+        moreHeight={20}
         weekHeight={140}
         events={[]}
         dragState={{

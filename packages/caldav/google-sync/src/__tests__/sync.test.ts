@@ -63,16 +63,14 @@ function makeAdapter(
   overrides: Partial<GoogleSyncAdapter> = {}
 ): GoogleSyncAdapter {
   return {
-    listCalendars: vi.fn(
-      (): Promise<GoogleCalendarList> =>
-        Promise.resolve({ items: [makeEntry()] })
+    listCalendars: vi.fn((): Promise<GoogleCalendarList> =>
+      Promise.resolve({ items: [makeEntry()] })
     ),
-    listEvents: vi.fn(
-      (): Promise<GoogleEventList> =>
-        Promise.resolve({
-          items: [makeApiEvent()],
-          nextSyncToken: 'tok-1',
-        })
+    listEvents: vi.fn((): Promise<GoogleEventList> =>
+      Promise.resolve({
+        items: [makeApiEvent()],
+        nextSyncToken: 'tok-1',
+      })
     ),
     getEvent: vi.fn(() =>
       Promise.resolve(makeApiEvent({ etag: '"fresh-etag"' }))

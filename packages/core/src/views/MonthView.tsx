@@ -5,7 +5,6 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useCallback,
 } from 'preact/hooks';
 
 import {
@@ -23,6 +22,7 @@ import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
 } from '@/hooks/virtualScroll';
+import { useStableMonthCallback } from '@/hooks/virtualScroll/useStableMonthCallback';
 import { useLocale } from '@/locale';
 import { useDragForView } from '@/plugins/dragBridge';
 import {
@@ -31,6 +31,8 @@ import {
   weekGrid,
   dayLabel,
   scrollContainer,
+  cn,
+  monthMoreEvents,
 } from '@/styles/classNames';
 import {
   Event,
@@ -130,6 +132,7 @@ const eventOverlapsWeek = (
   return targetWeek >= eventWeekStart && targetWeek <= eventWeekEnd;
 };
 
+const MORE_TEXT_HEIGHT = 20;
 const STATIC_TRANSITION_DURATION = 300;
 const EMPTY_WEEK_EVENTS: Event[] = [];
 
@@ -154,6 +157,29 @@ const MonthView = ({
 
   const scrollDisabled = config.scroll?.disabled === true;
   const isFadeMode = scrollDisabled && config.scroll?.transition === 'fade';
+
+  const moreMeasureRef = useRef<HTMLSpanElement>(null);
+  const [moreHeight, setMoreHeight] = useState(MORE_TEXT_HEIGHT);
+
+  useLayoutEffect(() => {
+    const element = moreMeasureRef.current;
+    if (!element) return;
+
+    // Read layout height so scaled ancestors do not shrink the reservation.
+    const initialHeight =
+      element.offsetHeight ||
+      Number.parseFloat(getComputedStyle(element).height);
+    if (initialHeight > 0) setMoreHeight(initialHeight);
+
+    const observer = new ResizeObserver(entries => {
+      // Safari before 15.4 omits borderBoxSize; fall back to layout height.
+      const height =
+        entries[0]?.borderBoxSize?.[0]?.blockSize ?? element.offsetHeight;
+      if (height > 0) setMoreHeight(height);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isFadeMode]);
 
   const [fadeDisplayDate, setFadeDisplayDate] = useState(currentDate);
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -379,27 +405,21 @@ const MonthView = ({
       ? internalDetailPanelEventId
       : propDetailPanelEventId;
 
-  const setSelectedEventId = useCallback(
-    (id: string | null) => {
-      if (propOnEventSelect) {
-        propOnEventSelect(id);
-      } else {
-        setInternalSelectedId(id);
-      }
-    },
-    [propOnEventSelect]
-  );
+  const setSelectedEventId = useStableMonthCallback((id: string | null) => {
+    if (propOnEventSelect) {
+      propOnEventSelect(id);
+    } else {
+      setInternalSelectedId(id);
+    }
+  });
 
-  const setDetailPanelEventId = useCallback(
-    (id: string | null) => {
-      if (propOnDetailPanelToggle) {
-        propOnDetailPanelToggle(id);
-      } else {
-        setInternalDetailPanelEventId(id);
-      }
-    },
-    [propOnDetailPanelToggle]
-  );
+  const setDetailPanelEventId = useStableMonthCallback((id: string | null) => {
+    if (propOnDetailPanelToggle) {
+      propOnDetailPanelToggle(id);
+    } else {
+      setInternalDetailPanelEventId(id);
+    }
+  });
 
   // Sync highlighted event from app state
   const prevHighlightedEventId = useRef(app.state.highlightedEventId);
@@ -527,7 +547,7 @@ const MonthView = ({
     appTimeZone,
   ]);
 
-  const getWeekEventsWithPreview = useCallback(
+  const getWeekEventsWithPreview = useStableMonthCallback(
     (weekStartDate: Date) => {
       const baseEvents =
         eventsByWeek.get(weekStartDate.getTime()) ?? EMPTY_WEEK_EVENTS;
@@ -559,8 +579,7 @@ const MonthView = ({
       }
 
       return adjustedEvents;
-    },
-    [eventsByWeek, dragPreviewEvent, startOfWeek, appTimeZone]
+    }
   );
 
   const isGridDateClickRef = useRef(false);
@@ -604,6 +623,7 @@ const MonthView = ({
     startOfWeek: startOfWeek,
     isEnabled: isWeekHeightInitialized && !isFadeMode,
     snapToMonth: config.snapToMonth,
+    instantNavigation: config.scroll?.instantNavigation,
     skipScrollOnDateChange: isGridDateClickRef,
   });
 
@@ -781,14 +801,12 @@ const MonthView = ({
     };
   }, [isFadeMode, scrollDisabled, scrollElementRef]);
 
-  const handleEventUpdate = useCallback(
-    (updatedEvent: Event) => app.updateEvent(updatedEvent.id, updatedEvent),
-    [app]
+  const handleEventUpdate = useStableMonthCallback((updatedEvent: Event) =>
+    app.updateEvent(updatedEvent.id, updatedEvent)
   );
 
-  const handleEventDelete = useCallback(
-    (eventId: string) => app.deleteEvent(eventId),
-    [app]
+  const handleEventDelete = useStableMonthCallback((eventId: string) =>
+    app.deleteEvent(eventId)
   );
 
   const handleChangeView = (view: ViewType) => {
@@ -796,12 +814,11 @@ const MonthView = ({
   };
 
   // Stable callbacks for WeekComponent props so memo() can bail out during scroll
-  const handleDetailPanelOpen = useCallback(
-    () => setNewlyCreatedEventId(null),
-    []
+  const handleDetailPanelOpen = useStableMonthCallback(() =>
+    setNewlyCreatedEventId(null)
   );
 
-  const handleWeekEventSelect = useCallback(
+  const handleWeekEventSelect = useStableMonthCallback(
     (eventId: string | null) => {
       const isViewable = app.getReadOnlyConfig().viewable;
       if ((screenSize !== 'desktop' || isTouch) && eventId && isViewable) {
@@ -813,16 +830,12 @@ const MonthView = ({
         }
       }
       setSelectedEventId(eventId);
-    },
-    [screenSize, isTouch, events, setSelectedEventId, app]
+    }
   );
 
-  const handleWeekEventLongPress = useCallback(
-    (eventId: string) => {
-      if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
-    },
-    [screenSize, isTouch, setSelectedEventId]
-  );
+  const handleWeekEventLongPress = useStableMonthCallback((eventId: string) => {
+    if (screenSize !== 'desktop' || isTouch) setSelectedEventId(eventId);
+  });
 
   const getCustomTitle = () => {
     const isAsianLocale = locale.startsWith('zh') || locale.startsWith('ja');
@@ -842,7 +855,7 @@ const MonthView = ({
       : `${currentMonth} ${new Intl.NumberFormat(locale, { useGrouping: false }).format(currentYear)}`;
   };
 
-  const handleGridDateClick = useCallback(
+  const handleGridDateClick = useStableMonthCallback(
     (date: Date, dayEvents: Event[], e?: MouseEvent) => {
       isGridDateClickRef.current = true;
       const clickAction = config?.gridDateClick;
@@ -864,19 +877,15 @@ const MonthView = ({
         app.changeView(ViewType.DAY);
       }
       // 'none' → do nothing
-    },
-    [config.gridDateClick, app]
+    }
   );
 
-  const handleSelectDate = useCallback(
-    (date: Date) => {
-      isGridDateClickRef.current = true;
-      app.selectDate(date);
-    },
-    [app]
-  );
+  const handleSelectDate = useStableMonthCallback((date: Date) => {
+    isGridDateClickRef.current = true;
+    app.selectDate(date);
+  });
 
-  const handleGridDateDoubleClick = useCallback(
+  const handleGridDateDoubleClick = useStableMonthCallback(
     (e: MouseEvent | TouchEvent, date: Date, dayEvents: Event[]) => {
       const dblClickAction = config?.gridDateDoubleClick ?? 'create-event';
 
@@ -922,8 +931,7 @@ const MonthView = ({
         app.changeView(ViewType.DAY);
       }
       // 'none' → do nothing
-    },
-    [config.gridDateDoubleClick, app, screenSize, t, appTimeZone]
+    }
   );
 
   return (
@@ -963,6 +971,13 @@ const MonthView = ({
           className={`${scrollContainer} df-month-view-fade-scroller`}
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
         >
+          <span
+            ref={moreMeasureRef}
+            className={cn(monthMoreEvents, 'df-month-more-events-measure')}
+            aria-hidden='true'
+          >
+            {t('more')}
+          </span>
           <div className='df-month-view-fade-body' style={fadeStyle}>
             {fadeWeeks.map((weekData, index) => {
               const weekEvents = getWeekEventsWithPreview(weekData.startDate);
@@ -982,6 +997,7 @@ const MonthView = ({
                   item={adjustedItem}
                   weekHeight={weekHeight}
                   eventHeight={config.eventHeight}
+                  moreHeight={moreHeight}
                   showWeekNumbers={config.showWeekNumbers}
                   showMonthIndicator={false}
                   currentMonth={
@@ -1042,6 +1058,13 @@ const MonthView = ({
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
           onScroll={handleScroll}
         >
+          <span
+            ref={moreMeasureRef}
+            className={cn(monthMoreEvents, 'df-month-more-events-measure')}
+            aria-hidden='true'
+          >
+            {t('more')}
+          </span>
           <div style={{ height: topSpacerHeight }} />
           {visibleWeeks.map((item, index) => {
             const weekEvents = getWeekEventsWithPreview(
@@ -1065,6 +1088,7 @@ const MonthView = ({
                 item={adjustedItem}
                 weekHeight={weekHeight}
                 eventHeight={config.eventHeight}
+                moreHeight={moreHeight}
                 showWeekNumbers={config.showWeekNumbers}
                 showMonthIndicator={config.showMonthIndicator}
                 currentMonth={currentMonth}

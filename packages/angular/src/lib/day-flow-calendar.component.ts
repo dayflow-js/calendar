@@ -45,13 +45,16 @@ import {
 } from '@dayflow/core';
 
 @Component({
+  standalone: false,
   selector: 'dayflow-calendar',
   template: `
     <div #container class="df-calendar-wrapper"></div>
 
     <!-- Hidden area to render Angular templates before they are portaled -->
     <div style="display: none">
-      <ng-container *ngFor="let rendering of customRenderings; trackBy: trackById">
+      <ng-container
+        *ngFor="let rendering of customRenderings; trackBy: trackById"
+      >
         <div
           *ngIf="getTemplate(rendering.generatorName)"
           [dayflowPortal]="rendering.containerEl"

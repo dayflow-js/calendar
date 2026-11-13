@@ -334,15 +334,15 @@ export function buildNestedStructure(
   // Establish parent-child relationships
   for (let i = 0; i < parallelGroups.length; i++) {
     const currentGroup = parallelGroups[i];
-    const currentGroupEvents = currentGroup.events.map(
-      e => eventMap.get(e.id)!
+    const currentGroupEvents = currentGroup.events.map(e =>
+      eventMap.get(e.id)!
     );
 
     let foundParent = false;
     for (let j = i - 1; j >= 0 && !foundParent; j--) {
       const potentialParentGroup = parallelGroups[j];
-      const potentialParentGroupEvents = potentialParentGroup.events.map(
-        e => eventMap.get(e.id)!
+      const potentialParentGroupEvents = potentialParentGroup.events.map(e =>
+        eventMap.get(e.id)!
       );
       const potentialParentGroupMapped: ParallelGroup = {
         events: potentialParentGroupEvents,

@@ -1,5 +1,3 @@
-import assert from 'node:assert/strict';
-
 import {
   autoScrollDelta,
   nextFocusedTaskId,
@@ -7,7 +5,7 @@ import {
   pickGroupAtPoint,
   resolveDropIndex,
 } from '@board/interaction/dropTarget';
-import { test } from 'vitest';
+import { assert, test } from 'vitest';
 
 const cards = [
   { id: 'a', top: 0, bottom: 40 },
@@ -43,14 +41,14 @@ test('picks the column under the pointer or the nearest one', () => {
     { id: 'todo', left: 0, right: 280 },
     { id: 'doing', left: 292, right: 572 },
   ];
-  assert.equal(pickGroupAtPoint(100, columns), 'todo');
-  assert.equal(pickGroupAtPoint(290, columns), 'doing');
-  assert.equal(pickGroupAtPoint(900, columns), 'doing');
-  assert.equal(pickGroupAtPoint(10, []), null);
+  assert.strictEqual(pickGroupAtPoint(100, columns), 'todo');
+  assert.strictEqual(pickGroupAtPoint(290, columns), 'doing');
+  assert.strictEqual(pickGroupAtPoint(900, columns), 'doing');
+  assert.strictEqual(pickGroupAtPoint(10, []), null);
 });
 
 test('auto-scroll speeds up towards the edges', () => {
-  assert.equal(autoScrollDelta(500, 0, 1000), 0);
+  assert.strictEqual(autoScrollDelta(500, 0, 1000), 0);
   assert.ok(autoScrollDelta(5, 0, 1000) < 0);
   assert.ok(autoScrollDelta(995, 0, 1000) > 0);
   assert.ok(
@@ -100,11 +98,11 @@ test('arrow keys move focus between cards and columns', () => {
     { id: 'empty', visibleTaskIds: [] },
     { id: 'done', visibleTaskIds: ['d'] },
   ];
-  assert.equal(nextFocusedTaskId(groups, 'a', 'ArrowDown'), 'b');
-  assert.equal(nextFocusedTaskId(groups, 'a', 'ArrowUp'), 'a');
-  assert.equal(nextFocusedTaskId(groups, 'c', 'ArrowRight'), 'd');
-  assert.equal(nextFocusedTaskId(groups, 'd', 'ArrowLeft'), 'a');
-  assert.equal(nextFocusedTaskId(groups, 'b', 'End'), 'c');
+  assert.strictEqual(nextFocusedTaskId(groups, 'a', 'ArrowDown'), 'b');
+  assert.strictEqual(nextFocusedTaskId(groups, 'a', 'ArrowUp'), 'a');
+  assert.strictEqual(nextFocusedTaskId(groups, 'c', 'ArrowRight'), 'd');
+  assert.strictEqual(nextFocusedTaskId(groups, 'd', 'ArrowLeft'), 'a');
+  assert.strictEqual(nextFocusedTaskId(groups, 'b', 'End'), 'c');
 });
 
 test('column drops use the other columns midpoints', async () => {
@@ -115,10 +113,10 @@ test('column drops use the other columns midpoints', async () => {
     { id: 'b', left: 292, width: 280 },
     { id: 'c', left: 584, width: 280 },
   ];
-  assert.equal(resolveColumnDropIndex(100, columns, 'c'), 0);
-  assert.equal(resolveColumnDropIndex(500, columns, 'a'), 1);
-  assert.equal(resolveColumnDropIndex(800, columns, 'a'), 2);
-  assert.equal(resolveColumnDropIndex(10, columns, 'a'), 0);
+  assert.strictEqual(resolveColumnDropIndex(100, columns, 'c'), 0);
+  assert.strictEqual(resolveColumnDropIndex(500, columns, 'a'), 1);
+  assert.strictEqual(resolveColumnDropIndex(800, columns, 'a'), 2);
+  assert.strictEqual(resolveColumnDropIndex(10, columns, 'a'), 0);
 });
 
 test('column offsets open a gap at the target index', async () => {
@@ -131,9 +129,9 @@ test('column offsets open a gap at the target index', async () => {
   // Moving `a` to the end: b and c slide left by a's width plus the gap,
   // and a's placeholder lands after c.
   const offsets = columnShiftOffsets(columns, 'a', 2);
-  assert.equal(offsets.get('b'), -292);
-  assert.equal(offsets.get('c'), -292);
-  assert.equal(offsets.get('a'), 44 + 12 + 280 + 12);
+  assert.strictEqual(offsets.get('b'), -292);
+  assert.strictEqual(offsets.get('c'), -292);
+  assert.strictEqual(offsets.get('a'), 44 + 12 + 280 + 12);
   // Unchanged position: no offsets.
   const still = columnShiftOffsets(columns, 'b', 1);
   assert.deepEqual([...still.values()], [0, 0, 0]);

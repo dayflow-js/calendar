@@ -120,7 +120,7 @@ describe('Board Calendar integration', () => {
       });
       fireEvent(target, event);
     };
-    pointer(columns[0].querySelector('header')!, 'PointerDown', 20);
+    pointer(columns[0].querySelector('header')!, 'pointerdown', 20);
     pointer(window, 'pointermove', 800);
     expect(host.querySelector('.df-board-column-overlay')).not.toHaveAttribute(
       'hidden'
@@ -143,7 +143,7 @@ describe('Board Calendar integration', () => {
     const onViewStateChange = vi.fn();
     const { host } = mount([task('draft')], { onViewStateChange });
     const header = host.querySelector('.df-board-column-header')!;
-    const down = new MouseEvent('PointerDown', { bubbles: true, clientX: 20 });
+    const down = new MouseEvent('pointerdown', { bubbles: true, clientX: 20 });
     Object.defineProperties(down, {
       pointerId: { value: 1 },
       pointerType: { value: 'mouse' },

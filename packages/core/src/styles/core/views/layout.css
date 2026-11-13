@@ -1652,6 +1652,7 @@
     cursor: pointer;
     color: var(--df-color-muted-foreground);
     font-size: 0.75rem;
+    white-space: nowrap;
     text-decoration: underline;
     text-decoration-color: transparent;
     text-underline-offset: 2px;
@@ -1667,7 +1668,25 @@
 
   .df-month-day-cell-more-events {
     pointer-events: auto;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    line-height: inherit;
     z-index: 100;
+  }
+
+  .df-month-day-cell-more-events:focus-visible {
+    outline: 2px solid var(--df-color-ring);
+    outline-offset: -2px;
+  }
+
+  .df-month-more-events-measure {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .df-month-day-cell-more-events[data-layout='desktop'] {
