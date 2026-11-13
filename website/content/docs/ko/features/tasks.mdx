@@ -111,13 +111,64 @@ const tasks: Event[] = [
 [인터랙티브 데모](/demo)에는 **Tasks** 스위치와 **Preview** 툴팁이 있어 완료 동작과 상세 패널에서의
 우선순위 변경을 보여 줍니다.
 
+## 상태와 담당자 [#statuses-and-assignees]
+
+할 일은 워크플로 단계를 거쳐 진행되고 멤버에게 할당될 수 있습니다. 둘 다 일반적인 할 일 필드이며,
+할 일 편집기와 [보드 플러그인](/docs-ko/plugins/board)에서 사용합니다.
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| 옵션 / 필드            | 타입                               | 의미                                                     |
+| ---------------------- | ---------------------------------- | -------------------------------------------------------- |
+| `taskStatuses`         | `TaskStatus[]`                     | 할 일이 거치는 단계(순서대로)                            |
+| `taskMembers`          | `TaskMember[]`                     | 할 일을 할당할 수 있는 멤버. 비어 있으면 필드를 숨깁니다 |
+| `task.status`          | `string`                           | `TaskStatus`의 ID                                        |
+| `task.assigneeIds`     | `string[]`                         | `TaskMember`의 ID                                        |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | 상태를 추가, 이름 변경, 색상 변경, 정렬, 삭제했을 때     |
+
+`TaskStatus`에는 `id`와 선택적인 `title`, `color`, `completed`가 있습니다. 기본 ID
+(`todo`, `in-progress`, `done`)는 `title`을 생략하면 번역된 이름을 표시합니다.
+`TaskMember`에는 `id`, `name`과 선택적인 `avatarUrl`, `color`가 있으며, 아바타가 없는
+멤버는 이니셜로 표시됩니다.
+
+`completed: true`인 상태가 있으면 완료 여부와 상태가 동기화됩니다. 할 일을 완료하면 첫 번째 완료
+상태로 이동하고, 다시 열면 이전의 미완료 상태로 돌아갑니다. 완료 상태가 없으면 체크박스와 상태는
+서로 독립적입니다.
+
+`taskMembers`를 설정하면 할 일 편집기에 **Assignees** 필드가 나타나고, 보드처럼 상태별로
+그룹화하는 뷰를 등록하면 **Column** 필드가 나타납니다. `app.setTaskStatuses(statuses)`는
+코드에서 상태를 교체하고 `onTaskStatusesChange`를 호출합니다.
+
 ## 코드로 업데이트하고 저장하기
 
 할 일 변경은 이벤트 변경과 같은 `onEventUpdate` 콜백을 사용합니다. `kind`와 `task` 메타데이터를
 이벤트 날짜와 함께 데이터 소스에 저장하세요.
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -125,6 +176,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// 상태로 옮기면 그에 맞게 할 일이 완료되거나 다시 열립니다.
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 헬퍼 함수는 업데이트된 값을 반환할 뿐, 직접 저장하지는 않습니다.

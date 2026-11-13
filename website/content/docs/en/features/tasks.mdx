@@ -113,13 +113,67 @@ without a time label. Day and Week tasks do not have an event color bar.
 The [interactive demo](/demo) includes a **Tasks** switch and a **Preview** tooltip
 that illustrates completion and changing priority in the detail panel.
 
+## Statuses and assignees [#statuses-and-assignees]
+
+Tasks can move through workflow stages and be assigned to people. Both are
+plain task fields, used by the task editor and by the
+[Board plugin](/docs/plugins/board).
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| Option / field         | Type                               | Meaning                                                       |
+| ---------------------- | ---------------------------------- | ------------------------------------------------------------- |
+| `taskStatuses`         | `TaskStatus[]`                     | Stages a task moves through, in order                         |
+| `taskMembers`          | `TaskMember[]`                     | People tasks can be assigned to; the field hides when empty   |
+| `task.status`          | `string`                           | A `TaskStatus` ID                                             |
+| `task.assigneeIds`     | `string[]`                         | `TaskMember` IDs                                              |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | Statuses were added, renamed, recolored, reordered or removed |
+
+A `TaskStatus` has an `id` and optional `title`, `color` and `completed`. Built-in
+IDs (`todo`, `in-progress`, `done`) show translated names when `title` is
+omitted. A `TaskMember` has an `id`, a `name` and optional `avatarUrl` and
+`color`; members without an avatar show their initials.
+
+When some status is `completed: true`, completion and status stay in sync:
+completing a task moves it to the first completed status, and reopening it
+returns it to its previous open status. Without a completed status, the
+checkbox is independent of the status.
+
+The task editor shows the **Assignees** field when `taskMembers` is set, and the
+**Column** field when a view that groups by status, such as the board, is
+registered. `app.setTaskStatuses(statuses)` replaces the statuses from code and
+calls `onTaskStatusesChange`.
+
 ## Programmatic updates and persistence
 
 Task changes use the same `onEventUpdate` callback as event changes. Persist `kind`
 and the `task` metadata together with the event dates in your data source.
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -127,6 +181,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// Moving to a status also completes or reopens the task to match it.
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 The helpers return updated values; they do not persist changes themselves.

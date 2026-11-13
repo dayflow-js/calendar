@@ -111,13 +111,65 @@ const tasks: Event[] = [
 [インタラクティブデモ](/demo)には **Tasks** スイッチと **Preview** ツールチップがあり、
 完了操作と詳細パネルでの優先度変更を確認できます。
 
+## ステータスと担当者 [#statuses-and-assignees]
+
+タスクはワークフローの段階を進み、メンバーに割り当てることができます。どちらも通常のタスクの
+フィールドで、タスクエディターと[ボードプラグイン](/docs-ja/plugins/board)が使用します。
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| オプション / フィールド | 型                                 | 意味                                                           |
+| ----------------------- | ---------------------------------- | -------------------------------------------------------------- |
+| `taskStatuses`          | `TaskStatus[]`                     | タスクが進む段階（順番どおり）                                 |
+| `taskMembers`           | `TaskMember[]`                     | タスクを割り当てられるメンバー。空のときは欄を非表示           |
+| `task.status`           | `string`                           | `TaskStatus` の ID                                             |
+| `task.assigneeIds`      | `string[]`                         | `TaskMember` の ID                                             |
+| `onTaskStatusesChange`  | `(statuses: TaskStatus[]) => void` | ステータスの追加・名前変更・色変更・並べ替え・削除時に呼ばれる |
+
+`TaskStatus` は `id` と、任意の `title`、`color`、`completed` を持ちます。組み込みの ID
+（`todo`、`in-progress`、`done`）は、`title` を省略すると翻訳された名前を表示します。
+`TaskMember` は `id`、`name` と、任意の `avatarUrl`、`color` を持ちます。アバターのない
+メンバーはイニシャルで表示されます。
+
+`completed: true` のステータスがある場合、完了状態とステータスは同期します。タスクを完了すると
+最初の完了ステータスに移り、再開すると以前の未完了ステータスに戻ります。完了ステータスがない
+場合、チェックボックスはステータスと独立しています。
+
+`taskMembers` を設定するとタスクエディターに **Assignees** 欄が表示され、ボードのように
+ステータスでグループ化するビューを登録すると **Column** 欄が表示されます。
+`app.setTaskStatuses(statuses)` はコードからステータスを置き換え、`onTaskStatusesChange`
+を呼び出します。
+
 ## プログラムからの更新と永続化
 
 タスクの変更は、予定の変更と同じ `onEventUpdate` コールバックを使います。
 `kind` と `task` のメタデータを、予定の日時と一緒にデータソースへ保存してください。
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -125,6 +177,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// ステータスへの移動に合わせて、タスクも完了または再開されます。
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 ヘルパーは更新後の値を返すだけで、変更を保存はしません。

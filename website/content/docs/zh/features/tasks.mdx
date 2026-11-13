@@ -107,13 +107,62 @@ const tasks: Event[] = [
 [交互 Demo](/demo) 提供 **Tasks** 开关，旁边的 **Preview** 提示会演示完成任务、
 打开详情面板和切换优先级。
 
+## 状态与负责人 [#statuses-and-assignees]
+
+任务可以在工作流的各个阶段之间流转，也可以分配给成员。两者都是普通的任务字段，
+由任务编辑器和[看板插件](/docs-zh/plugins/board)共同使用。
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| 配置项 / 字段          | 类型                               | 含义                                       |
+| ---------------------- | ---------------------------------- | ------------------------------------------ |
+| `taskStatuses`         | `TaskStatus[]`                     | 任务流转的阶段，按顺序排列                 |
+| `taskMembers`          | `TaskMember[]`                     | 可分配任务的成员；为空时隐藏负责人字段     |
+| `task.status`          | `string`                           | 一个 `TaskStatus` 的 ID                    |
+| `task.assigneeIds`     | `string[]`                         | `TaskMember` 的 ID                         |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | 状态被新增、重命名、改色、排序或删除时调用 |
+
+`TaskStatus` 包含 `id`，以及可选的 `title`、`color` 和 `completed`。内置 ID
+（`todo`、`in-progress`、`done`）在省略 `title` 时会显示翻译后的名称。`TaskMember`
+包含 `id`、`name`，以及可选的 `avatarUrl` 和 `color`；没有头像的成员显示姓名首字母。
+
+当某个状态设置了 `completed: true` 时，完成状态与任务状态保持同步：完成任务会把它移到第一个
+已完成状态，重新打开则回到之前的未完成状态。没有已完成状态时，勾选框与状态互不影响。
+
+设置 `taskMembers` 后，任务编辑器会显示 **Assignees** 字段；注册了按状态分组的视图（例如看板）后，
+会显示 **Column** 字段。`app.setTaskStatuses(statuses)` 可以在代码中替换状态，并调用
+`onTaskStatusesChange`。
+
 ## 程序更新与持久化
 
 任务变更使用与普通事件相同的 `onEventUpdate` 回调。
 保存数据时，应同时保留 `kind`、`task` 元数据和日期字段。
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // taskEvent 是已有的 kind: 'task' 的 Event。
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -121,6 +170,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// 移动到某个状态时，任务也会相应地完成或重新打开。
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 辅助函数只返回更新后的值，不会自动保存。

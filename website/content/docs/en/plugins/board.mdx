@@ -1,0 +1,281 @@
+---
+title: 'Board Plugin'
+description: Lay out tasks in columns by status, priority or assignee, with drag and drop and custom columns.
+---
+
+# Board Plugin
+
+The Board plugin adds a task board view to DayFlow. It lays out the calendar's
+own [tasks](/docs/features/tasks) (`kind: 'task'`) in columns by status, priority
+or assignee. Cards move between columns with drag and drop, and every change is
+saved through the regular calendar events and callbacks, so the board adds no
+second data store.
+
+Try it in the [interactive demo](/demo?view=board).
+
+## Installation
+
+<PackageTabs pkg='@dayflow/plugin-board' />
+
+## Usage
+
+The board is a view: register it in `views` next to your calendar views. It
+needs `enableTasks: true`, and `taskMembers` adds the people tasks can be
+assigned to.
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/react';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    // Create the view once so its board state survives re-renders.
+    const board = createBoardView();
+
+    export function TaskCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), board],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/vue';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createBoardView()],
+      enableTasks: true,
+      taskMembers: [
+        { id: 'ava', name: 'Ava Chen' },
+        { id: 'leo', name: 'Leo Martin' },
+      ],
+      callbacks: {
+        onEventUpdate: event => saveEvent(event),
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+    import { createBoardView } from '@dayflow/plugin-board';
+
+    // Add '@dayflow/core/dist/styles.css' and
+    // '@dayflow/plugin-board/styles.css' to the styles in angular.json.
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import {
+        DayFlowCalendar,
+        createMonthView,
+        useCalendarApp,
+      } from '@dayflow/svelte';
+      import { createBoardView } from '@dayflow/plugin-board';
+      import '@dayflow/core/dist/styles.css';
+      import '@dayflow/plugin-board/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+`saveEvent` stands for your own persistence function. **Board** then appears
+in the view switcher.
+
+## Task data
+
+Columns, priority and assignees are task fields, so the board, the calendar
+views and the task editor all read and write the same values. See
+[Statuses and assignees](/docs/features/tasks#statuses-and-assignees) for the
+`taskStatuses` and `taskMembers` options.
+
+| Field              | Meaning                                                               |
+| ------------------ | --------------------------------------------------------------------- |
+| `task.status`      | Column ID from `taskStatuses` (default `todo`, `in-progress`, `done`) |
+| `task.assigneeIds` | Member IDs from `taskMembers`                                         |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'`                               |
+| `task.completed`   | The checkbox; kept in sync with `completed` statuses                  |
+| `start`            | Due date. New tasks from the board are due today, all-day             |
+
+- When a status is `completed: true`, moving a card into it completes the task
+  and moving it out reopens it. Completing a task elsewhere moves it to the first
+  completed status.
+- Without a completed status, the checkbox is independent of the columns.
+- In assignee grouping a card belongs to its first assignee. Moving it swaps that
+  assignee and keeps the others; **Unassigned** clears them all.
+- The board respects calendar visibility and the calendar's read-only settings.
+
+## Using the board
+
+- **Move cards**: drag cards between columns to change status, priority or
+  assignee, or within a column to reorder. Focused cards move with **Alt + arrow
+  keys** or **Alt + Home/End**.
+- **Open a card**: click it to edit the title, column, priority, assignees, due
+  date and notes in the task editor.
+- **Add tasks**: **＋** in a column header or **New task** at the bottom of a
+  column adds a task with that column's status, priority or assignee.
+- **Edit columns**: click a status column's title to rename it; its **⋯** menu
+  renames, recolors or deletes it. Deleting a column asks whether to merge its
+  tasks into another column or delete them. **Add column** adds a new status.
+- **Reorder columns**: drag a column header, or press **Alt + Left/Right** on a
+  focused header.
+- **Group and filter**: **Group by** switches between status, priority and
+  assignee. Click member avatars to show only their tasks.
+
+Status column edits call `app.setTaskStatuses` and the
+`onTaskStatusesChange` callback, so persist them there.
+
+## Options
+
+| Option            | Type                                            | Default    | Description                                            |
+| ----------------- | ----------------------------------------------- | ---------- | ------------------------------------------------------ |
+| `label`, `title`  | `string`                                        | `'Board'`  | View switcher label; accessible name of the board      |
+| `groupBy`         | `'status' \| 'priority' \| 'assignee'`          | `'status'` | Initial grouping                                       |
+| `allowStatusEdit` | `boolean`                                       | `true`     | Add, rename, recolor and delete status columns         |
+| `allowCreate`     | `boolean`                                       | `true`     | Show **New task**; also needs write permission         |
+| `initialState`    | `BoardViewState`                                | -          | Saved grouping, column and card order, assignee filter |
+| `messages`        | `Partial<BoardMessages>`                        | -          | Override labels (English and Chinese are built in)     |
+| `columnWidth`     | `number`                                        | -          | Column width in px, minimum 220                        |
+| `showDescription` | `boolean`                                       | `true`     | Show task notes on cards                               |
+| `cardFields`      | `{ priority?, description?, due?, assignees? }` | -          | Set a field to `false` to hide it on cards             |
+| `cardClassName`   | `string \| (args) => string`                    | -          | Class names for a card                                 |
+| `cardStyle`       | `object \| (args) => object`                    | -          | Inline styles for a card                               |
+| `renderCard`      | `({ event, app, open }) => ComponentChildren`   | -          | Extra Preact content below the card title              |
+
+`cardClassName` and `cardStyle` receive `{ event, app, groupId, groupBy }`.
+
+### Callbacks
+
+| Callback            | When                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| `onTaskMove`        | Before a drag or keyboard move: `{ event, from, to, groupBy }`. Return `false` to cancel |
+| `onTaskCreate`      | Before **New task** adds a task. Return a changed draft, or `false`                      |
+| `onColumnDelete`    | After a column delete is confirmed. Return `false` to cancel                             |
+| `onCardClick`       | A card is clicked or opened with Enter. Return `false` to keep the editor closed         |
+| `onViewStateChange` | Grouping, column or card order or the filter changed. Persist the state here             |
+| `onError`           | A task save or state notification failed                                                 |
+
+Task data changes still reach the calendar callbacks (`onEventCreate`,
+`onEventUpdate`, `onEventDelete`, `onTaskStatusesChange`).
+
+## Saving the board layout
+
+Grouping, column order, card order and the assignee filter are presentation
+state. They never change your tasks; `onViewStateChange` reports them, and
+`initialState` restores them:
+
+```ts
+const board = createBoardView({
+  initialState:
+    JSON.parse(localStorage.getItem('board') ?? 'null') ?? undefined,
+  onViewStateChange: state =>
+    localStorage.setItem('board', JSON.stringify(state)),
+});
+```
+
+`board.getState(app)` and `board.setState(app, state)` read and replace the
+state from code. Keep the view factory stable: separate calendars keep separate
+state even when they share one factory.
+
+## Styling cards
+
+Cards read CSS custom properties, which can be set on `.df-board`, a column or
+a single card:
+
+| Property                                                     | Default                       |
+| ------------------------------------------------------------ | ----------------------------- |
+| `--df-board-card-bg`                                         | `var(--df-color-card)`        |
+| `--df-board-card-fg`                                         | inherited                     |
+| `--df-board-card-radius`                                     | `0.5rem`                      |
+| `--df-board-card-padding`                                    | `0.625rem 0.75rem 0.6875rem`  |
+| `--df-board-card-gap`                                        | `0.375rem`                    |
+| `--df-board-card-shadow`, `--df-board-card-shadow-hover`     | hairline ring and soft shadow |
+| `--df-board-card-title-size`, `--df-board-card-title-weight` | `0.875rem`, `500`             |
+
+Each card also carries `data-priority`, `data-group`, `data-calendar`,
+`data-completed` and `data-due` (`overdue`, `today` or `upcoming`):
+
+```css
+.df-board-card[data-due='overdue'] {
+  box-shadow: inset 3px 0 #ef4444;
+}
+```
+
+## Limitations
+
+- The board shows the tasks loaded into the calendar, across all dates. If you
+  load events by visible range, load the board's tasks too.
+- Every task has a due date; undated tasks, labels and subtasks are not supported
+  yet.
+- `renderCard` returns Preact content. Framework-native card slots are not
+  available yet.
