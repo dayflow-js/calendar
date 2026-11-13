@@ -1,0 +1,261 @@
+---
+title: 'ボードプラグイン'
+description: タスクをステータス・優先度・担当者ごとの列に並べ、ドラッグ＆ドロップやカスタム列に対応します。
+---
+
+# ボードプラグイン
+
+ボードプラグインは DayFlow にタスクボードビューを追加します。カレンダー自身の[タスク](/docs-ja/features/tasks)
+（`kind: 'task'`）を、ステータス・優先度・担当者ごとの列に並べます。カードは列の間でドラッグでき、
+変更はすべて通常のカレンダーのイベントとコールバックで保存されるため、別のデータストアは不要です。
+
+[インタラクティブデモ](/demo?view=board)で試せます。
+
+## インストール
+
+<PackageTabs pkg='@dayflow/plugin-board' />
+
+## 使い方
+
+ボードはビューの一つです。ほかのカレンダービューと一緒に `views` に登録します。
+`enableTasks: true` が必要で、`taskMembers` でタスクを割り当てられるメンバーを指定します。
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/react';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    // Create the view once so its board state survives re-renders.
+    const board = createBoardView();
+
+    export function TaskCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), board],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/vue';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createBoardView()],
+      enableTasks: true,
+      taskMembers: [
+        { id: 'ava', name: 'Ava Chen' },
+        { id: 'leo', name: 'Leo Martin' },
+      ],
+      callbacks: {
+        onEventUpdate: event => saveEvent(event),
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+    import { createBoardView } from '@dayflow/plugin-board';
+
+    // Add '@dayflow/core/dist/styles.css' and
+    // '@dayflow/plugin-board/styles.css' to the styles in angular.json.
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import {
+        DayFlowCalendar,
+        createMonthView,
+        useCalendarApp,
+      } from '@dayflow/svelte';
+      import { createBoardView } from '@dayflow/plugin-board';
+      import '@dayflow/core/dist/styles.css';
+      import '@dayflow/plugin-board/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+`saveEvent` はご自身の保存処理を表します。登録すると、ビュー切り替えに **Board** が表示されます。
+
+## タスクデータ
+
+列・優先度・担当者はタスクのフィールドなので、ボード、カレンダービュー、タスクエディターは
+同じ値を読み書きします。`taskStatuses` と `taskMembers` については
+[ステータスと担当者](/docs-ja/features/tasks#statuses-and-assignees)を参照してください。
+
+| フィールド         | 意味                                                           |
+| ------------------ | -------------------------------------------------------------- |
+| `task.status`      | `taskStatuses` の列 ID（既定は `todo`、`in-progress`、`done`） |
+| `task.assigneeIds` | `taskMembers` のメンバー ID                                    |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'`                        |
+| `task.completed`   | 完了チェックボックス。`completed` のステータスと同期します     |
+| `start`            | 期限。ボードから作成したタスクは今日・終日が期限になります     |
+
+- `completed: true` のステータスがある場合、その列にカードを移すとタスクが完了し、列から出すと再開します。
+  ほかの場所で完了したタスクは、最初の完了ステータスに移ります。
+- 完了ステータスがない場合、チェックボックスと列は独立しています。
+- 担当者でグループ化すると、カードは最初の担当者の列に入ります。移動するとその担当者だけが入れ替わり、
+  ほかの担当者は残ります。**Unassigned** に移すと全員が外れます。
+- ボードはカレンダーの表示設定と読み取り専用設定に従います。
+
+## ボードの操作
+
+- **カードを移動**：列の間でドラッグするとステータス・優先度・担当者が変わり、列内でドラッグすると並び順が変わります。
+  フォーカス中のカードは **Alt + 矢印キー** または **Alt + Home/End** でも移動できます。
+- **カードを開く**：クリックすると、タスクエディターでタイトル・列・優先度・担当者・期限・メモを編集できます。
+- **タスクを追加**：列見出しの **＋** または列下部の **New task** で、その列のステータス・優先度・担当者を持つタスクを追加します。
+- **列を編集**：ステータス列のタイトルをクリックすると名前を変更できます。**⋯** メニューから名前の変更、色の変更、削除ができます。
+  列を削除するときは、タスクをほかの列に統合するか一緒に削除するかを確認します。**Add column** でステータスを追加します。
+- **列の並べ替え**：列見出しをドラッグするか、フォーカス中の見出しで **Alt + 左/右** を押します。
+- **グループ化と絞り込み**：**Group by** でステータス・優先度・担当者を切り替えます。メンバーのアバターをクリックすると、そのメンバーのタスクだけを表示します。
+
+ステータス列の変更は `app.setTaskStatuses` と `onTaskStatusesChange` コールバックを呼び出すので、そこで保存してください。
+
+## オプション
+
+| オプション        | 型                                              | 既定値     | 説明                                           |
+| ----------------- | ----------------------------------------------- | ---------- | ---------------------------------------------- |
+| `label`、`title`  | `string`                                        | `'Board'`  | ビュー切り替えの表示名。ボードのアクセシブル名 |
+| `groupBy`         | `'status' \| 'priority' \| 'assignee'`          | `'status'` | 初期のグループ化                               |
+| `allowStatusEdit` | `boolean`                                       | `true`     | ステータス列の追加・名前変更・色変更・削除     |
+| `allowCreate`     | `boolean`                                       | `true`     | **New task** を表示。書き込み権限も必要        |
+| `initialState`    | `BoardViewState`                                | -          | 保存したグループ化、列とカードの順序、絞り込み |
+| `messages`        | `Partial<BoardMessages>`                        | -          | 表示文言の上書き（英語と中国語を内蔵）         |
+| `columnWidth`     | `number`                                        | -          | 列の幅（px）。最小 220                         |
+| `showDescription` | `boolean`                                       | `true`     | カードにタスクのメモを表示                     |
+| `cardFields`      | `{ priority?, description?, due?, assignees? }` | -          | `false` にした項目をカードで非表示にします     |
+| `cardClassName`   | `string \| (args) => string`                    | -          | カードのクラス名                               |
+| `cardStyle`       | `object \| (args) => object`                    | -          | カードのインラインスタイル                     |
+| `renderCard`      | `({ event, app, open }) => ComponentChildren`   | -          | カードのタイトル下に追加する Preact コンテンツ |
+
+`cardClassName` と `cardStyle` は `{ event, app, groupId, groupBy }` を受け取ります。
+
+### コールバック
+
+| コールバック        | タイミング                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `onTaskMove`        | ドラッグまたはキーボードで移動する前：`{ event, from, to, groupBy }`。`false` で中止 |
+| `onTaskCreate`      | **New task** がタスクを追加する前。変更した下書きか `false` を返します               |
+| `onColumnDelete`    | 列の削除を確定した後。`false` で中止                                                 |
+| `onCardClick`       | カードをクリック、または Enter で開いたとき。`false` でエディターを開きません        |
+| `onViewStateChange` | グループ化、列・カードの順序、絞り込みが変わったとき。ここで状態を保存します         |
+| `onError`           | タスクの保存または状態の通知に失敗したとき                                           |
+
+タスクデータの変更は、引き続きカレンダーのコールバック（`onEventCreate`、`onEventUpdate`、`onEventDelete`、`onTaskStatusesChange`）にも届きます。
+
+## ボードのレイアウトを保存する
+
+グループ化、列の順序、カードの順序、担当者の絞り込みは表示用の状態で、タスク自体は変更しません。
+`onViewStateChange` が変更を通知し、`initialState` で復元します。
+
+```ts
+const board = createBoardView({
+  initialState:
+    JSON.parse(localStorage.getItem('board') ?? 'null') ?? undefined,
+  onViewStateChange: state =>
+    localStorage.setItem('board', JSON.stringify(state)),
+});
+```
+
+`board.getState(app)` と `board.setState(app, state)` で、コードから状態を読み取り・置き換えできます。
+ビューのファクトリーは安定させてください。同じファクトリーを共有しても、カレンダーごとに状態は別々に保たれます。
+
+## カードのスタイル
+
+カードは次の CSS カスタムプロパティを参照します。`.df-board`、列、または個々のカードに設定できます。
+
+| プロパティ                                                   | 既定値                       |
+| ------------------------------------------------------------ | ---------------------------- |
+| `--df-board-card-bg`                                         | `var(--df-color-card)`       |
+| `--df-board-card-fg`                                         | 継承                         |
+| `--df-board-card-radius`                                     | `0.5rem`                     |
+| `--df-board-card-padding`                                    | `0.625rem 0.75rem 0.6875rem` |
+| `--df-board-card-gap`                                        | `0.375rem`                   |
+| `--df-board-card-shadow`、`--df-board-card-shadow-hover`     | 細い枠線とやわらかい影       |
+| `--df-board-card-title-size`、`--df-board-card-title-weight` | `0.875rem`、`500`            |
+
+各カードには `data-priority`、`data-group`、`data-calendar`、`data-completed`、
+`data-due`（`overdue`、`today`、`upcoming`）属性もあります。
+
+```css
+.df-board-card[data-due='overdue'] {
+  box-shadow: inset 3px 0 #ef4444;
+}
+```
+
+## 制限事項
+
+- ボードには、カレンダーに読み込まれたすべての日付のタスクが表示されます。表示範囲ごとにイベントを読み込む場合は、ボード用のタスクも読み込んでください。
+- すべてのタスクに期限があります。期限なしのタスク、ラベル、サブタスクにはまだ対応していません。
+- `renderCard` は Preact コンテンツを返します。各フレームワークネイティブのカードスロットにはまだ対応していません。

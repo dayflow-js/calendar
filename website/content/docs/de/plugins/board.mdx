@@ -1,0 +1,282 @@
+---
+title: 'Board-Plugin'
+description: Aufgaben in Spalten nach Status, Priorität oder Zuständigen, mit Drag-and-drop und eigenen Spalten.
+---
+
+# Board-Plugin
+
+Das Board-Plugin fügt DayFlow eine Aufgaben-Board-Ansicht hinzu. Es zeigt die
+[Aufgaben](/docs-de/features/tasks) des Kalenders (`kind: 'task'`) in Spalten nach
+Status, Priorität oder zuständiger Person. Karten lassen sich zwischen Spalten
+ziehen, und jede Änderung wird über die üblichen Kalender-Events und Callbacks
+gespeichert. Das Board braucht also keinen zweiten Datenspeicher.
+
+Probieren Sie es in der [interaktiven Demo](/demo?view=board) aus.
+
+## Installation
+
+<PackageTabs pkg='@dayflow/plugin-board' />
+
+## Verwendung
+
+Das Board ist eine Ansicht: Registrieren Sie es neben Ihren Kalenderansichten in
+`views`. Es benötigt `enableTasks: true`; `taskMembers` legt die Personen fest,
+denen Aufgaben zugewiesen werden können.
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/react';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    // Create the view once so its board state survives re-renders.
+    const board = createBoardView();
+
+    export function TaskCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), board],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/vue';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createBoardView()],
+      enableTasks: true,
+      taskMembers: [
+        { id: 'ava', name: 'Ava Chen' },
+        { id: 'leo', name: 'Leo Martin' },
+      ],
+      callbacks: {
+        onEventUpdate: event => saveEvent(event),
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+    import { createBoardView } from '@dayflow/plugin-board';
+
+    // Add '@dayflow/core/dist/styles.css' and
+    // '@dayflow/plugin-board/styles.css' to the styles in angular.json.
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import {
+        DayFlowCalendar,
+        createMonthView,
+        useCalendarApp,
+      } from '@dayflow/svelte';
+      import { createBoardView } from '@dayflow/plugin-board';
+      import '@dayflow/core/dist/styles.css';
+      import '@dayflow/plugin-board/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+`saveEvent` steht für Ihre eigene Speicherfunktion. Danach erscheint **Board** in
+der Ansichtsauswahl.
+
+## Aufgabendaten
+
+Spalten, Priorität und Zuständige sind Aufgabenfelder. Board, Kalenderansichten
+und Aufgabeneditor lesen und schreiben daher dieselben Werte. Zu den Optionen
+`taskStatuses` und `taskMembers` siehe
+[Status und Zuständige](/docs-de/features/tasks#statuses-and-assignees).
+
+| Feld               | Bedeutung                                                              |
+| ------------------ | ---------------------------------------------------------------------- |
+| `task.status`      | Spalten-ID aus `taskStatuses` (Standard `todo`, `in-progress`, `done`) |
+| `task.assigneeIds` | Mitglieds-IDs aus `taskMembers`                                        |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'`                                |
+| `task.completed`   | Das Kontrollkästchen; synchron mit `completed`-Status                  |
+| `start`            | Fälligkeit. Neue Aufgaben im Board sind heute ganztägig fällig         |
+
+- Gibt es einen Status mit `completed: true`, schließt das Verschieben einer Karte
+  in diese Spalte die Aufgabe ab, und das Herausziehen öffnet sie wieder. Wird eine
+  Aufgabe anderswo abgeschlossen, wandert sie in den ersten abgeschlossenen Status.
+- Ohne abgeschlossenen Status ist das Kontrollkästchen unabhängig von den Spalten.
+- Bei Gruppierung nach Zuständigen gehört eine Karte zur ersten zuständigen Person.
+  Beim Verschieben wird nur diese Person ersetzt, die übrigen bleiben;
+  **Unassigned** entfernt alle.
+- Das Board berücksichtigt die Kalendersichtbarkeit und die Schreibschutz-Einstellungen.
+
+## Das Board benutzen
+
+- **Karten verschieben**: Ziehen zwischen Spalten ändert Status, Priorität oder
+  Zuständige, Ziehen innerhalb einer Spalte die Reihenfolge. Fokussierte Karten
+  lassen sich mit **Alt + Pfeiltasten** oder **Alt + Pos1/Ende** bewegen.
+- **Karte öffnen**: Ein Klick öffnet den Aufgabeneditor für Titel, Spalte,
+  Priorität, Zuständige, Fälligkeit und Notizen.
+- **Aufgaben hinzufügen**: **＋** im Spaltenkopf oder **New task** am Spaltenende
+  legt eine Aufgabe mit dem Status, der Priorität oder der Person dieser Spalte an.
+- **Spalten bearbeiten**: Ein Klick auf den Titel einer Statusspalte benennt sie
+  um; das **⋯**-Menü benennt um, färbt um oder löscht. Beim Löschen wird gefragt,
+  ob die Aufgaben in eine andere Spalte übernommen oder mitgelöscht werden.
+  **Add column** fügt einen Status hinzu.
+- **Spalten umsortieren**: Spaltenkopf ziehen oder auf einem fokussierten Kopf
+  **Alt + Links/Rechts** drücken.
+- **Gruppieren und filtern**: **Group by** wechselt zwischen Status, Priorität und
+  Zuständigen. Ein Klick auf Avatare zeigt nur deren Aufgaben.
+
+Änderungen an Statusspalten rufen `app.setTaskStatuses` und den Callback
+`onTaskStatusesChange` auf. Speichern Sie sie dort.
+
+## Optionen
+
+| Option            | Typ                                             | Standard   | Beschreibung                                             |
+| ----------------- | ----------------------------------------------- | ---------- | -------------------------------------------------------- |
+| `label`, `title`  | `string`                                        | `'Board'`  | Name in der Ansichtsauswahl; barrierefreier Name         |
+| `groupBy`         | `'status' \| 'priority' \| 'assignee'`          | `'status'` | Anfängliche Gruppierung                                  |
+| `allowStatusEdit` | `boolean`                                       | `true`     | Statusspalten hinzufügen, umbenennen, umfärben, löschen  |
+| `allowCreate`     | `boolean`                                       | `true`     | **New task** anzeigen; braucht auch Schreibrechte        |
+| `initialState`    | `BoardViewState`                                | -          | Gespeicherte Gruppierung, Reihenfolgen und Filter        |
+| `messages`        | `Partial<BoardMessages>`                        | -          | Texte überschreiben (Englisch und Chinesisch integriert) |
+| `columnWidth`     | `number`                                        | -          | Spaltenbreite in px, mindestens 220                      |
+| `showDescription` | `boolean`                                       | `true`     | Aufgabennotizen auf Karten zeigen                        |
+| `cardFields`      | `{ priority?, description?, due?, assignees? }` | -          | Felder mit `false` auf Karten ausblenden                 |
+| `cardClassName`   | `string \| (args) => string`                    | -          | Klassennamen für eine Karte                              |
+| `cardStyle`       | `object \| (args) => object`                    | -          | Inline-Styles für eine Karte                             |
+| `renderCard`      | `({ event, app, open }) => ComponentChildren`   | -          | Zusätzlicher Preact-Inhalt unter dem Kartentitel         |
+
+`cardClassName` und `cardStyle` erhalten `{ event, app, groupId, groupBy }`.
+
+### Callbacks
+
+| Callback            | Wann                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `onTaskMove`        | Vor einer Ziehen- oder Tastaturbewegung: `{ event, from, to, groupBy }`. `false` bricht ab |
+| `onTaskCreate`      | Bevor **New task** eine Aufgabe anlegt. Geänderten Entwurf oder `false` zurückgeben        |
+| `onColumnDelete`    | Nach bestätigtem Löschen einer Spalte. `false` bricht ab                                   |
+| `onCardClick`       | Karte geklickt oder mit Enter geöffnet. `false` lässt den Editor geschlossen               |
+| `onViewStateChange` | Gruppierung, Spalten- oder Kartenreihenfolge oder Filter geändert. Hier speichern          |
+| `onError`           | Speichern einer Aufgabe oder eine Statusbenachrichtigung ist fehlgeschlagen                |
+
+Änderungen an Aufgabendaten erreichen weiterhin die Kalender-Callbacks
+(`onEventCreate`, `onEventUpdate`, `onEventDelete`, `onTaskStatusesChange`).
+
+## Board-Layout speichern
+
+Gruppierung, Spaltenreihenfolge, Kartenreihenfolge und Zuständigenfilter sind
+Darstellungszustand und ändern die Aufgaben nicht. `onViewStateChange` meldet
+Änderungen, `initialState` stellt sie wieder her:
+
+```ts
+const board = createBoardView({
+  initialState:
+    JSON.parse(localStorage.getItem('board') ?? 'null') ?? undefined,
+  onViewStateChange: state =>
+    localStorage.setItem('board', JSON.stringify(state)),
+});
+```
+
+`board.getState(app)` und `board.setState(app, state)` lesen und ersetzen den
+Zustand per Code. Halten Sie die View-Factory stabil: Getrennte Kalender behalten
+eigenen Zustand, auch wenn sie dieselbe Factory nutzen.
+
+## Karten gestalten
+
+Karten lesen CSS-Custom-Properties, die auf `.df-board`, einer Spalte oder einer
+einzelnen Karte gesetzt werden können:
+
+| Eigenschaft                                                  | Standard                         |
+| ------------------------------------------------------------ | -------------------------------- |
+| `--df-board-card-bg`                                         | `var(--df-color-card)`           |
+| `--df-board-card-fg`                                         | geerbt                           |
+| `--df-board-card-radius`                                     | `0.5rem`                         |
+| `--df-board-card-padding`                                    | `0.625rem 0.75rem 0.6875rem`     |
+| `--df-board-card-gap`                                        | `0.375rem`                       |
+| `--df-board-card-shadow`, `--df-board-card-shadow-hover`     | feiner Rand und weicher Schatten |
+| `--df-board-card-title-size`, `--df-board-card-title-weight` | `0.875rem`, `500`                |
+
+Jede Karte trägt außerdem `data-priority`, `data-group`, `data-calendar`,
+`data-completed` und `data-due` (`overdue`, `today` oder `upcoming`):
+
+```css
+.df-board-card[data-due='overdue'] {
+  box-shadow: inset 3px 0 #ef4444;
+}
+```
+
+## Einschränkungen
+
+- Das Board zeigt alle in den Kalender geladenen Aufgaben, unabhängig vom Datum.
+  Wenn Sie Events nach sichtbarem Bereich laden, laden Sie die Board-Aufgaben ebenfalls.
+- Jede Aufgabe hat ein Fälligkeitsdatum; Aufgaben ohne Datum, Labels und
+  Unteraufgaben werden noch nicht unterstützt.
+- `renderCard` liefert Preact-Inhalt. Framework-native Karten-Slots gibt es noch nicht.

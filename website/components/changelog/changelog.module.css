@@ -416,6 +416,29 @@
   color: var(--accent);
   font-weight: 550;
 }
+.contributors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 24px;
+  color: var(--faint);
+  font-size: 12px;
+}
+.contributors a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 550;
+}
+.contributors a:hover {
+  color: var(--accent);
+}
+.contributors img {
+  border-radius: 999px;
+  background: var(--surface);
+}
 .packages {
   display: flex;
   flex-wrap: wrap;

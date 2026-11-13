@@ -116,6 +116,55 @@ couleur des événements.
 La [démo interactive](/demo) comporte un interrupteur **Tasks** et une infobulle **Preview** qui
 illustre la fin d'une tâche et le changement de priorité dans le panneau de détails.
 
+## Statuts et responsables [#statuses-and-assignees]
+
+Les tâches peuvent passer par les étapes d'un flux de travail et être attribuées à
+des personnes. Ce sont des champs de tâche ordinaires, utilisés par l'éditeur de
+tâches et le [plugin de tableau](/docs-fr/plugins/board).
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| Option / champ         | Type                               | Signification                                                             |
+| ---------------------- | ---------------------------------- | ------------------------------------------------------------------------- |
+| `taskStatuses`         | `TaskStatus[]`                     | Étapes que traverse une tâche, dans l'ordre                               |
+| `taskMembers`          | `TaskMember[]`                     | Personnes assignables ; le champ est masqué s'il est vide                 |
+| `task.status`          | `string`                           | Un ID de `TaskStatus`                                                     |
+| `task.assigneeIds`     | `string[]`                         | IDs de `TaskMember`                                                       |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | Des statuts ont été ajoutés, renommés, recolorés, réordonnés ou supprimés |
+
+Un `TaskStatus` a un `id` et, en option, `title`, `color` et `completed`. Les IDs
+intégrés (`todo`, `in-progress`, `done`) affichent un nom traduit si `title` est
+omis. Un `TaskMember` a un `id`, un `name` et, en option, `avatarUrl` et `color` ;
+les membres sans avatar affichent leurs initiales.
+
+Si un statut a `completed: true`, l'état terminé et le statut restent synchronisés :
+terminer une tâche la place dans le premier statut terminé, et la rouvrir la ramène
+à son statut ouvert précédent. Sans statut terminé, la case à cocher est
+indépendante du statut.
+
+L'éditeur de tâches affiche le champ **Assignees** quand `taskMembers` est défini,
+et le champ **Column** quand une vue qui regroupe par statut, comme le tableau, est
+enregistrée. `app.setTaskStatuses(statuses)` remplace les statuts depuis le code et
+appelle `onTaskStatusesChange`.
+
 ## Mises à jour programmatiques et persistance
 
 Les modifications de tâches utilisent le même callback `onEventUpdate` que celles des événements.
@@ -123,7 +172,12 @@ Enregistrez `kind` et les métadonnées `task` avec les dates de l'événement d
 données.
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -131,6 +185,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// Passer à un statut termine ou rouvre aussi la tâche en conséquence.
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 Les fonctions utilitaires renvoient les valeurs mises à jour ; elles n'enregistrent rien

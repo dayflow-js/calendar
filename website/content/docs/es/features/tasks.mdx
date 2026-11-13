@@ -116,13 +116,67 @@ eventos.
 La [demo interactiva](/demo) incluye un interruptor **Tasks** y un tooltip **Preview** que
 muestra cómo completar una tarea y cambiar su prioridad en el panel de detalles.
 
+## Estados y responsables [#statuses-and-assignees]
+
+Las tareas pueden avanzar por las etapas de un flujo de trabajo y asignarse a
+personas. Ambos son campos normales de la tarea, que usan el editor de tareas y el
+[plugin de tablero](/docs-es/plugins/board).
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| Opción / campo         | Tipo                               | Significado                                                               |
+| ---------------------- | ---------------------------------- | ------------------------------------------------------------------------- |
+| `taskStatuses`         | `TaskStatus[]`                     | Etapas por las que pasa una tarea, en orden                               |
+| `taskMembers`          | `TaskMember[]`                     | Personas asignables; el campo se oculta si está vacío                     |
+| `task.status`          | `string`                           | Un ID de `TaskStatus`                                                     |
+| `task.assigneeIds`     | `string[]`                         | IDs de `TaskMember`                                                       |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | Se añadieron, renombraron, recolorearon, reordenaron o eliminaron estados |
+
+Un `TaskStatus` tiene un `id` y, opcionalmente, `title`, `color` y `completed`. Los
+IDs integrados (`todo`, `in-progress`, `done`) muestran nombres traducidos si se
+omite `title`. Un `TaskMember` tiene `id`, `name` y, opcionalmente, `avatarUrl` y
+`color`; los miembros sin avatar muestran sus iniciales.
+
+Si algún estado tiene `completed: true`, la finalización y el estado se mantienen
+sincronizados: completar una tarea la mueve al primer estado completado y
+reabrirla la devuelve a su estado abierto anterior. Sin un estado completado, la
+casilla es independiente del estado.
+
+El editor de tareas muestra el campo **Assignees** cuando hay `taskMembers`, y el
+campo **Column** cuando se registra una vista que agrupa por estado, como el
+tablero. `app.setTaskStatuses(statuses)` reemplaza los estados desde código y llama
+a `onTaskStatusesChange`.
+
 ## Actualizaciones programáticas y persistencia
 
 Los cambios en las tareas usan el mismo callback `onEventUpdate` que los cambios en eventos.
 Guarda `kind` y los metadatos de `task` junto con las fechas del evento en tu fuente de datos.
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -130,6 +184,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// Mover a un estado también completa o reabre la tarea según corresponda.
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 Las funciones auxiliares devuelven los valores actualizados; no guardan los cambios por sí

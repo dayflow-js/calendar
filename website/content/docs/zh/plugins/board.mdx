@@ -1,0 +1,260 @@
+---
+title: '看板插件'
+description: 按状态、优先级或负责人把任务分列展示，支持拖拽和自定义列。
+---
+
+# 看板插件
+
+看板插件为 DayFlow 添加一个任务看板视图。它把日历自身的[任务](/docs-zh/features/tasks)（`kind: 'task'`）
+按状态、优先级或负责人分列展示。卡片可以在列之间拖拽，每次修改都通过日历常规的事件和回调保存，
+看板不会引入第二套数据存储。
+
+可以在[交互 Demo](/demo?view=board) 中直接体验。
+
+## 安装
+
+<PackageTabs pkg='@dayflow/plugin-board' />
+
+## 使用
+
+看板是一个视图：把它和其他日历视图一起注册到 `views` 中。它需要 `enableTasks: true`，
+`taskMembers` 用于提供可以被分配任务的成员。
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/react';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    // Create the view once so its board state survives re-renders.
+    const board = createBoardView();
+
+    export function TaskCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), board],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/vue';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createBoardView()],
+      enableTasks: true,
+      taskMembers: [
+        { id: 'ava', name: 'Ava Chen' },
+        { id: 'leo', name: 'Leo Martin' },
+      ],
+      callbacks: {
+        onEventUpdate: event => saveEvent(event),
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+    import { createBoardView } from '@dayflow/plugin-board';
+
+    // Add '@dayflow/core/dist/styles.css' and
+    // '@dayflow/plugin-board/styles.css' to the styles in angular.json.
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import {
+        DayFlowCalendar,
+        createMonthView,
+        useCalendarApp,
+      } from '@dayflow/svelte';
+      import { createBoardView } from '@dayflow/plugin-board';
+      import '@dayflow/core/dist/styles.css';
+      import '@dayflow/plugin-board/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+`saveEvent` 代表你自己的持久化函数。注册后，视图切换器中会出现 **Board**。
+
+## 任务数据
+
+列、优先级和负责人都是任务字段，因此看板、日历视图和任务编辑器读写的是同一份数据。
+`taskStatuses` 和 `taskMembers` 选项见[状态与负责人](/docs-zh/features/tasks#statuses-and-assignees)。
+
+| 字段               | 含义                                                           |
+| ------------------ | -------------------------------------------------------------- |
+| `task.status`      | `taskStatuses` 中的列 ID（默认 `todo`、`in-progress`、`done`） |
+| `task.assigneeIds` | `taskMembers` 中的成员 ID                                      |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'`                        |
+| `task.completed`   | 完成勾选框；与 `completed` 状态保持同步                        |
+| `start`            | 截止日期。在看板中新建的任务默认今天截止、全天                 |
+
+- 当某个状态设置了 `completed: true` 时，把卡片移入该列会完成任务，移出则重新打开任务；
+  在其他地方完成任务时，它会被移到第一个已完成状态。
+- 没有已完成状态时，勾选框与列互不影响。
+- 按负责人分组时，卡片属于它的第一个负责人。移动卡片会替换这个负责人并保留其他人；
+  移到 **Unassigned** 会清空全部负责人。
+- 看板遵循日历的可见性和只读设置。
+
+## 使用看板
+
+- **移动卡片**：在列之间拖拽卡片可修改状态、优先级或负责人，在列内拖拽可调整顺序。
+  聚焦卡片后也可以用 **Alt + 方向键** 或 **Alt + Home/End** 移动。
+- **打开卡片**：点击卡片，在任务编辑器中修改标题、列、优先级、负责人、截止日期和备注。
+- **新建任务**：列头的 **＋** 或列底部的 **New task** 会新建一个带有该列状态、优先级或负责人的任务。
+- **编辑列**：点击状态列的标题可以重命名；**⋯** 菜单可以重命名、改颜色或删除列。
+  删除列时会询问是把任务合并到其他列还是一起删除。**Add column** 用于新增状态。
+- **调整列顺序**：拖拽列头，或在聚焦的列头上按 **Alt + 左/右**。
+- **分组与筛选**：**Group by** 可在状态、优先级和负责人之间切换。点击成员头像只显示该成员的任务。
+
+对状态列的修改会调用 `app.setTaskStatuses` 和 `onTaskStatusesChange` 回调，请在回调中保存。
+
+## 配置项
+
+| 配置项            | 类型                                            | 默认值     | 说明                                   |
+| ----------------- | ----------------------------------------------- | ---------- | -------------------------------------- |
+| `label`、`title`  | `string`                                        | `'Board'`  | 视图切换器中的名称；看板的无障碍名称   |
+| `groupBy`         | `'status' \| 'priority' \| 'assignee'`          | `'status'` | 初始分组方式                           |
+| `allowStatusEdit` | `boolean`                                       | `true`     | 允许新增、重命名、改色和删除状态列     |
+| `allowCreate`     | `boolean`                                       | `true`     | 显示 **New task**；同时需要写入权限    |
+| `initialState`    | `BoardViewState`                                | -          | 已保存的分组、列和卡片顺序、负责人筛选 |
+| `messages`        | `Partial<BoardMessages>`                        | -          | 覆盖界面文案（内置英文和中文）         |
+| `columnWidth`     | `number`                                        | -          | 列宽（px），最小 220                   |
+| `showDescription` | `boolean`                                       | `true`     | 在卡片上显示任务备注                   |
+| `cardFields`      | `{ priority?, description?, due?, assignees? }` | -          | 设为 `false` 可在卡片上隐藏对应字段    |
+| `cardClassName`   | `string \| (args) => string`                    | -          | 卡片的 class 名                        |
+| `cardStyle`       | `object \| (args) => object`                    | -          | 卡片的行内样式                         |
+| `renderCard`      | `({ event, app, open }) => ComponentChildren`   | -          | 在卡片标题下方渲染额外的 Preact 内容   |
+
+`cardClassName` 和 `cardStyle` 接收 `{ event, app, groupId, groupBy }`。
+
+### 回调
+
+| 回调                | 触发时机                                                                |
+| ------------------- | ----------------------------------------------------------------------- |
+| `onTaskMove`        | 拖拽或键盘移动之前：`{ event, from, to, groupBy }`。返回 `false` 可取消 |
+| `onTaskCreate`      | **New task** 新建任务之前。返回修改后的草稿，或返回 `false`             |
+| `onColumnDelete`    | 确认删除列之后。返回 `false` 可取消                                     |
+| `onCardClick`       | 点击卡片或按 Enter 打开卡片时。返回 `false` 可阻止打开编辑器            |
+| `onViewStateChange` | 分组、列或卡片顺序、筛选发生变化时。在这里保存看板状态                  |
+| `onError`           | 保存任务或通知状态失败时                                                |
+
+任务数据的修改仍会触发日历的回调（`onEventCreate`、`onEventUpdate`、`onEventDelete`、`onTaskStatusesChange`）。
+
+## 保存看板布局
+
+分组方式、列顺序、卡片顺序和负责人筛选属于展示状态，不会修改任务本身。
+`onViewStateChange` 会报告这些变化，`initialState` 用于恢复：
+
+```ts
+const board = createBoardView({
+  initialState:
+    JSON.parse(localStorage.getItem('board') ?? 'null') ?? undefined,
+  onViewStateChange: state =>
+    localStorage.setItem('board', JSON.stringify(state)),
+});
+```
+
+`board.getState(app)` 和 `board.setState(app, state)` 可以在代码中读取和替换状态。
+请保持视图工厂稳定：即使多个日历共用一个工厂，它们的状态也是相互独立的。
+
+## 卡片样式
+
+卡片读取以下 CSS 自定义属性，可以设置在 `.df-board`、某一列或单张卡片上：
+
+| 属性                                                         | 默认值                       |
+| ------------------------------------------------------------ | ---------------------------- |
+| `--df-board-card-bg`                                         | `var(--df-color-card)`       |
+| `--df-board-card-fg`                                         | 继承                         |
+| `--df-board-card-radius`                                     | `0.5rem`                     |
+| `--df-board-card-padding`                                    | `0.625rem 0.75rem 0.6875rem` |
+| `--df-board-card-gap`                                        | `0.375rem`                   |
+| `--df-board-card-shadow`、`--df-board-card-shadow-hover`     | 细边框和柔和阴影             |
+| `--df-board-card-title-size`、`--df-board-card-title-weight` | `0.875rem`、`500`            |
+
+每张卡片还带有 `data-priority`、`data-group`、`data-calendar`、`data-completed` 和
+`data-due`（`overdue`、`today` 或 `upcoming`）属性：
+
+```css
+.df-board-card[data-due='overdue'] {
+  box-shadow: inset 3px 0 #ef4444;
+}
+```
+
+## 限制
+
+- 看板显示已加载到日历中的所有任务，不限日期。如果按可见范围加载事件，也需要为看板加载任务。
+- 每个任务都有截止日期；暂不支持无日期任务、标签和子任务。
+- `renderCard` 返回 Preact 内容，暂不支持各框架原生的卡片插槽。

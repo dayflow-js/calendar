@@ -20,11 +20,11 @@ import {
 
 import { CalendarPicker, CalendarOption } from './CalendarPicker';
 import { EventConferenceField } from './EventConferenceField';
-import { EventKindSwitch } from './EventKindSwitch';
+import { canSwitchEventKind, EventKindSwitch } from './EventKindSwitch';
 import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
-import { TaskPriorityField } from './TaskPriorityField';
+import { TaskDetailsFields } from './TaskDetailsFields';
 import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailDialogProps extends EventDetailDialogProps {
@@ -239,15 +239,17 @@ const DefaultEventDetailDialog = ({
         </button>
 
         <div>
-          {isEditable && (app?.getTasksEnabled?.() || isTask(editedEvent)) && (
-            <EventKindSwitch
-              value={editedEvent.kind ?? 'event'}
-              disabled={isPending}
-              onChange={kind =>
-                setEditedEvent(convertEventKind(editedEvent, kind))
-              }
-            />
-          )}
+          {isEditable &&
+            canSwitchEventKind(app) &&
+            (app?.getTasksEnabled?.() || isTask(editedEvent)) && (
+              <EventKindSwitch
+                value={editedEvent.kind ?? 'event'}
+                disabled={isPending}
+                onChange={kind =>
+                  setEditedEvent(convertEventKind(editedEvent, kind))
+                }
+              />
+            )}
           <span className='df-form-label'>
             {t(isEditedTask ? 'taskTitle' : 'eventTitle')}
           </span>
@@ -342,7 +344,8 @@ const DefaultEventDetailDialog = ({
           />
 
           {isEditedTask ? (
-            <TaskPriorityField
+            <TaskDetailsFields
+              app={app}
               event={editedEvent}
               disabled={!isEditable || isPending}
               onChange={setEditedEvent}

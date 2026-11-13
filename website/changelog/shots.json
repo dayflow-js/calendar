@@ -1,5 +1,33 @@
 [
   {
+    "name": "board",
+    "alt": "Tasks in To do, In progress and Done columns on the board",
+    "path": "/demo?view=board&showSidebar=0&controls=0",
+    "steps": [
+      {
+        "waitFor": ".df-board-card-slot"
+      }
+    ]
+  },
+  {
+    "name": "board-task-editor",
+    "alt": "Editing a board card's column, priority and assignees",
+    "path": "/demo?view=board&showSidebar=0&controls=0",
+    "steps": [
+      {
+        "waitFor": ".df-board [data-board-task=\"demo-task-0\"]"
+      },
+      {
+        "click": ".df-board [data-board-task=\"demo-task-0\"]"
+      }
+    ],
+    "clip": [
+      ".df-event-detail-panel",
+      ".df-board [data-board-task=\"demo-task-0\"]"
+    ],
+    "padding": 32
+  },
+  {
     "name": "tasks",
     "alt": "Tasks with priorities beside events in Day view",
     "path": "/demo?view=day&enableTasks=1&showSidebar=0&controls=0",
@@ -14,7 +42,9 @@
     "alt": "Choosing a task priority in the detail panel",
     "path": "/demo?view=week&enableTasks=1&showSidebar=0&controls=0",
     "steps": [
-      { "click": ".df-calendar-container [data-event-id=\"demo-task-1\"]" }
+      {
+        "click": ".df-calendar-container [data-event-id=\"demo-task-1\"]"
+      }
     ],
     "clip": [
       ".df-event-detail-panel",
@@ -27,7 +57,9 @@
     "alt": "Formatted notes with a Join button detected from a Zoom link",
     "path": "/demo?view=week&showSidebar=0&controls=0",
     "steps": [
-      { "click": ".df-calendar-container [data-event-id=\"demo-notes\"]" }
+      {
+        "click": ".df-calendar-container [data-event-id=\"demo-notes\"]"
+      }
     ],
     "clip": [
       ".df-event-detail-panel",
@@ -40,8 +72,12 @@
     "alt": "The calendar picker grouped by Google and iCloud",
     "path": "/demo?view=week&showSidebar=0&controls=0",
     "steps": [
-      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" },
-      { "click": ".df-event-detail-panel .df-calendar-picker-trigger" }
+      {
+        "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]"
+      },
+      {
+        "click": ".df-event-detail-panel .df-calendar-picker-trigger"
+      }
     ],
     "clip": [".df-event-detail-panel", ".df-calendar-picker-group-label"],
     "padding": 32
@@ -51,7 +87,9 @@
     "alt": "A Google Meet link with a Join button in the event details",
     "path": "/demo?view=week&showSidebar=0&controls=0",
     "steps": [
-      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" }
+      {
+        "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]"
+      }
     ],
     "clip": [
       ".df-event-detail-panel",
@@ -64,8 +102,12 @@
     "alt": "The custom repeat dialog",
     "path": "/demo?view=week&showSidebar=0&controls=0",
     "steps": [
-      { "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]" },
-      { "click": ".df-event-repeat-field .df-form-select-trigger" },
+      {
+        "click": ".df-calendar-container [data-event-id=\"demo-meeting\"]"
+      },
+      {
+        "click": ".df-event-repeat-field .df-form-select-trigger"
+      },
       {
         "click": ".df-event-repeat-field .df-view-switcher-select-option:last-child"
       }

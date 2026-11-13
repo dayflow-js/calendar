@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { ChevronDown } from './Icons';
@@ -5,6 +6,8 @@ import { ChevronDown } from './Icons';
 export interface FormSelectOption<T extends string> {
   label: string;
   value: T;
+  /** Shown before the label, such as a color dot. */
+  prefix?: ComponentChildren;
 }
 
 interface FormSelectProps<T extends string> {
@@ -26,8 +29,8 @@ export const FormSelect = <T extends string>({
 }: FormSelectProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const selectedLabel =
-    options.find(option => option.value === value)?.label ?? value;
+  const selected = options.find(option => option.value === value);
+  const selectedLabel = selected?.label ?? value;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -65,7 +68,10 @@ export const FormSelect = <T extends string>({
         aria-haspopup='listbox'
         onClick={() => setIsOpen(open => !open)}
       >
-        <span className='df-form-select-value'>{selectedLabel}</span>
+        <span className='df-form-select-value'>
+          {selected?.prefix}
+          {selectedLabel}
+        </span>
         <span
           className='df-view-switcher-select-chevron'
           data-open={isOpen ? 'true' : 'false'}
@@ -90,6 +96,7 @@ export const FormSelect = <T extends string>({
                   setIsOpen(false);
                 }}
               >
+                {option.prefix}
                 {option.label}
               </button>
             ))}

@@ -694,4 +694,44 @@ describe('CalendarApp', () => {
       expect(onDismissUI).toHaveBeenCalledWith(dummyMouseEvent);
     });
   });
+
+  describe('Task statuses', () => {
+    it('replaces statuses from the UI and reports them', () => {
+      const onTaskStatusesChange = vi.fn();
+      const app = new CalendarApp({
+        views: [],
+        callbacks: { onTaskStatusesChange },
+      });
+      expect(app.getTaskStatuses().map(status => status.id)).toEqual([
+        'todo',
+        'in-progress',
+        'done',
+      ]);
+      const next = [{ id: 'open' }, { id: 'shipped', completed: true }];
+      app.setTaskStatuses(next);
+      expect(app.getTaskStatuses()).toBe(next);
+      expect(onTaskStatusesChange).toHaveBeenCalledWith(next);
+    });
+
+    it('ignores a workflow with duplicate status IDs', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(component);
+      const onTaskStatusesChange = vi.fn();
+      const app = new CalendarApp({
+        views: [],
+        callbacks: { onTaskStatusesChange },
+      });
+      const before = app.getTaskStatuses();
+      app.setTaskStatuses([{ id: 'a' }, { id: 'a' }]);
+      expect(app.getTaskStatuses()).toBe(before);
+      expect(onTaskStatusesChange).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
+    it('accepts columns without a completed status', () => {
+      const app = new CalendarApp({ views: [] });
+      const quarters = [{ id: 'q1' }, { id: 'q2' }];
+      app.setTaskStatuses(quarters);
+      expect(app.getTaskStatuses()).toBe(quarters);
+    });
+  });
 });

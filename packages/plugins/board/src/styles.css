@@ -1,0 +1,880 @@
+/* Board view. Colors come from the Calendar theme tokens, so light, dark and
+ * custom themes apply without extra configuration. A column's own color comes
+ * from `--df-board-group-color`. */
+.df-board {
+  --df-board-radius: 0.625rem;
+  --df-board-card-border: color-mix(
+    in srgb,
+    var(--df-color-foreground) 9%,
+    var(--df-color-background)
+  );
+  --df-board-shadow:
+    0 0 0 1px rgb(15 15 15 / 0.06), 0 1px 2px rgb(15 15 15 / 0.06);
+  --df-board-shadow-hover:
+    0 0 0 1px rgb(15 15 15 / 0.08), 0 4px 12px rgb(15 15 15 / 0.08);
+  --df-board-popover-shadow:
+    0 12px 32px rgb(16 24 40 / 0.14), 0 2px 6px rgb(16 24 40 / 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--df-color-foreground);
+  background: var(--df-color-background);
+}
+
+.dark .df-board {
+  --df-board-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.07), 0 1px 2px rgb(0 0 0 / 0.3);
+  --df-board-shadow-hover:
+    0 0 0 1px rgb(255 255 255 / 0.1), 0 6px 18px rgb(0 0 0 / 0.4);
+  --df-board-popover-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+/* Zero specificity so component classes below set their own type. */
+:where(.df-board) button,
+:where(.df-board) input {
+  font: inherit;
+  color: inherit;
+}
+
+.df-board button {
+  cursor: pointer;
+}
+
+.df-board :disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.df-board :focus-visible {
+  outline: 2px solid var(--df-color-ring);
+  outline-offset: 2px;
+}
+
+/* Toolbar ------------------------------------------------------------------
+ * Controls share the Calendar header's Today button metrics: 28px tall,
+ * 6px radius, 1px border and a hairline shadow. */
+
+.df-board-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.df-board-toolbar-start,
+.df-board-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.df-board-select {
+  position: relative;
+}
+
+.df-board-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding-inline: 0.625rem 0.5rem;
+  border: 1px solid var(--df-color-border);
+  border-radius: 0.375rem;
+  background: var(--df-color-background);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition:
+    background-color 150ms,
+    box-shadow 150ms;
+}
+
+.df-board-select-trigger:hover:not(:disabled),
+.df-board-select-trigger[aria-expanded='true'] {
+  background: var(--df-color-hover);
+}
+
+.df-board-select-label,
+.df-board-select-trigger svg {
+  color: var(--df-color-muted-foreground);
+}
+
+.df-board-people {
+  display: flex;
+  align-items: center;
+  height: 1.75rem;
+}
+
+.df-board-person {
+  display: inline-flex;
+  padding: 0;
+  margin-left: -0.3125rem;
+  border: 0;
+  border-radius: 9999px;
+  background: none;
+  box-shadow: 0 0 0 2px var(--df-color-background);
+  transition:
+    transform 150ms,
+    box-shadow 150ms,
+    opacity 150ms;
+}
+
+.df-board-person:first-child {
+  margin-left: 0;
+}
+
+.df-board-person:hover {
+  z-index: 1;
+  transform: translateY(-1px);
+}
+
+.df-board-people:has([aria-pressed='true'])
+  .df-board-person:not([aria-pressed='true']) {
+  opacity: 0.35;
+}
+
+.df-board-person[aria-pressed='true'] {
+  z-index: 2;
+  box-shadow:
+    0 0 0 2px var(--df-color-background),
+    0 0 0 3.5px var(--df-color-primary);
+}
+
+.df-board-clear-filter {
+  margin-left: 0.625rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.8125rem;
+  color: var(--df-color-muted-foreground) !important;
+}
+
+.df-board-clear-filter:hover {
+  color: var(--df-color-foreground) !important;
+}
+
+.df-board-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.75rem;
+  padding-inline: 0.625rem 0.75rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: var(--df-color-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  color: var(--df-color-primary-foreground) !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: opacity 150ms;
+}
+
+.df-board-primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.df-board-ghost {
+  height: 1.75rem;
+  padding-inline: 0.625rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: var(--df-color-muted-foreground) !important;
+}
+
+.df-board-ghost:hover {
+  background: var(--df-color-hover);
+}
+
+.df-board-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 1rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--df-color-destructive) 12%, transparent);
+  color: var(--df-color-destructive);
+  font-size: 0.8125rem;
+}
+
+.df-board-error button {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Popovers ----------------------------------------------------------------- */
+
+.df-board-popover {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  padding: 0.25rem;
+  border: 1px solid var(--df-color-border);
+  border-radius: 0.5rem;
+  background: var(--df-color-background);
+  box-shadow: var(--df-board-popover-shadow);
+  animation: df-board-pop 120ms ease-out;
+}
+
+.df-board-column-menu .df-board-popover {
+  right: 0;
+  left: auto;
+}
+
+@keyframes df-board-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.df-board-menu-item,
+.df-board-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  font-size: 0.8125rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.df-board-menu-item > span,
+.df-board-menu-row > span {
+  flex: 1;
+}
+
+/* Icon, label, then the control: the color row lines up with the items. */
+.df-board-menu-item > svg,
+.df-board-menu-row > svg {
+  flex: none;
+  color: var(--df-color-muted-foreground);
+}
+
+.df-board-menu-item:hover:not(:disabled) {
+  background: var(--df-color-hover);
+}
+
+.df-board-menu-item[data-danger] {
+  color: var(--df-color-destructive) !important;
+}
+
+.dark .df-board-menu-item[data-danger] {
+  color: #f87171 !important;
+}
+
+.df-board-menu-item[data-danger] svg {
+  color: currentColor;
+}
+
+.df-board-menu-row {
+  padding-block: 0.125rem;
+  padding-right: 0.25rem;
+  cursor: default;
+}
+
+.df-board-color-picker {
+  position: relative;
+  z-index: 60;
+}
+
+.df-board-menu-separator {
+  height: 1px;
+  margin: 0.25rem -0.25rem;
+  background: var(--df-color-border);
+}
+
+/* Columns: Notion-style, tinted by the column color ------------------------- */
+
+.df-board-columns {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 0;
+  padding: 0.125rem 1rem 1rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.df-board-column {
+  --df-board-tint: color-mix(
+    in srgb,
+    var(--df-board-group-color) 6%,
+    var(--df-color-background)
+  );
+  --df-board-ink: color-mix(
+    in srgb,
+    var(--df-board-group-color) 72%,
+    var(--df-color-foreground)
+  );
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 17rem;
+  max-height: 100%;
+  border-radius: var(--df-board-radius);
+  background: var(--df-board-tint);
+  transition: box-shadow 150ms;
+}
+
+.dark .df-board-column {
+  --df-board-tint: color-mix(
+    in srgb,
+    var(--df-board-group-color) 10%,
+    var(--df-color-background)
+  );
+  --df-board-ink: color-mix(in srgb, var(--df-board-group-color) 55%, white);
+}
+
+.df-board-column[data-drop-target='true'] {
+  box-shadow: inset 0 0 0 1.5px
+    color-mix(in srgb, var(--df-board-group-color) 45%, transparent);
+}
+
+.df-board-column-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.375rem 0.375rem 0.625rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.df-board-column-heading {
+  min-width: 0;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.df-board-column-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 100%;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--df-board-group-color) 18%, transparent);
+  color: var(--df-board-ink) !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.df-board-column-title:hover {
+  background: color-mix(in srgb, var(--df-board-group-color) 26%, transparent);
+}
+
+.df-board-column-title .df-task-avatar {
+  margin-left: -0.25rem;
+}
+
+.df-board-count {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--df-board-ink) 70%, transparent);
+}
+
+.df-board-column-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.df-board-column:hover .df-board-column-actions,
+.df-board-column-actions:focus-within,
+.df-board-column-actions:has([aria-expanded='true']) {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .df-board-column-actions {
+    opacity: 1;
+  }
+}
+
+.df-board-column-menu {
+  position: relative;
+}
+
+.df-board-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--df-board-ink, var(--df-color-muted-foreground)) !important;
+  transition: background-color 150ms;
+}
+
+.df-board-icon-button:hover:not(:disabled),
+.df-board-icon-button[aria-expanded='true'] {
+  background: color-mix(
+    in srgb,
+    var(--df-board-group-color, var(--df-color-foreground)) 14%,
+    transparent
+  );
+}
+
+/* Rename box, overlaid on the header like Notion's. */
+.df-board-rename {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  left: 0.25rem;
+  z-index: 40;
+  cursor: auto;
+}
+
+.df-board-rename form {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.3125rem 0.3125rem 0.625rem;
+  border: 1px solid var(--df-color-border);
+  border-radius: 0.5rem;
+  background: var(--df-color-background);
+  box-shadow: var(--df-board-popover-shadow);
+}
+
+.df-board-rename input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  outline: none !important;
+}
+
+.df-board-rename .df-board-primary {
+  height: 1.625rem;
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.df-board-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-height: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  overflow-y: auto;
+}
+
+.df-board-card-slot {
+  position: relative;
+}
+
+/* Centered in the 6px gap above a card, so it never takes layout space and
+ * the first one is not clipped by the scrolling list. */
+.df-board-drop-line {
+  position: absolute;
+  top: -0.25rem;
+  right: 0.25rem;
+  left: 0.25rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: var(--df-board-group-color);
+  pointer-events: none;
+}
+
+.df-board-cards > .df-board-drop-line {
+  position: static;
+  flex: none;
+  margin: -0.25rem 0.25rem 0;
+}
+
+.df-board-add-row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2rem;
+  margin: 0.25rem 0.5rem 0.5rem;
+  padding-inline: 0.5rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--df-board-ink) 75%, transparent) !important;
+  transition: background-color 150ms;
+}
+
+.df-board-add-row:hover {
+  background: color-mix(in srgb, var(--df-board-group-color) 12%, transparent);
+  color: var(--df-board-ink) !important;
+}
+
+.df-board-add-column {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2.75rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  border-radius: var(--df-board-radius);
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--df-color-muted-foreground) !important;
+  white-space: nowrap;
+  transition: background-color 150ms;
+}
+
+.df-board-add-column:hover {
+  background: var(--df-color-hover);
+  color: var(--df-color-foreground) !important;
+}
+
+/* Delete confirmation, portaled to <body> --------------------------------- */
+
+.df-board-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.4);
+  animation: df-board-fade-in 120ms ease-out;
+}
+
+.df-board-dialog {
+  box-sizing: border-box;
+  width: min(100%, 25rem);
+  padding: 1.25rem;
+  border: 1px solid var(--df-color-border);
+  border-radius: 0.75rem;
+  background: var(--df-color-card);
+  color: var(--df-color-card-foreground);
+  box-shadow: var(--df-board-popover-shadow, 0 12px 32px rgb(16 24 40 / 0.14));
+  animation: df-board-pop-in 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.df-board-dialog button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* "Merge" sits on the left, apart from Cancel / Delete. */
+.df-board-dialog-merge {
+  position: relative;
+  margin-right: auto;
+}
+
+.df-board-dialog-merge > .df-board-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.df-board-dialog-merge .df-board-popover {
+  max-height: 14rem;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgb(16 24 40 / 0.18);
+}
+
+.df-board-dialog-swatch {
+  flex: none !important;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 0.1875rem;
+}
+
+.df-board-dialog-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--df-color-foreground);
+}
+
+.df-board-dialog-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--df-color-muted-foreground);
+}
+
+.df-board-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.df-board-dialog .df-board-ghost {
+  border: 1px solid var(--df-color-border);
+  font-size: 0.875rem;
+  color: var(--df-color-foreground) !important;
+}
+
+.df-board-dialog .df-board-primary {
+  padding-inline: 0.75rem;
+}
+
+.df-board-primary[data-danger] {
+  background: var(--df-color-destructive, #dc2626);
+  color: var(--df-color-destructive-foreground, #fff) !important;
+}
+
+@keyframes df-board-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes df-board-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+/* Cards: title with priority, notes, then a footer of due date and people - */
+
+/* Themeable through --df-board-card-* custom properties, set on the board,
+ * a column or a card (e.g. through `cardStyle`). */
+.df-board-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-board-card-gap, 0.375rem);
+  padding: var(--df-board-card-padding, 0.625rem 0.75rem 0.6875rem);
+  border-radius: var(--df-board-card-radius, 0.5rem);
+  background: var(--df-board-card-bg, var(--df-color-card));
+  color: var(--df-board-card-fg, inherit);
+  box-shadow: var(--df-board-card-shadow, var(--df-board-shadow));
+  cursor: pointer;
+  transition:
+    box-shadow 150ms,
+    opacity 150ms;
+}
+
+.df-board-card:hover {
+  box-shadow: var(--df-board-card-shadow-hover, var(--df-board-shadow-hover));
+}
+
+.df-board-card[data-open='true'],
+.df-board-card[data-highlighted='true'] {
+  box-shadow:
+    0 0 0 1.5px var(--df-board-card-accent),
+    var(--df-board-shadow-hover);
+}
+
+.df-board-card[data-highlighted='true'] {
+  animation: df-board-flash 1.2s ease-out;
+}
+
+@keyframes df-board-flash {
+  0%,
+  40% {
+    background: color-mix(
+      in srgb,
+      var(--df-board-card-accent) 14%,
+      var(--df-color-card)
+    );
+  }
+}
+
+.df-board-card[data-dragging='true'] {
+  opacity: 0.4;
+}
+
+.df-board-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.df-board-card-head .df-board-card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.df-board-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.df-board-card-foot .df-board-chip {
+  flex: none;
+}
+
+.df-board-card-foot .df-task-avatar-stack {
+  flex: none;
+  margin-left: auto;
+}
+
+.df-board-card-foot .df-task-avatar-stack > .df-task-avatar {
+  box-shadow: 0 0 0 1.5px var(--df-color-card);
+}
+
+.df-board-card-text {
+  font-size: var(--df-board-card-title-size, 0.875rem);
+  font-weight: var(--df-board-card-title-weight, 500);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.df-board-card[data-completed='true'] .df-board-card-text {
+  color: var(--df-color-muted-foreground);
+}
+
+.df-board-card-description {
+  display: -webkit-box;
+  margin: -0.125rem 0 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--df-color-muted-foreground);
+  /* Keep the line breaks typed into the task notes. */
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.df-board-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.25rem;
+  padding-inline: 0.375rem;
+  border: 1px solid var(--df-board-card-border);
+  border-radius: 0.3125rem;
+  font-size: 0.75rem;
+  color: var(--df-color-muted-foreground);
+  white-space: nowrap;
+}
+
+.df-board-chip[data-tone='today'] {
+  color: #d97706;
+}
+
+.df-board-chip[data-tone='overdue'] {
+  border-color: color-mix(in srgb, #ef4444 30%, transparent);
+  color: #dc2626;
+}
+
+.df-board-priority {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.25rem;
+  margin-top: -0.0625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--df-color-muted-foreground);
+  white-space: nowrap;
+}
+
+.df-board-priority[data-priority='high'] {
+  color: #dc2626;
+}
+
+.df-board-priority[data-priority='medium'] {
+  color: #d97706;
+}
+
+.dark .df-board-chip[data-tone='today'],
+.dark .df-board-priority[data-priority='medium'] {
+  color: #fbbf24;
+}
+
+.dark .df-board-chip[data-tone='overdue'],
+.dark .df-board-priority[data-priority='high'] {
+  color: #f87171;
+}
+
+/* Column drag: driven by ColumnDragController ------------------------------ */
+
+.df-board-column-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  overflow: hidden;
+  border-radius: var(--df-board-radius);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.18);
+  pointer-events: none;
+}
+
+.df-board-column-overlay[hidden] {
+  display: none;
+}
+
+.df-board-column-overlay > .df-board-column {
+  width: 100% !important;
+  margin: 0;
+}
+
+.df-board[data-column-dragging='true'] .df-board-column {
+  transition: transform 180ms ease;
+}
+
+.df-board .is-column-drag-source {
+  opacity: 0.25;
+}
+
+.df-board[data-dragging='true'] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.df-board-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .df-board-column {
+    width: 82vw;
+  }
+}

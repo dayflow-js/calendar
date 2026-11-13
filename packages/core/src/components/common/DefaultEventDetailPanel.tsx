@@ -12,7 +12,6 @@ import { Temporal } from 'temporal-polyfill';
 
 import { usePanelHandoffAnimation } from '@/components/calendarEvent/hooks/usePanelHandoffAnimation';
 import { getCalendarContentElement } from '@/components/calendarEvent/utils';
-import { useTheme } from '@/contexts/ThemeContext';
 import { getDefaultCalendarRegistry } from '@/core/calendarRegistry';
 import { useLocale } from '@/locale';
 import { eventDetailPanel } from '@/styles/classNames';
@@ -27,7 +26,6 @@ import { logger } from '@/utils/logger';
 import { getEventConference, setEventConference } from '@/utils/meetingUtils';
 import { convertEventKind, isTask } from '@/utils/taskUtils';
 import { isPlainDate } from '@/utils/temporal';
-import { resolveAppliedTheme } from '@/utils/themeUtils';
 import {
   restoreVisualEventToCanonical,
   getViewTimeFormat,
@@ -35,11 +33,11 @@ import {
 
 import { CalendarOption, CalendarPicker } from './CalendarPicker';
 import { EventConferenceField } from './EventConferenceField';
-import { EventKindSwitch } from './EventKindSwitch';
+import { canSwitchEventKind, EventKindSwitch } from './EventKindSwitch';
 import { EventNotesField } from './EventNotesField';
 import { EventRepeatEditor } from './EventRepeatEditor';
 import { LoadingButton } from './LoadingButton';
-import { TaskPriorityField } from './TaskPriorityField';
+import { TaskDetailsFields } from './TaskDetailsFields';
 import { useRangePickerLocale } from './useRangePickerLocale';
 
 interface DefaultEventDetailPanelProps extends EventDetailPanelProps {
@@ -62,8 +60,6 @@ const DefaultEventDetailPanel = ({
   onClose: _onClose,
   app,
 }: DefaultEventDetailPanelProps) => {
-  const { effectiveTheme } = useTheme();
-  const appliedTheme = resolveAppliedTheme(effectiveTheme);
   const { t } = useLocale();
   const rangePickerLocale = useRangePickerLocale(app?.state.locale);
 
@@ -203,11 +199,6 @@ const DefaultEventDetailPanel = ({
     }));
   }, [app, app?.getCalendars()]); // Depend on app.getCalendars() to update when calendars change
 
-  // Check if dark mode is active (either via theme context or DOM class)
-  const isDark =
-    appliedTheme === 'dark' ||
-    (typeof document !== 'undefined' &&
-      document.documentElement.classList.contains('dark'));
   const isEditable = app?.canMutateFromUI(event.id) ?? false;
   const readOnlyConfig = app?.getReadOnlyConfig(event.id);
   const isViewable = readOnlyConfig?.viewable !== false;
@@ -227,8 +218,9 @@ const DefaultEventDetailPanel = ({
 
   if (!isViewable) return null;
 
-  const arrowBgColor = isDark ? '#1f2937' : 'white';
-  const arrowBorderColor = isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
+  // Match the panel surface so the arrow blends in with any theme
+  const arrowBgColor = 'var(--df-color-card)';
+  const arrowBorderColor = 'var(--df-color-border)';
 
   const convertToAllDay = () => {
     if (isLoading) return;
@@ -439,15 +431,17 @@ const DefaultEventDetailPanel = ({
       }}
     >
       <div style={arrowStyle}></div>
-      {isEditable && (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
-        <EventKindSwitch
-          value={draftEvent.kind ?? 'event'}
-          disabled={isLoading}
-          onChange={kind =>
-            applyDraftEventUpdate(convertEventKind(draftEvent, kind))
-          }
-        />
-      )}
+      {isEditable &&
+        canSwitchEventKind(app) &&
+        (app?.getTasksEnabled?.() || isTask(draftEvent)) && (
+          <EventKindSwitch
+            value={draftEvent.kind ?? 'event'}
+            disabled={isLoading}
+            onChange={kind =>
+              applyDraftEventUpdate(convertEventKind(draftEvent, kind))
+            }
+          />
+        )}
       <span className='df-form-label'>
         {t(isDraftTask ? 'taskTitle' : 'eventTitle')}
       </span>
@@ -551,7 +545,8 @@ const DefaultEventDetailPanel = ({
       />
 
       {isDraftTask ? (
-        <TaskPriorityField
+        <TaskDetailsFields
+          app={app}
           event={draftEvent}
           disabled={!isEditable || isLoading}
           onChange={applyDraftEventUpdate}

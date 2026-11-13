@@ -1,0 +1,282 @@
+---
+title: 'Plugin de tablero'
+description: Organiza las tareas en columnas por estado, prioridad o responsable, con arrastrar y soltar y columnas personalizadas.
+---
+
+# Plugin de tablero
+
+El plugin de tablero añade a DayFlow una vista de tablero de tareas. Muestra las
+[tareas](/docs-es/features/tasks) del propio calendario (`kind: 'task'`) en columnas
+por estado, prioridad o responsable. Las tarjetas se arrastran entre columnas y
+cada cambio se guarda mediante los eventos y callbacks habituales del calendario,
+así que el tablero no añade un segundo almacén de datos.
+
+Pruébalo en la [demo interactiva](/demo?view=board).
+
+## Instalación
+
+<PackageTabs pkg='@dayflow/plugin-board' />
+
+## Uso
+
+El tablero es una vista: regístralo en `views` junto a tus vistas de calendario.
+Necesita `enableTasks: true`, y `taskMembers` define las personas a las que se
+pueden asignar tareas.
+
+<FrameworkTabs>
+  <Tab>
+    ```tsx
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/react';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    // Create the view once so its board state survives re-renders.
+    const board = createBoardView();
+
+    export function TaskCalendar() {
+      const calendar = useCalendarApp({
+        views: [createMonthView(), board],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+
+      return <DayFlowCalendar calendar={calendar} />;
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```vue
+    <template>
+      <DayFlowCalendar :calendar="calendar" />
+    </template>
+
+    <script setup>
+    import {
+      DayFlowCalendar,
+      createMonthView,
+      useCalendarApp,
+    } from '@dayflow/vue';
+    import { createBoardView } from '@dayflow/plugin-board';
+    import '@dayflow/core/dist/styles.css';
+    import '@dayflow/plugin-board/styles.css';
+
+    const calendar = useCalendarApp({
+      views: [createMonthView(), createBoardView()],
+      enableTasks: true,
+      taskMembers: [
+        { id: 'ava', name: 'Ava Chen' },
+        { id: 'leo', name: 'Leo Martin' },
+      ],
+      callbacks: {
+        onEventUpdate: event => saveEvent(event),
+      },
+    });
+    </script>
+    ```
+
+  </Tab>
+  <Tab>
+    ```typescript
+    import { Component } from '@angular/core';
+    import { DayFlowCalendarModule } from '@dayflow/angular';
+    import { createMonthView } from '@dayflow/core';
+    import { createBoardView } from '@dayflow/plugin-board';
+
+    // Add '@dayflow/core/dist/styles.css' and
+    // '@dayflow/plugin-board/styles.css' to the styles in angular.json.
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [DayFlowCalendarModule],
+      template: `<dayflow-calendar [calendar]="calendar"></dayflow-calendar>`,
+    })
+    export class AppComponent {
+      calendar = {
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      };
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    ```svelte
+    <script>
+      import {
+        DayFlowCalendar,
+        createMonthView,
+        useCalendarApp,
+      } from '@dayflow/svelte';
+      import { createBoardView } from '@dayflow/plugin-board';
+      import '@dayflow/core/dist/styles.css';
+      import '@dayflow/plugin-board/styles.css';
+
+      const calendar = useCalendarApp({
+        views: [createMonthView(), createBoardView()],
+        enableTasks: true,
+        taskMembers: [
+          { id: 'ava', name: 'Ava Chen' },
+          { id: 'leo', name: 'Leo Martin' },
+        ],
+        callbacks: {
+          onEventUpdate: event => saveEvent(event),
+        },
+      });
+    </script>
+
+    <DayFlowCalendar {calendar} />
+    ```
+
+  </Tab>
+</FrameworkTabs>
+
+`saveEvent` representa tu propia función de guardado. Después, **Board** aparece
+en el selector de vistas.
+
+## Datos de las tareas
+
+Las columnas, la prioridad y los responsables son campos de la tarea, así que el
+tablero, las vistas del calendario y el editor de tareas leen y escriben los
+mismos valores. Consulta [Estados y responsables](/docs-es/features/tasks#statuses-and-assignees)
+para las opciones `taskStatuses` y `taskMembers`.
+
+| Campo              | Significado                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| `task.status`      | ID de columna de `taskStatuses` (por defecto `todo`, `in-progress`, `done`) |
+| `task.assigneeIds` | IDs de miembros de `taskMembers`                                            |
+| `task.priority`    | `'none' \| 'low' \| 'medium' \| 'high'`                                     |
+| `task.completed`   | La casilla; se sincroniza con los estados `completed`                       |
+| `start`            | Fecha de vencimiento. Las tareas nuevas del tablero vencen hoy, todo el día |
+
+- Si un estado tiene `completed: true`, mover una tarjeta a esa columna completa la
+  tarea y sacarla la reabre. Completar una tarea en otro lugar la mueve al primer
+  estado completado.
+- Sin un estado completado, la casilla es independiente de las columnas.
+- Al agrupar por responsable, una tarjeta pertenece a su primer responsable.
+  Moverla cambia solo ese responsable y conserva los demás; **Unassigned** los quita todos.
+- El tablero respeta la visibilidad de los calendarios y la configuración de solo lectura.
+
+## Usar el tablero
+
+- **Mover tarjetas**: arrastrar entre columnas cambia el estado, la prioridad o el
+  responsable; arrastrar dentro de una columna cambia el orden. Las tarjetas con
+  foco se mueven con **Alt + flechas** o **Alt + Inicio/Fin**.
+- **Abrir una tarjeta**: haz clic para editar el título, la columna, la prioridad,
+  los responsables, la fecha de vencimiento y las notas en el editor de tareas.
+- **Añadir tareas**: **＋** en el encabezado de una columna o **New task** al final
+  añade una tarea con el estado, la prioridad o el responsable de esa columna.
+- **Editar columnas**: haz clic en el título de una columna de estado para
+  renombrarla; su menú **⋯** permite renombrarla, cambiar su color o eliminarla.
+  Al eliminar una columna se pregunta si fusionar sus tareas en otra columna o
+  eliminarlas. **Add column** añade un estado.
+- **Reordenar columnas**: arrastra el encabezado o pulsa **Alt + Izquierda/Derecha**
+  sobre un encabezado con foco.
+- **Agrupar y filtrar**: **Group by** alterna entre estado, prioridad y responsable.
+  Haz clic en los avatares para ver solo sus tareas.
+
+Los cambios en las columnas de estado llaman a `app.setTaskStatuses` y al callback
+`onTaskStatusesChange`; guárdalos ahí.
+
+## Opciones
+
+| Opción            | Tipo                                            | Por defecto | Descripción                                                  |
+| ----------------- | ----------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| `label`, `title`  | `string`                                        | `'Board'`   | Nombre en el selector de vistas; nombre accesible            |
+| `groupBy`         | `'status' \| 'priority' \| 'assignee'`          | `'status'`  | Agrupación inicial                                           |
+| `allowStatusEdit` | `boolean`                                       | `true`      | Añadir, renombrar, recolorear y eliminar columnas            |
+| `allowCreate`     | `boolean`                                       | `true`      | Mostrar **New task**; requiere permiso de escritura          |
+| `initialState`    | `BoardViewState`                                | -           | Agrupación, orden de columnas y tarjetas, y filtro guardados |
+| `messages`        | `Partial<BoardMessages>`                        | -           | Sobrescribir textos (inglés y chino incluidos)               |
+| `columnWidth`     | `number`                                        | -           | Ancho de columna en px, mínimo 220                           |
+| `showDescription` | `boolean`                                       | `true`      | Mostrar las notas de la tarea en las tarjetas                |
+| `cardFields`      | `{ priority?, description?, due?, assignees? }` | -           | Pon un campo en `false` para ocultarlo en las tarjetas       |
+| `cardClassName`   | `string \| (args) => string`                    | -           | Nombres de clase para una tarjeta                            |
+| `cardStyle`       | `object \| (args) => object`                    | -           | Estilos en línea para una tarjeta                            |
+| `renderCard`      | `({ event, app, open }) => ComponentChildren`   | -           | Contenido Preact adicional bajo el título                    |
+
+`cardClassName` y `cardStyle` reciben `{ event, app, groupId, groupBy }`.
+
+### Callbacks
+
+| Callback            | Cuándo                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| `onTaskMove`        | Antes de mover con arrastre o teclado: `{ event, from, to, groupBy }`. `false` cancela    |
+| `onTaskCreate`      | Antes de que **New task** añada una tarea. Devuelve un borrador modificado o `false`      |
+| `onColumnDelete`    | Tras confirmar la eliminación de una columna. `false` cancela                             |
+| `onCardClick`       | Se hace clic en una tarjeta o se abre con Enter. `false` mantiene el editor cerrado       |
+| `onViewStateChange` | Cambió la agrupación, el orden de columnas o tarjetas, o el filtro. Guarda el estado aquí |
+| `onError`           | Falló el guardado de una tarea o la notificación de estado                                |
+
+Los cambios en los datos de las tareas siguen llegando a los callbacks del
+calendario (`onEventCreate`, `onEventUpdate`, `onEventDelete`, `onTaskStatusesChange`).
+
+## Guardar el diseño del tablero
+
+La agrupación, el orden de columnas y tarjetas y el filtro de responsables son
+estado de presentación: nunca modifican tus tareas. `onViewStateChange` los
+notifica e `initialState` los restaura:
+
+```ts
+const board = createBoardView({
+  initialState:
+    JSON.parse(localStorage.getItem('board') ?? 'null') ?? undefined,
+  onViewStateChange: state =>
+    localStorage.setItem('board', JSON.stringify(state)),
+});
+```
+
+`board.getState(app)` y `board.setState(app, state)` leen y reemplazan el estado
+desde código. Mantén estable la factoría de la vista: calendarios distintos
+conservan estados distintos aunque compartan una factoría.
+
+## Estilos de las tarjetas
+
+Las tarjetas leen propiedades personalizadas de CSS, que se pueden definir en
+`.df-board`, en una columna o en una sola tarjeta:
+
+| Propiedad                                                    | Por defecto                  |
+| ------------------------------------------------------------ | ---------------------------- |
+| `--df-board-card-bg`                                         | `var(--df-color-card)`       |
+| `--df-board-card-fg`                                         | heredado                     |
+| `--df-board-card-radius`                                     | `0.5rem`                     |
+| `--df-board-card-padding`                                    | `0.625rem 0.75rem 0.6875rem` |
+| `--df-board-card-gap`                                        | `0.375rem`                   |
+| `--df-board-card-shadow`, `--df-board-card-shadow-hover`     | borde fino y sombra suave    |
+| `--df-board-card-title-size`, `--df-board-card-title-weight` | `0.875rem`, `500`            |
+
+Cada tarjeta también incluye `data-priority`, `data-group`, `data-calendar`,
+`data-completed` y `data-due` (`overdue`, `today` o `upcoming`):
+
+```css
+.df-board-card[data-due='overdue'] {
+  box-shadow: inset 3px 0 #ef4444;
+}
+```
+
+## Limitaciones
+
+- El tablero muestra las tareas cargadas en el calendario, de cualquier fecha. Si
+  cargas eventos por rango visible, carga también las tareas del tablero.
+- Toda tarea tiene fecha de vencimiento; todavía no se admiten tareas sin fecha,
+  etiquetas ni subtareas.
+- `renderCard` devuelve contenido Preact. Aún no hay slots de tarjeta nativos de
+  cada framework.

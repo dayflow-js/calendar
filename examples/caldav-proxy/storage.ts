@@ -28,7 +28,11 @@ export function createMemoryStorage(): CalDAVStorage {
   return {
     getSyncToken: id => Promise.resolve(syncTokens.get(id) ?? null),
     setSyncToken: (id, token) => {
-      syncTokens.set(id, token);
+      if (token === null) {
+        syncTokens.delete(id);
+      } else {
+        syncTokens.set(id, token);
+      }
       return Promise.resolve();
     },
 
@@ -121,7 +125,11 @@ export function createLocalStorage(): CalDAVStorage {
   return {
     getSyncToken: id => Promise.resolve(lsGet(`st:${id}`)),
     setSyncToken: (id, token) => {
-      lsSet(`st:${id}`, token);
+      if (token === null) {
+        lsDel(`st:${id}`);
+      } else {
+        lsSet(`st:${id}`, token);
+      }
       return Promise.resolve();
     },
 

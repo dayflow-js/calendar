@@ -105,12 +105,42 @@ function Packages({ release }: { release: Release }) {
     <div className={styles.packages}>
       <span>Packages</span>
       {release.packages.map(group => (
-        <span key={group.version} className={styles.packageGroup}>
+        <span
+          key={`${group.names.join(',')}@${group.version}`}
+          className={styles.packageGroup}
+        >
           {group.names.map(name => (
             <code key={name}>{name}</code>
           ))}
           <b>{group.version}</b>
         </span>
+      ))}
+    </div>
+  );
+}
+
+function Contributors({ release }: { release: Release }) {
+  if (release.contributors.length === 0) return null;
+  return (
+    <div className={styles.contributors}>
+      <span>Thanks to</span>
+      {release.contributors.map(contributor => (
+        <a
+          key={contributor.login}
+          href={contributor.url}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {/* oxlint-disable-next-line nextjs/no-img-element -- remote GitHub avatar */}
+          <img
+            src={`${contributor.url}.png?size=40`}
+            alt=''
+            width={20}
+            height={20}
+            loading='lazy'
+          />
+          @{contributor.login}
+        </a>
       ))}
     </div>
   );
@@ -174,6 +204,7 @@ function FeatureRelease({
             ))}
           </div>
         )}
+        <Contributors release={release} />
         <Packages release={release} />
       </div>
     </article>
@@ -202,6 +233,7 @@ function MinorRelease({ release }: { release: Release }) {
             <ReleaseNotes key={section.heading} markdown={section.markdown} />
           ))}
         </div>
+        <Contributors release={release} />
       </div>
     </article>
   );

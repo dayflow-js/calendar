@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'preact/hooks';
 
+import type { EventActivateHandler } from '@/components/common/useEventActivation';
 import { getEventIcon } from '@/components/monthView/util';
 import { Event, MonthEventDragState, ICalendarApp } from '@/types';
 import {
@@ -113,7 +114,7 @@ interface YearStaticEventsLayerProps {
   columnsPerRow: number;
   app: ICalendarApp;
   selectedEventId: string | null;
-  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onSelectEvent: EventActivateHandler;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   isDraggable: boolean;
@@ -165,7 +166,7 @@ interface YearRowComponentProps {
   onSelectDate: (date: Date) => void;
   onCreateStart?: (e: MouseEvent | TouchEvent, targetDate: Date) => void;
   selectedEventId: string | null;
-  onSelectEvent: (eventId: string, segmentId: string) => void;
+  onSelectEvent: EventActivateHandler;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   onMoreEventsClick?: (date: Date, e?: MouseEvent) => void;
   onContextMenu: (menu: { x: number; y: number; date: Date } | null) => void;

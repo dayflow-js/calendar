@@ -18,6 +18,7 @@
   "dependencies": {
     "@dayflow/blossom-color-picker-react": "latest",
     "@dayflow/core": "latest",
+    "@dayflow/plugin-board": "latest",
     "@dayflow/plugin-drag": "latest",
     "@dayflow/plugin-keyboard-shortcuts": "latest",
     "@dayflow/plugin-localization": "latest",

@@ -116,13 +116,67 @@ Terminbalken.
 Die [interaktive Demo](/demo) enthält einen Schalter **Tasks** und einen Tooltip **Preview**, der
 das Erledigen und das Ändern der Priorität im Detail-Panel zeigt.
 
+## Status und Zuständige [#statuses-and-assignees]
+
+Aufgaben können Workflow-Phasen durchlaufen und Personen zugewiesen werden. Beides
+sind gewöhnliche Aufgabenfelder, die der Aufgabeneditor und das
+[Board-Plugin](/docs-de/plugins/board) verwenden.
+
+```ts
+const calendar = useCalendarApp({
+  views: [createMonthView()],
+  enableTasks: true,
+  // Defaults to To do, In progress and Done.
+  taskStatuses: [
+    { id: 'backlog', title: 'Backlog' },
+    { id: 'doing', title: 'Doing', color: '#3b82f6' },
+    { id: 'shipped', title: 'Shipped', completed: true },
+  ],
+  taskMembers: [
+    { id: 'ava', name: 'Ava Chen' },
+    { id: 'leo', name: 'Leo Martin', avatarUrl: '/leo.png' },
+  ],
+  callbacks: {
+    onTaskStatusesChange: statuses => saveStatuses(statuses),
+  },
+});
+```
+
+| Option / Feld          | Typ                                | Bedeutung                                                               |
+| ---------------------- | ---------------------------------- | ----------------------------------------------------------------------- |
+| `taskStatuses`         | `TaskStatus[]`                     | Phasen, die eine Aufgabe durchläuft, in Reihenfolge                     |
+| `taskMembers`          | `TaskMember[]`                     | Zuweisbare Personen; das Feld ist ausgeblendet, wenn leer               |
+| `task.status`          | `string`                           | Eine `TaskStatus`-ID                                                    |
+| `task.assigneeIds`     | `string[]`                         | `TaskMember`-IDs                                                        |
+| `onTaskStatusesChange` | `(statuses: TaskStatus[]) => void` | Status wurden hinzugefügt, umbenannt, umgefärbt, sortiert oder entfernt |
+
+Ein `TaskStatus` hat eine `id` sowie optional `title`, `color` und `completed`.
+Eingebaute IDs (`todo`, `in-progress`, `done`) zeigen ohne `title` übersetzte Namen.
+Ein `TaskMember` hat `id`, `name` sowie optional `avatarUrl` und `color`; Personen
+ohne Avatar werden mit Initialen angezeigt.
+
+Gibt es einen Status mit `completed: true`, bleiben Erledigt-Zustand und Status
+synchron: Eine erledigte Aufgabe wandert in den ersten abgeschlossenen Status, eine
+wieder geöffnete kehrt in ihren vorherigen offenen Status zurück. Ohne
+abgeschlossenen Status ist das Kontrollkästchen vom Status unabhängig.
+
+Mit `taskMembers` zeigt der Aufgabeneditor das Feld **Assignees**, und sobald eine
+nach Status gruppierende Ansicht wie das Board registriert ist, das Feld **Column**.
+`app.setTaskStatuses(statuses)` ersetzt die Status per Code und ruft
+`onTaskStatusesChange` auf.
+
 ## Programmatische Änderungen und Speicherung
 
 Änderungen an Aufgaben lösen denselben Callback `onEventUpdate` aus wie Änderungen an Terminen.
 Speichern Sie `kind` und die `task`-Metadaten zusammen mit den Termindaten in Ihrer Datenquelle.
 
 ```ts
-import { setTaskCompleted, setTaskPriority } from '@dayflow/core';
+import {
+  setTaskAssignees,
+  setTaskCompleted,
+  setTaskPriority,
+  setTaskStatus,
+} from '@dayflow/core';
 
 // `taskEvent` is an existing Event with kind: 'task'.
 const completed = setTaskCompleted(taskEvent, true, app.timeZone);
@@ -130,6 +184,14 @@ await app.updateEvent(taskEvent.id, { task: completed.task });
 
 const prioritized = setTaskPriority(taskEvent, 'high');
 await app.updateEvent(taskEvent.id, { task: prioritized.task });
+
+// Der Wechsel in einen Status schließt die Aufgabe passend ab oder öffnet sie wieder.
+const statuses = app.getTaskStatuses();
+const moved = setTaskStatus(taskEvent, statuses[1], app.timeZone, statuses);
+await app.updateEvent(taskEvent.id, { task: moved.task });
+
+const assigned = setTaskAssignees(taskEvent, ['ava', 'leo']);
+await app.updateEvent(taskEvent.id, { task: assigned.task });
 ```
 
 Die Hilfsfunktionen geben die geänderten Werte zurück; sie speichern selbst nichts.

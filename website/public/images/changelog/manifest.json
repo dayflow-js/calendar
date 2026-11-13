@@ -9,6 +9,16 @@
     "height": 826,
     "alt": "The appointment schedule editor beside a week calendar"
   },
+  "board": {
+    "width": 2048,
+    "height": 1500,
+    "alt": "Tasks in To do, In progress and Done columns on the board"
+  },
+  "board-task-editor": {
+    "width": 1460,
+    "height": 1156,
+    "alt": "Editing a board card's column, priority and assignees"
+  },
   "calendar-picker-groups": {
     "width": 1032,
     "height": 1192,

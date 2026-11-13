@@ -435,6 +435,9 @@ export const isEventDeepEqual = (
     (event1.kind ?? 'event') === (event2.kind ?? 'event') &&
     !!event1.task?.completed === !!event2.task?.completed &&
     (event1.task?.priority ?? 'none') === (event2.task?.priority ?? 'none') &&
+    (event1.task?.status ?? '') === (event2.task?.status ?? '') &&
+    (event1.task?.assigneeIds ?? []).join('\n') ===
+      (event2.task?.assigneeIds ?? []).join('\n') &&
     !!event1.allDay === !!event2.allDay &&
     event1.start.toString() === event2.start.toString() &&
     event1.end.toString() === event2.end.toString() &&
