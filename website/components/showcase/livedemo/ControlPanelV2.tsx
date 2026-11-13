@@ -39,7 +39,7 @@ import type {
   SwitcherMode,
   YearMode,
 } from './types';
-import { DEFAULT_THEME_COLOR } from './types';
+import { BOARD_VIEW, DEFAULT_THEME_COLOR } from './types';
 
 type Section = 'overview' | 'general' | 'views' | 'plugins';
 const SECTIONS: Array<[Section, string]> = [
@@ -54,6 +54,7 @@ const VIEWS = [
   ['Month', ViewType.MONTH],
   ['Year', ViewType.YEAR],
   ['Agenda', ViewType.AGENDA],
+  ['Board', BOARD_VIEW],
 ] as const;
 const TIME_ZONES = Object.values(TimeZone).toSorted();
 

@@ -1,4 +1,4 @@
-import { Event } from '@dayflow/core';
+import { Event, TaskMember, TaskPriority } from '@dayflow/core';
 import { Temporal } from 'temporal-polyfill';
 
 const calendarIds = [
@@ -597,36 +597,141 @@ export const generateMinimalSampleEvents = (): Event[] => {
   return events;
 };
 
-/** Due-today examples make tasks easy to find in every demo view. */
+/** Assignees for the demo tasks; the board can group and filter by them. */
+export const sampleTaskMembers: TaskMember[] = [
+  { id: 'ava', name: 'Ava Chen' },
+  { id: 'leo', name: 'Leo Martin' },
+  { id: 'mia', name: 'Mia Park' },
+  { id: 'noah', name: 'Noah Silva' },
+];
+
+type SampleTask = {
+  title: string;
+  priority: TaskPriority;
+  status: 'todo' | 'in-progress' | 'done';
+  assignees: string[];
+  /** Days from today. */
+  day: number;
+  /** Due hour, or null for an all-day task. */
+  hour: number | null;
+  description?: string;
+};
+
+const SAMPLE_TASKS: SampleTask[] = [
+  // Due today, so tasks are easy to find in every calendar view.
+  {
+    title: 'Send launch checklist',
+    priority: 'high',
+    status: 'in-progress',
+    assignees: ['ava'],
+    day: 0,
+    hour: null,
+    description:
+      'Click the circle to complete this task. Open its details to change the priority.',
+  },
+  {
+    title: 'Review design feedback',
+    priority: 'medium',
+    status: 'todo',
+    assignees: ['leo', 'mia'],
+    day: 0,
+    hour: 11,
+  },
+  {
+    title: 'Organize research notes',
+    priority: 'low',
+    status: 'todo',
+    assignees: ['mia'],
+    day: 0,
+    hour: 15,
+  },
+  // Spread over the coming days to fill the board's columns.
+  {
+    title: 'Draft release notes',
+    priority: 'medium',
+    status: 'in-progress',
+    assignees: ['noah'],
+    day: 1,
+    hour: null,
+    description: 'Summarize the new board view and task fields.',
+  },
+  {
+    title: 'Update onboarding emails',
+    priority: 'low',
+    status: 'todo',
+    assignees: ['ava', 'noah'],
+    day: 2,
+    hour: 10,
+  },
+  {
+    title: 'Fix mobile navigation bug',
+    priority: 'high',
+    status: 'todo',
+    assignees: ['leo'],
+    day: 1,
+    hour: null,
+  },
+  {
+    title: 'Plan Q1 roadmap workshop',
+    priority: 'medium',
+    status: 'todo',
+    assignees: [],
+    day: 4,
+    hour: 14,
+  },
+  {
+    title: 'Set up analytics dashboard',
+    priority: 'none',
+    status: 'in-progress',
+    assignees: ['mia'],
+    day: 3,
+    hour: null,
+  },
+  {
+    title: 'Book venue for team offsite',
+    priority: 'low',
+    status: 'done',
+    assignees: ['noah'],
+    day: -1,
+    hour: null,
+  },
+  {
+    title: 'Ship pricing page copy',
+    priority: 'high',
+    status: 'done',
+    assignees: ['ava'],
+    day: -2,
+    hour: 16,
+  },
+];
+
 export function generateSampleTasks(): Event[] {
   const today = Temporal.Now.plainDateISO();
   const timeZone = Temporal.Now.timeZoneId();
-  return [
-    { title: 'Send launch checklist', priority: 'high', hour: null },
-    { title: 'Review design feedback', priority: 'medium', hour: 11 },
-    { title: 'Organize research notes', priority: 'low', hour: 15 },
-  ].map(({ title, priority, hour }, index) => {
+  return SAMPLE_TASKS.map((sample, index) => {
+    const date = today.add({ days: sample.day });
     const due =
-      hour === null
-        ? today
-        : today.toZonedDateTime({
+      sample.hour === null
+        ? date
+        : date.toZonedDateTime({
             timeZone,
-            plainTime: Temporal.PlainTime.from({ hour }),
+            plainTime: Temporal.PlainTime.from({ hour: sample.hour }),
           });
     return {
       id: `demo-task-${index}`,
-      title,
+      title: sample.title,
       kind: 'task',
       calendarId: 'team',
       start: due,
       end: due,
-      allDay: hour === null,
+      allDay: sample.hour === null,
       task: {
-        completed: false,
-        priority: priority as 'low' | 'medium' | 'high',
+        completed: sample.status === 'done',
+        priority: sample.priority,
+        status: sample.status,
+        assigneeIds: sample.assignees,
       },
-      description:
-        'Click the circle to complete this task. Open its details to change the priority.',
+      ...(sample.description && { description: sample.description }),
     };
   });
 }

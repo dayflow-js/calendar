@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/plugin-board",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Task board view plugin for DayFlow Calendar",
   "license": "MIT",
   "files": [
