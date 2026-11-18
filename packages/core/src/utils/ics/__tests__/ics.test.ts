@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 import { Event } from '@/types/event';
 import { generateICS } from '@/utils/ics/icsGenerator';
 import { parseICS } from '@/utils/ics/icsParser';
+import { expandRecurringEvents } from '@/utils/recurrence';
 
 describe('ICS Utilities', () => {
   const mockDate = Temporal.PlainDateTime.from('2025-01-15T10:00:00');
@@ -105,6 +106,36 @@ END:VCALENDAR`;
       expect(ics).toContain('LOCATION:Test Location');
       expect(ics).toContain('CATEGORIES:Work,Meeting'); // Escaped comma
       expect(ics).toContain('END:VCALENDAR');
+    });
+  });
+
+  describe('Recurrence', () => {
+    const weeklyICS = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:standup@example.com
+DTSTART;TZID=America/New_York:20261102T100000
+DTEND;TZID=America/New_York:20261102T103000
+RRULE:FREQ=WEEKLY;BYDAY=MO
+SUMMARY:Weekly standup
+END:VEVENT
+END:VCALENDAR`;
+
+    it('imports RRULE so the series repeats', () => {
+      const { events } = parseICS(weeklyICS, {
+        defaultTimeZone: 'America/New_York',
+      });
+      const days = expandRecurringEvents(
+        events,
+        new Date('2026-11-01T00:00:00Z'),
+        new Date('2026-12-01T00:00:00Z'),
+        'America/New_York'
+      ).map(e => (e.start as Temporal.ZonedDateTime).day);
+      expect(days).toEqual([2, 9, 16, 23, 30]);
+    });
+
+    it('exports RRULE', () => {
+      const { events } = parseICS(weeklyICS);
+      expect(generateICS(events)).toContain('RRULE:FREQ=WEEKLY;BYDAY=MO');
     });
   });
 

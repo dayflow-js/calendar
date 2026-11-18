@@ -29,6 +29,8 @@ export interface ICSVEvent {
   location?: string;
   /** Event categories */
   categories?: string[];
+  /** Recurrence rule (RRULE value) */
+  rrule?: string;
 }
 
 /**
