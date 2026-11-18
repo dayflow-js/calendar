@@ -2,6 +2,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '@/types/event';
 import { extractConferenceFromDescription } from '@/utils/meetingUtils';
+import { getEventRecurrenceRule } from '@/utils/recurrence';
 import {
   isPlainDate,
   isPlainDateTime,
@@ -240,6 +241,8 @@ export function generateVEvent(event: Event): string[] {
     const cats = event.meta.categories.map(escapeICSValue).join(',');
     lines.push(formatProperty('CATEGORIES', cats));
   }
+  const rule = getEventRecurrenceRule(event);
+  if (rule) lines.push(formatProperty('RRULE', rule));
   lines.push('END:VEVENT');
   return lines;
 }
@@ -313,6 +316,9 @@ export function parseVEventLines(lines: string[]): ICSVEvent {
           value: paramObj['VALUE'] as 'DATE' | 'DATE-TIME',
           tzid: paramObj['TZID'],
         };
+        break;
+      case 'RRULE':
+        event.rrule = value.trim();
         break;
       case 'CATEGORIES':
         event.categories = value
@@ -409,6 +415,9 @@ export function convertToDayFlowEvent(
       location: icsEvent.location,
       originalUid: icsEvent.uid,
       categories: icsEvent.categories,
+      ...(icsEvent.rrule
+        ? { recurring: true, recurrenceRule: icsEvent.rrule }
+        : {}),
     },
   };
 }
