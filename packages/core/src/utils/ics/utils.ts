@@ -206,6 +206,17 @@ export function formatProperty(
   return foldLine(line);
 }
 
+/** Local wall-clock time with its IANA zone, e.g. TZID=America/New_York:20261102T100000. */
+function formatICSZonedLocal(temporal: Temporal.ZonedDateTime): {
+  value: string;
+  params: Record<string, string>;
+} {
+  return {
+    value: `${temporal.year}${pad2(temporal.month)}${pad2(temporal.day)}T${pad2(temporal.hour)}${pad2(temporal.minute)}${pad2(temporal.second)}`,
+    params: { TZID: temporal.timeZoneId },
+  };
+}
+
 // ============================================================================
 // Internal Logic
 // ============================================================================
@@ -215,7 +226,16 @@ export function generateVEvent(event: Event): string[] {
   const uid = event.meta?.originalUid || `${event.id}@dayflow`;
   lines.push(`UID:${uid}`);
   lines.push(`DTSTAMP:${formatDateToICSTimestamp(new Date())}`);
-  const startICS = formatICSDate(event.start, event.allDay);
+  const rule = getEventRecurrenceRule(event);
+  // A series written in UTC keeps its UTC hour, so after a DST change every
+  // occurrence moves by an hour in other calendars. Write it in its own zone.
+  const formatTime = (t: Event['start']) =>
+    rule && isZonedDateTime(t) && t.timeZoneId.includes('/')
+      ? formatICSZonedLocal(t)
+      : formatICSDate(t, false);
+  const startICS = event.allDay
+    ? formatICSDate(event.start, true)
+    : formatTime(event.start);
   // For all-day events, ICS DTEND is exclusive (day after the last inclusive
   // day). DayFlow stores inclusive end dates, so add 1 day on export.
   let endICS: { value: string; params?: Record<string, string> };
@@ -229,7 +249,7 @@ export function generateVEvent(event: Event): string[] {
       params: { VALUE: 'DATE' },
     };
   } else {
-    endICS = formatICSDate(event.end, false);
+    endICS = formatTime(event.end);
   }
   lines.push(formatProperty('DTSTART', startICS.value, startICS.params));
   lines.push(formatProperty('DTEND', endICS.value, endICS.params));
@@ -248,7 +268,6 @@ export function generateVEvent(event: Event): string[] {
     const cats = event.meta.categories.map(escapeICSValue).join(',');
     lines.push(formatProperty('CATEGORIES', cats));
   }
-  const rule = getEventRecurrenceRule(event);
   if (rule) lines.push(formatProperty('RRULE', rule));
   lines.push('END:VEVENT');
   return lines;
