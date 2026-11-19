@@ -81,10 +81,17 @@ export function parseICSDate(
 
     // If timezone specified, return ZonedDateTime
     if (params?.tzid) {
-      return Temporal.ZonedDateTime.from({
-        ...dateTime,
-        timeZone: params.tzid,
-      });
+      try {
+        return Temporal.ZonedDateTime.from({
+          ...dateTime,
+          timeZone: params.tzid,
+        });
+      } catch (e) {
+        // Outlook writes Windows zone names ("Eastern Standard Time") that are not
+        // IANA zones: keep the wall-clock time and let the default time zone apply
+        // rather than dropping the event.
+        if (!(e instanceof RangeError)) throw e;
+      }
     }
 
     // Otherwise return PlainDateTime
@@ -287,7 +294,10 @@ export function parseVEventLines(lines: string[]): ICSVEvent {
     params.forEach(p => {
       const [key, val] = p.split('=');
       if (key && val) {
-        paramObj[key.trim().toUpperCase()] = val.trim();
+        // RFC 5545 allows quoted values: TZID="America/New_York"
+        paramObj[key.trim().toUpperCase()] = val
+          .trim()
+          .replace(/^"(.*)"$/, '$1');
       }
     });
     switch (name) {

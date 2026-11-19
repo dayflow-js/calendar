@@ -5,6 +5,15 @@ import { generateICS } from '@/utils/ics/icsGenerator';
 import { parseICS } from '@/utils/ics/icsParser';
 import { expandRecurringEvents } from '@/utils/recurrence';
 
+const withTzid = (tzid: string) => `BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:tz@example.com
+DTSTART;TZID=${tzid}:20261120T090000
+DTEND;TZID=${tzid}:20261120T100000
+SUMMARY:Standup
+END:VEVENT
+END:VCALENDAR`;
+
 describe('ICS Utilities', () => {
   const mockDate = Temporal.PlainDateTime.from('2025-01-15T10:00:00');
   const mockEndDate = Temporal.PlainDateTime.from('2025-01-15T12:00:00');
@@ -136,6 +145,25 @@ END:VCALENDAR`;
     it('exports RRULE', () => {
       const { events } = parseICS(weeklyICS);
       expect(generateICS(events)).toContain('RRULE:FREQ=WEEKLY;BYDAY=MO');
+    });
+  });
+
+  describe('TZID', () => {
+    it('reads a quoted TZID', () => {
+      const result = parseICS(withTzid('"America/New_York"'));
+      expect(result.success).toBe(true);
+      expect(
+        (result.events[0].start as Temporal.ZonedDateTime).timeZoneId
+      ).toBe('America/New_York');
+    });
+
+    it('keeps an event whose TZID is a Windows zone name', () => {
+      const result = parseICS(withTzid('Eastern Standard Time'), {
+        defaultTimeZone: 'America/New_York',
+      });
+      expect(result.success).toBe(true);
+      const start = result.events[0].start as Temporal.ZonedDateTime;
+      expect([start.timeZoneId, start.hour]).toEqual(['America/New_York', 9]);
     });
   });
 
