@@ -18,6 +18,7 @@ interface StaticEventsLayerProps {
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   isDraggable: boolean;
+  isMobile?: boolean;
 }
 
 // Renders the non-dragged events for a month using lightweight YearEventBars.
@@ -33,6 +34,7 @@ const StaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
     onMoveStart,
     onContextMenuEvent,
     isDraggable,
+    isMobile,
   }: StaticEventsLayerProps) => (
     <>
       {segments.map(segment => (
@@ -44,6 +46,7 @@ const StaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
           isSelected={selectedEventId === segment.event.id}
           isBeingDragged={false}
           isDraggable={isDraggable}
+          isMobile={isMobile}
           app={app}
           onSelect={onSelectEvent}
           onMoveStart={onMoveStart}
@@ -70,6 +73,7 @@ interface FixedWeekMonthRowProps {
   onContextMenu: (e: MouseEvent, date: Date) => void;
   appTimeZone?: string;
   isDraggable: boolean;
+  isMobile?: boolean;
 }
 
 export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
@@ -90,6 +94,7 @@ export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
     onContextMenu,
     appTimeZone,
     isDraggable,
+    isMobile,
   }: FixedWeekMonthRowProps) => {
     const { locale } = useLocale();
     const today = useMemo(() => {
@@ -170,6 +175,7 @@ export const FixedWeekMonthRow = /* @__PURE__ */ memoWithDisplayName(
                 onMoveStart={onMoveStart}
                 onContextMenuEvent={onContextMenuEvent}
                 isDraggable={isDraggable}
+                isMobile={isMobile}
               />
             </div>
           </div>

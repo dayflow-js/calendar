@@ -683,6 +683,7 @@ export const FixedWeekYearView = ({
               onContextMenu={handleContextMenu}
               appTimeZone={appTimeZone}
               isDraggable={isEditable}
+              isMobile={isMobile}
             />
           ))}
           {isMovePreviewActive && dragPreviewEvent && (

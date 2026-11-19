@@ -597,6 +597,7 @@ export const DefaultYearView = ({
               onContextMenu={handleRowContextMenu}
               appTimeZone={appTimeZone}
               isDraggable={isEditable}
+              isMobile={isMobile}
             />
           ))}
         </div>
