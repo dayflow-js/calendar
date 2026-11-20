@@ -10,8 +10,17 @@
     "outlook",
     "sync"
   ],
+  "homepage": "https://calendar.dayflow.studio/docs/caldav/outlook-sync",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
   "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/caldav/outlook-sync"
+  },
   "files": [
     "dist",
     "README.md",

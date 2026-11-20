@@ -9,8 +9,17 @@
     "plugin",
     "shortcuts"
   ],
+  "homepage": "https://calendar.dayflow.studio/docs/plugins/keyboard-shortcuts",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
   "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/plugins/keyboard-shortcuts"
+  },
   "files": [
     "dist",
     "README.md",
