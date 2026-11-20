@@ -258,12 +258,24 @@ export function extractVEvents(lines: string[]): string[][] {
   const vevents: string[][] = [];
   let currentEventLines: string[] | null = null;
   let inVEvent = false;
+  // Depth of a component nested in the event (VALARM): its DESCRIPTION and
+  // SUMMARY belong to the reminder, not to the event.
+  let nestedDepth = 0;
   for (const line of lines) {
     const trimmed = line.trim();
     const upperLine = trimmed.toUpperCase();
     if (upperLine.startsWith('BEGIN:VEVENT')) {
       inVEvent = true;
       currentEventLines = [];
+      nestedDepth = 0;
+      continue;
+    }
+    if (inVEvent && upperLine.startsWith('BEGIN:')) {
+      nestedDepth++;
+      continue;
+    }
+    if (inVEvent && nestedDepth > 0) {
+      if (upperLine.startsWith('END:')) nestedDepth--;
       continue;
     }
     if (upperLine.startsWith('END:VEVENT')) {
