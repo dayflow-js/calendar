@@ -146,6 +146,13 @@ END:VCALENDAR`;
       const { events } = parseICS(weeklyICS);
       expect(generateICS(events)).toContain('RRULE:FREQ=WEEKLY;BYDAY=MO');
     });
+
+    it('exports a recurring event in its own time zone', () => {
+      const { events } = parseICS(weeklyICS);
+      const ics = generateICS(events);
+      expect(ics).toContain('DTSTART;TZID=America/New_York:20261102T100000');
+      expect(ics).toContain('DTEND;TZID=America/New_York:20261102T103000');
+    });
   });
 
   describe('TZID', () => {
