@@ -80,6 +80,9 @@ export function InteractiveCalendar() {
   const [, startTransition] = useTransition();
 
   const [showControls, setShowControls] = useState(false);
+  // Matches the calendar's own mobile breakpoint; the board view has no
+  // mobile layout, so the demo leaves it out on small screens.
+  const [isMobile, setIsMobile] = useState(false);
   const calendarRef = useRef<UseCalendarAppReturn | null>(null);
   const calendarWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -158,6 +161,22 @@ export function InteractiveCalendar() {
     }));
     setShowControls(isDesktop && params.get('controls') !== '0');
   }, []);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1024px)');
+    const sync = () => setIsMobile(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  const visibleViews = useMemo(
+    () =>
+      isMobile
+        ? selections.selectedViews.filter(view => view !== BOARD_VIEW)
+        : selections.selectedViews,
+    [isMobile, selections.selectedViews]
+  );
 
   const updateFeatures = useCallback(
     (updates: Partial<CalendarFeatures>) => {
@@ -270,7 +289,7 @@ export function InteractiveCalendar() {
   const sampleTasks = useMemo(() => generateSampleTasks(), []);
   // The board lays out tasks, so selecting it turns tasks on.
   const tasksEnabled =
-    features.enableTasks || selections.selectedViews.includes(BOARD_VIEW);
+    features.enableTasks || visibleViews.includes(BOARD_VIEW);
   const events = useMemo(() => {
     const visibleEvents = features.showMultiCalendar
       ? allEvents
@@ -319,7 +338,7 @@ export function InteractiveCalendar() {
     }
 
     const v = [];
-    if (selections.selectedViews.includes(ViewType.DAY)) {
+    if (visibleViews.includes(ViewType.DAY)) {
       v.push(
         createDayView({
           secondaryTimeZone: selections.secondaryTimeZone as never,
@@ -334,7 +353,7 @@ export function InteractiveCalendar() {
         } as never)
       );
     }
-    if (selections.selectedViews.includes(ViewType.WEEK)) {
+    if (visibleViews.includes(ViewType.WEEK)) {
       v.push(
         createWeekView({
           secondaryTimeZone: selections.secondaryTimeZone as never,
@@ -351,7 +370,7 @@ export function InteractiveCalendar() {
         } as never)
       );
     }
-    if (selections.selectedViews.includes(ViewType.MONTH)) {
+    if (visibleViews.includes(ViewType.MONTH)) {
       v.push(
         createMonthView({
           showWeekNumbers: features.showWeekNumbers,
@@ -361,7 +380,7 @@ export function InteractiveCalendar() {
         })
       );
     }
-    if (selections.selectedViews.includes(ViewType.YEAR)) {
+    if (visibleViews.includes(ViewType.YEAR)) {
       v.push(
         createYearView({
           mode: selections.yearMode as never,
@@ -370,7 +389,7 @@ export function InteractiveCalendar() {
         })
       );
     }
-    if (selections.selectedViews.includes(ViewType.AGENDA)) {
+    if (visibleViews.includes(ViewType.AGENDA)) {
       v.push(
         createAgendaView({
           daysToShow: selections.agendaDaysToShow,
@@ -380,15 +399,15 @@ export function InteractiveCalendar() {
         })
       );
     }
-    if (selections.selectedViews.includes(BOARD_VIEW)) {
+    if (visibleViews.includes(BOARD_VIEW)) {
       v.push(createBoardView());
     }
 
-    const currentView = selections.selectedViews.includes(selections.activeView)
+    const currentView = visibleViews.includes(selections.activeView)
       ? selections.activeView
-      : selections.selectedViews.includes(ViewType.MONTH)
+      : visibleViews.includes(ViewType.MONTH)
         ? ViewType.MONTH
-        : (selections.selectedViews[0] as ViewType);
+        : (visibleViews[0] as ViewType);
 
     return {
       views: v,
@@ -443,7 +462,7 @@ export function InteractiveCalendar() {
     features.showTimedEventsInYearView,
     features.showEmptyAgendaDays,
     features.sidebarOrder,
-    selections.selectedViews,
+    visibleViews,
     selections.activeView,
     selections.timeZone,
     selections.locale,
@@ -499,11 +518,11 @@ export function InteractiveCalendar() {
           }
         >
           <CalendarViewer
-            key={`${selections.locale}-${selections.selectedViews.join(',')}-${selections.yearMode}-${selections.switcherMode}`}
+            key={`${selections.locale}-${visibleViews.join(',')}-${selections.yearMode}-${selections.switcherMode}`}
             version={JSON.stringify({
               features,
               viewConfig: {
-                selectedViews: selections.selectedViews,
+                selectedViews: visibleViews,
                 yearMode: selections.yearMode,
                 timeFormat: selections.timeFormat,
                 firstHour: selections.firstHour,
