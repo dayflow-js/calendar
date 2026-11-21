@@ -1,7 +1,11 @@
+import { useContext, useMemo } from 'preact/hooks';
+
 import { TaskCheckbox } from '@/components/calendarEvent/components/TaskCheckbox';
 import type { EventActivateHandler } from '@/components/common/useEventActivation';
 import { getEventIcon } from '@/components/monthView/util';
-import { Event, ICalendarApp } from '@/types';
+import { ContentSlot } from '@/renderer/ContentSlot';
+import { CustomRenderingContext } from '@/renderer/CustomRenderingContext';
+import { Event, ICalendarApp, ViewType } from '@/types';
 import {
   buildColorBarGradient,
   getCalendarLineColors,
@@ -27,6 +31,7 @@ interface YearEventBarProps {
   isSelected: boolean;
   isBeingDragged: boolean;
   isDraggable: boolean;
+  isMobile?: boolean;
   app: ICalendarApp;
   onSelect: EventActivateHandler;
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
@@ -43,12 +48,31 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
     isSelected,
     isBeingDragged,
     isDraggable,
+    isMobile = false,
     app,
     onSelect,
     onMoveStart,
     onContextMenu,
   }: YearEventBarProps) => {
+    const customRenderingStore = useContext(CustomRenderingContext);
     const isAllDay = !!event.allDay;
+    const slotName = isAllDay ? 'eventContentAllDayYear' : 'eventContentYear';
+    const generatorName = customRenderingStore?.isOverridden(slotName)
+      ? slotName
+      : null;
+    const eventContentSlotArgs = useMemo(
+      () => ({
+        event,
+        viewType: ViewType.YEAR,
+        isAllDay,
+        isMobile,
+        isSelected,
+        isDragging: isBeingDragged,
+        segment,
+        layout: undefined,
+      }),
+      [event, isAllDay, isMobile, isSelected, isBeingDragged, segment]
+    );
     const task = isTask(event);
     const calendarId = getPrimaryCalendarId(event);
     const registry = app.getCalendarRegistry();
@@ -105,47 +129,8 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
     const showTitle = isFirstSegment;
     const tailDot = isLastSegment && !isFirstSegment;
 
-    return (
-      <div
-        data-event-id={event.id}
-        data-segment-id={segmentId}
-        data-detail-panel-key={segmentId}
-        data-kind={task ? 'task' : undefined}
-        data-selected={String(isSelected)}
-        data-dragging={String(isBeingDragged)}
-        className='df-year-event-bar'
-        onClick={handleClick}
-        onDblClick={handleDoubleClick}
-        onMouseDown={handleMouseDown}
-        onContextMenu={handleContextMenuEvent}
-        style={{
-          position: 'absolute',
-          left: `calc(${startPercent}% + 2px)`,
-          top: `${visualRowIndex * 18}px`,
-          width: `calc(${widthPercent}% - 4px)`,
-          height: '16px',
-          ...background,
-          color: textColor,
-          borderTopLeftRadius: isFirstSegment ? '4px' : '0',
-          borderBottomLeftRadius: isFirstSegment ? '4px' : '0',
-          borderTopRightRadius: isLastSegment ? '4px' : '0',
-          borderBottomRightRadius: isLastSegment ? '4px' : '0',
-          fontSize: '11px',
-          lineHeight: '16px',
-          padding: '0 4px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: isAllDay && !task ? '0' : '4px',
-          overflow: 'hidden',
-          cursor: isDraggable ? 'pointer' : 'default',
-          opacity: isBeingDragged ? 0.5 : 1,
-          zIndex: isSelected ? 10 : 1,
-          userSelect: 'none',
-          // Parent .df-year-fixed-event-layer sets pointer-events: none so
-          // the cell-background click-through works; bars opt back in here.
-          pointerEvents: 'auto',
-        }}
-      >
+    const renderContent = () => (
+      <>
         {task ? (
           isFirstSegment && (
             <TaskCheckbox
@@ -190,6 +175,60 @@ export const YearEventBar = /* @__PURE__ */ memoWithDisplayName(
         >
           {showTitle ? event.title : tailDot ? '···' : ''}
         </span>
+      </>
+    );
+
+    return (
+      <div
+        data-event-id={event.id}
+        data-segment-id={segmentId}
+        data-detail-panel-key={segmentId}
+        data-kind={task ? 'task' : undefined}
+        data-selected={String(isSelected)}
+        data-dragging={String(isBeingDragged)}
+        className='df-year-event-bar'
+        onClick={handleClick}
+        onDblClick={handleDoubleClick}
+        onMouseDown={handleMouseDown}
+        onContextMenu={handleContextMenuEvent}
+        style={{
+          position: 'absolute',
+          left: `calc(${startPercent}% + 2px)`,
+          top: `${visualRowIndex * 18}px`,
+          width: `calc(${widthPercent}% - 4px)`,
+          height: '16px',
+          ...background,
+          color: textColor,
+          borderTopLeftRadius: isFirstSegment ? '4px' : '0',
+          borderBottomLeftRadius: isFirstSegment ? '4px' : '0',
+          borderTopRightRadius: isLastSegment ? '4px' : '0',
+          borderBottomRightRadius: isLastSegment ? '4px' : '0',
+          fontSize: '11px',
+          lineHeight: '16px',
+          padding: '0 4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: isAllDay && !task ? '0' : '4px',
+          overflow: 'hidden',
+          cursor: isDraggable ? 'pointer' : 'default',
+          opacity: isBeingDragged ? 0.5 : 1,
+          zIndex: isSelected ? 10 : 1,
+          userSelect: 'none',
+          // Parent .df-year-fixed-event-layer sets pointer-events: none so
+          // the cell-background click-through works; bars opt back in here.
+          pointerEvents: 'auto',
+        }}
+      >
+        {generatorName ? (
+          <ContentSlot
+            store={customRenderingStore}
+            generatorName={generatorName}
+            generatorArgs={eventContentSlotArgs}
+            defaultContent={renderContent()}
+          />
+        ) : (
+          renderContent()
+        )}
       </div>
     );
   }
