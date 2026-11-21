@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'preact/hooks';
 
 import { dateToCalendarDate } from '@/calendar/calendarSystem';
 import CalendarEvent from '@/components/calendarEvent';
+import { MonthGridKeyboard } from '@/hooks/useMonthGridKeyboard';
 import { formatDateLabel } from '@/locale/intl';
 import { ContentSlot } from '@/renderer/ContentSlot';
 import {
@@ -25,6 +26,7 @@ import {
 
 interface WeekDayCellProps {
   app: ICalendarApp;
+  gridKeyboard?: MonthGridKeyboard;
   appTimeZone?: string;
   calendarRef: RefObject<HTMLDivElement>;
   currentMonth: string;
@@ -78,6 +80,7 @@ interface WeekDayCellProps {
 
 const WeekDayCell = ({
   app,
+  gridKeyboard,
   appTimeZone,
   calendarRef,
   currentMonth,
@@ -319,6 +322,42 @@ const WeekDayCell = ({
         dayIndex === 6 && !hasScrollbarSpace ? 'false' : 'true'
       }
       data-date={createDateString(day.date)}
+      role='gridcell'
+      tabIndex={
+        gridKeyboard
+          ? gridKeyboard.tabStopDate === createDateString(day.date)
+            ? 0
+            : -1
+          : undefined
+      }
+      aria-label={formatDateLabel(day.date, locale, { dateStyle: 'full' })}
+      aria-selected={gridKeyboard?.selectedDate === createDateString(day.date)}
+      aria-current={day.isToday ? 'date' : undefined}
+      onFocus={event => {
+        if (event.target === event.currentTarget)
+          gridKeyboard?.onFocus(day.date, event.currentTarget);
+      }}
+      onKeyDown={event => {
+        if (event.target !== event.currentTarget) return;
+        if (
+          (event.key === 'Enter' || event.key === ' ') &&
+          !event.altKey &&
+          !event.ctrlKey &&
+          !event.metaKey
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.key === 'Enter' && event.shiftKey) {
+            event.currentTarget.dispatchEvent(
+              new MouseEvent('dblclick', { bubbles: true, shiftKey: true })
+            );
+          } else {
+            event.currentTarget.click();
+          }
+          return;
+        }
+        gridKeyboard?.onKeyDown(event, day.date);
+      }}
       onClick={() => {
         if (onGridDateClick) {
           onGridDateClick(day.date, dayEvents);

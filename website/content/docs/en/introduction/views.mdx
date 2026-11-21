@@ -227,6 +227,10 @@ The month view displays a traditional calendar grid showing all days in a month.
 | `eventHeight`         | `number`                                                            | `16`             | Height in pixels of each event row in the month grid.                                                                               |
 | `scroll`              | `MonthScrollConfig`                                                 | —                | Controls scroll locking and month-switch animation. See below.                                                                      |
 
+#### Keyboard
+
+Tab enters the date grid at the selected/current date when visible, otherwise at the first visible day of the current month. Arrow keys move by one day (Left/Right) or one week (Up/Down); Home/End move to the start/end of the week, respecting `startOfWeek`. PageUp/PageDown move to the previous/next month, keeping the day where possible. Enter or Space runs `gridDateClick`; Shift+Enter runs `gridDateDoubleClick`. Events and "+N more" keep their own keyboard behavior and tab stops.
+
 #### MonthScrollConfig
 
 | Property            | Type                    | Default     | Description                                                                                                                                                                                                                      |
