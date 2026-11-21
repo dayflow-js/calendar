@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import CalendarEvent from '@/components/calendarEvent';
 import { GridContextMenu } from '@/components/contextMenu';
+import { MonthGridKeyboard } from '@/hooks/useMonthGridKeyboard';
 import { useLocale } from '@/locale';
 import { formatDateLabel } from '@/locale/intl';
 import { monthTitle } from '@/styles/classNames';
@@ -21,6 +22,7 @@ import {
 import WeekDayCell from './WeekDayCell';
 
 interface WeekComponentProps {
+  gridKeyboard?: MonthGridKeyboard;
   currentMonth: string;
   currentYear: number;
   newlyCreatedEventId: string | null;
@@ -80,6 +82,7 @@ const MULTI_DAY_TOP_OFFSET = 33;
 const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
   'WeekComponent',
   ({
+    gridKeyboard,
     currentMonth,
     currentYear,
     newlyCreatedEventId,
@@ -488,11 +491,12 @@ const WeekComponent = /* @__PURE__ */ memoWithDisplayName(
             }}
           >
             {/* Date grid */}
-            <div className='df-month-week-grid'>
+            <div className='df-month-week-grid' role='row'>
               {weekData.days.map((day, index) => (
                 <WeekDayCell
                   key={`day-${day.date.getTime()}`}
                   app={app}
+                  gridKeyboard={gridKeyboard}
                   appTimeZone={appTimeZone}
                   calendarRef={calendarRef}
                   currentMonth={currentMonth}
