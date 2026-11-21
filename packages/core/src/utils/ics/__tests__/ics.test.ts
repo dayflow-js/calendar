@@ -47,6 +47,26 @@ END:VEVENT
 END:VCALENDAR`;
 
   describe('parseICS', () => {
+    it('keeps the event description when it has a reminder', () => {
+      const ics = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:standup
+DTSTART:20260105T090000
+DTEND:20260105T100000
+SUMMARY:Standup
+DESCRIPTION:Daily sync agenda
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+      const event = parseICS(ics).events[0];
+      expect(event.title).toBe('Standup');
+      expect(event.description).toBe('Daily sync agenda');
+    });
+
     it('extracts a Teams link from an escaped, folded description', () => {
       const ics = `BEGIN:VCALENDAR
 BEGIN:VEVENT
