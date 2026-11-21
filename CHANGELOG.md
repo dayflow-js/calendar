@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### New Features & Enhancements
+
+- **Month View Keyboard Navigation (`@dayflow/core`)**: A single date tab stop with arrow, Home/End and PageUp/PageDown navigation, localized full-date labels, Enter/Space for `gridDateClick` and Shift+Enter for `gridDateDoubleClick`.
+
 ## [3.8.0] - 2026-11-13
 
 Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.8.0 · `@dayflow/plugin-board` 1.0.0 (new) · `@dayflow/plugin-localization` 1.7.0 · `@dayflow/plugin-sidebar` 1.7.0 · `@dayflow/ui-context-menu` 1.3.0 · `create-dayflow` 1.2.1. All other packages are unchanged.

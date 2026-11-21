@@ -18,6 +18,7 @@ import ViewHeader from '@/components/common/ViewHeader';
 import WeekComponent from '@/components/monthView/WeekComponent';
 import { useCalendarDrop } from '@/hooks/useCalendarDrop';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useMonthGridKeyboard } from '@/hooks/useMonthGridKeyboard';
 import {
   useVirtualMonthScroll,
   useResponsiveMonthConfig,
@@ -597,6 +598,7 @@ const MonthView = ({
     handleNextMonth,
     handleToday,
     setScrollTop,
+    scrollToDate,
   } = useVirtualMonthScroll({
     currentDate,
     calendarSystem,
@@ -670,6 +672,34 @@ const MonthView = ({
 
     return { visibleWeeks: targetWeeks, startIndex: effectiveIdx };
   }, [virtualData]);
+
+  const gridKeyboard = useMonthGridKeyboard(
+    app,
+    scrollElementRef,
+    (isFadeMode
+      ? fadeWeeks
+      : weeksData.slice(
+          virtualData.displayStartIndex,
+          virtualData.displayStartIndex + 6
+        )
+    ).flatMap(week => week.days),
+    isFadeMode ? fadeDisplayDate : app.getVisibleMonth(),
+    startOfWeek,
+    date => {
+      isGridDateClickRef.current = false;
+      const previousMonth = startOfCalendarMonth(currentDate, calendarSystem);
+      app.setCurrentDate(date);
+      // Date synchronization handles month changes. After manual scrolling,
+      // an arrow can also return to the selected month without changing it.
+      if (
+        !isFadeMode &&
+        startOfCalendarMonth(date, calendarSystem).getTime() ===
+          previousMonth.getTime()
+      ) {
+        scrollToDate(date);
+      }
+    }
+  );
 
   const topSpacerHeight = useMemo(
     () => effectiveStartIndex * weekHeight,
@@ -968,6 +998,8 @@ const MonthView = ({
       {isFadeMode ? (
         <div
           ref={scrollElementRef}
+          role='grid'
+          aria-label={getCustomTitle()}
           className={`${scrollContainer} df-month-view-fade-scroller`}
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
         >
@@ -994,6 +1026,7 @@ const MonthView = ({
               return (
                 <WeekComponent
                   key={`week-${weekData.startDate.getTime()}`}
+                  gridKeyboard={gridKeyboard}
                   item={adjustedItem}
                   weekHeight={weekHeight}
                   eventHeight={config.eventHeight}
@@ -1054,6 +1087,8 @@ const MonthView = ({
         // Virtual-scroll mode (default, or disabled without fade)
         <div
           ref={scrollElementRef}
+          role='grid'
+          aria-label={getCustomTitle()}
           className={`${scrollContainer} df-month-view-virtual-scroller`}
           data-layout-ready={isWeekHeightInitialized ? 'true' : 'false'}
           onScroll={handleScroll}
@@ -1085,6 +1120,7 @@ const MonthView = ({
             return (
               <WeekComponent
                 key={`week-${item.weekData.startDate.getTime()}`}
+                gridKeyboard={gridKeyboard}
                 item={adjustedItem}
                 weekHeight={weekHeight}
                 eventHeight={config.eventHeight}
