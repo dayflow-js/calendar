@@ -227,6 +227,10 @@ Day Flow 支持五种不同的视图类型，每种类型都针对不同的用�
 | `eventHeight`         | `number`                                                            | `16`             | 月视图网格中每个事件行的高度（px）。                                                                  |
 | `scroll`              | `MonthScrollConfig`                                                 | —                | 控制滚动锁定与月份切换动画，详见下方说明。                                                            |
 
+#### 键盘操作
+
+按 Tab 进入日期网格时，如果选中（或当前）日期可见，焦点落在该日期上，否则落在当月第一个可见日期上。方向键按天（左/右）或按周（上/下）移动；Home/End 跳到一周的开始/结束，遵循 `startOfWeek` 设置。PageUp/PageDown 切换到上/下一个月，并尽量保持同一天。Enter 或 Space 触发 `gridDateClick`，Shift+Enter 触发 `gridDateDoubleClick`。事件和"+N 个"按钮保留各自的键盘行为和 Tab 停靠点。
+
 #### MonthScrollConfig
 
 | 属性         | 类型                    | 默认值      | 描述                                                                                                                                             |
