@@ -118,6 +118,7 @@ interface YearStaticEventsLayerProps {
   onMoveStart?: (e: MouseEvent | TouchEvent, event: Event) => void;
   onContextMenuEvent?: (e: MouseEvent, event: Event) => void;
   isDraggable: boolean;
+  isMobile?: boolean;
 }
 
 // Lightweight static layer: renders all non-dragged events as bare
@@ -133,6 +134,7 @@ const YearStaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
     onMoveStart,
     onContextMenuEvent,
     isDraggable,
+    isMobile,
   }: YearStaticEventsLayerProps) => (
     <>
       {segments.map(segment => (
@@ -144,6 +146,7 @@ const YearStaticEventsLayer = /* @__PURE__ */ memoWithDisplayName(
           isSelected={selectedEventId === segment.event.id}
           isBeingDragged={false}
           isDraggable={isDraggable}
+          isMobile={isMobile}
           app={app}
           onSelect={onSelectEvent}
           onMoveStart={onMoveStart}
@@ -173,6 +176,7 @@ interface YearRowComponentProps {
   appTimeZone?: string;
   dragPreviewEvent?: Event | null;
   isDraggable: boolean;
+  isMobile?: boolean;
 }
 
 const eventOverlapsRow = (
@@ -280,6 +284,7 @@ export const YearRowComponent = /* @__PURE__ */ memoWithDisplayName(
     appTimeZone,
     dragPreviewEvent,
     isDraggable,
+    isMobile,
   }: YearRowComponentProps) => {
     const MAX_VISIBLE_ROWS = 3;
     const HEADER_HEIGHT = 26;
@@ -471,6 +476,7 @@ export const YearRowComponent = /* @__PURE__ */ memoWithDisplayName(
               onMoveStart={onMoveStart}
               onContextMenuEvent={onContextMenuEvent}
               isDraggable={isDraggable}
+              isMobile={isMobile}
             />
             {dragPreviewSegment && (
               <YearDragPreviewPill
