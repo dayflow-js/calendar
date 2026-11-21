@@ -553,7 +553,7 @@ const DefaultEventDetailPanel = ({
         />
       ) : (
         <EventConferenceField
-          key={draftEvent.id}
+          key={`conference-${draftEvent.id}`}
           value={getEventConference(draftEvent)}
           editable={isEditable}
           disabled={isLoading}
@@ -565,7 +565,7 @@ const DefaultEventDetailPanel = ({
 
       {shouldShowNotes && (
         <EventNotesField
-          key={draftEvent.id}
+          key={`notes-${draftEvent.id}`}
           id={`event-note-${draftEvent.id}`}
           value={draftEvent.description ?? ''}
           editable={isEditable}
