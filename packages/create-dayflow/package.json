@@ -13,15 +13,15 @@
     "svelte",
     "vue"
   ],
-  "homepage": "https://calendar.dayflow.studio",
+  "homepage": "https://calendar.dayflow.studio/docs/introduction",
   "bugs": {
-    "url": "https://github.com/dayflow-js/dayflow/issues"
+    "url": "https://github.com/dayflow-js/calendar/issues"
   },
   "license": "MIT",
   "author": "Jayce Li",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dayflow-js/dayflow.git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
     "directory": "packages/create-dayflow"
   },
   "bin": {

@@ -2,7 +2,16 @@
   "name": "@dayflow/plugin-board",
   "version": "1.0.0",
   "description": "Task board view plugin for DayFlow Calendar",
+  "homepage": "https://calendar.dayflow.studio/docs/plugins/board",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/plugins/board"
+  },
   "files": [
     "dist",
     "README.md",

@@ -9,6 +9,36 @@
 [![License](https://img.shields.io/github/license/dayflow-js/calendar)](https://github.com/dayflow-js/calendar/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
+[**ドキュメント**](https://calendar.dayflow.studio/docs-ja/introduction) ·
+[**ライブデモ**](https://calendar.dayflow.studio/demo) ·
+[**ウェブサイト**](https://calendar.dayflow.studio) ·
+[**変更履歴**](https://calendar.dayflow.studio/changelog) ·
+[**ブログ**](https://calendar.dayflow.studio/blog)
+
+## クイックスタート
+
+お使いのフレームワークのアダプターと、カレンダーコア・ドラッグプラグインをインストールします：
+
+```bash
+npm install @dayflow/react @dayflow/core @dayflow/plugin-drag
+```
+
+詳しい手順は **[はじめに](https://calendar.dayflow.studio/docs-ja/introduction)** をご覧ください。
+
+| フレームワーク | パッケージ                                                           | ガイド                                                           |
+| -------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| React          | [`@dayflow/react`](https://www.npmjs.com/package/@dayflow/react)     | [はじめに](https://calendar.dayflow.studio/docs-ja/introduction) |
+| Vue            | [`@dayflow/vue`](https://www.npmjs.com/package/@dayflow/vue)         | [はじめに](https://calendar.dayflow.studio/docs-ja/introduction) |
+| Angular        | [`@dayflow/angular`](https://www.npmjs.com/package/@dayflow/angular) | [はじめに](https://calendar.dayflow.studio/docs-ja/introduction) |
+| Svelte         | [`@dayflow/svelte`](https://www.npmjs.com/package/@dayflow/svelte)   | [はじめに](https://calendar.dayflow.studio/docs-ja/introduction) |
+
+## オープンソースカレンダーの先へ
+
+|                                                           |                                                                                              |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [**DayFlow Pro**](https://pro.dayflow.studio)             | リソースタイムライン、リソースグリッド、予約スケジュール、印刷対応出力をコアに追加します。   |
+| [**DayFlow Scheduler**](https://scheduler.dayflow.studio) | チーム計画、グループ化された行、長期タイムラインのための独立したリソース優先スケジューラー。 |
+
 ## 機能
 
 ### 日次、週次、月次、年次、その他のビュータイプ

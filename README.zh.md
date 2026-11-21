@@ -9,6 +9,36 @@
 [![License](https://img.shields.io/github/license/dayflow-js/calendar)](https://github.com/dayflow-js/calendar/blob/main/LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/9vdFZKJqBb)
 
+[**文档**](https://calendar.dayflow.studio/docs-zh/introduction) ·
+[**在线演示**](https://calendar.dayflow.studio/demo) ·
+[**官网**](https://calendar.dayflow.studio) ·
+[**更新日志**](https://calendar.dayflow.studio/changelog) ·
+[**博客**](https://calendar.dayflow.studio/blog)
+
+## 快速开始
+
+安装对应框架的适配器、日历核心和拖拽插件：
+
+```bash
+npm install @dayflow/react @dayflow/core @dayflow/plugin-drag
+```
+
+完整教程请见 **[快速上手](https://calendar.dayflow.studio/docs-zh/introduction)**。
+
+| 框架    | 包                                                                   | 指南                                                             |
+| ------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| React   | [`@dayflow/react`](https://www.npmjs.com/package/@dayflow/react)     | [快速上手](https://calendar.dayflow.studio/docs-zh/introduction) |
+| Vue     | [`@dayflow/vue`](https://www.npmjs.com/package/@dayflow/vue)         | [快速上手](https://calendar.dayflow.studio/docs-zh/introduction) |
+| Angular | [`@dayflow/angular`](https://www.npmjs.com/package/@dayflow/angular) | [快速上手](https://calendar.dayflow.studio/docs-zh/introduction) |
+| Svelte  | [`@dayflow/svelte`](https://www.npmjs.com/package/@dayflow/svelte)   | [快速上手](https://calendar.dayflow.studio/docs-zh/introduction) |
+
+## 开源日历之外
+
+|                                                           |                                                                |
+| --------------------------------------------------------- | -------------------------------------------------------------- |
+| [**DayFlow Pro**](https://pro.dayflow.studio)             | 在开源内核之上提供资源时间线、资源网格、预约排期和打印输出。   |
+| [**DayFlow Scheduler**](https://scheduler.dayflow.studio) | 独立的资源优先排程组件，适用于团队排班、分组行和长周期时间线。 |
+
 ## 功能特性
 
 ### 日视图、周视图、月视图、年视图及多种视图类型

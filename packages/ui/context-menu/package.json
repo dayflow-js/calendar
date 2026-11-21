@@ -8,8 +8,17 @@
     "preact",
     "ui"
   ],
+  "homepage": "https://calendar.dayflow.studio/docs/ui/context-menu",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
   "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/ui/context-menu"
+  },
   "files": [
     "dist",
     "README.md",

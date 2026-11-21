@@ -12,6 +12,7 @@
     "i18n:coverage": "node scripts/i18n-coverage.mjs",
     "lint": "oxlint .",
     "postinstall": "fumadocs-mdx",
+    "readme:capture-mobile": "node scripts/capture-readme-mobile.mjs",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit"
   },

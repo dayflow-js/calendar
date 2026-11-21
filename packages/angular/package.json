@@ -2,6 +2,15 @@
   "name": "@dayflow/angular",
   "version": "3.8.0",
   "description": "Angular adapter for DayFlow calendar",
+  "homepage": "https://calendar.dayflow.studio/docs/introduction",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/angular"
+  },
   "files": [
     "**/*.mjs",
     "**/*.d.ts",

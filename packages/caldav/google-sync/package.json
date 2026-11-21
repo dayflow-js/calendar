@@ -8,8 +8,17 @@
     "google-calendar",
     "sync"
   ],
+  "homepage": "https://calendar.dayflow.studio/docs/caldav/google-sync",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
   "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/caldav/google-sync"
+  },
   "files": [
     "dist",
     "README.md",
