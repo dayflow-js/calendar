@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "add-locale": "node scripts/add-locale.mjs",
-    "build": "next build",
+    "build": "next build && node scripts/postbuild-html-lang.mjs",
     "changelog:capture": "node scripts/capture-changelog.mjs",
     "dev": "next dev --disable-source-maps",
     "dev:source-maps": "next dev",

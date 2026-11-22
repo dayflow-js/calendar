@@ -33,6 +33,28 @@ export const languages = LOCALES.map(locale => ({
 }));
 
 /**
+ * Locales we offer to search engines.
+ *
+ * Every locale above stays published and reachable from the language switcher.
+ * This list only decides which ones go into the sitemap and the `hreflang` set,
+ * and which ones render `noindex`.
+ *
+ * Why it is a subset: the six translations are 210 of the 254 URLs in the
+ * sitemap -- 83% of it -- while Search Console reports 271 of 277 URLs as
+ * "Discovered - currently not indexed" and does not know the English
+ * `/docs/introduction` exists at all. Spending the crawl budget on six
+ * unvalidated languages starves the English docs. `zh` and `ja` stay in because
+ * the README is translated for them, so there is an audience to point at.
+ *
+ * Add a locale back by listing it here -- nothing else needs to change.
+ */
+export const indexedLanguages: readonly LanguageCode[] = ['en', 'zh', 'ja'];
+
+export function isIndexedLanguage(code: LanguageCode): boolean {
+  return indexedLanguages.includes(code);
+}
+
+/**
  * Single source of truth for every locale-aware consumer: the docs `loader()`,
  * the static search index and the UI provider all derive from this.
  *

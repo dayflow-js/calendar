@@ -4,25 +4,37 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import type { LanguageCode } from '@/lib/i18n';
-import { defaultLanguage, docsPrefix, languages } from '@/lib/i18n';
+import {
+  defaultLanguage,
+  docsPrefix,
+  isIndexedLanguage,
+  languages,
+} from '@/lib/i18n';
 import { BASE_PATH } from '@/lib/site';
 import { getPageImage, source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
+
+import { DocsJsonLd } from './DocsJsonLd';
 
 /**
  * `hreflang` map for one page across every locale.
  *
  * `fallbackLanguage` means each locale serves each page — an untranslated one
  * shows the English body under its own URL — so every locale is a genuine
- * alternate. Without this, search engines treat the seven URLs as duplicate
+ * alternate. Without this, search engines treat these URLs as duplicate
  * content competing with each other instead of as translations of one page.
+ *
+ * Only indexed locales appear here: pointing `hreflang` at a `noindex` page
+ * tells a crawler to use an alternate we have just asked it to drop.
  */
 function docsAlternates(slug: string[]) {
   const languageAlternates = Object.fromEntries(
-    languages.map(language => [
-      language.code,
-      `${docsPrefix(language.code)}/${slug.join('/')}`,
-    ])
+    languages
+      .filter(language => isIndexedLanguage(language.code))
+      .map(language => [
+        language.code,
+        `${docsPrefix(language.code)}/${slug.join('/')}`,
+      ])
   );
 
   return {
@@ -92,6 +104,7 @@ export async function DocsLocalePage({
       breadcrumb={{ enabled: false }}
       tableOfContent={{ style: 'clerk' }}
     >
+      <DocsJsonLd locale={locale} slug={slug} page={page} />
       <DocsBody>
         <MDX
           components={getMDXComponents({
@@ -131,6 +144,11 @@ export function generateDocsMetadata(
   return {
     title: page.data.title,
     description: page.data.description,
+    // `follow` stays on: these pages still link into the English docs, and that
+    // is the one thing we want a crawler to do while it is here.
+    ...(isIndexedLanguage(locale)
+      ? {}
+      : { robots: { index: false, follow: true } }),
     alternates: {
       canonical: page.url,
       languages: docsAlternates(slug),
