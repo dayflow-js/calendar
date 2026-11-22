@@ -8,11 +8,10 @@ import {
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import Script from 'next/script';
 
 import { LandingRevealEffects } from '@/components/LandingRevealEffects';
 import { LoadingImage, LoadingVideo } from '@/components/LoadingMedia';
-import { proUrl, schedulerUrl, SITE_URL } from '@/lib/site';
+import { PRO_URL, SCHEDULER_URL, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'DayFlow Calendar - React, Vue, Angular, and Svelte Calendar UI',
@@ -275,10 +274,13 @@ const softwareApplicationJsonLd = {
 export default function HomePage() {
   return (
     <main className='landing-root relative min-h-screen overflow-hidden bg-white text-slate-950 dark:bg-slate-950 dark:text-white'>
-      <Script
-        id='ld-software-application'
+      {/*
+        A plain <script>, not next/script: `strategy='beforeInteractive'` is
+        only honoured in the root layout, so next/script was queueing this tag
+        for client-side injection and it never appeared in the exported HTML.
+      */}
+      <script
         type='application/ld+json'
-        strategy='beforeInteractive'
         // oxlint-disable-next-line no-danger -- JSON-LD payload is JSON.stringify'd (no XSS risk); this is the Next.js-recommended way to embed structured data
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(softwareApplicationJsonLd),
@@ -553,7 +555,7 @@ export default function HomePage() {
           </div>
           <div className='flex flex-wrap gap-3'>
             <Link
-              href={proUrl('landing_cta')}
+              href={PRO_URL}
               target='_blank'
               rel='noopener noreferrer'
               className='inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500'
@@ -594,7 +596,7 @@ export default function HomePage() {
                 timeline views.
               </p>
               <a
-                href={schedulerUrl('landing_banner')}
+                href={SCHEDULER_URL}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-blue-600 px-5 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(37,99,235,0.26)] transition hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-[0_18px_40px_rgba(37,99,235,0.32)] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-blue-400/50'
@@ -605,7 +607,7 @@ export default function HomePage() {
             </div>
 
             <a
-              href={schedulerUrl('landing_banner_visual')}
+              href={SCHEDULER_URL}
               target='_blank'
               rel='noopener noreferrer'
               aria-label='Visit the Dayflow Scheduler website'
