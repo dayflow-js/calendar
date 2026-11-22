@@ -1,0 +1,81 @@
+---
+title: 'FullCalendar Alternative'
+description: 'How DayFlow compares with FullCalendar: MIT-licensed views, one calendar core across React, Vue, Angular and Svelte, and a plugin API mapped option by option.'
+---
+
+# A FullCalendar Alternative for React, Vue, Angular and Svelte
+
+FullCalendar is the most established calendar library on the web, and for a traditional month-week-day calendar it is a safe choice. DayFlow is a different trade: a smaller core with an explicit plugin boundary, the same component model across four frameworks, and every view in this comparison under the MIT licence.
+
+This page is about where the two differ in practice, not about which is "better". If you are already running FullCalendar and it fits, migrating buys you little.
+
+## At a Glance
+
+|                              | FullCalendar                                             | DayFlow                                                                           |
+| :--------------------------- | :------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| Framework support            | Wrappers around one core for React, Vue, Angular, Svelte | Native adapters for [React, Vue, Angular, Svelte](/docs/introduction) on one core |
+| Views in the OSS core        | Month, week, day, list                                   | [Day, week, month, year, agenda](/docs/introduction/views)                        |
+| Year view                    | Not in the standard plugins                              | Two year views: fixed-week and canvas                                             |
+| Resource / timeline views    | Commercially licensed                                    | [Separate paid modules](/docs/introduction/resource-timeline), core stays MIT     |
+| Drag, resize, drag-to-create | `interactionPlugin`                                      | [Drag plugin](/docs/plugins/drag)                                                 |
+| Event rendering              | `eventContent` render hooks                              | [Content slots](/docs/features/content-slots) and a style registry                |
+| Keyboard workflows           | Build your own                                           | [Keyboard shortcuts plugin](/docs/plugins/keyboard-shortcuts)                     |
+| Calendar sync                | Build your own                                           | [CalDAV, Google and Outlook sync](/docs/caldav/overview)                          |
+| Dark mode                    | Author your own CSS                                      | [Built in](/docs/features/dark-mode)                                              |
+
+The row that usually decides it is resource scheduling. FullCalendar's resource and timeline views require a commercial licence, so a product that starts with a free month view and later needs "who is booked when" hits a licence boundary inside the same library. DayFlow draws that line differently: the calendar core and every view above stay MIT, and resource planning lives in [DayFlow Pro](https://pro.dayflow.studio) as separate packages you add only if you need them.
+
+## Choose FullCalendar When
+
+- You need the broadest possible ecosystem of recipes, Stack Overflow answers and third-party integrations. FullCalendar has a decade of them; DayFlow does not.
+- Your app is already built on it and the licence terms suit you.
+- You depend on a specific FullCalendar behaviour or plugin that has no equivalent elsewhere.
+
+## Choose DayFlow When
+
+- You ship the same calendar in more than one framework, or expect to. The adapters are thin and the configuration is identical across them, so a Vue app and a React app are set up the same way.
+- You want year-scale views without a commercial plugin.
+- You prefer configuration in code over a large options object: views and behaviour are composed from `create*` factories, so unused features are not in the bundle.
+- You want the editing surface (drag, resize, keyboard, context menu) as explicit plugins you opt into.
+
+## Mapping the API
+
+The concepts line up closely enough that a port is mostly mechanical.
+
+| FullCalendar                       | DayFlow                                                                                                |
+| :--------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `<FullCalendar plugins={[...]} />` | `useCalendarApp({ plugins: [...] })` with [`<DayFlowCalendar />`](/docs/introduction/dayflow-calendar) |
+| `initialView: 'dayGridMonth'`      | `views: [createMonthView()]` — the first registered view opens                                         |
+| `dayGridPlugin`, `timeGridPlugin`  | `createMonthView()`, `createWeekView()`, `createDayView()`                                             |
+| `listPlugin`                       | `createAgendaView()`                                                                                   |
+| `interactionPlugin` + `editable`   | [`createDragPlugin()`](/docs/plugins/drag)                                                             |
+| `events: [{ title, start, end }]`  | [`createEvent({ id, title, start, end })`](/docs/introduction/events)                                  |
+| `eventContent`                     | [Content slots](/docs/features/content-slots)                                                          |
+| `eventClick`                       | [Event dialog](/docs/features/event-dialog) or the events plugin                                       |
+| `locale` / `locales`               | [Localization plugin](/docs/plugins/localization)                                                      |
+| `timeZone`                         | [Time zones](/docs/guides/timezones)                                                                   |
+| `themeSystem` / CSS overrides      | [Theme customization](/docs/guides/theme-customization)                                                |
+
+### A Migration Order That Works
+
+1. **Render the views first, with static events.** Register only the views you actually use and confirm the layout before touching behaviour.
+2. **Port the event shape.** Map your records to `createEvent` once, in one adapter function, rather than scattering field renames.
+3. **Add editing.** Register the drag plugin and verify your update path end to end on one view before enabling it everywhere.
+4. **Port custom rendering last.** It is the part most coupled to the old DOM, and doing it last means you are changing markup against a calendar you already trust.
+
+## If You Need Resource Scheduling
+
+Resource views are the reason many teams look at FullCalendar's premium tier. DayFlow splits that into two products, depending on which axis your UI is built around:
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) adds [resource timelines](/docs/introduction/resource-timeline), [resource grids](/docs/introduction/resource-grid), appointment booking and [print-ready output](/docs/plugins/print) on top of the calendar you already built.
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) is a standalone, resource-first component for products where rows — people, crews, rooms, machines — are the primary axis and dates run across them. Its own [FullCalendar comparison](https://scheduler.dayflow.studio/docs/compare/fullcalendar-alternative) covers that case in detail.
+
+The practical test: if users ask "what is happening on this date?", you want a calendar. If they ask "who is assigned, and when?", you want a scheduler.
+
+## Related Documentation
+
+- [Getting Started](/docs/introduction) — install and render a calendar in your framework.
+- [Views](/docs/introduction/views) — every view type and its options.
+- [`useCalendarApp`](/docs/introduction/use-calendar-app) — the full configuration surface.
+- [Plugins overview](/docs/plugins/overview) — what is available and what each one costs you.
+- [React Big Calendar Alternative](/docs/compare/react-big-calendar-alternative) — the other comparison.

@@ -1,4 +1,12 @@
 {
   "title": "文档",
-  "pages": ["introduction", "plugins", "features", "caldav", "guides", "ui"]
+  "pages": [
+    "introduction",
+    "plugins",
+    "features",
+    "caldav",
+    "guides",
+    "ui",
+    "compare"
+  ]
 }

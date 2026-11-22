@@ -1,0 +1,81 @@
+---
+title: 'FullCalendar 替代方案'
+description: 'DayFlow 与 FullCalendar 的对比：MIT 许可下的全部视图、React/Vue/Angular/Svelte 共用同一内核，以及逐项对应的插件 API 映射。'
+---
+
+# 面向 React、Vue、Angular 和 Svelte 的 FullCalendar 替代方案
+
+FullCalendar 是 Web 上最成熟的日历库，如果你要的就是传统的月/周/日日历，它是个稳妥的选择。DayFlow 做的是另一种权衡：更小的内核加上明确的插件边界、四个框架共享同一套组件模型，以及本文对比的全部视图都在 MIT 许可之下。
+
+这一页讲的是两者在实践中的差异，而不是谁更好。如果你已经在用 FullCalendar 且运行良好，迁移带来的收益很有限。
+
+## 一览
+
+|                      | FullCalendar                                    | DayFlow                                                                        |
+| :------------------- | :---------------------------------------------- | :----------------------------------------------------------------------------- |
+| 框架支持             | 围绕单一内核的 React、Vue、Angular、Svelte 封装 | 基于同一内核的 [React、Vue、Angular、Svelte](/docs-zh/introduction) 原生适配器 |
+| 开源内核包含的视图   | 月、周、日、列表                                | [日、周、月、年、日程](/docs-zh/introduction/views)                            |
+| 年视图               | 标准插件中没有                                  | 两种年视图：固定周与画布                                                       |
+| 资源 / 时间线视图    | 需商业许可                                      | [独立的付费模块](/docs-zh/introduction/resource-timeline)，内核保持 MIT        |
+| 拖拽、缩放、拖拽创建 | `interactionPlugin`                             | [拖拽插件](/docs-zh/plugins/drag)                                              |
+| 事件渲染             | `eventContent` 渲染钩子                         | [内容插槽](/docs-zh/features/content-slots)与样式注册表                        |
+| 键盘操作             | 自行实现                                        | [键盘快捷键插件](/docs-zh/plugins/keyboard-shortcuts)                          |
+| 日历同步             | 自行实现                                        | [CalDAV、Google 和 Outlook 同步](/docs-zh/caldav/overview)                     |
+| 暗色模式             | 自行编写 CSS                                    | [内置](/docs-zh/features/dark-mode)                                            |
+
+通常决定取舍的是资源排程这一行。FullCalendar 的资源和时间线视图需要商业许可，所以一个从免费月视图起步、后来需要「谁在什么时候被占用」的产品，会在同一个库内部撞上许可边界。DayFlow 的切分方式不同：日历内核和上表全部视图都保持 MIT，资源排程作为独立的包放在 [DayFlow Pro](https://pro.dayflow.studio) 里，需要时再加。
+
+## 什么时候选 FullCalendar
+
+- 你需要尽可能大的生态：现成的方案、Stack Overflow 答案和第三方集成。FullCalendar 积累了十年，DayFlow 没有。
+- 你的应用已经建立在它之上，并且许可条款可以接受。
+- 你依赖某个特定的 FullCalendar 行为或插件，别处没有对应实现。
+
+## 什么时候选 DayFlow
+
+- 你要在多个框架里交付同一个日历，或预计会这样。适配器很薄，配置在各框架间完全一致，Vue 应用和 React 应用的接入方式是同一套。
+- 你需要年尺度的视图，而不想为此购买商业插件。
+- 你偏好用代码组合而不是一个庞大的 options 对象：视图和行为由 `create*` 工厂函数组合而成，没用到的功能不会进入产物。
+- 你希望编辑能力（拖拽、缩放、键盘、右键菜单）是显式按需启用的插件。
+
+## API 映射
+
+两者的概念对应得足够接近，迁移基本是机械性的。
+
+| FullCalendar                       | DayFlow                                                                                                   |
+| :--------------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| `<FullCalendar plugins={[...]} />` | `useCalendarApp({ plugins: [...] })` 配合 [`<DayFlowCalendar />`](/docs-zh/introduction/dayflow-calendar) |
+| `initialView: 'dayGridMonth'`      | `views: [createMonthView()]` —— 第一个注册的视图即初始视图                                                |
+| `dayGridPlugin`、`timeGridPlugin`  | `createMonthView()`、`createWeekView()`、`createDayView()`                                                |
+| `listPlugin`                       | `createAgendaView()`                                                                                      |
+| `interactionPlugin` + `editable`   | [`createDragPlugin()`](/docs-zh/plugins/drag)                                                             |
+| `events: [{ title, start, end }]`  | [`createEvent({ id, title, start, end })`](/docs-zh/introduction/events)                                  |
+| `eventContent`                     | [内容插槽](/docs-zh/features/content-slots)                                                               |
+| `eventClick`                       | [事件对话框](/docs-zh/features/event-dialog)或 events 插件                                                |
+| `locale` / `locales`               | [本地化插件](/docs-zh/plugins/localization)                                                               |
+| `timeZone`                         | [时区](/docs-zh/guides/timezones)                                                                         |
+| `themeSystem` / CSS 覆盖           | [主题定制](/docs-zh/guides/theme-customization)                                                           |
+
+### 可行的迁移顺序
+
+1. **先把视图渲染出来，用静态事件。** 只注册你真正用到的视图，确认布局无误之后再碰行为。
+2. **迁移事件结构。** 在一个适配函数里一次性把你的记录映射到 `createEvent`，不要把字段改名散落到各处。
+3. **再加编辑能力。** 注册拖拽插件，先在一个视图上把更新链路完整验证一遍，再全面启用。
+4. **最后迁移自定义渲染。** 这部分与旧 DOM 耦合最深，放到最后做意味着你是在一个已经可信的日历上改标记。
+
+## 如果你需要资源排程
+
+资源视图是很多团队去看 FullCalendar 付费版的原因。DayFlow 按 UI 的主轴把这件事拆成了两个产品：
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) 在你已经搭好的日历之上，补充[资源时间线](/docs-zh/introduction/resource-timeline)、[资源网格](/docs-zh/introduction/resource-grid)、预约排期和[打印输出](/docs-zh/plugins/print)。
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) 是独立的、资源优先的组件，适用于以行（人员、班组、房间、设备）为主轴、时间横向展开的产品。它自己的 [FullCalendar 对比页](https://scheduler.dayflow.studio/docs/compare/fullcalendar-alternative)详细讨论了这种场景。
+
+一个实用的判断标准：如果用户问「这一天有什么安排？」，你要的是日历；如果他们问「谁被排到了什么时候？」，你要的是排程器。
+
+## 相关文档
+
+- [快速上手](/docs-zh/introduction) —— 在你的框架里安装并渲染一个日历。
+- [视图](/docs-zh/introduction/views) —— 全部视图类型及其选项。
+- [`useCalendarApp`](/docs-zh/introduction/use-calendar-app) —— 完整的配置面。
+- [插件总览](/docs-zh/plugins/overview) —— 有哪些插件，各自的代价是什么。
+- [React Big Calendar 替代方案](/docs-zh/compare/react-big-calendar-alternative) —— 另一篇对比。
