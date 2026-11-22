@@ -1,0 +1,81 @@
+---
+title: 'FullCalendar の代替'
+description: 'DayFlow と FullCalendar の比較：MIT ライセンスのままのすべてのビュー、React・Vue・Angular・Svelte で共通のコア、そして項目ごとに対応づけたプラグイン API。'
+---
+
+# React・Vue・Angular・Svelte のための FullCalendar 代替
+
+FullCalendar は Web で最も実績のあるカレンダーライブラリであり、従来型の月・週・日カレンダーが必要なだけなら安全な選択です。DayFlow は別のトレードオフを選んでいます。小さなコアと明示的なプラグイン境界、4 つのフレームワークで共通のコンポーネントモデル、そしてこの比較に出てくるすべてのビューが MIT ライセンスであること。
+
+このページは実務上どこが違うかを扱うもので、どちらが優れているかという話ではありません。すでに FullCalendar で問題なく動いているなら、移行して得られるものは小さいです。
+
+## 概要
+
+|                                  | FullCalendar                                     | DayFlow                                                                                |
+| :------------------------------- | :----------------------------------------------- | :------------------------------------------------------------------------------------- |
+| フレームワーク対応               | 単一コアをラップする React・Vue・Angular・Svelte | 同一コア上の [React・Vue・Angular・Svelte](/docs-ja/introduction) ネイティブアダプター |
+| OSS コアのビュー                 | 月、週、日、リスト                               | [日、週、月、年、アジェンダ](/docs-ja/introduction/views)                              |
+| 年ビュー                         | 標準プラグインには含まれない                     | 固定週とキャンバスの 2 種類                                                            |
+| リソース / タイムラインビュー    | 商用ライセンスが必要                             | [別売モジュール](/docs-ja/introduction/resource-timeline)、コアは MIT のまま           |
+| ドラッグ、リサイズ、ドラッグ作成 | `interactionPlugin`                              | [ドラッグプラグイン](/docs-ja/plugins/drag)                                            |
+| イベント描画                     | `eventContent` レンダーフック                    | [コンテンツスロット](/docs-ja/features/content-slots)とスタイルレジストリ              |
+| キーボード操作                   | 自前で実装                                       | [キーボードショートカットプラグイン](/docs-ja/plugins/keyboard-shortcuts)              |
+| カレンダー同期                   | 自前で実装                                       | [CalDAV・Google・Outlook 同期](/docs-ja/caldav/overview)                               |
+| ダークモード                     | 自分で CSS を書く                                | [標準で対応](/docs-ja/features/dark-mode)                                              |
+
+判断を分けることが多いのはリソーススケジューリングの行です。FullCalendar のリソースビューとタイムラインビューは商用ライセンスが必要なので、無料の月ビューから始めて後から「誰がいつ埋まっているか」が必要になった製品は、同じライブラリの中でライセンスの境界にぶつかります。DayFlow はこの線の引き方が違います。カレンダーコアと上記のすべてのビューは MIT のままで、リソース計画は [DayFlow Pro](https://pro.dayflow.studio) の別パッケージとして、必要なときだけ追加します。
+
+## FullCalendar を選ぶとき
+
+- 既存のレシピ、Stack Overflow の回答、サードパーティ連携といったエコシステムの広さが必要なとき。FullCalendar には 10 年分の蓄積があり、DayFlow にはありません。
+- すでにそれを前提に作られていて、ライセンス条件が許容できるとき。
+- 他に代替のない特定の FullCalendar の挙動やプラグインに依存しているとき。
+
+## DayFlow を選ぶとき
+
+- 同じカレンダーを複数のフレームワークで提供する、あるいはその見込みがあるとき。アダプターは薄く、設定はフレームワーク間で同一なので、Vue アプリと React アプリの組み立て方は同じです。
+- 商用プラグインなしで年単位のビューが必要なとき。
+- 巨大なオプションオブジェクトよりコードでの構成を好むとき。ビューと挙動は `create*` ファクトリーで組み立てるため、使わない機能はバンドルに入りません。
+- 編集機能（ドラッグ、リサイズ、キーボード、コンテキストメニュー）を明示的に選んで有効化したいとき。
+
+## API の対応
+
+概念はよく対応しているので、移植はおおむね機械的に進みます。
+
+| FullCalendar                       | DayFlow                                                                                                 |
+| :--------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| `<FullCalendar plugins={[...]} />` | `useCalendarApp({ plugins: [...] })` と [`<DayFlowCalendar />`](/docs-ja/introduction/dayflow-calendar) |
+| `initialView: 'dayGridMonth'`      | `views: [createMonthView()]` —— 最初に登録したビューが開きます                                          |
+| `dayGridPlugin`、`timeGridPlugin`  | `createMonthView()`、`createWeekView()`、`createDayView()`                                              |
+| `listPlugin`                       | `createAgendaView()`                                                                                    |
+| `interactionPlugin` + `editable`   | [`createDragPlugin()`](/docs-ja/plugins/drag)                                                           |
+| `events: [{ title, start, end }]`  | [`createEvent({ id, title, start, end })`](/docs-ja/introduction/events)                                |
+| `eventContent`                     | [コンテンツスロット](/docs-ja/features/content-slots)                                                   |
+| `eventClick`                       | [イベントダイアログ](/docs-ja/features/event-dialog)または events プラグイン                            |
+| `locale` / `locales`               | [ローカライズプラグイン](/docs-ja/plugins/localization)                                                 |
+| `timeZone`                         | [タイムゾーン](/docs-ja/guides/timezones)                                                               |
+| `themeSystem` / CSS の上書き       | [テーマカスタマイズ](/docs-ja/guides/theme-customization)                                               |
+
+### うまくいく移行の順序
+
+1. **まず静的なイベントでビューを描画する。** 実際に使うビューだけを登録し、挙動に手を付ける前にレイアウトを確認します。
+2. **イベントの形を移植する。** フィールド名の変換を各所にばらまくのではなく、1 つのアダプター関数の中で `createEvent` に一度だけマッピングします。
+3. **次に編集機能を追加する。** ドラッグプラグインを登録し、全体で有効にする前に 1 つのビューで更新経路を通しで検証します。
+4. **カスタム描画は最後に移植する。** 古い DOM と最も強く結びついている部分なので、最後に回せば、すでに信頼できるカレンダーに対してマークアップを変えることになります。
+
+## リソーススケジューリングが必要な場合
+
+リソースビューは、多くのチームが FullCalendar の有償版を検討する理由です。DayFlow は UI の主軸がどちらかによって、これを 2 つの製品に分けています。
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) は、すでに作ったカレンダーの上に[リソースタイムライン](/docs-ja/introduction/resource-timeline)、[リソースグリッド](/docs-ja/introduction/resource-grid)、予約スケジュール、[印刷対応出力](/docs-ja/plugins/print)を追加します。
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) は独立したリソース優先のコンポーネントで、行（人、チーム、部屋、設備）が主軸となり時間が横に流れる製品に向いています。そのケースは [Scheduler 側の FullCalendar 比較](https://scheduler.dayflow.studio/docs/compare/fullcalendar-alternative)で詳しく扱っています。
+
+実用的な判断基準：ユーザーが「この日は何がある？」と尋ねるならカレンダー、「誰がいつ割り当てられている？」と尋ねるならスケジューラーです。
+
+## 関連ドキュメント
+
+- [はじめに](/docs-ja/introduction) —— 使っているフレームワークでカレンダーを導入して描画する。
+- [ビュー](/docs-ja/introduction/views) —— すべてのビュータイプとそのオプション。
+- [`useCalendarApp`](/docs-ja/introduction/use-calendar-app) —— 設定の全体像。
+- [プラグイン概要](/docs-ja/plugins/overview) —— 何が使えて、それぞれ何を要するか。
+- [React Big Calendar の代替](/docs-ja/compare/react-big-calendar-alternative) —— もう一方の比較。

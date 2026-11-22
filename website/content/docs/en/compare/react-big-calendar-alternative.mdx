@@ -1,0 +1,97 @@
+---
+title: 'React Big Calendar Alternative'
+description: 'How DayFlow compares with react-big-calendar: no date-library localizer to wire up, drag and keyboard editing as plugins, year views, and the same API in Vue, Angular and Svelte.'
+---
+
+# A react-big-calendar Alternative
+
+react-big-calendar is a well-worn React calendar: MIT-licensed, a familiar month-week-day-agenda set, and a small enough surface to read in an afternoon. DayFlow overlaps with it heavily. The differences that matter are setup cost, what editing looks like, and whether you are staying in React.
+
+## At a Glance
+
+|                  | react-big-calendar                                      | DayFlow                                                                     |
+| :--------------- | :------------------------------------------------------ | :-------------------------------------------------------------------------- |
+| Frameworks       | React only                                              | [React, Vue, Angular, Svelte](/docs/introduction) on one core               |
+| Date library     | You supply a localizer (moment, date-fns, luxon, dayjs) | None to wire up                                                             |
+| Views            | Month, week, work week, day, agenda                     | [Day, week, month, year, agenda](/docs/introduction/views)                  |
+| Year view        | Not included                                            | Two year views: fixed-week and canvas                                       |
+| Drag and resize  | `withDragAndDrop` higher-order component                | [Drag plugin](/docs/plugins/drag)                                           |
+| Keyboard editing | Build your own                                          | [Keyboard shortcuts plugin](/docs/plugins/keyboard-shortcuts)               |
+| Event data       | Accessor props (`startAccessor`, `endAccessor`, …)      | [`createEvent`](/docs/introduction/events), or map once in your own adapter |
+| Dark mode        | Author your own CSS                                     | [Built in](/docs/features/dark-mode)                                        |
+| Theming          | Override the shipped stylesheet                         | [Tokens and theme customization](/docs/guides/theme-customization)          |
+| Calendar sync    | Build your own                                          | [CalDAV, Google and Outlook sync](/docs/caldav/overview)                    |
+
+## The Setup Difference
+
+react-big-calendar asks you to choose and configure a date library before it renders anything:
+
+```tsx
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+// …plus format, parse, startOfWeek, getDay and a locales map
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+```
+
+That is a one-time cost, but it is also a dependency decision you now own, and a common source of week-start and timezone bugs when the localizer config and the rest of the app disagree.
+
+DayFlow has no localizer step. Views are registered directly, and anything locale-specific is the [localization plugin](/docs/plugins/localization)'s job:
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createDayView(), createWeekView(), createMonthView()],
+  plugins: [createDragPlugin(), createEventsPlugin()],
+  events: [createEvent({ id: '1', title: 'Team meeting', start, end })],
+});
+```
+
+## Choose react-big-calendar When
+
+- You are React-only and will stay React-only.
+- You already have a date library configured and the integration is working.
+- You want the smallest possible API surface and are happy to build editing, theming and keyboard behaviour yourself.
+
+## Choose DayFlow When
+
+- You need the same calendar in more than one framework. The adapters differ only in how you mount the component; the configuration object is the same.
+- You want editing without assembling it: drag, resize, drag-to-create, [keyboard shortcuts](/docs/plugins/keyboard-shortcuts), a [context menu](/docs/ui/context-menu) and an [event dialog](/docs/features/event-dialog) are existing plugins.
+- You need year-scale views, or [tasks](/docs/features/tasks) and [multi-calendar events](/docs/features/multi-calendar-event).
+- You want [dark mode](/docs/features/dark-mode) and a theme token system rather than a stylesheet to override.
+
+## Mapping the API
+
+| react-big-calendar                 | DayFlow                                                                                           |
+| :--------------------------------- | :------------------------------------------------------------------------------------------------ |
+| `<Calendar localizer={…} />`       | `useCalendarApp({ … })` with [`<DayFlowCalendar />`](/docs/introduction/dayflow-calendar)         |
+| `views={['month', 'week', 'day']}` | `views: [createMonthView(), createWeekView(), createDayView()]`                                   |
+| `defaultView`                      | The first registered view opens                                                                   |
+| `startAccessor` / `endAccessor`    | Map your records through [`createEvent`](/docs/introduction/events)                               |
+| `withDragAndDrop(Calendar)`        | [`createDragPlugin()`](/docs/plugins/drag)                                                        |
+| `onEventDrop` / `onEventResize`    | Drag plugin callbacks                                                                             |
+| `onSelectEvent`                    | [Event dialog](/docs/features/event-dialog) or the events plugin                                  |
+| `components={{ event: … }}`        | [Content slots](/docs/features/content-slots)                                                     |
+| `eventPropGetter`                  | Event style variants and the style registry                                                       |
+| `messages` / `culture`             | [Localization plugin](/docs/plugins/localization)                                                 |
+| Stylesheet overrides               | [Theme customization](/docs/guides/theme-customization) and [global CSS](/docs/guides/global-css) |
+
+Accessors are the one place the port is not mechanical. react-big-calendar reads your records in place through accessor props; DayFlow expects events in its own shape. Doing that conversion once, in a single adapter function, is less code than it looks and it gives you one place to handle timezone normalization.
+
+## Beyond a Single Calendar
+
+If your product is really about resources rather than dates — shifts, crews, rooms, equipment — neither library's month view is the right primitive:
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) layers [resource timelines](/docs/introduction/resource-timeline) and [resource grids](/docs/introduction/resource-grid) onto the calendar core.
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) is a standalone resource-first scheduler, with its own [react-big-calendar comparison](https://scheduler.dayflow.studio/docs/compare/react-big-calendar-alternative).
+
+## Related Documentation
+
+- [Getting Started](/docs/introduction) — install and render a calendar.
+- [Views](/docs/introduction/views) — every view type and its options.
+- [Events](/docs/introduction/events) — the event shape and helpers.
+- [Plugins overview](/docs/plugins/overview) — the full plugin list.
+- [FullCalendar Alternative](/docs/compare/fullcalendar-alternative) — the other comparison.
