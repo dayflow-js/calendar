@@ -7,14 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
-import { proUrl, schedulerUrl } from '@/lib/site';
+import { PRO_URL, SCHEDULER_URL } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
-const PRO_URL = proUrl('docs_nav');
-const SCHEDULER_URL = schedulerUrl('docs_nav');
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
