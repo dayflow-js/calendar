@@ -225,6 +225,10 @@ La vue Mois affiche la grille de calendrier classique avec tous les jours du moi
 | `eventHeight`         | `number`                                                            | `16`             | Hauteur en pixels de chaque ligne d'événement dans la grille mensuelle.                                                                         |
 | `scroll`              | `MonthScrollConfig`                                                 | —                | Contrôle le verrouillage du défilement et l'animation de changement de mois. Voir ci-dessous.                                                   |
 
+#### Clavier
+
+Tab entre dans la grille des dates sur la date sélectionnée ou courante si elle est visible, sinon sur le premier jour visible du mois en cours. Les flèches déplacent le focus d'un jour (gauche/droite) ou d'une semaine (haut/bas) ; Début/Fin vont au début ou à la fin de la semaine, en respectant `startOfWeek`. Page préc./Page suiv. passent au mois précédent ou suivant en conservant le jour quand c'est possible. Entrée ou Espace déclenche `gridDateClick` ; Maj+Entrée déclenche `gridDateDoubleClick`. Les événements et « +N de plus » conservent leur propre comportement clavier et leurs propres arrêts de tabulation.
+
 #### MonthScrollConfig
 
 | Propriété    | Type                    | Par défaut  | Description                                                                                                                                                                                                                                                           |

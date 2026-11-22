@@ -225,6 +225,10 @@ La vista de mes muestra la rejilla de calendario tradicional con todos los días
 | `eventHeight`         | `number`                                                            | `16`              | Altura en píxeles de cada fila de evento en la rejilla mensual.                                                                                 |
 | `scroll`              | `MonthScrollConfig`                                                 | —                 | Controla el bloqueo del desplazamiento y la animación al cambiar de mes. Ver más abajo.                                                         |
 
+#### Teclado
+
+Con Tab se entra en la cuadrícula de fechas por la fecha seleccionada o actual si está visible; si no, por el primer día visible del mes actual. Las flechas mueven el foco un día (izquierda/derecha) o una semana (arriba/abajo); Inicio/Fin llevan al principio o al final de la semana, respetando `startOfWeek`. RePág/AvPág pasan al mes anterior o siguiente, conservando el día siempre que sea posible. Intro o Espacio ejecutan `gridDateClick`; Mayús+Intro ejecuta `gridDateDoubleClick`. Los eventos y el botón «+N más» mantienen su propio comportamiento de teclado y sus propias paradas de tabulación.
+
 #### MonthScrollConfig
 
 | Propiedad    | Tipo                    | Valor por defecto | Descripción                                                                                                                                                                                                                                |

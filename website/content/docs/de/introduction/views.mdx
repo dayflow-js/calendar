@@ -225,6 +225,10 @@ Die Monatsansicht zeigt das klassische Kalenderraster mit allen Tagen eines Mona
 | `eventHeight`         | `number`                                                            | `16`             | Höhe jeder Terminzeile im Monatsraster in Pixeln.                                                                                            |
 | `scroll`              | `MonthScrollConfig`                                                 | —                | Steuert die Scroll-Sperre und die Animation beim Monatswechsel. Siehe unten.                                                                 |
 
+#### Tastatur
+
+Mit Tab gelangen Sie im Datumsraster zum ausgewählten bzw. aktuellen Datum, sofern es sichtbar ist, andernfalls zum ersten sichtbaren Tag des aktuellen Monats. Die Pfeiltasten bewegen den Fokus um einen Tag (links/rechts) oder eine Woche (oben/unten); Pos1/Ende springen zum Anfang bzw. Ende der Woche und berücksichtigen dabei `startOfWeek`. Bild auf/Bild ab wechseln zum vorherigen bzw. nächsten Monat und behalten den Tag nach Möglichkeit bei. Enter oder Leertaste löst `gridDateClick` aus, Umschalt+Enter löst `gridDateDoubleClick` aus. Termine und „+N mehr“ behalten ihr eigenes Tastaturverhalten und ihre eigenen Tab-Stopps.
+
 #### MonthScrollConfig
 
 | Eigenschaft  | Typ                     | Standard    | Beschreibung                                                                                                                                                                                                                          |

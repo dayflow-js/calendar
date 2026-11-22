@@ -225,6 +225,10 @@ DayFlow는 서로 다른 사용 사례와 요구에 맞춰 최적화된 다섯 �
 | `eventHeight`         | `number`                                                            | `16`             | 월 그리드에서 각 이벤트 행의 높이(픽셀)입니다.                                                                  |
 | `scroll`              | `MonthScrollConfig`                                                 | —                | 스크롤 잠금과 월 전환 애니메이션을 제어합니다. 아래를 참고하세요.                                               |
 
+#### 키보드
+
+Tab 키로 날짜 그리드에 들어가면, 선택된(또는 현재) 날짜가 보이는 경우 그 날짜에, 그렇지 않으면 현재 달의 첫 번째 표시 날짜에 포커스가 갑니다. 화살표 키는 하루(왼쪽/오른쪽) 또는 한 주(위/아래)씩 이동하고, Home/End는 `startOfWeek`에 따라 주의 시작/끝으로 이동합니다. PageUp/PageDown은 이전/다음 달로 이동하며 가능하면 같은 날짜를 유지합니다. Enter 또는 Space는 `gridDateClick`을, Shift+Enter는 `gridDateDoubleClick`을 실행합니다. 이벤트와 "+N 개" 버튼은 자체 키보드 동작과 Tab 정지 위치를 그대로 유지합니다.
+
 #### MonthScrollConfig
 
 | 속성         | 타입                    | 기본값      | 설명                                                                                                                                                                                                                |
