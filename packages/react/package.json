@@ -1,6 +1,6 @@
 {
   "name": "@dayflow/react",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "description": "React adapter for DayFlow calendar",
   "homepage": "https://calendar.dayflow.studio/docs/introduction",
   "bugs": {

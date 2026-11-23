@@ -16,6 +16,15 @@ export interface ReleaseMeta {
 }
 
 export const releaseMeta: Record<string, ReleaseMeta> = {
+  '3.8.1': {
+    title: 'Keyboard Month view and sturdier ICS import',
+    summary:
+      'Move between Month view dates with the keyboard, customize Year view event bars, and import recurring events, reminders and Outlook time zones intact.',
+    links: [
+      { label: 'Month view keyboard', href: '/docs/introduction/views' },
+      { label: 'Event content slots', href: '/docs/features/content-slots' },
+    ],
+  },
   '3.8.0': {
     title: 'Task board',
     summary:

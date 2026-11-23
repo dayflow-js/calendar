@@ -2,11 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.8.1] - 2026-11-23
+
+Released in this version: `@dayflow/core`, `@dayflow/react`, `@dayflow/vue`, `@dayflow/svelte` and `@dayflow/angular` 3.8.1. All other packages are unchanged.
 
 ### New Features & Enhancements
 
-- **Month View Keyboard Navigation (`@dayflow/core`)**: A single date tab stop with arrow, Home/End and PageUp/PageDown navigation, localized full-date labels, Enter/Space for `gridDateClick` and Shift+Enter for `gridDateDoubleClick`.
+- **Month View Keyboard Navigation (`@dayflow/core`)**: The date grid is a single Tab stop. Arrow keys move by day or week, Home/End jump to the start or end of the week (following `startOfWeek`), and PageUp/PageDown change month. Enter or Space runs `gridDateClick` and Shift+Enter runs `gridDateDoubleClick`. Each date has a localized full-date label, and today and the selected date are announced.
+- **Year View Event Content (`@dayflow/core`)**: `eventContentYear` and `eventContentAllDayYear` now render in the Year view's `fixed-week` and `year-canvas` modes, with the same slot arguments as the other views.
+
+### Fixed
+
+- **ICS Recurring Events (`@dayflow/core`)**: Importing an .ics file keeps `RRULE`, so a recurring event shows every occurrence instead of only the first, and exporting writes the rule back. `EXDATE` and `RECURRENCE-ID` are not read yet.
+- **ICS Time Zones (`@dayflow/core`)**: Events with a quoted `TZID`, or a Windows zone name as Outlook and Exchange write it, are no longer dropped on import. An unknown zone falls back to the default time zone.
+- **ICS Reminders (`@dayflow/core`)**: An event with a reminder (`VALARM`) keeps its own description and title on import instead of the reminder's.
+- **ICS Export of Recurring Events (`@dayflow/core`)**: Recurring events are written in their own time zone (`DTSTART;TZID=…`), so other calendars no longer shift them by an hour after a daylight saving change.
+- **Event Detail Panel (`@dayflow/core`)**: The conference and notes fields no longer share a key, which `preact/debug` reported every time a panel opened.
+
+### Contributors
+
+- [@jayhemnani9910](https://github.com/jayhemnani9910): ICS recurrence import and export ([#177](https://github.com/dayflow-js/calendar/pull/177)), quoted and Windows time zones ([#178](https://github.com/dayflow-js/calendar/pull/178)), reminders on import ([#180](https://github.com/dayflow-js/calendar/pull/180)) and recurring export in the event's time zone ([#181](https://github.com/dayflow-js/calendar/pull/181)).
+- [@allandelmare](https://github.com/allandelmare): Month view keyboard navigation ([#182](https://github.com/dayflow-js/calendar/pull/182)) and Year view event content slots ([#183](https://github.com/dayflow-js/calendar/pull/183)).
 
 ## [3.8.0] - 2026-11-13
 
