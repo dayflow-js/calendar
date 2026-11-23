@@ -9,7 +9,7 @@ import {
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Badge } from '@/components/ui/badge';
 import type { LanguageCode } from '@/lib/i18n';
-import { proUrl, schedulerUrl } from '@/lib/site';
+import { PRO_URL, SCHEDULER_URL } from '@/lib/site';
 
 export const gitConfig = {
   user: 'dayflow-js',
@@ -18,9 +18,6 @@ export const gitConfig = {
 };
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
-const PRO_URL = proUrl('nav');
-const SCHEDULER_URL = schedulerUrl('nav');
-const SCHEDULER_SIDEBAR_URL = schedulerUrl('docs_sidebar');
 
 const SIDEBAR_TAB_LABELS: Record<
   LanguageCode,
@@ -111,7 +108,7 @@ export function sidebarTabs(
     },
     {
       title: labels.scheduler,
-      url: SCHEDULER_SIDEBAR_URL,
+      url: SCHEDULER_URL,
       icon: (
         <Image
           src={`${BASE}/schedule-logo.png`}

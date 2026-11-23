@@ -10,8 +10,17 @@
     "temporal",
     "ui"
   ],
+  "homepage": "https://calendar.dayflow.studio/docs/ui/range-picker",
+  "bugs": {
+    "url": "https://github.com/dayflow-js/calendar/issues"
+  },
   "license": "MIT",
   "author": "Jayce Li",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dayflow-js/calendar.git",
+    "directory": "packages/ui/range-picker"
+  },
   "files": [
     "dist",
     "README.md",

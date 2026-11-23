@@ -1,0 +1,97 @@
+---
+title: 'React Big Calendar の代替'
+description: 'DayFlow と react-big-calendar の比較：日付ライブラリの localizer 設定が不要、ドラッグとキーボード編集はプラグイン、年ビューを標準搭載、Vue・Angular・Svelte でも同じ API。'
+---
+
+# react-big-calendar の代替
+
+react-big-calendar は使い込まれた React 製カレンダーです。MIT ライセンスで、見慣れた月・週・日・アジェンダのビュー群を持ち、API は一日で読み切れる程度の大きさです。DayFlow とは機能が大きく重なります。実際に違うのは、導入の手間、編集機能の形、そして React に留まり続けるかどうかです。
+
+## 概要
+
+|                    | react-big-calendar                                       | DayFlow                                                                             |
+| :----------------- | :------------------------------------------------------- | :---------------------------------------------------------------------------------- |
+| フレームワーク     | React のみ                                               | 同一コア上の [React・Vue・Angular・Svelte](/docs-ja/introduction)                   |
+| 日付ライブラリ     | localizer を自分で用意（moment、date-fns、luxon、dayjs） | 設定不要                                                                            |
+| ビュー             | 月、週、稼働週、日、アジェンダ                           | [日、週、月、年、アジェンダ](/docs-ja/introduction/views)                           |
+| 年ビュー           | なし                                                     | 固定週とキャンバスの 2 種類                                                         |
+| ドラッグとリサイズ | `withDragAndDrop` 高階コンポーネント                     | [ドラッグプラグイン](/docs-ja/plugins/drag)                                         |
+| キーボード編集     | 自前で実装                                               | [キーボードショートカットプラグイン](/docs-ja/plugins/keyboard-shortcuts)           |
+| イベントデータ     | アクセサー props（`startAccessor`、`endAccessor` など）  | [`createEvent`](/docs-ja/introduction/events)、または自前のアダプターで一度だけ変換 |
+| ダークモード       | 自分で CSS を書く                                        | [標準で対応](/docs-ja/features/dark-mode)                                           |
+| テーマ             | 同梱スタイルシートを上書き                               | [トークンとテーマカスタマイズ](/docs-ja/guides/theme-customization)                 |
+| カレンダー同期     | 自前で実装                                               | [CalDAV・Google・Outlook 同期](/docs-ja/caldav/overview)                            |
+
+## 導入時の違い
+
+react-big-calendar は、何かを描画する前に日付ライブラリを選んで設定するよう求めます。
+
+```tsx
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+// さらに format、parse、startOfWeek、getDay と locales マップ
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+```
+
+これは一度きりのコストですが、同時にあなたが抱える依存関係の決定でもあり、localizer の設定とアプリの他の部分が食い違ったときに、週の開始曜日やタイムゾーンの不具合を生みやすい箇所でもあります。
+
+DayFlow には localizer の工程がありません。ビューは直接登録し、ロケール依存のことは[ローカライズプラグイン](/docs-ja/plugins/localization)の担当です。
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createDayView(), createWeekView(), createMonthView()],
+  plugins: [createDragPlugin(), createEventsPlugin()],
+  events: [createEvent({ id: '1', title: 'チームミーティング', start, end })],
+});
+```
+
+## react-big-calendar を選ぶとき
+
+- React のみで、今後も React のみであるとき。
+- すでに日付ライブラリを設定済みで、連携が動いているとき。
+- API をできるだけ小さく保ちたく、編集・テーマ・キーボード操作は自分で作るつもりのとき。
+
+## DayFlow を選ぶとき
+
+- 同じカレンダーを複数のフレームワークで必要とするとき。アダプターの違いはコンポーネントのマウント方法だけで、設定オブジェクトは同一です。
+- 編集機能を組み立てずに使いたいとき。ドラッグ、リサイズ、ドラッグ作成、[キーボードショートカット](/docs-ja/plugins/keyboard-shortcuts)、[コンテキストメニュー](/docs-ja/ui/context-menu)、[イベントダイアログ](/docs-ja/features/event-dialog)はすでにプラグインとして存在します。
+- 年単位のビュー、あるいは[タスク](/docs-ja/features/tasks)や[マルチカレンダーイベント](/docs-ja/features/multi-calendar-event)が必要なとき。
+- 上書き用のスタイルシートではなく、[ダークモード](/docs-ja/features/dark-mode)とテーマトークンの仕組みが欲しいとき。
+
+## API の対応
+
+| react-big-calendar                 | DayFlow                                                                                                 |
+| :--------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| `<Calendar localizer={…} />`       | `useCalendarApp({ … })` と [`<DayFlowCalendar />`](/docs-ja/introduction/dayflow-calendar)              |
+| `views={['month', 'week', 'day']}` | `views: [createMonthView(), createWeekView(), createDayView()]`                                         |
+| `defaultView`                      | 最初に登録したビューが開きます                                                                          |
+| `startAccessor` / `endAccessor`    | [`createEvent`](/docs-ja/introduction/events) 経由でレコードを変換                                      |
+| `withDragAndDrop(Calendar)`        | [`createDragPlugin()`](/docs-ja/plugins/drag)                                                           |
+| `onEventDrop` / `onEventResize`    | ドラッグプラグインのコールバック                                                                        |
+| `onSelectEvent`                    | [イベントダイアログ](/docs-ja/features/event-dialog)または events プラグイン                            |
+| `components={{ event: … }}`        | [コンテンツスロット](/docs-ja/features/content-slots)                                                   |
+| `eventPropGetter`                  | イベントスタイルのバリアントとスタイルレジストリ                                                        |
+| `messages` / `culture`             | [ローカライズプラグイン](/docs-ja/plugins/localization)                                                 |
+| スタイルシートの上書き             | [テーマカスタマイズ](/docs-ja/guides/theme-customization)と[グローバル CSS](/docs-ja/guides/global-css) |
+
+機械的に進まない唯一の箇所はアクセサーです。react-big-calendar はアクセサー props を通してレコードをそのまま読みますが、DayFlow は自前の形でイベントを受け取ります。この変換を 1 つのアダプター関数で一度だけ行えば、見た目よりコードは少なく済み、タイムゾーンの正規化を扱う場所も 1 か所にまとまります。
+
+## 単一のカレンダーを超えて
+
+製品の本質が日付ではなくリソース —— シフト、チーム、部屋、設備 —— にある場合、どちらのライブラリの月ビューも適切な基本単位ではありません。
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) はカレンダーコアの上に[リソースタイムライン](/docs-ja/introduction/resource-timeline)と[リソースグリッド](/docs-ja/introduction/resource-grid)を重ねます。
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) は独立したリソース優先のスケジューラーで、[react-big-calendar との比較](https://scheduler.dayflow.studio/docs/compare/react-big-calendar-alternative)も用意しています。
+
+## 関連ドキュメント
+
+- [はじめに](/docs-ja/introduction) —— カレンダーを導入して描画する。
+- [ビュー](/docs-ja/introduction/views) —— すべてのビュータイプとそのオプション。
+- [イベント](/docs-ja/introduction/events) —— イベントの形とヘルパー。
+- [プラグイン概要](/docs-ja/plugins/overview) —— プラグインの一覧。
+- [FullCalendar の代替](/docs-ja/compare/fullcalendar-alternative) —— もう一方の比較。

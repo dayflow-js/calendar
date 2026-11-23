@@ -1,0 +1,97 @@
+---
+title: 'React Big Calendar 替代方案'
+description: 'DayFlow 与 react-big-calendar 的对比：无需配置日期库 localizer、拖拽与键盘编辑以插件提供、内置年视图，并且在 Vue、Angular、Svelte 中是同一套 API。'
+---
+
+# react-big-calendar 替代方案
+
+react-big-calendar 是一个久经使用的 React 日历：MIT 许可、熟悉的月/周/日/日程视图集合，API 面小到可以一个下午读完。DayFlow 与它重叠很多。真正有区别的是接入成本、编辑能力的形态，以及你是否会一直待在 React 里。
+
+## 一览
+
+|            | react-big-calendar                                     | DayFlow                                                                   |
+| :--------- | :----------------------------------------------------- | :------------------------------------------------------------------------ |
+| 框架       | 仅 React                                               | 基于同一内核的 [React、Vue、Angular、Svelte](/docs-zh/introduction)       |
+| 日期库     | 需自行提供 localizer（moment、date-fns、luxon、dayjs） | 无需配置                                                                  |
+| 视图       | 月、周、工作周、日、日程                               | [日、周、月、年、日程](/docs-zh/introduction/views)                       |
+| 年视图     | 不包含                                                 | 两种年视图：固定周与画布                                                  |
+| 拖拽与缩放 | `withDragAndDrop` 高阶组件                             | [拖拽插件](/docs-zh/plugins/drag)                                         |
+| 键盘编辑   | 自行实现                                               | [键盘快捷键插件](/docs-zh/plugins/keyboard-shortcuts)                     |
+| 事件数据   | accessor 属性（`startAccessor`、`endAccessor` 等）     | [`createEvent`](/docs-zh/introduction/events)，或在自己的适配层一次性映射 |
+| 暗色模式   | 自行编写 CSS                                           | [内置](/docs-zh/features/dark-mode)                                       |
+| 主题       | 覆盖自带样式表                                         | [设计令牌与主题定制](/docs-zh/guides/theme-customization)                 |
+| 日历同步   | 自行实现                                               | [CalDAV、Google 和 Outlook 同步](/docs-zh/caldav/overview)                |
+
+## 接入上的差异
+
+react-big-calendar 在渲染任何东西之前，要求你先选定并配置一个日期库：
+
+```tsx
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+// 以及 format、parse、startOfWeek、getDay 和一个 locales 映射
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+```
+
+这是一次性成本，但它同时也是一个由你承担的依赖决策，而且当 localizer 的配置与应用其余部分不一致时，它是周起始日和时区类问题的常见来源。
+
+DayFlow 没有 localizer 这一步。视图直接注册，与语言区域相关的事情交给[本地化插件](/docs-zh/plugins/localization)：
+
+```tsx
+const calendar = useCalendarApp({
+  views: [createDayView(), createWeekView(), createMonthView()],
+  plugins: [createDragPlugin(), createEventsPlugin()],
+  events: [createEvent({ id: '1', title: '团队会议', start, end })],
+});
+```
+
+## 什么时候选 react-big-calendar
+
+- 你只用 React，并且会一直只用 React。
+- 你已经配好了日期库，集成运行正常。
+- 你希望 API 面尽可能小，并且乐意自己实现编辑、主题和键盘行为。
+
+## 什么时候选 DayFlow
+
+- 你需要在多个框架里用同一个日历。各适配器只在挂载组件的方式上不同，配置对象是同一套。
+- 你希望编辑能力是现成的而不用自己拼装：拖拽、缩放、拖拽创建、[键盘快捷键](/docs-zh/plugins/keyboard-shortcuts)、[右键菜单](/docs-zh/ui/context-menu)和[事件对话框](/docs-zh/features/event-dialog)都是已有插件。
+- 你需要年尺度视图，或者[任务](/docs-zh/features/tasks)与[多日历事件](/docs-zh/features/multi-calendar-event)。
+- 你想要[暗色模式](/docs-zh/features/dark-mode)和一套主题令牌体系，而不是一张需要覆盖的样式表。
+
+## API 映射
+
+| react-big-calendar                 | DayFlow                                                                                      |
+| :--------------------------------- | :------------------------------------------------------------------------------------------- |
+| `<Calendar localizer={…} />`       | `useCalendarApp({ … })` 配合 [`<DayFlowCalendar />`](/docs-zh/introduction/dayflow-calendar) |
+| `views={['month', 'week', 'day']}` | `views: [createMonthView(), createWeekView(), createDayView()]`                              |
+| `defaultView`                      | 第一个注册的视图即初始视图                                                                   |
+| `startAccessor` / `endAccessor`    | 通过 [`createEvent`](/docs-zh/introduction/events) 映射你的记录                              |
+| `withDragAndDrop(Calendar)`        | [`createDragPlugin()`](/docs-zh/plugins/drag)                                                |
+| `onEventDrop` / `onEventResize`    | 拖拽插件的回调                                                                               |
+| `onSelectEvent`                    | [事件对话框](/docs-zh/features/event-dialog)或 events 插件                                   |
+| `components={{ event: … }}`        | [内容插槽](/docs-zh/features/content-slots)                                                  |
+| `eventPropGetter`                  | 事件样式变体与样式注册表                                                                     |
+| `messages` / `culture`             | [本地化插件](/docs-zh/plugins/localization)                                                  |
+| 样式表覆盖                         | [主题定制](/docs-zh/guides/theme-customization)与[全局 CSS](/docs-zh/guides/global-css)      |
+
+accessor 是唯一一处迁移不太机械的地方。react-big-calendar 通过 accessor 属性就地读取你的记录，而 DayFlow 期望事件是它自己的结构。把这个转换在单个适配函数里做一次，代码量比看起来少，而且你会得到一个统一处理时区归一化的地方。
+
+## 超出单个日历之后
+
+如果你的产品本质上是关于资源而不是日期 —— 班次、班组、房间、设备 —— 那么两个库的月视图都不是合适的原语：
+
+- [**DayFlow Pro**](https://pro.dayflow.studio) 在日历内核之上叠加[资源时间线](/docs-zh/introduction/resource-timeline)和[资源网格](/docs-zh/introduction/resource-grid)。
+- [**DayFlow Scheduler**](https://scheduler.dayflow.studio) 是独立的资源优先排程器，也有自己的 [react-big-calendar 对比页](https://scheduler.dayflow.studio/docs/compare/react-big-calendar-alternative)。
+
+## 相关文档
+
+- [快速上手](/docs-zh/introduction) —— 安装并渲染一个日历。
+- [视图](/docs-zh/introduction/views) —— 全部视图类型及其选项。
+- [事件](/docs-zh/introduction/events) —— 事件结构与辅助函数。
+- [插件总览](/docs-zh/plugins/overview) —— 完整插件列表。
+- [FullCalendar 替代方案](/docs-zh/compare/fullcalendar-alternative) —— 另一篇对比。

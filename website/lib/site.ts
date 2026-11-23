@@ -17,27 +17,18 @@ export const SITE_URL = rawSiteUrl.endsWith('/')
 
 export const SITE_METADATA_BASE = new URL(SITE_URL);
 
-const PRO_BASE_URL = 'https://pro.dayflow.studio';
-const SCHEDULER_BASE_URL = 'https://scheduler.dayflow.studio';
-const BRAND_BASE_URL = 'https://dayflow.studio';
-
-function ecosystemUrl(baseUrl: string, content: string): string {
-  const params = new URLSearchParams({
-    utm_source: 'calendar.dayflow.studio',
-    utm_medium: 'referral',
-    utm_content: content,
-  });
-  return `${baseUrl}/?${params.toString()}`;
-}
-
-export function proUrl(content: string): string {
-  return ecosystemUrl(PRO_BASE_URL, content);
-}
-
-export function schedulerUrl(content: string): string {
-  return ecosystemUrl(SCHEDULER_BASE_URL, content);
-}
-
-export function brandUrl(content: string): string {
-  return ecosystemUrl(BRAND_BASE_URL, content);
-}
+/**
+ * Cross-site links to the rest of the suite, without UTM parameters.
+ *
+ * These used to carry `?utm_source=calendar.dayflow.studio&...`. To Google a
+ * `?utm_*` URL is a separate URL, so the link was credited to the parameterised
+ * address rather than to the canonical one, and Search Console reported no
+ * referring pages at all for `pro.dayflow.studio/` and
+ * `scheduler.dayflow.studio/` -- the only inbound links either site has.
+ *
+ * GA4 already attributes these clicks by referrer, so the parameters added no
+ * data we did not have.
+ */
+export const PRO_URL = 'https://pro.dayflow.studio';
+export const SCHEDULER_URL = 'https://scheduler.dayflow.studio';
+export const BRAND_URL = 'https://dayflow.studio';
